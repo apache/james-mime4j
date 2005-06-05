@@ -1,0 +1,11 @@
+Eryq -
+
+I occasionally receive an email (see below) like this one, which
+MIME::Parser does not parse.  Any ideas?  Is this a valid way to send
+an attachment, or is the problem on the "sender's" side?  Thanks for
+your time!
+
+   Mike
+
+-->> Promote YOUR web site!  FREE Perl CGI scripts add WEB ACCESS to your
+-->> E-Mail accounts! Download today!! http://webmail.uwohali.com

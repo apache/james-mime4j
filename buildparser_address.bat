@@ -1,0 +1,1 @@
+@echo. && jjtree -OUTPUT_DIRECTORY:src/java/org/mime4j/field/address/parser src/java/org/mime4j/field/address/AddressListParser.jjt && echo. && javacc -OUTPUT_DIRECTORY:src/java/org/mime4j/field/address/parser src/java/org/mime4j/field/address/parser/AddressListParser.jj

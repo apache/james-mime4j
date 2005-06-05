@@ -1,0 +1,4 @@
+ <H1>Hey there!</H1> 
+ Having a <I>wonderful</I> time... 
+ take a look!
+  <BR><IMG SRC="cid:my-graphic" ALT="Snapshot"><HR>

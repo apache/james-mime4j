@@ -1,0 +1,1 @@
+@echo. && javacc -OUTPUT_DIRECTORY:src/java/org/mime4j/field/datetime/parser src/java/org/mime4j/field/datetime/DateTimeParser.jj
