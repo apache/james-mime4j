@@ -193,7 +193,7 @@ public class DecoderUtil {
                  */
                 p2 = t2 != -1 ? body.indexOf("?=", t2 + 1) : -1;
                 if (p2 == -1) {
-                    if (body.charAt(t2 + 1) == '=') {
+                    if (t2 != -1 && body.charAt(t2 + 1) == '=') {
                         /*
                          * The text "=?charset?enc?=" appears to be valid for 
                          * empty strings.
@@ -239,13 +239,13 @@ public class DecoderUtil {
                                     +"corresponding Java charset");
                         }
                     } else if (!CharsetUtil.isDecodingSupported(charset)) {
-                            decodedWord = body.substring(p1, p2 + 2);
-                            if (log.isWarnEnabled()) {
-                                log.warn("Current JDK doesn't support decoding "
-                                       + "of charset '" + charset 
-                                       + "' (MIME charset '" 
-                                       + mimeCharset + "')");
-                            }
+                        decodedWord = body.substring(p1, p2 + 2);
+                        if (log.isWarnEnabled()) {
+                            log.warn("Current JDK doesn't support decoding "
+                                   + "of charset '" + charset 
+                                   + "' (MIME charset '" 
+                                   + mimeCharset + "')");
+                        }
                     } else {
                         if (enc.equalsIgnoreCase("Q")) {
                             decodedWord = DecoderUtil.decodeQ(encodedWord, charset);

@@ -20,7 +20,6 @@ import java.io.UnsupportedEncodingException;
 import junit.framework.TestCase;
 
 import org.apache.log4j.BasicConfigurator;
-import org.mime4j.util.CharsetUtil;
 
 /**
  * 
@@ -59,7 +58,7 @@ public class DecoderUtilTest extends TestCase {
         assertEquals("с т\tу ф ", s);
     }
     
-    public void testDecodeBody() {
+    public void testDecodeEncodedWords() {
         assertEquals("", DecoderUtil.decodeEncodedWords(""));
         assertEquals("Yada yada", DecoderUtil.decodeEncodedWords("Yada yada"));
         assertEquals("  сту\tф", 
@@ -75,5 +74,11 @@ public class DecoderUtilTest extends TestCase {
                 DecoderUtil.decodeEncodedWords("=?US-ASCII?b?QSBzaG9ydCB0ZXh0IGFnYWluIQ==?="));
         assertEquals("", DecoderUtil.decodeEncodedWords("=?iso8859-1?Q?="));
         assertEquals("", DecoderUtil.decodeEncodedWords("=?iso8859-1?b?="));
+        
+        /*
+         * Bug detected on June 7, 2005. Decoding the following string caused
+         * OutOfMemoryError.
+         */
+        assertEquals("=3?!!\\=?\"!g6P\"!Xp:\"!", DecoderUtil.decodeEncodedWords("=3?!!\\=?\"!g6P\"!Xp:\"!"));
     }    
 }
