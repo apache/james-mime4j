@@ -1,7 +1,7 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- 
 /*
- *  Copyright 2004 Trillian AB
+ *  Copyright 2004 the mime4j project
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,14 +22,20 @@
     </properties>
     <body>
         <section name="Mime4j">
+            <p>
+                <strong>NOTE:</strong> mime4j is now a subproject of 
+                <a href="http://james.apache.org/">Apache James</a>. Please use
+                the James mailing list for mime4j related questions. Downloads
+                will still be available from the sourceforge project page.
+            </p>
             <p> mime4j provides a parser, 
                 <a href="apidocs/org/mime4j/MimeStreamParser.html">
                     <code>MimeStreamParser</code>
-                </a>, for e-mail message streams in plain rfc822 format or MIME
+                </a>, for e-mail message streams in plain rfc822 and MIME
                 format. The parser uses a callback mechanism to report parsing
                 events such as the start of an entity header, the start of a
-                body, etc. If you are familiar to how one uses <a
-                href="http://www.saxproject.org/">SAX</a> to parse XML streams
+                body, etc. If you are familiar with the <a
+                href="http://www.saxproject.org/">SAX</a> XML parser interface
                 you should have no problem getting started with mime4j. </p>
             <p> The parser only deals with the structure of the message stream.
                 It won't do any decoding of base64 or quoted-printable encoded
@@ -45,14 +51,14 @@
                 the widely used perl <a
                 href="http://www.zeegee.com/code/perl/MIME-tools/">MIME::Tools</a>
                 parser has been used. mime4j and MIME:Tools rarely differ
-                (&lt;25 in those 5000). When they do (which mostly happens
-                with illegally formatted spam messages) we think mime4j does a
+                (&lt;25 in those 5000). When they do (which only occurs
+                for illegally formatted spam messages) we think mime4j does a
                 better job. </p>
             <p> mime4j can also be used to build a tree representation of an
                 e-mail message using the 
                 <a href="apidocs/org/mime4j/message/Message.html">
                     <code>Message</code>
-                </a>. Using this facility mime4j automatically handles the
+                </a> class. Using this facility mime4j automatically handles the
                 decoding of fields and bodies and uses temporary files for large
                 attachments. This representation is similar to the
                 representation constructed by the JavaMail API:s but is more

@@ -1,7 +1,7 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- 
 /*
- *  Copyright 2004 Trillian AB
+ *  Copyright 2004 the mime4j project
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -22,28 +22,25 @@
     </properties>
     <body>
         <section name="Building mime4j">
-            <subsection name="Getting the sources">
-                <subsection name="Using a stable release">
-                    <p> Go to the <a
-                            href="http://sourceforge.net/project/showfiles.php?group_id=108895">
-                            Sourceforge download pages</a> and download the most
-                        recent release in your prefered format, either
-                        <code>mime4j-x.y-src.tar.gz</code> or
-                        <code>mime4j-x.y-src.zip</code>. Extracting the archived
-                        sources will create the directory <code>mime4j-x.y/</code>
-                    </p>
-                </subsection>
-                <subsection name="Checking out from CVS">
-                    <p>
-                        <strong>If you </strong>
-                    </p>
-                    <p> The <a
-                            href="http://sourceforge.net/tracker/?group_id=108895&amp;atid=654176">
-                            Sourceforge CVS pages</a> has more information on
-                        how to checkout the sources from the CVS repository. </p>
-                </subsection>
+            <subsection name="Using a Stable Release">
+                <p> Go to the <a
+                        href="http://sourceforge.net/project/showfiles.php?group_id=108895">
+                        Sourceforge download pages</a> and download the most
+                    recent release in your preferred format, either
+                    <code>mime4j-x.y-src.tar.gz</code> or
+                    <code>mime4j-x.y-src.zip</code>. Extracting the archived
+                    sources will create the directory <code>mime4j-x.y/</code>
+                </p>
             </subsection>
-            <subsection name="Download and install Maven">
+            <subsection name="Checking Out From Subversion">
+                <p>
+                    Issue the following commands in a shell:
+                    <blockquote>
+                        <code>svn co 'https://svn.apache.org/repos/asf/james/mime4j/trunk/' mime4j</code><br/>
+                    </blockquote>
+                </p>
+            </subsection>
+            <subsection name="Download and Install Maven">
                 <p> You will need to download and install <a
                     href="http://maven.apache.org/">Maven</a> before building
                     the sources. The build has been tested with version 1.0 of
@@ -51,7 +48,7 @@
                 <p> One of the main differences between Maven and plain ant is
                     that Maven manages external dependencies for your projects
                     and (at least in theory) you should no longer have to store
-                    third-party jar files in your CVS tree. It maintains a local
+                    third-party jar files in your source code tree. It maintains a local
                     repository of versioned libraries and shares them between
                     your Maven projects. If it can't find the necessary files
                     there it will attempt to download them from the main Maven
@@ -59,11 +56,11 @@
                     build, you need to have a network connection available for
                     the inital download of the project dependencies. </p>
             </subsection>
-            <subsection name="Building the mime4j jar">
+            <subsection name="Building the mime4j Jar">
                 <p> Once Maven has been installed, building the project should
                     be as simple as typing <blockquote>
                         <code>cd mime4j-x.y/ (cd mime4j/ if sources come from
-                            CVS)<br/>maven jar</code>
+                            Subversion)<br/>maven jar</code>
                     </blockquote> from the command line. Maven will
                     automatically run all test cases for you. If you want to
                     disable the tests you should replace the last command above

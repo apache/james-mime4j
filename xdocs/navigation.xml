@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- 
 /*
- *  Copyright 2004 Trillian AB
+ *  Copyright 2004 the mime4j project
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,16 +17,20 @@
  */
  -->
 <project name="mime4j">
-    <title>mime4j</title>
+    <title>mime4j - the Java stream based MIME message parser</title>
     <body>
+        <links>
+            <item name="Home Page" href="http://www.mime4j.org/"/>
+            <item name="SourceForge Project Page" href="http://sourceforge.net/projects/mime4j/"/>
+            <item name="Browse Source Code" href="http://svn.apache.org/viewcvs.cgi/james/mime4j/trunk/"/>
+        </links>        
         <menu name="Quick Links">
             <item name="Download" href="http://sourceforge.net/project/showfiles.php?group_id=108895"/>
-            <item name="Forums" href="http://sourceforge.net/forum/?group_id=108895"/>
-            <item name="Mailing Lists" href="http://sourceforge.net/mail/?group_id=108895"/>
-            <item name="SourceForge project page" href="http://sourceforge.net/projects/mime4j/"/>
+            <!--<item name="Forums" href="http://sourceforge.net/forum/?group_id=108895"/>-->
+            <!--<item name="Mailing Lists" href="http://sourceforge.net/mail/?group_id=108895"/>-->
         </menu>
         <menu name="Overview">
-            <item name="Features" href="/features.html"/>
+            <!--<item name="Features" href="/features.html"/>-->
             <item name="News and Status" href="/status.html"/>
             <item name="Getting Started" href="/start/index.html" collapse="true">
                 <item name="Download" href="/start/download.html"/>
@@ -34,7 +38,7 @@
             </item>
         </menu>
         <menu name="Documentation">
-            <item name="Tutorial" href="/start/use.html"/>
+<!--            <item name="Samples" href="/samples.html"/>-->
             <item name="API docs (Javadoc)" href="/apidocs/"/>
         </menu>
     </body>

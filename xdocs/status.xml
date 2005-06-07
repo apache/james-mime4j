@@ -18,18 +18,19 @@
  -->
 <document>
     <properties>
-        <title>Downloading mime4j</title>
+        <title>News and Status</title>
     </properties>
     <body>
-        <section name="Downloading mime4j">
-            <p> Go to the <a
-                    href="http://sourceforge.net/project/showfiles.php?group_id=108895">
-                    Sourceforge download pages</a> and download the most recent
-                release in your preferred format, either
-                <code>mime4j-x.y.tar.gz</code> or <code>mime4j-x.y.zip</code>.
-                Extracting the archived sources will create the directory
-                <code>mime4j-x.y/</code> which contains the mime4j jar file and
-                the API docs.</p>
+        <section name="News and Status">
+            <subsection name="News">
+              <p>
+                mime4j is now a subproject of 
+                <a href="http://james.apache.org/">Apache James</a>.
+              </p>
+            </subsection>
+            <subsection name="Current Status">
+                <p> The next release will be version 0.2. </p>
+            </subsection>
         </section>
     </body>
 </document>
