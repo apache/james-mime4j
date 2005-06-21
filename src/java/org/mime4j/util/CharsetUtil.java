@@ -16,11 +16,7 @@
 package org.mime4j.util;
 
 import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
@@ -1021,11 +1017,13 @@ public class CharsetUtil {
             try {
                 String s = new String(dummy, JAVA_CHARSETS[i].canonical);
                 decodingSupported.add(JAVA_CHARSETS[i].canonical.toLowerCase());
+            } catch (UnsupportedOperationException e) {
             } catch (UnsupportedEncodingException e) {
             }
             try {
                 "dummy".getBytes(JAVA_CHARSETS[i].canonical);
                 encodingSupported.add(JAVA_CHARSETS[i].canonical.toLowerCase());
+            } catch (UnsupportedOperationException e) {
             } catch (UnsupportedEncodingException e) {
             }
         }
