@@ -20,7 +20,7 @@
     <pomVersion>3</pomVersion>
     <name>mime4j</name>
     <id>mime4j</id>
-    <currentVersion>0.2-SNAPSHOT</currentVersion>
+    <currentVersion>0.2</currentVersion>
 <!--    <organization>
         <name>sourceforge</name>
         <url>http://sourceforge.net/</url>
