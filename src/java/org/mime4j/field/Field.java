@@ -117,7 +117,7 @@ public abstract class Field {
             f = new MailboxField();
         } else if (name.equalsIgnoreCase(TO) || name.equalsIgnoreCase(CC) || name.equalsIgnoreCase(BCC)
                 || name.equalsIgnoreCase(RESENT_TO) || name.equalsIgnoreCase(RESENT_CC)
-                || name.equalsIgnoreCase(RESENT_BCC)) {
+                || name.equalsIgnoreCase(RESENT_BCC) || name.equalsIgnoreCase(REPLY_TO)) {
             f = new AddressListField();
         } else {
             f = new UnstructuredField();
