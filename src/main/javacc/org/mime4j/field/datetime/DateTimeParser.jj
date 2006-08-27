@@ -24,6 +24,8 @@
 options {
 	STATIC=false;
 	LOOKAHEAD=1;
+	NODE_PACKAGE="org.mime4j.field.datetime.parser";
+	PACKAGE_NAME="org.mime4j.field.datetime.parser";
 	//DEBUG_PARSER=true;
 	//DEBUG_TOKEN_MANAGER=true;
 }
@@ -308,18 +310,18 @@ SKIP :
 <INCOMMENT>
 MORE :
 {
-	<<QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
+	< <QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
 |	"(" { commentNest = 1; } : NESTED_COMMENT
-|	<<ANY>>
+|	< <ANY>>
 }
 
 <NESTED_COMMENT>
 MORE :
 {
-	<<QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
+	< <QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
 |	"(" { ++commentNest; }
 |	")" { --commentNest; if (commentNest == 0) SwitchTo(INCOMMENT); }
-|	<<ANY>>
+|	< <ANY>>
 }
 
 TOKEN :

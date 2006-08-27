@@ -60,7 +60,7 @@ public class MessageParserTest extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         
-        File dir = new File("testmsgs");
+        File dir =	new File("src/test/resources/testmsgs");
         File[] files = dir.listFiles();
         
         for (int i = 0; i < files.length && i < 5000; i++) {

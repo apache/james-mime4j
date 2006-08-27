@@ -160,18 +160,18 @@ SKIP :
 <INCOMMENT>
 MORE :
 {
-	<<QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
+	< <QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
 |	"(" { commentNest = 1; } : NESTED_COMMENT
-|	<<ANY>>
+|	< <ANY>>
 }
 
 <NESTED_COMMENT>
 MORE :
 {
-	<<QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
+	< <QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
 |	"(" { ++commentNest; }
 |	")" { --commentNest; if (commentNest == 0) SwitchTo(INCOMMENT); }
-|	<<ANY>>
+|	< <ANY>>
 }
 
 
@@ -186,7 +186,7 @@ MORE :
 <INQUOTEDSTRING>
 MORE :
 {
-	<<QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
+	< <QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
 |	< (~["\"", "\\"])+ >
 }
 
