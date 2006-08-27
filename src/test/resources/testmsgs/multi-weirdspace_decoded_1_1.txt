@@ -1,0 +1,13 @@
+When unpacked, this message should produce two GIF files:
+
+	* The 1st should be called "3d-compress.gif"
+	* The 2nd should be called "3d-eye.gif"
+
+There is an empty preamble, and linear space after the bounds.
+
+-- 
+   ____           __
+  / __/__________/_/  Eryq (eryq@rhine.gsfc.nasa.gov)
+ / __/ _/ / / , /     Hughes STX Corporation, NASA/Goddard
+/___/_/ \  /\  /___ 
+        /_/ /_____/   http://selsvr.stx.com/~eryq/

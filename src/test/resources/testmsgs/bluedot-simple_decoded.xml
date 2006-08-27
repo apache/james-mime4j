@@ -1,0 +1,13 @@
+<message>
+<header>
+<field>
+Content-Type: image/jpeg; name="bluedot.jpg"</field>
+<field>
+Content-Disposition: inline; filename="bluedot.jpg"</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+<field>
+Content-Id: my-graphic</field>
+</header>
+<binary-body name="bluedot-simple_decoded_1.bin"/>
+</message>

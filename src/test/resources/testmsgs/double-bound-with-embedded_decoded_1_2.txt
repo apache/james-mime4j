@@ -1,0 +1,6 @@
+<p>This message contains double boundaries all over the
+place.  We want to make sure that bad things don't happen.
+
+<p>One bad thing is that the doubled-boundary above can
+be mistaken for a single boundary plus a bogus premature
+end of headers.
