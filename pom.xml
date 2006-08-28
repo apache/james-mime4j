@@ -8,7 +8,7 @@
   <groupId>org.apache.james</groupId>
   <artifactId>james-mime4j</artifactId>
   <name>Apache James mime4j</name>
-  <version>0.4-SNAPSHOT</version>
+  <version>0.3-SNAPSHOT</version>
   <description>Java stream based MIME message parser</description>
   <url>http://james.apache.org/mime4j/index.html</url>
   <issueManagement>
@@ -17,9 +17,9 @@
   <inceptionYear>2004</inceptionYear>
   <developers>
     <developer>
-      <id>ntherning</id>
+      <id>niklas</id>
       <name>Niklas Therning</name>
-      <email>niklas(at)trillian(dot)se</email>
+      <email>niklas(at)apache(dot)org</email>
       <organization>Trillian AB</organization>
     </developer>
     <developer>
@@ -30,9 +30,9 @@
     </developer>
   </developers>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4k/trunk</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4k/trunk</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/james/mime4k/trunk/?root=Apache-SVN</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/trunk</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/trunk</developerConnection>
+    <url>http://svn.apache.org/viewcvs.cgi/james/mime4j/trunk/?root=Apache-SVN</url>
   </scm>
   <build>
     <plugins>
@@ -86,6 +86,15 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.4</source>
+          <target>1.4</target>
+          <encoding>iso8859-1</encoding>
+        </configuration>
+      </plugin>      
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
