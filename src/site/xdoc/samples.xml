@@ -27,7 +27,7 @@
     <body>
         <section name="Samples">
             <p>
-            The mime4j distribution includes a number of sample applications
+            The mime4j distribution includes samples
             which demonstrate how the library could be used. This section
             gives you a short review of those samples. For more information
             you should download the distribution and study the sample sources.
@@ -52,7 +52,7 @@
                             you want the study the structure of MIME messages.
                             </td>
                     </tr>
-                    <tr>
+               <!--      <tr>
                         <td>
                             <code>org.mime4j.samples.sax.Mime2Sax</code>
                         </td>
@@ -63,7 +63,7 @@
                             <code>org.mime4j.samples.pgp.PGPSignatureVerifier</code>
                         </td>
                         <td></td>
-                    </tr>
+                    </tr> -->
                 </table>
         </section>
     </body>
