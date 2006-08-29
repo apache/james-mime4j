@@ -42,7 +42,7 @@ public abstract class TempStorage {
             }
             
         } catch (Throwable t) {
-            log.error("Unable to create or instantiate TempStorage class '" 
+            log.warn("Unable to create or instantiate TempStorage class '" 
                       + clazz + "' using SimpleTempStorage instead", t);
         }
 

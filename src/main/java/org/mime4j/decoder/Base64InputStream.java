@@ -80,7 +80,7 @@ public class Base64InputStream extends InputStream {
             switch (i = s.read()) {
                 case -1:
                     if (pos > 0) {
-                        log.error("Unexpected EOF in MIME parser, dropping " 
+                        log.warn("Unexpected EOF in MIME parser, dropping " 
                                 + pos + " sextets");
                     }
                     return;
