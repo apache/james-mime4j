@@ -32,7 +32,7 @@
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/trunk</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/trunk</developerConnection>
-    <url>http://svn.apache.org/viewcvs.cgi/james/mime4j/trunk/?root=Apache-SVN</url>
+    <url>http://svn.apache.org/viewvc/james/mime4j/trunk/</url>
   </scm>
   <build>
     <plugins>
