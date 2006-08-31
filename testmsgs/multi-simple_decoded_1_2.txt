@@ -1,2 +1,0 @@
-This is explicitly typed plain ASCII text.
-It DOES end with a linebreak.

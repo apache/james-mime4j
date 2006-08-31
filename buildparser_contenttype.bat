@@ -1,1 +1,0 @@
-@echo. && javacc -OUTPUT_DIRECTORY:src/java/org/mime4j/field/contenttype/parser src/java/org/mime4j/field/contenttype/ContentTypeParser.jj
