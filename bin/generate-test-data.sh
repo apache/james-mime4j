@@ -5,7 +5,7 @@ BASE_DIR=`dirname $0`/..
 DIR=$1
 
 if [ -z $1 ]; then
-    DIR=$BASE_DIR/testmsgs
+    DIR=$BASE_DIR/src/test/resources/testmsgs
 fi
 
 for i in $DIR/*.msg; do
