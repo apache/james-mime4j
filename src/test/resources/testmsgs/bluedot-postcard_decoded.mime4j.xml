@@ -1,0 +1,73 @@
+<message>
+<header>
+<field>
+Content-Type: multipart/alternative; boundary="----------=_961872013-1436-0"</field>
+<field>
+Content-Transfer-Encoding: binary</field>
+<field>
+Mime-Version: 1.0</field>
+<field>
+X-Mailer: MIME-tools 5.211 (Entity 5.205)</field>
+<field>
+To: noone</field>
+<field>
+Subject: A postcard for you</field>
+</header>
+<multipart>
+<preamble>
+This is a multi-part message in MIME format...
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain</field>
+<field>
+Content-Disposition: inline</field>
+<field>
+Content-Transfer-Encoding: binary</field>
+</header>
+<text-body name="bluedot-postcard_decoded_1_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: multipart/related; boundary="----------=_961872013-1436-1"</field>
+<field>
+Content-Transfer-Encoding: binary</field>
+</header>
+<multipart>
+<preamble>
+This is a multi-part message in MIME format...
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/html</field>
+<field>
+Content-Disposition: inline</field>
+<field>
+Content-Transfer-Encoding: binary</field>
+</header>
+<text-body name="bluedot-postcard_decoded_1_2_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: image/jpeg; name="bluedot.jpg"</field>
+<field>
+Content-Disposition: inline; filename="bluedot.jpg"</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+<field>
+Content-Id: my-graphic</field>
+</header>
+<binary-body name="bluedot-postcard_decoded_1_2_2.bin"/>
+</body-part>
+<epilogue>
+</epilogue>
+</multipart>
+</body-part>
+<epilogue>
+</epilogue>
+</multipart>
+</message>

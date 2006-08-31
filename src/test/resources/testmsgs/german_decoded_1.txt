@@ -1,0 +1,48 @@
+Hallo Herr Specht,
+entschuldigen Sie vorab, dass ich Ihnen nicht telefonisch zur Verfuegung
+stehe, ich Praesentationen gehalten/ noch zu halten und viele
+Kundennachfragen zu projektieren. Nach Informationen des Produkt-Managers
+Temme steht der POP schon zur Verfügung! Standort: voraussichtlich:
+Winterfeldstr. 21, 10781 Berlin.
+Der POP hat zur Zeit direkte 34M-Anbindungen zu folgenden Orten: Rostock,
+Hamburg, Hannover & Leipzig. 4 weitere werden in kuerze in Betrieb gehen.
+Damit haben Sie einen Besonderen Sicherheitsstandard verfuegbar!
+Kontakt muessen Sie ueber Ihre oerltliche Vertriebseinheit aufnehmen:
+entweder den Geschaefts-Kunden-Vertrieb oder das GrossKundenManagement.
+Diese Vertriebseinheiten greifen auf den oertlichen Technischen
+Vertriebs-Support zu. Die Informationen werden ueber TVS zur Vertriebseiheit
+gegeben und dann zu Ihnen.
+ Sie benoetigen eine Standleitung von Ihrer Lokation zum Internet-POP
+Uebergabepunkt zu Ihrem Info-Server ist ein CISCO 1000-Router. Dann zahlen
+Sie neben den monatlichen Kosten fuer die Standleitung die Kosten fuer den
+Internet-Zugang: zB bei 64k: 1500DM bei 2GByte Freivolumen. 128K: 3000 DM
+bei 5 GB Freivolumen & 2M: 30.000 DM bei 50GB Freivolumen.
+Freundliche Gruesse 
+Guenter Deuschle
+
+
+>Sehr geehrter Herr Deuschle,
+>Sie sind mir von Herrn Meyendriesch empfohlen worden.
+>Ich versuche Informationen ueber das T-eigene 34Mbit/s Netz und den 
+>lokalen Pop-Berlin rauszufinden, bzw. was ein Anschluss kostet und 
+>wo man ihn herbekommt. Laut Herrn Schnick in Berlin gibt es den 
+>T-Pop nicht, laut Traceroute von Herrn Meyendriesch sehrwohl. Auch 
+>ist dies Netz in der IX vom Mai 96 erwaehnt.
+>Koennen Sie mir helfen?
+>
+>MfG
+>-- 
+>Juergen Specht - KULTURBOX
+>
+>
+
+===================================================
+Dipl.-Ing.  Guenter     D E U S C H L E
+Deutsche Telekom AG     Niederlassung 3 Hannover
+GrossKundenManagement - Techn. Vertriebs-Support:
+Team-Leiter             Internet Online-Dienste
+---------------------------------------------------
+GrKM-TVS-IOD           Tel: +49-511-333-2772
+Vahrenwalder-Str. 245  FAX: +49-511-333-2751
+30179 Hannover       eMail: deuschle@mnh.telekom.de 
+===================================================
