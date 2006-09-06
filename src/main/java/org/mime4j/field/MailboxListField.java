@@ -26,10 +26,15 @@ import org.mime4j.field.address.MailboxList;
 import org.mime4j.field.address.parser.ParseException;
 
 public class MailboxListField extends Field {
-    private static Log log = LogFactory.getLog(MailboxListField.class);
-
+    
     private MailboxList mailboxList;
     private ParseException parseException;
+
+    protected MailboxListField(final String name, final String body, final String raw, final MailboxList mailboxList, final ParseException parseException) {
+        super(name, body, raw);
+        this.mailboxList = mailboxList;
+        this.parseException = parseException;
+    }
 
     public MailboxList getMailboxList() {
         return mailboxList;
@@ -38,17 +43,23 @@ public class MailboxListField extends Field {
     public ParseException getParseException() {
         return parseException;
     }
+    
+    public static class Parser implements FieldParser {
+        private static Log log = LogFactory.getLog(Parser.class);
 
-    protected void parseBody(String body) {
-        try {
-            mailboxList = AddressList.parse(body).flatten();
-        }
-        catch (ParseException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': "+ e.getMessage());
+        public Field parse(final String name, final String body, final String raw) {
+            MailboxList mailboxList = null;
+            ParseException parseException = null;
+            try {
+                mailboxList = AddressList.parse(body).flatten();
             }
-            parseException = e;
+            catch (ParseException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Parsing value '" + body + "': "+ e.getMessage());
+                }
+                parseException = e;
+            }
+            return new MailboxListField(name, body, raw, mailboxList, parseException);
         }
-
     }
 }

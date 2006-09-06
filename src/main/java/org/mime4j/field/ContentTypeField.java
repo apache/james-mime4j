@@ -31,7 +31,6 @@ import org.mime4j.field.contenttype.parser.ContentTypeParser;
 import org.mime4j.field.contenttype.parser.ParseException;
 import org.mime4j.field.contenttype.parser.TokenMgrError;
 
-
 /**
  * Represents a <code>Content-Type</code> field.
  *
@@ -41,7 +40,6 @@ import org.mime4j.field.contenttype.parser.TokenMgrError;
  * @version $Id: ContentTypeField.java,v 1.6 2005/01/27 14:16:31 ntherning Exp $
  */
 public class ContentTypeField extends Field {
-    private static Log log = LogFactory.getLog(ContentTypeField.class);
     
     /**
      * The prefix of all <code>multipart</code> MIME types.
@@ -69,56 +67,15 @@ public class ContentTypeField extends Field {
     public static final String PARAM_CHARSET = "charset";
     
     private String mimeType = "";
-    private HashMap parameters = null;
+    private Map parameters = null;
     private ParseException parseException;
 
-    protected ContentTypeField() {
+    protected ContentTypeField(String name, String body, String raw, String mimeType, Map parameters, ParseException parseException) {
+        super(name, body, raw);
+        this.mimeType = mimeType;
+        this.parameters = parameters;
+        this.parseException = parseException;
     }
-    
-    protected void parseBody(String body) {
-
-        ContentTypeParser parser = new ContentTypeParser(new StringReader(body));
-        try {
-            parser.parseAll();
-        }
-        catch (ParseException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': "+ e.getMessage());
-            }
-            parseException = e;
-        }
-        catch (TokenMgrError e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': "+ e.getMessage());
-            }
-            parseException = new ParseException(e.getMessage());
-        }
-
-        try {
-            final String type = parser.getType();
-            final String subType = parser.getSubType();
-
-            if (type == null || subType == null)
-                return;
-            mimeType = (type + "/" + parser.getSubType()).toLowerCase();
-
-            ArrayList paramNames = parser.getParamNames();
-            ArrayList paramValues = parser.getParamValues();
-
-            if (paramNames == null || paramValues == null)
-                return;
-            for (int i = 0; i < paramNames.size() && i < paramValues.size(); i++) {
-                if (parameters == null)
-                    parameters = new HashMap((int)(paramNames.size() * 1.3 + 1));
-                String name = ((String)paramNames.get(i)).toLowerCase();
-                String value = ((String)paramValues.get(i));
-                parameters.put(name, value);
-            }
-        }
-        catch (NullPointerException npe) {
-        }
-    }
-
 
     /**
      * Gets the exception that was raised during parsing of
@@ -243,5 +200,57 @@ public class ContentTypeField extends Field {
      */
     public boolean isMultipart() {
         return mimeType.startsWith(TYPE_MULTIPART_PREFIX);
+    }
+    
+    public static class Parser implements FieldParser {
+        private static Log log = LogFactory.getLog(Parser.class);
+
+        public Field parse(final String name, final String body, final String raw) {
+            ParseException parseException = null;
+            String mimeType = "";
+            Map parameters = null;
+
+            ContentTypeParser parser = new ContentTypeParser(new StringReader(body));
+            try {
+                parser.parseAll();
+            }
+            catch (ParseException e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Parsing value '" + body + "': "+ e.getMessage());
+                }
+                parseException = e;
+            }
+            catch (TokenMgrError e) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Parsing value '" + body + "': "+ e.getMessage());
+                }
+                parseException = new ParseException(e.getMessage());
+            }
+
+            try {
+                final String type = parser.getType();
+                final String subType = parser.getSubType();
+
+                if (type != null && subType != null) {
+                    mimeType = (type + "/" + parser.getSubType()).toLowerCase();
+
+                    ArrayList paramNames = parser.getParamNames();
+                    ArrayList paramValues = parser.getParamValues();
+
+                    if (paramNames != null && paramValues != null) {
+                        for (int i = 0; i < paramNames.size() && i < paramValues.size(); i++) {
+                            if (parameters == null)
+                                parameters = new HashMap((int)(paramNames.size() * 1.3 + 1));
+                            String paramName = ((String)paramNames.get(i)).toLowerCase();
+                            String paramValue = ((String)paramValues.get(i));
+                            parameters.put(paramName, paramValue);
+                        }
+                    }
+                }
+            }
+            catch (NullPointerException npe) {
+            }
+            return new ContentTypeField(name, body, raw, mimeType, parameters, parseException);
+        }
     }
 }

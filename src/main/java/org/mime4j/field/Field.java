@@ -22,10 +22,6 @@ package org.mime4j.field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-
 /**
  * The base class of all field classes.
  *
@@ -33,8 +29,6 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id: Field.java,v 1.6 2004/10/25 07:26:46 ntherning Exp $
  */
 public abstract class Field {
-    private static Log log = LogFactory.getLog(Field.class);
-    
     public static final String SENDER = "Sender";
     public static final String FROM = "From";
     public static final String TO = "To";
@@ -57,18 +51,23 @@ public abstract class Field {
     
     private static final String FIELD_NAME_PATTERN = 
         "^([\\x21-\\x39\\x3b-\\x7e]+)[ \t]*:";
-    private static Pattern fieldNamePattern = 
+    private static final Pattern fieldNamePattern = 
         Pattern.compile(FIELD_NAME_PATTERN);
+        
+    private static final DefaultFieldParser parser = new DefaultFieldParser();
     
-    private String name;
-    private String body;
-    private String raw;
+    private final String name;
+    private final String body;
+    private final String raw;
     
-    protected Field() {
+    protected Field(final String name, final String body, final String raw) {
+        this.name = name;
+        this.body = body;
+        this.raw = raw;
     }
     
     /**
-     * Parsers the given string and returns an instance of the 
+     * Parses the given string and returns an instance of the 
      * <code>Field</code> class. The type of the class returned depends on
      * the field name:
      * <table>
@@ -83,64 +82,37 @@ public abstract class Field {
      * @return a <code>Field</code> instance.
      * @throws IllegalArgumentException on parse errors.
      */
-    public static Field parse(String s) {
-        String raw = s;
+    public static Field parse(final String raw) {
         
         /*
          * Unfold the field.
          */
-        s = s.replaceAll("\r|\n", "");
+        final String unfolded = raw.replaceAll("\r|\n", "");
         
         /*
          * Split into name and value.
          */
-        Matcher fieldMatcher = fieldNamePattern.matcher(s);
+        final Matcher fieldMatcher = fieldNamePattern.matcher(unfolded);
         if (!fieldMatcher.find()) {
             throw new IllegalArgumentException("Invalid field in string");
         }
-        String name = fieldMatcher.group(1);
+        final String name = fieldMatcher.group(1);
         
-        String body = s.substring(fieldMatcher.end());
+        String body = unfolded.substring(fieldMatcher.end());
         if (body.length() > 0 && body.charAt(0) == ' ') {
             body = body.substring(1);
         }
         
-        Field f = null;
-
-        // TODO jcheng 2004-09-27: Clean this up
-
-        if (name.equalsIgnoreCase(CONTENT_TRANSFER_ENCODING)) {
-            f = new ContentTransferEncodingField();
-        } else if (name.equalsIgnoreCase(CONTENT_TYPE)) {
-            f = new ContentTypeField();
-        } else if (name.equalsIgnoreCase(DATE) || name.equalsIgnoreCase(RESENT_DATE)) {
-            f = new DateTimeField();
-        } else if (name.equalsIgnoreCase(FROM) || name.equalsIgnoreCase(RESENT_FROM)) {
-            f = new MailboxListField();
-        } else if (name.equalsIgnoreCase(SENDER) || name.equalsIgnoreCase(RESENT_SENDER)) {
-            f = new MailboxField();
-        } else if (name.equalsIgnoreCase(TO) || name.equalsIgnoreCase(CC) || name.equalsIgnoreCase(BCC)
-                || name.equalsIgnoreCase(RESENT_TO) || name.equalsIgnoreCase(RESENT_CC)
-                || name.equalsIgnoreCase(RESENT_BCC) || name.equalsIgnoreCase(REPLY_TO)) {
-            f = new AddressListField();
-        } else {
-            f = new UnstructuredField();
-        }
-        
-        f.name = name;
-        f.raw = raw;
-        f.body = body;
-        f.parseBody(body);
-        
-        return f;
+        return parser.parse(name, body, raw);
     }
     
     /**
-     * Parses the field body.
-     * 
-     * @param body the field unfolded body.
+     * Gets the default parser used to parse fields.
+     * @return the default field parser
      */
-    protected abstract void parseBody(String body);
+    public static DefaultFieldParser getParser() {
+        return parser;
+    }
     
     /**
      * Gets the name of the field (<code>Subject</code>, 

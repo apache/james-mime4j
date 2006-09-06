@@ -20,6 +20,7 @@
 package org.mime4j.field;
 
 
+
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.
  *
@@ -50,13 +51,11 @@ public class ContentTransferEncodingField extends Field {
     
     private String encoding;
     
-    protected ContentTransferEncodingField() {
+    protected ContentTransferEncodingField(String name, String body, String raw, String encoding) {
+        super(name, body, raw);
+        this.encoding = encoding;
     }
-    
-    protected void parseBody(String body) {
-        encoding = body.trim().toLowerCase();
-    }
-    
+
     /**
      * Gets the encoding defined in this field.
      * 
@@ -78,5 +77,12 @@ public class ContentTransferEncodingField extends Field {
             return f.getEncoding();
         }
         return ENC_7BIT;
+    }
+    
+    public static class Parser implements FieldParser {
+        public Field parse(final String name, final String body, final String raw) {
+            final String encoding = body.trim().toLowerCase();
+            return new ContentTransferEncodingField(name, body, raw, encoding);
+        }
     }
 }
