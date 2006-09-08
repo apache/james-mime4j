@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
   <artifactId>james-mime4j</artifactId>
-  <name>Apache James mime4j</name>
+  <name>Apache JAMES Mime4j</name>
   <version>0.3-SNAPSHOT</version>
   <description>Java stream based MIME message parser</description>
   <url>http://james.apache.org/mime4j/index.html</url>
@@ -15,6 +15,12 @@
     <url>http://sourceforge.net/tracker/?group_id=108895&amp;atid=654176</url>
   </issueManagement>
   <inceptionYear>2004</inceptionYear>
+  <distributionManagement>
+    <site>
+      <id>mime4j-website</id>
+      <url>scp://minotaur.apache.org/www/james.apache.org/mime4j/</url>
+    </site>
+  </distributionManagement>
   <developers>
     <developer>
       <id>niklas</id>
