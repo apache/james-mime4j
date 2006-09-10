@@ -1,4 +1,4 @@
 Make the DOM-like parser capable of loading bodies (at least large attachment)
 on demand instead of using temporary files.
 
-Remove dependencies on commons-lang and commons-io.
+Remove dependencies on commons-io.
