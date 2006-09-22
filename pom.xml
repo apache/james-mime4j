@@ -21,7 +21,7 @@
   <parent>
     <artifactId>james-project</artifactId>
     <groupId>org.apache.james</groupId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
@@ -148,25 +148,61 @@
   </build>
   <repositories>
     <repository>
+      <id>local-mime4j-3rd-party-m1</id>
+      <name>Local mime4j third party repository</name>
+      <url>file://${basedir}/repos/third-party-m1</url>
+      <layout>legacy</layout>
       <snapshots>
+        <enabled>true</enabled>
         <checksumPolicy>ignore</checksumPolicy>
       </snapshots>
-      <id>bago-dist-m1</id>
-      <name>Temporary Repository</name>
-      <url>http://people.apache.org/~bago/maven/dist-m1</url>
-      <layout>legacy</layout>
     </repository>
+    
+    <repository>
+      <id>central</id>
+      <name>Apache Snapshot Repository</name>
+      <url>http://people.apache.org/repo/m2-ibiblio-rsync-repository</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshot Repository</name>
+      <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+    
   </repositories>
   <dependencies>
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>1.0.4</version>
+      <version>1.1</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>logkit</groupId>
+          <artifactId>logkit</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>avalon-framework</groupId>
+          <artifactId>avalon-framework</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <version>1.2.8</version>
+      <version>1.2.13</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
