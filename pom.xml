@@ -31,7 +31,7 @@
   <description>Java stream based MIME message parser</description>
   <url>http://james.apache.org/mime4j/index.html</url>
   <issueManagement>
-    <url>http://sourceforge.net/tracker/?group_id=108895&amp;atid=654176</url>
+    <url>http://issues.apache.org/jira/browse/MIME4J</url>
   </issueManagement>
   <inceptionYear>2004</inceptionYear>
   <distributionManagement>
