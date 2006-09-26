@@ -29,7 +29,7 @@
   <name>Apache JAMES Mime4j</name>
   <version>0.3-SNAPSHOT</version>
   <description>Java stream based MIME message parser</description>
-  <url>http://james.apache.org/mime4j/index.html</url>
+  <url>http://james.apache.org/mime4j</url>
   <issueManagement>
     <url>http://issues.apache.org/jira/browse/MIME4J</url>
   </issueManagement>
