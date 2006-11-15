@@ -55,7 +55,7 @@
                 messages violating the standards. It has been tested using a
                 large corpus (&gt;5000) of e-mail messages. As a benchmark
                 the widely used perl <a
-                href="http://www.zeegee.com/code/perl/MIME-tools/">MIME::Tools</a>
+                href="http://www.mimedefang.org/node.php?id=48">MIME::Tools</a>
                 parser has been used. mime4j and MIME:Tools rarely differ
                 (&lt;25 in those 5000). When they do (which only occurs
                 for illegally formatted spam messages) we think mime4j does a
