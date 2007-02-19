@@ -26,7 +26,7 @@ import java.io.Reader;
 /**
  * Encapsulates the contents of a <code>text/*</code> entity body.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: TextBody.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public interface TextBody extends Body {

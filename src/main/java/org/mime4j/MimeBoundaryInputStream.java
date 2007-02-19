@@ -33,8 +33,8 @@ import org.apache.commons.logging.LogFactory;
  * If {@link #parentEOF()} is <code>true</code> an unexpected end of stream
  * has been detected in the parent stream.
  * 
- * @author Joe Cheng
- * @author Niklas Therning
+ * 
+ * 
  * @version $Id: MimeBoundaryInputStream.java,v 1.2 2004/11/29 13:15:42 ntherning Exp $
  */
 public class MimeBoundaryInputStream extends InputStream {

@@ -26,7 +26,7 @@ import java.io.IOException;
  * InputStream that shields its underlying input stream from
  * being closed.
  * 
- * @author Joe Cheng
+ * 
  * @version $Id: CloseShieldInputStream.java,v 1.2 2004/10/02 12:41:10 ntherning Exp $
  */
 public class CloseShieldInputStream extends InputStream {

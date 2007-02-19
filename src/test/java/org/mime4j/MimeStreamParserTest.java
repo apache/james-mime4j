@@ -36,7 +36,7 @@ import org.apache.log4j.BasicConfigurator;
 /**
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: MimeStreamParserTest.java,v 1.6 2005/02/11 10:12:02 ntherning Exp $
  */
 public class MimeStreamParserTest extends TestCase {

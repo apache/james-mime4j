@@ -32,7 +32,7 @@ import java.io.IOException;
  * tasks. Currently performs header parsing and applies content-transfer
  * decoding to body parts.
  *
- * @author Joe Cheng
+ * 
  */
 public abstract class SimpleContentHandler implements ContentHandler {
 

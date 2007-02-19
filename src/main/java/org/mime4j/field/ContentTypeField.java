@@ -36,7 +36,7 @@ import org.mime4j.field.contenttype.parser.TokenMgrError;
  *
  * <p>TODO: Remove dependency on Java 1.4 regexps</p>
  *
- * @author Niklas Therning
+ * 
  * @version $Id: ContentTypeField.java,v 1.6 2005/01/27 14:16:31 ntherning Exp $
  */
 public class ContentTypeField extends Field {

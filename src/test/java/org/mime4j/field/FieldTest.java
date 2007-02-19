@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 /**
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: FieldTest.java,v 1.3 2004/10/25 07:26:47 ntherning Exp $
  */
 public class FieldTest extends TestCase {

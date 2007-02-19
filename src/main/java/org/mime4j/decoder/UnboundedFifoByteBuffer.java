@@ -46,11 +46,11 @@ import java.util.NoSuchElementException;
  * @since Commons Collections 3.0 (previously in main package v2.1)
  * @version $Revision: 1.1 $ $Date: 2004/08/24 06:52:02 $
  *
- * @author Avalon
- * @author Federico Barbieri
- * @author Berin Loritsch
- * @author Paul Jack
- * @author Stephen Colebourne
+ * 
+ * 
+ * 
+ * 
+ * 
  */
 class UnboundedFifoByteBuffer {
 

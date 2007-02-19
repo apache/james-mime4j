@@ -24,7 +24,7 @@ import java.io.IOException;
 /**
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: TempPath.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 public interface TempPath {

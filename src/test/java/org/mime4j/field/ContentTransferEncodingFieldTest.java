@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 /**
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: ContentTransferEncodingFieldTest.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 public class ContentTransferEncodingFieldTest extends TestCase {

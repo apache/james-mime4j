@@ -44,7 +44,7 @@ import org.mime4j.util.CharsetUtil;
  * 
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: MessageParserTest.java,v 1.4 2004/10/25 07:26:47 ntherning Exp $
  */
 public class MessageParserTest extends TestCase {

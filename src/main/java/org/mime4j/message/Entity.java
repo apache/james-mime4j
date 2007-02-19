@@ -29,7 +29,7 @@ import org.mime4j.field.Field;
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
  *
- * @author Niklas Therning
+ * 
  * @version $Id: Entity.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public abstract class Entity {

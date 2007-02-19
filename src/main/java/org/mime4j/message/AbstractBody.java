@@ -24,7 +24,7 @@ package org.mime4j.message;
  * Abstract <code>Body</code> implementation providing the parent
  * functionality required by bodies.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: AbstractBody.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 public abstract class AbstractBody implements Body {

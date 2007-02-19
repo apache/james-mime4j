@@ -33,7 +33,7 @@ import java.util.List;
  * first body part while the epilogue consists of whatever characters come
  * after the last body part.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: Multipart.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public class Multipart implements Body {

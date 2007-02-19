@@ -24,7 +24,7 @@ import java.util.ArrayList;
 /**
  * A named group of zero or more mailboxes.  
  *
- * @author Joe Cheng &lt;code@joecheng.com&gt;
+ * 
  */
 public class Group extends Address {
 	private String name;

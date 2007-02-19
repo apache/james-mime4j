@@ -25,7 +25,7 @@ import java.util.ArrayList;
  * An immutable, random-access list of Strings (that 
  * are supposedly domain names or domain literals).
  *
- * @author Joe Cheng &lt;code@joecheng.com&gt;
+ * 
  */
 public class DomainList {
 	private ArrayList domains;

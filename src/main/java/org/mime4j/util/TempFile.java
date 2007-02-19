@@ -26,7 +26,7 @@ import java.io.OutputStream;
 /**
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: TempFile.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public interface TempFile {

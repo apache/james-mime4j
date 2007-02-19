@@ -26,7 +26,7 @@ import java.io.InputStream;
 /**
  * Interface implemented by bodies containing binary data.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: BinaryBody.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public interface BinaryBody extends Body {

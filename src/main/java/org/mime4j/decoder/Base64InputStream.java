@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Performs Base-64 decoding on an underlying stream.
  * 
- * @author Joe Cheng
+ * 
  * @version $Id: Base64InputStream.java,v 1.3 2004/11/29 13:15:47 ntherning Exp $
  */
 public class Base64InputStream extends InputStream {

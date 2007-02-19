@@ -25,7 +25,7 @@ import java.io.OutputStream;
 /**
  * Encapsulates the body of an entity (see RFC 2045).
  *
- * @author Niklas Therning
+ * 
  * @version $Id: Body.java,v 1.4 2004/10/04 15:36:43 ntherning Exp $
  */
 public interface Body {

@@ -34,7 +34,7 @@ import org.mime4j.util.TempStorage;
 /**
  * Binary body backed by a {@link org.mime4j.util.TempFile}.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: TempFileBinaryBody.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 class TempFileBinaryBody extends AbstractBody implements BinaryBody {

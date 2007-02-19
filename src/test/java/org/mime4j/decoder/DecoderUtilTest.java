@@ -28,7 +28,7 @@ import org.apache.log4j.BasicConfigurator;
 /**
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: DecoderUtilTest.java,v 1.3 2004/11/09 12:57:40 ntherning Exp $
  */
 public class DecoderUtilTest extends TestCase {

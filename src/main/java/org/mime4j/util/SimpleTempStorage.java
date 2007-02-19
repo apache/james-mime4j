@@ -35,7 +35,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: SimpleTempStorage.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 public class SimpleTempStorage extends TempStorage {

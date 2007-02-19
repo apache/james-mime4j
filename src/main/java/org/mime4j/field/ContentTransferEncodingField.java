@@ -24,7 +24,7 @@ package org.mime4j.field;
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: ContentTransferEncodingField.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 public class ContentTransferEncodingField extends Field {

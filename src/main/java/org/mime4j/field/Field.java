@@ -25,7 +25,7 @@ import java.util.regex.Pattern;
 /**
  * The base class of all field classes.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: Field.java,v 1.6 2004/10/25 07:26:46 ntherning Exp $
  */
 public abstract class Field {

@@ -28,7 +28,7 @@ import junit.framework.TestCase;
 /**
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: MessageTest.java,v 1.4 2004/10/02 12:41:11 ntherning Exp $
  */
 public class MessageTest extends TestCase {

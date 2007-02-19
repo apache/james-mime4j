@@ -31,7 +31,7 @@ import org.mime4j.util.CharsetUtil;
 /**
  * Static methods for decoding strings, byte arrays and encoded words.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: DecoderUtil.java,v 1.3 2005/02/07 15:33:59 ntherning Exp $
  */
 public class DecoderUtil {

@@ -27,7 +27,7 @@ import java.util.ArrayList;
  * 
  * Currently, no public methods are introduced on this class.
  * 
- * @author Joe Cheng &lt;code@joecheng.com&gt;
+ * 
  */
 public abstract class Address {
 

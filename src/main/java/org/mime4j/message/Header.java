@@ -35,7 +35,7 @@ import org.mime4j.field.Field;
 /**
  * The header of an entity (see RFC 2045).
  *
- * @author Niklas Therning
+ * 
  * @version $Id: Header.java,v 1.3 2004/10/04 15:36:44 ntherning Exp $
  */
 public class Header {

@@ -25,7 +25,7 @@ import java.io.OutputStream;
 /**
  * Represents a MIME body part  (see RFC 2045).
  *
- * @author Niklas Therning
+ * 
  * @version $Id: BodyPart.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public class BodyPart extends Entity {

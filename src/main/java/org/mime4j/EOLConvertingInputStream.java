@@ -28,7 +28,7 @@ import java.io.PushbackInputStream;
  * bytes not followed by <code>\n</code> and <code>\n</code> not 
  * preceded by <code>\r</code> to <code>\r\n</code>.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: EOLConvertingInputStream.java,v 1.4 2004/11/29 13:15:42 ntherning Exp $
  */
 public class EOLConvertingInputStream extends InputStream {

@@ -73,7 +73,7 @@ import java.io.InputStream;
  * messages.
  * </p>
  *
- * @author Niklas Therning
+ * 
  * @version $Id: ContentHandler.java,v 1.3 2004/10/02 12:41:10 ntherning Exp $
  */
 public interface ContentHandler {

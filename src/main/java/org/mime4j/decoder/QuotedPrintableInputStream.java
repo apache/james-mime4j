@@ -28,8 +28,8 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Performs Quoted-Printable decoding on an underlying stream.
  * 
- * @author Joe Cheng
- * @author Niklas Therning
+ * 
+ * 
  * @version $Id: QuotedPrintableInputStream.java,v 1.3 2004/11/29 13:15:47 ntherning Exp $
  */
 public class QuotedPrintableInputStream extends InputStream {

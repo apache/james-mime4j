@@ -33,7 +33,7 @@ import junit.framework.TestCase;
 /**
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: SimpleTempStorageTest.java,v 1.2 2004/10/02 12:41:12 ntherning Exp $
  */
 public class SimpleTempStorageTest extends TestCase {

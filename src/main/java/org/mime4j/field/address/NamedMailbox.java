@@ -22,7 +22,7 @@ package org.mime4j.field.address;
 /**
  * A Mailbox that has a name/description.
  *
- * @author Joe Cheng &lt;code@joecheng.com&gt;
+ * 
  */
 public class NamedMailbox extends Mailbox {
 	private String name;

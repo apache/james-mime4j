@@ -43,7 +43,7 @@ import org.mime4j.field.UnstructuredField;
  * </pre>
  * 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: Message.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public class Message extends Entity implements Body {

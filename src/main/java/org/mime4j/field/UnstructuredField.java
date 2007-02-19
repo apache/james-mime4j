@@ -25,7 +25,7 @@ import org.mime4j.decoder.DecoderUtil;
 /**
  * Simple unstructured field such as <code>Subject</code>.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: UnstructuredField.java,v 1.3 2004/10/25 07:26:46 ntherning Exp $
  */
 public class UnstructuredField extends Field {

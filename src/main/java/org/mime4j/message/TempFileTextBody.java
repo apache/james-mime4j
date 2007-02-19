@@ -38,7 +38,7 @@ import org.mime4j.util.TempStorage;
 /**
  * Text body backed by a {@link org.mime4j.util.TempFile}.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: TempFileTextBody.java,v 1.3 2004/10/25 07:26:46 ntherning Exp $
  */
 class TempFileTextBody extends AbstractBody implements TextBody {

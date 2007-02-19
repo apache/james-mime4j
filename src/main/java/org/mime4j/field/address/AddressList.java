@@ -29,7 +29,7 @@ import java.util.Iterator;
 /**
  * An immutable, random-access list of Address objects.
  *
- * @author Joe Cheng &lt;code@joecheng.com&gt;
+ * 
  */
 public class AddressList {
 	

@@ -45,7 +45,7 @@ import org.mime4j.message.TextBody;
  *
  * Some of this code have been copied from the Java tutorial's JTree section.
  *
- * @author Niklas Therning
+ * 
  * @version $Id$
  */
 public class MessageTree extends JPanel implements TreeSelectionListener {

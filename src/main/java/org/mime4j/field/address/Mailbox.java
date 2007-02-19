@@ -24,7 +24,7 @@ import java.util.ArrayList;
 /**
  * Represents a single e-mail address. 
  *
- * @author Joe Cheng &lt;code@joecheng.com&gt;
+ * 
  */
 public class Mailbox extends Address {
 	private DomainList route;

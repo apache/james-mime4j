@@ -29,7 +29,7 @@ import java.io.InputStream;
  * reached end of file. This is used by the parser's 
  * {@link org.mime4j.MimeStreamParser#stop()} method.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: RootInputStream.java,v 1.2 2004/10/02 12:41:10 ntherning Exp $
  */
 class RootInputStream extends InputStream {

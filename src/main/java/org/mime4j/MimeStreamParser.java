@@ -46,7 +46,7 @@ import org.mime4j.decoder.QuotedPrintableInputStream;
  * (<code>\r\n</code>). If you are unsure of the line endings in your stream 
  * you should wrap it in a {@link org.mime4j.EOLConvertingInputStream} instance.
  *
- * @author Niklas Therning
+ * 
  * @version $Id: MimeStreamParser.java,v 1.8 2005/02/11 10:12:02 ntherning Exp $
  */
 public class MimeStreamParser {

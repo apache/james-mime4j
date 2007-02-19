@@ -29,7 +29,7 @@ import org.mime4j.field.address.parser.*;
  * Transforms the JJTree-generated abstract syntax tree
  * into a graph of org.mime4j.field.address objects.
  *
- * @author Joe Cheng &lt;code@joecheng.com&gt;
+ * 
  */
 class Builder {
 

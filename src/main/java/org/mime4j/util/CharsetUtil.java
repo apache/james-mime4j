@@ -783,7 +783,7 @@ import org.apache.commons.logging.LogFactory;
  *     </tr>
  * </table>
  * 
- * @author Niklas Therning
+ * 
  * @version $Id: CharsetUtil.java,v 1.1 2004/10/25 07:26:46 ntherning Exp $
  */
 public class CharsetUtil {

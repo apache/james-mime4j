@@ -24,7 +24,7 @@ import java.util.ArrayList;
 /**
  * An immutable, random-access list of Mailbox objects.
  *
- * @author Joe Cheng &lt;code@joecheng.com&gt;
+ * 
  */
 public class MailboxList {
 

@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
  * Encapsulates the values of the MIME-specific header fields 
  * (which starts with <code>Content-</code>). 
  *
- * @author Niklas Therning
+ * 
  * @version $Id: BodyDescriptor.java,v 1.4 2005/02/11 10:08:37 ntherning Exp $
  */
 public class BodyDescriptor {
