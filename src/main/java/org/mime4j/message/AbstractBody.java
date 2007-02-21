@@ -30,10 +30,16 @@ package org.mime4j.message;
 public abstract class AbstractBody implements Body {
     private Entity parent = null;
     
+    /**
+     * @see org.mime4j.message.Body#getParent()
+     */
     public Entity getParent() {
         return parent;
     }
     
+    /**
+     * @see org.mime4j.message.Body#setParent(org.mime4j.message.Entity)
+     */
     public void setParent(Entity parent) {
         this.parent = parent;
     }

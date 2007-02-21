@@ -30,6 +30,7 @@ import java.io.InputStream;
  * @version $Id: BinaryBody.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public interface BinaryBody extends Body {
+    
     /**
      * Gets a <code>InputStream</code> which reads the bytes of the
      * body.

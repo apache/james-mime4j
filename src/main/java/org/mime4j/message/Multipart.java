@@ -71,10 +71,16 @@ public class Multipart implements Body {
         this.subType = subType;
     }
     
+    /**
+     * @see org.mime4j.message.Body#getParent()
+     */
     public Entity getParent() {
         return parent;
     }
     
+    /**
+     * @see org.mime4j.message.Body#setParent(org.mime4j.message.Entity)
+     */
     public void setParent(Entity parent) {
         this.parent = parent;
         for (Iterator it = bodyParts.iterator(); it.hasNext();) {
@@ -149,6 +155,11 @@ public class Multipart implements Body {
         this.preamble = preamble;
     }
 
+    /**
+     * TODO: Implement me
+     * 
+     * @see org.mime4j.message.Body#writeTo(java.io.OutputStream)
+     */
     public void writeTo(OutputStream out) throws IOException {
     }
 }

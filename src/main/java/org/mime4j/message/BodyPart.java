@@ -29,6 +29,12 @@ import java.io.OutputStream;
  * @version $Id: BodyPart.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public class BodyPart extends Entity {
+    
+    /**
+     * TODO: Implement me
+     * 
+     * @see org.mime4j.message.Entity#writeTo(java.io.OutputStream)
+     */
     public void writeTo(OutputStream out) throws IOException {
     }
 }

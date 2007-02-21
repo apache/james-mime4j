@@ -26,7 +26,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.io.CopyUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mime4j.util.CharsetUtil;
@@ -60,10 +60,13 @@ class TempFileTextBody extends AbstractBody implements TextBody {
         tempFile = tempPath.createTempFile("attachment", ".txt");
         
         OutputStream out = tempFile.getOutputStream();
-        CopyUtils.copy(is, out);
+        IOUtils.copy(is, out);
         out.close();
     }
     
+    /**
+     * @see org.mime4j.message.TextBody#getReader()
+     */
     public Reader getReader() throws UnsupportedEncodingException, IOException {
         String javaCharset = null;
         if (mimeCharset != null) {
@@ -102,6 +105,11 @@ class TempFileTextBody extends AbstractBody implements TextBody {
         return new InputStreamReader(tempFile.getInputStream(), javaCharset);
     }
     
+    
+    /**
+     * @see org.mime4j.message.Body#writeTo(java.io.OutputStream)
+     */
     public void writeTo(OutputStream out) throws IOException {
+	IOUtils.copy(tempFile.getInputStream(), out);	
     }
 }

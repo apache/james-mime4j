@@ -117,6 +117,12 @@ public class Header {
         return Collections.unmodifiableList(l);
     }
     
+    /**
+     * Return Header Object as String representation. Each headerline is 
+     * seperated by  "\r\n"
+     * 
+     * @return headers
+     */
     public String toString() {
         StringBuffer str = new StringBuffer();
         for (Iterator it = fields.iterator(); it.hasNext();) {

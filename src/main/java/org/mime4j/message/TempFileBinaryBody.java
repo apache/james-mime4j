@@ -23,7 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.commons.io.CopyUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mime4j.util.TempFile;
@@ -49,22 +49,35 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
         tempFile = tempPath.createTempFile("attachment", ".bin");
         
         OutputStream out = tempFile.getOutputStream();
-        CopyUtils.copy(is, out);
+        IOUtils.copy(is, out);
         out.close();
     }
     
+    /**
+     * @see org.mime4j.message.AbstractBody#getParent()
+     */
     public Entity getParent() {
         return parent;
     }
     
+    /**
+     * @see org.mime4j.message.AbstractBody#setParent(org.mime4j.message.Entity)
+     */
     public void setParent(Entity parent) {
         this.parent = parent;
     }
     
+    /**
+     * @see org.mime4j.message.BinaryBody#getInputStream()
+     */
     public InputStream getInputStream() throws IOException {
         return tempFile.getInputStream();
     }
     
+    /**
+     * @see org.mime4j.message.Body#writeTo(java.io.OutputStream)
+     */
     public void writeTo(OutputStream out) throws IOException {
+	IOUtils.copy(getInputStream(),out);
     }
 }

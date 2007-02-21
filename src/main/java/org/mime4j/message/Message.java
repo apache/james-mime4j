@@ -77,6 +77,11 @@ public class Message extends Entity implements Body {
         return (UnstructuredField) getHeader().getField(Field.SUBJECT);
     }
 
+    /**
+     * TODO: Implement me
+     * '//
+     * @see org.mime4j.message.Entity#writeTo(java.io.OutputStream)
+     */
     public void writeTo(OutputStream out) throws IOException {
     }
     
@@ -95,6 +100,9 @@ public class Message extends Entity implements Body {
             }
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#startMessage()
+         */
         public void startMessage() {
             if (stack.isEmpty()) {
                 stack.push(Message.this);
@@ -106,20 +114,32 @@ public class Message extends Entity implements Body {
             }
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#endMessage()
+         */
         public void endMessage() {
             expect(Message.class);
             stack.pop();
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#startHeader()
+         */
         public void startHeader() {
             stack.push(new Header());
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#field(java.lang.String)
+         */
         public void field(String fieldData) {
             expect(Header.class);
             ((Header) stack.peek()).addField(Field.parse(fieldData));
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#endHeader()
+         */
         public void endHeader() {
             expect(Header.class);
             Header h = (Header) stack.pop();
@@ -127,6 +147,9 @@ public class Message extends Entity implements Body {
             ((Entity) stack.peek()).setHeader(h);
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#startMultipart(org.mime4j.BodyDescriptor)
+         */
         public void startMultipart(BodyDescriptor bd) {
             expect(Entity.class);
             
@@ -136,6 +159,9 @@ public class Message extends Entity implements Body {
             stack.push(multiPart);
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#body(org.mime4j.BodyDescriptor, java.io.InputStream)
+         */
         public void body(BodyDescriptor bd, InputStream is) throws IOException {
             expect(Entity.class);
             
@@ -156,10 +182,16 @@ public class Message extends Entity implements Body {
             ((Entity) stack.peek()).setBody(body);
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#endMultipart()
+         */
         public void endMultipart() {
             stack.pop();
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#startBodyPart()
+         */
         public void startBodyPart() {
             expect(Multipart.class);
             
@@ -168,11 +200,17 @@ public class Message extends Entity implements Body {
             stack.push(bodyPart);
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#endBodyPart()
+         */
         public void endBodyPart() {
             expect(BodyPart.class);
             stack.pop();
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#epilogue(java.io.InputStream)
+         */
         public void epilogue(InputStream is) throws IOException {
             expect(Multipart.class);
             StringBuffer sb = new StringBuffer();
@@ -183,6 +221,9 @@ public class Message extends Entity implements Body {
             ((Multipart) stack.peek()).setEpilogue(sb.toString());
         }
         
+        /**
+         * @see org.mime4j.ContentHandler#preamble(java.io.InputStream)
+         */
         public void preamble(InputStream is) throws IOException {
             expect(Multipart.class);
             StringBuffer sb = new StringBuffer();
@@ -193,6 +234,11 @@ public class Message extends Entity implements Body {
             ((Multipart) stack.peek()).setPreamble(sb.toString());
         }
         
+        /**
+         * TODO: Implement me
+         * 
+         * @see org.mime4j.ContentHandler#raw(java.io.InputStream)
+         */
         public void raw(InputStream is) throws IOException {
         }
 
