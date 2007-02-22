@@ -24,8 +24,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * 
- *
- * 
  * @version $Id: TempStorage.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 public abstract class TempStorage {

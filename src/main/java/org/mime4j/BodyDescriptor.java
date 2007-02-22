@@ -35,7 +35,6 @@ import org.apache.commons.logging.LogFactory;
 public class BodyDescriptor {
     private static Log log = LogFactory.getLog(BodyDescriptor.class);
     
-    private BodyDescriptor parent = null;
     private String mimeType = "text/plain";
     private String boundary = null;
     private String charset = "us-ascii";
@@ -319,11 +318,7 @@ public class BodyDescriptor {
         return result;
     }
     
-    /**
-     * Ret
-     * @param mimeType
-     * @return
-     */
+
     public boolean isMimeType(String mimeType) {
         return this.mimeType.equals(mimeType.toLowerCase());
     }

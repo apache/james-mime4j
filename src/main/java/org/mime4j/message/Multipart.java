@@ -163,24 +163,25 @@ public class Multipart implements Body {
      * @see org.mime4j.message.Body#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
-	String boundary = getBoundary();
-	List bodyParts = getBodyParts();
-	
-	out.write((getPreamble() + "\r\n").getBytes());
-	
-	for (int i = 0; i < bodyParts.size();i++) {
-	    out.write((boundary + "\r\n").getBytes());
-	    ((BodyPart)bodyParts.get(i)).writeTo(out);
-	}
-	
-	out.write((getEpilogue() + "\r\n").getBytes());
-	out.write((boundary + "--" + "\r\n").getBytes());
+        String boundary = getBoundary();
+        List bodyParts = getBodyParts();
+
+        out.write((getPreamble() + "\r\n").getBytes());
+
+        for (int i = 0; i < bodyParts.size(); i++) {
+            out.write((boundary + "\r\n").getBytes());
+            ((BodyPart) bodyParts.get(i)).writeTo(out);
+        }
+
+        out.write((getEpilogue() + "\r\n").getBytes());
+        out.write((boundary + "--" + "\r\n").getBytes());
 
     }
-    
+
     private String getBoundary() {
-	Entity e = getParent();
-	ContentTypeField cField = (ContentTypeField) e.getHeader().getField(Field.CONTENT_TYPE);
-	return cField.getBoundary();
+        Entity e = getParent();
+        ContentTypeField cField = (ContentTypeField) e.getHeader().getField(
+                Field.CONTENT_TYPE);
+        return cField.getBoundary();
     }
 }

@@ -33,7 +33,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.commons.io.CopyUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.mime4j.EOLConvertingInputStream;
@@ -177,7 +176,7 @@ public class MessageParserTest extends TestCase {
                 assertEquals(perlFile.getName(), s1, s2);
             } else {
                 OutputStream out = new FileOutputStream(mime4jFile);
-                CopyUtils.copy(((BinaryBody) b).getInputStream(), out);
+                IOUtils.copy(((BinaryBody) b).getInputStream(), out);
             
                 assertEqualsBinary(perlFile.getName(), expected, ((BinaryBody) b).getInputStream());
             }

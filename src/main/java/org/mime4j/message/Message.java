@@ -83,17 +83,17 @@ public class Message extends Entity implements Body {
      * @see org.mime4j.message.Entity#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
-	
-	out.write(getHeader().toString().getBytes());
-	out.write("\r\n".getBytes());
-	Body body = getBody();
-	
-	if (body instanceof Multipart) {
-	    Multipart mp = (Multipart) body;
-	    mp.writeTo(out);
-	} else {
-	    body.writeTo(out);
-	}
+
+        out.write(getHeader().toString().getBytes());
+        out.write("\r\n".getBytes());
+        Body body = getBody();
+
+        if (body instanceof Multipart) {
+            Multipart mp = (Multipart) body;
+            mp.writeTo(out);
+        } else {
+            body.writeTo(out);
+        }
     }
     
     

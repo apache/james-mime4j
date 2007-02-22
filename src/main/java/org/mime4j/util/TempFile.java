@@ -24,9 +24,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * 
- *
- * 
  * @version $Id: TempFile.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public interface TempFile {

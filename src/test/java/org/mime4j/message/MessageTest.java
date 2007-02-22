@@ -126,59 +126,62 @@ public class MessageTest extends TestCase {
     }
     
     public void testWriteTo() throws IOException {
-	byte[] inputByte = getRawMessageAsByteArray();
+        byte[] inputByte = getRawMessageAsByteArray();
 
-	Message m = new Message(new ByteArrayInputStream(inputByte));
-	ByteArrayOutputStream out = new  ByteArrayOutputStream();
-	
-	m.writeTo(out);
-	
-	InputStream output = new ByteArrayInputStream(out.toByteArray());
-	
-	int b = -1;
-	int i = 0;
-	while ((b = output.read() ) != -1) {
-	    assertEquals("same byte", b, inputByte[i]);
-	    i++;
-	}
+        Message m = new Message(new ByteArrayInputStream(inputByte));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        m.writeTo(out);
+
+        InputStream output = new ByteArrayInputStream(out.toByteArray());
+
+        int b = -1;
+        int i = 0;
+        while ((b = output.read()) != -1) {
+            assertEquals("same byte", b, inputByte[i]);
+            i++;
+        }
     }
-    
+
     public void testAddHeaderWriteTo() throws IOException {
-	String headerName = "testheader";
-	String headerValue = "testvalue";
-	String testheader = headerName + ": " + headerValue;
+        String headerName = "testheader";
+        String headerValue = "testvalue";
+        String testheader = headerName + ": " + headerValue;
 
-	byte[] inputByte = getRawMessageAsByteArray();
-	
-	Message m = new Message(new ByteArrayInputStream(inputByte));
-	m.getHeader().addField(Field.parse(testheader));
-	
-	assertEquals("header added",m.getHeader().getField(headerName).getBody(),headerValue);
-	
-	ByteArrayOutputStream out = new  ByteArrayOutputStream();
-	m.writeTo(out);
-	List lines = IOUtils.readLines((new BufferedReader(new InputStreamReader(new ByteArrayInputStream(out.toByteArray())))));
-    	
-	assertTrue("header added",lines.contains(testheader));
+        byte[] inputByte = getRawMessageAsByteArray();
+
+        Message m = new Message(new ByteArrayInputStream(inputByte));
+        m.getHeader().addField(Field.parse(testheader));
+
+        assertEquals("header added", m.getHeader().getField(headerName)
+                .getBody(), headerValue);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        m.writeTo(out);
+        List lines = IOUtils.readLines((new BufferedReader(
+                new InputStreamReader(new ByteArrayInputStream(out
+                        .toByteArray())))));
+
+        assertTrue("header added", lines.contains(testheader));
     }
-    
+
     private byte[] getRawMessageAsByteArray() {
-	StringBuffer header = new StringBuffer();
-	StringBuffer body = new StringBuffer();
-	StringBuffer complete = new StringBuffer();
-	
-	header.append("Date: Wed, 21 Feb 2007 11:09:27 +0100\r\n");
-	header.append("From: Test <test@test>\r\n");
-	header.append("To: Norman Maurer <nm@byteaction.de>\r\n");
-	header.append("Subject: Testmail\r\n");
-	header.append("Content-Type: text/plain; charset=ISO-8859-15; format=flowed\r\n");
-	header.append("Content-Transfer-Encoding: 8bit\r\n");
-	body.append("\r\n");
-	body.append("testbody\r\n");
-	complete.append(header);
-	complete.append(body);
-	
-	return complete.toString().getBytes();
+        StringBuffer header = new StringBuffer();
+        StringBuffer body = new StringBuffer();
+        StringBuffer complete = new StringBuffer();
+
+        header.append("Date: Wed, 21 Feb 2007 11:09:27 +0100\r\n");
+        header.append("From: Test <test@test>\r\n");
+        header.append("To: Norman Maurer <nm@byteaction.de>\r\n");
+        header.append("Subject: Testmail\r\n");
+        header
+                .append("Content-Type: text/plain; charset=ISO-8859-15; format=flowed\r\n");
+        header.append("Content-Transfer-Encoding: 8bit\r\n\r\n");
+        body.append("testbody\r\n");
+        complete.append(header);
+        complete.append(body);
+
+        return complete.toString().getBytes();
     }
 
 }

@@ -118,8 +118,8 @@ public class Header {
     }
     
     /**
-     * Return Header Object as String representation. Each headerline is 
-     * seperated by  "\r\n"
+     * Return Header Object as String representation. Each headerline is
+     * seperated by "\r\n"
      * 
      * @return headers
      */
@@ -129,7 +129,9 @@ public class Header {
             str.append(it.next().toString());
             str.append("\r\n");
         }
-        str.append("\r\n");
+
+        // TODO: Check where the CLRFCLRF is handled
+        // str.append("\r\n");
         return str.toString();
     }
 
