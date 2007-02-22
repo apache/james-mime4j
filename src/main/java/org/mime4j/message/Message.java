@@ -66,6 +66,7 @@ public class Message extends Entity implements Body {
         parser.setContentHandler(new MessageBuilder());
         parser.parse(is);
     }
+
     
     /**
      * Gets the <code>Subject</code> field.
@@ -78,12 +79,23 @@ public class Message extends Entity implements Body {
     }
 
     /**
-     * TODO: Implement me
-     * '//
+     * 
      * @see org.mime4j.message.Entity#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
+	
+	out.write(getHeader().toString().getBytes());
+	out.write("\r\n".getBytes());
+	Body body = getBody();
+	
+	if (body instanceof Multipart) {
+	    Multipart mp = (Multipart) body;
+	    mp.writeTo(out);
+	} else {
+	    body.writeTo(out);
+	}
     }
+    
     
     private class MessageBuilder implements ContentHandler {
         private Stack stack = new Stack();

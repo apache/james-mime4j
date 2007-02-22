@@ -31,10 +31,11 @@ import java.io.OutputStream;
 public class BodyPart extends Entity {
     
     /**
-     * TODO: Implement me
      * 
      * @see org.mime4j.message.Entity#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
+	out.write(getHeader().toString().getBytes());
+	getBody().writeTo(out);
     }
 }

@@ -26,6 +26,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.mime4j.field.ContentTypeField;
+import org.mime4j.field.Field;
+
 /**
  * Represents a MIME multipart body (see RFC 2045).A multipart body has a 
  * ordered list of body parts. The multipart body also has a preamble and
@@ -156,10 +159,28 @@ public class Multipart implements Body {
     }
 
     /**
-     * TODO: Implement me
      * 
      * @see org.mime4j.message.Body#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
+	String boundary = getBoundary();
+	List bodyParts = getBodyParts();
+	
+	out.write((getPreamble() + "\r\n").getBytes());
+	
+	for (int i = 0; i < bodyParts.size();i++) {
+	    out.write((boundary + "\r\n").getBytes());
+	    ((BodyPart)bodyParts.get(i)).writeTo(out);
+	}
+	
+	out.write((getEpilogue() + "\r\n").getBytes());
+	out.write((boundary + "--" + "\r\n").getBytes());
+
+    }
+    
+    private String getBoundary() {
+	Entity e = getParent();
+	ContentTypeField cField = (ContentTypeField) e.getHeader().getField(Field.CONTENT_TYPE);
+	return cField.getBoundary();
     }
 }
