@@ -129,9 +129,6 @@ public class Header {
             str.append(it.next().toString());
             str.append("\r\n");
         }
-
-        // TODO: Check where the CLRFCLRF is handled
-        // str.append("\r\n");
         return str.toString();
     }
 

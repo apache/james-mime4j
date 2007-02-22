@@ -29,13 +29,18 @@ import java.io.OutputStream;
  * @version $Id: BodyPart.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public class BodyPart extends Entity {
-    
+
     /**
      * 
      * @see org.mime4j.message.Entity#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
-	out.write(getHeader().toString().getBytes());
-	getBody().writeTo(out);
+        String header = getHeader().toString();
+        if (header.equals("") == false) {
+
+            out.write((header + "\r\n").getBytes());
+        }
+
+        getBody().writeTo(out);
     }
 }

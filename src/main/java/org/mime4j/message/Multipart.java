@@ -178,6 +178,11 @@ public class Multipart implements Body {
 
     }
 
+    /**
+     * Return the boundory of the parent Entity
+     * 
+     * @return boundery
+     */
     private String getBoundary() {
         Entity e = getParent();
         ContentTypeField cField = (ContentTypeField) e.getHeader().getField(

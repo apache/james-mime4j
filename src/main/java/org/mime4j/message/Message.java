@@ -83,11 +83,10 @@ public class Message extends Entity implements Body {
      * @see org.mime4j.message.Entity#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
+        String header = getHeader().toString();
+        out.write((header + "\r\n").getBytes());
 
-        out.write(getHeader().toString().getBytes());
-        out.write("\r\n".getBytes());
         Body body = getBody();
-
         if (body instanceof Multipart) {
             Multipart mp = (Multipart) body;
             mp.writeTo(out);
@@ -99,7 +98,6 @@ public class Message extends Entity implements Body {
     
     private class MessageBuilder implements ContentHandler {
         private Stack stack = new Stack();
-        private Message root = null;
         
         public MessageBuilder() {
         }
@@ -252,6 +250,7 @@ public class Message extends Entity implements Body {
          * @see org.mime4j.ContentHandler#raw(java.io.InputStream)
          */
         public void raw(InputStream is) throws IOException {
+            throw new UnsupportedOperationException("Not supported");
         }
 
     }
