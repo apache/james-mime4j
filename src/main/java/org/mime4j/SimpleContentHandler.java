@@ -34,7 +34,7 @@ import java.io.IOException;
  *
  * 
  */
-public abstract class SimpleContentHandler implements ContentHandler {
+public abstract class SimpleContentHandler extends  AbstractContentHandler {
 
     /**
      * Called after headers are parsed.
@@ -54,63 +54,6 @@ public abstract class SimpleContentHandler implements ContentHandler {
      * @throws IOException should be thrown on I/O errors.
      */
     public abstract void bodyDecoded(BodyDescriptor bd, InputStream is) throws IOException;
-
-    /* Subclassers: override these as necessary. */
-
-    /**
-     * @see ContentHandler#startMessage()
-     */
-    public void startMessage() {
-    }
-
-    /**
-     * @see ContentHandler#endMessage()
-     */
-    public void endMessage() {
-    }
-
-    /**
-     * @see ContentHandler#startBodyPart()
-     */
-    public void startBodyPart() {
-    }
-
-    /**
-     * @see ContentHandler#endBodyPart()
-     */
-    public void endBodyPart() {
-    }
-
-    /**
-     * @see ContentHandler#preamble(java.io.InputStream)
-     */
-    public void preamble(InputStream is) throws IOException {
-    }
-
-    /**
-     * @see ContentHandler#epilogue(java.io.InputStream)
-     */
-    public void epilogue(InputStream is) throws IOException {
-    }
-
-    /**
-     * @see ContentHandler#startMultipart(BodyDescriptor)
-     */
-    public void startMultipart(BodyDescriptor bd) {
-    }
-
-    /**
-     * @see ContentHandler#endMultipart()
-     */
-    public void endMultipart() {
-    }
-
-    /**
-     * @see ContentHandler#raw(java.io.InputStream)  
-     */
-    public void raw(InputStream is) throws IOException {
-    }
-
 
 
     /* Implement introduced callbacks. */

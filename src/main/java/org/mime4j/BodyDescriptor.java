@@ -319,42 +319,92 @@ public class BodyDescriptor {
         return result;
     }
     
+    /**
+     * Ret
+     * @param mimeType
+     * @return
+     */
     public boolean isMimeType(String mimeType) {
         return this.mimeType.equals(mimeType.toLowerCase());
     }
     
+    /**
+     * Return true if the BodyDescriptor belongs to a message 
+     * 
+     * @return
+     */
     public boolean isMessage() {
         return mimeType.equals("message/rfc822");
     }
     
+    /**
+     * Retrun true if the BodyDescripotro belogns to a multipart
+     * 
+     * @return
+     */
     public boolean isMultipart() {
         return mimeType.startsWith("multipart/");
     }
     
+    /**
+     * Return the MimeType 
+     * 
+     * @return mimeType
+     */
     public String getMimeType() {
         return mimeType;
     }
     
+    /**
+     * Return the boundary
+     * 
+     * @return boundary
+     */
     public String getBoundary() {
         return boundary;
     }
     
+    /**
+     * Return the charset
+     * 
+     * @return charset
+     */
     public String getCharset() {
         return charset;
     }
     
+    /**
+     * Return all parameters for the BodyDescriptor
+     * 
+     * @return parameters
+     */
     public Map getParameters() {
         return parameters;
     }
     
+    /**
+     * Return the TransferEncoding
+     * 
+     * @return transferEncoding
+     */
     public String getTransferEncoding() {
         return transferEncoding;
     }
     
+    /**
+     * Return true if it's base64 encoded
+     * 
+     * @return
+     * 
+     */
     public boolean isBase64Encoded() {
         return "base64".equals(transferEncoding);
     }
     
+    /**
+     * Return true if it's quoted-printable
+     * @return
+     */
     public boolean isQuotedPrintableEncoded() {
         return "quoted-printable".equals(transferEncoding);
     }

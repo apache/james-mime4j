@@ -129,6 +129,7 @@ public class Header {
             str.append(it.next().toString());
             str.append("\r\n");
         }
+        str.append("\r\n");
         return str.toString();
     }
 
