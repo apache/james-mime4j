@@ -1118,6 +1118,17 @@ public class CharsetUtil {
         return null;
     }
 
+    public static java.nio.charset.Charset getCharset(String charsetName) {
+        java.nio.charset.Charset c = java.nio.charset.Charset.forName(charsetName);
+        
+        if (c == null) {
+            //TODO: Check what touse as default
+            c = java.nio.charset.Charset.forName("ISO8859-1");
+            
+        }
+        return c;
+        
+    }
     /*
      * Uncomment the code below and run the main method to regenerate the
      * Javadoc table above when the known charsets change. 

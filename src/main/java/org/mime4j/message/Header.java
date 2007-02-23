@@ -19,8 +19,11 @@
 
 package org.mime4j.message;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -29,7 +32,9 @@ import java.util.List;
 
 import org.mime4j.AbstractContentHandler;
 import org.mime4j.MimeStreamParser;
+import org.mime4j.field.ContentTypeField;
 import org.mime4j.field.Field;
+import org.mime4j.util.CharsetUtil;
 
 
 /**
@@ -130,6 +135,22 @@ public class Header {
             str.append("\r\n");
         }
         return str.toString();
+    }
+    
+    
+    /**
+     * Write the Header to the given outputStream
+     * 
+     * @param out
+     * @throws IOException
+     */
+    public void writeTo(OutputStream out) throws IOException {
+        String charString = ((ContentTypeField) getField(Field.CONTENT_TYPE)).getCharset();
+        
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, CharsetUtil.getCharset(charString)),8192);
+        writer.append(toString()+ "\r\n");
+        writer.flush();
+        writer.close();
     }
 
 }

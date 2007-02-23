@@ -22,6 +22,7 @@ package org.mime4j.message;
 import java.io.IOException;
 import java.io.OutputStream;
 
+
 /**
  * Represents a MIME body part  (see RFC 2045).
  *
@@ -35,12 +36,7 @@ public class BodyPart extends Entity {
      * @see org.mime4j.message.Entity#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
-        String header = getHeader().toString();
-        if (header.equals("") == false) {
-
-            out.write((header + "\r\n").getBytes());
-        }
-
+        getHeader().writeTo(out);
         getBody().writeTo(out);
     }
 }

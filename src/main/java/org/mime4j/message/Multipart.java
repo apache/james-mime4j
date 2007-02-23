@@ -19,8 +19,10 @@
 
 package org.mime4j.message;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -28,6 +30,7 @@ import java.util.List;
 
 import org.mime4j.field.ContentTypeField;
 import org.mime4j.field.Field;
+import org.mime4j.util.CharsetUtil;
 
 /**
  * Represents a MIME multipart body (see RFC 2045).A multipart body has a 
@@ -166,15 +169,17 @@ public class Multipart implements Body {
         String boundary = getBoundary();
         List bodyParts = getBodyParts();
 
-        out.write((getPreamble() + "\r\n").getBytes());
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, CharsetUtil.getCharset(getCharset())),8192);
+        
+        writer.append(getPreamble() + "\r\n");
 
         for (int i = 0; i < bodyParts.size(); i++) {
-            out.write((boundary + "\r\n").getBytes());
+            writer.append(boundary + "\r\n");
             ((BodyPart) bodyParts.get(i)).writeTo(out);
         }
 
-        out.write((getEpilogue() + "\r\n").getBytes());
-        out.write((boundary + "--" + "\r\n").getBytes());
+        writer.append(getEpilogue() + "\r\n");
+        writer.append(boundary + "--" + "\r\n");
 
     }
 
@@ -188,5 +193,11 @@ public class Multipart implements Body {
         ContentTypeField cField = (ContentTypeField) e.getHeader().getField(
                 Field.CONTENT_TYPE);
         return cField.getBoundary();
+    }
+    
+    private String getCharset() {
+        Entity e = getParent();
+        String charString = ((ContentTypeField) e.getHeader().getField(Field.CONTENT_TYPE)).getCharset();
+        return charString;
     }
 }
