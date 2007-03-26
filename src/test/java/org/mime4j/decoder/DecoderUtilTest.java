@@ -78,6 +78,7 @@ public class DecoderUtilTest extends TestCase {
                 DecoderUtil.decodeEncodedWords("=?US-ASCII?b?QSBzaG9ydCB0ZXh0IGFnYWluIQ==?="));
         assertEquals("", DecoderUtil.decodeEncodedWords("=?iso8859-1?Q?="));
         assertEquals("", DecoderUtil.decodeEncodedWords("=?iso8859-1?b?="));
+        assertEquals("", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?"));
         
         /*
          * Bug detected on June 7, 2005. Decoding the following string caused

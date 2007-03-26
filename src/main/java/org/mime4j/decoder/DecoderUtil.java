@@ -197,9 +197,9 @@ public class DecoderUtil {
                  */
                 p2 = t2 != -1 ? body.indexOf("?=", t2 + 1) : -1;
                 if (p2 == -1) {
-                    if (t2 != -1 && body.charAt(t2 + 1) == '=') {
+                    if (t2 != -1 && (body.length() - 1 == t2 || body.charAt(t2 + 1) == '=')) {
                         /*
-                         * The text "=?charset?enc?=" appears to be valid for 
+                         * Treat "=?charset?enc?" and "=?charset?enc?=" as
                          * empty strings.
                          */
                         p2 = t2;
