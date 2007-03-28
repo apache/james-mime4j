@@ -148,7 +148,7 @@ public class Header {
         String charString = ((ContentTypeField) getField(Field.CONTENT_TYPE)).getCharset();
         
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, CharsetUtil.getCharset(charString)),8192);
-        writer.append(toString()+ "\r\n");
+        writer.write(toString()+ "\r\n");
         writer.flush();
         writer.close();
     }
