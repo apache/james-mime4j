@@ -25,6 +25,8 @@ import java.io.InputStream;
 /**
  * Abstract <code>ContentHandler</code> with default implementations of all
  * the methods of the <code>ContentHandler</code> interface.
+ * 
+ * The default is to todo nothing.
  *
  * 
  * @version $Id: AbstractContentHandler.java,v 1.3 2004/10/02 12:41:10 ntherning Exp $

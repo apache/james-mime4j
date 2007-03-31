@@ -109,6 +109,9 @@ public class SimpleTempStorage extends TempStorage {
         return new SimpleTempFile(f);
     }
     
+    /**
+     * @see org.mime4j.util.TempStorage#getRootTempPath()
+     */
     public TempPath getRootTempPath() {
         return rootPath;
     }
@@ -124,16 +127,25 @@ public class SimpleTempStorage extends TempStorage {
             this.path = path;
         }
         
+        /**
+         * @see org.mime4j.util.TempPath#createTempFile()
+         */
         public TempFile createTempFile() throws IOException {
             return SimpleTempStorage.this.createTempFile(this, null, null);
         }
 
+        /**
+         * @see org.mime4j.util.TempPath#createTempFile(java.lang.String, java.lang.String)
+         */
         public TempFile createTempFile(String prefix, String suffix) 
                 throws IOException {
             
             return SimpleTempStorage.this.createTempFile(this, prefix, suffix);
         }
 
+        /**
+         * @see org.mime4j.util.TempPath#createTempFile(java.lang.String, java.lang.String, boolean)
+         */
         public TempFile createTempFile(String prefix, String suffix, 
                                        boolean allowInMemory) 
             throws IOException {
@@ -141,17 +153,29 @@ public class SimpleTempStorage extends TempStorage {
             return SimpleTempStorage.this.createTempFile(this, prefix, suffix);
         }
         
+        /**
+         * @see org.mime4j.util.TempPath#getAbsolutePath()
+         */
         public String getAbsolutePath() {
             return path.getAbsolutePath();
         }
 
+        /**
+         * Do nothing
+         */
         public void delete() {
         }
 
+        /**
+         * @see org.mime4j.util.TempPath#createTempPath()
+         */
         public TempPath createTempPath() throws IOException {
             return SimpleTempStorage.this.createTempPath(this, null);
         }
 
+        /**
+         * @see org.mime4j.util.TempPath#createTempPath(java.lang.String)
+         */
         public TempPath createTempPath(String prefix) throws IOException {
             return SimpleTempStorage.this.createTempPath(this, prefix);
         }
@@ -160,36 +184,50 @@ public class SimpleTempStorage extends TempStorage {
     
     private class SimpleTempFile implements TempFile {
         private File file = null;
-        
-        private SimpleTempFile(String file) {
-            this.file = new File(file);
-            this.file.deleteOnExit();
-        }
-        
+
         private SimpleTempFile(File file) {
             this.file = file;
             this.file.deleteOnExit();
         }
 
+        /**
+         * @see org.mime4j.util.TempFile#getInputStream()
+         */
         public InputStream getInputStream() throws IOException {
             return new BufferedInputStream(new FileInputStream(file));
         }
 
+        /**
+         * @see org.mime4j.util.TempFile#getOutputStream()
+         */
         public OutputStream getOutputStream() throws IOException {
             return new BufferedOutputStream(new FileOutputStream(file));
         }
 
+        /**
+         * @see org.mime4j.util.TempFile#getAbsolutePath()
+         */
         public String getAbsolutePath() {
             return file.getAbsolutePath();
         }
 
+        /**
+         * Do nothing
+         */
         public void delete() {
+            // Not implementated
         }
 
+        /**
+         * @see org.mime4j.util.TempFile#isInMemory()
+         */
         public boolean isInMemory() {
             return false;
         }
 
+        /**
+         * @see org.mime4j.util.TempFile#length()
+         */
         public long length() {
             return file.length();
         }

@@ -23,9 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Stream that constrains itself to a single MIME body part.
  * After the stream ends (i.e. read() returns -1) {@link #hasMoreParts()}
@@ -38,8 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id: MimeBoundaryInputStream.java,v 1.2 2004/11/29 13:15:42 ntherning Exp $
  */
 public class MimeBoundaryInputStream extends InputStream {
-    private static Log log = LogFactory.getLog(MimeBoundaryInputStream.class);
-
+    
     private PushbackInputStream s = null;
     private byte[] boundary = null;
     private boolean first = true;
@@ -114,6 +110,9 @@ public class MimeBoundaryInputStream extends InputStream {
         }
     }
     
+    /**
+     * @see java.io.InputStream#read()
+     */
     public int read() throws IOException {
         if (eof) {
             return -1;

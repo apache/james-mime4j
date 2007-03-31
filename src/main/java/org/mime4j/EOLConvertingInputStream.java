@@ -77,6 +77,9 @@ public class EOLConvertingInputStream extends InputStream {
         in.close();
     }
     
+    /**
+     * @see java.io.InputStream#read()
+     */
     public int read() throws IOException {
         int b = in.read();
         

@@ -139,9 +139,9 @@ public class Header {
     
     
     /**
-     * Write the Header to the given outputStream
+     * Write the Header to the given OutputStream
      * 
-     * @param out
+     * @param out the OutputStream to write to
      * @throws IOException
      */
     public void writeTo(OutputStream out) throws IOException {

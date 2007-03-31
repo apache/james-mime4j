@@ -160,5 +160,11 @@ public abstract class Entity {
             && getMimeType().startsWith(ContentTypeField.TYPE_MULTIPART_PREFIX);
     }
     
+    /**
+     * Write the content to the given outputstream
+     * 
+     * @param out the outputstream to write to
+     * @throws IOException 
+     */
     public abstract void writeTo(OutputStream out) throws IOException;
 }

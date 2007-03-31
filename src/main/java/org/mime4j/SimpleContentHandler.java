@@ -60,20 +60,32 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
 
     private Header currHeader;
 
+    /**
+     * @see org.mime4j.AbstractContentHandler#startHeader()
+     */
     public final void startHeader() {
         currHeader = new Header();
     }
 
+    /**
+     * @see org.mime4j.AbstractContentHandler#field(java.lang.String)
+     */
     public final void field(String fieldData) {
         currHeader.addField(Field.parse(fieldData));
     }
 
+    /**
+     * @see org.mime4j.AbstractContentHandler#endHeader()
+     */
     public final void endHeader() {
         Header tmp = currHeader;
         currHeader = null;
         headers(tmp);
     }
 
+    /**
+     * @see org.mime4j.AbstractContentHandler#body(org.mime4j.BodyDescriptor, java.io.InputStream)
+     */
     public final void body(BodyDescriptor bd, InputStream is) throws IOException {
         if (bd.isBase64Encoded()) {
             bodyDecoded(bd, new Base64InputStream(is));

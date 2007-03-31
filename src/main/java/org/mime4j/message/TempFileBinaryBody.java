@@ -43,6 +43,12 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
     private Entity parent = null;
     private TempFile tempFile = null;
 
+    /**
+     * Use the given InputStream to build the TemporyFileBinaryBody
+     * 
+     * @param is the InputStream to use as source
+     * @throws IOException
+     */
     public TempFileBinaryBody(InputStream is) throws IOException {
         
         TempPath tempPath = TempStorage.getInstance().getRootTempPath();

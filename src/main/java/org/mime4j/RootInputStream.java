@@ -67,6 +67,9 @@ class RootInputStream extends InputStream {
         this.truncated = true;
     }
     
+    /**
+     * @see java.io.InputStream#read()
+     */
     public int read() throws IOException {
         if (truncated) {
             return -1;
@@ -80,6 +83,10 @@ class RootInputStream extends InputStream {
         return b;
     }
     
+    /**
+     * 
+     * @see java.io.InputStream#read(byte[], int, int)
+     */
     public int read(byte[] b, int off, int len) throws IOException {
         if (truncated) {
             return -1;
@@ -95,6 +102,9 @@ class RootInputStream extends InputStream {
         return n;
     }
     
+    /**
+     * @see java.io.InputStream#read(byte[])
+     */
     public int read(byte[] b) throws IOException {
         return read(b, 0, b.length);
     }
