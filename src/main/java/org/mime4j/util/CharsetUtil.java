@@ -1119,10 +1119,11 @@ public class CharsetUtil {
     }
 
     public static java.nio.charset.Charset getCharset(String charsetName) {
+        if(charsetName == null) charsetName = "ISO8859-1";
+            
         java.nio.charset.Charset c = java.nio.charset.Charset.forName(charsetName);
         
         if (c == null) {
-            //TODO: Check what touse as default
             c = java.nio.charset.Charset.forName("ISO8859-1");
             
         }
