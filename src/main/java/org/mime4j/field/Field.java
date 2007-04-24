@@ -183,6 +183,9 @@ public abstract class Field {
         return TO.equalsIgnoreCase(name);
     }
     
+    /**
+     * @see #getRaw()
+     */
     public String toString() {
         return raw;
     }

@@ -20,6 +20,8 @@
 package org.mime4j.util;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 import java.util.TreeSet;
 
@@ -1119,15 +1121,22 @@ public class CharsetUtil {
     }
 
     public static java.nio.charset.Charset getCharset(String charsetName) {
-        if(charsetName == null) charsetName = "ISO8859-1";
-            
-        java.nio.charset.Charset c = java.nio.charset.Charset.forName(charsetName);
+        String defaultCharset = "ISO-8851-1";
         
-        if (c == null) {
-            c = java.nio.charset.Charset.forName("ISO8859-1");
+        // Use the default chareset if given charset is null
+        if(charsetName == null) charsetName = defaultCharset;
             
+        try {
+            return java.nio.charset.Charset.forName(charsetName);
+        } catch (IllegalCharsetNameException e) {
+            log.info("Illegal charset " + charsetName + ", fallback to " + defaultCharset + ": " + e);
+            // Use default charset on exception 
+            return java.nio.charset.Charset.forName(defaultCharset);
+        } catch (UnsupportedCharsetException ex) {
+            log.info("Unsupported charset " + charsetName + ", fallback to " + defaultCharset + ": " + ex);
+            // Use default charset on exception
+            return java.nio.charset.Charset.forName(defaultCharset);
         }
-        return c;
         
     }
     /*

@@ -74,7 +74,7 @@ class TempFileTextBody extends AbstractBody implements TextBody {
         }
         
         if (javaCharset == null) {
-            javaCharset = "ISO8859-1";
+            javaCharset = "ISO-8859-1";
             
             if (log.isWarnEnabled()) {
                 if (mimeCharset == null) {
