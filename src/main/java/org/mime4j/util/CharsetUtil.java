@@ -1121,7 +1121,7 @@ public class CharsetUtil {
     }
 
     public static java.nio.charset.Charset getCharset(String charsetName) {
-        String defaultCharset = "ISO-8851-1";
+        String defaultCharset = "ISO-8859-1";
         
         // Use the default chareset if given charset is null
         if(charsetName == null) charsetName = defaultCharset;
