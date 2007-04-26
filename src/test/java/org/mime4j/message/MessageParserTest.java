@@ -19,25 +19,27 @@
 
 package org.mime4j.message;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.BasicConfigurator;
+import org.mime4j.EOLConvertingInputStream;
+import org.mime4j.field.Field;
+import org.mime4j.util.CharsetUtil;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.BasicConfigurator;
-import org.mime4j.EOLConvertingInputStream;
-import org.mime4j.field.Field;
-import org.mime4j.util.CharsetUtil;
 
 /**
  * 
@@ -63,7 +65,7 @@ public class MessageParserTest extends TestCase {
     public static Test suite() {
         TestSuite suite = new TestSuite();
         
-        File dir =	new File("src/test/resources/testmsgs");
+        File dir = new File("src/test/resources/testmsgs");
         File[] files = dir.listFiles();
         
         for (int i = 0; i < files.length && i < 5000; i++) {
@@ -94,13 +96,28 @@ public class MessageParserTest extends TestCase {
         String result = getStructure(m, prefix, "1");
         String mime4jFileName = fileName.substring(0, fileName.length() - 4) 
                                     + "_decoded.mime4j.xml";
+        String expected = null;
+        try {
+            expected = IOUtils.toString(
+                    new FileInputStream(xmlFileName), "ISO8859-1");
+        } catch (FileNotFoundException ex) {
+            writeToFile(result, mime4jFileName);
+            fail("Test file not found. Generated the expected result with mime4j prefix: "+ex.getMessage());
+        }
+        try {
+            assertEquals(expected, result);
+        } catch (AssertionError ae) {
+            writeToFile(result, mime4jFileName);
+            throw ae;
+        }
+    }
+
+    private void writeToFile(String result, String mime4jFileName)
+            throws FileNotFoundException, IOException,
+            UnsupportedEncodingException {
         FileOutputStream out = new FileOutputStream(mime4jFileName);
         out.write(result.getBytes("ISO8859-1"));
         out.close();
-        
-        String expected = IOUtils.toString(
-                    new FileInputStream(xmlFileName), "ISO8859-1");
-        assertEquals(expected, result);
     }
     
     private String escape(String s) {
@@ -157,28 +174,38 @@ public class MessageParserTest extends TestCase {
             String tag = b instanceof TextBody ? "text-body" : "binary-body";
             sb.append("<" + tag + " name=\"" + name + "\"/>\r\n");
                 
-            File perlFile = new File(new File(fileName).getParent(), name);
+            File expectedFile = new File(new File(fileName).getParent(), name);
             File mime4jFile = new File(new File(fileName).getParent(), 
                               name.substring(0, name.length() - 4) + ".mime4j"
                                + (b instanceof TextBody ? ".txt" : ".bin"));
                 
-            InputStream expected = 
-                new BufferedInputStream(new FileInputStream(perlFile));
+            InputStream expected = null;
+            try {
+                expected = new BufferedInputStream(new FileInputStream(expectedFile));
+            } catch (FileNotFoundException ex) {
+                writeToFile(b, mime4jFile);
+                fail("Test file not found. Generated the expected result with mime4j prefix: "+ex.getMessage());
+            }
             
-            if (b instanceof TextBody) {
-                String charset = CharsetUtil.toJavaCharset(e.getCharset());
-                if (charset == null) {
-                    charset = "ISO8859-1";
+            try {
+                if (b instanceof TextBody) {
+                    String charset = CharsetUtil.toJavaCharset(e.getCharset());
+                    if (charset == null) {
+                        charset = "ISO8859-1";
+                    }
+
+                    String s1 = IOUtils.toString(expected, charset).replaceAll(
+                            "\r", "");
+                    String s2 = IOUtils.toString(((TextBody) b).getReader())
+                            .replaceAll("\r", "");
+                    assertEquals(expectedFile.getName(), s1, s2);
+                } else {
+                    assertEqualsBinary(expectedFile.getName(), expected,
+                            ((BinaryBody) b).getInputStream());
                 }
-                
-                String s1 = IOUtils.toString(expected, charset).replaceAll("\r", "");
-                String s2 = IOUtils.toString(((TextBody) b).getReader()).replaceAll("\r", "");
-                assertEquals(perlFile.getName(), s1, s2);
-            } else {
-                OutputStream out = new FileOutputStream(mime4jFile);
-                IOUtils.copy(((BinaryBody) b).getInputStream(), out);
-            
-                assertEqualsBinary(perlFile.getName(), expected, ((BinaryBody) b).getInputStream());
+            } catch (AssertionError er) {
+                writeToFile(b, mime4jFile);
+                throw er;
             }
         }
         
@@ -190,6 +217,17 @@ public class MessageParserTest extends TestCase {
         }            
         
         return sb.toString();
+    }
+
+    private void writeToFile(Body b, File mime4jFile)
+            throws FileNotFoundException, IOException {
+        if (b instanceof TextBody) {
+            OutputStream out = new FileOutputStream(mime4jFile);
+            IOUtils.copy(((TextBody) b).getReader(), out);
+        } else {
+            OutputStream out = new FileOutputStream(mime4jFile);
+            IOUtils.copy(((BinaryBody) b).getInputStream(), out);
+        }
     }
 
     private void assertEqualsBinary(String msg, InputStream a, InputStream b) 
