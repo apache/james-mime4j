@@ -25,14 +25,8 @@
     <body>
         <links>
             <item name="Home Page" href="http://www.mime4j.org/"/>
-            <item name="SourceForge Project Page" href="http://sourceforge.net/projects/mime4j/"/>
             <item name="Browse Source Code" href="http://svn.apache.org/viewcvs.cgi/james/mime4j/trunk/"/>
         </links>        
-        <menu name="Quick Links">
-            <item name="Download" href="http://sourceforge.net/project/showfiles.php?group_id=108895"/>
-            <!--<item name="Forums" href="http://sourceforge.net/forum/?group_id=108895"/>-->
-            <!--<item name="Mailing Lists" href="http://sourceforge.net/mail/?group_id=108895"/>-->
-        </menu>
         <menu name="Overview">
             <!--<item name="Features" href="/features.html"/>-->
             <item name="News and Status" href="/status.html"/>

@@ -27,20 +27,18 @@
     <body>
         <section name="Building mime4j">
             <subsection name="Using a Stable Release">
-                <p> Go to the <a
-                        href="http://sourceforge.net/project/showfiles.php?group_id=108895">
-                        Sourceforge download pages</a> and download the most
-                    recent release in your preferred format, either
-                    <code>mime4j-x.y-src.tar.gz</code> or
-                    <code>mime4j-x.y-src.zip</code>. Extracting the archived
-                    sources will create the directory <code>mime4j-x.y/</code>
-                </p>
+            <p> Go to the <a href="http://james.apache.org/download.cgi">download 
+              pages</a> and download the most recent
+                release in your preferred format, either
+                <code>james-mime4j-x.y-src.tar.gz</code> or <code>james-mime4j-x.y-src.zip</code>.
+                Extracting the archived sources will create the directory
+                <code>james-mime4j-x.y/</code>.</p>
             </subsection>
             <subsection name="Checking Out From Subversion">
                 <p>
                     Issue the following commands in a shell:
                     <blockquote>
-                        <code>svn checkout http://svn.apache.org/repos/asf/james/mime4k/trunk james-mime4j</code><br/>
+                        <code>svn checkout http://svn.apache.org/repos/asf/james/mime4j/trunk james-mime4j</code><br/>
                     </blockquote>
                 </p>
             </subsection>
@@ -63,7 +61,7 @@
             <subsection name="Building the mime4j Jar">
                 <p> Once Maven has been installed, building the project should
                     be as simple as typing <blockquote>
-                        <code>cd mime4j-x.y/ (cd james-mime4j/ if sources come from
+                        <code>cd james-mime4j-x.y/ (cd james-mime4j/ if sources come from
                             Subversion)<br/>mvn package</code>
                     </blockquote> from the command line. Maven will
                     automatically run all test cases for you and create the
@@ -76,6 +74,14 @@
                 <p>
                     To generate an Eclipse project from the sources run <blockquote>
                         <code>mvn eclipse:eclipse</code></blockquote>
+                <p>
+                  <strong>NOTE!</strong> Mime4j uses <a href="https://javacc.dev.java.net/">JavaCC</a> to generate parsers for
+                  header fields. <code>mvn eclipse:eclipse</code> currently has problems with 
+                  generating proper source folders for the JavaCC generated code.
+                  After running <code>mvn eclipse:eclipse</code> you must manually
+                  add <code>target/generated-sources/javacc</code> and 
+                  <code>target/generated-sources/jjtree</code> as source folders
+                  under <em>Project -&gt; Properties</em> in Eclipse.
                 </p>
                 <p>
                     For more information on using

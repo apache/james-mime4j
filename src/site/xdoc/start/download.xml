@@ -26,13 +26,12 @@
     </properties>
     <body>
         <section name="Downloading mime4j">
-            <p> Go to the <a
-                    href="http://sourceforge.net/project/showfiles.php?group_id=108895">
-                    Sourceforge download pages</a> and download the most recent
+            <p> Go to the <a href="http://james.apache.org/download.cgi">download 
+              pages</a> and download the most recent
                 release in your preferred format, either
-                <code>mime4j-x.y.tar.gz</code> or <code>mime4j-x.y.zip</code>.
-                Extracting the archived sources will create the directory
-                <code>mime4j-x.y/</code> which contains the mime4j jar file and
+                <code>james-mime4j-x.y.tar.gz</code> or <code>james-mime4j-x.y.zip</code>.
+                Extracting the archive will create the directory
+                <code>james-mime4j-x.y/</code> which contains the mime4j jar file and
                 the API docs.</p>
         </section>
     </body>

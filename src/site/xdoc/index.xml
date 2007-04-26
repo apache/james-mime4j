@@ -27,12 +27,10 @@
     <body>
         <section name="Mime4j">
             <p>
-                <strong>NOTE:</strong> mime4j is now a subproject of 
+                <strong>NOTE:</strong> mime4j is a subproject of 
                 <a href="http://james.apache.org/">Apache James</a>. Please use
-                the James mailing list for mime4j related questions. We have not
-                yet made a release under The Apache Software Fondation umbrella.
-                In the mean time downloads of old releases will still be available
-                from the sourceforge project page.
+                the <a href="http://james.apache.org/mail.html">James mailing list</a> 
+                for mime4j related questions.
             </p>
             <p> mime4j provides a parser, 
                 <a href="apidocs/org/mime4j/MimeStreamParser.html">
