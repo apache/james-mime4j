@@ -40,13 +40,13 @@
                     </tr>
                     <tr>
                         <td>
-                            <code>org.mime4j.samples.tree.MessageTree</code>
+                            <code>org.apache.james.mime4j.samples.tree.MessageTree</code>
                         </td>
                         <td>Displays a tree of the contents of a
                             mime4j <code>Message</code> object in a Swing GUI.
                             To try it out run
                             <blockquote>
-                             <code>java org.mime4j.samples.tree.MessageTree path/to/message.msg</code>
+                             <code>java org.apache.james.mime4j.samples.tree.MessageTree path/to/message.msg</code>
                             </blockquote>
                             The output is very useful if
                             you want the study the structure of MIME messages.
@@ -54,13 +54,13 @@
                     </tr>
                <!--      <tr>
                         <td>
-                            <code>org.mime4j.samples.sax.Mime2Sax</code>
+                            <code>org.apache.james.mime4j.samples.sax.Mime2Sax</code>
                         </td>
                         <td></td>
                     </tr>
                     <tr>
                         <td>
-                            <code>org.mime4j.samples.pgp.PGPSignatureVerifier</code>
+                            <code>org.apache.james.mime4j.samples.pgp.PGPSignatureVerifier</code>
                         </td>
                         <td></td>
                     </tr> -->
