@@ -19,21 +19,19 @@
 
 package org.apache.james.mime4j;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.BasicConfigurator;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 
 import junit.framework.TestCase;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.AbstractContentHandler;
-import org.apache.james.mime4j.BodyDescriptor;
-import org.apache.james.mime4j.ContentHandler;
-import org.apache.james.mime4j.MimeStreamParser;
-import org.apache.log4j.BasicConfigurator;
 
 
 
@@ -436,9 +434,19 @@ public class MimeStreamParserTest extends TestCase {
                 
                 String result = handler.sb.toString();
                 String xmlFile = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf('.')) + ".xml";
-                String expected = IOUtils.toString(new FileInputStream(xmlFile), "ISO8859-1");
+                String xmlFileMime4j = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf('.')) + ".mime4j.xml";
                 
-                assertEquals("Error parsing " + f.getName(), expected, result);
+                try {
+                    String expected = IOUtils.toString(new FileInputStream(xmlFile), "ISO8859-1");
+                    
+                    assertEquals("Error parsing " + f.getName(), expected, result);
+                } catch (FileNotFoundException e) {
+                    FileOutputStream fos = new FileOutputStream(xmlFileMime4j);
+                    fos.write(result.getBytes());
+                    fos.flush();
+                    fos.close();
+                    fail("XML file not found: generated a file with the expected result!");
+                }
             }
         }
     }
