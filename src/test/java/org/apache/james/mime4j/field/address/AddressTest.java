@@ -19,13 +19,19 @@
 
 package org.apache.james.mime4j.field.address;
 
-import junit.framework.TestCase;
-
-import org.apache.james.mime4j.field.address.AddressList;
-import org.apache.james.mime4j.field.address.Group;
-import org.apache.james.mime4j.field.address.Mailbox;
-import org.apache.james.mime4j.field.address.NamedMailbox;
 import org.apache.james.mime4j.field.address.parser.ParseException;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import junit.framework.TestCase;
 
 public class AddressTest extends TestCase {
 
@@ -151,9 +157,199 @@ public class AddressTest extends TestCase {
         // ensure that TokenMgrError doesn't get thrown
         try {
             AddressList.parse(")");
+            fail("Expected parsing error");
         }
         catch (ParseException e) {
 
         }
+    }
+    
+    public void testNullConstructorAndBadUsage() {
+        AddressList al = new AddressList(null, false);
+        assertEquals(0, al.size());
+        
+        try {
+            al.get(-1);
+            fail("Expected index out of bound exception!");
+        } catch (IndexOutOfBoundsException e) {
+        }
+        
+        try {
+            al.get(0);
+            fail("Expected index out of bound exception!");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    
+    public void testAddressList() {
+        ArrayList al = new ArrayList();
+        al.add("example.com");
+
+        // shared arraylist
+        AddressList dl = new AddressList(al, true);
+        assertEquals(1, dl.size());
+        al.add("foo.example.com");
+        assertEquals(2, dl.size());
+        
+        // cloned arraylist
+        AddressList dlcopy = new AddressList(al, false);
+        assertEquals(2, dlcopy.size());
+        al.add("bar.example.com");
+        assertEquals(2, dlcopy.size());
+        
+        // check route string
+        assertEquals(2, dlcopy.flatten().size());
+    }
+
+    public void testInteractiveMain() throws Exception {
+        PrintStream out_orig = System.out;
+        InputStream in_orig = System.in;
+        PrintStream err_orig = System.err;
+        try {
+            PipedOutputStream piped = new PipedOutputStream();
+            PipedInputStream newInput = new PipedInputStream(piped);
+            
+            PipedInputStream inOut = new PipedInputStream();
+            PrintStream outPs = new PrintStream(new PipedOutputStream(inOut));
+            BufferedReader outReader = new BufferedReader(new InputStreamReader(inOut));
+            PipedInputStream inErr = new PipedInputStream();
+            PrintStream errPs = new PrintStream(new PipedOutputStream(inErr));
+            BufferedReader errReader = new BufferedReader(new InputStreamReader(inErr));
+            
+            
+            System.setIn(newInput);
+            System.setOut(outPs);
+            System.setErr(errPs);
+            Thread t = new Thread() {
+                public void run() {
+                    try {
+                        AddressList.main(null);
+                    } catch (Exception e) {
+                        fail("Catched an exception in main: "+e);
+                    }
+                }
+            };
+            t.start();
+            
+            PrintWriter input = new PrintWriter(piped);
+            
+            input.write("Test <test@example.com>\r\n");
+            input.flush();
+
+            String out = outReader.readLine();
+            assertEquals("> Test <test@example.com>", out);
+
+            input.write("A <foo@example.com>\r\n");
+            input.flush();
+            
+            String out2 = outReader.readLine();
+            assertEquals("> A <foo@example.com>", out2);
+
+            input.write("\"Foo Bar\" <foo>\r\n");
+            input.flush();
+            
+            String out3 = errReader.readLine();
+            assertNotNull(out3);
+
+            input.write("quit\r\n");
+            input.flush();
+            
+            // we read 2 angular brackets because one was from the previous exception error.
+            String out4 = outReader.readLine();
+            assertEquals("> > Goodbye.", out4);
+
+            t.join();
+        } finally {
+            System.setIn(in_orig);
+            System.setOut(out_orig);
+            System.setErr(err_orig);
+        }
+    }
+
+    public void testEmptyDomainList() {
+        DomainList dl = new DomainList(null, false);
+        assertEquals(0, dl.size());
+        
+        try {
+            dl.get(-1);
+            fail("Expected index out of bound exception!");
+        } catch (IndexOutOfBoundsException e) {
+        }
+        
+        try {
+            dl.get(0);
+            fail("Expected index out of bound exception!");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+    
+    public void testDomainList() {
+        ArrayList al = new ArrayList();
+        al.add("example.com");
+
+        // shared arraylist
+        DomainList dl = new DomainList(al, true);
+        assertEquals(1, dl.size());
+        al.add("foo.example.com");
+        assertEquals(2, dl.size());
+        
+        // cloned arraylist
+        DomainList dlcopy = new DomainList(al, false);
+        assertEquals(2, dlcopy.size());
+        al.add("bar.example.com");
+        assertEquals(2, dlcopy.size());
+        
+        // check route string
+        assertEquals("@example.com,@foo.example.com", dlcopy.toRouteString());
+    }
+    
+
+    public void testEmptyMailboxList() {
+        MailboxList ml = new MailboxList(null, false);
+        assertEquals(0, ml.size());
+        
+        try {
+            ml.get(-1);
+            fail("Expected index out of bound exception!");
+        } catch (IndexOutOfBoundsException e) {
+        }
+        
+        try {
+            ml.get(0);
+            fail("Expected index out of bound exception!");
+        } catch (IndexOutOfBoundsException e) {
+        }
+    }
+
+    public void testMailboxList() {
+        ArrayList al = new ArrayList();
+        al.add(new Mailbox("local","example.com"));
+
+        // shared arraylist
+        MailboxList ml = new MailboxList(al, true);
+        assertEquals(1, ml.size());
+        al.add(new Mailbox("local2", "foo.example.com"));
+        assertEquals(2, ml.size());
+        
+        // cloned arraylist
+        MailboxList mlcopy = new MailboxList(al, false);
+        assertEquals(2, mlcopy.size());
+        al.add(new Mailbox("local3", "bar.example.com"));
+        assertEquals(2, mlcopy.size());
+        
+        mlcopy.print();
+    }
+    
+    public void testGroupSerialization() {
+        ArrayList al = new ArrayList();
+        al.add(new Mailbox("test", "example.com"));
+        al.add(new NamedMailbox("Foo!", "foo", "example.com"));
+        DomainList dl = new DomainList(new ArrayList(Arrays.asList(new String[] {"foo.example.com"})), true);
+        NamedMailbox namedMailbox = new NamedMailbox("Foo Bar", dl, "foo2", "example.com");
+        assertSame(dl, namedMailbox.getRoute());
+        al.add(namedMailbox);
+        Group g = new Group("group", new MailboxList(al, false));
+        assertEquals("group:<test@example.com>,Foo! <foo@example.com>,Foo Bar <foo2@example.com>;", g.toString());
     }
 }

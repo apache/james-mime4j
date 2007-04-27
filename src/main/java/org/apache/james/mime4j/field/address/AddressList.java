@@ -24,7 +24,6 @@ import org.apache.james.mime4j.field.address.parser.ParseException;
 
 import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * An immutable, random-access list of Address objects.
@@ -45,15 +44,6 @@ public class AddressList {
 		else
 			this.addresses = new ArrayList(0);
 	}
-
-    public Iterator iterator() {
-        return new Iterator() {
-            private int pos = 0;
-            public void remove() { throw new UnsupportedOperationException(); }
-            public boolean hasNext() { return pos < size(); }
-            public Object next() { return get(pos++); }
-        };
-    }
 
 	/**
 	 * The number of elements in this list.
