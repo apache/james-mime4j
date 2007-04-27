@@ -182,20 +182,21 @@ public class AddressTest extends TestCase {
     }
 
     
-    public void testAddressList() {
+    public void testAddressList() throws ParseException {
+        AddressList addlist = AddressList.parse("foo@example.com, bar@example.com, third@example.com");
         ArrayList al = new ArrayList();
-        al.add("example.com");
+        al.add(addlist.get(0));
 
         // shared arraylist
         AddressList dl = new AddressList(al, true);
         assertEquals(1, dl.size());
-        al.add("foo.example.com");
+        al.add(addlist.get(1));
         assertEquals(2, dl.size());
         
         // cloned arraylist
         AddressList dlcopy = new AddressList(al, false);
         assertEquals(2, dlcopy.size());
-        al.add("bar.example.com");
+        al.add(addlist.get(2));
         assertEquals(2, dlcopy.size());
         
         // check route string
