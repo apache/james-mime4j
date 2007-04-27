@@ -1,4 +1,0 @@
-This is <bold>part 4 of the outer message</bold>
-<smaller>as defined in RFC1341</smaller><nl>
-<nl>
-Isn't it <bigger><bigger>cool?</bigger></bigger>
