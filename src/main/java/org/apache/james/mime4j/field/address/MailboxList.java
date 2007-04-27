@@ -38,7 +38,7 @@ public class MailboxList {
 		if (mailboxes != null)
 			this.mailboxes = (dontCopy ? mailboxes : (ArrayList) mailboxes.clone());
 		else
-			mailboxes = new ArrayList(0);
+			this.mailboxes = new ArrayList(0);
 	}
 	
 	/**
