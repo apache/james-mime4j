@@ -150,7 +150,6 @@ public class Header {
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, CharsetUtil.getCharset(charString)),8192);
         writer.write(toString()+ "\r\n");
         writer.flush();
-        writer.close();
     }
 
 }
