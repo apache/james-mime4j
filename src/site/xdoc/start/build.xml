@@ -74,6 +74,7 @@
                 <p>
                     To generate an Eclipse project from the sources run <blockquote>
                         <code>mvn eclipse:eclipse</code></blockquote>
+                </p>
                 <p>
                   <strong>NOTE!</strong> Mime4j uses <a href="https://javacc.dev.java.net/">JavaCC</a> to generate parsers for
                   header fields. <code>mvn eclipse:eclipse</code> currently has problems with 

@@ -34,8 +34,8 @@
       <item name="News and Status" href="/status.html"/>
       <item name="Example" href="/samples.html"/>
       <item name="Start" href="/start/index.html" collapse="true">
-        <item name="Build" href="/start/build.html" collapse="true"/>
         <item name="Download" href="/start/download.html" collapse="true"/>
+        <item name="Build" href="/start/build.html" collapse="true"/>
       </item>
     </menu>
     
