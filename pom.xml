@@ -124,11 +124,34 @@
         </configuration>
       </plugin>
       <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <id>create-javadocs</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- append to the packaging phase. -->
+            <goals>
+              <goal>javadoc</goal> <!-- goals == mojos -->
+              <goal>jar</goal> <!-- goals == mojos -->
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.2-beta-1</version>
         <configuration>
           <descriptorSourceDirectory>${basedir}/src/assemble/</descriptorSourceDirectory>
         </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- append to the packaging phase. -->
+            <goals>
+              <goal>attached</goal> <!-- goals == mojos -->
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <!-- Add NOTICE and LICENSE to generated JAR -->
       <plugin>
