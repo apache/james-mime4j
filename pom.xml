@@ -24,7 +24,7 @@
     <version>1.1-SNAPSHOT</version>
     <!-- Either this really points to the james-project/pom.xml or you
          will have to tune the local repository, later, in this file -->
-    <relativePath>../james-project/pom.xml</relativePath>
+    <relativePath>../james-project/project/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
@@ -43,24 +43,6 @@
       <url>scp://minotaur.apache.org/www/james.apache.org/mime4j/</url>
     </site>
   </distributionManagement>
-  <developers>
-    <developer>
-      <id>niklas</id>
-      <name>Niklas Therning</name>
-      <email>niklas(at)apache(dot)org</email>
-      <organization>Trillian AB</organization>
-    </developer>
-    <developer>
-      <id>jcheng</id>
-      <name>Joe Cheng</name>
-      <email>joe(at)joecheng(dot)com</email>
-    </developer>
-  </developers>
-  <contributors>
-    <contributor>
-      <name>Rob Oxspring</name>
-    </contributor>
-  </contributors>
   <scm>
     <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/trunk</connection>
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/trunk</developerConnection>
