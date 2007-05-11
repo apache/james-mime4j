@@ -40,9 +40,9 @@
     </fileSet>
     <fileSet>
       <directory>target</directory>
-      <outputDirectory></outputDirectory>
+      <outputDirectory>/</outputDirectory>
       <includes>
-        <include>${project.build.finalName}</include>
+        <include>${artifactId}-${version}.jar</include>
       </includes>
     </fileSet>
     <fileSet>
