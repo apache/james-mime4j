@@ -28,7 +28,7 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
-  <artifactId>james-mime4j</artifactId>
+  <artifactId>apache-mime4j</artifactId>
   <name>Apache JAMES Mime4j</name>
   <version>0.3-SNAPSHOT</version>
   <description>Java stream based MIME message parser</description>
@@ -117,7 +117,12 @@
         <configuration>
           <archive>
             <manifestEntries>
-              <mode>development</mode>
+              <Specification-Title>Apache Mime4j</Specification-Title>
+              <Specification-Version>0.3</Specification-Version>
+              <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
+              <Implementation-Title>Apache Mime4j</Implementation-Title>
+              <Implementation-Version>0.3</Implementation-Version>
+              <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
               <url>${pom.url}</url>
             </manifestEntries>
           </archive>
