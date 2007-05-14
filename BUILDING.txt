@@ -1,0 +1,8 @@
+In order to build mime4j you need maven 2.0.6 or greater.
+
+mvn -U -Plocal package
+
+-U runs a plugin update
+-Plocal enable the local stage repository for dependencies.
+
+Redistributables will be placed in the target folder. 
