@@ -46,19 +46,18 @@ public class QuotedPrintableInputStreamTest extends TestCase {
     public void testDecode() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = null;
         QuotedPrintableInputStream decoder = null;
-        byte[] bytes = null;
 
         bis = new ByteArrayInputStream("=e1=e2=E3=E4\r\n".getBytes("US-ASCII"));
         decoder = new QuotedPrintableInputStream(bis);
-        assertEquals("בגדה\r\n", new String(read(decoder), "ISO8859-1"));
+        assertEquals("\u00e1\u00e2\u00e3\u00e4\r\n", new String(read(decoder), "ISO8859-1"));
         
         bis = new ByteArrayInputStream("=e1=g2=E3=E4\r\n".getBytes("US-ASCII"));
         decoder = new QuotedPrintableInputStream(bis);
-        assertEquals("ב=g2דה\r\n", new String(read(decoder), "ISO8859-1"));
+        assertEquals("\u00e1=g2\u00e3\u00e4\r\n", new String(read(decoder), "ISO8859-1"));
         
         bis = new ByteArrayInputStream("   =e1 =e2  =E3\t=E4  \t \t    \r\n".getBytes("US-ASCII"));
         decoder = new QuotedPrintableInputStream(bis);
-        assertEquals("   ב ג  ד\tה\r\n", new String(read(decoder), "ISO8859-1"));
+        assertEquals("   \u00e1 \u00e2  \u00e3\t\u00e4\r\n", new String(read(decoder), "ISO8859-1"));
         
         /*
          * Test soft line breaks.
