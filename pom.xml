@@ -30,7 +30,7 @@
   <groupId>org.apache.james</groupId>
   <artifactId>apache-mime4j</artifactId>
   <name>Apache JAMES Mime4j</name>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.3</version>
   <description>Java stream based MIME message parser</description>
   <url>http://james.apache.org/mime4j</url>
   <issueManagement>
@@ -44,9 +44,9 @@
     </site>
   </distributionManagement>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/trunk</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/trunk</developerConnection>
-    <url>http://svn.apache.org/viewvc/james/mime4j/trunk/</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-0.3</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-0.3</developerConnection>
+    <url>http://svn.apache.org/viewvc/james/mime4j/tags/apache-mime4j-0.3</url>
   </scm>
   <build>
     <plugins>
