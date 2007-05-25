@@ -26,6 +26,7 @@ import java.util.Stack;
 
 import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.ContentHandler;
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeStreamParser;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
@@ -64,7 +65,14 @@ public class Message extends Entity implements Body {
     public Message(InputStream is) throws IOException {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new MessageBuilder());
-        parser.parse(is);
+        try {
+            parser.parse(is);
+        } catch (MimeException e) {
+            IllegalStateException ise = new IllegalStateException(
+                    "Unexpected message processing error");
+            ise.initCause(e);
+            throw ise;
+        }
     }
 
     

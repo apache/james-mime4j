@@ -91,7 +91,7 @@ public class MimeStreamParserTest extends TestCase {
         }
     }*/
     
-    public void testBoundaryInEpilogue() throws IOException {
+    public void testBoundaryInEpilogue() throws Exception {
         StringBuffer sb = new StringBuffer();
         sb.append("From: foo@bar.com\r\n");
         sb.append("To: someone@else.com\r\n");
@@ -136,7 +136,7 @@ public class MimeStreamParserTest extends TestCase {
         assertEquals(epilogue.toString(), actual.toString());
     }
     
-    public void testParseOneLineFields() throws IOException {
+    public void testParseOneLineFields() throws Exception {
         StringBuffer sb = new StringBuffer();
         final LinkedList expected = new LinkedList();
         expected.add("From: foo@abr.com");
@@ -156,7 +156,7 @@ public class MimeStreamParserTest extends TestCase {
         assertEquals(0, expected.size());
     }
     
-    public void testCRWithoutLFInHeader() throws IOException {
+    public void testCRWithoutLFInHeader() throws Exception {
         /*
          * Test added because \r:s not followed by \n:s in the header would
          * cause an infinite loop. 
@@ -179,7 +179,7 @@ public class MimeStreamParserTest extends TestCase {
         assertEquals(0, expected.size());
     }
     
-    public void testParseMultiLineFields() throws IOException {
+    public void testParseMultiLineFields() throws Exception {
         StringBuffer sb = new StringBuffer();
         final LinkedList expected = new LinkedList();
         expected.add("Received: by netmbx.netmbx.de (/\\==/\\ Smail3.1.28.1)\r\n"
@@ -202,7 +202,7 @@ public class MimeStreamParserTest extends TestCase {
         assertEquals(0, expected.size());
     }
     
-    public void testStop() throws IOException {
+    public void testStop() throws Exception {
         final MimeStreamParser parser = new MimeStreamParser();
         TestHandler handler = new TestHandler() {
             public void endHeader() {
@@ -239,7 +239,7 @@ public class MimeStreamParserTest extends TestCase {
     /*
      * Tests that invalid fields are ignored.
      */
-    public void testInvalidFields() throws IOException {
+    public void testInvalidFields() throws Exception {
         StringBuffer sb = new StringBuffer();
         final LinkedList expected = new LinkedList();
         sb.append("From - foo@abr.com\r\n");
@@ -264,7 +264,7 @@ public class MimeStreamParserTest extends TestCase {
     /*
      * Tests that empty streams still generate the expected series of events.
      */
-    public void testEmptyStream() throws IOException {
+    public void testEmptyStream() throws Exception {
         final LinkedList expected = new LinkedList();
         expected.add("startMessage");
         expected.add("startHeader");
@@ -323,7 +323,7 @@ public class MimeStreamParserTest extends TestCase {
     /*
      * Tests parsing of empty headers.
      */
-    public void testEmpyHeader() throws IOException {
+    public void testEmpyHeader() throws Exception {
         StringBuffer sb = new StringBuffer();
         sb.append("\r\n");
         sb.append("The body is right here\r\n");
@@ -351,7 +351,7 @@ public class MimeStreamParserTest extends TestCase {
     /*
      * Tests parsing of empty body.
      */
-    public void testEmptyBody() throws IOException {
+    public void testEmptyBody() throws Exception {
         StringBuffer sb = new StringBuffer();
         final LinkedList expected = new LinkedList();
         expected.add("From: some@one.com");
@@ -377,7 +377,7 @@ public class MimeStreamParserTest extends TestCase {
     /*
      * Tests that invalid fields are ignored.
      */
-    public void testPrematureEOFAfterFields() throws IOException {
+    public void testPrematureEOFAfterFields() throws Exception {
         StringBuffer sb = new StringBuffer();
         final LinkedList expected = new LinkedList();
         expected.add("From: some@one.com");
@@ -415,7 +415,7 @@ public class MimeStreamParserTest extends TestCase {
         assertEquals(0, expected.size());
     }
     
-    public void testParse() throws IOException {
+    public void testParse() throws Exception {
         File dir = new File("src/test/resources/testmsgs");
         File[] files = dir.listFiles();
         

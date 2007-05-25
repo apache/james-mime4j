@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.james.mime4j.AbstractContentHandler;
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeStreamParser;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
@@ -68,7 +69,14 @@ public class Header {
                 addField(Field.parse(fieldData));
             }
         });
-        parser.parse(is);
+        try {
+            parser.parse(is);
+        } catch (MimeException e) {
+            IllegalStateException ise = new IllegalStateException(
+                    "Unexpected header processing error");
+            ise.initCause(e);
+            throw ise;
+        }
     }
 
     /**

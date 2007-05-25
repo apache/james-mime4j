@@ -79,9 +79,10 @@ public class MimeStreamParser {
      * Parses a stream of bytes containing a MIME message.
      * 
      * @param is the stream to parse.
+     * @throws MimeException if the message can not be processed
      * @throws IOException on I/O errors.
      */
-    public void parse(InputStream is) throws IOException {
+    public void parse(InputStream is) throws MimeException, IOException {
         rootStream = new RootInputStream(is);
         parseMessage(rootStream);
     }
@@ -132,9 +133,10 @@ public class MimeStreamParser {
      * arbitrary data, body parts or an embedded message.
      * 
      * @param is the stream to parse.
+     * @throws MimeException if the entity can not be processed
      * @throws IOException on I/O errors.
      */
-    private void parseEntity(InputStream is) throws IOException {
+    private void parseEntity(InputStream is) throws MimeException, IOException {
         BodyDescriptor bd = parseHeader(is);
         
         if (bd.isMultipart()) {
@@ -192,7 +194,8 @@ public class MimeStreamParser {
         }
     }
     
-    private void parseMessage(InputStream is) throws IOException {
+    private void parseMessage(InputStream is)
+            throws MimeException, IOException {
         if (raw) {
             handler.raw(new CloseShieldInputStream(is));
         } else {
@@ -202,7 +205,8 @@ public class MimeStreamParser {
         }
     }
     
-    private void parseBodyPart(InputStream is) throws IOException {
+    private void parseBodyPart(InputStream is)
+            throws MimeException, IOException {
         if (raw) {
             handler.raw(new CloseShieldInputStream(is));
         } else {
@@ -218,8 +222,11 @@ public class MimeStreamParser {
      * @param is the stream to parse.
      * @return a <code>BodyDescriptor</code> describing the body following 
      *         the header.
+     * @throws MimeException if the header can not be processed
+     * @throws IOException on I/O errors
      */
-    private BodyDescriptor parseHeader(InputStream is) throws IOException {
+    private BodyDescriptor parseHeader(InputStream is)
+            throws MimeException, IOException {
         BodyDescriptor bd = new BodyDescriptor(bodyDescriptors.isEmpty() 
                         ? null : (BodyDescriptor) bodyDescriptors.getFirst());
         
