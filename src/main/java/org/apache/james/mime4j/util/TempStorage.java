@@ -35,7 +35,7 @@ public abstract class TempStorage {
         String clazz = System.getProperty("org.apache.james.mime4j.tempStorage");
         try {
             
-            if (inst != null) {
+            if (clazz != null) {
                 inst = (TempStorage) Class.forName(clazz).newInstance();
             }
             
