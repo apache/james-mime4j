@@ -183,7 +183,7 @@ void local_part() :
 	( t=<DOTATOM> | t=<QUOTEDSTRING> )
 	(	[t="."]
 		{
-			if (t.image.charAt(t.image.length() - 1) != '.' || t.kind == AddressListParserConstants.QUOTEDSTRING)
+			if ( t.kind == AddressListParserConstants.QUOTEDSTRING || t.image.charAt(t.image.length() - 1) != '.')
 				throw new ParseException("Words in local part must be separated by '.'");
 		}
 		(	t=<DOTATOM> | t=<QUOTEDSTRING> )

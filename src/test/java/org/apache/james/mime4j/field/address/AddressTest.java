@@ -353,4 +353,16 @@ public class AddressTest extends TestCase {
         Group g = new Group("group", new MailboxList(al, false));
         assertEquals("group:<test@example.com>,Foo! <foo@example.com>,Foo Bar <foo2@example.com>;", g.toString());
     }
+    
+    public void testEmptyQuotedStringBeforeDotAtomInLocalPart() throws Exception {
+        /*
+         * This used to give a StringIndexOutOfBoundsException instead of the expected
+         * ParseException
+         */
+        try {
+            AddressList.parse("\"\"bar@bar.com");
+            fail("ParseException expected");
+        } catch (ParseException pe) {
+        }
+    }
 }
