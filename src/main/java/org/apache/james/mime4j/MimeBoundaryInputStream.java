@@ -36,11 +36,11 @@ import java.io.PushbackInputStream;
  */
 public class MimeBoundaryInputStream extends InputStream {
     
-    private PushbackInputStream s = null;
-    private byte[] boundary = null;
+    private PushbackInputStream s;
+    private byte[] boundary;
     private boolean first = true;
-    private boolean eof = false;
-    private boolean parenteof = false;
+    private boolean eof;
+    private boolean parenteof;
     private boolean moreParts = true;
 
     /**

@@ -438,7 +438,6 @@ public class MimeStreamParserTest extends TestCase {
                 
                 try {
                     String expected = IOUtils.toString(new FileInputStream(xmlFile), "ISO8859-1");
-                    
                     assertEquals("Error parsing " + f.getName(), expected, result);
                 } catch (FileNotFoundException e) {
                     FileOutputStream fos = new FileOutputStream(xmlFileMime4j);
