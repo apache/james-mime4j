@@ -27,8 +27,6 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.decoder.Base64InputStream;
-import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 
 
 /**
@@ -189,19 +187,18 @@ public class MimeTokenStream {
 
     private abstract class Entity extends StateMachine {
         private final BodyDescriptor parent;
-        private final InputStream contents;
+        private final Cursor cursor;
         private final StringBuffer sb = new StringBuffer();
         private BodyDescriptor body;
         private int pos, start;
         private int lineNumber, startLineNumber;
         private final int endState;
-        private MimeBoundaryInputStream mbis;
-        InputStream stream;
+        
         String field;
 
-        Entity(InputStream contents, BodyDescriptor parent, int startState, int endState) {
+        Entity(Cursor cursor, BodyDescriptor parent, int startState, int endState) {
             this.parent = parent;
-            this.contents = contents;
+            this.cursor = cursor;
             state = startState;
             this.endState = endState;
         }
@@ -211,21 +208,23 @@ public class MimeTokenStream {
         }
 
         private int setParseBodyPartState() throws IOException {
-            mbis.consume();
-            if (mbis.parentEOF()) {
+            cursor.advanceToBoundary();
+            if (cursor.isEnded()) {
                 if (log.isWarnEnabled()) {
-                    log.warn("Line " + rootInputStream.getLineNumber() 
+                    log.warn("Line " + cursor.getLineNumber() 
                             + ": Body part ended prematurely. "
                             + "Higher level boundary detected or "
                             + "EOF reached.");
                 }
             } else {
-                if (mbis.hasMoreParts()) {
-                    mbis = new MimeBoundaryInputStream(contents, body.getBoundary());
+                if (cursor.moreMimeParts()) {
+                    final String boundary = body.getBoundary();
+                    cursor.boundary(boundary);
+                   
                     if (isRaw()) {
-                        currentStateMachine = new RawEntity(mbis);
+                        currentStateMachine = new RawEntity(cursor.getStream());
                     } else {
-                        currentStateMachine = new BodyPart(mbis, body);
+                        currentStateMachine = new BodyPart(cursor.nextMimePartCursor(), body);
                     }
                     entities.add(currentStateMachine);
                     state = T_IN_BODYPART;
@@ -233,7 +232,6 @@ public class MimeTokenStream {
                 }
             }
             state = T_EPILOGUE;
-            stream = new CloseShieldInputStream(contents);
             return T_EPILOGUE;
         }
 
@@ -254,25 +252,23 @@ public class MimeTokenStream {
                     if (body.isMultipart()) {
                         state = T_START_MULTIPART;
                     } else if (body.isMessage()) {
-                        InputStream is = contents;
+                        Cursor nextCursor = cursor;
                         if (body.isBase64Encoded()) {
                             log.warn("base64 encoded message/rfc822 detected");
-                            is = new EOLConvertingInputStream(new Base64InputStream(contents));
+                            nextCursor = cursor.decodeBase64();
                         } else if (body.isQuotedPrintableEncoded()) {
                             log.warn("quoted-printable encoded message/rfc822 detected");
-                            is = new EOLConvertingInputStream(new QuotedPrintableInputStream(contents));
+                            nextCursor = cursor.decodeQuotedPrintable();
                         }
                         state = endState;
-                        return parseMessage(is, body);
+                        return parseMessage(nextCursor, body);
                     } else {
-                        stream = new CloseShieldInputStream(contents);
                         state = T_BODY;
                         break;
                     }
                     break;
                 case T_START_MULTIPART:
-                    mbis = new MimeBoundaryInputStream(contents, body.getBoundary());
-                    stream = new CloseShieldInputStream(mbis);
+                    cursor.boundary(body.getBoundary());
                     state = T_PREAMBLE;
                     break;
                 case T_PREAMBLE:
@@ -299,11 +295,11 @@ public class MimeTokenStream {
 
         private void initHeaderParsing() throws IOException {
             body = new BodyDescriptor(parent);
-            startLineNumber = lineNumber = rootInputStream.getLineNumber();
+            startLineNumber = lineNumber = cursor.getLineNumber();
 
             int curr = 0;
             int prev = 0;
-            while ((curr = contents.read()) != -1) {
+            while ((curr = cursor.advance()) != -1) {
                 if (curr == '\n' && (prev == '\n' || prev == 0)) {
                     /*
                      * [\r]\n[\r]\n or an immediate \r\n have been seen.
@@ -316,7 +312,7 @@ public class MimeTokenStream {
             }
             
             if (curr == -1 && log.isWarnEnabled()) {
-                log.warn("Line " + rootInputStream.getLineNumber()  
+                log.warn("Line " + cursor.getLineNumber()  
                         + ": Unexpected end of headers detected. "
                         + "Boundary detected in header or EOF reached.");
             }
@@ -375,19 +371,19 @@ public class MimeTokenStream {
     }
 
     private class Message extends Entity {
-        Message(InputStream contents, BodyDescriptor parent) {
-            super(contents, parent, T_START_MESSAGE, T_END_MESSAGE);
+        Message(Cursor cursor, BodyDescriptor parent) {
+            super(cursor, parent, T_START_MESSAGE, T_END_MESSAGE);
         }
     }
 
     private class BodyPart extends Entity {
-        BodyPart(InputStream contents, BodyDescriptor parent) {
-            super(contents, parent, T_START_BODYPART, T_END_BODYPART);
+        BodyPart(Cursor cursor, BodyDescriptor parent) {
+            super(cursor, parent, T_START_BODYPART, T_END_BODYPART);
         }
     }
     
     private int state = T_END_OF_STREAM;
-    private RootInputStream rootInputStream;
+    private Cursor cursor;
     private StateMachine currentStateMachine;
     private final List entities = new ArrayList();
     private boolean raw;
@@ -398,15 +394,15 @@ public class MimeTokenStream {
      */
     public void parse(InputStream stream) {
         entities.clear();
-        rootInputStream = new RootInputStream(stream);
-        state = parseMessage(rootInputStream, null);
+        cursor = new StreamCursor(stream);
+        state = parseMessage(cursor, null);
     }
 
-    private int parseMessage(InputStream pStream, BodyDescriptor parent) {
+    private int parseMessage(Cursor cursor, BodyDescriptor parent) {
         if (isRaw()) {
-            currentStateMachine = new RawEntity(pStream);
+            currentStateMachine = new RawEntity(cursor.getStream());
         } else {
-            currentStateMachine = new Message(pStream, parent);
+            currentStateMachine = new Message(cursor, parent);
         }
         entities.add(currentStateMachine);
         return currentStateMachine.state;
@@ -450,7 +446,7 @@ public class MimeTokenStream {
      * {@link ContentHandler#startMessage()}, etc.
      */
     public void stop() {
-        rootInputStream.truncate();
+        cursor.stop();
     }
 
     /**
@@ -490,7 +486,7 @@ public class MimeTokenStream {
             case T_PREAMBLE:
             case T_EPILOGUE:
             case T_BODY:
-                return ((Entity) currentStateMachine).stream;
+                return ((Entity) currentStateMachine).cursor.getStream();
             default:
                 throw new IllegalStateException("Expected state to be either of T_RAW_ENTITY, T_PREAMBLE, or T_EPILOGUE.");
         }
