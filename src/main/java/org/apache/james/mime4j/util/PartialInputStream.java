@@ -43,10 +43,6 @@ public class PartialInputStream extends PositionInputStream {
             return -1;
     }
 
-    public int read(byte b[]) throws IOException {
-        return read(b, 0, b.length);
-    }
-
     public int read(byte b[], int off, int len) throws IOException {
         len = Math.min(len, getBytesLeft());
         return super.read(b, off, len);    //To change body of overridden methods use File | Settings | File Templates.

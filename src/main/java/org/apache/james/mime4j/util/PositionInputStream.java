@@ -72,12 +72,6 @@ public class PositionInputStream extends InputStream {
         return c;
     }
 
-    public int read(byte b[]) throws IOException {
-        final int c = inputStream.read(b);
-        position += c;
-        return c;
-    }
-
     public int read(byte b[], int off, int len) throws IOException {
         final int c = inputStream.read(b, off, len);
         position += c;

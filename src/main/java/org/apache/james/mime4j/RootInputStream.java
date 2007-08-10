@@ -101,11 +101,4 @@ class RootInputStream extends InputStream {
         }
         return n;
     }
-    
-    /**
-     * @see java.io.InputStream#read(byte[])
-     */
-    public int read(byte[] b) throws IOException {
-        return read(b, 0, b.length);
-    }
 }
