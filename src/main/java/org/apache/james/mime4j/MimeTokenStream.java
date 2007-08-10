@@ -75,7 +75,7 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id: MimeStreamParser.java,v 1.8 2005/02/11 10:12:02 ntherning Exp $
  */
 public class MimeTokenStream {
-    private static final Log log = LogFactory.getLog(MimeStreamParser.class);
+    private static final Log log = LogFactory.getLog(MimeTokenStream.class);
 
     /**
      * This token indicates, that the MIME stream has been completely
@@ -194,7 +194,7 @@ public class MimeTokenStream {
         private int lineNumber, startLineNumber;
         private final int endState;
         
-        String field;
+        String field, fieldName, fieldValue;
 
         Entity(Cursor cursor, BodyDescriptor parent, int startState, int endState) {
             this.parent = parent;
@@ -342,7 +342,7 @@ public class MimeTokenStream {
                     boolean valid = false;
                     if (index != -1 && fieldChars.get(field.charAt(0))) {
                         valid = true;
-                        String fieldName = field.substring(0, index).trim();
+                        fieldName = field.substring(0, index).trim();
                         for (int i = 0; i < fieldName.length(); i++) {
                             if (!fieldChars.get(fieldName.charAt(i))) {
                                 valid = false;
@@ -350,7 +350,8 @@ public class MimeTokenStream {
                             }
                         }
                         if (valid) {
-                            body.addField(fieldName, field.substring(index + 1));
+                            fieldValue = field.substring(index + 1);
+                            body.addField(fieldName, fieldValue);
                             startLineNumber = lineNumber;
                             pos += 2;
                             lineNumber++;
@@ -466,6 +467,36 @@ public class MimeTokenStream {
         switch (getState()) {
             case T_FIELD:
                 return ((Entity) currentStateMachine).field;
+            default:
+                throw new IllegalStateException("Expected state to be T_FIELD.");
+        }
+    }
+
+    /**
+     * This method is valid, if {@link #getState()} returns {@link #T_FIELD}.
+     * @return String with the fields name.
+     * @throws IllegalStateException {@link #getState()} returns another
+     *   value than {@link #T_FIELD}.
+     */
+    public String getFieldName() {
+        switch (getState()) {
+            case T_FIELD:
+                return ((Entity) currentStateMachine).fieldName;
+            default:
+                throw new IllegalStateException("Expected state to be T_FIELD.");
+        }
+    }
+
+    /**
+     * This method is valid, if {@link #getState()} returns {@link #T_FIELD}.
+     * @return String with the fields value.
+     * @throws IllegalStateException {@link #getState()} returns another
+     *   value than {@link #T_FIELD}.
+     */
+    public String getFieldValue() {
+        switch (getState()) {
+            case T_FIELD:
+                return ((Entity) currentStateMachine).fieldValue;
             default:
                 throw new IllegalStateException("Expected state to be T_FIELD.");
         }
