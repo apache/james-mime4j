@@ -254,10 +254,10 @@ public class MimeTokenStream {
                     } else if (body.isMessage()) {
                         Cursor nextCursor = cursor;
                         if (body.isBase64Encoded()) {
-                            log.warn("base64 encoded message/rfc822 detected");
+                            log.debug("base64 encoded message/rfc822 detected");
                             nextCursor = cursor.decodeBase64();
                         } else if (body.isQuotedPrintableEncoded()) {
-                            log.warn("quoted-printable encoded message/rfc822 detected");
+                            log.debug("quoted-printable encoded message/rfc822 detected");
                             nextCursor = cursor.decodeQuotedPrintable();
                         }
                         state = endState;
