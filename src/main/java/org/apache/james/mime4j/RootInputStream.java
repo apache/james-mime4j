@@ -59,7 +59,7 @@ class RootInputStream extends InputStream {
     
     /**
      * Truncates this <code>InputStream</code>. After this call any 
-     * call to {@link #read()}, {@link #read(byte[]) or 
+     * call to {@link #read()}, {@link #read(byte[])} or 
      * {@link #read(byte[], int, int)} will return
      * -1 as if end-of-file had been reached.
      */
