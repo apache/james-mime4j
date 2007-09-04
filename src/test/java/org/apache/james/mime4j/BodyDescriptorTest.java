@@ -19,22 +19,25 @@
 
 package org.apache.james.mime4j;
 
-import org.apache.james.mime4j.BodyDescriptor;
-
 import junit.framework.TestCase;
 
 /**
- * 
- *
- * 
  * @version $Id: BodyDescriptorTest.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 public class BodyDescriptorTest extends TestCase {
 
+    protected BodyDescriptor newBodyDescriptor() {
+        return new DefaultBodyDescriptor();
+    }
+
+    protected BodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
+        return new DefaultBodyDescriptor(parent);
+    }
+    
     public void testGetParameters() {
         BodyDescriptor bd = null;
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; charset=ISO-8859-1; "
                 + "boundary=foo; param1=value1; param2=value2; param3=value3");
         assertEquals(3, bd.getParameters().size());
@@ -42,7 +45,7 @@ public class BodyDescriptorTest extends TestCase {
         assertEquals("value2", (String) bd.getParameters().get("param2"));
         assertEquals("value3", (String) bd.getParameters().get("param3"));
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; param1=value1; param2=value2;"
                      + " param3=value3");
         assertEquals(3, bd.getParameters().size());
@@ -50,7 +53,7 @@ public class BodyDescriptorTest extends TestCase {
         assertEquals("value2", (String) bd.getParameters().get("param2"));
         assertEquals("value3", (String) bd.getParameters().get("param3"));
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; "
                 + "param1= \" value with\tspaces \" ; "
                 + "param2=\"\\\"value4 with escaped \\\" \\\"\";");
@@ -62,7 +65,7 @@ public class BodyDescriptorTest extends TestCase {
          * Make sure escaped characters (except ") are still escaped.
          * The parameter value should be \n\"
          */
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; param=\"\\n\\\\\\\"\"");
         assertEquals(1, bd.getParameters().size());
         assertEquals("\\n\\\"", (String) bd.getParameters().get("param"));
@@ -74,7 +77,7 @@ public class BodyDescriptorTest extends TestCase {
         /*
          * Make sure that only the first Content-Type header added is used.
          */
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; charset=ISO-8859-1");
         assertEquals("text/plain", bd.getMimeType());
         assertEquals("iso-8859-1", bd.getCharset());
@@ -86,30 +89,30 @@ public class BodyDescriptorTest extends TestCase {
     public void testGetMimeType() {
         BodyDescriptor bd = null;
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/PLAIN");
         assertEquals("text/plain", bd.getMimeType());
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/PLAIN;");
         assertEquals("text/plain", bd.getMimeType());
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("content-type", "   TeXt / html   ");
         assertEquals("text/html", bd.getMimeType());
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("CONTENT-TYPE", "   x-app/yada ;  param = yada");
         assertEquals("x-app/yada", bd.getMimeType());
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("CONTENT-TYPE", "   yada");
         assertEquals("text/plain", bd.getMimeType());
         
         /*
          * Make sure that only the first Content-Type header added is used.
          */
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain");
         assertEquals("text/plain", bd.getMimeType());
         bd.addField("Content-Type ", "text/html");
@@ -121,18 +124,18 @@ public class BodyDescriptorTest extends TestCase {
         BodyDescriptor child = null;
         BodyDescriptor parent = null;
         
-        parent = new DefaultBodyDescriptor();
+        parent = newBodyDescriptor();
         parent.addField("Content-Type", "mutlipart/alternative; boundary=foo");
         
-        child = new DefaultBodyDescriptor(parent);
+        child = newBodyDescriptor(parent);
         assertEquals("text/plain", child.getMimeType());
         child.addField("Content-Type", " child/type");
         assertEquals("child/type", child.getMimeType());
         
-        parent = new DefaultBodyDescriptor();
+        parent = newBodyDescriptor();
         parent.addField("Content-Type", "multipart/digest; boundary=foo");
         
-        child = new DefaultBodyDescriptor(parent);
+        child = newBodyDescriptor(parent);
         assertEquals("message/rfc822", child.getMimeType());
         child.addField("Content-Type", " child/type");
         assertEquals("child/type", child.getMimeType());
@@ -145,12 +148,12 @@ public class BodyDescriptorTest extends TestCase {
         /*
          * Test charset.
          */
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         assertEquals("us-ascii", bd.getCharset());
         bd.addField("Content-Type ", "some/type; charset=ISO-8859-1");
         assertEquals("iso-8859-1", bd.getCharset());
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         assertEquals("us-ascii", bd.getCharset());
         bd.addField("Content-Type ", "some/type");
         assertEquals("us-ascii", bd.getCharset());
@@ -158,27 +161,27 @@ public class BodyDescriptorTest extends TestCase {
         /*
          * Test boundary.
          */
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type", "text/html; boundary=yada yada");
         assertNull(bd.getBoundary());
 
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type", "multipart/yada; boundary=yada");
         assertEquals("yada", bd.getBoundary());
 
         /*
          * Test some weird parameters.
          */
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type", "multipart/yada; boundary=yada yada");
         assertEquals("yada", bd.getBoundary());
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type", "multipart/yada; boUNdarY= ya:*da; \tcharset\t =  big5");
         assertEquals("ya:*da", bd.getBoundary());
         assertEquals("big5", bd.getCharset());
         
-        bd = new DefaultBodyDescriptor();
+        bd = newBodyDescriptor();
         bd.addField("Content-Type", "multipart/yada; boUNdarY= \"ya \\\"\\\"\tda \\\"\"; "
                             + "\tcharset\t =  \"\\\"hepp\\\"  =us\t-ascii\"");
         assertEquals("ya \"\"\tda \"", bd.getBoundary());
