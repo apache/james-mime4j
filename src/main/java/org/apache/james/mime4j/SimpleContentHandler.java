@@ -23,6 +23,7 @@ import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.message.Header;
+import org.apache.james.mime4j.util.MimeUtil;
 
 import java.io.InputStream;
 import java.io.IOException;
@@ -87,10 +88,10 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
      * @see org.apache.james.mime4j.AbstractContentHandler#body(org.apache.james.mime4j.BodyDescriptor, java.io.InputStream)
      */
     public final void body(BodyDescriptor bd, InputStream is) throws IOException {
-        if (bd.isBase64Encoded()) {
+        if (MimeUtil.isBase64Encoding(bd.getTransferEncoding())) {
             bodyDecoded(bd, new Base64InputStream(is));
         }
-        else if (bd.isQuotedPrintableEncoded()) {
+        else if (MimeUtil.isQuotedPrintableEncoded(bd.getTransferEncoding())) {
             bodyDecoded(bd, new QuotedPrintableInputStream(is));
         }
         else {

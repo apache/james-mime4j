@@ -1,0 +1,213 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.james.mime4j;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.util.MimeUtil;
+
+/**
+ * Encapsulates the values of the MIME-specific header fields 
+ * (which starts with <code>Content-</code>). 
+ *
+ * 
+ * @version $Id: BodyDescriptor.java,v 1.4 2005/02/11 10:08:37 ntherning Exp $
+ */
+public class DefaultBodyDescriptor implements BodyDescriptor {
+    private static Log log = LogFactory.getLog(DefaultBodyDescriptor.class);
+    
+    private String mimeType = "text/plain";
+    private String boundary = null;
+    private String charset = "us-ascii";
+    private String transferEncoding = "7bit";
+    private Map parameters = new HashMap();
+    private boolean contentTypeSet;
+    private boolean contentTransferEncSet;
+    private long contentLength = -1;
+    
+    /**
+     * Creates a new root <code>BodyDescriptor</code> instance.
+     */
+    public DefaultBodyDescriptor() {
+        this(null);
+    }
+
+    /**
+     * Creates a new <code>BodyDescriptor</code> instance.
+     * 
+     * @param parent the descriptor of the parent or <code>null</code> if this
+     *        is the root descriptor.
+     */
+    public DefaultBodyDescriptor(BodyDescriptor parent) {
+        if (parent != null && MimeUtil.isSameMimeType("multipart/digest", parent.getMimeType())) {
+            mimeType = "message/rfc822";
+        } else {
+            mimeType = "text/plain";
+        }
+    }
+    
+    /**
+     * Should be called for each <code>Content-</code> header field of 
+     * a MIME message or part.
+     * 
+     * @param name the field name.
+     * @param value the field value.
+     */
+    public void addField(String name, String value) {
+        
+        name = name.trim().toLowerCase();
+        
+        if (name.equals("content-transfer-encoding") && !contentTransferEncSet) {
+            contentTransferEncSet = true;
+            
+            value = value.trim().toLowerCase();
+            if (value.length() > 0) {
+                transferEncoding = value;
+            }
+            
+        } else if (name.equals("content-length")  &&  contentLength != -1) {
+            try {
+                contentLength = Long.parseLong(value.trim());
+            } catch (NumberFormatException e) {
+                log.error("Invalid content-length: " + value);
+            }
+        } else if (name.equals("content-type") && !contentTypeSet) {
+            contentTypeSet = true;
+            
+            value = value.trim();
+            
+            /*
+             * Unfold Content-Type value
+             */
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (c == '\r' || c == '\n') {
+                    continue;
+                }
+                sb.append(c);
+            }
+            
+            Map params = MimeUtil.getHeaderParams(sb.toString());
+            
+            String main = (String) params.get("");
+            if (main != null) {
+                main = main.toLowerCase().trim();
+                int index = main.indexOf('/');
+                boolean valid = false;
+                if (index != -1) {
+                    String type = main.substring(0, index).trim();
+                    String subtype = main.substring(index + 1).trim();
+                    if (type.length() > 0 && subtype.length() > 0) {
+                        main = type + "/" + subtype;
+                        valid = true;
+                    }
+                }
+                
+                if (!valid) {
+                    main = null;
+                }
+            }
+            String b = (String) params.get("boundary");
+            
+            if (main != null 
+                    && ((main.startsWith("multipart/") && b != null) 
+                            || !main.startsWith("multipart/"))) {
+                
+                mimeType = main;
+            }
+            
+            if (MimeUtil.isMultipart(mimeType)) {
+                boundary = b;
+            }
+            
+            String c = (String) params.get("charset");
+            if (c != null) {
+                c = c.trim();
+                if (c.length() > 0) {
+                    charset = c.toLowerCase();
+                }
+            }
+            
+            /*
+             * Add all other parameters to parameters.
+             */
+            parameters.putAll(params);
+            parameters.remove("");
+            parameters.remove("boundary");
+            parameters.remove("charset");
+        }
+    }
+
+    /**
+     * Return the MimeType 
+     * 
+     * @return mimeType
+     */
+    public String getMimeType() {
+        return mimeType;
+    }
+    
+    /**
+     * Return the boundary
+     * 
+     * @return boundary
+     */
+    public String getBoundary() {
+        return boundary;
+    }
+    
+    /**
+     * Return the charset
+     * 
+     * @return charset
+     */
+    public String getCharset() {
+        return charset;
+    }
+    
+    /**
+     * Return all parameters for the BodyDescriptor
+     * 
+     * @return parameters
+     */
+    public Map getParameters() {
+        return parameters;
+    }
+    
+    /**
+     * Return the TransferEncoding
+     * 
+     * @return transferEncoding
+     */
+    public String getTransferEncoding() {
+        return transferEncoding;
+    }
+    
+    public String toString() {
+        return mimeType;
+    }
+
+    public long getContentLength() {
+        return contentLength;
+    }
+}

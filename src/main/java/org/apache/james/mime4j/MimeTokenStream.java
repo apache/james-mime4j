@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.util.MimeUtil;
 
 
 /**
@@ -249,14 +250,16 @@ public class MimeTokenStream {
                     setParsingFieldState();
                     break;
                 case T_END_HEADER:
-                    if (body.isMultipart()) {
+                    final String mimeType = body.getMimeType();
+                    if (MimeUtil.isMultipart(mimeType)) {
                         state = T_START_MULTIPART;
-                    } else if (body.isMessage()) {
+                    } else if (MimeUtil.isMessage(mimeType)) {
                         Cursor nextCursor = cursor;
-                        if (body.isBase64Encoded()) {
+                        final String transferEncoding = body.getTransferEncoding();
+                        if (MimeUtil.isBase64Encoding(transferEncoding)) {
                             log.debug("base64 encoded message/rfc822 detected");
                             nextCursor = cursor.decodeBase64();
-                        } else if (body.isQuotedPrintableEncoded()) {
+                        } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
                             log.debug("quoted-printable encoded message/rfc822 detected");
                             nextCursor = cursor.decodeQuotedPrintable();
                         }
@@ -294,7 +297,7 @@ public class MimeTokenStream {
         }
 
         private void initHeaderParsing() throws IOException {
-            body = new BodyDescriptor(parent);
+            body = newBodyDescriptor(parent);
             startLineNumber = lineNumber = cursor.getLineNumber();
 
             int curr = 0;
@@ -561,5 +564,14 @@ public class MimeTokenStream {
         }
         state = T_END_OF_STREAM;
         return state;
+    }
+
+    /**
+     * Creates a new instance of {@link BodyDescriptor}. Subclasses may override
+     * this in order to create body descriptors, that provide more specific
+     * information.
+     */
+    protected BodyDescriptor newBodyDescriptor(BodyDescriptor pParent) {
+        return new DefaultBodyDescriptor(pParent);
     }
 }
