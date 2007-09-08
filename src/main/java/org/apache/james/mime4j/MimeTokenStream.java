@@ -168,6 +168,57 @@ public class MimeTokenStream {
             fieldChars.set(i);
         }
     }
+    
+    /**
+     * Creates a stream that strictly validates the input.
+     * @return <code>MimeTokenStream</code> which throws a 
+     * <code>MimeException</code> whenever possible issues 
+     * are dedicated in the input
+     */
+    public static final MimeTokenStream createStrictValidationStream() {
+        return new MimeTokenStream(true);
+    }
+    
+    /**
+     * Enumerates events which can be monitored.
+     */
+    public final static class Event { 
+
+        /** Indicates that a body part ended prematurely. */
+        public static final Event MIME_BODY_PREMATURE_END 
+            = new Event("Body part ended prematurely. " +
+                    "Boundary detected in header or EOF reached."); 
+        /** Indicates that unexpected end of headers detected.*/
+        public static final Event HEADERS_PREMATURE_END 
+            = new Event("Unexpected end of headers detected. " +
+                    "Higher level boundary detected or EOF reached.");
+        
+        private final String code;
+        
+        private Event(final String code) {
+            super();
+            this.code = code;
+        }
+        
+        public int hashCode() {
+            return code.hashCode();
+        }
+
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            final Event other = (Event) obj;
+            return code.equals(other.code);
+        }
+        
+        public String toString() {
+            return code;
+        }
+    }
 
     abstract static class StateMachine {
         int state;
@@ -208,15 +259,10 @@ public class MimeTokenStream {
             state = parseField() ? T_FIELD : T_END_HEADER;
         }
 
-        private int setParseBodyPartState() throws IOException {
+        private int setParseBodyPartState() throws IOException, MimeException {
             cursor.advanceToBoundary();
             if (cursor.isEnded()) {
-                if (log.isWarnEnabled()) {
-                    log.warn("Line " + cursor.getLineNumber() 
-                            + ": Body part ended prematurely. "
-                            + "Higher level boundary detected or "
-                            + "EOF reached.");
-                }
+                monitor(Event.MIME_BODY_PREMATURE_END);
             } else {
                 if (cursor.moreMimeParts()) {
                     final String boundary = body.getBoundary();
@@ -296,7 +342,7 @@ public class MimeTokenStream {
             return state;
         }
 
-        private void initHeaderParsing() throws IOException {
+        private void initHeaderParsing() throws IOException, MimeException {
             body = newBodyDescriptor(parent);
             startLineNumber = lineNumber = cursor.getLineNumber();
 
@@ -314,10 +360,8 @@ public class MimeTokenStream {
                 prev = curr == '\r' ? prev : curr;
             }
             
-            if (curr == -1 && log.isWarnEnabled()) {
-                log.warn("Line " + cursor.getLineNumber()  
-                        + ": Unexpected end of headers detected. "
-                        + "Boundary detected in header or EOF reached.");
+            if (curr == -1) {
+                monitor(Event.HEADERS_PREMATURE_END);
             }
         }
 
@@ -386,12 +430,27 @@ public class MimeTokenStream {
         }
     }
     
+    private final boolean strictParsing;
     private int state = T_END_OF_STREAM;
     private Cursor cursor;
     private StateMachine currentStateMachine;
     private final List entities = new ArrayList();
     private boolean raw;
-
+    
+    /**
+     * Constructs a standard (lax) stream.
+     * Optional validation events will be logged only.
+     * Use {@link #createStrictValidationStream()} to create
+     * a stream that strictly validates the input.
+     */
+    public MimeTokenStream() {
+        this(false);
+    }
+    
+    private MimeTokenStream(final boolean strictParsing) {
+        this.strictParsing = strictParsing;
+    }
+    
     /** Instructs the {@code MimeTokenStream} to parse the given streams contents.
      * If the {@code MimeTokenStream} has already been in use, resets the streams
      * internal state.
@@ -436,7 +495,7 @@ public class MimeTokenStream {
     public void setRaw(boolean raw) {
         this.raw = raw;
     }
-    
+
     /**
      * Finishes the parsing and stops reading lines.
      * NOTE: No more lines will be parsed but the parser
@@ -502,6 +561,70 @@ public class MimeTokenStream {
                 return ((Entity) currentStateMachine).fieldValue;
             default:
                 throw new IllegalStateException("Expected state to be T_FIELD.");
+        }
+    }
+
+    /**
+     * Monitors the given event.
+     * Subclasses may override to perform actions upon events.
+     * Base implementation logs at warn.
+     * @param event <code>Event</code>, not null
+     * @throws MimeException subclasses may elect to throw this exception upon
+     * invalid content
+     * @throws IOException subclasses may elect to throw this exception
+     */
+    protected void monitor(Event event) throws MimeException, IOException {
+        if (strictParsing) {
+            throw new MimeParseEventException(event);
+        } else {
+            warn(event);
+        }
+    }
+    
+    /**
+     * Creates an indicative message suitable for display
+     * based on the given event and the current state of the system.
+     * @param event <code>Event</code>, not null
+     * @return message suitable for use as a message in an exception
+     * or for logging
+     */
+    protected String message(Event event) {
+        String preamble = "";
+        try {
+            preamble = "Line " + cursor.getLineNumber() + ": ";
+        } catch (IOException e) {
+            log.debug("Cannot get event line number.", e);
+        }
+
+        final String message;
+        if (event == null) {
+            message = "Event is unexpectedly null.";
+        } else {
+            message = event.toString();
+        }
+        final String result = preamble + message;
+        return result;
+    }
+    
+    /**
+     * Logs (at warn) an indicative message based on the given event 
+     * and the current state of the system.
+     * @param event <code>Event</code>, not null
+     */
+    protected void warn(Event event) {
+        if (log.isWarnEnabled()) {
+            log.warn(message(event));
+        }
+    }
+    
+    /**
+     * Logs (at debug) an indicative message based on the given event
+     * and the current state of the system.
+     * @param event <code>Event</code>, not null
+     */
+    protected void debug(Event event) {
+        if (log.isDebugEnabled()) {
+            log.debug(message(event));
         }
     }
 
