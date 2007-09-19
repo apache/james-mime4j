@@ -125,9 +125,16 @@ public class Header {
      * @param name the field name (e.g. From, Subject).
      * @return the list of fields.
      */
-    public List getFields(String name) {
-        List l = (List) fieldMap.get(name.toLowerCase());
-        return Collections.unmodifiableList(l);
+    public List getFields(final String name) {
+        final String lowerCaseName = name.toLowerCase();
+        final List l = (List) fieldMap.get(lowerCaseName);
+        final List results;
+        if (l == null || l.isEmpty()) {
+            results = Collections.EMPTY_LIST;
+        } else {
+            results = Collections.unmodifiableList(l);
+        }
+        return results;
     }
     
     /**
