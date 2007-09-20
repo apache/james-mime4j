@@ -17,12 +17,13 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j;
+package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.AbstractContentHandler;
+import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.util.MimeUtil;
 
 import java.io.InputStream;

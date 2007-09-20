@@ -30,9 +30,9 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeStreamParser;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
-import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
+import org.apache.james.mime4j.util.MimeUtil;
 
 
 /**
@@ -184,9 +184,9 @@ public class Message extends Entity implements Body {
             expect(Entity.class);
             
             String enc = bd.getTransferEncoding();
-            if (ContentTransferEncodingField.ENC_BASE64.equals(enc)) {
+            if (MimeUtil.ENC_BASE64.equals(enc)) {
                 is = new Base64InputStream(is);
-            } else if (ContentTransferEncodingField.ENC_QUOTED_PRINTABLE.equals(enc)) {
+            } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(enc)) {
                 is = new QuotedPrintableInputStream(is);
             }
             

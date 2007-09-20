@@ -19,15 +19,10 @@
 
 package org.apache.james.mime4j.field.datetime;
 
-import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
-import org.apache.james.mime4j.field.datetime.parser.ParseException;
-import org.apache.james.mime4j.field.datetime.parser.TokenMgrError;
-
-import java.util.Date;
 import java.util.Calendar;
-import java.util.TimeZone;
+import java.util.Date;
 import java.util.GregorianCalendar;
-import java.io.StringReader;
+import java.util.TimeZone;
 
 public class DateTime {
     private final Date date;
@@ -115,13 +110,4 @@ public class DateTime {
         System.out.println(getYear() + " " + getMonth() + " " + getDay() + "; " + getHour() + " " + getMinute() + " " + getSecond() + " " + getTimeZone());
     }
 
-
-    public static DateTime parse(String dateString) throws ParseException {
-        try {
-            return new DateTimeParser(new StringReader(dateString)).parseAll();
-        }
-        catch (TokenMgrError err) {
-            throw new ParseException(err.getMessage());
-        }
-    }
 }

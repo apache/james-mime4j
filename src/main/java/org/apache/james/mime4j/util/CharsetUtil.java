@@ -1021,7 +1021,7 @@ public class CharsetUtil {
         byte[] dummy = new byte[] {'d', 'u', 'm', 'm', 'y'};
         for (int i = 0; i < JAVA_CHARSETS.length; i++) {
             try {
-                String s = new String(dummy, JAVA_CHARSETS[i].canonical);
+                new String(dummy, JAVA_CHARSETS[i].canonical);
                 decodingSupported.add(JAVA_CHARSETS[i].canonical.toLowerCase());
             } catch (UnsupportedOperationException e) {
             } catch (UnsupportedEncodingException e) {

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.field.ContentTransferEncodingField;
 
 
 /**
@@ -14,6 +13,26 @@ import org.apache.james.mime4j.field.ContentTransferEncodingField;
  */
 public final class MimeUtil {
     private static final Log log = LogFactory.getLog(MimeUtil.class);
+    /**
+     * The <code>quoted-printable</code> encoding.
+     */
+    public static final String ENC_QUOTED_PRINTABLE = "quoted-printable";
+    /**
+     * The <code>binary</code> encoding.
+     */
+    public static final String ENC_BINARY = "binary";
+    /**
+     * The <code>base64</code> encoding.
+     */
+    public static final String ENC_BASE64 = "base64";
+    /**
+     * The <code>8bit</code> encoding.
+     */
+    public static final String ENC_8BIT = "8bit";
+    /**
+     * The <code>7bit</code> encoding.
+     */
+    public static final String ENC_7BIT = "7bit";
 
     private MimeUtil() {
         // this is an utility class to be used statically.
@@ -45,14 +64,14 @@ public final class MimeUtil {
      * Returns, whether the given transfer-encoding is "base64".
      */
     public static boolean isBase64Encoding(String pTransferEncoding) {
-        return ContentTransferEncodingField.ENC_BASE64.equalsIgnoreCase(pTransferEncoding);
+        return ENC_BASE64.equalsIgnoreCase(pTransferEncoding);
     }
 
     /**
      * Returns, whether the given transfer-encoding is "quoted-printable".
      */
     public static boolean isQuotedPrintableEncoded(String pTransferEncoding) {
-        return ContentTransferEncodingField.ENC_QUOTED_PRINTABLE.equals(pTransferEncoding);
+        return ENC_QUOTED_PRINTABLE.equals(pTransferEncoding);
     }
 
     /**

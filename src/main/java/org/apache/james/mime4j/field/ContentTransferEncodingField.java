@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
+import org.apache.james.mime4j.util.MimeUtil;
+
 
 
 /**
@@ -28,27 +30,6 @@ package org.apache.james.mime4j.field;
  * @version $Id: ContentTransferEncodingField.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 public class ContentTransferEncodingField extends Field {
-    /**
-     * The <code>7bit</code> encoding.
-     */
-    public static final String ENC_7BIT = "7bit";
-    /**
-     * The <code>8bit</code> encoding.
-     */
-    public static final String ENC_8BIT = "8bit";
-    /**
-     * The <code>binary</code> encoding.
-     */
-    public static final String ENC_BINARY = "binary";
-    /**
-     * The <code>quoted-printable</code> encoding.
-     */
-    public static final String ENC_QUOTED_PRINTABLE = "quoted-printable";
-    /**
-     * The <code>base64</code> encoding.
-     */
-    public static final String ENC_BASE64 = "base64";
-    
     private String encoding;
     
     protected ContentTransferEncodingField(String name, String body, String raw, String encoding) {
@@ -76,7 +57,7 @@ public class ContentTransferEncodingField extends Field {
         if (f != null && f.getEncoding().length() != 0) {
             return f.getEncoding();
         }
-        return ENC_7BIT;
+        return MimeUtil.ENC_7BIT;
     }
     
     public static class Parser implements FieldParser {
