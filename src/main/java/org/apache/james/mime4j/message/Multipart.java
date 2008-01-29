@@ -169,18 +169,28 @@ public class Multipart implements Body {
         String boundary = getBoundary();
         List bodyParts = getBodyParts();
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, CharsetUtil.getCharset(getCharset())),8192);
+        BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(out, CharsetUtil.getCharset(getCharset())),
+                8192);
         
-        writer.write(getPreamble() + "\r\n");
+        writer.write(getPreamble());
+        writer.write("\r\n");
 
         for (int i = 0; i < bodyParts.size(); i++) {
-            writer.write(boundary + "\r\n");
+            writer.write("--");
+            writer.write(boundary);
+            writer.write("\r\n");
+            writer.flush();
             ((BodyPart) bodyParts.get(i)).writeTo(out);
+            writer.write("\r\n");
         }
 
-        writer.write(getEpilogue() + "\r\n");
-        writer.write(boundary + "--" + "\r\n");
-
+        writer.write("--");
+        writer.write(boundary);
+        writer.write("--\r\n");
+        writer.write(getEpilogue());
+        writer.write("\r\n");
+        writer.flush();
     }
 
     /**
