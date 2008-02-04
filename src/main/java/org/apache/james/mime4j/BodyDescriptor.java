@@ -19,8 +19,6 @@
 
 package org.apache.james.mime4j;
 
-import java.util.Map;
-
 /**
  * Encapsulates the values of the MIME-specific header fields 
  * (which starts with <code>Content-</code>). 
@@ -28,7 +26,7 @@ import java.util.Map;
  * 
  * @version $Id: BodyDescriptor.java,v 1.4 2005/02/11 10:08:37 ntherning Exp $
  */
-public interface BodyDescriptor {
+public interface BodyDescriptor extends ContentDescriptor {
     /**
      * Returns the body descriptors boundary.
      * @return Boundary string, if known, or null. The latter may be the
@@ -43,38 +41,4 @@ public interface BodyDescriptor {
      */
     void addField(String pFieldName, String pFieldValue);
 
-    /**
-     * Returns the body descriptors MIME type.
-     * @return The MIME type, which has been parsed from the
-     *   content-type definition. Must not be null, but
-     *   "text/plain", if no content-type was specified.
-     */
-    String getMimeType();
-
-    /**
-     * The body descriptors character set.
-     * @return Character set, which has been parsed from the
-     *   content-type definition. Must not be null, but "US-ASCII",
-     *   if no content-type was specified.
-     */
-    String getCharset();
-
-    /**
-     * Returns the body descriptors transfer encoding.
-     * @return The transfer encoding. Must not be null, but "7bit",
-     *   if no transfer-encoding was specified.
-     */
-    String getTransferEncoding();
-
-    /**
-     * Returns the map of parameters of the content-type header.
-     */
-    Map getParameters();
-
-    /**
-     * Returns the body descriptors content-length.
-     * @return Content length, if known, or -1, to indicate the absence of a
-     *   content-length header.
-     */
-    long getContentLength();
 }
