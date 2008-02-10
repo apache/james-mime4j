@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,6 +37,7 @@ import org.apache.james.mime4j.MimeStreamParser;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.MessageUtils;
 
 
 /**
@@ -154,17 +156,53 @@ public class Header {
     
     
     /**
+     * Write the Header to the given OutputStream. 
+     * 
+     * @param out the OutputStream to write to
+     * @param mode compatibility mode
+     * 
+     * @throws IOException if case of an I/O error
+     * @throws MimeException if case of a MIME protocol violation
+     */
+    public void writeTo(final OutputStream out, int mode) throws IOException, MimeException {
+        Charset charset = null;
+        if (mode == MessageUtils.LENIENT) {
+            ContentTypeField cf = ((ContentTypeField) getField(Field.CONTENT_TYPE));
+            if (cf != null && cf.getCharset() != null) {
+                charset = CharsetUtil.getCharset(cf.getCharset());
+            } else {
+                charset = MessageUtils.ISO_8859_1;
+            }
+        } else {
+            charset = MessageUtils.DEFAULT_CHARSET;
+        }
+        BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(out, charset), 8192);
+        for (Iterator it = fields.iterator(); it.hasNext();) {
+            Field field = (Field) it.next();
+            String fs = field.toString();
+            if (mode == MessageUtils.STRICT_ERROR && !MessageUtils.isASCII(fs)) {
+                throw new MimeException("Header '" + fs + "' violates RFC 822");
+            }
+            writer.write(fs);
+            writer.write(MessageUtils.CRLF);
+        }
+        writer.write(MessageUtils.CRLF);
+        writer.flush();
+    }
+
+    /**
      * Write the Header to the given OutputStream
      * 
      * @param out the OutputStream to write to
      * @throws IOException
      */
-    public void writeTo(OutputStream out) throws IOException {
-        String charString = ((ContentTypeField) getField(Field.CONTENT_TYPE)).getCharset();
-        
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, CharsetUtil.getCharset(charString)),8192);
-        writer.write(toString()+ "\r\n");
-        writer.flush();
+    public void writeTo(final OutputStream out) throws IOException {
+        try {
+            writeTo(out, MessageUtils.LENIENT);
+        } catch (MimeException ex) {
+            throw new IOException(ex.getMessage());
+        }
     }
 
 }

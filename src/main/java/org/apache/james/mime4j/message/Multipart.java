@@ -23,14 +23,17 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.MessageUtils;
 
 /**
  * Represents a MIME multipart body (see RFC 2045).A multipart body has a 
@@ -162,52 +165,73 @@ public class Multipart implements Body {
     }
 
     /**
+     * Write the Multipart to the given OutputStream. 
      * 
-     * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream)
+     * @param out the OutputStream to write to
+     * @param mode compatibility mode
+     * 
+     * @throws IOException if case of an I/O error
+     * @throws MimeException if case of a MIME protocol violation
      */
-    public void writeTo(OutputStream out) throws IOException {
-        String boundary = getBoundary();
+    public void writeTo(final OutputStream out, int mode) throws IOException, MimeException {
+        Entity e = getParent();
+        
+        ContentTypeField cField = (ContentTypeField) e.getHeader().getField(
+                Field.CONTENT_TYPE);
+        if (cField == null || cField.getBoundary() == null) {
+            throw new MimeException("Multipart boundary not specified");
+        }
+        String boundary = cField.getBoundary();
+
+        Charset charset = null;
+        if (mode == MessageUtils.LENIENT) {
+            if (cField != null && cField.getCharset() != null) {
+                charset = CharsetUtil.getCharset(cField.getCharset());
+            } else {
+                charset = MessageUtils.ISO_8859_1;
+            }
+        } else {
+            charset = MessageUtils.DEFAULT_CHARSET;
+        }
+        
+        BufferedWriter writer = new BufferedWriter(
+                new OutputStreamWriter(out, charset), 8192);
+        
         List bodyParts = getBodyParts();
 
-        BufferedWriter writer = new BufferedWriter(
-                new OutputStreamWriter(out, CharsetUtil.getCharset(getCharset())),
-                8192);
-        
         writer.write(getPreamble());
-        writer.write("\r\n");
+        writer.write(MessageUtils.CRLF);
 
         for (int i = 0; i < bodyParts.size(); i++) {
             writer.write("--");
             writer.write(boundary);
-            writer.write("\r\n");
+            writer.write(MessageUtils.CRLF);
             writer.flush();
             ((BodyPart) bodyParts.get(i)).writeTo(out);
-            writer.write("\r\n");
+            writer.write(MessageUtils.CRLF);
         }
 
         writer.write("--");
         writer.write(boundary);
-        writer.write("--\r\n");
+        writer.write("--");
+        writer.write(MessageUtils.CRLF);
         writer.write(getEpilogue());
-        writer.write("\r\n");
+        writer.write(MessageUtils.CRLF);
         writer.flush();
     }
 
     /**
-     * Return the boundory of the parent Entity
+     * Write the Header to the given OutputStream
      * 
-     * @return boundery
+     * @param out the OutputStream to write to
+     * @throws IOException
      */
-    private String getBoundary() {
-        Entity e = getParent();
-        ContentTypeField cField = (ContentTypeField) e.getHeader().getField(
-                Field.CONTENT_TYPE);
-        return cField.getBoundary();
+    public void writeTo(final OutputStream out) throws IOException {
+        try {
+            writeTo(out, MessageUtils.LENIENT);
+        } catch (MimeException ex) {
+            throw new IOException(ex.getMessage());
+        }
     }
-    
-    private String getCharset() {
-        Entity e = getParent();
-        String charString = ((ContentTypeField) e.getHeader().getField(Field.CONTENT_TYPE)).getCharset();
-        return charString;
-    }
+
 }
