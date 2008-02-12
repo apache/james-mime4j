@@ -128,7 +128,7 @@ public class MimeStreamParser {
      *        disables it.
      */
     public void setRaw(boolean raw) {
-        mimeTokenStream.setRaw(raw);
+        mimeTokenStream.setRecursionMode(MimeTokenStream.M_RAW);
     }
     
     /**

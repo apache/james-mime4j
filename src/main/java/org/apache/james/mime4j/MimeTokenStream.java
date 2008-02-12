@@ -168,6 +168,85 @@ public class MimeTokenStream {
             fieldChars.set(i);
         }
     }
+
+    /** 
+     * Recursively parse every <code>message/rfc822</code> part 
+     * @see #getRecursionMode() 
+     */
+    public static final int M_RECURSE = 0;
+    /**
+     * Do not recurse <code>message/rfc822</code> parts 
+     * @see #getRecursionMode()
+     */
+    public static final int M_NO_RECURSE = 1;
+    /** 
+     * Parse into raw entities
+     * @see #getRecursionMode() 
+     */
+    public static final int M_RAW = 2;
+    
+    /**
+     * Renders a state as a string suitable for logging.
+     * @param state 
+     * @return rendered as string, not null
+     */
+    public static final String stateToString(int state) {
+        final String result;
+        switch (state) {
+            case T_END_OF_STREAM:
+                result = "End of stream";
+                break;
+            case T_START_MESSAGE:
+                result = "Start message";
+                break;
+            case T_END_MESSAGE:
+                result = "End message";
+                break;
+            case T_RAW_ENTITY:
+                result = "Raw entity";
+                break;
+            case T_START_HEADER:
+                result = "Start header";
+                break;
+            case T_FIELD:
+                result = "Field";
+                break;
+            case T_END_HEADER:
+                result = "End header";
+                break;
+            case T_START_MULTIPART:
+                result = "Start multipart";
+                break;
+            case T_END_MULTIPART:
+                result = "End multipart";
+                break;
+            case T_PREAMBLE:
+                result = "Premable";
+                break;
+            case T_EPILOGUE:
+                result = "Epilogue";
+                break;
+            case T_START_BODYPART:
+                result = "Start bodypart";
+                break;
+            case T_END_BODYPART:
+                result = "End bodypart";
+                break;
+            case T_BODY:
+                result = "Body";
+                break;
+            case T_IN_BODYPART:
+                result = "Bodypart";
+                break;
+            case T_IN_MESSAGE:
+                result = "In message";
+                break;
+            default:
+                result = "Unknown";
+                break;
+        }
+        return result;
+    }
     
     /**
      * Creates a stream that strictly validates the input.
@@ -299,7 +378,7 @@ public class MimeTokenStream {
                     final String mimeType = body.getMimeType();
                     if (MimeUtil.isMultipart(mimeType)) {
                         state = T_START_MULTIPART;
-                    } else if (MimeUtil.isMessage(mimeType)) {
+                    } else if (recursionMode != M_NO_RECURSE && MimeUtil.isMessage(mimeType)) {
                         Cursor nextCursor = cursor;
                         final String transferEncoding = body.getTransferEncoding();
                         if (MimeUtil.isBase64Encoding(transferEncoding)) {
@@ -435,7 +514,8 @@ public class MimeTokenStream {
     private Cursor cursor;
     private StateMachine currentStateMachine;
     private final List entities = new ArrayList();
-    private boolean raw;
+    
+    private int recursionMode = M_RECURSE;
     
     /**
      * Constructs a standard (lax) stream.
@@ -462,10 +542,15 @@ public class MimeTokenStream {
     }
 
     private int parseMessage(Cursor cursor, BodyDescriptor parent) {
-        if (isRaw()) {
-            currentStateMachine = new RawEntity(cursor.getStream());
-        } else {
-            currentStateMachine = new Message(cursor, parent);
+        switch (recursionMode) {
+            case M_RAW:
+                currentStateMachine = new RawEntity(cursor.getStream());
+                break;
+            case M_NO_RECURSE:
+                // expected to be called only at start of paring
+            case M_RECURSE:
+                currentStateMachine = new Message(cursor, parent);
+                break;
         }
         entities.add(currentStateMachine);
         return currentStateMachine.state;
@@ -479,7 +564,7 @@ public class MimeTokenStream {
      * @see #setRaw(boolean)
      */
     public boolean isRaw() {
-        return raw;
+        return recursionMode == M_RAW;
     }
     
     /**
@@ -491,9 +576,40 @@ public class MimeTokenStream {
      * 
      * @param raw <code>true</code> enables raw mode, <code>false</code>
      *        disables it.
+     * @deprecated pass {@link #M_RAW} to {@link #setRecursionMode(int)} 
      */
     public void setRaw(boolean raw) {
-        this.raw = raw;
+        if (raw) {
+            recursionMode = M_RAW;
+        } else {
+            recursionMode = M_RECURSE;
+        }
+    }
+    
+    /**
+     * Gets the current recursion mode.
+     * The recursion mode specifies the approach taken to parsing parts.
+     * {@link #M_RAW}  mode does not parse the part at all.
+     * {@link #M_RECURSE} mode recursively parses each mail
+     * when an <code>message/rfc822</code> part is encounted;
+     * {@link #M_NO_RECURSE} does not.
+     * @return {@link #M_RECURSE}, {@link #M_RAW} or {@link #M_NO_RECURSE}
+     */
+    public int getRecursionMode() {
+        return recursionMode;
+    }
+    
+    /**
+     * Sets the current recursion.
+     * The recursion mode specifies the approach taken to parsing parts.
+     * {@link #M_RAW}  mode does not parse the part at all.
+     * {@link #M_RECURSE} mode recursively parses each mail
+     * when an <code>message/rfc822</code> part is encounted;
+     * {@link #M_NO_RECURSE} does not.
+     * @param mode {@link #M_RECURSE}, {@link #M_RAW} or {@link #M_NO_RECURSE}
+     */
+    public void setRecursionMode(int mode) {
+        this.recursionMode = mode;
     }
 
     /**
