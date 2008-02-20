@@ -92,6 +92,7 @@ public class MimeTokenNoRecurseTest extends TestCase {
         nextIs(MimeTokenStream.T_EPILOGUE);
         nextIs(MimeTokenStream.T_END_MULTIPART);
         nextIs(MimeTokenStream.T_END_MESSAGE);
+        nextIs(MimeTokenStream.T_END_BODYPART);
         nextShouldBeStandardPart(true);
         nextIs(MimeTokenStream.T_EPILOGUE);
         nextIs(MimeTokenStream.T_END_MULTIPART);

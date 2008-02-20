@@ -392,7 +392,7 @@ public class MimeTokenStream {
                             log.debug("quoted-printable encoded message/rfc822 detected");
                             nextCursor = cursor.decodeQuotedPrintable();
                         }
-                        state = endState;
+                        state = T_IN_MESSAGE;
                         return parseMessage(nextCursor, body);
                     } else {
                         state = T_BODY;

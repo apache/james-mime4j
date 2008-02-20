@@ -106,8 +106,7 @@ public class MultipartStreamTest extends TestCase {
         assertEquals(BODY, IOUtils.toString(out, "us-ascii"));
         checkState(MimeTokenStream.T_END_MULTIPART);
         checkState(MimeTokenStream.T_END_MESSAGE);
-        //TODO: 
-        //checkState(MimeTokenStream.T_END_BODYPART);
+        checkState(MimeTokenStream.T_END_BODYPART);
         checkState(MimeTokenStream.T_START_BODYPART);
         checkState(MimeTokenStream.T_START_HEADER);
         checkState(MimeTokenStream.T_FIELD);
