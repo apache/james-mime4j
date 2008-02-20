@@ -302,6 +302,7 @@ public class MimeTokenStream {
     abstract static class StateMachine {
         int state;
         abstract int next() throws IOException, MimeException;
+        abstract InputStream read();
     }
 
     private static class RawEntity extends StateMachine {
@@ -313,6 +314,9 @@ public class MimeTokenStream {
         int next() {
             state = T_END_OF_STREAM;
             return state;
+        }
+        InputStream read() {
+            return stream;
         }
     }
 
@@ -348,7 +352,7 @@ public class MimeTokenStream {
                     cursor.boundary(boundary);
                    
                     if (isRaw()) {
-                        currentStateMachine = new RawEntity(cursor.getStream());
+                        currentStateMachine = new RawEntity(cursor.nextSection());
                     } else {
                         currentStateMachine = new BodyPart(cursor.nextMimePartCursor(), body);
                     }
@@ -397,7 +401,11 @@ public class MimeTokenStream {
                     break;
                 case T_START_MULTIPART:
                     cursor.boundary(body.getBoundary());
-                    state = T_PREAMBLE;
+                    if (cursor.isEnded()) {
+                        state = T_END_MULTIPART;
+                    } else {
+                        state = T_PREAMBLE;
+                    }
                     break;
                 case T_PREAMBLE:
                     return setParseBodyPartState();
@@ -421,6 +429,19 @@ public class MimeTokenStream {
             return state;
         }
 
+        InputStream read() {
+            switch (getState()) {
+                case T_PREAMBLE:
+                case T_EPILOGUE:
+                case T_BODY:
+                    return cursor.nextSection();
+                case T_START_MULTIPART:
+                    return cursor.rest();
+                default:
+                    throw new IllegalStateException("Expected state to be either of T_RAW_ENTITY, T_PREAMBLE, or T_EPILOGUE.");
+            }
+        }
+        
         private void initHeaderParsing() throws IOException, MimeException {
             body = newBodyDescriptor(parent);
             startLineNumber = lineNumber = cursor.getLineNumber();
@@ -544,7 +565,7 @@ public class MimeTokenStream {
     private int parseMessage(Cursor cursor, BodyDescriptor parent) {
         switch (recursionMode) {
             case M_RAW:
-                currentStateMachine = new RawEntity(cursor.getStream());
+                currentStateMachine = new RawEntity(cursor.nextSection());
                 break;
             case M_NO_RECURSE:
                 // expected to be called only at start of paring
@@ -753,16 +774,7 @@ public class MimeTokenStream {
      *   invalid value.
      */
     public InputStream getInputStream() {
-        switch (getState()) {
-            case T_RAW_ENTITY:
-                return ((RawEntity) currentStateMachine).stream;
-            case T_PREAMBLE:
-            case T_EPILOGUE:
-            case T_BODY:
-                return ((Entity) currentStateMachine).cursor.getStream();
-            default:
-                throw new IllegalStateException("Expected state to be either of T_RAW_ENTITY, T_PREAMBLE, or T_EPILOGUE.");
-        }
+        return currentStateMachine.read();
     }
 
     /**

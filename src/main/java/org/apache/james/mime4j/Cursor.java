@@ -97,7 +97,7 @@ public interface Cursor {
      * Advances the cursor.
      * @return the next byte
      * @throws IOException
-     * @see #getStream()
+     * @see #nextSection()
      */
     public byte advance() throws IOException;
     
@@ -105,6 +105,11 @@ public interface Cursor {
      * Gets a stream to read the contents of the next section of the message.
      * @return <code>InputStream</code>, not null
      */
-    public InputStream getStream();
+    public InputStream nextSection();
 
+    /**
+     * Gets a stream to read the contents of the rest of this message.
+     * @return <code>InputStream</code>, not null
+     */
+    public InputStream rest();
 }

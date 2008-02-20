@@ -132,9 +132,9 @@ public class StreamCursor implements Cursor {
     }
 
     /**
-     * @see Cursor#getStream()
+     * @see Cursor#nextSection()
      */
-    public InputStream getStream() {
+    public InputStream nextSection() {
         InputStream result = stream;
         if (result == null)
         {
@@ -147,6 +147,12 @@ public class StreamCursor implements Cursor {
      * @see Cursor#advance()
      */
     public byte advance() throws IOException {
-        return (byte) getStream().read();
+        return (byte) nextSection().read();
     }
+
+    public InputStream rest() {
+        return contents;
+    }
+    
+    
 }
