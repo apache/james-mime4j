@@ -21,12 +21,17 @@ package org.apache.james.mime4j;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.decoder.Base64InputStream;
+import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.util.MimeUtil;
 
 
@@ -777,6 +782,47 @@ public class MimeTokenStream {
         return currentStateMachine.read();
     }
 
+    /**
+     * Gets a reader configured for the current body or body part.
+     * The reader will return a transfer and charset decoded 
+     * stream of characters based on the MIME fields with the standard
+     * defaults.
+     * This is a conveniance method and relies on {@link #getInputStream()}.
+     * Consult the javadoc for that method for known limitations.
+     * 
+     * @return <code>Reader</code>, not null
+     * @see #getInputStream 
+     * @throws IllegalStateException {@link #getState()} returns an
+     *   invalid value 
+     * @throws UnsupportedCharsetException if there is no JVM support 
+     * for decoding the charset
+     * @throws IllegalCharsetNameException if the charset name specified
+     * in the mime type is illegal
+     */
+    public Reader getReader() {
+        final BodyDescriptor bodyDescriptor = getBodyDescriptor();
+        final String mimeCharset = bodyDescriptor.getCharset();
+        final String transferEncoding = bodyDescriptor.getTransferEncoding();
+        final Charset charset;
+        if (mimeCharset == null || "".equals(mimeCharset)) {
+            charset = Charset.forName("US-ASCII");
+        } else {
+            charset = Charset.forName(mimeCharset);
+        }
+        
+        final InputStream inputStream;
+        final InputStream transferEncodedStream = getInputStream();
+        if (MimeUtil.isBase64Encoding(transferEncoding)) {
+            inputStream = new Base64InputStream(transferEncodedStream);
+        } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
+            inputStream = new QuotedPrintableInputStream(transferEncodedStream);
+        } else {
+            inputStream = transferEncodedStream;
+        }
+        final InputStreamReader result = new InputStreamReader(inputStream, charset);
+        return result;
+    }
+    
     /**
      * This method is valid, if {@link #getState()} returns
      * {@link #T_BODY}, or {@link #T_START_MULTIPART}. It returns the current
