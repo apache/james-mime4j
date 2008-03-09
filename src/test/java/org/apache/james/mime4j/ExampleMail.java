@@ -207,6 +207,28 @@ public class ExampleMail {
     public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END = 
             "\r\n--1729--\r\n";
     
+    public static final String MIME_MIXED_ALTERNATIVE = 
+        "From: Timothy Tayler <timothy@example.org>\r\n" +
+        "To: Samual Smith <samual@example.org>\r\n" +
+        "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" +
+        "Subject: A Multipart Email\r\n" +
+        "Content-Type: multipart/alternative;boundary=1729\r\n\r\n" +
+        "Start with a preamble\r\n" +
+        "\r\n--1729\r\n" +
+        "Content-Type: applcation/xhtml+xml\r\n\r\n" +
+        "<!DOCTYPE html\r\n" +
+        "PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\r\n" +
+        "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\r\n" +
+        "<html><head><title>Rhubarb</title></head><body>Rhubarb!</body></html>\r\n" +
+        "\r\n--1729\r\n" +
+        "Content-Type: text/plain; charset=US-ASCII\r\n\r\n" +
+        "Rhubarb!\r\n" +
+        "\r\n--1729\r\n" +
+        "Content-Type: text/html; charset=US-ASCII\r\n\r\n" +
+        "<html><head><title>Rhubarb</title></head><body>Rhubarb!</body></html>\r\n" +
+        "\r\n--1729--\r\n" +
+        "This is the epilogue\r\n";
+    
     private static final byte[][] MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTE_ARRAYS = {
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_ONE),
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_7BIT),
@@ -216,6 +238,7 @@ public class ExampleMail {
         EncodeUtils.toBase64(ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BASE64)),
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END),
     };
+    public static final byte[] MIME_MIXED_ALTERNATIVE_BYTES = ascii(MIME_MIXED_ALTERNATIVE);
     public static final byte[] MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTES = join(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTE_ARRAYS);
     public static final byte[] ONE_PART_MIME_QUOTED_PRINTABLE_ASCII_BYTES = ascii(ONE_PART_MIME_QUOTED_PRINTABLE_ASCII);
     public static final byte[] ONE_PART_MIME_BASE64_LATIN1_BYTES = join(ascii(ONE_PART_MIME_BASE64_LATIN1_HEADERS), ONE_PART_MIME_BASE64_LATIN1_ENCODED);

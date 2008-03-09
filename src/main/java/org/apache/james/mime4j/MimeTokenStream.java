@@ -824,14 +824,22 @@ public class MimeTokenStream {
     }
     
     /**
-     * This method is valid, if {@link #getState()} returns
-     * {@link #T_BODY}, or {@link #T_START_MULTIPART}. It returns the current
-     * entities body descriptor.
+     * <p>Gets a descriptor for the current entity.
+     * This method is valid if {@link #getState()} returns:</p>
+     * <ul>
+     * <li>{@link #T_BODY}</li>
+     * <li>{@link #T_START_MULTIPART}</li>
+     * <li>{@link #T_EPILOGUE}</li>
+     * <li>{@link #T_PREAMBLE}</li>
+     * </ul>
+     * @return <code>BodyDescriptor</code>, not nulls
      */
     public BodyDescriptor getBodyDescriptor() {
         switch (getState()) {
             case T_BODY:
             case T_START_MULTIPART:
+            case T_PREAMBLE:
+            case T_EPILOGUE:
                 return ((Entity) currentStateMachine).body;
             default:
                 throw new IllegalStateException("Expected state to be T_BODY.");
