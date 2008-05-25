@@ -38,7 +38,7 @@ public final class MessageUtils {
     public static final Charset ISO_8859_1 = CharsetUtil.getCharset("ISO-8859-1");
     
     public static final Charset DEFAULT_CHARSET = ASCII;
-
+    
     public static final String CRLF = "\r\n";
     
     public static boolean isASCII(char ch) {
@@ -57,5 +57,4 @@ public final class MessageUtils {
         }
         return true;
     }
-    
 }

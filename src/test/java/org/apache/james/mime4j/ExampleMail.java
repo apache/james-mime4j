@@ -25,6 +25,157 @@ public class ExampleMail {
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
     public static final Charset LATIN1 = Charset.forName("ISO-8859-1");
     
+    public static final String MULTIPART_WITH_BINARY_ATTACHMENTS = 
+        "Return-Path: <robertburrelldonkin@blueyonder.co.uk>\r\n" +
+        "Received: (qmail 18554 invoked from network); 25 May 2008 14:38:53 -0000\r\n" +
+        "Received: from unknown (HELO p3presmtp01-16.prod.phx3.secureserver.net)\r\n" +
+        "        ([208.109.80.165]) (envelope-sender <rdonkin-owner@locus.apache.org>) by\r\n" +
+        "        smtp20-01.prod.mesa1.secureserver.net (qmail-1.03) with SMTP for\r\n" +
+        "        <asf@xmlmapt.org>; 25 May 2008 14:38:53 -0000\r\n" +
+        "Received: (qmail 9751 invoked from network); 25 May 2008 14:38:53 -0000\r\n" +
+        "Received: from minotaur.apache.org ([140.211.11.9]) (envelope-sender\r\n" +
+        "        <rdonkin-owner@locus.apache.org>) by\r\n" +
+        "        p3presmtp01-16.prod.phx3.secureserver.net (qmail-ldap-1.03) with SMTP for\r\n" +
+        "        <asf@xmlmapt.org>; 25 May 2008 14:38:50 -0000\r\n" +
+        "Received: (qmail 46768 invoked by uid 1289); 25 May 2008 14:38:46 -0000\r\n" +
+        "Delivered-To: rdonkin@locus.apache.org\r\n" +
+        "Received: (qmail 46763 invoked from network); 25 May 2008 14:38:46 -0000\r\n" +
+        "Received: from hermes.apache.org (HELO mail.apache.org) (140.211.11.2) by\r\n" +
+        "        minotaur.apache.org with SMTP; 25 May 2008 14:38:46 -0000\r\n" +
+        "Received: (qmail 61275 invoked by uid 500); 25 May 2008 14:38:48 -0000\r\n" +
+        "Delivered-To: apmail-rdonkin@apache.org\r\n" +
+        "Delivered-To: rob@localhost\r\n" +
+        "Delivered-To: rob@localhost\r\n" +
+        "Received: (qmail 61272 invoked by uid 99); 25 May 2008 14:38:48 -0000\r\n" +
+        "Received: from athena.apache.org (HELO athena.apache.org) (140.211.11.136)\r\n" +
+        "        by apache.org (qpsmtpd/0.29) with ESMTP; Sun, 25 May 2008 07:38:48 -0700\r\n" +
+        "X-ASF-Spam-Status: No, hits=-0.0 required=10.0 tests=SPF_PASS\r\n" +
+        "X-Spam-Check-By: apache.org\r\n" +
+        "Received-SPF: pass (athena.apache.org: domain of\r\n" +
+        "        robertburrelldonkin@blueyonder.co.uk designates 195.188.213.5 as permitted\r\n" +
+        "        sender)\r\n" +
+        "Received: from [195.188.213.5] (HELO smtp-out2.blueyonder.co.uk)\r\n" +
+        "        (195.188.213.5) by apache.org (qpsmtpd/0.29) with ESMTP; Sun, 25 May 2008\r\n" +
+        "        14:38:00 +0000\r\n" +
+        "Received: from [172.23.170.140] (helo=anti-virus02-07) by\r\n" +
+        "        smtp-out2.blueyonder.co.uk with smtp (Exim 4.52) id 1K0HMV-00087e-HY for\r\n" +
+        "        rdonkin@apache.org; Sun, 25 May 2008 15:38:15 +0100\r\n" +
+        "Received: from [82.38.65.6] (helo=[10.0.0.27]) by\r\n" +
+        "        asmtp-out5.blueyonder.co.uk with esmtpa (Exim 4.52) id 1K0HMU-0001A2-3q for\r\n" +
+        "        rdonkin@apache.org; Sun, 25 May 2008 15:38:14 +0100\r\n" +
+        "Subject: This is an example of a multipart mixed email with image content\r\n" +
+        "From: Robert Burrell Donkin <robertburrelldonkin@blueyonder.co.uk>\r\n" +
+        "To: Robert Burrell Donkin <rdonkin@apache.org>\r\n" +
+        "Content-Type: multipart/mixed; boundary=\"=-tIdGYVstQJghyEDATnJ+\"\r\n" +
+        "Date: Sun, 25 May 2008 15:38:13 +0100\r\n" +
+        "Message-Id: <1211726293.5772.10.camel@localhost>\r\n" +
+        "Mime-Version: 1.0\r\n" +
+        "X-Mailer: Evolution 2.12.3 \r\n" +
+        "X-Virus-Checked: Checked by ClamAV on apache.org\r\n" +
+        "X-Nonspam: None\r\n" +
+        "X-fetched-from: mail.xmlmapt.org\r\n" +
+        "X-Evolution-Source: imap://rob@thebes/\r\n" +
+        "\r\n" +
+        "\r\n" +
+        "--=-tIdGYVstQJghyEDATnJ+\r\n" +
+        "Content-Type: text/plain\r\n" +
+        "Content-Transfer-Encoding: 7bit\r\n" +
+        "\r\n" +
+        "Licensed to the Apache Software Foundation (ASF) under one\r\n" +
+        "or more contributor license agreements.  See the NOTICE file\r\n" +
+        "distributed with this work for additional information\r\n" +
+        "regarding copyright ownership.  The ASF licenses this file\r\n" +
+        "to you under the Apache License, Version 2.0 (the\r\n" +
+        "\"License\"); you may not use this file except in compliance\r\n" +
+        "with the License.  You may obtain a copy of the License at\r\n" +
+        "\r\n" +
+        "    http://www.apache.org/licenses/LICENSE-2.0\r\n" +
+        " \r\n" +
+        "Unless required by applicable law or agreed to in writing,\r\n" +
+        "software distributed under the License is distributed on an\r\n" +
+        "\"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\r\n" +
+        "KIND, either express or implied.  See the License for the\r\n" +
+        "specific language governing permissions and limitations\r\n" +
+        "under the License.\r\n" +
+        " \r\n" +
+        "\r\n" +
+        "--=-tIdGYVstQJghyEDATnJ+\r\n" +
+        "Content-Disposition: attachment; filename=blob.png\r\n" +
+        "Content-Type: image/png; name=blob.png\r\n" +
+        "Content-Transfer-Encoding: base64\r\n" +
+        "\r\n" +
+        "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAAAXNSR0IArs4c6QAAAAlwSFlzAAAL\r\n" +
+        "EwAACxMBAJqcGAAAAAd0SU1FB9gFGQ4iJ99ufcYAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRo\r\n" +
+        "IEdJTVBXgQ4XAAAA0ElEQVQY02XMwUrDQBhF4XsnkyYhjWJaCloEN77/a/gERVwJLQiiNjYmbTqZ\r\n" +
+        "/7qIG/VsPziMTw+23Wj/ovZdMQJgViCvWNVusfa23djuUf2nugbnI2RynkWF5a2Fwdvrs7q9vhqE\r\n" +
+        "E2QAEIO6BhZBerUf6luMw49NyTR0OLw5kJD9sqk4Ipwc6GAREv5n5piXTDOQfy1JMSs8ZgXKq2kF\r\n" +
+        "iwDgEriEecnLlefFEmGAIvqD4ggJJNMM85qLtXfX9xYGuEQ+4/kIi0g88zlXd66++QaQDG5GPZyp\r\n" +
+        "rQAAAABJRU5ErkJggg==\r\n" +
+        "\r\n" +
+        "\r\n" +
+        "--=-tIdGYVstQJghyEDATnJ+\r\n" +
+        "Content-Disposition: attachment; filename=blob.png\r\n" +
+        "Content-Type: image/png; name=blob.png\r\n" +
+        "Content-Transfer-Encoding: base64\r\n" +
+        "\r\n" +
+        "iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAAAXNSR0IArs4c6QAAAAlwSFlzAAAL\r\n" +
+        "EwAACxMBAJqcGAAAAAd0SU1FB9gFGQ4iJ99ufcYAAAAZdEVYdENvbW1lbnQAQ3JlYXRlZCB3aXRo\r\n" +
+        "IEdJTVBXgQ4XAAAA0ElEQVQY02XMwUrDQBhF4XsnkyYhjWJaCloEN77/a/gERVwJLQiiNjYmbTqZ\r\n" +
+        "/7qIG/VsPziMTw+23Wj/ovZdMQJgViCvWNVusfa23djuUf2nugbnI2RynkWF5a2Fwdvrs7q9vhqE\r\n" +
+        "E2QAEIO6BhZBerUf6luMw49NyTR0OLw5kJD9sqk4Ipwc6GAREv5n5piXTDOQfy1JMSs8ZgXKq2kF\r\n" +
+        "iwDgEriEecnLlefFEmGAIvqD4ggJJNMM85qLtXfX9xYGuEQ+4/kIi0g88zlXd66++QaQDG5GPZyp\r\n" +
+        "rQAAAABJRU5ErkJggg==\r\n" +
+        "\r\n" +
+        "\r\n" +
+        "--=-tIdGYVstQJghyEDATnJ+\r\n" +
+        "Content-Disposition: attachment; filename=rhubarb.txt\r\n" +
+        "Content-Type: text/plain; name=rhubarb.txt; charset=us-ascii\r\n" +
+        "Content-Transfer-Encoding: quoted-printable\r\n" +
+        "\r\n" +
+        "Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhu=\r\n" +
+        "barb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubar=\r\n" +
+        "b Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb R=\r\n" +
+        "hubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhub=\r\n" +
+        "arb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb=\r\n" +
+        " Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rh=\r\n" +
+        "ubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhuba=\r\n" +
+        "rb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb =\r\n" +
+        "Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhu=\r\n" +
+        "barb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubar=\r\n" +
+        "b Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb R=\r\n" +
+        "hubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhub=\r\n" +
+        "arb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb=\r\n" +
+        " Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rh=\r\n" +
+        "ubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhuba=\r\n" +
+        "rb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb =\r\n" +
+        "Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhu=\r\n" +
+        "barb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubar=\r\n" +
+        "b Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb R=\r\n" +
+        "hubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhub=\r\n" +
+        "arb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb=\r\n" +
+        " Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rh=\r\n" +
+        "ubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhuba=\r\n" +
+        "rb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb =\r\n" +
+        "Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhu=\r\n" +
+        "barb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubar=\r\n" +
+        "b Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb R=\r\n" +
+        "hubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhub=\r\n" +
+        "arb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb=\r\n" +
+        " Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rh=\r\n" +
+        "ubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhuba=\r\n" +
+        "rb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb =\r\n" +
+        "Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhu=\r\n" +
+        "barb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubar=\r\n" +
+        "b Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb R=\r\n" +
+        "hubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhub=\r\n" +
+        "arb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb=\r\n" +
+        " Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rh=\r\n" +
+        "ubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhuba=\r\n" +
+        "rb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb =\r\n" +
+        "Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb\r\n" +
+        "\r\n" +
+        "--=-tIdGYVstQJghyEDATnJ+--\r\n";
+    
     public static final String ONE_PART_MIME_ASCII_BODY = "A single part MIME mail.\r\n";
 
     public static final String RFC822_SIMPLE_BODY = "This is a very simple email.\r\n";
@@ -246,7 +397,8 @@ public class ExampleMail {
     public static final byte[] RFC822_SIMPLE_BYTES = US_ASCII.encode(RFC_SIMPLE).array();
     public static final byte[] ONE_PART_MIME_ASCII_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII).array();
     public static final byte[] ONE_PART_MIME_8859_BYTES = LATIN1.encode(ONE_PART_MIME_8859).array();
-    
+    public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES = US_ASCII.encode(MULTIPART_WITH_BINARY_ATTACHMENTS).array();
+     
     public static final byte[] ascii(String text) {
         
         return US_ASCII.encode(text).array();

@@ -41,6 +41,7 @@ public class MessageWriteToTest extends TestCase {
         assertFalse("Not multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out, MessageUtils.STRICT_IGNORE);
+        assertEquals(out.toByteArray(), ExampleMail.RFC822_SIMPLE_BYTES);
     }
     
     public void testSimpleMailStrictError() throws Exception {
@@ -48,6 +49,7 @@ public class MessageWriteToTest extends TestCase {
         assertFalse("Not multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out, MessageUtils.STRICT_ERROR);
+        assertEquals(out.toByteArray(), ExampleMail.RFC822_SIMPLE_BYTES);
     }
     
     public void testSimpleMailLenient() throws Exception {
@@ -55,6 +57,40 @@ public class MessageWriteToTest extends TestCase {
         assertFalse("Not multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out, MessageUtils.LENIENT);
+        assertEquals(out.toByteArray(), ExampleMail.RFC822_SIMPLE_BYTES);
+    }
+    
+    private void assertEquals(byte[] expected, byte[] actual) {
+        StringBuffer buffer = new StringBuffer(expected.length);
+        assertEquals(expected.length, actual.length);
+        for (int i = 0; i < actual.length; i++) {
+            buffer.append((char)actual[i]);
+            assertEquals("Mismatch@" + i, expected[i], actual[i]);
+        }
+    }
+    
+    public void testBinaryAttachmentLenient() throws Exception {
+        Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
+        assertTrue("Is multipart", message.isMultipart());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        message.writeTo(out, MessageUtils.LENIENT);
+        assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
+    }
+    
+    public void testBinaryAttachmentStrictError() throws Exception {
+        Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
+        assertTrue("Is multipart", message.isMultipart());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        message.writeTo(out, MessageUtils.STRICT_ERROR);
+        assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
+    }
+    
+    public void testBinaryAttachmentStrictIgnore() throws Exception {
+        Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
+        assertTrue("Is multipart", message.isMultipart());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        message.writeTo(out, MessageUtils.STRICT_IGNORE);
+        assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
     }
     
     private Message createMessage(byte[] octets) throws Exception {

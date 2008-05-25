@@ -35,7 +35,7 @@ public interface BinaryBody extends Body {
      * Gets a <code>InputStream</code> which reads the bytes of the
      * body.
      * 
-     * @return the stream.
+     * @return the stream, transfer decoded
      * @throws IOException on I/O errors.
      */
     InputStream getInputStream() throws IOException;

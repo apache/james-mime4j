@@ -208,7 +208,8 @@ public class Multipart implements Body {
             writer.write(boundary);
             writer.write(MessageUtils.CRLF);
             writer.flush();
-            ((BodyPart) bodyParts.get(i)).writeTo(out, mode);
+            final BodyPart bodyPart = (BodyPart) bodyParts.get(i);
+            bodyPart.writeTo(out, mode);
             writer.write(MessageUtils.CRLF);
         }
 
@@ -216,8 +217,8 @@ public class Multipart implements Body {
         writer.write(boundary);
         writer.write("--");
         writer.write(MessageUtils.CRLF);
-        writer.write(getEpilogue());
-        writer.write(MessageUtils.CRLF);
+        final String epilogue = getEpilogue();
+        writer.write(epilogue);
         writer.flush();
     }
 }

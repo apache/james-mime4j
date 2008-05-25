@@ -28,12 +28,9 @@ import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.ContentHandler;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeStreamParser;
-import org.apache.james.mime4j.decoder.Base64InputStream;
-import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
 import org.apache.james.mime4j.util.MessageUtils;
-import org.apache.james.mime4j.util.MimeUtil;
 
 
 /**
@@ -99,7 +96,7 @@ public class Message extends Entity implements Body {
         getHeader().writeTo(out, mode);
 
         final Body body = getBody();
-        body.writeTo(out, MessageUtils.LENIENT);
+        body.writeTo(out, mode);
     }
     
     private class MessageBuilder implements ContentHandler {
@@ -179,21 +176,16 @@ public class Message extends Entity implements Body {
         /**
          * @see org.apache.james.mime4j.ContentHandler#body(org.apache.james.mime4j.BodyDescriptor, java.io.InputStream)
          */
-        public void body(BodyDescriptor bd, InputStream is) throws IOException {
+        public void body(BodyDescriptor bd, final InputStream is) throws IOException {
             expect(Entity.class);
             
-            String enc = bd.getTransferEncoding();
-            if (MimeUtil.ENC_BASE64.equals(enc)) {
-                is = new Base64InputStream(is);
-            } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(enc)) {
-                is = new QuotedPrintableInputStream(is);
-            }
+            final String enc = bd.getTransferEncoding();
             
-            Body body = null;
+            final Body body;
             if (bd.getMimeType().startsWith("text/")) {
                 body = new TempFileTextBody(is, bd.getCharset());
             } else {
-                body = new TempFileBinaryBody(is);
+                body = new TempFileBinaryBody(is, enc);
             }
             
             ((Entity) stack.peek()).setBody(body);
@@ -252,7 +244,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * TODO: Implement me
+         * TODO: Implement me... but how?
          * 
          * @see org.apache.james.mime4j.ContentHandler#raw(java.io.InputStream)
          */
