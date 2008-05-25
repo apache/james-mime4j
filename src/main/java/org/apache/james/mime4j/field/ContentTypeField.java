@@ -33,9 +33,6 @@ import org.apache.james.mime4j.field.contenttype.parser.TokenMgrError;
 
 /**
  * Represents a <code>Content-Type</code> field.
- *
- * <p>TODO: Remove dependency on Java 1.4 regexps</p>
- *
  * 
  * @version $Id: ContentTypeField.java,v 1.6 2005/01/27 14:16:31 ntherning Exp $
  */
