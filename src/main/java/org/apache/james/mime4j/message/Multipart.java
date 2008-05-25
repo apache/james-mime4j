@@ -208,7 +208,7 @@ public class Multipart implements Body {
             writer.write(boundary);
             writer.write(MessageUtils.CRLF);
             writer.flush();
-            ((BodyPart) bodyParts.get(i)).writeTo(out);
+            ((BodyPart) bodyParts.get(i)).writeTo(out, mode);
             writer.write(MessageUtils.CRLF);
         }
 
@@ -220,19 +220,4 @@ public class Multipart implements Body {
         writer.write(MessageUtils.CRLF);
         writer.flush();
     }
-
-    /**
-     * Write the Header to the given OutputStream
-     * 
-     * @param out the OutputStream to write to
-     * @throws IOException
-     */
-    public void writeTo(final OutputStream out) throws IOException {
-        try {
-            writeTo(out, MessageUtils.LENIENT);
-        } catch (MimeException ex) {
-            throw new IOException(ex.getMessage());
-        }
-    }
-
 }

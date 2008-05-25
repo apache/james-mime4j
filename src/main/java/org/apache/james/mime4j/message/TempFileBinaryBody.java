@@ -81,9 +81,9 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
     }
     
     /**
-     * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream)
+     * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream, int)
      */
-    public void writeTo(OutputStream out) throws IOException {
+    public void writeTo(OutputStream out, int mode) throws IOException {
 	IOUtils.copy(getInputStream(),out);
     }
 }

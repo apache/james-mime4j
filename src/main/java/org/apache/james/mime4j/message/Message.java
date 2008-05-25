@@ -87,40 +87,19 @@ public class Message extends Entity implements Body {
     public UnstructuredField getSubject() {
         return (UnstructuredField) getHeader().getField(Field.SUBJECT);
     }
-
-    /**
-     * 
-     * @see org.apache.james.mime4j.message.Entity#writeTo(java.io.OutputStream)
-     */
-    public void writeTo(OutputStream out) throws IOException {
-        getHeader().writeTo(out);
-
-        Body body = getBody();
-        if (body instanceof Multipart) {
-            Multipart mp = (Multipart) body;
-            mp.writeTo(out);
-        } else {
-            body.writeTo(out);
-        }
-    }
     
     /**
      * Writes out the content of this message..
      * @param out not null
      * @param mode header out validation mode {@link MessageUtils}
      * @throws MimeException 
-     * @see org.apache.james.mime4j.message.Entity#writeTo(java.io.OutputStream)
+     * @see org.apache.james.mime4j.message.Entity#writeTo(java.io.OutputStream, int)
      */
     public void writeTo(OutputStream out, int mode) throws IOException, MimeException {
         getHeader().writeTo(out, mode);
 
-        Body body = getBody();
-        if (body instanceof Multipart) {
-            Multipart mp = (Multipart) body;
-            mp.writeTo(out);
-        } else {
-            body.writeTo(out);
-        }
+        final Body body = getBody();
+        body.writeTo(out, MessageUtils.LENIENT);
     }
     
     private class MessageBuilder implements ContentHandler {

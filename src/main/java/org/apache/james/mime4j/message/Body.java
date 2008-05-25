@@ -22,6 +22,8 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.james.mime4j.MimeException;
+
 /**
  * Encapsulates the body of an entity (see RFC 2045).
  *
@@ -48,7 +50,8 @@ public interface Body {
      * Writes this body to the given stream in MIME message format.
      * 
      * @param out the stream to write to.
+     * @param mode output mode {@link MessageUtils}
      * @throws IOException on I/O errors.
      */
-    void writeTo(OutputStream out) throws IOException;
+    void writeTo(OutputStream out, int mode) throws IOException, MimeException;
 }

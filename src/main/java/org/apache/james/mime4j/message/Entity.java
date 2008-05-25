@@ -22,6 +22,7 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
@@ -164,7 +165,8 @@ public abstract class Entity {
      * Write the content to the given outputstream
      * 
      * @param out the outputstream to write to
+     * @param mode output mode {@link MessageUtils}
      * @throws IOException 
      */
-    public abstract void writeTo(OutputStream out) throws IOException;
+    public abstract void writeTo(OutputStream out, int mode) throws IOException, MimeException;
 }

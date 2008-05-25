@@ -195,19 +195,4 @@ public class Header {
         writer.write(MessageUtils.CRLF);
         writer.flush();
     }
-
-    /**
-     * Write the Header to the given OutputStream
-     * 
-     * @param out the OutputStream to write to
-     * @throws IOException
-     */
-    public void writeTo(final OutputStream out) throws IOException {
-        try {
-            writeTo(out, MessageUtils.LENIENT);
-        } catch (MimeException ex) {
-            throw new IOException(ex.getMessage());
-        }
-    }
-
 }

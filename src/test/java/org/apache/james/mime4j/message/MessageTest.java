@@ -22,17 +22,15 @@ package org.apache.james.mime4j.message;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.message.Header;
-import org.apache.james.mime4j.message.Message;
-
-import junit.framework.TestCase;
+import org.apache.james.mime4j.util.MessageUtils;
 
 /**
  * 
@@ -125,13 +123,13 @@ public class MessageTest extends TestCase {
         assertTrue("multipart/mixed", m.isMultipart());
     }
     
-    public void testWriteTo() throws IOException {
+    public void testWriteTo() throws Exception {
         byte[] inputByte = getRawMessageAsByteArray();
 
         Message m = new Message(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        m.writeTo(out);
+        m.writeTo(out, MessageUtils.LENIENT);
 
         InputStream output = new ByteArrayInputStream(out.toByteArray());
 
@@ -143,7 +141,7 @@ public class MessageTest extends TestCase {
         }
     }
 
-    public void testAddHeaderWriteTo() throws IOException {
+    public void testAddHeaderWriteTo() throws Exception {
         String headerName = "testheader";
         String headerValue = "testvalue";
         String testheader = headerName + ": " + headerValue;
@@ -157,7 +155,7 @@ public class MessageTest extends TestCase {
                 .getBody(), headerValue);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        m.writeTo(out);
+        m.writeTo(out, MessageUtils.LENIENT);
         List lines = IOUtils.readLines((new BufferedReader(
                 new InputStreamReader(new ByteArrayInputStream(out
                         .toByteArray())))));

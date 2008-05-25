@@ -22,6 +22,8 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.james.mime4j.MimeException;
+
 
 /**
  * Represents a MIME body part  (see RFC 2045).
@@ -33,10 +35,10 @@ public class BodyPart extends Entity {
 
     /**
      * 
-     * @see org.apache.james.mime4j.message.Entity#writeTo(java.io.OutputStream)
+     * @see org.apache.james.mime4j.message.Entity#writeTo(java.io.OutputStream, int)
      */
-    public void writeTo(OutputStream out) throws IOException {
-        getHeader().writeTo(out);
-        getBody().writeTo(out);
+    public void writeTo(OutputStream out, int mode) throws IOException, MimeException {
+        getHeader().writeTo(out, mode);
+        getBody().writeTo(out, mode);
     }
 }
