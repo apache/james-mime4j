@@ -20,9 +20,9 @@ package org.apache.james.mime4j.message;
 
 import java.io.ByteArrayInputStream;
 
-import org.apache.james.mime4j.ExampleMail;
-
 import junit.framework.TestCase;
+
+import org.apache.james.mime4j.ExampleMail;
 
 public class MessageCompleteMailTest extends TestCase {
 
@@ -47,7 +47,7 @@ public class MessageCompleteMailTest extends TestCase {
         Multipart part = (Multipart)message.getBody();
         assertEquals("mixed", part.getSubType());
     }
-    
+
     private Message createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
         Message message = new Message(in);

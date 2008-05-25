@@ -167,11 +167,16 @@ public class Header {
     public void writeTo(final OutputStream out, int mode) throws IOException, MimeException {
         Charset charset = null;
         if (mode == MessageUtils.LENIENT) {
-            ContentTypeField cf = ((ContentTypeField) getField(Field.CONTENT_TYPE));
-            if (cf != null && cf.getCharset() != null) {
-                charset = CharsetUtil.getCharset(cf.getCharset());
+            final ContentTypeField contentTypeField = ((ContentTypeField) getField(Field.CONTENT_TYPE));
+            if (contentTypeField == null) {
+                charset = MessageUtils.DEFAULT_CHARSET;
             } else {
-                charset = MessageUtils.ISO_8859_1;
+                final String contentTypeFieldCharset = contentTypeField.getCharset();
+                if (contentTypeField != null && contentTypeFieldCharset != null) {
+                    charset = CharsetUtil.getCharset(contentTypeFieldCharset);
+                } else {
+                    charset = MessageUtils.ISO_8859_1;
+                }
             }
         } else {
             charset = MessageUtils.DEFAULT_CHARSET;

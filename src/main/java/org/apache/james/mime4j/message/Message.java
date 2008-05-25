@@ -32,6 +32,7 @@ import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
+import org.apache.james.mime4j.util.MessageUtils;
 import org.apache.james.mime4j.util.MimeUtil;
 
 
@@ -103,6 +104,24 @@ public class Message extends Entity implements Body {
         }
     }
     
+    /**
+     * Writes out the content of this message..
+     * @param out not null
+     * @param mode header out validation mode {@link MessageUtils}
+     * @throws MimeException 
+     * @see org.apache.james.mime4j.message.Entity#writeTo(java.io.OutputStream)
+     */
+    public void writeTo(OutputStream out, int mode) throws IOException, MimeException {
+        getHeader().writeTo(out, mode);
+
+        Body body = getBody();
+        if (body instanceof Multipart) {
+            Multipart mp = (Multipart) body;
+            mp.writeTo(out);
+        } else {
+            body.writeTo(out);
+        }
+    }
     
     private class MessageBuilder implements ContentHandler {
         private Stack stack = new Stack();
