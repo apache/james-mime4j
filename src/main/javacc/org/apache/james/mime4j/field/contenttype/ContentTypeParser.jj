@@ -125,6 +125,7 @@ String value() :
 {Token t;}
 {
 (	t=<ATOKEN>
+|   t=<DIGITS>
 |	t=<QUOTEDSTRING>
 )
 	{ return t.image; }
