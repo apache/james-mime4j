@@ -29,7 +29,7 @@ public class MimeTokenStreamBodyDescriptorTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         parser = new MimeTokenStream();
-        parser.parse(new ByteArrayInputStream(ExampleMail.MIME_MIXED_ALTERNATIVE_BYTES));
+        parser.parse(new ByteArrayInputStream(ExampleMail.MIME_MULTIPART_ALTERNATIVE_BYTES));
     }
 
     protected void tearDown() throws Exception {

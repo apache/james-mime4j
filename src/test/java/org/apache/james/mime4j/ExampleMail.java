@@ -207,7 +207,7 @@ public class ExampleMail {
     public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END = 
             "\r\n--1729--\r\n";
     
-    public static final String MIME_MIXED_ALTERNATIVE = 
+    public static final String MIME_MULTIPART_ALTERNATIVE = 
         "From: Timothy Tayler <timothy@example.org>\r\n" +
         "To: Samual Smith <samual@example.org>\r\n" +
         "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" +
@@ -238,7 +238,7 @@ public class ExampleMail {
         EncodeUtils.toBase64(ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BASE64)),
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END),
     };
-    public static final byte[] MIME_MIXED_ALTERNATIVE_BYTES = ascii(MIME_MIXED_ALTERNATIVE);
+    public static final byte[] MIME_MULTIPART_ALTERNATIVE_BYTES = ascii(MIME_MULTIPART_ALTERNATIVE);
     public static final byte[] MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTES = join(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTE_ARRAYS);
     public static final byte[] ONE_PART_MIME_QUOTED_PRINTABLE_ASCII_BYTES = ascii(ONE_PART_MIME_QUOTED_PRINTABLE_ASCII);
     public static final byte[] ONE_PART_MIME_BASE64_LATIN1_BYTES = join(ascii(ONE_PART_MIME_BASE64_LATIN1_HEADERS), ONE_PART_MIME_BASE64_LATIN1_ENCODED);

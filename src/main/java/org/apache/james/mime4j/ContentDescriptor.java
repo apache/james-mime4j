@@ -30,12 +30,31 @@ import java.util.Map;
 public interface ContentDescriptor {
     /**
      * Returns the body descriptors MIME type.
+     * @see #getMediaType()
+     * @see #getSubType()
      * @return The MIME type, which has been parsed from the
      *   content-type definition. Must not be null, but
      *   "text/plain", if no content-type was specified.
      */
     String getMimeType();
+    
+    /**
+     * Gets the defaulted MIME media type for this content.
+     * For example <code>TEXT</code>, <code>IMAGE</code>, <code>MULTIPART</code>
+     * @see #getMimeType()
+     * @return the MIME media type when content-type specified,
+     * otherwise the correct default (<code>TEXT</code>)
+     */
+    String getMediaType();
 
+    /**
+     * Gets the defaulted MIME sub type for this content.
+     * @see #getMimeType()
+     * @return the MIME media type when content-type is specified,
+     * otherwise the correct default (<code>PLAIN</code>)
+     */
+    String getSubType();
+    
     /**
      * The body descriptors character set.
      * @return Character set, which has been parsed from the

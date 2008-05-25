@@ -33,9 +33,25 @@ import org.apache.james.mime4j.util.MimeUtil;
  * @version $Id: BodyDescriptor.java,v 1.4 2005/02/11 10:08:37 ntherning Exp $
  */
 public class DefaultBodyDescriptor implements BodyDescriptor {
+    private static final String SUB_TYPE_EMAIL = "rfc822";
+
+    private static final String MEDIA_TYPE_TEXT = "text";
+
+    private static final String MEDIA_TYPE_MESSAGE = "message";
+
+    private static final String EMAIL_MESSAGE_MIME_TYPE = MEDIA_TYPE_MESSAGE + "/" + SUB_TYPE_EMAIL;
+
+    private static final String DEFAULT_SUB_TYPE = "plain";
+
+    private static final String DEFAULT_MEDIA_TYPE = MEDIA_TYPE_TEXT;
+
+    private static final String DEFAULT_MIME_TYPE = DEFAULT_MEDIA_TYPE + "/" + DEFAULT_SUB_TYPE;
+
     private static Log log = LogFactory.getLog(DefaultBodyDescriptor.class);
     
-    private String mimeType = "text/plain";
+    private String mediaType = DEFAULT_MEDIA_TYPE;
+    private String subType = DEFAULT_SUB_TYPE;
+    private String mimeType = DEFAULT_MIME_TYPE;
     private String boundary = null;
     private String charset = "us-ascii";
     private String transferEncoding = "7bit";
@@ -59,9 +75,13 @@ public class DefaultBodyDescriptor implements BodyDescriptor {
      */
     public DefaultBodyDescriptor(BodyDescriptor parent) {
         if (parent != null && MimeUtil.isSameMimeType("multipart/digest", parent.getMimeType())) {
-            mimeType = "message/rfc822";
+            mimeType = EMAIL_MESSAGE_MIME_TYPE;
+            subType = SUB_TYPE_EMAIL;
+            mediaType = MEDIA_TYPE_MESSAGE;
         } else {
-            mimeType = "text/plain";
+            mimeType = DEFAULT_MIME_TYPE;
+            subType = DEFAULT_SUB_TYPE;
+            mediaType = DEFAULT_MEDIA_TYPE;
         }
     }
     
@@ -110,13 +130,15 @@ public class DefaultBodyDescriptor implements BodyDescriptor {
             Map params = MimeUtil.getHeaderParams(sb.toString());
             
             String main = (String) params.get("");
+            String type = null;
+            String subtype = null;
             if (main != null) {
                 main = main.toLowerCase().trim();
                 int index = main.indexOf('/');
                 boolean valid = false;
                 if (index != -1) {
-                    String type = main.substring(0, index).trim();
-                    String subtype = main.substring(index + 1).trim();
+                    type = main.substring(0, index).trim();
+                    subtype = main.substring(index + 1).trim();
                     if (type.length() > 0 && subtype.length() > 0) {
                         main = type + "/" + subtype;
                         valid = true;
@@ -125,6 +147,8 @@ public class DefaultBodyDescriptor implements BodyDescriptor {
                 
                 if (!valid) {
                     main = null;
+                    type = null;
+                    subtype = null;
                 }
             }
             String b = (String) params.get("boundary");
@@ -134,6 +158,8 @@ public class DefaultBodyDescriptor implements BodyDescriptor {
                             || !main.startsWith("multipart/"))) {
                 
                 mimeType = main;
+                this.subType = subtype;
+                this.mediaType = type;
             }
             
             if (MimeUtil.isMultipart(mimeType)) {
@@ -209,5 +235,13 @@ public class DefaultBodyDescriptor implements BodyDescriptor {
 
     public long getContentLength() {
         return contentLength;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public String getSubType() {
+        return subType;
     }
 }

@@ -50,12 +50,13 @@ public class Multipart implements Body {
     private String epilogue = "";
     private List bodyParts = new LinkedList();
     private Entity parent = null;
-    private String subType = "alternative";
+    private String subType;
 
     /**
      * Creates a new empty <code>Multipart</code> instance.
      */
-    public Multipart() {
+    public Multipart(String subType) {
+        this.subType = subType;
     }
 
     /**

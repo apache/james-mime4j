@@ -45,7 +45,7 @@ public class MultipartFormTest extends TestCase {
                 Field.parse("Content-Type: multipart/form-data; boundary=foo"));
         message.setHeader(header);
         
-        Multipart multipart = new Multipart();
+        Multipart multipart = new Multipart("alternative");
         multipart.setParent(message);
         BodyPart p1 = new BodyPart();
         Header h1 = new Header();

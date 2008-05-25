@@ -168,11 +168,12 @@ public class Message extends Entity implements Body {
         /**
          * @see org.apache.james.mime4j.ContentHandler#startMultipart(org.apache.james.mime4j.BodyDescriptor)
          */
-        public void startMultipart(BodyDescriptor bd) {
+        public void startMultipart(final BodyDescriptor bd) {
             expect(Entity.class);
             
-            Entity e = (Entity) stack.peek();
-            Multipart multiPart = new Multipart();
+            final Entity e = (Entity) stack.peek();
+            final String subType = bd.getSubType();
+            final Multipart multiPart = new Multipart(subType);
             e.setBody(multiPart);
             stack.push(multiPart);
         }
