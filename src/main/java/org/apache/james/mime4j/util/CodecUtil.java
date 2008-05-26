@@ -35,6 +35,128 @@ public class CodecUtil {
     
     private static final int DEFAULT_ENCODING_BUFFER_SIZE = 1024;
     
+    private static final byte SPACE = 0x20;
+    private static final byte EQUALS = 0x3D;
+    private static final byte CR = 0x0D;
+    private static final byte LF = 0x0A;
+    private static final byte QUOTED_PRINTABLE_LAST_PLAIN = 0x7E;
+    private static final int QUOTED_PRINTABLE_MAX_LINE_LENGTH = 76;
+    private static final int QUOTED_PRINTABLE_OCTETS_PER_ESCAPE = 3;
+    private static final byte[] HEX_DIGITS = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+        
+    /**
+     * Encodes the given stream using Quoted-Printable.
+     * This assumes that text is binary and therefore escapes
+     * all line endings.
+     * @param in not null
+     * @param out not null
+     * @throws IOException
+     */
+    public static void encodeQuotedPrintableBinary(final InputStream in, final OutputStream out) throws IOException {
+        
+        BinaryQuotedPrintableEncoder encoder = new BinaryQuotedPrintableEncoder(DEFAULT_ENCODING_BUFFER_SIZE);
+        encoder.encode(in, out);
+    }
+    
+    private static final class BinaryQuotedPrintableEncoder {
+        private final byte[] inBuffer;
+        private final byte[] outBuffer;
+        
+        private int nextSoftBreak;
+        private int inputIndex;
+        private int outputIndex;
+        private int inputLength;
+        private InputStream in;
+        private OutputStream out;
+        
+        
+        public BinaryQuotedPrintableEncoder(int bufferSize) {
+            inBuffer = new byte[bufferSize];
+            outBuffer = new byte[3*bufferSize];
+            inputLength = 0;
+            outputIndex = 0;
+            nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH + 1;
+            in = null;
+            out = null;
+        }
+        
+        public void encode(final InputStream in, final OutputStream out) throws IOException {
+            this.in = in;
+            this.out = out;
+            nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH + 1;
+            read();
+            while(inputLength > -1) {
+                while (inputIndex < inputLength) { 
+                    final byte next = inBuffer[inputIndex];
+                    encode(next);
+                    inputIndex++;
+                }
+                read();
+            }
+            flushOutput();
+        }
+
+        private void read() throws IOException {
+            inputLength = in.read(inBuffer);
+            inputIndex = 0;
+        }
+        
+        private void encode(byte next) throws IOException {
+            if (next <= SPACE) {
+                escape(next);
+            } else if (next > QUOTED_PRINTABLE_LAST_PLAIN) {
+                escape(next);
+            } else if (next == EQUALS) {
+                escape(next);
+            } else {
+                plain(next);
+            }
+        }
+        
+        private void plain(byte next) throws IOException {
+            if (--nextSoftBreak <= 1) {
+                softBreak();
+            }
+            write(next);
+        }
+        
+        private void escape(byte next) throws IOException {
+            if (--nextSoftBreak <= QUOTED_PRINTABLE_OCTETS_PER_ESCAPE) {
+                softBreak();
+            }
+            write(EQUALS);
+            --nextSoftBreak;
+            write(HEX_DIGITS[next >> 4]);
+            --nextSoftBreak;
+            write(HEX_DIGITS[next % 0x10]);
+        }
+        
+        private void write(byte next) throws IOException {
+            outBuffer[outputIndex] = next;
+            if (outputIndex >= outBuffer.length) {
+                flushOutput();
+            } else {
+                outputIndex++;
+            }
+        }
+        
+        private void softBreak() throws IOException {
+            write(EQUALS);
+            write(CR);
+            write(LF);
+            nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH;
+        }
+        
+        private void flushOutput() throws IOException {
+            if (outputIndex < outBuffer.length) {
+                out.write(outBuffer, 0, outputIndex);
+            } else {
+                out.write(outBuffer);
+            }
+            outputIndex = 0;
+        }
+    }
+    
     /**
      * Encodes the given stream using Base64.
      * @param in not null
