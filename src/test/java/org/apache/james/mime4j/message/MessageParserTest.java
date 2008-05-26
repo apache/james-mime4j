@@ -250,17 +250,4 @@ public class MessageParserTest extends TestCase {
             }
         }
     }
-
-    public static void main(String[] args) throws IOException {
-        File dir = new File("/home/niklas/Projects/upskido/tmp");
-        File[] files = dir.listFiles();
-        
-        for (int i = 0; i < files.length; i++) {
-            File f = files[i];
-            if (f.getName().toLowerCase().endsWith(".msg")) {
-                Message m = new Message(new BufferedInputStream(new FileInputStream(f)));
-            }
-        }
-        
-    }
 }
