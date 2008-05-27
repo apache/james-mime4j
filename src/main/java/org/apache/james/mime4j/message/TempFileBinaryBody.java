@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.util.CodecUtil;
@@ -66,7 +65,7 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
         } else {
             decodedStream = is;
         }
-        IOUtils.copy(decodedStream, out);
+        CodecUtil.copy(decodedStream, out);
         out.close();
     }
     
@@ -103,7 +102,7 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
             CodecUtil.encodeQuotedPrintableBinary(inputStream,out);
             out.write(CodecUtil.CRLF_CRLF);
         } else {
-            IOUtils.copy(inputStream,out);
+            CodecUtil.copy(inputStream,out);
         }
     }
 }

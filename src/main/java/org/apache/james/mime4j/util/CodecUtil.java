@@ -45,6 +45,20 @@ public class CodecUtil {
     private static final byte[] HEX_DIGITS = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
         
     /**
+     * Copies the contents of one stream to the other.
+     * @param in not null
+     * @param out not null
+     * @throws IOException
+     */
+    public static void copy(final InputStream in, final OutputStream out) throws IOException {
+        final byte[] buffer = new byte[DEFAULT_ENCODING_BUFFER_SIZE];
+        int inputLength;
+        while (-1 != (inputLength = in.read(buffer))) {
+            out.write(buffer, 0, inputLength);
+        }
+    }
+    
+    /**
      * Encodes the given stream using Quoted-Printable.
      * This assumes that text is binary and therefore escapes
      * all line endings.

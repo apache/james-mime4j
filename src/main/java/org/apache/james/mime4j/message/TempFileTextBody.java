@@ -26,10 +26,10 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.CodecUtil;
 import org.apache.james.mime4j.util.TempFile;
 import org.apache.james.mime4j.util.TempPath;
 import org.apache.james.mime4j.util.TempStorage;
@@ -60,7 +60,7 @@ class TempFileTextBody extends AbstractBody implements TextBody {
         tempFile = tempPath.createTempFile("attachment", ".txt");
         
         OutputStream out = tempFile.getOutputStream();
-        IOUtils.copy(is, out);
+        CodecUtil.copy(is, out);
         out.close();
     }
     
@@ -110,6 +110,6 @@ class TempFileTextBody extends AbstractBody implements TextBody {
      * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream, int)
      */
     public void writeTo(OutputStream out, int mode) throws IOException {
-	IOUtils.copy(tempFile.getInputStream(), out);	
+        CodecUtil.copy(tempFile.getInputStream(), out);	
     }
 }
