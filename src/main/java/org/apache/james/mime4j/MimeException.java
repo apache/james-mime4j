@@ -16,10 +16,14 @@
  */
 package org.apache.james.mime4j;
 
+import java.io.IOException;
+
 /**
  * MIME processing exception.
  */
-public class MimeException extends Exception {
+public class MimeException extends IOException {
+
+    private static final long serialVersionUID = 8352821278714188542L;
 
     /**
      * Constructs a new MIME exception with the specified detail message.
