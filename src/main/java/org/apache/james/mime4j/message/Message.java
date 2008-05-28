@@ -244,8 +244,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * TODO: Implement me... but how?
-         * 
+         * Unsupported.
          * @see org.apache.james.mime4j.ContentHandler#raw(java.io.InputStream)
          */
         public void raw(InputStream is) throws IOException {
