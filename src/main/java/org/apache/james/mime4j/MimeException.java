@@ -23,8 +23,6 @@ import java.io.IOException;
  */
 public class MimeException extends IOException {
 
-    private static final long serialVersionUID = 8352821278714188542L;
-
     /**
      * Constructs a new MIME exception with the specified detail message.
      *

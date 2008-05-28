@@ -66,7 +66,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javacc-maven-plugin</artifactId>
-        <version>2.1</version>
+        <version>2.4</version>
         <executions>
           <execution>
             <id>generate-jjtree</id>
@@ -87,7 +87,6 @@
             </goals>
             <configuration>
               <sourceDirectory>${project.build.directory}/generated-sources/jjtree/org/apache/james/mime4j/field/address/parser</sourceDirectory>
-              <packageName>org.apache.james.mime4j.field.address.parser</packageName>
             </configuration>
           </execution>
           <execution>
@@ -98,7 +97,6 @@
             </goals>
             <configuration>
               <sourceDirectory>${basedir}/src/main/javacc/org/apache/james/mime4j/field/datetime</sourceDirectory>
-              <packageName>org.apache.james.mime4j.field.datetime.parser</packageName>
             </configuration>
           </execution>
           <execution>
@@ -109,7 +107,6 @@
             </goals>
             <configuration>
               <sourceDirectory>${basedir}/src/main/javacc/org/apache/james/mime4j/field/contenttype</sourceDirectory>
-              <packageName>org.apache.james.mime4j.field.contenttype.parser</packageName>
             </configuration>
           </execution>
         </executions>
