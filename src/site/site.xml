@@ -41,5 +41,9 @@
     </menu>
     
     ${reports}
+    
+    <menu name="Related Projects">
+    	<item name="httpmime" href="http://hc.apache.org/httpcomponents-client/httpmime/index.html" />
+    </menu>
   </body>
 </project>
