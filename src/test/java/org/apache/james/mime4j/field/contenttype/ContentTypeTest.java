@@ -31,7 +31,7 @@ public class ContentTypeTest extends TestCase {
 
     public void testExceptionTree() {
         // make sure that our ParseException extends MimeException.
-        ParseException.class.asSubclass(MimeException.class);
+        assertTrue(MimeException.class.isAssignableFrom(ParseException.class));
     }
 
     public void testContentType() throws ParseException {
