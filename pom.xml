@@ -72,7 +72,7 @@
             <id>generate-jjtree</id>
             <phase>generate-sources</phase>
             <goals>
-              <goal>jjtree</goal>
+              <goal>jjtree-javacc</goal>
             </goals>
           </execution>
           <execution>
