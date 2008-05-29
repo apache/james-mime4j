@@ -20,12 +20,19 @@
 package org.apache.james.mime4j.field.datetime;
 
 import junit.framework.TestCase;
+
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
 
 import java.io.StringReader;
 
 public class DateTimeTest extends TestCase {
+    
+    public void testExceptionTree() {
+        // make sure that our ParseException extends MimeException.
+        ParseException.class.asSubclass(MimeException.class);
+    }
 
     public void testNormalDate() throws ParseException {
         new DateTimeParser(new StringReader("Fri, 21 Nov 1997 09:55:06 -0600")).parseAll();

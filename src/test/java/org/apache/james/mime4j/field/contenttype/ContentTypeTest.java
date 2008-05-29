@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.contenttype;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.contenttype.parser.ContentTypeParser;
 import org.apache.james.mime4j.field.contenttype.parser.ParseException;
 
@@ -27,6 +28,11 @@ import java.io.StringReader;
 import junit.framework.TestCase;
 
 public class ContentTypeTest extends TestCase {
+
+    public void testExceptionTree() {
+        // make sure that our ParseException extends MimeException.
+        ParseException.class.asSubclass(MimeException.class);
+    }
 
     public void testContentType() throws ParseException {
         test("one/two; three          =  four", "one", "two");

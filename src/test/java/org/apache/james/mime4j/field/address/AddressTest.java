@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 
 import java.io.BufferedReader;
@@ -34,6 +35,11 @@ import java.util.Arrays;
 import junit.framework.TestCase;
 
 public class AddressTest extends TestCase {
+
+    public void testExceptionTree() {
+        // make sure that our ParseException extends MimeException.
+        ParseException.class.asSubclass(MimeException.class);
+    }
 
     public void testParse1() throws ParseException {
         AddressList addrList = AddressList.parse("John Doe <jdoe@machine(comment).  example>");
