@@ -74,10 +74,6 @@
             <goals>
               <goal>jjtree</goal>
             </goals>
-            <configuration>
-              <!-- <nodePackage>org.apache.jsieve.parser.generated</nodePackage> -->
-              <outputDirectory>${project.build.directory}/generated-sources/jjtree/org/apache/james/mime4j/field/address/parser</outputDirectory>
-            </configuration>
           </execution>
           <execution>
             <id>generate-javacc</id>
@@ -86,7 +82,7 @@
               <goal>javacc</goal>
             </goals>
             <configuration>
-              <sourceDirectory>${project.build.directory}/generated-sources/jjtree/org/apache/james/mime4j/field/address/parser</sourceDirectory>
+              <sourceDirectory>${project.build.directory}/generated-sources/jjtree/</sourceDirectory>
             </configuration>
           </execution>
           <execution>
@@ -95,19 +91,6 @@
             <goals>
               <goal>javacc</goal>
             </goals>
-            <configuration>
-              <sourceDirectory>${basedir}/src/main/javacc/org/apache/james/mime4j/field/datetime</sourceDirectory>
-            </configuration>
-          </execution>
-          <execution>
-            <id>generate-javacc3</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>javacc</goal>
-            </goals>
-            <configuration>
-              <sourceDirectory>${basedir}/src/main/javacc/org/apache/james/mime4j/field/contenttype</sourceDirectory>
-            </configuration>
           </execution>
         </executions>
       </plugin>
