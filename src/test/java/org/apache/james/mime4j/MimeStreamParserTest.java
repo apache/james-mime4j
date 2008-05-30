@@ -298,7 +298,7 @@ public class MimeStreamParserTest extends TestCase {
                 fail("field shouldn't be called for empty stream");
             }
 
-            public void startMultipart() {
+            public void startMultipart(BodyDescriptor bd) {
                 fail("startMultipart shouldn't be called for empty stream");
             }
 
