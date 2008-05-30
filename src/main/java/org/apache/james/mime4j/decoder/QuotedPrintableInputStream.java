@@ -121,7 +121,7 @@ public class QuotedPrintableInputStream extends InputStream {
                     return;
             }
 
-            byte b = (byte)pushbackq.dequeue();
+            byte b = pushbackq.dequeue();
 
             switch (state) {
                 case 0:  // start state, no bytes pending

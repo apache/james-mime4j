@@ -263,7 +263,7 @@ public class CodecUtil {
         }
         
         private int toInt(byte b) {
-            return (int)(b & 255);
+            return 255 & b;
         }
 
         private int setResult(byte[] results, int outputIndex, byte value) {

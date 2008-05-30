@@ -42,7 +42,7 @@ public final class MessageUtils {
     public static final String CRLF = "\r\n";
     
     public static boolean isASCII(char ch) {
-        return ((int)ch & 0xFF80) == 0;
+        return (0xFF80 & ch) == 0;
     }
     
     public static boolean isASCII(final String s) {

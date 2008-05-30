@@ -90,7 +90,7 @@ public class EncodeUtils {
     }
 
     private static int toInt(byte b) {
-        return (int)(b & 255);
+        return 255 & b;
     }
 
 
