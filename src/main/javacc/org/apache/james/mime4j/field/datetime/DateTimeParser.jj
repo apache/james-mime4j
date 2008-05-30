@@ -28,8 +28,6 @@
 options {
 	STATIC=false;
 	LOOKAHEAD=1;
-	NODE_PACKAGE="org.apache.james.mime4j.field.datetime.parser";
-	PACKAGE_NAME="org.apache.james.mime4j.field.datetime.parser";
 	//DEBUG_PARSER=true;
 	//DEBUG_TOKEN_MANAGER=true;
 }
