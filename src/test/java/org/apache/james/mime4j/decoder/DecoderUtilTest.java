@@ -60,15 +60,15 @@ public class DecoderUtilTest extends TestCase {
     public void testDecodeQ() throws UnsupportedEncodingException {
         String s = DecoderUtil.decodeQ("=e1_=e2=09=E3_=E4_", 
                                                          "ISO8859-1");
-        assertEquals("с т\tу ф ", s);
+        assertEquals("\u00e1 \u00e2\t\u00e3 \u00e4 ", s);
     }
     
     public void testDecodeEncodedWords() {
         assertEquals("", DecoderUtil.decodeEncodedWords(""));
         assertEquals("Yada yada", DecoderUtil.decodeEncodedWords("Yada yada"));
-        assertEquals("  сту\tф", 
+        assertEquals("  \u00e1\u00e2\u00e3\t\u00e4", 
                 DecoderUtil.decodeEncodedWords("=?iso-8859-1?Q?_=20=e1=e2=E3=09=E4?="));
-        assertEquals("Word 1 '  ту\tф'. Word 2 '  ту\tф'", 
+        assertEquals("Word 1 '  \u00e2\u00e3\t\u00e4'. Word 2 '  \u00e2\u00e3\t\u00e4'", 
                 DecoderUtil.decodeEncodedWords("Word 1 '=?iso-8859-1?Q?_=20=e2=E3=09=E4?="
                         + "'. Word 2 '=?iso-8859-1?q?_=20=e2=E3=09=E4?='"));
         assertEquals("=?iso-8859-YADA?Q?_=20=t1=e2=E3=09=E4?=", 
