@@ -107,6 +107,7 @@
               <Implementation-Title>Apache Mime4j</Implementation-Title>
               <Implementation-Version>${pom.version}</Implementation-Version>
               <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
+              <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
               <url>${pom.url}</url>
             </manifestEntries>
           </archive>
