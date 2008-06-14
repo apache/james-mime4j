@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public final class MimeUtil {
     private static final Log log = LogFactory.getLog(MimeUtil.class);
+    
     /**
      * The <code>quoted-printable</code> encoding.
      */
@@ -53,6 +54,9 @@ public final class MimeUtil {
      */
     public static final String ENC_7BIT = "7bit";
 
+    /** <code>MIME-Version</code> header name (lowercase) */
+    public static final String MIME_HEADER_MIME_VERSION = "mime-version";
+    
     private MimeUtil() {
         // this is an utility class to be used statically.
         // this constructor protect from instantiation.

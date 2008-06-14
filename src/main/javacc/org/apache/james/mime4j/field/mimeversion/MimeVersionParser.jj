@@ -17,23 +17,13 @@
  * under the License.                                           *
  ****************************************************************/
 
-
-/**
- * RFC2045 Content-Type parser.
- *
- * Created 10/2/2004
- * by Joe Cheng <code@joecheng.com>
- */
-
 options {
-	STATIC=false;
-	LOOKAHEAD=1;
-	JDK_VERSION = "1.4";
-	//DEBUG_PARSER=true;
-	//DEBUG_TOKEN_MANAGER=true;
+  static=false;
+  JDK_VERSION = "1.4";
+  OUTPUT_DIRECTORY = "target/generated-sources/javacc";
 }
 
-PARSER_BEGIN(ContentTypeParser)
+PARSER_BEGIN(MimeVersionParser)
 /****************************************************************
  * Licensed to the Apache Software Foundation (ASF) under one   *
  * or more contributor license agreements.  See the NOTICE file *
@@ -52,36 +42,23 @@ PARSER_BEGIN(ContentTypeParser)
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
-package org.apache.james.mime4j.field.contenttype.parser;
+package org.apache.james.mime4j.field.mimeversion;
 
-import java.util.ArrayList;
-
-public class ContentTypeParser {
-
-	private String type;
-	private String subtype;
-	private ArrayList paramNames = new ArrayList();
-	private ArrayList paramValues = new ArrayList();
-
-	public String getType() { return type; }
-	public String getSubType() { return subtype; }
-	public ArrayList getParamNames() { return paramNames; }
-	public ArrayList getParamValues() { return paramValues; }
-
-    public static void main(String args[]) throws ParseException {
-	while (true) {
-	    try {
-		ContentTypeParser parser = new ContentTypeParser(System.in);
-	    	parser.parseLine();
-	    } catch (Exception x) {
-		x.printStackTrace();
-		return;
-	    }
+public class MimeVersionParser {
+	public static final int INITIAL_VERSION_VALUE = -1;
+	private int major=INITIAL_VERSION_VALUE;
+	private int minor=INITIAL_VERSION_VALUE;
+	
+	public int getMinorVersion() {
+		return minor;
 	}
-    }
+	
+	public int getMajorVersion() {
+		return major;
+	}
 }
+PARSER_END(MimeVersionParser)
 
-PARSER_END(ContentTypeParser)
 
 void parseLine() :
 {}
@@ -97,46 +74,24 @@ void parseAll() :
 
 void parse() :
 {
-	Token type;
-	Token subtype;
+	Token major;
+	Token minor;
 }
 {
-	type=<ATOKEN> "/" subtype=<ATOKEN>
+	major=<DIGITS> <DOT> minor=<DIGITS>
 	{
-		this.type = type.image;
-		this.subtype = subtype.image;
-	}
-	( ";" parameter() )*
-}
-
-void parameter() :
-{
-	Token attrib;
-	String val;
-}
-{
-	attrib=<ATOKEN> "=" val=value()
-	{
-		paramNames.add(attrib.image);
-		paramValues.add(val);
+		try {
+			this.major = Integer.parseInt(major.image);
+			this.minor = Integer.parseInt(minor.image);
+		} catch (NumberFormatException e) {
+			throw new ParseException(e.getMessage());
+		}
 	}
 }
-
-String value() :
-{Token t;}
-{
-(	t=<ATOKEN>
-|   t=<DIGITS>
-|	t=<QUOTEDSTRING>
-)
-	{ return t.image; }
-}
-
-
 
 SPECIAL_TOKEN :
 {
- 	< WS: ( [" ", "\t"] )+ >
+ 	< WS: ( [" ", "\t", "\r", "\n"] )+ >
 }
 
 TOKEN_MGR_DECLS :
@@ -147,8 +102,9 @@ TOKEN_MGR_DECLS :
 	// This is because the outermost level must be treated
 	// specially anyway, because the outermost ")" has a
 	// different token type than inner ")" instances.
-	static int commentNest;
+	int commentNest;
 }
+
 
 MORE :
 {
@@ -182,9 +138,6 @@ MORE :
 |	")" { --commentNest; if (commentNest == 0) SwitchTo(INCOMMENT); }
 |	< <ANY>>
 }
-
-
-
 // QUOTED STRINGS
 
 MORE :
@@ -205,7 +158,6 @@ TOKEN :
 	< QUOTEDSTRING: "\"" > { matchedToken.image = image.substring(0, image.length() - 1); } : DEFAULT
 }
 
-
 TOKEN :
 {
 	< DIGITS: ( ["0"-"9"] )+ >
@@ -213,11 +165,8 @@ TOKEN :
 
 TOKEN :
 {
-	< ATOKEN: ( ~[" ", "\t", "(", ")", "<", ">", "@", ",", ";", ":", "\\", "\"", "/", "[", "]", "?", "="] )+ >
+	< DOT: "." >
 }
-
-
-// GLOBALS
 
 <*>
 TOKEN :

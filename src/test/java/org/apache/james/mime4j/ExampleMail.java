@@ -220,6 +220,34 @@ public class ExampleMail {
     "\r\n" +
     ONE_PART_MIME_ASCII_BODY;
     
+    public static final String ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
+    "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
+    "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
+    "From: \"Robert Burrell Donkin\" <robertburrelldonkin@gmail.com>\r\n" +
+    "To: \"James Developers List\" <server-dev@james.apache.org>\r\n" +
+    "Subject: [Mime4J] getReader\r\n" +
+    "MIME-Version: 2.(This is a comment)4\r\n" +
+    "Content-Type: text/plain; charset=US-ASCII\r\n" +
+    "Content-Transfer-Encoding: 7bit\r\n" +
+    "Content-Disposition: inline\r\n" +
+    "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
+    "\r\n" + ONE_PART_MIME_ASCII_BODY;
+    
+    public static final String ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
+    "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
+    "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
+    "From: \"Robert Burrell Donkin\" <robertburrelldonkin@gmail.com>\r\n" +
+    "To: \"James Developers List\" <server-dev@james.apache.org>\r\n" +
+    "Subject: [Mime4J] getReader\r\n" +
+    "MIME-Version: 4.   \r\n" +
+    "  1\r\n" +
+    "Content-Type: text/plain; charset=US-ASCII\r\n" +
+    "Content-Transfer-Encoding: 7bit\r\n" +
+    "Content-Disposition: inline\r\n" +
+    "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
+    "\r\n" + ONE_PART_MIME_ASCII_BODY;
+    
+    
     public static final String ONE_PART_MIME_8859 = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
     "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
     "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
@@ -380,6 +408,7 @@ public class ExampleMail {
         "\r\n--1729--\r\n" +
         "This is the epilogue\r\n";
     
+    
     private static final byte[][] MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTE_ARRAYS = {
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_ONE),
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_7BIT),
@@ -398,7 +427,10 @@ public class ExampleMail {
     public static final byte[] ONE_PART_MIME_ASCII_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII).array();
     public static final byte[] ONE_PART_MIME_8859_BYTES = LATIN1.encode(ONE_PART_MIME_8859).array();
     public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES = US_ASCII.encode(MULTIPART_WITH_BINARY_ATTACHMENTS).array();
-     
+    public static final byte[] ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION).array();
+    public static final byte[] ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES).array();
+    
+
     public static final byte[] ascii(String text) {
         
         return US_ASCII.encode(text).array();

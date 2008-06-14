@@ -254,13 +254,21 @@ public class MimeTokenStream {
     }
     
     /**
+     * Creates a stream that creates a more detailed body descriptor.
+     * @return <code>MimeTokenStream</code>, not null
+     */
+    public static final MimeTokenStream createMaximalDescriptorStream() {
+        return new MimeTokenStream(false, true);
+    }
+    
+    /**
      * Creates a stream that strictly validates the input.
      * @return <code>MimeTokenStream</code> which throws a 
      * <code>MimeException</code> whenever possible issues 
      * are dedicated in the input
      */
     public static final MimeTokenStream createStrictValidationStream() {
-        return new MimeTokenStream(true);
+        return new MimeTokenStream(true, false);
     }
     
     /**
@@ -536,6 +544,7 @@ public class MimeTokenStream {
     }
     
     private final boolean strictParsing;
+    private final boolean maximalBodyDescriptor;
     private int state = T_END_OF_STREAM;
     private Cursor cursor;
     private StateMachine currentStateMachine;
@@ -550,11 +559,12 @@ public class MimeTokenStream {
      * a stream that strictly validates the input.
      */
     public MimeTokenStream() {
-        this(false);
+        this(false, false);
     }
     
-    private MimeTokenStream(final boolean strictParsing) {
+    protected MimeTokenStream(final boolean strictParsing, final boolean maximalBodyDescriptor) {
         this.strictParsing = strictParsing;
+        this.maximalBodyDescriptor = maximalBodyDescriptor;
     }
     
     /** Instructs the {@code MimeTokenStream} to parse the given streams contents.
@@ -877,6 +887,12 @@ public class MimeTokenStream {
      * information.
      */
     protected BodyDescriptor newBodyDescriptor(BodyDescriptor pParent) {
-        return new DefaultBodyDescriptor(pParent);
+        final BodyDescriptor result;
+        if (maximalBodyDescriptor) {
+            result = new MaximalBodyDescriptor(pParent);
+        } else {
+            result = new DefaultBodyDescriptor(pParent);
+        }
+        return result;
     }
 }
