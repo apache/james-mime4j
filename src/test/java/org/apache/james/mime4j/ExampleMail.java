@@ -22,6 +22,8 @@ import java.nio.charset.Charset;
 
 public class ExampleMail {
     
+    public static final String CONTENT_DESCRIPTION = "Blah blah blah";
+    public static final String CONTENT_ID = "<f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>";
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
     public static final Charset LATIN1 = Charset.forName("ISO-8859-1");
     
@@ -258,6 +260,8 @@ public class ExampleMail {
     "Content-Type: text/plain; charset=ISO-8859-1\r\n" +
     "Content-Transfer-Encoding: 8bit\r\n" +
     "Content-Disposition: inline\r\n" +
+    "Content-ID: " + CONTENT_ID + "\r\n" +
+    "Content-Description: " + CONTENT_DESCRIPTION + "\r\n" +
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n" +
     ONE_PART_MIME_8859_BODY;

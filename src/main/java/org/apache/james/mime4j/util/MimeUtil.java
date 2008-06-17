@@ -56,6 +56,10 @@ public final class MimeUtil {
 
     /** <code>MIME-Version</code> header name (lowercase) */
     public static final String MIME_HEADER_MIME_VERSION = "mime-version";
+    /** <code>Content-ID</code> header name (lowercase) */
+    public static final String MIME_HEADER_CONTENT_ID = "content-id";
+    /** <code>Content-Description</code> header name (lowercase) */
+    public static final String MIME_HEADER_CONTENT_DESCRIPTION = "content-description";
     
     private MimeUtil() {
         // this is an utility class to be used statically.

@@ -55,7 +55,7 @@ public class MimeTokenStreamReaderTest extends TestCase {
     public void testShouldReadOnePartMime8859Body() throws Exception {
         byte[] bytes = ExampleMail.ONE_PART_MIME_8859_BYTES;
         String body = ExampleMail.ONE_PART_MIME_8859_BODY;
-        checkSimpleMail(bytes, body, 11);
+        checkSimpleMail(bytes, body, 13);
     }
     
     public void testShouldReadOnePartMimeBase64ASCIIBody() throws Exception {

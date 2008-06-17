@@ -32,10 +32,14 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
 
     private static final int DEFAULT_MINOR_VERSION = 0;
     private static final int DEFAULT_MAJOR_VERSION = 1;
-    private boolean mimeVersionSet;
+    private boolean isMimeVersionSet;
     private int mimeMinorVersion;
     private int mimeMajorVersion;
     private MimeException mimeVersionException;
+    private String contentId;
+    private boolean isContentIdSet;
+    private String contentDescription;
+    private boolean isContentDescriptionSet;
     
     protected MaximalBodyDescriptor() {
         this(null);
@@ -43,20 +47,44 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
 
     protected MaximalBodyDescriptor(BodyDescriptor parent) {
         super(parent);
-        mimeVersionSet = false;
+        isMimeVersionSet = false;
         mimeMajorVersion = DEFAULT_MAJOR_VERSION;
         mimeMinorVersion = DEFAULT_MINOR_VERSION;
+        this.contentId = null;
+        this.isContentIdSet = false;
+        this.contentDescription = null;
+        this.isContentDescriptionSet = false;
     }
-    
-    
     
     public void addField(String name, String value) {
         name = name.trim().toLowerCase();
-        if (MimeUtil.MIME_HEADER_MIME_VERSION.equals(name) && !mimeVersionSet) {
+        if (MimeUtil.MIME_HEADER_MIME_VERSION.equals(name) && !isMimeVersionSet) {
             parseMimeVersion(value);
+        } else if (MimeUtil.MIME_HEADER_CONTENT_ID.equals(name) && !isContentIdSet) {
+            parseContentId(value);
+        } else if (MimeUtil.MIME_HEADER_CONTENT_DESCRIPTION.equals(name) && !isContentDescriptionSet) {
+            parseContentDescription(value);
         } else {
             super.addField(name, value);
         }
+    }
+
+    private void parseContentDescription(String value) {
+        if (value == null) {
+            contentDescription = "";
+        } else {
+            contentDescription = value.trim();
+        }
+        isContentDescriptionSet = true;
+    }
+
+    private void parseContentId(final String value) {
+        if (value == null) {
+            contentId = "";
+        } else {
+            contentId = value.trim();
+        }
+        isContentIdSet = true;
     }
 
     private void parseMimeVersion(String value) {
@@ -75,7 +103,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         } catch (MimeException e) {
             this.mimeVersionException = e;
         }
-        mimeVersionSet = true;
+        isMimeVersionSet = true;
     }
     
     /**
@@ -102,5 +130,25 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
     
     public MimeException getMimeVersionParseException() {
         return mimeVersionException;
+    }
+    
+    /**
+     * Gets the value of the <a href='http://www.faqs.org/rfcs/rfc2045'>RFC</a> 
+     * <code>Content-Description</code> header.
+     * @return value of the <code>Content-Description</code> when present,
+     * null otherwise
+     */
+    public String getContentDescription() {
+        return contentDescription;
+    }
+    
+    /**
+     * Gets the value of the <a href='http://www.faqs.org/rfcs/rfc2045'>RFC</a> 
+     * <code>Content-ID</code> header.
+     * @return value of the <code>Content-ID</code> when present,
+     * null otherwise
+     */
+    public String getContentId() {
+        return contentId;
     }
 } 

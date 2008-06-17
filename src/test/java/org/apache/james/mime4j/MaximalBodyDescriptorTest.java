@@ -49,6 +49,21 @@ public class MaximalBodyDescriptorTest extends TestCase {
         assertNull(descriptor.getMimeVersionParseException());
     }
     
+    public void testContentId() throws Exception {
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_8859_BYTES);
+        assertEquals(1, descriptor.getMimeMajorVersion());
+        assertEquals(0, descriptor.getMimeMinorVersion());
+        assertNull(descriptor.getMimeVersionParseException());
+        assertEquals(ExampleMail.CONTENT_ID, descriptor.getContentId());
+    }
+
+    public void testContentDescription() throws Exception {
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_8859_BYTES);
+        assertEquals(1, descriptor.getMimeMajorVersion());
+        assertEquals(0, descriptor.getMimeMinorVersion());
+        assertNull(descriptor.getMimeVersionParseException());
+        assertEquals(ExampleMail.CONTENT_DESCRIPTION, descriptor.getContentDescription());
+    }
     
     public void testMimeVersionHeaderBreak() throws Exception {
         MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES_BYTES);
