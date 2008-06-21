@@ -22,7 +22,7 @@ import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
 
-public class MaximalBodyDescriptorTest extends TestCase {
+public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
 
     MimeTokenStream parser;
     
@@ -85,5 +85,13 @@ public class MaximalBodyDescriptorTest extends TestCase {
         assertNotNull(descriptor);
         assertTrue("Parser is maximal so body descriptor should be maximal", descriptor instanceof MaximalBodyDescriptor);
         return (MaximalBodyDescriptor) descriptor;
+    }
+
+    protected MutableBodyDescriptor newBodyDescriptor() {
+        return new MaximalBodyDescriptor();
+    }
+
+    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
+        return new MaximalBodyDescriptor(parent);
     }
 }

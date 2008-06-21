@@ -24,15 +24,11 @@ import junit.framework.TestCase;
 /**
  * @version $Id: BodyDescriptorTest.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
-public class BodyDescriptorTest extends TestCase {
+public abstract class BaseTestForBodyDescriptors extends TestCase {
 
-    protected MutableBodyDescriptor newBodyDescriptor() {
-        return new DefaultBodyDescriptor();
-    }
+    protected abstract MutableBodyDescriptor newBodyDescriptor();
 
-    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
-        return new DefaultBodyDescriptor(parent);
-    }
+    protected abstract MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent);
     
     public void testGetParameters() {
         MutableBodyDescriptor bd = null;
