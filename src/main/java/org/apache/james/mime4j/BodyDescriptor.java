@@ -34,11 +34,4 @@ public interface BodyDescriptor extends ContentDescriptor {
      */
     String getBoundary();
 
-    /**
-     * Adds a field to the body descriptor.
-     * @param pFieldName The fields name.
-     * @param pFieldValue The unparsed fields value.
-     */
-    void addField(String pFieldName, String pFieldValue);
-
 }

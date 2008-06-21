@@ -337,7 +337,7 @@ public class MimeTokenStream {
         private final BodyDescriptor parent;
         private final Cursor cursor;
         private final StringBuffer sb = new StringBuffer();
-        private BodyDescriptor body;
+        private MutableBodyDescriptor body;
         private int pos, start;
         private int lineNumber, startLineNumber;
         private final int endState;
@@ -886,8 +886,8 @@ public class MimeTokenStream {
      * this in order to create body descriptors, that provide more specific
      * information.
      */
-    protected BodyDescriptor newBodyDescriptor(BodyDescriptor pParent) {
-        final BodyDescriptor result;
+    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor pParent) {
+        final MutableBodyDescriptor result;
         if (maximalBodyDescriptor) {
             result = new MaximalBodyDescriptor(pParent);
         } else {

@@ -26,16 +26,16 @@ import junit.framework.TestCase;
  */
 public class BodyDescriptorTest extends TestCase {
 
-    protected BodyDescriptor newBodyDescriptor() {
+    protected MutableBodyDescriptor newBodyDescriptor() {
         return new DefaultBodyDescriptor();
     }
 
-    protected BodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
+    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
         return new DefaultBodyDescriptor(parent);
     }
     
     public void testGetParameters() {
-        BodyDescriptor bd = null;
+        MutableBodyDescriptor bd = null;
         
         bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; charset=ISO-8859-1; "
@@ -72,7 +72,7 @@ public class BodyDescriptorTest extends TestCase {
     }
     
     public void testAddField() {
-        BodyDescriptor bd = null;
+        MutableBodyDescriptor bd = null;
         
         /*
          * Make sure that only the first Content-Type header added is used.
@@ -87,7 +87,7 @@ public class BodyDescriptorTest extends TestCase {
     }
     
     public void testGetMimeType() {
-        BodyDescriptor bd = null;
+        MutableBodyDescriptor bd = null;
         
         bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/PLAIN");
@@ -121,8 +121,8 @@ public class BodyDescriptorTest extends TestCase {
         /*
          * Implicit mime types.
          */
-        BodyDescriptor child = null;
-        BodyDescriptor parent = null;
+        MutableBodyDescriptor child = null;
+        MutableBodyDescriptor parent = null;
         
         parent = newBodyDescriptor();
         parent.addField("Content-Type", "mutlipart/alternative; boundary=foo");
@@ -143,7 +143,7 @@ public class BodyDescriptorTest extends TestCase {
     }
     
     public void testParameters() {
-        BodyDescriptor bd = null;
+        MutableBodyDescriptor bd = null;
 
         /*
          * Test charset.
