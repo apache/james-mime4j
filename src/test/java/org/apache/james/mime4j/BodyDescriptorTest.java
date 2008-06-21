@@ -40,26 +40,26 @@ public class BodyDescriptorTest extends TestCase {
         bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; charset=ISO-8859-1; "
                 + "boundary=foo; param1=value1; param2=value2; param3=value3");
-        assertEquals(3, bd.getParameters().size());
-        assertEquals("value1", (String) bd.getParameters().get("param1"));
-        assertEquals("value2", (String) bd.getParameters().get("param2"));
-        assertEquals("value3", (String) bd.getParameters().get("param3"));
+        assertEquals(3, bd.getContentTypeParameters().size());
+        assertEquals("value1", (String) bd.getContentTypeParameters().get("param1"));
+        assertEquals("value2", (String) bd.getContentTypeParameters().get("param2"));
+        assertEquals("value3", (String) bd.getContentTypeParameters().get("param3"));
         
         bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; param1=value1; param2=value2;"
                      + " param3=value3");
-        assertEquals(3, bd.getParameters().size());
-        assertEquals("value1", (String) bd.getParameters().get("param1"));
-        assertEquals("value2", (String) bd.getParameters().get("param2"));
-        assertEquals("value3", (String) bd.getParameters().get("param3"));
+        assertEquals(3, bd.getContentTypeParameters().size());
+        assertEquals("value1", (String) bd.getContentTypeParameters().get("param1"));
+        assertEquals("value2", (String) bd.getContentTypeParameters().get("param2"));
+        assertEquals("value3", (String) bd.getContentTypeParameters().get("param3"));
         
         bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; "
                 + "param1= \" value with\tspaces \" ; "
                 + "param2=\"\\\"value4 with escaped \\\" \\\"\";");
-        assertEquals(2, bd.getParameters().size());
-        assertEquals(" value with\tspaces ", (String) bd.getParameters().get("param1"));
-        assertEquals("\"value4 with escaped \" \"", (String) bd.getParameters().get("param2"));
+        assertEquals(2, bd.getContentTypeParameters().size());
+        assertEquals(" value with\tspaces ", (String) bd.getContentTypeParameters().get("param1"));
+        assertEquals("\"value4 with escaped \" \"", (String) bd.getContentTypeParameters().get("param2"));
         
         /*
          * Make sure escaped characters (except ") are still escaped.
@@ -67,8 +67,8 @@ public class BodyDescriptorTest extends TestCase {
          */
         bd = newBodyDescriptor();
         bd.addField("Content-Type ", "text/plain; param=\"\\n\\\\\\\"\"");
-        assertEquals(1, bd.getParameters().size());
-        assertEquals("\\n\\\"", (String) bd.getParameters().get("param"));
+        assertEquals(1, bd.getContentTypeParameters().size());
+        assertEquals("\\n\\\"", (String) bd.getContentTypeParameters().get("param"));
     }
     
     public void testAddField() {

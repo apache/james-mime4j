@@ -216,7 +216,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * 
      * @return parameters
      */
-    public Map getParameters() {
+    public Map getContentTypeParameters() {
         return parameters;
     }
     
