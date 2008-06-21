@@ -22,7 +22,7 @@ package org.apache.james.mime4j;
  * Describes standard <a href='http://www.faqs.org/rfcs/rfc2045.html' rel='tag'>RFC2045</a>
  * headers.
  */
-public interface RFC2045Descriptor extends ContentDescriptor {
+public interface RFC2045MimeDescriptor extends ContentDescriptor {
 
     /**
      * Gets the MIME major version

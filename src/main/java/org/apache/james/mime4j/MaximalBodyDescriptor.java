@@ -28,7 +28,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * Parses and stores values for standard MIME header values.
  * 
  */
-public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045Descriptor {
+public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045MimeDescriptor {
 
     private static final int DEFAULT_MINOR_VERSION = 0;
     private static final int DEFAULT_MAJOR_VERSION = 1;
@@ -107,35 +107,35 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     }
     
     /**
-     * @see org.apache.james.mime4j.RFC2045Descriptor#getMimeMajorVersion()
+     * @see org.apache.james.mime4j.RFC2045MimeDescriptor#getMimeMajorVersion()
      */
     public int getMimeMajorVersion() {
         return mimeMajorVersion;
     }
     
     /**
-     * @see org.apache.james.mime4j.RFC2045Descriptor#getMimeMinorVersion()
+     * @see org.apache.james.mime4j.RFC2045MimeDescriptor#getMimeMinorVersion()
      */
     public int getMimeMinorVersion() {
         return mimeMinorVersion;
     }
     
     /**
-     * @see org.apache.james.mime4j.RFC2045Descriptor#getMimeVersionParseException()
+     * @see org.apache.james.mime4j.RFC2045MimeDescriptor#getMimeVersionParseException()
      */
     public MimeException getMimeVersionParseException() {
         return mimeVersionException;
     }
     
     /**
-     * @see org.apache.james.mime4j.RFC2045Descriptor#getContentDescription()
+     * @see org.apache.james.mime4j.RFC2045MimeDescriptor#getContentDescription()
      */
     public String getContentDescription() {
         return contentDescription;
     }
     
     /**
-     * @see org.apache.james.mime4j.RFC2045Descriptor#getContentId()
+     * @see org.apache.james.mime4j.RFC2045MimeDescriptor#getContentId()
      */
     public String getContentId() {
         return contentId;
