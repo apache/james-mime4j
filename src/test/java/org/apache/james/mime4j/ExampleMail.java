@@ -19,6 +19,7 @@
 package org.apache.james.mime4j;
 
 import java.nio.charset.Charset;
+import java.util.Locale;
 
 public class ExampleMail {
     
@@ -102,7 +103,8 @@ public class ExampleMail {
         " \r\n" +
         "\r\n" +
         "--=-tIdGYVstQJghyEDATnJ+\r\n" +
-        "Content-Disposition: attachment; filename=blob.png\r\n" +
+        "Content-Disposition: attachment; filename=blob.png;\r\n   modification-date=\"Sun, 21 Jun 2008 15:32:18 +0000\"; " +
+        "creation-date=\"Sat, 20 Jun 2008 10:15:09 +0000\"; read-date=\"Mon, 22 Jun 2008 12:08:56 +0000\";size=10234;\r\n" +
         "Content-Type: image/png; name=blob.png\r\n" +
         "Content-Transfer-Encoding: base64\r\n" +
         "\r\n" +
@@ -205,6 +207,20 @@ public class ExampleMail {
     private static final byte[] ONE_PART_MIME_BASE64_LATIN1_ENCODED = EncodeUtils.toBase64(latin1(ONE_PART_MIME_BASE64_LATIN1_BODY));
     
     public static final String ONE_PART_MIME_BASE64_ASCII_BODY = "Hello, World!\r\n";
+    
+    public static final String ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS =
+        "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
+        "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
+        "From: \"Robert Burrell Donkin\" <robertburrelldonkin@gmail.com>\r\n" +
+        "To: \"James Developers List\" <server-dev@james.apache.org>\r\n" +
+        "Subject: [Mime4J] getReader\r\n" +
+        "MIME-Version: 1.0\r\n" +
+        "Content-Type: text/plain; charset=US-ASCII\r\n" +
+        "Content-Transfer-Encoding: 7bit\r\n" +
+        "Content-Disposition: inline; foo=bar; one=1; param=value;\r\n" +
+        "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
+        "\r\n" +
+        ONE_PART_MIME_ASCII_BODY;
 
     private static final byte[] ONE_PART_MIME_BASE64_ASCII_ENCODED = EncodeUtils.toBase64(ascii(ONE_PART_MIME_BASE64_ASCII_BODY));
 
@@ -422,9 +438,12 @@ public class ExampleMail {
         EncodeUtils.toBase64(ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BASE64)),
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END),
     };
+    
+    public static final byte[] ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS_BYTES = ascii(ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS);
     public static final byte[] MIME_MULTIPART_ALTERNATIVE_BYTES = ascii(MIME_MULTIPART_ALTERNATIVE);
     public static final byte[] MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTES = join(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTE_ARRAYS);
     public static final byte[] ONE_PART_MIME_QUOTED_PRINTABLE_ASCII_BYTES = ascii(ONE_PART_MIME_QUOTED_PRINTABLE_ASCII);
+    public static final byte[] ONE_PART_MIME_BASE64_LATIN1_UPPERCASE_BYTES = join(ascii(ONE_PART_MIME_BASE64_LATIN1_HEADERS.toUpperCase(Locale.UK)), ONE_PART_MIME_BASE64_LATIN1_ENCODED);
     public static final byte[] ONE_PART_MIME_BASE64_LATIN1_BYTES = join(ascii(ONE_PART_MIME_BASE64_LATIN1_HEADERS), ONE_PART_MIME_BASE64_LATIN1_ENCODED);
     public static final byte[] ONE_PART_MIME_BASE64_ASCII_BYTES = join(ascii(ONE_PART_MIME_BASE64_ASCII_HEADERS), ONE_PART_MIME_BASE64_ASCII_ENCODED);
     public static final byte[] RFC822_SIMPLE_BYTES = US_ASCII.encode(RFC_SIMPLE).array();

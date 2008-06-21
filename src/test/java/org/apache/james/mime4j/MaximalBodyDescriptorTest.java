@@ -20,7 +20,7 @@ package org.apache.james.mime4j;
 
 import java.io.ByteArrayInputStream;
 
-import junit.framework.TestCase;
+import org.apache.james.mime4j.field.datetime.DateTime;
 
 public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
 
@@ -70,6 +70,57 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         assertEquals(4, descriptor.getMimeMajorVersion());
         assertEquals(1, descriptor.getMimeMinorVersion());
         assertNull(descriptor.getMimeVersionParseException());
+    }
+    
+    public void testContentDispositionType() throws Exception {
+        RFC2183ContentDispositionDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_BASE64_LATIN1_BYTES);
+        assertEquals("inline", descriptor.getContentDispositionType());
+    }
+    
+    public void testContentDispositionTypeCaseConversion() throws Exception {
+        RFC2183ContentDispositionDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_BASE64_LATIN1_BYTES);
+        assertEquals("Should be converted to lower case", "inline", descriptor.getContentDispositionType());
+        assertNotNull(descriptor.getContentDispositionParameters());
+        assertEquals(0, descriptor.getContentDispositionParameters().size());
+    }
+    
+    public void testContentDispositionParameters() throws Exception {
+        RFC2183ContentDispositionDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS_BYTES);
+        assertEquals("inline", descriptor.getContentDispositionType());
+        assertNotNull(descriptor.getContentDispositionParameters());
+        assertEquals(3, descriptor.getContentDispositionParameters().size());
+        assertEquals("value", descriptor.getContentDispositionParameters().get("param"));
+        assertEquals("1", descriptor.getContentDispositionParameters().get("one"));
+        assertEquals("bar", descriptor.getContentDispositionParameters().get("foo"));
+    }
+    
+    public void testContentDispositionStandardParameters() throws Exception {
+        RFC2183ContentDispositionDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, 1);
+        assertEquals("attachment", descriptor.getContentDispositionType());
+        assertNotNull(descriptor.getContentDispositionParameters());
+        assertEquals(5, descriptor.getContentDispositionParameters().size());
+        assertEquals("blob.png", descriptor.getContentDispositionFilename());
+        assertEquals(new DateTime("2008", 6, 21, 15, 32, 18, 0), descriptor.getContentDispositionModificationDate());
+        assertEquals(new DateTime("2008", 6, 20, 10, 15, 9, 0), descriptor.getContentDispositionCreationDate());
+        assertEquals(new DateTime("2008", 6, 22, 12, 8, 56, 0), descriptor.getContentDispositionReadDate());
+        assertEquals(10234, descriptor.getContentDispositionSize());
+    }
+    
+    private RFC2183ContentDispositionDescriptor describe(byte[] mail, int zeroBasedPart) throws Exception {
+        ByteArrayInputStream bias = new ByteArrayInputStream(mail);
+        parser.parse(bias);
+        int state = parser.next();
+        while (state != MimeTokenStream.T_END_OF_STREAM && zeroBasedPart>=0) {
+            state = parser.next();
+            if (state == MimeTokenStream.T_BODY) {
+                --zeroBasedPart;
+            }
+        }
+        assertEquals(MimeTokenStream.T_BODY, state);
+        BodyDescriptor descriptor = parser.getBodyDescriptor();
+        assertNotNull(descriptor);
+        assertTrue("Parser is maximal so body descriptor should be maximal", descriptor instanceof MaximalBodyDescriptor);
+        return (RFC2183ContentDispositionDescriptor) descriptor;
     }
     
     private MaximalBodyDescriptor describe(byte[] mail) throws Exception {

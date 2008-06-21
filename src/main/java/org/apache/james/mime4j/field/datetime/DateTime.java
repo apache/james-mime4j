@@ -107,7 +107,56 @@ public class DateTime {
     }
 
     public void print() {
-        System.out.println(getYear() + " " + getMonth() + " " + getDay() + "; " + getHour() + " " + getMinute() + " " + getSecond() + " " + getTimeZone());
+        System.out.println(toString());
     }
 
+    public String toString() {
+        return getYear() + " " + getMonth() + " " + getDay() + "; " + getHour() + " " + getMinute() + " " + getSecond() + " " + getTimeZone();
+    }
+
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((date == null) ? 0 : date.hashCode());
+        result = PRIME * result + day;
+        result = PRIME * result + hour;
+        result = PRIME * result + minute;
+        result = PRIME * result + month;
+        result = PRIME * result + second;
+        result = PRIME * result + timeZone;
+        result = PRIME * result + year;
+        return result;
+    }
+
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final DateTime other = (DateTime) obj;
+        if (date == null) {
+            if (other.date != null)
+                return false;
+        } else if (!date.equals(other.date))
+            return false;
+        if (day != other.day)
+            return false;
+        if (hour != other.hour)
+            return false;
+        if (minute != other.minute)
+            return false;
+        if (month != other.month)
+            return false;
+        if (second != other.second)
+            return false;
+        if (timeZone != other.timeZone)
+            return false;
+        if (year != other.year)
+            return false;
+        return true;
+    }
+
+    
 }

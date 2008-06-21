@@ -60,6 +60,36 @@ public final class MimeUtil {
     public static final String MIME_HEADER_CONTENT_ID = "content-id";
     /** <code>Content-Description</code> header name (lowercase) */
     public static final String MIME_HEADER_CONTENT_DESCRIPTION = "content-description";
+    /** 
+     * <code>Content-Disposition</code> header name (lowercase). 
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
+     */
+    public static final String MIME_HEADER_CONTENT_DISPOSITION = "content-disposition";
+    /** 
+     * <code>Content-Disposition</code> filename parameter (lowercase). 
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
+     */
+    public static final String PARAM_FILENAME = "filename";
+    /** 
+     * <code>Content-Disposition</code> modification-date parameter (lowercase). 
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
+     */
+    public static final String PARAM_MODIFICATION_DATE = "modification-date";
+    /** 
+     * <code>Content-Disposition</code> creation-date parameter (lowercase). 
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
+     */
+    public static final String PARAM_CREATION_DATE = "creation-date";
+    /** 
+     * <code>Content-Disposition</code> read-date parameter (lowercase). 
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
+     */
+    public static final String PARAM_READ_DATE = "read-date";
+    /** 
+     * <code>Content-Disposition</code> size parameter (lowercase). 
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
+     */
+    public static final String PARAM_SIZE = "size";
     
     private MimeUtil() {
         // this is an utility class to be used statically.

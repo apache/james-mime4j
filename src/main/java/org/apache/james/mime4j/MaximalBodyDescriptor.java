@@ -19,7 +19,12 @@
 package org.apache.james.mime4j;
 
 import java.io.StringReader;
+import java.util.Collections;
+import java.util.Map;
 
+import org.apache.james.mime4j.field.datetime.DateTime;
+import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
+import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import org.apache.james.mime4j.field.mimeversion.MimeVersionParser;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -28,7 +33,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * Parses and stores values for standard MIME header values.
  * 
  */
-public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045MimeDescriptor {
+public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045MimeDescriptor, RFC2183ContentDispositionDescriptor {
 
     private static final int DEFAULT_MINOR_VERSION = 0;
     private static final int DEFAULT_MAJOR_VERSION = 1;
@@ -40,6 +45,17 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     private boolean isContentIdSet;
     private String contentDescription;
     private boolean isContentDescriptionSet;
+    private String contentDispositionType;
+    private Map contentDispositionParameters;
+    private DateTime contentDispositionModificationDate;
+    private MimeException contentDispositionModificationDateParseException;
+    private DateTime contentDispositionCreationDate;
+    private MimeException contentDispositionCreationDateParseException;
+    private DateTime contentDispositionReadDate;
+    private MimeException contentDispositionReadDateParseException;
+    private long contentDispositionSize;
+    private MimeException contentDispositionSizeParseException;
+    private boolean isContentDispositionSet;
     
     protected MaximalBodyDescriptor() {
         this(null);
@@ -54,6 +70,17 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         this.isContentIdSet = false;
         this.contentDescription = null;
         this.isContentDescriptionSet = false;
+        this.contentDispositionType = null;
+        this.contentDispositionParameters = Collections.EMPTY_MAP;
+        this.contentDispositionModificationDate = null;
+        this.contentDispositionModificationDateParseException = null;
+        this.contentDispositionCreationDate = null;
+        this.contentDispositionCreationDateParseException = null;
+        this.contentDispositionReadDate = null;
+        this.contentDispositionReadDateParseException = null;
+        this.contentDispositionSize = -1;
+        this.contentDispositionSizeParseException = null;
+        this.isContentDispositionSet = false;
     }
     
     public void addField(String name, String value) {
@@ -64,11 +91,66 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
             parseContentId(value);
         } else if (MimeUtil.MIME_HEADER_CONTENT_DESCRIPTION.equals(name) && !isContentDescriptionSet) {
             parseContentDescription(value);
+        } else if (MimeUtil.MIME_HEADER_CONTENT_DISPOSITION.equals(name) && !isContentDispositionSet) {
+            parseContentDisposition(value);
         } else {
             super.addField(name, value);
         }
     }
 
+    private void parseContentDisposition(final String value) {
+        isContentDispositionSet = true;
+        contentDispositionParameters = MimeUtil.getHeaderParams(value);
+        contentDispositionType = (String) contentDispositionParameters.get("");
+        
+        final String contentDispositionModificationDate 
+            = (String) contentDispositionParameters.get(MimeUtil.PARAM_MODIFICATION_DATE);
+        if (contentDispositionModificationDate != null) {
+            try {
+                this.contentDispositionModificationDate = parseDate(contentDispositionModificationDate);
+            } catch (ParseException e) {
+                this.contentDispositionModificationDateParseException = e;
+            }         
+        }
+        
+        final String contentDispositionCreationDate 
+            = (String) contentDispositionParameters.get(MimeUtil.PARAM_CREATION_DATE);
+        if (contentDispositionCreationDate != null) {
+            try {
+                this.contentDispositionCreationDate = parseDate(contentDispositionCreationDate);
+            } catch (ParseException e) {
+                this.contentDispositionCreationDateParseException = e;
+            }         
+        }
+        
+        final String contentDispositionReadDate 
+            = (String) contentDispositionParameters.get(MimeUtil.PARAM_READ_DATE);
+        if (contentDispositionReadDate != null) {
+            try {
+                this.contentDispositionReadDate = parseDate(contentDispositionReadDate);
+            } catch (ParseException e) {
+                this.contentDispositionReadDateParseException = e;
+            }         
+        }
+        
+        final String size = (String) contentDispositionParameters.get(MimeUtil.PARAM_SIZE);
+        if (size != null) {
+            try {
+                contentDispositionSize = Long.parseLong(size);
+            } catch (NumberFormatException e) {
+                this.contentDispositionSizeParseException = (MimeException) new MimeException(e.getMessage(), e).fillInStackTrace();
+            }
+        }
+        contentDispositionParameters.remove("");
+    }
+
+    private DateTime parseDate(final String date) throws ParseException {
+        final StringReader stringReader = new StringReader(date);
+        final DateTimeParser parser = new DateTimeParser(stringReader);
+        DateTime result = parser.date_time();
+        return result;
+    }
+    
     private void parseContentDescription(String value) {
         if (value == null) {
             contentDescription = "";
@@ -140,4 +222,83 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     public String getContentId() {
         return contentId;
     }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionType()
+     */
+    public String getContentDispositionType() {
+        return contentDispositionType;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionParameters()
+     */
+    public Map getContentDispositionParameters() {
+        return contentDispositionParameters;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionFilename()
+     */
+    public String getContentDispositionFilename() {
+        return (String) contentDispositionParameters.get(MimeUtil.PARAM_FILENAME);
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionModificationDate()
+     */
+    public DateTime getContentDispositionModificationDate() {
+        return contentDispositionModificationDate;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionModificationDateParseException()
+     */
+    public MimeException getContentDispositionModificationDateParseException() {
+        return contentDispositionModificationDateParseException;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionCreationDate()
+     */
+    public DateTime getContentDispositionCreationDate() {
+        return contentDispositionCreationDate;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionCreationDateParseException()
+     */
+    public MimeException getContentDispositionCreationDateParseException() {
+        return contentDispositionCreationDateParseException;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionReadDate()
+     */
+    public DateTime getContentDispositionReadDate() {
+        return contentDispositionReadDate;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionReadDateParseException()
+     */
+    public MimeException getContentDispositionReadDateParseException() {
+        return contentDispositionReadDateParseException;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionSize()
+     */
+    public long getContentDispositionSize() {
+        return contentDispositionSize;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2183ContentDispositionDescriptor#getContentDispositionSizeParseException()
+     */
+    public MimeException getContentDispositionSizeParseException() {
+        return contentDispositionSizeParseException;
+    }
+    
+    
 } 
