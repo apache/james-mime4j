@@ -28,7 +28,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * Parses and stores values for standard MIME header values.
  * 
  */
-public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
+public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045Descriptor {
 
     private static final int DEFAULT_MINOR_VERSION = 0;
     private static final int DEFAULT_MAJOR_VERSION = 1;
@@ -107,46 +107,35 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
     }
     
     /**
-     * Gets the MIME major version
-     * as specified by the <code>MIME-Version</code>
-     * header.
-     * Defaults to one.
-     * @return positive integer
+     * @see org.apache.james.mime4j.RFC2045Descriptor#getMimeMajorVersion()
      */
     public int getMimeMajorVersion() {
         return mimeMajorVersion;
     }
     
     /**
-     * Gets the MIME minor version
-     * as specified by the <code>MIME-Version</code>
-     * header. 
-     * Defaults to zero.
-     * @return positive integer
+     * @see org.apache.james.mime4j.RFC2045Descriptor#getMimeMinorVersion()
      */
     public int getMimeMinorVersion() {
         return mimeMinorVersion;
     }
     
+    /**
+     * @see org.apache.james.mime4j.RFC2045Descriptor#getMimeVersionParseException()
+     */
     public MimeException getMimeVersionParseException() {
         return mimeVersionException;
     }
     
     /**
-     * Gets the value of the <a href='http://www.faqs.org/rfcs/rfc2045'>RFC</a> 
-     * <code>Content-Description</code> header.
-     * @return value of the <code>Content-Description</code> when present,
-     * null otherwise
+     * @see org.apache.james.mime4j.RFC2045Descriptor#getContentDescription()
      */
     public String getContentDescription() {
         return contentDescription;
     }
     
     /**
-     * Gets the value of the <a href='http://www.faqs.org/rfcs/rfc2045'>RFC</a> 
-     * <code>Content-ID</code> header.
-     * @return value of the <code>Content-ID</code> when present,
-     * null otherwise
+     * @see org.apache.james.mime4j.RFC2045Descriptor#getContentId()
      */
     public String getContentId() {
         return contentId;
