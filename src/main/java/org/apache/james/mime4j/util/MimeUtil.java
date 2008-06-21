@@ -102,17 +102,35 @@ public final class MimeUtil {
     }
 
     /**
-     * Parses a complex field value into a map of key/value pairs. You may
+     * <p>Parses a complex field value into a map of key/value pairs. You may
      * use this, for example, to parse a definition like
      * <pre>
      *   text/plain; charset=UTF-8; boundary=foobar
      * </pre>
      * The above example would return a map with the keys "", "charset",
      * and "boundary", and the values "text/plain", "UTF-8", and "foobar".
+     * </p><p>
+     * Header value will be unfolded and excess white space trimmed.
+     * </p>
      * @param pValue The field value to parse.
      * @return The result map; use the key "" to retrieve the first value.
      */
     public static Map getHeaderParams(String pValue) {
+        pValue = pValue.trim();
+        
+        /*
+         * Unfold Content-Type value
+         */
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < pValue.length(); i++) {
+            char c = pValue.charAt(i);
+            if (c == '\r' || c == '\n') {
+                continue;
+            }
+            sb.append(c);
+        }
+        pValue = sb.toString();
+        
         Map result = new HashMap();
 
         // split main value and parameters

@@ -111,77 +111,67 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
                 log.error("Invalid content-length: " + value);
             }
         } else if (name.equals("content-type") && !contentTypeSet) {
-            contentTypeSet = true;
-            
-            value = value.trim();
-            
-            /*
-             * Unfold Content-Type value
-             */
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < value.length(); i++) {
-                char c = value.charAt(i);
-                if (c == '\r' || c == '\n') {
-                    continue;
-                }
-                sb.append(c);
-            }
-            
-            Map params = MimeUtil.getHeaderParams(sb.toString());
-            
-            String main = (String) params.get("");
-            String type = null;
-            String subtype = null;
-            if (main != null) {
-                main = main.toLowerCase().trim();
-                int index = main.indexOf('/');
-                boolean valid = false;
-                if (index != -1) {
-                    type = main.substring(0, index).trim();
-                    subtype = main.substring(index + 1).trim();
-                    if (type.length() > 0 && subtype.length() > 0) {
-                        main = type + "/" + subtype;
-                        valid = true;
-                    }
-                }
-                
-                if (!valid) {
-                    main = null;
-                    type = null;
-                    subtype = null;
-                }
-            }
-            String b = (String) params.get("boundary");
-            
-            if (main != null 
-                    && ((main.startsWith("multipart/") && b != null) 
-                            || !main.startsWith("multipart/"))) {
-                
-                mimeType = main;
-                this.subType = subtype;
-                this.mediaType = type;
-            }
-            
-            if (MimeUtil.isMultipart(mimeType)) {
-                boundary = b;
-            }
-            
-            String c = (String) params.get("charset");
-            if (c != null) {
-                c = c.trim();
-                if (c.length() > 0) {
-                    charset = c.toLowerCase();
-                }
-            }
-            
-            /*
-             * Add all other parameters to parameters.
-             */
-            parameters.putAll(params);
-            parameters.remove("");
-            parameters.remove("boundary");
-            parameters.remove("charset");
+            parseContentType(value);
         }
+    }
+
+    private void parseContentType(String value) {
+        contentTypeSet = true;
+        
+        Map params = MimeUtil.getHeaderParams(value);
+        
+        String main = (String) params.get("");
+        String type = null;
+        String subtype = null;
+        if (main != null) {
+            main = main.toLowerCase().trim();
+            int index = main.indexOf('/');
+            boolean valid = false;
+            if (index != -1) {
+                type = main.substring(0, index).trim();
+                subtype = main.substring(index + 1).trim();
+                if (type.length() > 0 && subtype.length() > 0) {
+                    main = type + "/" + subtype;
+                    valid = true;
+                }
+            }
+            
+            if (!valid) {
+                main = null;
+                type = null;
+                subtype = null;
+            }
+        }
+        String b = (String) params.get("boundary");
+        
+        if (main != null 
+                && ((main.startsWith("multipart/") && b != null) 
+                        || !main.startsWith("multipart/"))) {
+            
+            mimeType = main;
+            this.subType = subtype;
+            this.mediaType = type;
+        }
+        
+        if (MimeUtil.isMultipart(mimeType)) {
+            boundary = b;
+        }
+        
+        String c = (String) params.get("charset");
+        if (c != null) {
+            c = c.trim();
+            if (c.length() > 0) {
+                charset = c.toLowerCase();
+            }
+        }
+        
+        /*
+         * Add all other parameters to parameters.
+         */
+        parameters.putAll(params);
+        parameters.remove("");
+        parameters.remove("boundary");
+        parameters.remove("charset");
     }
 
     /**
