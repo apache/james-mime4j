@@ -134,6 +134,7 @@ public class ExampleMail {
         "--=-tIdGYVstQJghyEDATnJ+\r\n" +
         "Content-Disposition: attachment; filename=rhubarb.txt\r\n" +
         "Content-Type: text/plain; name=rhubarb.txt; charset=us-ascii\r\n" +
+        "Content-Language: en, en-US, en-CA\r\n" +
         "Content-Transfer-Encoding: quoted-printable\r\n" +
         "\r\n" +
         "Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhu=\r\n" +

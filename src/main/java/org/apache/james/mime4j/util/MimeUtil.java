@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.BodyDescriptor;
 
 
 /**
@@ -90,6 +91,11 @@ public final class MimeUtil {
      * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
      */
     public static final String PARAM_SIZE = "size";
+    /**
+     * <code>Langauge-Tag</code> header (lower case).
+     * See <a href='http://www.faqs.org/rfcs/rfc4646.html'>RFC4646</a>.
+     */
+    public static final String MIME_HEADER_LANGAUGE = "content-language";
     
     private MimeUtil() {
         // this is an utility class to be used statically.

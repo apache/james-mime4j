@@ -23,7 +23,7 @@ options {
   OUTPUT_DIRECTORY = "../../../../../../../../../target/generated-sources/javacc";
 }
 
-PARSER_BEGIN(MimeVersionParser)
+PARSER_BEGIN(ContentLanguageParser)
 /****************************************************************
  * Licensed to the Apache Software Foundation (ASF) under one   *
  * or more contributor license agreements.  See the NOTICE file *
@@ -42,52 +42,75 @@ PARSER_BEGIN(MimeVersionParser)
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
-package org.apache.james.mime4j.field.mimeversion;
+package org.apache.james.mime4j.field.language;
 
-public class MimeVersionParser {
-	public static final int INITIAL_VERSION_VALUE = -1;
-	private int major=INITIAL_VERSION_VALUE;
-	private int minor=INITIAL_VERSION_VALUE;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ContentLanguageParser {
+	private ArrayList languages = new ArrayList();
 	
-	public int getMinorVersion() {
-		return minor;
-	}
-	
-	public int getMajorVersion() {
-		return major;
-	}
-}
-PARSER_END(MimeVersionParser)
-
-
-void parseLine() :
-{}
-{
-	parse() ["\r"] "\n"
-}
-
-void parseAll() :
-{}
-{
-	parse() <EOF>
-}
-
-void parse() :
-{
-	Token major;
-	Token minor;
-}
-{
-	major=<DIGITS> <DOT> minor=<DIGITS>
-	{
+	/**
+	 * Parses the input into a list of language tags.
+	 * @return list of language tag Strings
+	 */
+	public List parse() throws ParseException {
 		try {
-			this.major = Integer.parseInt(major.image);
-			this.minor = Integer.parseInt(minor.image);
-		} catch (NumberFormatException e) {
-			throw new ParseException(e.getMessage());
+			return doParse();
+		} catch (TokenMgrError e) {
+			// An issue with the TOKENiser 
+			// but it's not polite to throw an Error
+			// when executing on a server
+			throw new ParseException(e);
 		}
 	}
 }
+PARSER_END(ContentLanguageParser)
+
+private List doParse() :
+{
+}
+{
+	language() ( "," language() )*
+	{return languages;}
+}
+
+String language() :
+{
+	Token token;
+	StringBuffer languageTag = new StringBuffer();
+	String result;
+}
+{
+	token = <ALPHA> 
+			{
+				languageTag.append(token.image);
+			}
+		( 
+		"-" 
+// This keeps TOKENising simple
+				token = <ALPHA> 
+					{
+						languageTag.append('-');
+						languageTag.append(token.image);
+					}
+				|
+				token = <ALPHANUM> 
+					{
+						languageTag.append('-');
+						languageTag.append(token.image);
+					}
+		)*
+	
+	{
+		result = languageTag.toString();
+		languages.add(result);
+		return result;
+	}
+}
+
+
+
 
 SPECIAL_TOKEN :
 {
@@ -161,6 +184,16 @@ TOKEN :
 TOKEN :
 {
 	< DIGITS: ( ["0"-"9"] )+ >
+}
+
+TOKEN :
+{
+	< ALPHA: ( ["a"-"z"] | ["A"-"Z"] )+ >
+}
+
+TOKEN :
+{
+	<ALPHANUM : (  ["0"-"9"] |  ["a"-"z"] | ["A"-"Z"] )+>
 }
 
 TOKEN :

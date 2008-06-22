@@ -106,7 +106,16 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         assertEquals(10234, descriptor.getContentDispositionSize());
     }
     
-    private RFC2183ContentDispositionDescriptor describe(byte[] mail, int zeroBasedPart) throws Exception {
+    public void testLanguageTagParameters() throws Exception {
+        RFC3066ContentLanguageDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, 3);
+        assertNotNull(descriptor.getContentLanguage());
+        assertEquals(3, descriptor.getContentLanguage().size());
+        assertEquals("en", descriptor.getContentLanguage().get(0));
+        assertEquals("en-US", descriptor.getContentLanguage().get(1));
+        assertEquals("en-CA", descriptor.getContentLanguage().get(2));
+    }
+    
+    private MaximalBodyDescriptor describe(byte[] mail, int zeroBasedPart) throws Exception {
         ByteArrayInputStream bias = new ByteArrayInputStream(mail);
         parser.parse(bias);
         int state = parser.next();
@@ -120,7 +129,7 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         BodyDescriptor descriptor = parser.getBodyDescriptor();
         assertNotNull(descriptor);
         assertTrue("Parser is maximal so body descriptor should be maximal", descriptor instanceof MaximalBodyDescriptor);
-        return (RFC2183ContentDispositionDescriptor) descriptor;
+        return (MaximalBodyDescriptor) descriptor;
     }
     
     private MaximalBodyDescriptor describe(byte[] mail) throws Exception {

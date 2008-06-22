@@ -20,11 +20,13 @@ package org.apache.james.mime4j;
 
 import java.io.StringReader;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.james.mime4j.field.datetime.DateTime;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
+import org.apache.james.mime4j.field.language.ContentLanguageParser;
 import org.apache.james.mime4j.field.mimeversion.MimeVersionParser;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -33,7 +35,8 @@ import org.apache.james.mime4j.util.MimeUtil;
  * Parses and stores values for standard MIME header values.
  * 
  */
-public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045MimeDescriptor, RFC2183ContentDispositionDescriptor {
+public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045MimeDescriptor, 
+        RFC2183ContentDispositionDescriptor, RFC3066ContentLanguageDescriptor {
 
     private static final int DEFAULT_MINOR_VERSION = 0;
     private static final int DEFAULT_MAJOR_VERSION = 1;
@@ -56,6 +59,9 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     private long contentDispositionSize;
     private MimeException contentDispositionSizeParseException;
     private boolean isContentDispositionSet;
+    private List contentLanguage;
+    private MimeException contentLanguageParseException;
+    private boolean isContentLanguageSet;
     
     protected MaximalBodyDescriptor() {
         this(null);
@@ -81,6 +87,9 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         this.contentDispositionSize = -1;
         this.contentDispositionSizeParseException = null;
         this.isContentDispositionSet = false;
+        this.contentLanguage = null;
+        this.contentLanguageParseException = null;
+        this.isContentIdSet = false;
     }
     
     public void addField(String name, String value) {
@@ -93,8 +102,22 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
             parseContentDescription(value);
         } else if (MimeUtil.MIME_HEADER_CONTENT_DISPOSITION.equals(name) && !isContentDispositionSet) {
             parseContentDisposition(value);
+        } else if (MimeUtil.MIME_HEADER_LANGAUGE.equals(name) && !isContentLanguageSet) {
+            parseLanguageTag(value);
         } else {
             super.addField(name, value);
+        }
+    }
+    
+    private void parseLanguageTag(final String value) {
+        isContentLanguageSet = true;
+        if (value != null) {
+            try {
+                final ContentLanguageParser parser = new ContentLanguageParser(new StringReader(value));
+                contentLanguage = parser.parse();
+            } catch (MimeException e) {
+                contentLanguageParseException = e;
+            }
         }
     }
 
@@ -110,7 +133,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
                 this.contentDispositionModificationDate = parseDate(contentDispositionModificationDate);
             } catch (ParseException e) {
                 this.contentDispositionModificationDateParseException = e;
-            }         
+            } 
         }
         
         final String contentDispositionCreationDate 
@@ -300,5 +323,17 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         return contentDispositionSizeParseException;
     }
     
-    
+    /**
+     * @see org.apache.james.mime4j.RFC3066ContentLanguageDescriptor#getContentLanguage()
+     */
+    public List getContentLanguage() {
+        return contentLanguage;
+    }
+
+    /**
+     * @see org.apache.james.mime4j.RFC3066ContentLanguageDescriptor#getContentLanguageParseException()
+     */
+    public MimeException getContentLanguageParseException() {
+        return contentLanguageParseException;
+    }
 } 

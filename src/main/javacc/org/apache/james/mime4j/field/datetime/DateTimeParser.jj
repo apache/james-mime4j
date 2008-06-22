@@ -28,6 +28,7 @@
 options {
 	STATIC=false;
 	LOOKAHEAD=1;
+	OUTPUT_DIRECTORY = "../../../../../../../../../target/generated-sources/javacc";
 	//DEBUG_PARSER=true;
 	//DEBUG_TOKEN_MANAGER=true;
 }

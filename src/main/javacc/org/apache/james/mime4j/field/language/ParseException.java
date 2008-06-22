@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
-package org.apache.james.mime4j.field.mimeversion;
+package org.apache.james.mime4j.field.language;
 
 import org.apache.james.mime4j.MimeException;
 
@@ -67,10 +67,15 @@ public class ParseException extends MimeException {
    */
 
   public ParseException() {
-    super("Cannot parse field");
-    specialConstructor = false;
+      super("Cannot parse field");
+      specialConstructor = false;
   }
   
+  public ParseException(Throwable t) {
+      this(t.getMessage());
+      initCause(t);
+  }
+
   public ParseException(String message) {
     super(message);
     specialConstructor = false;
