@@ -64,6 +64,7 @@ public class StructuredFieldParserTest extends TestCase {
     
     private String parse(String in) throws Exception {
         StructuredFieldParser parser = new StructuredFieldParser(new StringReader(in));
+        parser.setFoldingPreserved(true);
         return parser.parse();
     }
 }

@@ -28,6 +28,7 @@ import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import org.apache.james.mime4j.field.language.ContentLanguageParser;
 import org.apache.james.mime4j.field.mimeversion.MimeVersionParser;
+import org.apache.james.mime4j.field.structured.StructuredFieldParser;
 import org.apache.james.mime4j.util.MimeUtil;
 
 
@@ -36,7 +37,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * 
  */
 public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045MimeDescriptor, 
-        RFC2183ContentDispositionDescriptor, RFC3066ContentLanguageDescriptor {
+        RFC2183ContentDispositionDescriptor, RFC3066ContentLanguageDescriptor, RFC2557ContentLocationDescriptor {
 
     private static final int DEFAULT_MINOR_VERSION = 0;
     private static final int DEFAULT_MAJOR_VERSION = 1;
@@ -62,6 +63,9 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     private List contentLanguage;
     private MimeException contentLanguageParseException;
     private boolean isContentLanguageSet;
+    private MimeException contentLocationParseException;
+    private String contentLocation;
+    private boolean isContentLocationSet;
     
     protected MaximalBodyDescriptor() {
         this(null);
@@ -90,6 +94,9 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         this.contentLanguage = null;
         this.contentLanguageParseException = null;
         this.isContentIdSet = false;
+        this.contentLocation = null;
+        this.contentLocationParseException = null;
+        this.isContentLocationSet = false;
     }
     
     public void addField(String name, String value) {
@@ -103,13 +110,29 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         } else if (MimeUtil.MIME_HEADER_CONTENT_DISPOSITION.equals(name) && !isContentDispositionSet) {
             parseContentDisposition(value);
         } else if (MimeUtil.MIME_HEADER_LANGAUGE.equals(name) && !isContentLanguageSet) {
-            parseLanguageTag(value);
+            parseLanguage(value);
+        } else if (MimeUtil.MIME_HEADER_LOCATION.equals(name) && !isContentLocationSet) {
+            parseLocation(value);
         } else {
             super.addField(name, value);
         }
     }
     
-    private void parseLanguageTag(final String value) {
+    private void parseLocation(final String value) {
+        isContentLocationSet = true;
+        if (value != null) {
+            final StringReader stringReader = new StringReader(value);
+            final StructuredFieldParser parser = new StructuredFieldParser(stringReader);
+            parser.setFoldingPreserved(false);
+            try {
+                contentLocation = parser.parse();
+            } catch (MimeException e) { 
+                contentLocationParseException = e;
+            }
+        }
+    }
+    
+    private void parseLanguage(final String value) {
         isContentLanguageSet = true;
         if (value != null) {
             try {
@@ -335,5 +358,19 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
      */
     public MimeException getContentLanguageParseException() {
         return contentLanguageParseException;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2557ContentLocationDescriptor#getContentLocation()
+     */
+    public String getContentLocation() {
+        return contentLocation;
+    }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC2557ContentLocationDescriptor#getContentLocationParseException()
+     */
+    public MimeException getContentLocationParseException() {
+        return contentLocationParseException;
     }
 } 

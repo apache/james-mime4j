@@ -52,6 +52,22 @@ package org.apache.james.mime4j.field.structured;
  */
 public class StructuredFieldParser {
 	
+	private boolean preserveFolding = false;
+	
+	/**
+	 * Should the \r\n folding sequence be preserved?
+	 */
+	public boolean isFoldingPreserved() {
+		return preserveFolding;
+	}
+	
+	/**
+	 * Sets whether the \r\n folding sequence should be preserved.
+	 */
+	public void setFoldingPreserved(boolean preserveFolding) {
+		this.preserveFolding =  preserveFolding;
+	}
+	
 	/**
 	 * Unfolds the input and removes comments.
 	 * @return unfolded header value with comments removed
@@ -107,7 +123,7 @@ private String doParse() :
 		|
 		t = <FOLD>
 			{
-				buffer.append("\r\n");
+				if (preserveFolding) buffer.append("\r\n");
 			}
 		|
 		t = <WS> 

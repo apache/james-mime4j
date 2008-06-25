@@ -106,13 +106,33 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         assertEquals(10234, descriptor.getContentDispositionSize());
     }
     
-    public void testLanguageTagParameters() throws Exception {
+    public void testLanguageParameters() throws Exception {
         RFC3066ContentLanguageDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, 3);
         assertNotNull(descriptor.getContentLanguage());
         assertEquals(3, descriptor.getContentLanguage().size());
         assertEquals("en", descriptor.getContentLanguage().get(0));
         assertEquals("en-US", descriptor.getContentLanguage().get(1));
         assertEquals("en-CA", descriptor.getContentLanguage().get(2));
+    }
+    
+    public void testContentLocationRelativeUrl() throws Exception {
+        RFC2557ContentLocationDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 0);
+        assertEquals("relative/url", descriptor.getContentLocation());
+    }
+    
+    public void testContentLocationAbsoluteUrl() throws Exception {
+        RFC2557ContentLocationDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 1);
+        assertEquals("http://www.example.org/absolute/rhubard.txt", descriptor.getContentLocation());
+    }
+    
+    public void testContentLocationWithComment() throws Exception {
+        RFC2557ContentLocationDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 3);
+        assertEquals("http://www.example.org/absolute/comments/rhubard.txt", descriptor.getContentLocation());
+    }
+    
+    public void testContentLocationFoldedUrl() throws Exception {
+        RFC2557ContentLocationDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 4);
+        assertEquals("http://www.example.org/this/is/a/very/long/url/split/over/two/lines/", descriptor.getContentLocation());
     }
     
     private MaximalBodyDescriptor describe(byte[] mail, int zeroBasedPart) throws Exception {

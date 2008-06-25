@@ -92,10 +92,15 @@ public final class MimeUtil {
      */
     public static final String PARAM_SIZE = "size";
     /**
-     * <code>Langauge-Tag</code> header (lower case).
+     * <code>Content-Langauge</code> header (lower case).
      * See <a href='http://www.faqs.org/rfcs/rfc4646.html'>RFC4646</a>.
      */
     public static final String MIME_HEADER_LANGAUGE = "content-language";
+    /**
+     * <code>Content-Location</code> header (lower case).
+     * See <a href='http://www.faqs.org/rfcs/rfc2557.html'>RFC2557</a>.
+     */
+    public static final String MIME_HEADER_LOCATION = "content-location";
     
     private MimeUtil() {
         // this is an utility class to be used statically.
