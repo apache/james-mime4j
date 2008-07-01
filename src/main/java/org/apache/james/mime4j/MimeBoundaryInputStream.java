@@ -21,52 +21,52 @@ package org.apache.james.mime4j;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PushbackInputStream;
 
 /**
  * Stream that constrains itself to a single MIME body part.
- * After the stream ends (i.e. read() returns -1) {@link #hasMoreParts()}
+ * After the stream ends (i.e. read() returns -1) {@link #isLastPart()}
  * can be used to determine if a final boundary has been seen or not.
- * If {@link #parentEOF()} is <code>true</code> an unexpected end of stream
- * has been detected in the parent stream.
- * 
- * 
  * 
  * @version $Id: MimeBoundaryInputStream.java,v 1.2 2004/11/29 13:15:42 ntherning Exp $
  */
 public class MimeBoundaryInputStream extends InputStream {
+
+    private final InputBuffer buffer;
+    private final byte[] boundary;
     
-    private PushbackInputStream s;
-    private byte[] boundary;
-    private boolean first = true;
     private boolean eof;
-    private boolean parenteof;
-    private boolean moreParts = true;
+    private int limit;
+    private boolean atBoundary;
+    private int boundaryLen;
+    private boolean lastPart;
+    private boolean completed;
 
     /**
      * Creates a new MimeBoundaryInputStream.
      * @param s The underlying stream.
      * @param boundary Boundary string (not including leading hyphens).
      */
-    public MimeBoundaryInputStream(InputStream s, String boundary) 
+    public MimeBoundaryInputStream(InputBuffer inbuffer, String boundary) 
             throws IOException {
+        this.buffer = inbuffer;
+        this.eof = false;
+        this.limit = 0;
+        this.atBoundary = false;
+        this.boundaryLen = 0;
+        this.lastPart = false;
+        this.completed = false;
         
-        this.s = new PushbackInputStream(s, boundary.length() + 4);
-
-        boundary = "--" + boundary;
-        this.boundary = new byte[boundary.length()];
-        for (int i = 0; i < this.boundary.length; i++) {
-            this.boundary[i] = (byte) boundary.charAt(i);
+        this.boundary = new byte[boundary.length() + 2];
+        this.boundary[0] = (byte) '-';
+        this.boundary[1] = (byte) '-';
+        for (int i = 0; i < boundary.length(); i++) {
+            byte ch = (byte) boundary.charAt(i);
+            if (ch == '\r' || ch == '\n') {
+                throw new IllegalArgumentException("Boundary may not contain CR or LF");
+            }
+            this.boundary[i + 2] = ch;
         }
-        
-        /*
-         * By reading one byte we will update moreParts to be as expected
-         * before any bytes have been read.
-         */
-        int b = read();
-        if (b != -1) {
-            this.s.unread(b);
-        }
+        fillBuffer();
     }
 
     /**
@@ -75,110 +75,144 @@ public class MimeBoundaryInputStream extends InputStream {
      * @throws IOException on I/O errors.
      */
     public void close() throws IOException {
-        s.close();
     }
 
     /**
-     * Determines if the underlying stream has more parts (this stream has
-     * not seen an end boundary).
-     * 
-     * @return <code>true</code> if there are more parts in the underlying 
-     *         stream, <code>false</code> otherwise.
+     * @see java.io.InputStream#markSupported()
      */
-    public boolean hasMoreParts() {
-        return moreParts;
+    public boolean markSupported() {
+        return false;
     }
 
-    /**
-     * Determines if the parent stream has reached EOF
-     * 
-     * @return <code>true</code>  if EOF has been reached for the parent stream, 
-     *         <code>false</code> otherwise.
-     */
-    public boolean parentEOF() {
-        return parenteof;
-    }
-    
-    /**
-     * Consumes all unread bytes of this stream. After a call to this method
-     * this stream will have reached EOF.
-     * 
-     * @throws IOException on I/O errors.
-     */
-    public void consume() throws IOException {
-        while (read() != -1) {
-        }
-    }
-    
     /**
      * @see java.io.InputStream#read()
      */
     public int read() throws IOException {
+        if (completed) {
+            return -1;
+        }
+        if (endOfStream() && !hasData()) {
+            skipBoundary();            
+            return -1;
+        }
+        for (;;) {
+            if (hasData()) {
+                return buffer.read();
+            } else if (endOfStream()) {
+                skipBoundary();            
+                return -1;
+            }
+            fillBuffer();
+        }
+    }
+    
+    public int read(byte[] b, int off, int len) throws IOException {
+        if (completed) {
+            return -1;
+        }
+        if (endOfStream() && !hasData()) {
+            skipBoundary();            
+            return -1;
+        }
+        fillBuffer();
+        if (!hasData()) {
+            return 0;
+        }
+        int chunk = Math.min(len, limit - buffer.pos());
+        return buffer.read(b, off, chunk);
+    }
+
+    private boolean endOfStream() {
+        return eof || atBoundary;
+    }
+    
+    private boolean hasData() {
+        return limit > buffer.pos() && limit < buffer.length();
+    }
+    
+    private int fillBuffer() throws IOException {
         if (eof) {
             return -1;
         }
+        int bytesRead;
+        if (!hasData()) {
+            bytesRead = buffer.fillBuffer();
+        } else {
+            bytesRead = 0;
+        }
+        eof = bytesRead == -1;
         
-        if (first) {
-            first = false;
-            if (matchBoundary()) {
-                return -1;
+        int i = buffer.indexOf(boundary);
+        if (i != -1) {
+            limit = i;
+            atBoundary = true;
+            calculateBoundaryLen();
+        } else {
+            if (eof) {
+                limit = buffer.length();
+            } else {
+                limit = buffer.length() - (boundary.length + 1); 
+                                          // \r\n + (boundary - one char)
             }
         }
-        
-        int b1 = s.read();
-        int b2 = s.read();
-        
-        if (b1 == '\r' && b2 == '\n') {
-            if (matchBoundary()) {
-                return -1;
-            }
-        }
-        
-        if (b2 != -1) {
-            s.unread(b2);
-        }
-
-        parenteof = b1 == -1;
-        eof = parenteof;
-        
-        return b1;
+        return bytesRead;
     }
     
-    private boolean matchBoundary() throws IOException {
-        
-        for (int i = 0; i < boundary.length; i++) {
-            int b = s.read();
-            if (b != boundary[i]) {
-                if (b != -1) {
-                    s.unread(b);
-                }
-                for (int j = i - 1; j >= 0; j--) {
-                    s.unread(boundary[j]);
-                }
-                return false;
+    private void calculateBoundaryLen() throws IOException {
+        boundaryLen = boundary.length;
+        int len = limit - buffer.pos();
+        if (len > 0) {
+            if (buffer.charAt(limit - 1) == '\n') {
+                boundaryLen++;
+                limit--;
             }
         }
-        
-        /*
-         * We have a match. Is it an end boundary?
-         */
-        int prev = s.read();
-        int curr = s.read();
-        moreParts = !(prev == '-' && curr == '-');
-        do {
-            if (curr == '\n' && prev == '\r') {
-                break;
+        if (len > 1) {
+            if (buffer.charAt(limit - 1) == '\r') {
+                boundaryLen++;
+                limit--;
             }
-            prev = curr;
-        } while ((curr = s.read()) != -1);
-        
-        if (curr == -1) {
-            moreParts = false;
-            parenteof = true;
         }
-        
-        eof = true;
-        
-        return true;
     }
+    
+    private void skipBoundary() throws IOException {
+        if (!completed) {
+            completed = true;
+            buffer.skip(boundaryLen);
+            for (;;) {
+                if (buffer.length() > 1) {
+                    int ch1 = buffer.charAt(buffer.pos());
+                    int ch2 = buffer.charAt(buffer.pos() + 1);
+                    if (ch1 == '-' && ch2 == '-') {
+                        this.lastPart = true;
+                        buffer.skip(2);
+                        if (buffer.length() > 1) {
+                            ch1 = buffer.charAt(buffer.pos());
+                            ch2 = buffer.charAt(buffer.pos() + 1);
+                            if (ch1 == '\r' && ch2 == '\n') {
+                                buffer.skip(2);
+                            }
+                        }
+                    } else if (ch1 == '\r' && ch2 == '\n') {
+                        buffer.skip(2);
+                    }
+                    break;
+                } else {
+                    fillBuffer();
+                }
+                if (eof) {
+                    break;
+                }
+            }
+        }
+    }
+    
+    public boolean isLastPart() {
+        return lastPart;        
+    }
+    
+    public boolean eof() {
+        return eof && !buffer.hasBufferedData();
+    }
+    
 }

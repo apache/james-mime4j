@@ -341,6 +341,7 @@ public class MimeTokenStream {
         private int pos, start;
         private int lineNumber, startLineNumber;
         private final int endState;
+        private boolean raw;
         
         String field, fieldName, fieldValue;
 
@@ -357,7 +358,7 @@ public class MimeTokenStream {
 
         private int setParseBodyPartState() throws IOException, MimeException {
             cursor.advanceToBoundary();
-            if (cursor.isEnded()) {
+            if (cursor.isEnded() && cursor.moreMimeParts()) {
                 monitor(Event.MIME_BODY_PREMATURE_END);
             } else {
                 if (cursor.moreMimeParts()) {
@@ -414,7 +415,7 @@ public class MimeTokenStream {
                     break;
                 case T_START_MULTIPART:
                     cursor.boundary(body.getBoundary());
-                    if (cursor.isEnded()) {
+                    if (cursor.isEnded() || raw) {
                         state = T_END_MULTIPART;
                     } else {
                         state = T_PREAMBLE;
@@ -449,6 +450,7 @@ public class MimeTokenStream {
                 case T_BODY:
                     return cursor.nextSection();
                 case T_START_MULTIPART:
+                    raw = true;
                     return cursor.rest();
                 default:
                     throw new IllegalStateException("Expected state to be either of T_RAW_ENTITY, T_PREAMBLE, or T_EPILOGUE.");
@@ -535,6 +537,16 @@ public class MimeTokenStream {
         Message(Cursor cursor, BodyDescriptor parent) {
             super(cursor, parent, T_START_MESSAGE, T_END_MESSAGE);
         }
+
+        InputStream read() {
+            switch (getState()) {
+            case T_EPILOGUE:
+                return cursor.root();
+            default:
+                return super.read();
+            }
+        }
+        
     }
 
     private class BodyPart extends Entity {

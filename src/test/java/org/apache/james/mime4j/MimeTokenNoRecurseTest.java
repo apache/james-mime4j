@@ -38,7 +38,7 @@ public class MimeTokenNoRecurseTest extends TestCase {
                 "--42\r\n" +
                 "Content-Type:text/plain; charset=US-ASCII\r\n\r\n" +
                 "Second part of this mail\r\n" +
-                "--42\r\n";
+                "--42--\r\n";
 
     private static final String MAIL_WITH_RFC822_PART = "MIME-Version: 1.0\r\n" +
             "From: Timothy Tayler <tim@example.org>\r\n" +

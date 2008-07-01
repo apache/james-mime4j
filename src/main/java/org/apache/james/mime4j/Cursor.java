@@ -112,4 +112,11 @@ public interface Cursor {
      * @return <code>InputStream</code>, not null
      */
     public InputStream rest();
+
+    /**
+     * Gets root stream for this message.
+     * @return <code>InputStream</code>, not null
+     */
+    public InputStream root();
+
 }

@@ -30,19 +30,21 @@ import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
  */
 public class StreamCursor implements Cursor {
 
-    final RootInputStream rootInputStream;
-    final InputStream contents;
-    MimeBoundaryInputStream mbis;
-    InputStream stream;
+    protected final InputBuffer buffer;
+    protected final BufferingInputStream bufferingInputStream;
+    protected final RootInputStream rootInputStream;
+    
+    protected MimeBoundaryInputStream mbis;
+    protected InputStream contentStream;
     
     /**
      * Constructs a child cursor.
      * @param parent <code>Cursor</code>, not null 
-     * @param contents <code>InputStream</code> contents, not null
      */
-    StreamCursor(StreamCursor parent, InputStream contents) {
+    StreamCursor(StreamCursor parent) {
+        this.buffer = parent.buffer;
+        this.bufferingInputStream = parent.bufferingInputStream;
         this.rootInputStream = parent.rootInputStream;
-        this.contents = contents;
     }
     
     /**
@@ -50,18 +52,22 @@ public class StreamCursor implements Cursor {
      * @param stream <code>InputStream</code>, not null
      */
     StreamCursor(InputStream stream) {
-        rootInputStream = new RootInputStream(stream);
-        contents = rootInputStream;
+        this.buffer = new InputBuffer(stream, 1024 * 4);
+        this.bufferingInputStream = new BufferingInputStream(this.buffer);
+        this.rootInputStream = new RootInputStream(this.bufferingInputStream);
+        this.contentStream = this.rootInputStream;
     }
     
     /**
-     * Constructs a cursor with the given root and contents.
-     * @param rootInputStream <code>RootInputStream</code>, not null
-     * @param contents <code>InputStream</code>, not null
+     * Constructs a cursor from the previous cursor.
+     * @param previous <code>StreamCursor</code>, not null
+     * @param contentStream <code>InputStream</code>, not null
      */
-    StreamCursor(RootInputStream rootInputStream, InputStream contents) {
-        this.rootInputStream = rootInputStream;
-        this.contents = contents;
+    StreamCursor(StreamCursor previous, InputStream contentStream) {
+        this.buffer = previous.buffer;
+        this.bufferingInputStream = previous.bufferingInputStream;
+        this.rootInputStream = previous.rootInputStream;
+        this.contentStream = contentStream;
     }
     
     /**
@@ -82,65 +88,61 @@ public class StreamCursor implements Cursor {
      * @see Cursor#decodeBase64()
      */
     public Cursor decodeBase64() throws IOException {
-        InputStream is = new EOLConvertingInputStream(new Base64InputStream(contents));
-        return new StreamCursor(rootInputStream, is);
+        return new StreamCursor(this, 
+                new EOLConvertingInputStream(new Base64InputStream(mbis)));
     }
     
     /**
      * @see Cursor#decodeQuotedPrintable()
      */
     public Cursor decodeQuotedPrintable() throws IOException {
-        InputStream is = new EOLConvertingInputStream(new QuotedPrintableInputStream(contents));
-        return new StreamCursor(rootInputStream, is);
+        return new StreamCursor(this, 
+                new EOLConvertingInputStream(new QuotedPrintableInputStream(mbis)));
     }
     
     /**
      * @see Cursor#advanceToBoundary()
      */
     public void advanceToBoundary() throws IOException {
-        mbis.consume();
-        stream = null;
+        byte[] tmp = new byte[2048];
+        while (mbis.read(tmp)!= -1) {
+        }
     }
 
     /**
      * @see Cursor#isEnded()
      */
     public boolean isEnded() throws IOException {
-        return mbis.parentEOF();
+        return mbis.eof();
     }
 
     /**
      * @see Cursor#moreMimeParts()
      */
     public boolean moreMimeParts() throws IOException {
-        return mbis.hasMoreParts();
+        return !mbis.isLastPart();
     }
 
     /**
      * @see Cursor#boundary(String)
      */
     public void boundary(String boundary) throws IOException {
-        mbis = new MimeBoundaryInputStream(contents, boundary);
-        stream = new CloseShieldInputStream(mbis);
+        mbis = new MimeBoundaryInputStream(buffer, boundary);
+        contentStream = new CloseShieldInputStream(mbis);
     }
 
     /**
      * @see Cursor#nextMimePartCursor()
      */
     public Cursor nextMimePartCursor() {
-        return new StreamCursor(rootInputStream, mbis);
+        return new StreamCursor(this, mbis);
     }
 
     /**
      * @see Cursor#nextSection()
      */
     public InputStream nextSection() {
-        InputStream result = stream;
-        if (result == null)
-        {
-            result = contents;
-        }
-        return result;
+        return contentStream;
     }
 
     /**
@@ -151,8 +153,11 @@ public class StreamCursor implements Cursor {
     }
 
     public InputStream rest() {
-        return contents;
+        return contentStream;
     }
-    
+
+    public InputStream root() {
+        return rootInputStream;
+    }
     
 }
