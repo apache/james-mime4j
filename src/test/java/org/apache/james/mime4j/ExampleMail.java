@@ -300,7 +300,40 @@ public class ExampleMail {
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n" + ONE_PART_MIME_ASCII_BODY;
     
-    
+    public static final String INNER_MAIL = "From: Timothy Tayler <tim@example.org>\r\n" +
+    "To: Joshua Tetley <joshua@example.org>\r\n" +
+    "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
+    "Subject: Multipart Without RFC822 Part\r\n" +
+    "Content-Type: multipart/mixed;boundary=42\r\n\r\n" +
+    "--42\r\n" +
+    "Content-Type:text/plain; charset=US-ASCII\r\n\r\n" +
+    "First part of this mail\r\n" +
+    "--42\r\n" +
+    "Content-Type:text/plain; charset=US-ASCII\r\n\r\n" +
+    "Second part of this mail\r\n" +
+    "--42--\r\n";
+
+    public static final String MAIL_WITH_RFC822_PART = "MIME-Version: 1.0\r\n" +
+    "From: Timothy Tayler <tim@example.org>\r\n" +
+    "To: Joshua Tetley <joshua@example.org>\r\n" +
+    "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
+    "Subject: Multipart With RFC822 Part\r\n" +
+    "Content-Type: multipart/mixed;boundary=1729\r\n\r\n" +
+    "A short premable\r\n" +
+    "--1729\r\n\r\n" +
+    "First part has no headers\r\n" +
+    "--1729\r\n" +
+    "Content-Type: text/plain; charset=US-ASCII\r\n\r\n" +
+    "Second part is plain text\r\n" +
+    "--1729\r\n" +
+    "Content-Type: message/rfc822\r\n\r\n" +
+    INNER_MAIL +
+    "--1729\r\n" +
+    "Content-Type: text/plain; charset=US-ASCII\r\n\r\n" +
+    "Last part is plain text\r\n" +
+    "--1729--\r\n" +
+    "The End";
+        
     public static final String ONE_PART_MIME_8859 = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
     "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
     "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
@@ -488,7 +521,7 @@ public class ExampleMail {
     public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES = US_ASCII.encode(MULTIPART_WITH_BINARY_ATTACHMENTS).array();
     public static final byte[] ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION).array();
     public static final byte[] ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES).array();
-    
+    public static final byte[] MAIL_WITH_RFC822_PART_BYTES = ascii(MAIL_WITH_RFC822_PART);
 
     public static final byte[] ascii(String text) {
         

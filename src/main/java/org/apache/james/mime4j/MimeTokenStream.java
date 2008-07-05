@@ -213,7 +213,9 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      */
     public void setRecursionMode(int mode) {
         recursionMode = mode;
-        currentStateMachine.setRecursionMode(mode);
+        if (currentStateMachine != null) {
+            currentStateMachine.setRecursionMode(mode);
+        }
     }
 
     /**
