@@ -19,24 +19,18 @@
 package org.apache.james.mime4j;
 
 /**
- * Describes <a href='http://tools.ietf.org/html/rfc2557'>RFC2557</a>  
- * <code>Content-Location</code>.
+ * Describes <a href='http://tools.ietf.org/html/rfc1864'>RFC1864</a>  
+ * <code>Content-MD5</code>.
  */
-public interface RFC2557ContentLocationDescriptor {
+public interface RFC1864ContentMD5Descriptor {
 
     /**
-     * Get the <code>content-location</code> header value.
-     * See <a href='http://tools.ietf.org/html/rfc2557'>RFC2557</a> 
-     * @return the URL content-location
+     * Gets the raw, Base64 encoded value of the
+     * <code>Content-MD5</code> field.
+     * See <a href='http://tools.ietf.org/html/rfc1864'>RFC1864</a>.
+     * @return raw encoded content-md5
      * or null if no header exists
      */
-    public abstract String getContentLocation();
-
-    /**
-     * Gets any exception thrown during the parsing of {@link #getContentLanguage()}
-     * @return <code>ParseException</code> when the content-language parse fails,
-     * null otherwise
-     */
-    public abstract MimeException getContentLocationParseException();
+    public abstract String getContentMD5Raw();
 
 }

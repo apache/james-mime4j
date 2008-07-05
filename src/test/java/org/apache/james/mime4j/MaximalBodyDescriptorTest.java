@@ -135,6 +135,11 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         assertEquals("http://www.example.org/this/is/a/very/long/url/split/over/two/lines/", descriptor.getContentLocation());
     }
     
+    public void testContentMD5Url() throws Exception {
+        RFC1864ContentMD5Descriptor descriptor = describe(ExampleMail.ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS_BYTES);
+        assertEquals(ExampleMail.MD5_CONTENT, descriptor.getContentMD5Raw());
+    }
+    
     private MaximalBodyDescriptor describe(byte[] mail, int zeroBasedPart) throws Exception {
         ByteArrayInputStream bias = new ByteArrayInputStream(mail);
         parser.parse(bias);

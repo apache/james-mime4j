@@ -23,6 +23,7 @@ import java.util.Locale;
 
 public class ExampleMail {
     
+    public static final String MD5_CONTENT = "Q2hlY2sgSW50ZWdyaXR5IQ==";
     public static final String CONTENT_DESCRIPTION = "Blah blah blah";
     public static final String CONTENT_ID = "<f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>";
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
@@ -253,6 +254,7 @@ public class ExampleMail {
         "Content-Type: text/plain; charset=US-ASCII\r\n" +
         "Content-Transfer-Encoding: 7bit\r\n" +
         "Content-Disposition: inline; foo=bar; one=1; param=value;\r\n" +
+        "Content-MD5: " + MD5_CONTENT + "\r\n" +
         "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
         "\r\n" +
         ONE_PART_MIME_ASCII_BODY;

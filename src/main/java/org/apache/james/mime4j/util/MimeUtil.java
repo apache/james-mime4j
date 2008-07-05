@@ -101,6 +101,11 @@ public final class MimeUtil {
      * See <a href='http://www.faqs.org/rfcs/rfc2557.html'>RFC2557</a>.
      */
     public static final String MIME_HEADER_LOCATION = "content-location";
+    /**
+     * <code>Content-MD5</code> header (lower case).
+     * See <a href='http://www.faqs.org/rfcs/rfc1864.html'>RFC1864</a>.
+     */
+    public static final String MIME_HEADER_MD5 = "content-md5";
     
     private MimeUtil() {
         // this is an utility class to be used statically.

@@ -37,7 +37,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * 
  */
 public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045MimeDescriptor, 
-        RFC2183ContentDispositionDescriptor, RFC3066ContentLanguageDescriptor, RFC2557ContentLocationDescriptor {
+        RFC2183ContentDispositionDescriptor, RFC3066ContentLanguageDescriptor, RFC2557ContentLocationDescriptor, RFC1864ContentMD5Descriptor {
 
     private static final int DEFAULT_MINOR_VERSION = 0;
     private static final int DEFAULT_MAJOR_VERSION = 1;
@@ -66,6 +66,8 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     private MimeException contentLocationParseException;
     private String contentLocation;
     private boolean isContentLocationSet;
+    private String contentMD5Raw;
+    private boolean isContentMD5Set;
     
     protected MaximalBodyDescriptor() {
         this(null);
@@ -97,6 +99,8 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         this.contentLocation = null;
         this.contentLocationParseException = null;
         this.isContentLocationSet = false;
+        this.contentMD5Raw = null;
+        this.isContentMD5Set = false;
     }
     
     public void addField(String name, String value) {
@@ -113,11 +117,20 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
             parseLanguage(value);
         } else if (MimeUtil.MIME_HEADER_LOCATION.equals(name) && !isContentLocationSet) {
             parseLocation(value);
+        } else if (MimeUtil.MIME_HEADER_MD5.equals(name) && !isContentMD5Set) {
+            parseMD5(value);
         } else {
             super.addField(name, value);
         }
     }
     
+    private void parseMD5(String value) {
+        isContentMD5Set = true;
+        if (value != null) {
+            contentMD5Raw = value.trim();
+        }
+    }
+
     private void parseLocation(final String value) {
         isContentLocationSet = true;
         if (value != null) {
@@ -373,4 +386,13 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     public MimeException getContentLocationParseException() {
         return contentLocationParseException;
     }
+    
+    /**
+     * @see org.apache.james.mime4j.RFC1864ContentMD5Descriptor#getContentMD5Raw()
+     */
+    public String getContentMD5Raw() {
+        return contentMD5Raw;
+    }
+    
+    
 } 
