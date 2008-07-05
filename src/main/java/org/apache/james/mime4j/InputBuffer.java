@@ -181,6 +181,11 @@ public class InputBuffer {
         return chunk;
     }
 
+    public void clear() {
+        this.bufpos = 0;
+        this.buflen = 0;
+    }
+    
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         buffer.append("[pos: ");

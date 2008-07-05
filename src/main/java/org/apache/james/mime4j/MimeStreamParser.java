@@ -33,7 +33,7 @@ import java.io.InputStream;
  *      ContentHandler handler = new MyHandler();
  *      MimeStreamParser parser = new MimeStreamParser();
  *      parser.setContentHandler(handler);
- *      parser.parse(new BufferedInputStream(new FileInputStream("mime.msg")));
+ *      parser.parse(new FileInputStream("mime.msg"));
  * </pre>
  * <strong>NOTE:</strong> All lines must end with CRLF 
  * (<code>\r\n</code>). If you are unsure of the line endings in your stream 

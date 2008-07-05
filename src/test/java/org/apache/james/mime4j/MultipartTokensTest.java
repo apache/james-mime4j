@@ -57,6 +57,7 @@ public class MultipartTokensTest extends TestCase {
     MESSAGE +
     "\r\n" +
     "--42\r\n" +
+    "\r\n" +
     "Custard!" +
     "\r\n" +
     "--42--\r\n";
@@ -157,6 +158,29 @@ public class MultipartTokensTest extends TestCase {
         checkState(MimeTokenStream.T_END_OF_STREAM);
     }
 
+    public void testMultipartMessageWithoutHeader() throws Exception {
+        parser.parseHeadless(new ByteArrayInputStream(US_ASCII.encode(BODY).array()), 
+                "multipart/mixed;boundary=1729");
+        checkState(MimeTokenStream.T_END_HEADER);
+        checkState(MimeTokenStream.T_START_MULTIPART);
+        checkState(MimeTokenStream.T_PREAMBLE);
+        checkState(MimeTokenStream.T_START_BODYPART);
+        checkState(MimeTokenStream.T_START_HEADER);
+        checkState(MimeTokenStream.T_END_HEADER);
+        checkState(MimeTokenStream.T_BODY);
+        checkState(MimeTokenStream.T_END_BODYPART);
+        checkState(MimeTokenStream.T_START_BODYPART);
+        checkState(MimeTokenStream.T_START_HEADER);
+        checkState(MimeTokenStream.T_FIELD);
+        checkState(MimeTokenStream.T_END_HEADER);
+        checkState(MimeTokenStream.T_BODY);
+        checkState(MimeTokenStream.T_END_BODYPART);
+        checkState(MimeTokenStream.T_EPILOGUE);
+        checkState(MimeTokenStream.T_END_MULTIPART);
+        checkState(MimeTokenStream.T_END_MESSAGE);
+        checkState(MimeTokenStream.T_END_OF_STREAM);
+    }
+    
     private void checkState(final int state) throws IOException, MimeException {
         assertEquals(MimeTokenStream.stateToString(state), MimeTokenStream.stateToString(parser.next()));
     }

@@ -27,13 +27,13 @@ package org.apache.james.mime4j;
 public class MimeParseEventException extends MimeException {
     
     private static final long serialVersionUID = 4632991604246852302L;
-    private final MimeTokenStream.Event event;
+    private final Event event;
     
     /**
      * Constructs an exception 
      * @param event <code>MimeTokenStream.Event</code>, not null
      */
-    public MimeParseEventException(final MimeTokenStream.Event event) {
+    public MimeParseEventException(final Event event) {
         super(event.toString());
         this.event = event;
     }
@@ -42,7 +42,7 @@ public class MimeParseEventException extends MimeException {
      * Gets the causal parse event.
      * @return <code>MimeTokenStream.Event</code>, not null
      */
-    public MimeTokenStream.Event getEvent() {
+    public Event getEvent() {
         return event;
     }
 }

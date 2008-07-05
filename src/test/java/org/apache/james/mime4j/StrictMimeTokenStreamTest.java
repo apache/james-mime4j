@@ -39,7 +39,7 @@ public class StrictMimeTokenStreamTest extends TestCase {
             parser.next();
             fail("Expected exception to be thrown");
         } catch (MimeParseEventException e) {
-            assertEquals("Premature end of headers", MimeTokenStream.Event.HEADERS_PREMATURE_END, e.getEvent());
+            assertEquals("Premature end of headers", Event.HEADERS_PREMATURE_END, e.getEvent());
         }
      }
     
