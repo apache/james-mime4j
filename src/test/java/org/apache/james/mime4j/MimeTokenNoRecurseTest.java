@@ -139,6 +139,37 @@ public class MimeTokenNoRecurseTest extends TestCase {
         nextIs(MimeTokenStream.T_EPILOGUE);
         nextIs(MimeTokenStream.T_END_MULTIPART);
     }
+    
+    public void testWhenNoRecurseInputStreamShouldContainInnerMail() throws Exception {
+        stream.setRecursionMode(MimeTokenStream.M_NO_RECURSE);
+        nextIs(MimeTokenStream.T_START_HEADER);
+        nextIs(MimeTokenStream.T_FIELD);
+        nextIs(MimeTokenStream.T_FIELD);
+        nextIs(MimeTokenStream.T_FIELD);
+        nextIs(MimeTokenStream.T_FIELD);
+        nextIs(MimeTokenStream.T_FIELD);
+        nextIs(MimeTokenStream.T_FIELD);
+        nextIs(MimeTokenStream.T_END_HEADER);
+        
+        nextIs(MimeTokenStream.T_START_MULTIPART);
+        nextIs(MimeTokenStream.T_PREAMBLE);
+        nextShouldBeStandardPart(false);
+        
+        nextShouldBeStandardPart(true);
+        nextIs(MimeTokenStream.T_START_BODYPART);
+        nextIs(MimeTokenStream.T_START_HEADER);
+        nextIs(MimeTokenStream.T_FIELD);
+        nextIs(MimeTokenStream.T_END_HEADER);
+        nextIs(MimeTokenStream.T_BODY);
+        InputStream inputStream = stream.getInputStream();
+        int next = inputStream.read();
+        int i=0;
+        while (next != -1) {
+            assertEquals("@" + i, INNER_MAIL.charAt(i++), (char) next);
+            next = inputStream.read();
+        }
+        assertEquals(INNER_MAIL.length()-2, i);
+    }
 
     private void nextShouldBeStandardPart(boolean withHeader) throws Exception {
         nextIs(MimeTokenStream.T_START_BODYPART);
