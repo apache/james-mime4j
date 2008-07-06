@@ -56,10 +56,15 @@ public interface ContentDescriptor {
     String getSubType();
     
     /**
-     * The body descriptors character set.
+     * <p>The body descriptors character set, defaulted appropriately for the MIME type.</p>
+     * <p>
+     * For <code>TEXT</code> types, this will be defaulted to <code>us-ascii</code>.
+     * For other types, when the charset parameter is missing this property will be null.
+     * </p>
      * @return Character set, which has been parsed from the
-     *   content-type definition. Must not be null, but "US-ASCII",
-     *   if no content-type was specified.
+     *   content-type definition. Not null for <code>TEXT</code> types, when unset will
+     *   be set to default <code>us-ascii</code>. For other types, when unset,
+     *   null will be returnedsvn s
      */
     String getCharset();
 

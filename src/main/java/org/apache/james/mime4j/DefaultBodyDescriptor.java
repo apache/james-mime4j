@@ -33,6 +33,8 @@ import org.apache.james.mime4j.util.MimeUtil;
  * @version $Id: BodyDescriptor.java,v 1.4 2005/02/11 10:08:37 ntherning Exp $
  */
 public class DefaultBodyDescriptor implements MutableBodyDescriptor {
+    private static final String US_ASCII = "us-ascii";
+
     private static final String SUB_TYPE_EMAIL = "rfc822";
 
     private static final String MEDIA_TYPE_TEXT = "text";
@@ -53,7 +55,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
     private String subType = DEFAULT_SUB_TYPE;
     private String mimeType = DEFAULT_MIME_TYPE;
     private String boundary = null;
-    private String charset = "us-ascii";
+    private String charset = US_ASCII;
     private String transferEncoding = "7bit";
     private Map parameters = new HashMap();
     private boolean contentTypeSet;
@@ -158,11 +160,15 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
         }
         
         String c = (String) params.get("charset");
+        charset = null;
         if (c != null) {
             c = c.trim();
             if (c.length() > 0) {
                 charset = c.toLowerCase();
             }
+        }
+        if (charset == null && MEDIA_TYPE_TEXT.equals(mediaType)) {
+            charset = US_ASCII;
         }
         
         /*

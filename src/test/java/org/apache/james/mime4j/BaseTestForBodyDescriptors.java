@@ -146,12 +146,12 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
          */
         bd = newBodyDescriptor();
         assertEquals("us-ascii", bd.getCharset());
-        bd.addField("Content-Type ", "some/type; charset=ISO-8859-1");
+        bd.addField("Content-Type ", "text/type; charset=ISO-8859-1");
         assertEquals("iso-8859-1", bd.getCharset());
         
         bd = newBodyDescriptor();
         assertEquals("us-ascii", bd.getCharset());
-        bd.addField("Content-Type ", "some/type");
+        bd.addField("Content-Type ", "text/type");
         assertEquals("us-ascii", bd.getCharset());
         
         /*
@@ -184,5 +184,16 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         assertEquals("\"hepp\"  =us\t-ascii", bd.getCharset());
         
     }
+    
+    public void testDoDefaultToUsAsciiWhenUntyped() throws Exception {
+        MutableBodyDescriptor descriptor = newBodyDescriptor();
+        descriptor.addField("To", "me@example.org");
+        assertEquals("us-ascii", descriptor.getCharset());
+    }
 
+    public void testDoNotDefaultToUsAsciiForNonTextTypes() throws Exception {
+        MutableBodyDescriptor descriptor = newBodyDescriptor();
+        descriptor.addField("Content-Type", "image/png; name=blob.png");
+        assertNull(descriptor.getCharset());
+    }
 }
