@@ -23,11 +23,111 @@ import java.util.Locale;
 
 public class ExampleMail {
     
+    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MULTIPART_MIXED = "--4.66920160910299\r\n" + 
+            "Content-Type: image/gif\r\n" + 
+            "Content-Transfer-Encoding: base64\r\n" + 
+            "MIME-Version: 1.0\r\n" + 
+            "Content-ID: 238478934723847238947892374\r\n" + 
+            "Content-Description: Bogus Image Data\r\n" + 
+            "\r\n" + 
+            "ABCDFEGHIJKLMNO\r\n" + 
+            "\r\n" + 
+            "--4.66920160910299\r\n" + 
+            "Content-Type: message/rfc822\r\n" + 
+            "\r\n" + 
+            "From: Timothy Tayler <timothy@example.org>\r\n" + 
+            "To: John Smith <john@example.org>\r\n" + 
+            "Date: Sat, 16 Feb 2008 12:00:00 +0000 (GMT)\r\n" + 
+            "Subject: Another Example Email\r\n" + 
+            "Content-Type: multipart/mixed;boundary=2.50290787509\r\n" + 
+            "\r\n" + 
+            "Yet another preamble\r\n" + 
+            "\r\n" + 
+            "--2.50290787509\r\n" + 
+            "Content-Type: text/plain\r\n" + 
+            "\r\n" + 
+            "Rhubard AND Custard!\r\n" + 
+            "\r\n" + 
+            "--2.50290787509\r\n" + 
+            "Content-Type: multipart/alternative;boundary=3.243F6A8885A308D3\r\n" + 
+            "\r\n" + 
+            "--3.243F6A8885A308D3\r\n" + 
+            "Content-Type: text/plain\r\n" + 
+            "\r\n" + 
+            "Rhubard?Custard?\r\n" + 
+            "\r\n" + 
+            "--3.243F6A8885A308D3\r\n" + 
+            "\r\n" + 
+            "Content-Type: text/richtext\r\n" + 
+            "\r\n" + 
+            "Rhubard?Custard?\r\n" + 
+            "\r\n" + 
+            "--3.243F6A8885A308D3--\r\n" + 
+            "\r\n" + 
+            "--2.50290787509--\r\n" + 
+            "\r\n" + 
+            "--4.66920160910299--";
+
+    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MAIL = "From: Timothy Tayler <timothy@example.org>\r\n" + 
+            "To: Samual Smith <samual@example.org>\r\n" + 
+            "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" + 
+            "Subject: A Multipart Alternative Email\r\n" + 
+            "Content-Type: multipart/alternative;boundary=42\r\n" + 
+            "\r\n" + 
+            "This message has a premable\r\n" + 
+            "\r\n" + 
+            "--42\r\n" + 
+            "Content-Type: text/plain; charset=US-ASCII\r\n" + 
+            "\r\n" + 
+            "Custard!\r\n" + 
+            "\r\n" + 
+            "--42\r\n" + 
+            "Content-Type: application/octet-stream\r\n" + 
+            "\r\n" + 
+            "CUSTARDCUSTARDCUSTARD\r\n" + 
+            "\r\n" + 
+            "--42--\r\n";
+
+    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_BODY = "Start with a preamble\r\n" + 
+            "\r\n" + 
+            "--1729\r\n" + 
+            "Content-Type: text/plain; charset=US-ASCII\r\n" + 
+            "\r\n" + 
+            "Rhubarb!\r\n" + 
+            "\r\n" + 
+            "--1729\r\n" + 
+            "Content-Type: application/octet-stream\r\n" + 
+            "Content-Transfer-Encoding: base64\r\n" + 
+            "\r\n" + 
+            "987654321AHPLA\r\n" + 
+            "\r\n" + 
+            "--1729\r\n" + 
+            "Content-Type: message/rfc822\r\n" + 
+            "\r\n" + 
+            MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MAIL + 
+            "\r\n" + 
+            "--1729\r\n" + 
+            "Content-Type: multipart/mixed; boundary=4.66920160910299\r\n" + 
+            "\r\n" + 
+            MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MULTIPART_MIXED + "\r\n" +
+            "--1729--\r\n" + 
+            "\r\n";
+    
     public static final String MD5_CONTENT = "Q2hlY2sgSW50ZWdyaXR5IQ==";
     public static final String CONTENT_DESCRIPTION = "Blah blah blah";
     public static final String CONTENT_ID = "<f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>";
     public static final Charset US_ASCII = Charset.forName("US-ASCII");
     public static final Charset LATIN1 = Charset.forName("ISO-8859-1");
+    
+    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES = 
+        "From: Timothy Tayler <timothy@example.org>\r\n" + 
+        "To: Samual Smith <samual@example.org>\r\n" + 
+        "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" + 
+        "Subject: A Multipart Email\r\n" + 
+        "Content-Type: multipart/mixed;boundary=1729\r\n" + 
+        "\r\n" + 
+        MIME_MULTIPART_EMBEDDED_MESSAGES_BODY; 
+
     
     public static final String MULTIPART_WITH_CONTENT_LOCATION = 
         "From: Timothy Tayler <timothy@example.org>\r\n" +
@@ -524,7 +624,8 @@ public class ExampleMail {
     public static final byte[] ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION).array();
     public static final byte[] ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES).array();
     public static final byte[] MAIL_WITH_RFC822_PART_BYTES = ascii(MAIL_WITH_RFC822_PART);
-
+    public static final byte[] MIME_MULTIPART_EMBEDDED_MESSAGES_BYTES = ascii(MIME_MULTIPART_EMBEDDED_MESSAGES);
+    
     public static final byte[] ascii(String text) {
         
         return US_ASCII.encode(text).array();

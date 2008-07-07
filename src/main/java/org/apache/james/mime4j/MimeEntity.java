@@ -93,7 +93,9 @@ public class MimeEntity extends AbstractEntity {
             break;
         case EntityStates.T_END_HEADER:
             String mimeType = body.getMimeType();
-            if (MimeUtil.isMultipart(mimeType)) {
+            if (recursionMode == RecursionMode.M_FLAT) {
+                state = EntityStates.T_BODY;
+            } else if (MimeUtil.isMultipart(mimeType)) {
                 state = EntityStates.T_START_MULTIPART;
                 clearMimeStream();
             } else if (recursionMode != RecursionMode.M_NO_RECURSE 

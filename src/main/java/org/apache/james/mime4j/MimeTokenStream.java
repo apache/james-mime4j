@@ -156,6 +156,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
             currentStateMachine = rawentity;
             break;
         case M_NO_RECURSE:
+        case M_FLAT:
             // expected to be called only at start of paring
         case M_RECURSE:
             MimeEntity mimeentity = new MimeEntity(

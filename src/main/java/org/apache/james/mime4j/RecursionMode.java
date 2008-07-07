@@ -39,5 +39,11 @@ public interface RecursionMode {
      * @see #getRecursionMode() 
      */
     public static final int M_RAW = 2;
+    /**
+     * Do not recurse <code>message/rfc822</code> parts
+     * and treat multiparts as a single flat body. 
+     * @see #getRecursionMode()
+     */
+    public static final int M_FLAT = 3;
     
 }
