@@ -58,4 +58,14 @@ public class InputBufferTest extends TestCase {
         assertEquals(-1, i);
     }
     
+    public void testPatternMatching4() throws Exception {
+        String text = "bla bla yada yada haha haha";
+        String pattern = "bla";
+        byte[] b1 = text.getBytes("US-ASCII");
+        byte[] b2 = pattern.getBytes("US-ASCII");
+        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        inbuffer.fillBuffer();
+        int i = inbuffer.indexOf(b2);
+        assertEquals(0, i);
+    }
 }
