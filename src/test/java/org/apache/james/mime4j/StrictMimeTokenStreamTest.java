@@ -35,6 +35,7 @@ public class StrictMimeTokenStreamTest extends TestCase {
         parser.parse(new ByteArrayInputStream(HEADER_ONLY.getBytes()));
         
         assertEquals("Headers start", MimeTokenStream.T_START_HEADER, parser.next());
+        assertEquals("Field", MimeTokenStream.T_FIELD, parser.next());
         try {
             parser.next();
             fail("Expected exception to be thrown");

@@ -13,6 +13,9 @@ public final class Event {
     public static final Event HEADERS_PREMATURE_END 
         = new Event("Unexpected end of headers detected. " +
                 "Higher level boundary detected or EOF reached.");
+    /** Indicates that unexpected end of headers detected.*/
+    public static final Event INALID_HEADER 
+        = new Event("Invalid header encountered");
     
     private final String code;
     

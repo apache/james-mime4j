@@ -18,12 +18,13 @@ public class MimeEntity extends AbstractEntity {
      */
     private static final int T_IN_MESSAGE = -3;
 
-    private final InputBuffer inbuffer;
+    private final RootInputStream rootStream;
     private final InputStream rawStream;
+    private final InputBuffer inbuffer;
     
     private int recursionMode;
     private MimeBoundaryInputStream mimeStream;
-    private EOFSensitiveInputStream dataStream;
+    private BufferingInputStreamAdaptor dataStream;
     private boolean skipHeader;
     
     public MimeEntity(
@@ -35,10 +36,11 @@ public class MimeEntity extends AbstractEntity {
             int endState,
             boolean maximalBodyDescriptor,
             boolean strictParsing) {
-        super(rootStream, parent, startState, endState, maximalBodyDescriptor, strictParsing);
+        super(parent, startState, endState, maximalBodyDescriptor, strictParsing);
+        this.rootStream = rootStream;
         this.inbuffer = inbuffer;
         this.rawStream = rawStream;
-        this.dataStream = new EOFSensitiveInputStream(rawStream);
+        this.dataStream = new BufferingInputStreamAdaptor(rawStream);
         this.skipHeader = false;
     }
 
@@ -68,7 +70,11 @@ public class MimeEntity extends AbstractEntity {
         body.addField("Content-Type", contentType);
     }
     
-    protected InputStream getDataStream() {
+    protected int getLineNumber() {
+        return rootStream.getLineNumber();
+    }
+    
+    protected BufferingInputStream getDataStream() {
         return dataStream;
     }
     
@@ -85,9 +91,6 @@ public class MimeEntity extends AbstractEntity {
             state = EntityStates.T_START_HEADER;
             break;
         case EntityStates.T_START_HEADER:
-            initHeaderParsing();
-            state = parseField() ? EntityStates.T_FIELD : EntityStates.T_END_HEADER;
-            break;
         case EntityStates.T_FIELD:
             state = parseField() ? EntityStates.T_FIELD : EntityStates.T_END_HEADER;
             break;
@@ -160,12 +163,12 @@ public class MimeEntity extends AbstractEntity {
 
     private void createMimeStream() throws IOException {
         mimeStream = new MimeBoundaryInputStream(inbuffer, body.getBoundary());
-        dataStream = new EOFSensitiveInputStream(mimeStream); 
+        dataStream = new BufferingInputStreamAdaptor(mimeStream); 
     }
     
     private void clearMimeStream() {
         mimeStream = null;
-        dataStream = new EOFSensitiveInputStream(rawStream); 
+        dataStream = new BufferingInputStreamAdaptor(rawStream); 
     }
     
     private void advanceToBoundary() throws IOException {
@@ -181,12 +184,10 @@ public class MimeEntity extends AbstractEntity {
         InputStream instream;
         if (MimeUtil.isBase64Encoding(transferEncoding)) {
             log.debug("base64 encoded message/rfc822 detected");
-            instream = new EOLConvertingInputStream(
-                    new Base64InputStream(mimeStream));                    
+            instream = new Base64InputStream(mimeStream);                    
         } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
             log.debug("quoted-printable encoded message/rfc822 detected");
-            instream = new EOLConvertingInputStream(
-                    new QuotedPrintableInputStream(mimeStream));                    
+            instream = new QuotedPrintableInputStream(mimeStream);                    
         } else {
             instream = dataStream;
         }

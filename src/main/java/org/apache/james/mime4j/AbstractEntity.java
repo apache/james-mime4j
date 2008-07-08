@@ -20,11 +20,11 @@
 package org.apache.james.mime4j;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.BitSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.util.MessageUtils;
 
 /**
  * Abstract MIME entity.
@@ -33,7 +33,6 @@ public abstract class AbstractEntity implements EntityStateMachine {
 
     protected final Log log;
     
-    protected final RootInputStream rootStream;
     protected final BodyDescriptor parent;
     protected final int startState;
     protected final int endState;
@@ -43,12 +42,12 @@ public abstract class AbstractEntity implements EntityStateMachine {
     
     protected int state;
 
-    private final StringBuffer sb = new StringBuffer();
-    
-    private int pos, start;
-    private int lineNumber, startLineNumber;
-    
+    private final ByteArrayBuffer linebuf;
+    private final CharArrayBuffer fieldbuf;
+
+    private int lineCount;
     private String field, fieldName, fieldValue;
+    private boolean endOfHeader;
 
     private static final BitSet fieldChars = new BitSet();
 
@@ -71,14 +70,12 @@ public abstract class AbstractEntity implements EntityStateMachine {
     private static final int T_IN_MESSAGE = -3;
 
     AbstractEntity(
-            RootInputStream rootStream,
             BodyDescriptor parent,
             int startState, 
             int endState,
             boolean maximalBodyDescriptor,
             boolean strictParsing) {
         this.log = LogFactory.getLog(getClass());        
-        this.rootStream = rootStream;
         this.parent = parent;
         this.state = startState;
         this.startState = startState; 
@@ -86,6 +83,10 @@ public abstract class AbstractEntity implements EntityStateMachine {
         this.maximalBodyDescriptor = maximalBodyDescriptor;
         this.strictParsing = strictParsing;
         this.body = newBodyDescriptor(parent);
+        this.linebuf = new ByteArrayBuffer(64);
+        this.fieldbuf = new CharArrayBuffer(64);
+        this.lineCount = 0;
+        this.endOfHeader = false;
     }
 
     public int getState() {
@@ -106,83 +107,92 @@ public abstract class AbstractEntity implements EntityStateMachine {
         }
         return result;
     }
-    
-    protected abstract InputStream getDataStream();
-    
-    protected void initHeaderParsing() throws IOException, MimeException {
-        startLineNumber = lineNumber = rootStream.getLineNumber();
 
-        InputStream instream = getDataStream();
-        
-        int curr = 0;
-        int prev = 0;
-        while ((curr = instream.read()) != -1) {
-            if (curr == '\n' && (prev == '\n' || prev == 0)) {
-                /*
-                 * [\r]\n[\r]\n or an immediate \r\n have been seen.
-                 */
-                sb.deleteCharAt(sb.length() - 1);
+    protected abstract int getLineNumber();
+    
+    protected abstract BufferingInputStream getDataStream();
+    
+    private void fillFieldBuffer() throws IOException, MimeException {
+        if (endOfHeader) {
+            return;
+        }
+        BufferingInputStream instream = getDataStream();
+        fieldbuf.clear();
+        for (;;) {
+            // If there's still data stuck in the line buffer
+            // copy it to the field buffer
+            int len = linebuf.length();
+            if (len > 0) {
+                fieldbuf.append(linebuf, 0, len);
+            }
+            linebuf.clear();
+            if (instream.readLine(linebuf) == -1) {
+                monitor(Event.HEADERS_PREMATURE_END);
+                endOfHeader = true;
                 break;
             }
-            sb.append((char) curr);
-            prev = curr == '\r' ? prev : curr;
-        }
-        
-        if (curr == -1) {
-            monitor(Event.HEADERS_PREMATURE_END);
+            len = linebuf.length();
+            if (len > 0 && linebuf.byteAt(len - 1) == '\n') {
+                len--;
+            }
+            if (len > 0 && linebuf.byteAt(len - 1) == '\r') {
+                len--;
+            }
+            if (len == 0) {
+                // empty line detected 
+                endOfHeader = true;
+                break;
+            }
+            lineCount++;
+            if (lineCount > 1) {
+                int ch = linebuf.byteAt(0);
+                if (ch != MessageUtils.SP && ch != MessageUtils.HT) {
+                    // new header detected
+                    break;
+                }
+            }
         }
     }
 
-    protected boolean parseField() {
-        while (pos < sb.length()) {
-            while (pos < sb.length() && sb.charAt(pos) != '\r') {
-                pos++;
+    protected boolean parseField() throws IOException {
+        for (;;) {
+            if (endOfHeader) {
+                return false;
             }
-            if (pos < sb.length() - 1 && sb.charAt(pos + 1) != '\n') {
-                pos++;
-                continue;
+            fillFieldBuffer();
+            
+            // Strip away line delimiter
+            int len = fieldbuf.length();
+            if (len > 0 && fieldbuf.charAt(len - 1) == '\n') {
+                len--;
             }
-            if (pos >= sb.length() - 2 || fieldChars.get(sb.charAt(pos + 2))) {
-                /*
-                 * field should be the complete field data excluding the 
-                 * trailing \r\n.
-                 */
-                field = sb.substring(start, pos);
-                start = pos + 2;
-                
-                /*
-                 * Check for a valid field.
-                 */
-                int index = field.indexOf(':');
-                boolean valid = false;
-                if (index != -1 && fieldChars.get(field.charAt(0))) {
-                    valid = true;
-                    fieldName = field.substring(0, index).trim();
-                    for (int i = 0; i < fieldName.length(); i++) {
-                        if (!fieldChars.get(fieldName.charAt(i))) {
-                            valid = false;
-                            break;
-                        }
-                    }
-                    if (valid) {
-                        fieldValue = field.substring(index + 1);
-                        body.addField(fieldName, fieldValue);
-                        startLineNumber = lineNumber;
-                        pos += 2;
-                        lineNumber++;
-                        return true;
+            if (len > 0 && fieldbuf.charAt(len - 1) == '\r') {
+                len--;
+            }
+            fieldbuf.setLength(len);
+            
+            boolean valid = true;
+            field = fieldbuf.toString();
+            int pos = fieldbuf.indexOf(':');
+            if (pos == -1) {
+                monitor(Event.INALID_HEADER);
+                valid = false;
+            } else {
+                fieldName = fieldbuf.substring(0, pos);
+                for (int i = 0; i < fieldName.length(); i++) {
+                    if (!fieldChars.get(fieldName.charAt(i))) {
+                        monitor(Event.INALID_HEADER);
+                        valid = false;
+                        break;
                     }
                 }
-                if (log.isWarnEnabled()) {
-                    log.warn("Line " + startLineNumber 
-                            + ": Ignoring invalid field: '" + field.trim() + "'");
-                }
-                startLineNumber = lineNumber;
+                fieldValue = fieldbuf.substring(pos + 1, fieldbuf.length());
             }
-            pos += 2;
-            lineNumber++;
+            if (valid) {
+                body.addField(fieldName, fieldValue);            
+                return true;
+            }
         }
-        return false;
     }
 
     /**
@@ -278,7 +288,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * or for logging
      */
     protected String message(Event event) {
-        String preamble = "Line " + rootStream.getLineNumber() + ": ";
+        String preamble = "Line " + getLineNumber() + ": ";
         final String message;
         if (event == null) {
             message = "Event is unexpectedly null.";

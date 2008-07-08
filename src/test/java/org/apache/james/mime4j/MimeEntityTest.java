@@ -40,7 +40,7 @@ public class MimeEntityTest extends TestCase {
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
         RootInputStream rootStream = new RootInputStream(instream); 
         InputBuffer inbuffer = new InputBuffer(rootStream, 12); 
-        BufferingInputStream rawstream = new BufferingInputStream(inbuffer); 
+        BasicBufferingInputStream rawstream = new BasicBufferingInputStream(inbuffer); 
         
         MimeEntity entity = new MimeEntity(
                 rootStream,
@@ -129,7 +129,7 @@ public class MimeEntityTest extends TestCase {
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
         RootInputStream rootStream = new RootInputStream(instream); 
         InputBuffer inbuffer = new InputBuffer(rootStream, 24); 
-        BufferingInputStream rawstream = new BufferingInputStream(inbuffer); 
+        BasicBufferingInputStream rawstream = new BasicBufferingInputStream(inbuffer); 
         
         MimeEntity entity = new MimeEntity(
                 rootStream,
@@ -244,7 +244,7 @@ public class MimeEntityTest extends TestCase {
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
         RootInputStream rootStream = new RootInputStream(instream); 
         InputBuffer inbuffer = new InputBuffer(rootStream, 24); 
-        BufferingInputStream rawstream = new BufferingInputStream(inbuffer); 
+        BasicBufferingInputStream rawstream = new BasicBufferingInputStream(inbuffer); 
         
         MimeEntity entity = new MimeEntity(
                 rootStream,

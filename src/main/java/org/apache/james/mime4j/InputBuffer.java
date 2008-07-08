@@ -124,8 +124,13 @@ public class InputBuffer {
      * Communications of the ACM . 33(8):132-142.
      * </p>
      */
-    public int indexOf(final byte[] pattern) {
-        int len = this.buflen - this.bufpos;
+    public int indexOf(final byte[] pattern, int off, int len) {
+        if (pattern == null) {
+            throw new IllegalArgumentException("Pattern may not be null");
+        }
+        if (off < this.bufpos || len < 0 || off + len > this.buflen) {
+            throw new IndexOutOfBoundsException();
+        }
         if (len < pattern.length) {
             return -1;
         }
@@ -163,16 +168,55 @@ public class InputBuffer {
         return -1;
     }
     
-    public int length() {
-        return this.buflen;
+    /**
+     * Implements quick search algorithm as published by
+     * <p> 
+     * SUNDAY D.M., 1990, 
+     * A very fast substring search algorithm, 
+     * Communications of the ACM . 33(8):132-142.
+     * </p>
+     */
+    public int indexOf(final byte[] pattern) {
+        return indexOf(pattern, this.bufpos, this.buflen - this.bufpos);
+    }
+
+    public int indexOf(byte b, int off, int len) {
+        if (off < this.bufpos || len < 0 || off + len > this.buflen) {
+            throw new IndexOutOfBoundsException();
+        }
+        for (int i = off; i < off + len; i++) {
+            if (this.buffer[i] == b) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    public int indexOf(byte b) {
+        return indexOf(b, this.bufpos, this.buflen - this.bufpos);
     }
     
     public byte charAt(int pos) {
+        if (pos < this.bufpos || pos > this.buflen) {
+            throw new IndexOutOfBoundsException();
+        }
         return this.buffer[pos];
+    }
+    
+    public byte[] buf() {
+        return this.buffer;        
     }
     
     public int pos() {
         return this.bufpos;
+    }
+    
+    public int limit() {
+        return this.buflen;
+    }
+    
+    public int length() {
+        return this.buflen - this.bufpos;
     }
     
     public int skip(int n) {
@@ -191,7 +235,7 @@ public class InputBuffer {
         buffer.append("[pos: ");
         buffer.append(this.bufpos);
         buffer.append("]");
-        buffer.append("[len: ");
+        buffer.append("[limit: ");
         buffer.append(this.buflen);
         buffer.append("]");
         buffer.append("[");

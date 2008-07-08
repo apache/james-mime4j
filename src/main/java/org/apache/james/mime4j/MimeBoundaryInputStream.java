@@ -20,7 +20,6 @@
 package org.apache.james.mime4j;
 
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
  * Stream that constrains itself to a single MIME body part.
@@ -29,7 +28,7 @@ import java.io.InputStream;
  * 
  * @version $Id: MimeBoundaryInputStream.java,v 1.2 2004/11/29 13:15:42 ntherning Exp $
  */
-public class MimeBoundaryInputStream extends InputStream {
+public class MimeBoundaryInputStream extends BufferingInputStream {
 
     private final InputBuffer buffer;
     private final byte[] boundary;
@@ -122,12 +121,58 @@ public class MimeBoundaryInputStream extends InputStream {
         return buffer.read(b, off, chunk);
     }
 
+    public int readLine(final ByteArrayBuffer dst) throws IOException {
+        if (dst == null) {
+            throw new IllegalArgumentException("Destination buffer may not be null");
+        }
+        if (completed) {
+            return -1;
+        }
+        if (endOfStream() && !hasData()) {
+            skipBoundary();            
+            return -1;
+        }
+
+        int total = 0;
+        boolean found = false;
+        int bytesRead = 0;
+        while (!found) {
+            if (!hasData()) {
+                bytesRead = fillBuffer();
+                if (!hasData() && endOfStream()) {
+                    skipBoundary();
+                    bytesRead = -1;
+                    break;
+                }
+            }
+            int len = this.limit - this.buffer.pos();
+            int i = this.buffer.indexOf((byte)'\n', this.buffer.pos(), len);
+            int chunk;
+            if (i != -1) {
+                found = true;
+                chunk = i + 1 - this.buffer.pos();
+            } else {
+                chunk = len;
+            }
+            if (chunk > 0) {
+                dst.append(this.buffer.buf(), this.buffer.pos(), chunk);
+                this.buffer.skip(chunk);
+                total += chunk;
+            }
+        }
+        if (total == 0 && bytesRead == -1) {
+            return -1;
+        } else {
+            return total;
+        }
+    }
+    
     private boolean endOfStream() {
         return eof || atBoundary;
     }
     
     private boolean hasData() {
-        return limit > buffer.pos() && limit < buffer.length();
+        return limit > buffer.pos() && limit < buffer.limit();
     }
     
     private int fillBuffer() throws IOException {
@@ -149,9 +194,9 @@ public class MimeBoundaryInputStream extends InputStream {
             calculateBoundaryLen();
         } else {
             if (eof) {
-                limit = buffer.length();
+                limit = buffer.limit();
             } else {
-                limit = buffer.length() - (boundary.length + 1); 
+                limit = buffer.limit() - (boundary.length + 1); 
                                           // \r\n + (boundary - one char)
             }
         }
@@ -186,16 +231,8 @@ public class MimeBoundaryInputStream extends InputStream {
                     if (ch1 == '-' && ch2 == '-') {
                         this.lastPart = true;
                         buffer.skip(2);
-                        if (buffer.length() > 1) {
-                            ch1 = buffer.charAt(buffer.pos());
-                            ch2 = buffer.charAt(buffer.pos() + 1);
-                            if (ch1 == '\r' && ch2 == '\n') {
-                                buffer.skip(2);
-                            }
-                        }
-                    } else if (ch1 == '\r' && ch2 == '\n') {
-                        buffer.skip(2);
                     }
+                    skipLineDelimiter();                    
                     break;
                 } else {
                     fillBuffer();
@@ -204,6 +241,23 @@ public class MimeBoundaryInputStream extends InputStream {
                     break;
                 }
             }
+        }
+    }
+    
+    private void skipLineDelimiter() {
+        int ch1 = 0;
+        int ch2 = 0;
+        int len = buffer.length(); 
+        if (len > 0) {
+            ch1 = buffer.charAt(buffer.pos());
+        }
+        if (len > 1) {
+            ch2 = buffer.charAt(buffer.pos() + 1);
+        }
+        if (ch1 == '\r' && ch2 == '\n') {
+            buffer.skip(2);
+        } else if (ch1 == '\n') {
+            buffer.skip(1);
         }
     }
     

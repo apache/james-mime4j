@@ -20,6 +20,7 @@
 package org.apache.james.mime4j;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -39,6 +40,25 @@ public class MimeBoundaryInputStreamTest extends TestCase {
     public void testBasicReading() throws IOException {
         String text = "Line 1\r\nLine 2\r\n--boundary\r\n" +
                 "Line 3\r\nLine 4\r\n--boundary--";
+        
+        ByteArrayInputStream bis = new ByteArrayInputStream(text.getBytes("US-ASCII"));
+        
+        InputBuffer buffer = new InputBuffer(bis, 4096); 
+        
+        MimeBoundaryInputStream mime1 = new MimeBoundaryInputStream(buffer, "boundary");
+        assertEquals("Line 1\r\nLine 2", read(mime1, 5));
+        
+        assertFalse(mime1.isLastPart());
+        
+        MimeBoundaryInputStream mime2 = new MimeBoundaryInputStream(buffer, "boundary");
+        assertEquals("Line 3\r\nLine 4", read(mime2, 5));
+
+        assertTrue(mime2.isLastPart());
+    }
+    
+    public void testLenientLineDelimiterReading() throws IOException {
+        String text = "Line 1\r\nLine 2\n--boundary\n" +
+                "Line 3\r\nLine 4\n--boundary--\n";
         
         ByteArrayInputStream bis = new ByteArrayInputStream(text.getBytes("US-ASCII"));
         
@@ -215,5 +235,99 @@ public class MimeBoundaryInputStreamTest extends TestCase {
         buffer = new InputBuffer(bis, 4096); 
         stream = new MimeBoundaryInputStream(buffer, "boundary");
         assertEquals(-1, stream.read());
-    }    
+    }
+    
+    
+    public void testBasicReadLine() throws Exception {
+        
+        String[] teststrs = new String[5];
+        teststrs[0] = "Hello\r\n";
+        teststrs[1] = "This string should be much longer than the size of the input buffer " +
+                "which is only 20 bytes for this test\r\n";
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < 15; i++) {
+            sb.append("123456789 ");
+        }
+        sb.append("and stuff like that\r\n");
+        teststrs[2] = sb.toString();
+        teststrs[3] = "\r\n";
+        teststrs[4] = "And goodbye\r\n";
+
+        String term = "\r\n--1234\r\n";
+        
+        ByteArrayOutputStream outstream = new ByteArrayOutputStream();
+        
+        for (int i = 0; i < teststrs.length; i++) {
+            outstream.write(teststrs[i].getBytes("US-ASCII"));
+        }
+        outstream.write(term.getBytes("US-ASCII"));
+        byte[] raw = outstream.toByteArray();
+        
+        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(raw), 20); 
+        BufferingInputStream instream = new MimeBoundaryInputStream(inbuffer, "1234"); 
+        
+        ByteArrayBuffer linebuf = new ByteArrayBuffer(8); 
+        for (int i = 0; i < teststrs.length; i++) {
+            linebuf.clear();
+            instream.readLine(linebuf);
+            String s = new String(linebuf.toByteArray(), "US-ASCII");
+            assertEquals(teststrs[i], s);
+        }
+        assertEquals(-1, instream.readLine(linebuf));
+        assertEquals(-1, instream.readLine(linebuf));
+    }
+    
+    public void testReadEmptyLine() throws Exception {
+        
+        String teststr = "01234567890123456789\n\n\r\n\r\r\n\n\n\n\n\n--1234\r\n";
+        byte[] raw = teststr.getBytes("US-ASCII");
+        
+        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(raw), 20); 
+        BufferingInputStream instream = new MimeBoundaryInputStream(inbuffer, "1234"); 
+        
+        ByteArrayBuffer linebuf = new ByteArrayBuffer(8); 
+        linebuf.clear();
+        instream.readLine(linebuf);
+        String s = new String(linebuf.toByteArray(), "US-ASCII");
+        assertEquals("01234567890123456789\n", s);
+        
+        linebuf.clear();
+        instream.readLine(linebuf);
+        s = new String(linebuf.toByteArray(), "US-ASCII");
+        assertEquals("\n", s);
+        
+        linebuf.clear();
+        instream.readLine(linebuf);
+        s = new String(linebuf.toByteArray(), "US-ASCII");
+        assertEquals("\r\n", s);
+
+        linebuf.clear();
+        instream.readLine(linebuf);
+        s = new String(linebuf.toByteArray(), "US-ASCII");
+        assertEquals("\r\r\n", s);
+
+        linebuf.clear();
+        instream.readLine(linebuf);
+        s = new String(linebuf.toByteArray(), "US-ASCII");
+        assertEquals("\n", s);
+
+        linebuf.clear();
+        instream.readLine(linebuf);
+        s = new String(linebuf.toByteArray(), "US-ASCII");
+        assertEquals("\n", s);
+
+        linebuf.clear();
+        instream.readLine(linebuf);
+        s = new String(linebuf.toByteArray(), "US-ASCII");
+        assertEquals("\n", s);
+
+        linebuf.clear();
+        instream.readLine(linebuf);
+        s = new String(linebuf.toByteArray(), "US-ASCII");
+        assertEquals("\n", s);
+
+        assertEquals(-1, instream.readLine(linebuf));
+        assertEquals(-1, instream.readLine(linebuf));
+    }
+    
 }

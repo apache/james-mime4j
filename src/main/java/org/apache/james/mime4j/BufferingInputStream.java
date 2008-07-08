@@ -23,31 +23,19 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Implementation of {@link InputStream} backed by an {@link InputBuffer} instance. 
+ * Input stream capable of reading lines of text. 
  */
-public class BufferingInputStream extends InputStream {
+public abstract class BufferingInputStream extends InputStream {
 
-    private final InputBuffer buffer;
-    
-    public BufferingInputStream(final InputBuffer buffer) {
-        super();
-        this.buffer = buffer;
-    }
-    
-    public void close() throws IOException {
-        this.buffer.closeStream();
-    }
-
-    public boolean markSupported() {
-        return false;
-    }
-
-    public int read() throws IOException {
-        return this.buffer.read();
-    }
-
-    public int read(byte[] b, int off, int len) throws IOException {
-        return this.buffer.read(b, off, len);
-    }
+    /**
+     * Reads one line of text into the given {@link ByteArrayBuffer}.
+     *  
+     * @param dst Destination
+     * @return number of bytes copied or <code>-1</code> if the end of 
+     * the stream has been reached.
+     * 
+     * @throws IOException in case of an I/O error.
+     */
+    public abstract int readLine(final ByteArrayBuffer dst) throws IOException;
     
 }
