@@ -85,5 +85,8 @@ public class BasicBufferingInputStream extends BufferingInputStream {
             return total;
         }
     }
+    
+    public void reset() {
+    }
 
 }

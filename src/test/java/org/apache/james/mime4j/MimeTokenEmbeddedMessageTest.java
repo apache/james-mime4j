@@ -21,7 +21,6 @@ package org.apache.james.mime4j;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 
 import junit.framework.TestCase;
 
@@ -40,7 +39,7 @@ public class MimeTokenEmbeddedMessageTest extends TestCase {
         super.tearDown();
     }
 
-    public void _testWhenRecurseShouldVisitInnerMailsAndInnerMultiparts() throws Exception {
+    public void testWhenRecurseShouldVisitInnerMailsAndInnerMultiparts() throws Exception {
         stream.setRecursionMode(MimeTokenStream.M_RECURSE);
 
         nextIs(MimeTokenStream.T_START_HEADER);
@@ -113,11 +112,14 @@ public class MimeTokenEmbeddedMessageTest extends TestCase {
         nextIs(MimeTokenStream.T_START_HEADER);
         nextIs(MimeTokenStream.T_FIELD);
         nextIs(MimeTokenStream.T_END_HEADER);
-        nextIs(MimeTokenStream.T_BODY);
+        nextIs(MimeTokenStream.T_START_MULTIPART);
         checkInputStream(ExampleMail.MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MULTIPART_MIXED);
+        nextIs(MimeTokenStream.T_END_MULTIPART);
         nextIs(MimeTokenStream.T_END_BODYPART);
         nextIs(MimeTokenStream.T_EPILOGUE);
         nextIs(MimeTokenStream.T_END_MULTIPART);
+        nextIs(MimeTokenStream.T_END_MESSAGE);
+        nextIs(MimeTokenStream.T_END_OF_STREAM);
     }
     
     

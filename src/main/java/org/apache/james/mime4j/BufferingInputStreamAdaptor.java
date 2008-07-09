@@ -97,4 +97,10 @@ class BufferingInputStreamAdaptor extends BufferingInputStream {
         return this.used;
     }
 
+    public void reset() {
+        if (this.bis != null) {
+            this.bis.reset();
+        }
+    }
+    
 }

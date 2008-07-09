@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.james.mime4j.AbstractContentHandler;
+import org.apache.james.mime4j.CharArrayBuffer;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeStreamParser;
 import org.apache.james.mime4j.field.ContentTypeField;
@@ -146,7 +147,7 @@ public class Header {
      * @return headers
      */
     public String toString() {
-        StringBuffer str = new StringBuffer();
+        CharArrayBuffer str = new CharArrayBuffer(128);
         for (Iterator it = fields.iterator(); it.hasNext();) {
             str.append(it.next().toString());
             str.append("\r\n");

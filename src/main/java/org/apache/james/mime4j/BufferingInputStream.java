@@ -38,4 +38,9 @@ public abstract class BufferingInputStream extends InputStream {
      */
     public abstract int readLine(final ByteArrayBuffer dst) throws IOException;
     
+    /**
+     * Resets the internal state.
+     */
+    public abstract void reset();
+    
 }

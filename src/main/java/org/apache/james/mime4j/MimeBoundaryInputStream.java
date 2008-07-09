@@ -49,7 +49,7 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
             throws IOException {
         this.buffer = inbuffer;
         this.eof = false;
-        this.limit = 0;
+        this.limit = -1;
         this.atBoundary = false;
         this.boundaryLen = 0;
         this.lastPart = false;
@@ -121,6 +121,14 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
         return buffer.read(b, off, chunk);
     }
 
+    /**
+     * Resets the internal state. This will force the boundary to be rescanned.
+     */
+    public void reset() {
+        atBoundary = false;
+        limit = -1;
+    }
+    
     public int readLine(final ByteArrayBuffer dst) throws IOException {
         if (dst == null) {
             throw new IllegalArgumentException("Destination buffer may not be null");

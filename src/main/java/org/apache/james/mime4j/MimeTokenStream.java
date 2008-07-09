@@ -64,11 +64,6 @@ import org.apache.james.mime4j.util.MimeUtil;
  *          }
  *      }
  * </pre>
- * <p>
- * <strong>NOTE:</strong> All lines must end with CRLF 
- * (<code>\r\n</code>). If you are unsure of the line endings in your stream 
- * you should wrap it in a {@link org.apache.james.mime4j.EOLConvertingInputStream}
- * instance.</p>
  * <p>Instances of {@link MimeTokenStream} are reusable: Invoking the
  * method {@link #parse(InputStream)} resets the token streams internal
  * state. However, they are definitely <em>not</em> thread safe. If you

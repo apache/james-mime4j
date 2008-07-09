@@ -212,6 +212,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
         case EntityStates.T_START_MULTIPART:
         case EntityStates.T_PREAMBLE:
         case EntityStates.T_EPILOGUE:
+        case EntityStates.T_END_OF_STREAM:
             return body;
         default:
             throw new IllegalStateException("Invalid state :" + stateToString(state));
@@ -322,7 +323,8 @@ public abstract class AbstractEntity implements EntityStateMachine {
     }
 
     public String toString() {
-        return "Current state: " + stateToString(state);
+        return getClass().getSimpleName() + " [" + stateToString(state)
+        + "][" + body.getMimeType() + "][" + body.getBoundary() + "]";
     }
 
     /**

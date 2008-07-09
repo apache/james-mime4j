@@ -25,6 +25,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.CharArrayBuffer;
 
 
 /**
@@ -167,7 +168,7 @@ public final class MimeUtil {
         /*
          * Unfold Content-Type value
          */
-        StringBuffer sb = new StringBuffer();
+        CharArrayBuffer sb = new CharArrayBuffer(128);
         for (int i = 0; i < pValue.length(); i++) {
             char c = pValue.charAt(i);
             if (c == '\r' || c == '\n') {
@@ -193,8 +194,8 @@ public final class MimeUtil {
         result.put("", main);
         if (rest != null) {
             char[] chars = rest.toCharArray();
-            StringBuffer paramName = new StringBuffer();
-            StringBuffer paramValue = new StringBuffer();
+            CharArrayBuffer paramName = new CharArrayBuffer(64);
+            CharArrayBuffer paramValue = new CharArrayBuffer(64);
 
             final byte READY_FOR_NAME = 0;
             final byte IN_NAME = 1;
@@ -222,8 +223,8 @@ public final class MimeUtil {
                             break;
                         }
 
-                        paramName = new StringBuffer();
-                        paramValue = new StringBuffer();
+                        paramName = new CharArrayBuffer(64);
+                        paramValue = new CharArrayBuffer(64);
 
                         state = IN_NAME;
                         // fall-through

@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.util.Stack;
 
 import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.CharArrayBuffer;
 import org.apache.james.mime4j.ContentHandler;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeStreamParser;
@@ -222,7 +223,7 @@ public class Message extends Entity implements Body {
          */
         public void epilogue(InputStream is) throws IOException {
             expect(Multipart.class);
-            StringBuffer sb = new StringBuffer();
+            CharArrayBuffer sb = new CharArrayBuffer(128);
             int b;
             while ((b = is.read()) != -1) {
                 sb.append((char) b);
@@ -235,7 +236,7 @@ public class Message extends Entity implements Body {
          */
         public void preamble(InputStream is) throws IOException {
             expect(Multipart.class);
-            StringBuffer sb = new StringBuffer();
+            CharArrayBuffer sb = new CharArrayBuffer(128);
             int b;
             while ((b = is.read()) != -1) {
                 sb.append((char) b);

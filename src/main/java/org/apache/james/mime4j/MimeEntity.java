@@ -27,6 +27,8 @@ public class MimeEntity extends AbstractEntity {
     private BufferingInputStreamAdaptor dataStream;
     private boolean skipHeader;
     
+    private byte[] tmpbuf;
+    
     public MimeEntity(
             RootInputStream rootStream,
             InputStream rawStream,
@@ -164,6 +166,11 @@ public class MimeEntity extends AbstractEntity {
     private void createMimeStream() throws IOException {
         mimeStream = new MimeBoundaryInputStream(inbuffer, body.getBoundary());
         dataStream = new BufferingInputStreamAdaptor(mimeStream); 
+        // If multipart message is embedded into another multipart message
+        // make sure to reset parent's mime stream
+        if (rawStream instanceof BufferingInputStream) {
+            ((BufferingInputStream) rawStream).reset();
+        }
     }
     
     private void clearMimeStream() {
@@ -173,8 +180,10 @@ public class MimeEntity extends AbstractEntity {
     
     private void advanceToBoundary() throws IOException {
         if (!dataStream.eof()) {
-            byte[] tmp = new byte[2048];
-            while (dataStream.read(tmp)!= -1) {
+            if (tmpbuf == null) {
+                tmpbuf = new byte[2048];
+            }
+            while (dataStream.read(tmpbuf)!= -1) {
             }
         }
     }
