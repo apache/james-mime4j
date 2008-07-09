@@ -35,16 +35,35 @@ import java.io.InputStream;
  *      parser.setContentHandler(handler);
  *      parser.parse(new FileInputStream("mime.msg"));
  * </pre>
- * <strong>NOTE:</strong> All lines must end with CRLF 
- * (<code>\r\n</code>). If you are unsure of the line endings in your stream 
- * you should wrap it in a {@link org.apache.james.mime4j.EOLConvertingInputStream} instance.
- *
  * 
  * @version $Id: MimeStreamParser.java,v 1.8 2005/02/11 10:12:02 ntherning Exp $
  */
 public class MimeStreamParser {
+
     private ContentHandler handler = null;
+    private boolean contentDecoding;
     private final MimeTokenStream mimeTokenStream = new MimeTokenStream();
+
+    public MimeStreamParser() {
+        super();
+        this.contentDecoding = false;
+    }
+    
+    /**
+     * Determines whether this parser automatically decodes body content
+     * based on the on the MIME fields with the standard defaults.
+     */ 
+    public boolean isContentDecoding() {
+        return contentDecoding;
+    }
+
+    /**
+     * Defines whether parser should automatically decode body content
+     * based on the on the MIME fields with the standard defaults.
+     */ 
+    public void setContentDecoding(boolean b) {
+        this.contentDecoding = b;
+    }
 
     /**
      * Parses a stream of bytes containing a MIME message.
@@ -59,7 +78,14 @@ public class MimeStreamParser {
             int state = mimeTokenStream.getState();
             switch (state) {
                 case MimeTokenStream.T_BODY:
-                    handler.body(mimeTokenStream.getBodyDescriptor(), mimeTokenStream.getInputStream());
+                    BodyDescriptor desc = mimeTokenStream.getBodyDescriptor();
+                    InputStream bodyContent;
+                    if (contentDecoding) {
+                        bodyContent = mimeTokenStream.getDecodedInputStream(); 
+                    } else {
+                        bodyContent = mimeTokenStream.getInputStream(); 
+                    }
+                    handler.body(desc, bodyContent);
                     break;
                 case MimeTokenStream.T_END_BODYPART:
                     handler.endBodyPart();

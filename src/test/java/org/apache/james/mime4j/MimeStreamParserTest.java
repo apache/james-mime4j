@@ -449,7 +449,45 @@ public class MimeStreamParserTest extends TestCase {
             }
         }
     }
+    
+    public void testAutomaticContentDecoding() throws Exception {
+        MimeStreamParser parser = new MimeStreamParser();
+        parser.setContentDecoding(true);
+        TestHandler handler = new TestHandler();
+        parser.setContentHandler(handler);
 
+        String msg = "Subject: Yada yada\r\n"
+                   + "From: foo@bar.com\r\n"
+                   + "Content-Type: application/octet-stream\r\n"
+                   + "Content-Transfer-Encoding: base64\r\n"
+                   + "\r\n"
+                   + "V2hvIGF0ZSBteSBjYWtlPwo=";
+        String expected = "<message>\r\n"
+                        + "<header>\r\n"
+                        + "<field>\r\n"
+                        + "Subject: Yada yada"
+                        + "</field>\r\n"
+                        + "<field>\r\n"
+                        + "From: foo@bar.com"
+                        + "</field>\r\n"
+                        + "<field>\r\n"
+                        + "Content-Type: application/octet-stream"
+                        + "</field>\r\n"
+                        + "<field>\r\n"
+                        + "Content-Transfer-Encoding: base64"
+                        + "</field>\r\n"
+                        + "</header>\r\n"
+                        + "<body>\r\n"
+                        + "Who ate my cake?\n"
+                        + "</body>\r\n"
+                        + "</message>\r\n";
+        
+        parser.parse(new ByteArrayInputStream(msg.getBytes()));
+        String result = handler.sb.toString();
+        
+        assertEquals(expected, result);
+    }
+    
     private static class TestHandler implements ContentHandler {
         private StringBuffer sb = new StringBuffer();
 

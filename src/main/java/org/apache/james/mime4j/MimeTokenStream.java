@@ -239,15 +239,40 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     }
 
     /**
+     * This method returns the raw entity, preamble, or epilogue contents.
+     * <p/>
      * This method is valid, if {@link #getState()} returns either of
      * {@link #T_RAW_ENTITY}, {@link #T_PREAMBLE}, or {@link #T_EPILOGUE}.
-     * It returns the raw entity, preamble, or epilogue contents.
+     * 
      * @return Data stream, depending on the current state.
      * @throws IllegalStateException {@link #getState()} returns an
      *   invalid value.
      */
     public InputStream getInputStream() {
         return currentStateMachine.getContentStream();
+    }
+    
+    /**
+     * This method returns a transfer decoded stream based on the MIME 
+     * fields with the standard defaults.
+     * <p/>
+     * This method is valid, if {@link #getState()} returns either of
+     * {@link #T_RAW_ENTITY}, {@link #T_PREAMBLE}, or {@link #T_EPILOGUE}.
+     * 
+     * @return Data stream, depending on the current state.
+     * @throws IllegalStateException {@link #getState()} returns an
+     *   invalid value.
+     */
+    public InputStream getDecodedInputStream() {
+        BodyDescriptor bodyDescriptor = getBodyDescriptor();
+        String transferEncoding = bodyDescriptor.getTransferEncoding();
+        InputStream dataStream = currentStateMachine.getContentStream();
+        if (MimeUtil.isBase64Encoding(transferEncoding)) {
+            dataStream = new Base64InputStream(dataStream);
+        } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
+            dataStream = new QuotedPrintableInputStream(dataStream);
+        }
+        return dataStream;
     }
 
     /**
@@ -270,25 +295,14 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     public Reader getReader() {
         final BodyDescriptor bodyDescriptor = getBodyDescriptor();
         final String mimeCharset = bodyDescriptor.getCharset();
-        final String transferEncoding = bodyDescriptor.getTransferEncoding();
         final Charset charset;
         if (mimeCharset == null || "".equals(mimeCharset)) {
             charset = Charset.forName("US-ASCII");
         } else {
             charset = Charset.forName(mimeCharset);
         }
-        
-        final InputStream inputStream;
-        final InputStream transferEncodedStream = getInputStream();
-        if (MimeUtil.isBase64Encoding(transferEncoding)) {
-            inputStream = new Base64InputStream(transferEncodedStream);
-        } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
-            inputStream = new QuotedPrintableInputStream(transferEncodedStream);
-        } else {
-            inputStream = transferEncodedStream;
-        }
-        final InputStreamReader result = new InputStreamReader(inputStream, charset);
-        return result;
+        final InputStream instream = getDecodedInputStream();
+        return new InputStreamReader(instream, charset);
     }
     
     /**
