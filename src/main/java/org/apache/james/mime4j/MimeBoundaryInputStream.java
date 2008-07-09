@@ -268,5 +268,12 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
     public boolean eof() {
         return eof && !buffer.hasBufferedData();
     }
-    
+
+    public String toString() {
+        final StringBuffer buffer = new StringBuffer("MimeBoundaryInputStream, boundary ");
+        for (int i = 0; i < boundary.length; i++) {
+            buffer.append((char) boundary[i]);
+        }
+        return buffer.toString();
+    }
 }
