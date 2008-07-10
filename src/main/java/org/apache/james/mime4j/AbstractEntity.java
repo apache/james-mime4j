@@ -323,7 +323,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
     }
 
     public String toString() {
-        return getClass().getSimpleName() + " [" + stateToString(state)
+        return getClass().getName() + " [" + stateToString(state)
         + "][" + body.getMimeType() + "][" + body.getBoundary() + "]";
     }
 
