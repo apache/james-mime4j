@@ -115,7 +115,7 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
         }
         fillBuffer();
         if (!hasData()) {
-            return 0;
+            return read(b, off, len);
         }
         int chunk = Math.min(len, limit - buffer.pos());
         return buffer.read(b, off, chunk);
