@@ -101,6 +101,49 @@ public class MultipartTokensTest extends TestCase {
         checkState(MimeTokenStream.T_END_OF_STREAM);
     }
     
+    public void testShouldParseMoreComplexMessage() throws Exception {
+        String message = 
+            "Content-Type: multipart/alternative; boundary=\"outer-boundary\"\r\n" +
+            "\r\n" +
+            "--outer-boundary\r\n" +
+            "Content-Type: multipart/alternative; boundary=\"inner-boundary\"\r\n" +
+            "\r\n" +
+            "--inner-boundary\r\n" +
+            "Content-Type: text/plain\r\n" +
+            "\r\n" +
+            "Some text\r\n" +
+            "--inner-boundary--\r\n" +
+            "\r\n" +
+            "foo\r\n" +
+            "--outer-boundary--\r\n";
+        
+        parser.parse(new ByteArrayInputStream(US_ASCII.encode(message).array()));
+        checkState(MimeTokenStream.T_START_HEADER);
+        checkState(MimeTokenStream.T_FIELD);
+        checkState(MimeTokenStream.T_END_HEADER);
+        checkState(MimeTokenStream.T_START_MULTIPART);
+        checkState(MimeTokenStream.T_PREAMBLE);
+        checkState(MimeTokenStream.T_START_BODYPART);
+        checkState(MimeTokenStream.T_START_HEADER);
+        checkState(MimeTokenStream.T_FIELD);
+        checkState(MimeTokenStream.T_END_HEADER);
+        checkState(MimeTokenStream.T_START_MULTIPART);
+        checkState(MimeTokenStream.T_PREAMBLE);
+        checkState(MimeTokenStream.T_START_BODYPART);
+        checkState(MimeTokenStream.T_START_HEADER);
+        checkState(MimeTokenStream.T_FIELD);
+        checkState(MimeTokenStream.T_END_HEADER);
+        checkState(MimeTokenStream.T_BODY);
+        checkState(MimeTokenStream.T_END_BODYPART);
+        checkState(MimeTokenStream.T_EPILOGUE);
+        checkState(MimeTokenStream.T_END_MULTIPART);
+        checkState(MimeTokenStream.T_END_BODYPART);
+        checkState(MimeTokenStream.T_EPILOGUE);
+        checkState(MimeTokenStream.T_END_MULTIPART);
+        checkState(MimeTokenStream.T_END_MESSAGE);
+        checkState(MimeTokenStream.T_END_OF_STREAM);
+    }
+    
     public void testShouldParseMessageWithEmbeddedMessage() throws Exception {
         parser.parse(new ByteArrayInputStream(US_ASCII.encode(COMPLEX_MESSAGE).array()));
         checkState(MimeTokenStream.T_START_HEADER);

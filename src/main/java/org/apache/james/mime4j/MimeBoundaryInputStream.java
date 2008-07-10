@@ -127,6 +127,7 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
     public void reset() {
         atBoundary = false;
         limit = -1;
+        eof = false;
     }
     
     public int readLine(final ByteArrayBuffer dst) throws IOException {
