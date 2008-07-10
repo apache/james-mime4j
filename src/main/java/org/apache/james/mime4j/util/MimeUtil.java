@@ -19,18 +19,16 @@
 
 package org.apache.james.mime4j.util;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.CharArrayBuffer;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.BodyDescriptor;
-import org.apache.james.mime4j.CharArrayBuffer;
-
 
 /**
- * A utility class, which provides some MIME related application logic,
- * depending on abstract objects like the {@link BodyDescriptor}.
+ * A utility class, which provides some MIME related application logic.
  */
 public final class MimeUtil {
     private static final Log log = LogFactory.getLog(MimeUtil.class);
