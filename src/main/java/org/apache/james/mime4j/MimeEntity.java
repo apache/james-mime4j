@@ -191,14 +191,18 @@ public class MimeEntity extends AbstractEntity {
     private EntityStateMachine nextMessage() {
         String transferEncoding = body.getTransferEncoding();
         InputStream instream;
+        InputBuffer buffer;
         if (MimeUtil.isBase64Encoding(transferEncoding)) {
             log.debug("base64 encoded message/rfc822 detected");
-            instream = new Base64InputStream(mimeStream);                    
+            instream = new Base64InputStream(dataStream);                    
+            buffer = new InputBuffer(instream, 4 * 1024);
         } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
             log.debug("quoted-printable encoded message/rfc822 detected");
-            instream = new QuotedPrintableInputStream(mimeStream);                    
+            instream = new QuotedPrintableInputStream(dataStream);                    
+            buffer = new InputBuffer(instream, 4 * 1024);
         } else {
             instream = dataStream;
+            buffer = inbuffer;
         }
         
         if (recursionMode == RecursionMode.M_RAW) {
@@ -208,7 +212,7 @@ public class MimeEntity extends AbstractEntity {
             MimeEntity message = new MimeEntity(
                     rootStream, 
                     instream,
-                    inbuffer, 
+                    buffer, 
                     body, 
                     EntityStates.T_START_MESSAGE, 
                     EntityStates.T_END_MESSAGE,
