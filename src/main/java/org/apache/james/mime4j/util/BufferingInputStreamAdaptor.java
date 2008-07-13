@@ -17,7 +17,9 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j;
+package org.apache.james.mime4j.util;
+
+import org.apache.james.mime4j.ByteArrayBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +31,7 @@ import java.io.InputStream;
  * 
  * @version $Id$
  */
-class BufferingInputStreamAdaptor extends BufferingInputStream {
+public class BufferingInputStreamAdaptor extends BufferingInputStream {
 
     private final InputStream is;
     private final BufferingInputStream bis;

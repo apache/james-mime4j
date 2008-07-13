@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.james.mime4j.util.Base64InputStream;
+import org.apache.james.mime4j.util.BufferingInputStream;
+import org.apache.james.mime4j.util.BufferingInputStreamAdaptor;
+import org.apache.james.mime4j.util.InputBuffer;
+import org.apache.james.mime4j.util.MimeBoundaryInputStream;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.apache.james.mime4j.util.QuotedPrintableInputStream;
 

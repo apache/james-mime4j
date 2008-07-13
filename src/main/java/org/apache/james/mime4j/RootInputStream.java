@@ -32,7 +32,7 @@ import java.io.InputStream;
  * 
  * @version $Id: RootInputStream.java,v 1.2 2004/10/02 12:41:10 ntherning Exp $
  */
-class RootInputStream extends InputStream {
+public class RootInputStream extends InputStream {
     private InputStream is = null;
     private int lineNumber = 1;
     private int prev = -1;

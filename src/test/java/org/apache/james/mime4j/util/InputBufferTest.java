@@ -17,7 +17,9 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j;
+package org.apache.james.mime4j.util;
+
+import org.apache.james.mime4j.util.InputBuffer;
 
 import java.io.ByteArrayInputStream;
 
@@ -33,8 +35,8 @@ public class InputBufferTest extends TestCase {
         InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         
-        assertEquals((int)'b', inbuffer.read());
-        assertEquals((int)'l', inbuffer.read());
+        assertEquals('b', inbuffer.read());
+        assertEquals('l', inbuffer.read());
         
         try {
             inbuffer.charAt(1);

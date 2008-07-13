@@ -24,6 +24,7 @@ import java.util.BitSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.util.BufferingInputStream;
 import org.apache.james.mime4j.util.MessageUtils;
 
 /**
