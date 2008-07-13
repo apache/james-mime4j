@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.storage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

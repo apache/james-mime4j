@@ -17,16 +17,16 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.storage;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.james.mime4j.util.SimpleTempStorage;
-import org.apache.james.mime4j.util.TempFile;
-import org.apache.james.mime4j.util.TempPath;
+import org.apache.james.mime4j.storage.SimpleTempStorage;
+import org.apache.james.mime4j.storage.TempFile;
+import org.apache.james.mime4j.storage.TempPath;
 
 import junit.framework.TestCase;
 

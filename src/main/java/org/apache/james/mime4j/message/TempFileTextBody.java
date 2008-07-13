@@ -28,15 +28,15 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.storage.TempFile;
+import org.apache.james.mime4j.storage.TempPath;
+import org.apache.james.mime4j.storage.TempStorage;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.CodecUtil;
-import org.apache.james.mime4j.util.TempFile;
-import org.apache.james.mime4j.util.TempPath;
-import org.apache.james.mime4j.util.TempStorage;
 
 
 /**
- * Text body backed by a {@link org.apache.james.mime4j.util.TempFile}.
+ * Text body backed by a {@link org.apache.james.mime4j.storage.TempFile}.
  *
  * 
  * @version $Id: TempFileTextBody.java,v 1.3 2004/10/25 07:26:46 ntherning Exp $

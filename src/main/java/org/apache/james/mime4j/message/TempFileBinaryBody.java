@@ -23,17 +23,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.james.mime4j.storage.TempFile;
+import org.apache.james.mime4j.storage.TempPath;
+import org.apache.james.mime4j.storage.TempStorage;
 import org.apache.james.mime4j.util.Base64InputStream;
 import org.apache.james.mime4j.util.CodecUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.apache.james.mime4j.util.QuotedPrintableInputStream;
-import org.apache.james.mime4j.util.TempFile;
-import org.apache.james.mime4j.util.TempPath;
-import org.apache.james.mime4j.util.TempStorage;
 
 
 /**
- * Binary body backed by a {@link org.apache.james.mime4j.util.TempFile}.
+ * Binary body backed by a {@link org.apache.james.mime4j.storage.TempFile}.
  *
  * 
  * @version $Id: TempFileBinaryBody.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
