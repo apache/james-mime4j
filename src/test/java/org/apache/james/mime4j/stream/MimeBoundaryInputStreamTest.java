@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.james.mime4j.stream.BufferingInputStream;
-import org.apache.james.mime4j.stream.InputBuffer;
 import org.apache.james.mime4j.stream.MimeBoundaryInputStream;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.InputBuffer;
 
 
 import junit.framework.TestCase;

@@ -21,6 +21,7 @@ package org.apache.james.mime4j.stream;
 
 
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.InputBuffer;
 
 import java.io.IOException;
 

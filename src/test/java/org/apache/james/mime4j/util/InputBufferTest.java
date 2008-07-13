@@ -17,9 +17,9 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j.util;
 
-import org.apache.james.mime4j.stream.InputBuffer;
+import org.apache.james.mime4j.util.InputBuffer;
 
 import java.io.ByteArrayInputStream;
 
