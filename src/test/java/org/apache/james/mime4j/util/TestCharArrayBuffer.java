@@ -17,10 +17,10 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.util;
 
-import org.apache.james.mime4j.parser.ByteArrayBuffer;
-import org.apache.james.mime4j.parser.CharArrayBuffer;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.CharArrayBuffer;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

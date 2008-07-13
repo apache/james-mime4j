@@ -19,7 +19,6 @@
 
 package org.apache.james.mime4j.util;
 
-import org.apache.james.mime4j.parser.ByteArrayBuffer;
 import org.apache.james.mime4j.util.BufferingInputStreamAdaptor;
 
 import java.io.ByteArrayInputStream;

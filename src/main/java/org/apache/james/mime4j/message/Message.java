@@ -28,9 +28,9 @@ import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
-import org.apache.james.mime4j.parser.CharArrayBuffer;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.MessageUtils;
 
 

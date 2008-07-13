@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.util;
 
 /**
  * A resizable byte array.
