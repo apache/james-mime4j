@@ -17,16 +17,17 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.james.mime4j.util.BufferingInputStream;
-import org.apache.james.mime4j.util.InputBuffer;
-import org.apache.james.mime4j.util.MimeBoundaryInputStream;
+import org.apache.james.mime4j.stream.BufferingInputStream;
+import org.apache.james.mime4j.stream.InputBuffer;
+import org.apache.james.mime4j.stream.MimeBoundaryInputStream;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 
 import junit.framework.TestCase;

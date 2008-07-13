@@ -17,13 +17,13 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.james.mime4j.util.EOLConvertingInputStream;
+import org.apache.james.mime4j.stream.EOLConvertingInputStream;
 
 
 import junit.framework.TestCase;

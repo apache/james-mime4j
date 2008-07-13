@@ -27,8 +27,8 @@ import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
+import org.apache.james.mime4j.stream.EOLConvertingInputStream;
 import org.apache.james.mime4j.util.CharsetUtil;
-import org.apache.james.mime4j.util.EOLConvertingInputStream;
 import org.apache.log4j.BasicConfigurator;
 
 import java.io.BufferedInputStream;

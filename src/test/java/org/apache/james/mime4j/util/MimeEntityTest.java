@@ -27,8 +27,8 @@ import org.apache.james.mime4j.parser.EntityStates;
 import org.apache.james.mime4j.parser.MimeEntity;
 import org.apache.james.mime4j.parser.RecursionMode;
 import org.apache.james.mime4j.parser.RootInputStream;
-import org.apache.james.mime4j.util.BasicBufferingInputStream;
-import org.apache.james.mime4j.util.InputBuffer;
+import org.apache.james.mime4j.stream.BasicBufferingInputStream;
+import org.apache.james.mime4j.stream.InputBuffer;
 
 import junit.framework.TestCase;
 

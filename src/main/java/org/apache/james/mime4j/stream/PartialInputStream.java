@@ -18,64 +18,42 @@
  ****************************************************************/
 
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.stream;
 
 import java.io.InputStream;
 import java.io.IOException;
 
-public class PositionInputStream extends InputStream {
+public class PartialInputStream extends PositionInputStream {
+    private final long limit;
 
-    private final InputStream inputStream;
-    protected long position = 0;
-    private long markedPosition = 0;
-
-    public PositionInputStream(InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
-
-    public long getPosition() {
-        return position;
+    public PartialInputStream(InputStream inputStream, long offset, long length) throws IOException {
+        super(inputStream);
+        inputStream.skip(offset);
+        this.limit = offset + length;
     }
 
     public int available() throws IOException {
-        return inputStream.available();
+        return Math.min(super.available(), getBytesLeft());
     }
 
     public int read() throws IOException {
-        int b = inputStream.read();
-        if (b != -1)
-            position++;
-        return b;
-    }
-
-    public void close() throws IOException {
-        inputStream.close();
-    }
-
-    public void reset() throws IOException {
-        inputStream.reset();
-        position = markedPosition;
-    }
-
-    public boolean markSupported() {
-        return inputStream.markSupported();
-    }
-
-    public void mark(int readlimit) {
-        inputStream.mark(readlimit);
-        markedPosition = position;
-    }
-
-    public long skip(long n) throws IOException {
-        final long c = inputStream.skip(n);
-        position += c;
-        return c;
+        if (limit > position)
+            return super.read();
+        else
+            return -1;
     }
 
     public int read(byte b[], int off, int len) throws IOException {
-        final int c = inputStream.read(b, off, len);
-        position += c;
-        return c;
+        len = Math.min(len, getBytesLeft());
+        return super.read(b, off, len);    //To change body of overridden methods use File | Settings | File Templates.
     }
 
+    public long skip(long n) throws IOException {
+        n = Math.min(n, getBytesLeft());
+        return super.skip(n);    //To change body of overridden methods use File | Settings | File Templates.
+    }
+
+    private int getBytesLeft() {
+        return (int)Math.min(Integer.MAX_VALUE, limit - position);
+    }
 }

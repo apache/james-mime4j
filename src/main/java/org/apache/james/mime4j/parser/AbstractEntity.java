@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MutableBodyDescriptor;
-import org.apache.james.mime4j.util.BufferingInputStream;
+import org.apache.james.mime4j.stream.BufferingInputStream;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.MessageUtils;

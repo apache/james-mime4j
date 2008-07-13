@@ -17,8 +17,10 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.stream;
 
+
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 import java.io.IOException;
 
