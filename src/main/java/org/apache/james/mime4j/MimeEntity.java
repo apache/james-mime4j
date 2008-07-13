@@ -3,9 +3,9 @@ package org.apache.james.mime4j;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.james.mime4j.decoder.Base64InputStream;
-import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
+import org.apache.james.mime4j.util.Base64InputStream;
 import org.apache.james.mime4j.util.MimeUtil;
+import org.apache.james.mime4j.util.QuotedPrintableInputStream;
 
 public class MimeEntity extends AbstractEntity {
 

@@ -17,13 +17,13 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.decoder;
+package org.apache.james.mime4j.util;
 
 import java.io.UnsupportedEncodingException;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.decoder.DecoderUtil;
+import org.apache.james.mime4j.util.DecoderUtil;
 import org.apache.log4j.BasicConfigurator;
 
 /**

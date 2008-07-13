@@ -28,9 +28,9 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.LinkedList;
 
-import org.apache.james.mime4j.decoder.Base64InputStream;
-import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
+import org.apache.james.mime4j.util.Base64InputStream;
 import org.apache.james.mime4j.util.MimeUtil;
+import org.apache.james.mime4j.util.QuotedPrintableInputStream;
 
 /**
  * <p>

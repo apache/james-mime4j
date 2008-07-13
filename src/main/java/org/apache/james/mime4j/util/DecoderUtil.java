@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.decoder;
+package org.apache.james.mime4j.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,7 +27,6 @@ import java.io.UnsupportedEncodingException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.CharArrayBuffer;
-import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * Static methods for decoding strings, byte arrays and encoded words.

@@ -25,7 +25,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 
 import junit.framework.TestCase;
 

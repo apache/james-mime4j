@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.decoder;
+package org.apache.james.mime4j.util;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;
