@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.decoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

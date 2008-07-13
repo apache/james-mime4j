@@ -17,11 +17,11 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.decoder;
 
 import java.util.Iterator;
 
-public class ByteQueue {
+class ByteQueue {
 
     private UnboundedFifoByteBuffer buf;
     private int initialCapacity = -1;

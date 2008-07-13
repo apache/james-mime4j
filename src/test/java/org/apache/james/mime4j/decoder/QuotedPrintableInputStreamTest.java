@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.decoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,7 +27,7 @@ import java.io.UnsupportedEncodingException;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.util.QuotedPrintableInputStream;
+import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.log4j.BasicConfigurator;
 
 /**

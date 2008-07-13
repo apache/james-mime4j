@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
+import org.apache.james.mime4j.decoder.DecoderUtil;
 import org.apache.james.mime4j.field.address.parser.ASTaddr_spec;
 import org.apache.james.mime4j.field.address.parser.ASTaddress;
 import org.apache.james.mime4j.field.address.parser.ASTaddress_list;
@@ -33,7 +34,6 @@ import org.apache.james.mime4j.field.address.parser.ASTroute;
 import org.apache.james.mime4j.field.address.parser.Node;
 import org.apache.james.mime4j.field.address.parser.SimpleNode;
 import org.apache.james.mime4j.field.address.parser.Token;
-import org.apache.james.mime4j.util.DecoderUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;

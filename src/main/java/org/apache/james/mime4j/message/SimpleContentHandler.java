@@ -20,11 +20,11 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.decoder.Base64InputStream;
+import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
-import org.apache.james.mime4j.util.Base64InputStream;
 import org.apache.james.mime4j.util.MimeUtil;
-import org.apache.james.mime4j.util.QuotedPrintableInputStream;
 
 import java.io.InputStream;
 import java.io.IOException;
