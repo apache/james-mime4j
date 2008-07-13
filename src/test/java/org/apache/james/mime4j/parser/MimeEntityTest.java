@@ -17,17 +17,13 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
-
-import java.io.ByteArrayInputStream;
+package org.apache.james.mime4j.parser;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.parser.EntityStateMachine;
-import org.apache.james.mime4j.parser.EntityStates;
-import org.apache.james.mime4j.parser.MimeEntity;
-import org.apache.james.mime4j.parser.RecursionMode;
-import org.apache.james.mime4j.parser.RootInputStream;
 import org.apache.james.mime4j.stream.BasicBufferingInputStream;
+import org.apache.james.mime4j.util.InputBuffer;
+
+import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
 
