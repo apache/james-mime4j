@@ -8,6 +8,7 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.stream.BufferingInputStream;
 import org.apache.james.mime4j.stream.BufferingInputStreamAdaptor;
 import org.apache.james.mime4j.stream.MimeBoundaryInputStream;
+import org.apache.james.mime4j.stream.RootInputStream;
 import org.apache.james.mime4j.util.Base64InputStream;
 import org.apache.james.mime4j.util.InputBuffer;
 import org.apache.james.mime4j.util.MimeUtil;

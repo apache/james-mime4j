@@ -17,12 +17,12 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.apache.james.mime4j.parser.RootInputStream;
+import org.apache.james.mime4j.stream.RootInputStream;
 
 
 import junit.framework.TestCase;

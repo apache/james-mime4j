@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.stream.BasicBufferingInputStream;
+import org.apache.james.mime4j.stream.RootInputStream;
 import org.apache.james.mime4j.util.Base64InputStream;
 import org.apache.james.mime4j.util.InputBuffer;
 import org.apache.james.mime4j.util.MimeUtil;
