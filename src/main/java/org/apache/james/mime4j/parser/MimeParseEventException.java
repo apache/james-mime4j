@@ -17,39 +17,34 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.parser;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import org.apache.james.mime4j.MimeException;
 
-import org.apache.james.mime4j.parser.ExampleMail;
-
-import junit.framework.TestCase;
-
-public class CodecUtilTest extends TestCase {
-
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
-    public void testCopy() throws Exception {
-        byte[] content = ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES;
-        ByteArrayInputStream in = new ByteArrayInputStream(content);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.copy(in, out);
-        assertEquals(content, out.toByteArray());
-    }
+/**
+ * Indicates that strict parsing has been enabled 
+ * and an optional invality has been found in the input.
+ * {@link #getEvent()} indicates the type of invalidity.
+ */
+public class MimeParseEventException extends MimeException {
     
-    private void assertEquals(byte[] expected, byte[] actual) {
-        StringBuffer buffer = new StringBuffer(expected.length);
-        assertEquals(expected.length, actual.length);
-        for (int i = 0; i < actual.length; i++) {
-            buffer.append((char)actual[i]);
-            assertEquals("Mismatch@" + i, expected[i], actual[i]);
-        }
+    private static final long serialVersionUID = 4632991604246852302L;
+    private final Event event;
+    
+    /**
+     * Constructs an exception 
+     * @param event <code>MimeTokenStream.Event</code>, not null
+     */
+    public MimeParseEventException(final Event event) {
+        super(event.toString());
+        this.event = event;
+    }
+
+    /**
+     * Gets the causal parse event.
+     * @return <code>MimeTokenStream.Event</code>, not null
+     */
+    public Event getEvent() {
+        return event;
     }
 }

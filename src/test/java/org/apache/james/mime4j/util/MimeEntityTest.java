@@ -22,11 +22,11 @@ package org.apache.james.mime4j.util;
 import java.io.ByteArrayInputStream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.EntityStateMachine;
-import org.apache.james.mime4j.EntityStates;
-import org.apache.james.mime4j.MimeEntity;
-import org.apache.james.mime4j.RecursionMode;
-import org.apache.james.mime4j.RootInputStream;
+import org.apache.james.mime4j.parser.EntityStateMachine;
+import org.apache.james.mime4j.parser.EntityStates;
+import org.apache.james.mime4j.parser.MimeEntity;
+import org.apache.james.mime4j.parser.RecursionMode;
+import org.apache.james.mime4j.parser.RootInputStream;
 import org.apache.james.mime4j.util.BasicBufferingInputStream;
 import org.apache.james.mime4j.util.InputBuffer;
 

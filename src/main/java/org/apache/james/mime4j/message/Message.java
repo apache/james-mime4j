@@ -25,12 +25,12 @@ import java.io.OutputStream;
 import java.util.Stack;
 
 import org.apache.james.mime4j.BodyDescriptor;
-import org.apache.james.mime4j.CharArrayBuffer;
-import org.apache.james.mime4j.ContentHandler;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.MimeStreamParser;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
+import org.apache.james.mime4j.parser.CharArrayBuffer;
+import org.apache.james.mime4j.parser.ContentHandler;
+import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.util.MessageUtils;
 
 
@@ -115,7 +115,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#startMessage()
+         * @see org.apache.james.mime4j.parser.ContentHandler#startMessage()
          */
         public void startMessage() {
             if (stack.isEmpty()) {
@@ -129,7 +129,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#endMessage()
+         * @see org.apache.james.mime4j.parser.ContentHandler#endMessage()
          */
         public void endMessage() {
             expect(Message.class);
@@ -137,14 +137,14 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#startHeader()
+         * @see org.apache.james.mime4j.parser.ContentHandler#startHeader()
          */
         public void startHeader() {
             stack.push(new Header());
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#field(java.lang.String)
+         * @see org.apache.james.mime4j.parser.ContentHandler#field(java.lang.String)
          */
         public void field(String fieldData) {
             expect(Header.class);
@@ -152,7 +152,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#endHeader()
+         * @see org.apache.james.mime4j.parser.ContentHandler#endHeader()
          */
         public void endHeader() {
             expect(Header.class);
@@ -162,7 +162,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#startMultipart(org.apache.james.mime4j.BodyDescriptor)
+         * @see org.apache.james.mime4j.parser.ContentHandler#startMultipart(org.apache.james.mime4j.BodyDescriptor)
          */
         public void startMultipart(final BodyDescriptor bd) {
             expect(Entity.class);
@@ -175,7 +175,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#body(org.apache.james.mime4j.BodyDescriptor, java.io.InputStream)
+         * @see org.apache.james.mime4j.parser.ContentHandler#body(org.apache.james.mime4j.BodyDescriptor, java.io.InputStream)
          */
         public void body(BodyDescriptor bd, final InputStream is) throws IOException {
             expect(Entity.class);
@@ -193,14 +193,14 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#endMultipart()
+         * @see org.apache.james.mime4j.parser.ContentHandler#endMultipart()
          */
         public void endMultipart() {
             stack.pop();
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#startBodyPart()
+         * @see org.apache.james.mime4j.parser.ContentHandler#startBodyPart()
          */
         public void startBodyPart() {
             expect(Multipart.class);
@@ -211,7 +211,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#endBodyPart()
+         * @see org.apache.james.mime4j.parser.ContentHandler#endBodyPart()
          */
         public void endBodyPart() {
             expect(BodyPart.class);
@@ -219,7 +219,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#epilogue(java.io.InputStream)
+         * @see org.apache.james.mime4j.parser.ContentHandler#epilogue(java.io.InputStream)
          */
         public void epilogue(InputStream is) throws IOException {
             expect(Multipart.class);
@@ -232,7 +232,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.ContentHandler#preamble(java.io.InputStream)
+         * @see org.apache.james.mime4j.parser.ContentHandler#preamble(java.io.InputStream)
          */
         public void preamble(InputStream is) throws IOException {
             expect(Multipart.class);
@@ -246,7 +246,7 @@ public class Message extends Entity implements Body {
         
         /**
          * Unsupported.
-         * @see org.apache.james.mime4j.ContentHandler#raw(java.io.InputStream)
+         * @see org.apache.james.mime4j.parser.ContentHandler#raw(java.io.InputStream)
          */
         public void raw(InputStream is) throws IOException {
             throw new UnsupportedOperationException("Not supported");

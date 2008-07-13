@@ -17,32 +17,33 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
-
-import org.apache.james.mime4j.parser.ByteArrayBuffer;
-
-import java.io.IOException;
-import java.io.InputStream;
+package org.apache.james.mime4j.parser;
 
 /**
- * Input stream capable of reading lines of text. 
+ * Enumeration of parsing modes.
  */
-public abstract class BufferingInputStream extends InputStream {
+public interface RecursionMode {
 
-    /**
-     * Reads one line of text into the given {@link ByteArrayBuffer}.
-     *  
-     * @param dst Destination
-     * @return number of bytes copied or <code>-1</code> if the end of 
-     * the stream has been reached.
-     * 
-     * @throws IOException in case of an I/O error.
+    /** 
+     * Recursively parse every <code>message/rfc822</code> part 
+     * @see #getRecursionMode() 
      */
-    public abstract int readLine(final ByteArrayBuffer dst) throws IOException;
-    
+    public static final int M_RECURSE = 0;
     /**
-     * Resets the internal state.
+     * Do not recurse <code>message/rfc822</code> parts 
+     * @see #getRecursionMode()
      */
-    public abstract void reset();
+    public static final int M_NO_RECURSE = 1;
+    /** 
+     * Parse into raw entities
+     * @see #getRecursionMode() 
+     */
+    public static final int M_RAW = 2;
+    /**
+     * Do not recurse <code>message/rfc822</code> parts
+     * and treat multiparts as a single flat body. 
+     * @see #getRecursionMode()
+     */
+    public static final int M_FLAT = 3;
     
 }

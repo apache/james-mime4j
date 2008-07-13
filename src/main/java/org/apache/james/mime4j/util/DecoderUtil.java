@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.CharArrayBuffer;
+import org.apache.james.mime4j.parser.CharArrayBuffer;
 
 /**
  * Static methods for decoding strings, byte arrays and encoded words.

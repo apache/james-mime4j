@@ -22,7 +22,7 @@ import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.ExampleMail;
+import org.apache.james.mime4j.parser.ExampleMail;
 
 public class MessageCompleteMailTest extends TestCase {
 
