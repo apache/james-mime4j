@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.storage;
+package org.apache.james.mime4j.message.storage;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -110,7 +110,7 @@ public class SimpleTempStorage extends TempStorage {
     }
     
     /**
-     * @see org.apache.james.mime4j.storage.TempStorage#getRootTempPath()
+     * @see org.apache.james.mime4j.message.storage.TempStorage#getRootTempPath()
      */
     public TempPath getRootTempPath() {
         return rootPath;
@@ -128,14 +128,14 @@ public class SimpleTempStorage extends TempStorage {
         }
         
         /**
-         * @see org.apache.james.mime4j.storage.TempPath#createTempFile()
+         * @see org.apache.james.mime4j.message.storage.TempPath#createTempFile()
          */
         public TempFile createTempFile() throws IOException {
             return SimpleTempStorage.this.createTempFile(this, null, null);
         }
 
         /**
-         * @see org.apache.james.mime4j.storage.TempPath#createTempFile(java.lang.String, java.lang.String)
+         * @see org.apache.james.mime4j.message.storage.TempPath#createTempFile(java.lang.String, java.lang.String)
          */
         public TempFile createTempFile(String prefix, String suffix) 
                 throws IOException {
@@ -144,7 +144,7 @@ public class SimpleTempStorage extends TempStorage {
         }
 
         /**
-         * @see org.apache.james.mime4j.storage.TempPath#createTempFile(java.lang.String, java.lang.String, boolean)
+         * @see org.apache.james.mime4j.message.storage.TempPath#createTempFile(java.lang.String, java.lang.String, boolean)
          */
         public TempFile createTempFile(String prefix, String suffix, 
                                        boolean allowInMemory) 
@@ -154,7 +154,7 @@ public class SimpleTempStorage extends TempStorage {
         }
         
         /**
-         * @see org.apache.james.mime4j.storage.TempPath#getAbsolutePath()
+         * @see org.apache.james.mime4j.message.storage.TempPath#getAbsolutePath()
          */
         public String getAbsolutePath() {
             return path.getAbsolutePath();
@@ -167,14 +167,14 @@ public class SimpleTempStorage extends TempStorage {
         }
 
         /**
-         * @see org.apache.james.mime4j.storage.TempPath#createTempPath()
+         * @see org.apache.james.mime4j.message.storage.TempPath#createTempPath()
          */
         public TempPath createTempPath() throws IOException {
             return SimpleTempStorage.this.createTempPath(this, null);
         }
 
         /**
-         * @see org.apache.james.mime4j.storage.TempPath#createTempPath(java.lang.String)
+         * @see org.apache.james.mime4j.message.storage.TempPath#createTempPath(java.lang.String)
          */
         public TempPath createTempPath(String prefix) throws IOException {
             return SimpleTempStorage.this.createTempPath(this, prefix);
@@ -191,21 +191,21 @@ public class SimpleTempStorage extends TempStorage {
         }
 
         /**
-         * @see org.apache.james.mime4j.storage.TempFile#getInputStream()
+         * @see org.apache.james.mime4j.message.storage.TempFile#getInputStream()
          */
         public InputStream getInputStream() throws IOException {
             return new BufferedInputStream(new FileInputStream(file));
         }
 
         /**
-         * @see org.apache.james.mime4j.storage.TempFile#getOutputStream()
+         * @see org.apache.james.mime4j.message.storage.TempFile#getOutputStream()
          */
         public OutputStream getOutputStream() throws IOException {
             return new BufferedOutputStream(new FileOutputStream(file));
         }
 
         /**
-         * @see org.apache.james.mime4j.storage.TempFile#getAbsolutePath()
+         * @see org.apache.james.mime4j.message.storage.TempFile#getAbsolutePath()
          */
         public String getAbsolutePath() {
             return file.getAbsolutePath();
@@ -219,14 +219,14 @@ public class SimpleTempStorage extends TempStorage {
         }
 
         /**
-         * @see org.apache.james.mime4j.storage.TempFile#isInMemory()
+         * @see org.apache.james.mime4j.message.storage.TempFile#isInMemory()
          */
         public boolean isInMemory() {
             return false;
         }
 
         /**
-         * @see org.apache.james.mime4j.storage.TempFile#length()
+         * @see org.apache.james.mime4j.message.storage.TempFile#length()
          */
         public long length() {
             return file.length();
