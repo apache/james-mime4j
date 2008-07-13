@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.descriptor;
 
 import java.util.Map;
 

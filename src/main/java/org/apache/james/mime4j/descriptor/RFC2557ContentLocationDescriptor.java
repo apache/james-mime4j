@@ -16,18 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.descriptor;
 
-import org.apache.james.mime4j.BodyDescriptor;
-import org.apache.james.mime4j.MutableBodyDescriptor;
-import org.apache.james.mime4j.parser.DefaultBodyDescriptor;
+import org.apache.james.mime4j.MimeException;
 
-public class DefaultBodyDescriptorTest extends BaseTestForBodyDescriptors {
-    protected MutableBodyDescriptor newBodyDescriptor() {
-        return new DefaultBodyDescriptor();
-    }
+/**
+ * Describes <a href='http://tools.ietf.org/html/rfc2557'>RFC2557</a>  
+ * <code>Content-Location</code>.
+ */
+public interface RFC2557ContentLocationDescriptor {
 
-    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
-        return new DefaultBodyDescriptor(parent);
-    }
+    /**
+     * Get the <code>content-location</code> header value.
+     * See <a href='http://tools.ietf.org/html/rfc2557'>RFC2557</a> 
+     * @return the URL content-location
+     * or null if no header exists
+     */
+    public abstract String getContentLocation();
+
+    /**
+     * Gets any exception thrown during the parsing of {@link #getContentLanguage()}
+     * @return <code>ParseException</code> when the content-language parse fails,
+     * null otherwise
+     */
+    public abstract MimeException getContentLocationParseException();
+
 }

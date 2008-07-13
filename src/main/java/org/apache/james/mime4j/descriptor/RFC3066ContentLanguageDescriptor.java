@@ -16,29 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.descriptor;
 
 import org.apache.james.mime4j.MimeException;
 
+import java.util.List;
+
 /**
- * Describes <a href='http://tools.ietf.org/html/rfc2557'>RFC2557</a>  
- * <code>Content-Location</code>.
+ * Describes RFC3066 content-language headers.
  */
-public interface RFC2557ContentLocationDescriptor {
+public interface RFC3066ContentLanguageDescriptor {
 
     /**
-     * Get the <code>content-location</code> header value.
-     * See <a href='http://tools.ietf.org/html/rfc2557'>RFC2557</a> 
-     * @return the URL content-location
+     * Get the <code>content-language</code> header values.
+     * Each applicable language tag will be returned in order.
+     * See <a href='http://tools.ietf.org/html/rfc4646'>RFC4646</a> 
+     * <cite>http://tools.ietf.org/html/rfc4646</cite>.
+     * @return list of language tag Strings,
      * or null if no header exists
      */
-    public abstract String getContentLocation();
+    public abstract List getContentLanguage();
 
     /**
      * Gets any exception thrown during the parsing of {@link #getContentLanguage()}
      * @return <code>ParseException</code> when the content-language parse fails,
      * null otherwise
      */
-    public abstract MimeException getContentLocationParseException();
+    public abstract MimeException getContentLanguageParseException();
 
 }

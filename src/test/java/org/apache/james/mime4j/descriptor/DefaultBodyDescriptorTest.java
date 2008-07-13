@@ -16,21 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.descriptor;
 
-/**
- * Describes <a href='http://tools.ietf.org/html/rfc1864'>RFC1864</a>  
- * <code>Content-MD5</code>.
- */
-public interface RFC1864ContentMD5Descriptor {
+import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.MutableBodyDescriptor;
+import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
+import org.apache.james.mime4j.parser.BaseTestForBodyDescriptors;
 
-    /**
-     * Gets the raw, Base64 encoded value of the
-     * <code>Content-MD5</code> field.
-     * See <a href='http://tools.ietf.org/html/rfc1864'>RFC1864</a>.
-     * @return raw encoded content-md5
-     * or null if no header exists
-     */
-    public abstract String getContentMD5Raw();
+public class DefaultBodyDescriptorTest extends BaseTestForBodyDescriptors {
+    protected MutableBodyDescriptor newBodyDescriptor() {
+        return new DefaultBodyDescriptor();
+    }
 
+    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
+        return new DefaultBodyDescriptor(parent);
+    }
 }

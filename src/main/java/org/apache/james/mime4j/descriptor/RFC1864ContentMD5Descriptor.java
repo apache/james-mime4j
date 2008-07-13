@@ -16,32 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.james.mime4j.parser;
-
-import org.apache.james.mime4j.MimeException;
-
-import java.util.List;
+package org.apache.james.mime4j.descriptor;
 
 /**
- * Describes RFC3066 content-language headers.
+ * Describes <a href='http://tools.ietf.org/html/rfc1864'>RFC1864</a>  
+ * <code>Content-MD5</code>.
  */
-public interface RFC3066ContentLanguageDescriptor {
+public interface RFC1864ContentMD5Descriptor {
 
     /**
-     * Get the <code>content-language</code> header values.
-     * Each applicable language tag will be returned in order.
-     * See <a href='http://tools.ietf.org/html/rfc4646'>RFC4646</a> 
-     * <cite>http://tools.ietf.org/html/rfc4646</cite>.
-     * @return list of language tag Strings,
+     * Gets the raw, Base64 encoded value of the
+     * <code>Content-MD5</code> field.
+     * See <a href='http://tools.ietf.org/html/rfc1864'>RFC1864</a>.
+     * @return raw encoded content-md5
      * or null if no header exists
      */
-    public abstract List getContentLanguage();
-
-    /**
-     * Gets any exception thrown during the parsing of {@link #getContentLanguage()}
-     * @return <code>ParseException</code> when the content-language parse fails,
-     * null otherwise
-     */
-    public abstract MimeException getContentLanguageParseException();
+    public abstract String getContentMD5Raw();
 
 }

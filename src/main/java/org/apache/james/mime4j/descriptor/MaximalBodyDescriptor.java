@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.descriptor;
 
 import java.io.StringReader;
 import java.util.Collections;
@@ -71,11 +71,11 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     private String contentMD5Raw;
     private boolean isContentMD5Set;
     
-    protected MaximalBodyDescriptor() {
+    public MaximalBodyDescriptor() {
         this(null);
     }
 
-    protected MaximalBodyDescriptor(BodyDescriptor parent) {
+    public MaximalBodyDescriptor(BodyDescriptor parent) {
         super(parent);
         isMimeVersionSet = false;
         mimeMajorVersion = DEFAULT_MAJOR_VERSION;
@@ -250,147 +250,147 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2045MimeDescriptor#getMimeMajorVersion()
+     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getMimeMajorVersion()
      */
     public int getMimeMajorVersion() {
         return mimeMajorVersion;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2045MimeDescriptor#getMimeMinorVersion()
+     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getMimeMinorVersion()
      */
     public int getMimeMinorVersion() {
         return mimeMinorVersion;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2045MimeDescriptor#getMimeVersionParseException()
+     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getMimeVersionParseException()
      */
     public MimeException getMimeVersionParseException() {
         return mimeVersionException;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2045MimeDescriptor#getContentDescription()
+     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getContentDescription()
      */
     public String getContentDescription() {
         return contentDescription;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2045MimeDescriptor#getContentId()
+     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getContentId()
      */
     public String getContentId() {
         return contentId;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionType()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionType()
      */
     public String getContentDispositionType() {
         return contentDispositionType;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionParameters()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionParameters()
      */
     public Map getContentDispositionParameters() {
         return contentDispositionParameters;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionFilename()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionFilename()
      */
     public String getContentDispositionFilename() {
         return (String) contentDispositionParameters.get(MimeUtil.PARAM_FILENAME);
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionModificationDate()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionModificationDate()
      */
     public DateTime getContentDispositionModificationDate() {
         return contentDispositionModificationDate;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionModificationDateParseException()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionModificationDateParseException()
      */
     public MimeException getContentDispositionModificationDateParseException() {
         return contentDispositionModificationDateParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionCreationDate()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionCreationDate()
      */
     public DateTime getContentDispositionCreationDate() {
         return contentDispositionCreationDate;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionCreationDateParseException()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionCreationDateParseException()
      */
     public MimeException getContentDispositionCreationDateParseException() {
         return contentDispositionCreationDateParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionReadDate()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionReadDate()
      */
     public DateTime getContentDispositionReadDate() {
         return contentDispositionReadDate;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionReadDateParseException()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionReadDateParseException()
      */
     public MimeException getContentDispositionReadDateParseException() {
         return contentDispositionReadDateParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionSize()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionSize()
      */
     public long getContentDispositionSize() {
         return contentDispositionSize;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor#getContentDispositionSizeParseException()
+     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionSizeParseException()
      */
     public MimeException getContentDispositionSizeParseException() {
         return contentDispositionSizeParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC3066ContentLanguageDescriptor#getContentLanguage()
+     * @see org.apache.james.mime4j.descriptor.RFC3066ContentLanguageDescriptor#getContentLanguage()
      */
     public List getContentLanguage() {
         return contentLanguage;
     }
 
     /**
-     * @see org.apache.james.mime4j.parser.RFC3066ContentLanguageDescriptor#getContentLanguageParseException()
+     * @see org.apache.james.mime4j.descriptor.RFC3066ContentLanguageDescriptor#getContentLanguageParseException()
      */
     public MimeException getContentLanguageParseException() {
         return contentLanguageParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2557ContentLocationDescriptor#getContentLocation()
+     * @see org.apache.james.mime4j.descriptor.RFC2557ContentLocationDescriptor#getContentLocation()
      */
     public String getContentLocation() {
         return contentLocation;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC2557ContentLocationDescriptor#getContentLocationParseException()
+     * @see org.apache.james.mime4j.descriptor.RFC2557ContentLocationDescriptor#getContentLocationParseException()
      */
     public MimeException getContentLocationParseException() {
         return contentLocationParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.RFC1864ContentMD5Descriptor#getContentMD5Raw()
+     * @see org.apache.james.mime4j.descriptor.RFC1864ContentMD5Descriptor#getContentMD5Raw()
      */
     public String getContentMD5Raw() {
         return contentMD5Raw;

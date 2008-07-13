@@ -16,19 +16,21 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.descriptor;
 
 import java.io.ByteArrayInputStream;
 
 import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.MutableBodyDescriptor;
+import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
+import org.apache.james.mime4j.descriptor.RFC1864ContentMD5Descriptor;
+import org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor;
+import org.apache.james.mime4j.descriptor.RFC2557ContentLocationDescriptor;
+import org.apache.james.mime4j.descriptor.RFC3066ContentLanguageDescriptor;
 import org.apache.james.mime4j.field.datetime.DateTime;
-import org.apache.james.mime4j.parser.MaximalBodyDescriptor;
+import org.apache.james.mime4j.parser.BaseTestForBodyDescriptors;
+import org.apache.james.mime4j.parser.ExampleMail;
 import org.apache.james.mime4j.parser.MimeTokenStream;
-import org.apache.james.mime4j.parser.RFC1864ContentMD5Descriptor;
-import org.apache.james.mime4j.parser.RFC2183ContentDispositionDescriptor;
-import org.apache.james.mime4j.parser.RFC2557ContentLocationDescriptor;
-import org.apache.james.mime4j.parser.RFC3066ContentLanguageDescriptor;
 
 public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
 
