@@ -1,0 +1,41 @@
+<message>
+<header>
+<field>
+Content-Type: multipart/mixed; boundary="outer-boundary"</field>
+</header>
+<multipart>
+<preamble>
+Outer preamble
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain</field>
+</header>
+<text-body name="missing-inner-boundary_decoded_1_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: multipart/alternative; boundary="inner-boundary"</field>
+</header>
+<multipart>
+<preamble>
+AAA
+
+--outer-boundary--
+Outer epilouge
+</preamble>
+<body-part>
+<header>
+</header>
+<text-body name="missing-inner-boundary_decoded_1_2_1.txt"/>
+</body-part>
+<epilogue>
+</epilogue>
+</multipart>
+</body-part>
+<epilogue>
+</epilogue>
+</multipart>
+</message>
