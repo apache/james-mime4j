@@ -122,6 +122,7 @@ public class MimeEntity extends AbstractEntity {
                 clearMimeStream();
                 state = EntityStates.T_END_MULTIPART;
             } else {
+                clearMimeStream();
                 createMimeStream();
                 state = T_IN_BODYPART;
                 return nextMimeEntity();
@@ -133,6 +134,7 @@ public class MimeEntity extends AbstractEntity {
                 monitor(Event.MIME_BODY_PREMATURE_END);
             } else {
                 if (!mimeStream.isLastPart()) {
+                    clearMimeStream();
                     createMimeStream();
                     state = T_IN_BODYPART;
                     return nextMimeEntity();
@@ -160,7 +162,11 @@ public class MimeEntity extends AbstractEntity {
     }
 
     private void createMimeStream() throws IOException {
-        mimeStream = new MimeBoundaryInputStream(inbuffer, body.getBoundary());
+        if (mimeStream != null) {
+            mimeStream = new MimeBoundaryInputStream(new InputBuffer(mimeStream, 4 * 1024), body.getBoundary());
+        } else {
+            mimeStream = new MimeBoundaryInputStream(inbuffer, body.getBoundary());
+        }
         dataStream = new BufferingInputStreamAdaptor(mimeStream); 
         // If multipart message is embedded into another multipart message
         // make sure to reset parent's mime stream

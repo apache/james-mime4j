@@ -24,9 +24,6 @@ Content-Type: multipart/alternative; boundary="inner-boundary"</field>
 <multipart>
 <preamble>
 AAA
-
---outer-boundary--
-Outer epilouge
 </preamble>
 <body-part>
 <header>
@@ -39,6 +36,7 @@ Outer epilouge
 </multipart>
 </body-part>
 <epilogue>
+Outer epilouge
 </epilogue>
 </multipart>
 </message>
