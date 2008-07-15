@@ -24,12 +24,12 @@ import java.io.ByteArrayOutputStream;
 
 import junit.framework.TestCase;
 
-public class BasicBufferingInputStreamTest extends TestCase {
+public class BufferedLineReaderInputStreamTest extends TestCase {
 
     public void testBasicOperations() throws Exception {
         String text = "ah blahblah";
         byte[] b1 = text.getBytes("US-ASCII");
-        InputBuffer instream = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         
         assertEquals((byte)'a', instream.read());
         assertEquals((byte)'h', instream.read());
@@ -67,7 +67,7 @@ public class BasicBufferingInputStreamTest extends TestCase {
         }
         byte[] raw = outstream.toByteArray();
         
-        InputBuffer instream = new InputBuffer(new ByteArrayInputStream(raw), 16); 
+        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(raw), 16); 
         
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8); 
         for (int i = 0; i < teststrs.length; i++) {
@@ -85,7 +85,7 @@ public class BasicBufferingInputStreamTest extends TestCase {
         String teststr = "\n\n\r\n\r\r\n\n\n\n\n\n";
         byte[] raw = teststr.getBytes("US-ASCII");
         
-        BufferingInputStream instream = new InputBuffer(new ByteArrayInputStream(raw), 4); 
+        LineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(raw), 4); 
         
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8); 
         linebuf.clear();

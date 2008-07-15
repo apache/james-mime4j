@@ -19,18 +19,18 @@ public class MimeEntity extends AbstractEntity {
     private static final int T_IN_MESSAGE = -3;
 
     private final RootInputStream rootStream;
-    private final InputBuffer inbuffer;
+    private final BufferedLineReaderInputStream inbuffer;
     
     private int recursionMode;
     private MimeBoundaryInputStream mimeStream;
-    private BufferingInputStreamAdaptor dataStream;
+    private LineReaderInputStreamAdaptor dataStream;
     private boolean skipHeader;
     
     private byte[] tmpbuf;
     
     public MimeEntity(
             RootInputStream rootStream,
-            InputBuffer inbuffer,
+            BufferedLineReaderInputStream inbuffer,
             BodyDescriptor parent, 
             int startState, 
             int endState,
@@ -39,13 +39,13 @@ public class MimeEntity extends AbstractEntity {
         super(parent, startState, endState, maximalBodyDescriptor, strictParsing);
         this.rootStream = rootStream;
         this.inbuffer = inbuffer;
-        this.dataStream = new BufferingInputStreamAdaptor(inbuffer);
+        this.dataStream = new LineReaderInputStreamAdaptor(inbuffer);
         this.skipHeader = false;
     }
 
     public MimeEntity(
             RootInputStream rootStream,
-            InputBuffer inbuffer,
+            BufferedLineReaderInputStream inbuffer,
             BodyDescriptor parent, 
             int startState, 
             int endState) {
@@ -72,7 +72,7 @@ public class MimeEntity extends AbstractEntity {
         return rootStream.getLineNumber();
     }
     
-    protected BufferingInputStream getDataStream() {
+    protected LineReaderInputStream getDataStream() {
         return dataStream;
     }
     
@@ -163,11 +163,11 @@ public class MimeEntity extends AbstractEntity {
 
     private void createMimeStream() throws IOException {
         if (mimeStream != null) {
-            mimeStream = new MimeBoundaryInputStream(new InputBuffer(mimeStream, 4 * 1024), body.getBoundary());
+            mimeStream = new MimeBoundaryInputStream(new BufferedLineReaderInputStream(mimeStream, 4 * 1024), body.getBoundary());
         } else {
             mimeStream = new MimeBoundaryInputStream(inbuffer, body.getBoundary());
         }
-        dataStream = new BufferingInputStreamAdaptor(mimeStream); 
+        dataStream = new LineReaderInputStreamAdaptor(mimeStream); 
         // If multipart message is embedded into another multipart message
         // make sure to reset parent's mime stream
         inbuffer.reset();
@@ -175,7 +175,7 @@ public class MimeEntity extends AbstractEntity {
     
     private void clearMimeStream() {
         mimeStream = null;
-        dataStream = new BufferingInputStreamAdaptor(inbuffer); 
+        dataStream = new LineReaderInputStreamAdaptor(inbuffer); 
     }
     
     private void advanceToBoundary() throws IOException {
@@ -207,7 +207,7 @@ public class MimeEntity extends AbstractEntity {
         } else {
             MimeEntity message = new MimeEntity(
                     rootStream, 
-                    new InputBuffer(instream, 4 * 1024),
+                    new BufferedLineReaderInputStream(instream, 4 * 1024),
                     body, 
                     EntityStates.T_START_MESSAGE, 
                     EntityStates.T_END_MESSAGE,
@@ -223,7 +223,7 @@ public class MimeEntity extends AbstractEntity {
             RawEntity message = new RawEntity(mimeStream);
             return message;
         } else {
-            InputBuffer stream = new InputBuffer(mimeStream, 4 * 1024);
+            BufferedLineReaderInputStream stream = new BufferedLineReaderInputStream(mimeStream, 4 * 1024);
             MimeEntity mimeentity = new MimeEntity(
                     rootStream, 
                     stream,

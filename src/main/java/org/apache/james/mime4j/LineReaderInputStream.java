@@ -26,9 +26,9 @@ import java.io.InputStream;
 /**
  * Input stream capable of reading lines of text. 
  */
-public abstract class BufferingInputStream extends FilterInputStream {
+public abstract class LineReaderInputStream extends FilterInputStream {
 
-    protected BufferingInputStream(InputStream in) {
+    protected LineReaderInputStream(InputStream in) {
         super(in);
     }
 

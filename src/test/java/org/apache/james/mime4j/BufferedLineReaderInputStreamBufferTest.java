@@ -23,18 +23,18 @@ import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
 
-public class InputBufferTest extends TestCase {
+public class BufferedLineReaderInputStreamBufferTest extends TestCase {
 
     public void testInvalidInput() throws Exception {
         String text = "blah blah yada yada";
         byte[] b1 = text.getBytes("US-ASCII");
         String pattern = "blah";
         byte[] b2 = pattern.getBytes("US-ASCII");
-        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         
-        assertEquals((int)'b', inbuffer.read());
-        assertEquals((int)'l', inbuffer.read());
+        assertEquals('b', inbuffer.read());
+        assertEquals('l', inbuffer.read());
         
         try {
             inbuffer.charAt(1);
@@ -93,7 +93,7 @@ public class InputBufferTest extends TestCase {
     public void testBasicOperations() throws Exception {
         String text = "bla bla yada yada haha haha";
         byte[] b1 = text.getBytes("US-ASCII");
-        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         assertEquals(0, inbuffer.pos());
         assertEquals(27, inbuffer.limit());
@@ -131,7 +131,7 @@ public class InputBufferTest extends TestCase {
         String pattern = "d";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern.getBytes("US-ASCII");
-        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         assertEquals(7, i);
@@ -142,7 +142,7 @@ public class InputBufferTest extends TestCase {
         String pattern = "siid";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern.getBytes("US-ASCII");
-        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         assertEquals(18, i);
@@ -153,7 +153,7 @@ public class InputBufferTest extends TestCase {
         String pattern = "blah";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern.getBytes("US-ASCII");
-        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         assertEquals(-1, i);
@@ -164,7 +164,7 @@ public class InputBufferTest extends TestCase {
         String pattern = "bla";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern.getBytes("US-ASCII");
-        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         assertEquals(0, i);
@@ -175,7 +175,7 @@ public class InputBufferTest extends TestCase {
         String pattern1 = "bla bla";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern1.getBytes("US-ASCII");
-        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         byte[] tmp = new byte[3];
         inbuffer.read(tmp);
@@ -188,7 +188,7 @@ public class InputBufferTest extends TestCase {
     public void testCharOutOfBound() throws Exception {
         String text = "zzz blah blah blah ggg";
         byte[] b1 = text.getBytes("US-ASCII");
-        InputBuffer inbuffer = new InputBuffer(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         byte[] tmp = new byte[3];
         inbuffer.read(tmp);

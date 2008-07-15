@@ -28,7 +28,7 @@ import java.io.IOException;
  * 
  * @version $Id: MimeBoundaryInputStream.java,v 1.2 2004/11/29 13:15:42 ntherning Exp $
  */
-public class MimeBoundaryInputStream extends BufferingInputStream {
+public class MimeBoundaryInputStream extends LineReaderInputStream {
 
     private final byte[] boundary;
     
@@ -39,17 +39,17 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
     private boolean lastPart;
     private boolean completed;
 
-    private InputBuffer buffer;
+    private BufferedLineReaderInputStream buffer;
 
     /**
      * Creates a new MimeBoundaryInputStream.
      * @param s The underlying stream.
      * @param boundary Boundary string (not including leading hyphens).
      */
-    public MimeBoundaryInputStream(InputBuffer inbuffer, String boundary) 
+    public MimeBoundaryInputStream(BufferedLineReaderInputStream inbuffer, String boundary) 
             throws IOException {
         super(inbuffer);
-        this.buffer = (InputBuffer) in;
+        this.buffer = (BufferedLineReaderInputStream) in;
         this.eof = false;
         this.limit = -1;
         this.atBoundary = false;

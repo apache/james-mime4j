@@ -110,13 +110,13 @@ public abstract class AbstractEntity implements EntityStateMachine {
 
     protected abstract int getLineNumber();
     
-    protected abstract BufferingInputStream getDataStream();
+    protected abstract LineReaderInputStream getDataStream();
     
     private void fillFieldBuffer() throws IOException, MimeException {
         if (endOfHeader) {
             return;
         }
-        BufferingInputStream instream = getDataStream();
+        LineReaderInputStream instream = getDataStream();
         fieldbuf.clear();
         for (;;) {
             // If there's still data stuck in the line buffer

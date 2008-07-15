@@ -26,14 +26,14 @@ import java.io.InputStream;
  * Input buffer that can be used to search for patterns using Quick Search 
  * algorithm in data read from an {@link InputStream}. 
  */
-public class InputBuffer extends BufferingInputStream {
+public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
     private final byte[] buffer;
     
     private int bufpos;
     private int buflen;
     
-    public InputBuffer(final InputStream instream, int buffersize) {
+    public BufferedLineReaderInputStream(final InputStream instream, int buffersize) {
         super(instream);
         if (instream == null) {
             throw new IllegalArgumentException("Input stream may not be null");

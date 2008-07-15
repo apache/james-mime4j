@@ -29,16 +29,16 @@ import java.io.InputStream;
  * 
  * @version $Id$
  */
-class BufferingInputStreamAdaptor extends BufferingInputStream {
+class LineReaderInputStreamAdaptor extends LineReaderInputStream {
 
-    private final BufferingInputStream bis;
+    private final LineReaderInputStream bis;
     private boolean used = false;
     private boolean eof = false;
 
-    public BufferingInputStreamAdaptor(final InputStream is) {
+    public LineReaderInputStreamAdaptor(final InputStream is) {
         super(is);
-        if (is instanceof BufferingInputStream) {
-            this.bis = (BufferingInputStream) is;
+        if (is instanceof LineReaderInputStream) {
+            this.bis = (LineReaderInputStream) is;
         } else {
             this.bis = null;
         }

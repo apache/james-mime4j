@@ -39,7 +39,7 @@ public class MimeEntityTest extends TestCase {
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
         RootInputStream rootStream = new RootInputStream(instream); 
-        InputBuffer rawstream = new InputBuffer(rootStream, 12); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 12); 
         
         MimeEntity entity = new MimeEntity(
                 rootStream,
@@ -126,7 +126,7 @@ public class MimeEntityTest extends TestCase {
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
         RootInputStream rootStream = new RootInputStream(instream); 
-        InputBuffer rawstream = new InputBuffer(rootStream, 24); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 24); 
         
         MimeEntity entity = new MimeEntity(
                 rootStream,
@@ -239,7 +239,7 @@ public class MimeEntityTest extends TestCase {
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
         RootInputStream rootStream = new RootInputStream(instream); 
-        InputBuffer rawstream = new InputBuffer(rootStream, 24); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 24); 
         
         MimeEntity entity = new MimeEntity(
                 rootStream,

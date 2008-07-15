@@ -99,7 +99,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     private int state = T_END_OF_STREAM;
     private EntityStateMachine currentStateMachine;
     private int recursionMode = M_RECURSE;
-    private InputBuffer inbuffer;
+    private BufferedLineReaderInputStream inbuffer;
     private RootInputStream rootInputStream;
     
     /**
@@ -144,7 +144,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     private void doParse(InputStream stream, String contentType) {
         entities.clear();
         rootInputStream = new RootInputStream(stream);
-        inbuffer = new InputBuffer(rootInputStream, 4 * 1024);
+        inbuffer = new BufferedLineReaderInputStream(rootInputStream, 4 * 1024);
         switch (recursionMode) {
         case M_RAW:
             RawEntity rawentity = new RawEntity(inbuffer);
