@@ -41,21 +41,21 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
-import org.mime4j.field.AddressListField;
-import org.mime4j.field.ContentTypeField;
-import org.mime4j.field.DateTimeField;
-import org.mime4j.field.Field;
-import org.mime4j.field.UnstructuredField;
-import org.mime4j.field.address.Mailbox;
-import org.mime4j.field.address.MailboxList;
-import org.mime4j.message.BinaryBody;
-import org.mime4j.message.Body;
-import org.mime4j.message.BodyPart;
-import org.mime4j.message.Entity;
-import org.mime4j.message.Header;
-import org.mime4j.message.Message;
-import org.mime4j.message.Multipart;
-import org.mime4j.message.TextBody;
+import org.apache.james.mime4j.field.AddressListField;
+import org.apache.james.mime4j.field.ContentTypeField;
+import org.apache.james.mime4j.field.DateTimeField;
+import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.UnstructuredField;
+import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.field.address.MailboxList;
+import org.apache.james.mime4j.message.BinaryBody;
+import org.apache.james.mime4j.message.Body;
+import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.Entity;
+import org.apache.james.mime4j.message.Header;
+import org.apache.james.mime4j.message.Message;
+import org.apache.james.mime4j.message.Multipart;
+import org.apache.james.mime4j.message.TextBody;
 
 /**
  * Displays a parsed Message in a window. The window will be divided into
@@ -282,8 +282,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                 int size = 0;
                 try {
                     InputStream is = body.getInputStream();
-                    int b;
-                    while ((b = is.read()) != -1) {
+                    while ((is.read()) != -1) {
                         size++;
                     }
                 } catch (IOException ex) {
