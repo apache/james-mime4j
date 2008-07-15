@@ -280,7 +280,4 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return buffer.toString();
     }
 
-    public void reset() {
-    }
-    
 }

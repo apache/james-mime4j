@@ -123,15 +123,6 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         return buffer.read(b, off, chunk);
     }
 
-    /**
-     * Resets the internal state. This will force the boundary to be rescanned.
-     */
-    public void reset() {
-        atBoundary = false;
-        limit = -1;
-        eof = false;
-    }
-    
     public int readLine(final ByteArrayBuffer dst) throws IOException {
         if (dst == null) {
             throw new IllegalArgumentException("Destination buffer may not be null");

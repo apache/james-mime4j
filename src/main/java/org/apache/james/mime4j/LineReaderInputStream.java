@@ -43,9 +43,4 @@ public abstract class LineReaderInputStream extends FilterInputStream {
      */
     public abstract int readLine(final ByteArrayBuffer dst) throws IOException;
     
-    /**
-     * Resets the internal state.
-     */
-    public abstract void reset();
-    
 }

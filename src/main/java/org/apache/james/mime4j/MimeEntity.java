@@ -168,9 +168,6 @@ public class MimeEntity extends AbstractEntity {
             mimeStream = new MimeBoundaryInputStream(inbuffer, body.getBoundary());
         }
         dataStream = new LineReaderInputStreamAdaptor(mimeStream); 
-        // If multipart message is embedded into another multipart message
-        // make sure to reset parent's mime stream
-        inbuffer.reset();
     }
     
     private void clearMimeStream() {
