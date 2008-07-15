@@ -183,7 +183,7 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
     }
     
     private boolean hasData() {
-        return limit > buffer.pos() && limit < buffer.limit();
+        return limit > buffer.pos() && limit <= buffer.limit();
     }
     
     private int fillBuffer() throws IOException {
