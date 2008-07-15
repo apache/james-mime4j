@@ -31,14 +31,12 @@ import java.io.InputStream;
  */
 class BufferingInputStreamAdaptor extends BufferingInputStream {
 
-    private final InputStream is;
     private final BufferingInputStream bis;
     private boolean used = false;
     private boolean eof = false;
 
     public BufferingInputStreamAdaptor(final InputStream is) {
-        super();
-        this.is = is;
+        super(is);
         if (is instanceof BufferingInputStream) {
             this.bis = (BufferingInputStream) is;
         } else {
@@ -47,14 +45,14 @@ class BufferingInputStreamAdaptor extends BufferingInputStream {
     }
 
     public int read() throws IOException {
-        int i = this.is.read();
+        int i = in.read();
         this.eof = i == -1;
         this.used = true;
         return i;
     }
 
     public int read(byte[] b, int off, int len) throws IOException {
-        int i = this.is.read(b, off, len);
+        int i = in.read(b, off, len);
         this.eof = i == -1;
         this.used = true;
         return i;
@@ -75,7 +73,7 @@ class BufferingInputStreamAdaptor extends BufferingInputStream {
     private int doReadLine(final ByteArrayBuffer dst) throws IOException {
         int total = 0;
         int ch;
-        while ((ch = this.is.read()) != -1) {
+        while ((ch = in.read()) != -1) {
             dst.append(ch);
             total++;
             if (ch == '\n') {

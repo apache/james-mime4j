@@ -147,7 +147,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
         inbuffer = new InputBuffer(rootInputStream, 4 * 1024);
         switch (recursionMode) {
         case M_RAW:
-            RawEntity rawentity = new RawEntity(new BasicBufferingInputStream(inbuffer));
+            RawEntity rawentity = new RawEntity(inbuffer);
             currentStateMachine = rawentity;
             break;
         case M_NO_RECURSE:
@@ -156,7 +156,6 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
         case M_RECURSE:
             MimeEntity mimeentity = new MimeEntity(
                     rootInputStream,
-                    new BasicBufferingInputStream(inbuffer),
                     inbuffer,
                     null, 
                     T_START_MESSAGE, 

@@ -26,23 +26,21 @@ import java.io.InputStream;
  * Input buffer that can be used to search for patterns using Quick Search 
  * algorithm in data read from an {@link InputStream}. 
  */
-public class InputBuffer {
+public class InputBuffer extends BufferingInputStream {
 
-    private final InputStream instream;
     private final byte[] buffer;
     
     private int bufpos;
     private int buflen;
     
     public InputBuffer(final InputStream instream, int buffersize) {
-        super();
+        super(instream);
         if (instream == null) {
             throw new IllegalArgumentException("Input stream may not be null");
         }
         if (buffersize <= 0) {
             throw new IllegalArgumentException("Buffer size may not be negative or zero");
         }
-        this.instream = instream;
         this.buffer = new byte[buffersize];
         this.bufpos = 0;
         this.buflen = 0;
@@ -61,7 +59,7 @@ public class InputBuffer {
         int l;
         int off = this.buflen;
         int len = this.buffer.length - off;
-        l = this.instream.read(this.buffer, off, len);
+        l = in.read(this.buffer, off, len);
         if (l == -1) {
             return -1;
         } else {
@@ -74,10 +72,6 @@ public class InputBuffer {
         return this.bufpos < this.buflen;
     }
 
-    public void closeStream() throws IOException {
-        this.instream.close();
-    }
-    
     public int read() throws IOException {
         int noRead = 0;
         while (!hasBufferedData()) {
@@ -116,6 +110,46 @@ public class InputBuffer {
         return read(b, 0, b.length);
     }
     
+    public boolean markSupported() {
+        return false;
+    }
+
+    
+    public int readLine(final ByteArrayBuffer linebuf) throws IOException {
+        if (linebuf == null) {
+            throw new IllegalArgumentException("Buffer may not be null");
+        }
+        int total = 0;
+        boolean found = false;
+        int bytesRead = 0;
+        while (!found) {
+            if (!hasBufferedData()) {
+                bytesRead = fillBuffer();
+                if (bytesRead == -1) {
+                    break;
+                }
+            }
+            int i = indexOf((byte)'\n');
+            int chunk;
+            if (i != -1) {
+                found = true;
+                chunk = i + 1 - pos();
+            } else {
+                chunk = length();
+            }
+            if (chunk > 0) {
+                linebuf.append(buf(), pos(), chunk);
+                skip(chunk);
+                total += chunk;
+            }
+        }
+        if (total == 0 && bytesRead == -1) {
+            return -1;
+        } else {
+            return total;
+        }
+    }
+
     /**
      * Implements quick search algorithm as published by
      * <p> 
@@ -244,6 +278,9 @@ public class InputBuffer {
         }
         buffer.append("]");
         return buffer.toString();
+    }
+
+    public void reset() {
     }
     
 }

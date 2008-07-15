@@ -30,7 +30,6 @@ import java.io.IOException;
  */
 public class MimeBoundaryInputStream extends BufferingInputStream {
 
-    private final InputBuffer buffer;
     private final byte[] boundary;
     
     private boolean eof;
@@ -40,6 +39,8 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
     private boolean lastPart;
     private boolean completed;
 
+    private InputBuffer buffer;
+
     /**
      * Creates a new MimeBoundaryInputStream.
      * @param s The underlying stream.
@@ -47,7 +48,8 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
      */
     public MimeBoundaryInputStream(InputBuffer inbuffer, String boundary) 
             throws IOException {
-        this.buffer = inbuffer;
+        super(inbuffer);
+        this.buffer = (InputBuffer) in;
         this.eof = false;
         this.limit = -1;
         this.atBoundary = false;
@@ -241,7 +243,7 @@ public class MimeBoundaryInputStream extends BufferingInputStream {
                         this.lastPart = true;
                         buffer.skip(2);
                     }
-                    skipLineDelimiter();                    
+                    skipLineDelimiter();   
                     break;
                 } else {
                     fillBuffer();

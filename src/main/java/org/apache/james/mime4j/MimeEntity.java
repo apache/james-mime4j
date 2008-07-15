@@ -19,7 +19,6 @@ public class MimeEntity extends AbstractEntity {
     private static final int T_IN_MESSAGE = -3;
 
     private final RootInputStream rootStream;
-    private final InputStream rawStream;
     private final InputBuffer inbuffer;
     
     private int recursionMode;
@@ -31,7 +30,6 @@ public class MimeEntity extends AbstractEntity {
     
     public MimeEntity(
             RootInputStream rootStream,
-            InputStream rawStream,
             InputBuffer inbuffer,
             BodyDescriptor parent, 
             int startState, 
@@ -41,19 +39,17 @@ public class MimeEntity extends AbstractEntity {
         super(parent, startState, endState, maximalBodyDescriptor, strictParsing);
         this.rootStream = rootStream;
         this.inbuffer = inbuffer;
-        this.rawStream = rawStream;
-        this.dataStream = new BufferingInputStreamAdaptor(rawStream);
+        this.dataStream = new BufferingInputStreamAdaptor(inbuffer);
         this.skipHeader = false;
     }
 
     public MimeEntity(
             RootInputStream rootStream,
-            InputStream rawStream,
             InputBuffer inbuffer,
             BodyDescriptor parent, 
             int startState, 
             int endState) {
-        this(rootStream, rawStream, inbuffer, parent, startState, endState, false, false);
+        this(rootStream, inbuffer, parent, startState, endState, false, false);
     }
 
     public int getRecursionMode() {
@@ -168,14 +164,12 @@ public class MimeEntity extends AbstractEntity {
         dataStream = new BufferingInputStreamAdaptor(mimeStream); 
         // If multipart message is embedded into another multipart message
         // make sure to reset parent's mime stream
-        if (rawStream instanceof BufferingInputStream) {
-            ((BufferingInputStream) rawStream).reset();
-        }
+        inbuffer.reset();
     }
     
     private void clearMimeStream() {
         mimeStream = null;
-        dataStream = new BufferingInputStreamAdaptor(rawStream); 
+        dataStream = new BufferingInputStreamAdaptor(inbuffer); 
     }
     
     private void advanceToBoundary() throws IOException {
@@ -191,18 +185,14 @@ public class MimeEntity extends AbstractEntity {
     private EntityStateMachine nextMessage() {
         String transferEncoding = body.getTransferEncoding();
         InputStream instream;
-        InputBuffer buffer;
         if (MimeUtil.isBase64Encoding(transferEncoding)) {
             log.debug("base64 encoded message/rfc822 detected");
             instream = new Base64InputStream(dataStream);                    
-            buffer = new InputBuffer(instream, 4 * 1024);
         } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
             log.debug("quoted-printable encoded message/rfc822 detected");
             instream = new QuotedPrintableInputStream(dataStream);                    
-            buffer = new InputBuffer(instream, 4 * 1024);
         } else {
             instream = dataStream;
-            buffer = inbuffer;
         }
         
         if (recursionMode == RecursionMode.M_RAW) {
@@ -211,8 +201,7 @@ public class MimeEntity extends AbstractEntity {
         } else {
             MimeEntity message = new MimeEntity(
                     rootStream, 
-                    instream,
-                    buffer, 
+                    new InputBuffer(instream, 4 * 1024),
                     body, 
                     EntityStates.T_START_MESSAGE, 
                     EntityStates.T_END_MESSAGE,
@@ -228,10 +217,10 @@ public class MimeEntity extends AbstractEntity {
             RawEntity message = new RawEntity(mimeStream);
             return message;
         } else {
+            InputBuffer stream = new InputBuffer(mimeStream, 4 * 1024);
             MimeEntity mimeentity = new MimeEntity(
                     rootStream, 
-                    mimeStream,
-                    inbuffer, 
+                    stream,
                     body, 
                     EntityStates.T_START_BODYPART, 
                     EntityStates.T_END_BODYPART,

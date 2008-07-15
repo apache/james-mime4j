@@ -19,13 +19,18 @@
 
 package org.apache.james.mime4j;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * Input stream capable of reading lines of text. 
  */
-public abstract class BufferingInputStream extends InputStream {
+public abstract class BufferingInputStream extends FilterInputStream {
+
+    protected BufferingInputStream(InputStream in) {
+        super(in);
+    }
 
     /**
      * Reads one line of text into the given {@link ByteArrayBuffer}.
