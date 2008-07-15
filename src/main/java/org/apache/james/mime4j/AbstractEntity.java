@@ -363,7 +363,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
                 result = "End multipart";
                 break;
             case EntityStates.T_PREAMBLE:
-                result = "Premable";
+                result = "Preamble";
                 break;
             case EntityStates.T_EPILOGUE:
                 result = "Epilogue";
