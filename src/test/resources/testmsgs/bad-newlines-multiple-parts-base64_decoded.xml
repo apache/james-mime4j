@@ -26,6 +26,7 @@ Content-Transfer-Encoding: 7bit</field>
 <text-body name="bad-newlines-multiple-parts-base64_decoded_1_1_1.txt"/>
 </body-part>
 <epilogue>
+That was a multi-part message in MIME format.
 </epilogue>
 </multipart>
 </message>
