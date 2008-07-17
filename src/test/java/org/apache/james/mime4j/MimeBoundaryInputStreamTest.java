@@ -330,4 +330,17 @@ public class MimeBoundaryInputStreamTest extends TestCase {
         assertEquals(-1, instream.readLine(linebuf));
     }
     
+    public void testboundaryLongerThanBuffer() throws IOException {
+        String text = "--looooooooooooooooooooooooooong-boundary\r\n";
+        
+        ByteArrayInputStream bis = new ByteArrayInputStream(text.getBytes());
+        BufferedLineReaderInputStream buffer = new BufferedLineReaderInputStream(bis, 10); 
+        
+        try {
+            new MimeBoundaryInputStream(buffer, "looooooooooooooooooooooooooong-boundary");
+            fail("IllegalArgumentException should have been thrown");
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+
 }

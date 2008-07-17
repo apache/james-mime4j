@@ -49,7 +49,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     public MimeBoundaryInputStream(BufferedLineReaderInputStream inbuffer, String boundary) 
             throws IOException {
         super(inbuffer);
-        this.buffer = (BufferedLineReaderInputStream) in;
+        if (inbuffer.capacity() <= boundary.length()) {
+            throw new IllegalArgumentException("Boundary is too long");
+        }
+        this.buffer = inbuffer;
         this.eof = false;
         this.limit = -1;
         this.atBoundary = false;

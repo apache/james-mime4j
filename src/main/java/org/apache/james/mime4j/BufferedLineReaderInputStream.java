@@ -28,7 +28,7 @@ import java.io.InputStream;
  */
 public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
-    private final byte[] buffer;
+    private byte[] buffer;
     
     private int bufpos;
     private int buflen;
@@ -44,6 +44,21 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         this.buffer = new byte[buffersize];
         this.bufpos = 0;
         this.buflen = 0;
+    }
+    
+    private void expand(int newlen) {
+        byte newbuffer[] = new byte[newlen];
+        int len = this.buflen - this.bufpos;
+        if (len > 0) {
+            System.arraycopy(this.buffer, this.bufpos, newbuffer, this.bufpos, len);
+        }
+        this.buffer = newbuffer;
+    }
+    
+    public void ensureCapacity(int len) {
+        if (len > this.buffer.length) {
+            expand(len);
+        }
     }
     
     public int fillBuffer() throws IOException {
@@ -251,6 +266,10 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     
     public int length() {
         return this.buflen - this.bufpos;
+    }
+    
+    public int capacity() {
+        return this.buffer.length;
     }
     
     public int skip(int n) {

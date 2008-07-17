@@ -20,14 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.EOLConvertingInputStream;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.message.BinaryBody;
-import org.apache.james.mime4j.message.Body;
-import org.apache.james.mime4j.message.Entity;
-import org.apache.james.mime4j.message.Message;
-import org.apache.james.mime4j.message.Multipart;
-import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.log4j.BasicConfigurator;
 
@@ -90,10 +83,7 @@ public class MessageParserTest extends TestCase {
         
         System.out.println("Parsing " + f.getName());
         
-        InputStream in = new EOLConvertingInputStream(new BufferedInputStream(
-                        new FileInputStream(f))); //, 
-        
-        Message m = new Message(in);
+        Message m = new Message(new FileInputStream(f));
         
         String prefix = f.getName().substring(0, f.getName().length() - 4);
         String xmlFileName = fileName.substring(0, fileName.length() - 4) 
@@ -104,8 +94,7 @@ public class MessageParserTest extends TestCase {
                                     + "_decoded.mime4j.xml";
         String expected = null;
         try {
-            expected = IOUtils.toString(
-                    new FileInputStream(xmlFileName), "ISO8859-1");
+            expected = IOUtils.toString(new FileInputStream(xmlFileName), "ISO8859-1");
         } catch (FileNotFoundException ex) {
             writeToFile(result, mime4jFileName);
             fail("Test file not found. Generated the expected result with mime4j prefix: "+ex.getMessage());
