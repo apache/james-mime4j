@@ -1,0 +1,23 @@
+<message>
+<header>
+<field>
+Content-Type: multipart/mixed; boundary="boundary"</field>
+</header>
+<multipart>
+<preamble>
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain</field>
+</header>
+<body>
+This should be a text including the --boundary
+string and should not be parsed as multiple bodies
+</body>
+</body-part>
+<epilogue>
+epilouge
+</epilogue>
+</multipart>
+</message>
