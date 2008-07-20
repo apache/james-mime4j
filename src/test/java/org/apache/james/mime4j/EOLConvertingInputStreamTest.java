@@ -41,6 +41,10 @@ public class EOLConvertingInputStreamTest extends TestCase {
         testConvertCR("Line 1\r\nLine 2\r\n", "Line 1\r\nLine 2\r\n");
         testConvertLF("Line 1\r\nLine 2\r\n", "Line 1\r\nLine 2\r\n");
         
+        testConvertBoth("Line 1\n\rLine 2\n\r", "Line 1\r\n\r\nLine 2\r\n\r\n");
+        testConvertCR("Line 1\n\rLine 2\n\r", "Line 1\n\r\nLine 2\n\r\n");
+        testConvertLF("Line 1\n\rLine 2\n\r", "Line 1\r\n\rLine 2\r\n\r");
+        
         testConvertBoth("Line 1\nLine 2\n", "Line 1\r\nLine 2\r\n");
         testConvertCR("Line 1\nLine 2\n", "Line 1\nLine 2\n");
         testConvertLF("Line 1\nLine 2\n", "Line 1\r\nLine 2\r\n");
