@@ -48,12 +48,15 @@ import junit.framework.TestSuite;
  * @version $Id: MessageParserTest.java,v 1.4 2004/10/25 07:26:47 ntherning Exp $
  */
 public class MessageParserTest extends TestCase {
-    private String fileName = null;
+    private File file = null;
 
-    public MessageParserTest(String name, String fileName) {
+    public MessageParserTest(String name) {
+        this(name, MessageParserTestSuite.getFile(name));
+    }
+
+    public MessageParserTest(String name, File file) {
         super(name);
-        
-        this.fileName = fileName;
+        this.file = file;
     }
 
     public void setUp() {
@@ -62,24 +65,33 @@ public class MessageParserTest extends TestCase {
     }
         
     public static Test suite() {
-        TestSuite suite = new TestSuite();
+        return new MessageParserTestSuite();
+    }
+    
+    static class MessageParserTestSuite extends TestSuite {
         
-        File dir = new File("src/test/resources/testmsgs");
-        File[] files = dir.listFiles();
-        
-        for (int i = 0; i < files.length && i < 5000; i++) {
-            File f = files[i];
-            if (f.getName().toLowerCase().endsWith(".msg")) {
-                suite.addTest(new MessageParserTest(f.getName(), 
-                                                        f.getAbsolutePath()));
+        private static final File TESTS_FOLDER = new File("src/test/resources/testmsgs");
+
+        public MessageParserTestSuite() {
+            File dir = TESTS_FOLDER;
+            File[] files = dir.listFiles();
+            
+            for (int i = 0; i < files.length && i < 5000; i++) {
+                File f = files[i];
+                if (f.getName().toLowerCase().endsWith(".msg")) {
+                    addTest(new MessageParserTest(f.getName().substring(0, f.getName().length()-4), f));
+                }
             }
         }
         
-        return suite;
+        public static File getFile(String name) {
+            return new File(TESTS_FOLDER.getAbsolutePath()+File.separator+name+".msg");
+        }
     }
     
     protected void runTest() throws IOException {
-        File f = new File(fileName);
+        File f = file;
+        String fileName = file.getAbsolutePath();
         
         System.out.println("Parsing " + f.getName());
         
@@ -169,8 +181,8 @@ public class MessageParserTest extends TestCase {
             String tag = b instanceof TextBody ? "text-body" : "binary-body";
             sb.append("<" + tag + " name=\"" + name + "\"/>\r\n");
                 
-            File expectedFile = new File(new File(fileName).getParent(), name);
-            File mime4jFile = new File(new File(fileName).getParent(), 
+            File expectedFile = new File(file.getParent(), name);
+            File mime4jFile = new File(file.getParent(), 
                               name.substring(0, name.length() - 4) + ".mime4j"
                                + (b instanceof TextBody ? ".txt" : ".bin"));
                 

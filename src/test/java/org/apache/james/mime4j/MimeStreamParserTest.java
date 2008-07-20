@@ -19,21 +19,14 @@
 
 package org.apache.james.mime4j;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.log4j.BasicConfigurator;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 
 import junit.framework.TestCase;
-
-
 
 /**
  * 
@@ -415,41 +408,6 @@ public class MimeStreamParserTest extends TestCase {
         assertEquals(0, expected.size());
     }
     
-    public void testParse() throws Exception {
-        File dir = new File("src/test/resources/testmsgs");
-        File[] files = dir.listFiles();
-        
-        for (int i = 0; i < files.length; i++) {
-            File f = files[i];
-            
-            if (f.getName().toLowerCase().endsWith(".msg")) {
-                MimeStreamParser parser = null;
-                TestHandler handler = null;
-                parser = new MimeStreamParser();
-                handler = new TestHandler();
-                
-                System.out.println("Parsing " + f.getName());
-                parser.setContentHandler(handler);
-                parser.parse(new FileInputStream(f));
-                
-                String result = handler.sb.toString();
-                String xmlFile = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf('.')) + ".xml";
-                String xmlFileMime4j = f.getAbsolutePath().substring(0, f.getAbsolutePath().lastIndexOf('.')) + ".mime4j.xml";
-                
-                try {
-                    String expected = IOUtils.toString(new FileInputStream(xmlFile), "ISO8859-1");
-                    assertEquals("Error parsing " + f.getName(), expected, result);
-                } catch (FileNotFoundException e) {
-                    FileOutputStream fos = new FileOutputStream(xmlFileMime4j);
-                    fos.write(result.getBytes());
-                    fos.flush();
-                    fos.close();
-                    fail("XML file not found: generated a file with the expected result!");
-                }
-            }
-        }
-    }
-    
     public void testAutomaticContentDecoding() throws Exception {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentDecoding(true);
@@ -488,83 +446,4 @@ public class MimeStreamParserTest extends TestCase {
         assertEquals(expected, result);
     }
     
-    private static class TestHandler implements ContentHandler {
-        private StringBuffer sb = new StringBuffer();
-
-        private String escape(char c) {
-            if (c == '&') {
-                return "&amp;";
-            }
-            if (c == '>') {
-                return "&gt;";
-            }
-            if (c == '<') {
-                return "&lt;";
-            }
-            return "" + c;
-        }
-        
-        private String escape(String s) {
-            s = s.replaceAll("&", "&amp;");
-            s = s.replaceAll(">", "&gt;");
-            s = s.replaceAll("<", "&lt;");
-            return s;
-        }
-        
-        public void epilogue(InputStream is) throws IOException {
-            sb.append("<epilogue>\r\n");
-            int b = 0;
-            while ((b = is.read()) != -1) {
-                sb.append(escape((char) b));
-            }
-            sb.append("</epilogue>\r\n");
-        }
-        public void preamble(InputStream is) throws IOException {
-            sb.append("<preamble>\r\n");
-            int b = 0;
-            while ((b = is.read()) != -1) {
-                sb.append(escape((char) b));
-            }
-            sb.append("</preamble>\r\n");
-        }
-        public void startMultipart(BodyDescriptor bd) {
-            sb.append("<multipart>\r\n");
-        }
-        public void body(BodyDescriptor bd, InputStream is) throws IOException {
-            sb.append("<body>\r\n");
-            int b = 0;
-            while ((b = is.read()) != -1) {
-                sb.append(escape((char) b));
-            }
-            sb.append("</body>\r\n");
-        }
-        public void endMultipart() {
-            sb.append("</multipart>\r\n");
-        }
-        public void startBodyPart() {
-            sb.append("<body-part>\r\n");
-        }
-        public void endBodyPart() {
-            sb.append("</body-part>\r\n");
-        }
-        public void startHeader() {
-            sb.append("<header>\r\n");
-        }
-        public void field(String fieldData) {
-            sb.append("<field>\r\n" + escape(fieldData) + "</field>\r\n");
-        }
-        public void endHeader() {
-            sb.append("</header>\r\n");
-        }
-        public void startMessage() {
-            sb.append("<message>\r\n");
-        }
-        public void endMessage() {
-            sb.append("</message>\r\n");
-        }
-
-        public void raw(InputStream is) throws IOException {
-            fail("raw should never be called");
-        }
-    }
 }
