@@ -201,10 +201,8 @@ public class MessageParserTest extends TestCase {
                         charset = "ISO8859-1";
                     }
 
-                    String s1 = IOUtils.toString(expected, charset).replaceAll(
-                            "\r", "");
-                    String s2 = IOUtils.toString(((TextBody) b).getReader())
-                            .replaceAll("\r", "");
+                    String s1 = IOUtils.toString(expected, charset);
+                    String s2 = IOUtils.toString(((TextBody) b).getReader());
                     assertEquals(expectedFile.getName(), s1, s2);
                 } else {
                     assertEqualsBinary(expectedFile.getName(), expected,
