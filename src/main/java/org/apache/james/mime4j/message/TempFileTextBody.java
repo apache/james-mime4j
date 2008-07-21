@@ -128,7 +128,6 @@ class TempFileTextBody extends AbstractBody implements TextBody {
             out.write(CodecUtil.CRLF_CRLF);
         } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(transferEncoding)) {
             CodecUtil.encodeQuotedPrintable(inputStream,out);
-            out.write(CodecUtil.CRLF_CRLF);
         } else {
             CodecUtil.copy(inputStream,out);
         }

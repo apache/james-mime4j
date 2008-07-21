@@ -100,7 +100,6 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
             out.write(CodecUtil.CRLF_CRLF);
         } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(transferEncoding)) {
             CodecUtil.encodeQuotedPrintableBinary(inputStream,out);
-            out.write(CodecUtil.CRLF_CRLF);
         } else {
             CodecUtil.copy(inputStream,out);
         }
