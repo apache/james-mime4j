@@ -146,11 +146,9 @@ public class CodecUtil {
         }
         
         private void write(byte next) throws IOException {
-            outBuffer[outputIndex] = next;
+            outBuffer[outputIndex++] = next;
             if (outputIndex >= outBuffer.length) {
                 flushOutput();
-            } else {
-                outputIndex++;
             }
         }
         

@@ -21,6 +21,7 @@ package org.apache.james.mime4j.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 import org.apache.james.mime4j.ExampleMail;
 
@@ -42,6 +43,20 @@ public class CodecUtilTest extends TestCase {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.copy(in, out);
         assertEquals(content, out.toByteArray());
+    }
+    
+    public void testEncodeQuotedPrintableLargeInput() throws Exception {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < 1024 * 5; i++) {
+            sb.append((char) ('0' + (i % 10)));
+        }
+        String expected = sb.toString().replaceAll("(\\d{75})", "$1=\r\n");
+        
+        InputStream in = new ByteArrayInputStream(sb.toString().getBytes("US-ASCII"));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CodecUtil.encodeQuotedPrintableBinary(in, out);
+        String actual = new String(out.toByteArray(), "US-ASCII");
+        assertEquals(expected, actual);
     }
     
     private void assertEquals(byte[] expected, byte[] actual) {
