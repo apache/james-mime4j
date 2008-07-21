@@ -184,7 +184,7 @@ public class Message extends Entity implements Body {
             
             final Body body;
             if (bd.getMimeType().startsWith("text/")) {
-                body = new TempFileTextBody(is, bd.getCharset());
+                body = new TempFileTextBody(is, bd.getCharset(), enc);
             } else {
                 body = new TempFileBinaryBody(is, enc);
             }
