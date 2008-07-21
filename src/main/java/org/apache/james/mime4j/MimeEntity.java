@@ -167,12 +167,17 @@ public class MimeEntity extends AbstractEntity {
         if (bufferSize < 4096) {
             bufferSize = 4096;
         }
-        if (mimeStream != null) {
-            mimeStream = new MimeBoundaryInputStream(
-                    new BufferedLineReaderInputStream(mimeStream, bufferSize), boundary);
-        } else {
-            inbuffer.ensureCapacity(bufferSize);
-            mimeStream = new MimeBoundaryInputStream(inbuffer, boundary);
+        try {
+            if (mimeStream != null) {
+                mimeStream = new MimeBoundaryInputStream(
+                        new BufferedLineReaderInputStream(mimeStream, bufferSize), boundary);
+            } else {
+                inbuffer.ensureCapacity(bufferSize);
+                mimeStream = new MimeBoundaryInputStream(inbuffer, boundary);
+            }
+        } catch (IllegalArgumentException e) {
+            // thrown when boundary is too long
+            throw new MimeException(e.getMessage(), e);
         }
         dataStream = new LineReaderInputStreamAdaptor(mimeStream); 
     }

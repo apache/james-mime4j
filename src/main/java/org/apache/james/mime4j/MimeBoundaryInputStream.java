@@ -45,6 +45,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
      * Creates a new MimeBoundaryInputStream.
      * @param s The underlying stream.
      * @param boundary Boundary string (not including leading hyphens).
+     * @throws IllegalArgumentException when boundary is too long
      */
     public MimeBoundaryInputStream(BufferedLineReaderInputStream inbuffer, String boundary) 
             throws IOException {
