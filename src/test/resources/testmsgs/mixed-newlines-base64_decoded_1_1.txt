@@ -1,5 +1,0 @@
-The separator between the header and body is LFCR (LF of the last header) and it should
-be converted to CRLFCRLF.
-A line ending with LF
-a line ending with CRLF
-a line ending with CR
