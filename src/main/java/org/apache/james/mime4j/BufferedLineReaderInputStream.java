@@ -195,7 +195,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         
         int j = 0;
         while (j <= len - pattern.length) {
-            int cur = this.bufpos + j;
+            int cur = off + j;
             boolean match = true;
             for (int i = 0; i < pattern.length; i++) {
                 if (this.buffer[cur + i] != pattern[i]) {
