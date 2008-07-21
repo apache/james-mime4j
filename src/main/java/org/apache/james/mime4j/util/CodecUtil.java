@@ -138,11 +138,14 @@ public class CodecUtil {
             if (--nextSoftBreak <= QUOTED_PRINTABLE_OCTETS_PER_ESCAPE) {
                 softBreak();
             }
+            
+            int nextUnsigned = (int) next & 0xff;
+            
             write(EQUALS);
             --nextSoftBreak;
-            write(HEX_DIGITS[next >> 4]);
+            write(HEX_DIGITS[nextUnsigned >> 4]);
             --nextSoftBreak;
-            write(HEX_DIGITS[next % 0x10]);
+            write(HEX_DIGITS[nextUnsigned % 0x10]);
         }
         
         private void write(byte next) throws IOException {

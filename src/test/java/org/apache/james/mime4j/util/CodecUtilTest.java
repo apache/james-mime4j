@@ -58,6 +58,15 @@ public class CodecUtilTest extends TestCase {
         String actual = new String(out.toByteArray(), "US-ASCII");
         assertEquals(expected, actual);
     }
+
+    public void testEncodeQuotedPrintableNonAsciiChars() throws Exception {
+        String s = "7bit content with euro \u20AC symbol";
+        InputStream in = new ByteArrayInputStream(s.getBytes("iso-8859-15"));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CodecUtil.encodeQuotedPrintableBinary(in, out);
+        String actual = new String(out.toByteArray(), "US-ASCII");
+        assertEquals("7bit=20content=20with=20euro=20=A4=20symbol", actual);
+    }
     
     private void assertEquals(byte[] expected, byte[] actual) {
         StringBuffer buffer = new StringBuffer(expected.length);
