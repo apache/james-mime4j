@@ -35,6 +35,7 @@ public class CodecUtil {
     
     private static final int DEFAULT_ENCODING_BUFFER_SIZE = 1024;
     
+    private static final byte TAB = 0x09;
     private static final byte SPACE = 0x20;
     private static final byte EQUALS = 0x3D;
     private static final byte CR = 0x0D;
@@ -60,7 +61,7 @@ public class CodecUtil {
     
     /**
      * Encodes the given stream using Quoted-Printable.
-     * This assumes that text is binary and therefore escapes
+     * This assumes that stream is binary and therefore escapes
      * all line endings.
      * @param in not null
      * @param out not null
@@ -68,14 +69,18 @@ public class CodecUtil {
      */
     public static void encodeQuotedPrintableBinary(final InputStream in, final OutputStream out) throws IOException {
         
-        BinaryQuotedPrintableEncoder encoder = new BinaryQuotedPrintableEncoder(DEFAULT_ENCODING_BUFFER_SIZE);
+        QuotedPrintableEncoder encoder = new QuotedPrintableEncoder(DEFAULT_ENCODING_BUFFER_SIZE, true);
         encoder.encode(in, out);
     }
     
-    private static final class BinaryQuotedPrintableEncoder {
+    private static final class QuotedPrintableEncoder {
         private final byte[] inBuffer;
         private final byte[] outBuffer;
+        private final boolean binary;
         
+        private boolean pendingSpace;
+        private boolean pendingTab;
+        private boolean pendingCR;
         private int nextSoftBreak;
         private int inputIndex;
         private int outputIndex;
@@ -84,7 +89,7 @@ public class CodecUtil {
         private OutputStream out;
         
         
-        public BinaryQuotedPrintableEncoder(int bufferSize) {
+        public QuotedPrintableEncoder(int bufferSize, boolean binary) {
             inBuffer = new byte[bufferSize];
             outBuffer = new byte[3*bufferSize];
             inputLength = 0;
@@ -92,11 +97,18 @@ public class CodecUtil {
             nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH + 1;
             in = null;
             out = null;
+            this.binary = binary;
+            pendingSpace = false;
+            pendingTab = false;
+            pendingCR = false;
         }
         
         public void encode(final InputStream in, final OutputStream out) throws IOException {
             this.in = in;
             this.out = out;
+            pendingSpace = false;
+            pendingTab = false;
+            pendingCR = false;
             nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH + 1;
             read();
             while(inputLength > -1) {
@@ -107,6 +119,7 @@ public class CodecUtil {
                 }
                 read();
             }
+            writePending();
             flushOutput();
         }
 
@@ -115,15 +128,73 @@ public class CodecUtil {
             inputIndex = 0;
         }
         
+        private void writePending() throws IOException {
+            if (pendingSpace) {
+                plain(SPACE);
+            } else if (pendingTab) {
+                plain(TAB);
+            } else if (pendingCR) {
+                plain(CR);
+            }
+            clearPending();
+        }
+        
+        private void clearPending() throws IOException {
+            pendingSpace  = false;
+            pendingTab = false;
+            pendingCR = false;
+        }
+        
         private void encode(byte next) throws IOException {
-            if (next <= SPACE) {
-                escape(next);
-            } else if (next > QUOTED_PRINTABLE_LAST_PLAIN) {
-                escape(next);
-            } else if (next == EQUALS) {
-                escape(next);
+            if (next == LF) {
+                if (binary) {
+                    writePending();
+                    escape(next);
+                } else {
+                    if (pendingCR) {
+                        // Expect either space or tab pending 
+                        // but not both
+                        if (pendingSpace) {
+                            escape(SPACE);
+                        } else if (pendingTab) {
+                            escape(TAB);
+                        }
+                        lineBreak();
+                        clearPending();
+                    } else {
+                        writePending();
+                        plain(next);
+                    }
+                }
+            } else if (next == CR) {
+                if (binary)  {
+                    escape(next);
+                } else {
+                    pendingCR = true;
+                }
             } else {
-                plain(next);
+                writePending();
+                if (next == SPACE) {
+                    if (binary)  {
+                        escape(next);
+                    } else {
+                        pendingSpace = true;
+                    }
+                } else if (next == TAB) {
+                    if (binary)  {
+                        escape(next);
+                    } else {
+                        pendingTab = true;
+                    }
+                } else if (next < SPACE) {
+                    escape(next);
+                } else if (next > QUOTED_PRINTABLE_LAST_PLAIN) {
+                    escape(next);
+                } else if (next == EQUALS) {
+                    escape(next);
+                } else {
+                    plain(next);
+                }
             }
         }
         
@@ -157,6 +228,10 @@ public class CodecUtil {
         
         private void softBreak() throws IOException {
             write(EQUALS);
+            lineBreak();
+        }
+
+        private void lineBreak() throws IOException {
             write(CR);
             write(LF);
             nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH;
@@ -170,6 +245,19 @@ public class CodecUtil {
             }
             outputIndex = 0;
         }
+    }
+    
+    /**
+     * Encodes the given stream using Quoted-Printable.
+     * This assumes that stream is text and therefore does not escape
+     * all line endings.
+     * @param in not null
+     * @param out not null
+     * @throws IOException
+     */
+    public static void encodeQuotedPrintable(final InputStream in, final OutputStream out) throws IOException {
+        final QuotedPrintableEncoder encoder = new QuotedPrintableEncoder(DEFAULT_ENCODING_BUFFER_SIZE, false);
+        encoder.encode(in, out);
     }
     
     /**
