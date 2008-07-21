@@ -127,7 +127,7 @@ class TempFileTextBody extends AbstractBody implements TextBody {
             CodecUtil.encodeBase64(inputStream, out);
             out.write(CodecUtil.CRLF_CRLF);
         } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(transferEncoding)) {
-            CodecUtil.encodeQuotedPrintableBinary(inputStream,out);
+            CodecUtil.encodeQuotedPrintable(inputStream,out);
             out.write(CodecUtil.CRLF_CRLF);
         } else {
             CodecUtil.copy(inputStream,out);
