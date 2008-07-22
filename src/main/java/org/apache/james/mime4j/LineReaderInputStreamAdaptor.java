@@ -94,5 +94,8 @@ class LineReaderInputStreamAdaptor extends LineReaderInputStream {
     public boolean isUsed() {
         return this.used;
     }
-
+    
+    public String toString() {
+        return "[LineReaderInputStreamAdaptor: " + bis + "]";
+    }
 }
