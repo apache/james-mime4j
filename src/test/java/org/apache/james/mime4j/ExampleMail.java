@@ -491,6 +491,7 @@ public class ExampleMail {
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n" + breakLines(ONE_PART_MIME_QUOTED_PRINTABLE_ASCII_BODY.replaceAll("\r\n", "=0D=0A"));
     
+    
     public static final String RFC_SIMPLE = 
             "From: Timothy Tayler <timothy@example.org>\r\n" +
             "To: Samual Smith <samual@example.org>\r\n" +
@@ -499,6 +500,15 @@ public class ExampleMail {
             "\r\n" +
             RFC822_SIMPLE_BODY;
 
+    public static final String MIME_RFC822_SIMPLE = 
+        "From: Samual Smith <sam@example.org>\r\n" +
+        "To: Joshua Tetley <josh@example.org>\r\n" +
+        "Date: Thu, 14 Feb 2008 12:30:00 +0000 (GMT)\r\n" +
+        "Subject: FW: A Simple Email\r\n" +
+        "MIME-Version: 1.0\r\n" +
+        "Content-Type: message/rfc822\r\n" +
+        "\r\n" + RFC_SIMPLE;
+    
     public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_7BIT = "Sonnet XXXIII By William Shakespeare\r\n" +
             "\r\n" +
             "Full many a glorious morning have I seen\r\n" +
@@ -609,6 +619,7 @@ public class ExampleMail {
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END),
     };
     
+    public static final byte[] MIME_RFC822_SIMPLE_BYTES = ascii(MIME_RFC822_SIMPLE);
     public static final byte[] MULTIPART_WITH_CONTENT_LOCATION_BYTES = ascii(MULTIPART_WITH_CONTENT_LOCATION);
     public static final byte[] ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS_BYTES = ascii(ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS);
     public static final byte[] MIME_MULTIPART_ALTERNATIVE_BYTES = ascii(MIME_MULTIPART_ALTERNATIVE);
