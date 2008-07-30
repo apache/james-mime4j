@@ -1,11 +1,11 @@
 Content-Type: multipart/mixed; boundary="boundary"
 
---boundary
+--boundary This should be ignored Content-Type: message/rfc822
 Content-Type: text/plain
 
 first part
 
---boundary-- This should be already part of the epilogue.
+--boundary-- This should be ignored at all and not part of the epilogue.
 
 From the RFC about ending boundary:
 

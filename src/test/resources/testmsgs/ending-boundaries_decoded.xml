@@ -14,7 +14,6 @@ Content-Type: text/plain</field>
 <text-body name="ending-boundaries_decoded_1_1.txt"/>
 </body-part>
 <epilogue>
- This should be already part of the epilogue.
 
 From the RFC about ending boundary:
 
