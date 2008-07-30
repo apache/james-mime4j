@@ -193,7 +193,16 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         }
         eof = bytesRead == -1;
         
+        
         int i = buffer.indexOf(boundary);
+        // NOTE this currently check only for LF. It doesn't check for canonical CRLF
+        // and neither for isolated CR. This will require updates according to MIME4J-60
+        while (i > 0 && buffer.charAt(i-1) != '\n') {
+            // skip the "fake" boundary (it does not contain LF or CR so we cannot have
+            // another boundary starting before this is complete.
+            i = i + boundary.length;
+            i = buffer.indexOf(boundary, i, buffer.limit() - i);
+        }
         if (i != -1) {
             limit = i;
             atBoundary = true;
@@ -230,40 +239,37 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         if (!completed) {
             completed = true;
             buffer.skip(boundaryLen);
+            boolean checkForLastPart = true;
             for (;;) {
                 if (buffer.length() > 1) {
                     int ch1 = buffer.charAt(buffer.pos());
                     int ch2 = buffer.charAt(buffer.pos() + 1);
-                    if (ch1 == '-' && ch2 == '-') {
+                    
+                    if (checkForLastPart) if (ch1 == '-' && ch2 == '-') {
                         this.lastPart = true;
                         buffer.skip(2);
+                        checkForLastPart = false;
+                        continue;
                     }
-                    skipLineDelimiter();   
-                    break;
+                    
+                    if (ch1 == '\r' && ch2 == '\n') {
+                        buffer.skip(2);
+                        break;
+                    } else if (ch1 == '\n') {
+                        buffer.skip(1);
+                        break;
+                    } else {
+                        // ignoring everything in a line starting with a boundary.
+                        buffer.skip(1);
+                    }
+                    
                 } else {
+                    if (eof) {
+                        break;
+                    }
                     fillBuffer();
                 }
-                if (eof) {
-                    break;
-                }
             }
-        }
-    }
-    
-    private void skipLineDelimiter() {
-        int ch1 = 0;
-        int ch2 = 0;
-        int len = buffer.length(); 
-        if (len > 0) {
-            ch1 = buffer.charAt(buffer.pos());
-        }
-        if (len > 1) {
-            ch2 = buffer.charAt(buffer.pos() + 1);
-        }
-        if (ch1 == '\r' && ch2 == '\n') {
-            buffer.skip(2);
-        } else if (ch1 == '\n') {
-            buffer.skip(1);
         }
     }
     
