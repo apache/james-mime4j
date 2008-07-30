@@ -19,13 +19,16 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.util.CodecUtil;
+import org.apache.james.mime4j.util.MessageUtils;
+import org.apache.james.mime4j.util.MimeUtil;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
@@ -168,5 +171,29 @@ public abstract class Entity {
      * @param mode output mode {@link MessageUtils}
      * @throws IOException 
      */
-    public abstract void writeTo(OutputStream out, int mode) throws IOException, MimeException;
+    public void writeTo(OutputStream out, int mode) throws IOException, MimeException {
+        getHeader().writeTo(out, mode);
+        
+        out.flush();
+        
+        final Body body = getBody();
+
+        OutputStream encOut;
+        if (MimeUtil.ENC_BASE64.equals(getContentTransferEncoding())) {
+            encOut = CodecUtil.wrapBase64(out);
+        } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(getContentTransferEncoding())) {
+            encOut = CodecUtil.wrapQuotedPrintable(out, (body instanceof BinaryBody));
+        } else {
+            encOut = out;
+        }
+        body.writeTo(encOut, mode);
+        encOut.flush();
+        // the Base64 output streams requires closing of the stream but
+        // we don't want it to close the inner stream so we override the behaviour
+        // for the wrapping stream writer.
+        if (encOut != out) encOut.close();
+        if (MimeUtil.ENC_BASE64.equals(getContentTransferEncoding())) {
+            out.write(CodecUtil.CRLF_CRLF);
+        }
+    }
 }

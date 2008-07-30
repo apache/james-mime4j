@@ -19,11 +19,14 @@
 
 package org.apache.james.mime4j.util;
 
+import org.apache.james.mime4j.ExampleMail;
+import org.apache.james.mime4j.decoder.Base64InputStream;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-
-import org.apache.james.mime4j.ExampleMail;
+import java.io.OutputStreamWriter;
 
 import junit.framework.TestCase;
 
@@ -67,6 +70,90 @@ public class CodecUtilTest extends TestCase {
         String actual = new String(out.toByteArray(), "US-ASCII");
         assertEquals("7bit=20content=20with=20euro=20=A4=20symbol", actual);
     }
+    
+    public void testBase64OutputStream() throws Exception {
+        StringBuffer sb = new StringBuffer(2048);
+        for (int i = 0; i < 128; i++) {
+            sb.append("0123456789ABCDEF");
+        }
+        String input = sb.toString();
+        String output = roundtripUsingOutputStream(input);
+        assertEquals(input, output);
+    }
+
+    private String roundtripUsingOutputStream(String input) throws IOException {
+        ByteArrayOutputStream out2 = new ByteArrayOutputStream();
+        Base64OutputStream outb64 = new Base64OutputStream(new OutputStreamWriter(new LineBreakingOutputStream(out2, 76)));
+        CodecUtil.copy(new ByteArrayInputStream(input.getBytes()), outb64);
+        outb64.flush();
+        outb64.close();
+        
+        InputStream is = new Base64InputStream(new ByteArrayInputStream(out2.toByteArray()));
+        ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
+        CodecUtil.copy(is, outRoundtrip);
+        String output = new String(outRoundtrip.toByteArray());
+        return output;
+    }
+    
+    
+    /**
+     * This test is a proof for MIME4J-67
+     */
+    /* Currently commented because we don't want failing tests.
+    public void testBase64Encoder() throws Exception {
+        StringBuffer sb = new StringBuffer(2048);
+        for (int i = 0; i < 128; i++) {
+            sb.append("0123456789ABCDEF");
+        }
+        String input = sb.toString();
+        String output = roundtripUsingEncoder(input);
+        assertEquals(input, output);
+    }
+
+    private String roundtripUsingEncoder(String input) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CodecUtil.encodeBase64(new ByteArrayInputStream(input.getBytes()), out);
+        
+        InputStream is = new Base64InputStream(new ByteArrayInputStream(out.toByteArray()));
+        ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
+        CodecUtil.copy(is, outRoundtrip);
+        String output = new String(outRoundtrip.toByteArray());
+        return output;
+    } 
+    */
+    
+    /* performance test, not a unit test
+    public void testPerformance() throws Exception {
+        if (true) return;
+        byte[] bytes = new byte[10000];
+        Random r = new Random(432875623874L);
+        r.nextBytes(bytes);
+        long totalEncoder1 = 0;
+        long totalStream1 = 0;
+        long totalEncoder2 = 0;
+        for (int i = 0; i < 10000; i++) {
+            int length = r.nextInt(1000);
+            int pos = r.nextInt(9000);
+            String input = new String(bytes, pos, length);
+            long time1 = System.currentTimeMillis();
+            roundtripUsingEncoder(input);
+            long time2 = System.currentTimeMillis();
+            roundtripUsingOutputStream(input);
+            long time3 = System.currentTimeMillis();
+            roundtripUsingEncoder(input);
+            long time4 = System.currentTimeMillis();
+            roundtripUsingOutputStream(input);
+            
+            totalEncoder1 += time2-time1;
+            totalStream1 += time3-time2;
+            totalEncoder2 += time4-time3;
+        }
+        
+        System.out.println("Encoder 1st: "+totalEncoder1);
+        System.out.println("Encoder 2st: "+totalEncoder2);
+        System.out.println("Stream 1st: "+totalStream1);
+    }
+    */
     
     private void assertEquals(byte[] expected, byte[] actual) {
         StringBuffer buffer = new StringBuffer(expected.length);

@@ -19,9 +19,11 @@
 
 package org.apache.james.mime4j.util;
 
+import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 /**
  * Utility methods related to codecs.
@@ -82,20 +84,15 @@ public class CodecUtil {
         private boolean pendingTab;
         private boolean pendingCR;
         private int nextSoftBreak;
-        private int inputIndex;
         private int outputIndex;
-        private int inputLength;
-        private InputStream in;
         private OutputStream out;
         
         
         public QuotedPrintableEncoder(int bufferSize, boolean binary) {
             inBuffer = new byte[bufferSize];
             outBuffer = new byte[3*bufferSize];
-            inputLength = 0;
             outputIndex = 0;
             nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH + 1;
-            in = null;
             out = null;
             this.binary = binary;
             pendingSpace = false;
@@ -103,29 +100,32 @@ public class CodecUtil {
             pendingCR = false;
         }
         
-        public void encode(final InputStream in, final OutputStream out) throws IOException {
-            this.in = in;
+        void initEncoding(final OutputStream out) {
             this.out = out;
             pendingSpace = false;
             pendingTab = false;
             pendingCR = false;
             nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH + 1;
-            read();
-            while(inputLength > -1) {
-                while (inputIndex < inputLength) { 
-                    final byte next = inBuffer[inputIndex];
-                    encode(next);
-                    inputIndex++;
-                }
-                read();
+        }
+        
+        void encodeChunk(byte[] buffer, int off, int len) throws IOException {
+            for (int inputIndex = off; inputIndex < len + off; inputIndex++) {
+                encode(buffer[inputIndex]);
             }
+        }
+        
+        void completeEncoding() throws IOException {
             writePending();
             flushOutput();
         }
-
-        private void read() throws IOException {
-            inputLength = in.read(inBuffer);
-            inputIndex = 0;
+        
+        public void encode(final InputStream in, final OutputStream out) throws IOException {
+            initEncoding(out);
+            int inputLength;
+            while((inputLength = in.read(inBuffer)) > -1) {
+                encodeChunk(inBuffer, 0, inputLength);
+            }
+            completeEncoding();
         }
         
         private void writePending() throws IOException {
@@ -210,7 +210,7 @@ public class CodecUtil {
                 softBreak();
             }
             
-            int nextUnsigned = (int) next & 0xff;
+            int nextUnsigned = next & 0xff;
             
             write(EQUALS);
             --nextSoftBreak;
@@ -247,6 +247,36 @@ public class CodecUtil {
         }
     }
     
+    static class QuotedPrintableOutputStream extends FilterOutputStream {
+        
+        QuotedPrintableEncoder encoder;
+
+        public QuotedPrintableOutputStream(OutputStream arg0, boolean binary) {
+            super(arg0);
+            encoder = new QuotedPrintableEncoder(DEFAULT_ENCODING_BUFFER_SIZE, binary);
+            encoder.initEncoding(out);
+        }
+
+        public void close() throws IOException {
+            encoder.completeEncoding();
+            // do not close the wrapped stream
+        }
+
+        public void flush() throws IOException {
+            encoder.flushOutput();
+        }
+
+        public void write(byte[] b, int off, int len) throws IOException {
+            encoder.encodeChunk(b, off, len);
+        }
+
+        public void write(int b) throws IOException {
+            if (true) throw new UnsupportedOperationException("QuotedPrintableOutputStream filter does not support byte per byte writes");
+            encoder.encodeChunk(new byte[] { (byte) b }, 0, 1);
+        }
+        
+    }
+    
     /**
      * Encodes the given stream using Quoted-Printable.
      * This assumes that stream is text and therefore does not escape
@@ -260,15 +290,37 @@ public class CodecUtil {
         encoder.encode(in, out);
     }
     
+    public static void encodeBase64(final InputStream in, final OutputStream out) throws IOException {
+        final Base64Encoder encoder = new Base64Encoder(DEFAULT_ENCODING_BUFFER_SIZE);
+        encoder.encode(in, out);
+    }
+    
+    
     /**
-     * Encodes the given stream using Base64.
-     * @param in not null
-     * @param out not null 
+     * Wraps the given stream in a Quoted-Printable encoder.
+     * @param out not null
+     * @return encoding outputstream 
      * @throws IOException
      */
-    public static void encodeBase64(final InputStream in, final OutputStream out) throws IOException {
-        Base64Encoder encoder = new Base64Encoder(DEFAULT_ENCODING_BUFFER_SIZE);
-        encoder.encode(in, out);
+    public static OutputStream wrapQuotedPrintable(final OutputStream out, boolean binary) throws IOException {
+        return new QuotedPrintableOutputStream(out, binary);
+    }
+    
+    /**
+     * Wraps the given stream in a Base64 encoder.
+     * @param out not null
+     * @return encoding outputstream 
+     * @throws IOException
+     */
+    public static OutputStream wrapBase64(final OutputStream out) throws IOException {
+        return new Base64OutputStream(new OutputStreamWriter(new LineBreakingOutputStream(out, 76)) {
+
+            public void close() throws IOException {
+                // do not close wrapped stream but flush them
+                flush();
+            }
+            
+        });
     }
     
     private static final class Base64Encoder {
@@ -294,23 +346,23 @@ public class CodecUtil {
         }
         
         public void encode(final InputStream inStream, final OutputStream outStream) throws IOException {
-            int inputLength = inStream.read(in);
-            while (inputLength > -1) {
-                int outputLength = encodeInputBuffer(inputLength);
+            int inputLength;
+            while ((inputLength = inStream.read(in)) > -1) {
+                int outputLength = encodeInputBuffer(in, 0, inputLength);
                 if (outputLength > 0) {
                     outStream.write(out, 0, outputLength);
                 }
-                inputLength = inStream.read(in);
             }
         }
         
-        private int encodeInputBuffer(final int inputLength) {
+        private int encodeInputBuffer(byte[] in, final int pos, final int inputLength) {
             if (inputLength == 0) {
                 return 0;
             }
-            int inputIndex = 0;
+            int inputEnd = pos + inputLength;
+            int inputIndex = pos;
             int outputIndex = 0;
-            while (inputLength - inputIndex > 2) {
+            while (inputEnd - inputIndex > 2) {
                 int one = (toInt(in[inputIndex++]) << 16);
                 int two = (toInt(in[inputIndex++]) << 8);
                 int three = toInt(in[inputIndex++]);
@@ -325,7 +377,7 @@ public class CodecUtil {
                 outputIndex = setResult(out, outputIndex, ENCODING[index]);
             }
             
-            switch (inputLength - inputIndex) {
+            switch (inputEnd - inputIndex) {
                 case 1:
                     int quantum = in[inputIndex++] << 16;
                     int index = (quantum & FIRST_MASK) >> 18;
@@ -369,4 +421,5 @@ public class CodecUtil {
             return outputIndex;
         }
     }
+
 }

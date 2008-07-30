@@ -19,10 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
-import org.apache.james.mime4j.MimeException;
 
 
 /**
@@ -33,12 +29,4 @@ import org.apache.james.mime4j.MimeException;
  */
 public class BodyPart extends Entity {
 
-    /**
-     * 
-     * @see org.apache.james.mime4j.message.Entity#writeTo(java.io.OutputStream, int)
-     */
-    public void writeTo(OutputStream out, int mode) throws IOException, MimeException {
-        getHeader().writeTo(out, mode);
-        getBody().writeTo(out, mode);
-    }
 }

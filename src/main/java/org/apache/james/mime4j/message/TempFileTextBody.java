@@ -19,23 +19,20 @@
 
 package org.apache.james.mime4j.message;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.CodecUtil;
+import org.apache.james.mime4j.util.TempFile;
+import org.apache.james.mime4j.util.TempPath;
+import org.apache.james.mime4j.util.TempStorage;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.decoder.Base64InputStream;
-import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
-import org.apache.james.mime4j.util.CharsetUtil;
-import org.apache.james.mime4j.util.CodecUtil;
-import org.apache.james.mime4j.util.MimeUtil;
-import org.apache.james.mime4j.util.TempFile;
-import org.apache.james.mime4j.util.TempPath;
-import org.apache.james.mime4j.util.TempStorage;
 
 
 /**
@@ -49,30 +46,15 @@ class TempFileTextBody extends AbstractBody implements TextBody {
     
     private String mimeCharset = null;
     private TempFile tempFile = null;
-    private final String transferEncoding;
 
-    public TempFileTextBody(InputStream is) throws IOException {
-        this(is, null, null);
-    }
-    
-    public TempFileTextBody(final InputStream is, final String mimeCharset, 
-            final String transferEncoding) throws IOException {
+    public TempFileTextBody(final InputStream is, final String mimeCharset) throws IOException {
         
         this.mimeCharset = mimeCharset;
-        this.transferEncoding = transferEncoding;        
         TempPath tempPath = TempStorage.getInstance().getRootTempPath();
         tempFile = tempPath.createTempFile("attachment", ".txt");
         
         OutputStream out = tempFile.getOutputStream();
-        final InputStream decodedStream;
-        if (MimeUtil.ENC_BASE64.equals(transferEncoding)) {
-            decodedStream = new Base64InputStream(is);
-        } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(transferEncoding)) {
-            decodedStream = new QuotedPrintableInputStream(is);
-        } else {
-            decodedStream = is;
-        }
-        CodecUtil.copy(decodedStream, out);
+        CodecUtil.copy(is, out);
         out.close();
     }
     
@@ -123,13 +105,6 @@ class TempFileTextBody extends AbstractBody implements TextBody {
      */
     public void writeTo(OutputStream out, int mode) throws IOException {
         final InputStream inputStream = tempFile.getInputStream();
-        if (MimeUtil.ENC_BASE64.equals(transferEncoding)) {
-            CodecUtil.encodeBase64(inputStream, out);
-            out.write(CodecUtil.CRLF_CRLF);
-        } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(transferEncoding)) {
-            CodecUtil.encodeQuotedPrintable(inputStream,out);
-        } else {
-            CodecUtil.copy(inputStream,out);
-        }
+        CodecUtil.copy(inputStream,out);
     }
 }

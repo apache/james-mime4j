@@ -19,19 +19,20 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.Stack;
-
 import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.CharArrayBuffer;
 import org.apache.james.mime4j.ContentHandler;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeStreamParser;
+import org.apache.james.mime4j.decoder.Base64InputStream;
+import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
-import org.apache.james.mime4j.util.MessageUtils;
+import org.apache.james.mime4j.util.MimeUtil;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Stack;
 
 
 /**
@@ -84,20 +85,6 @@ public class Message extends Entity implements Body {
      */
     public UnstructuredField getSubject() {
         return (UnstructuredField) getHeader().getField(Field.SUBJECT);
-    }
-    
-    /**
-     * Writes out the content of this message..
-     * @param out not null
-     * @param mode header out validation mode {@link MessageUtils}
-     * @throws MimeException 
-     * @see org.apache.james.mime4j.message.Entity#writeTo(java.io.OutputStream, int)
-     */
-    public void writeTo(OutputStream out, int mode) throws IOException, MimeException {
-        getHeader().writeTo(out, mode);
-
-        final Body body = getBody();
-        body.writeTo(out, mode);
     }
     
     private class MessageBuilder implements ContentHandler {
@@ -183,13 +170,24 @@ public class Message extends Entity implements Body {
             final String enc = bd.getTransferEncoding();
             
             final Body body;
-            if (bd.getMimeType().startsWith("text/")) {
-                body = new TempFileTextBody(is, bd.getCharset(), enc);
+            
+            final InputStream decodedStream;
+            if (MimeUtil.ENC_BASE64.equals(enc)) {
+                decodedStream = new Base64InputStream(is);
+            } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(enc)) {
+                decodedStream = new QuotedPrintableInputStream(is);
             } else {
-                body = new TempFileBinaryBody(is, enc);
+                decodedStream = is;
             }
             
-            ((Entity) stack.peek()).setBody(body);
+            if (bd.getMimeType().startsWith("text/")) {
+                body = new TempFileTextBody(decodedStream, bd.getCharset());
+            } else {
+                body = new TempFileBinaryBody(decodedStream);
+            }
+            
+            Entity entity = ((Entity) stack.peek());
+            entity.setBody(body);
         }
         
         /**
