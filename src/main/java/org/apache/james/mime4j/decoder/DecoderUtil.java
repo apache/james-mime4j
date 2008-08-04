@@ -26,7 +26,7 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.CharArrayBuffer;
+import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**

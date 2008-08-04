@@ -19,11 +19,11 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.AbstractContentHandler;
 import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.util.MimeUtil;
 
 import java.io.InputStream;
@@ -63,21 +63,21 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     private Header currHeader;
 
     /**
-     * @see org.apache.james.mime4j.AbstractContentHandler#startHeader()
+     * @see org.apache.james.mime4j.parser.AbstractContentHandler#startHeader()
      */
     public final void startHeader() {
         currHeader = new Header();
     }
 
     /**
-     * @see org.apache.james.mime4j.AbstractContentHandler#field(java.lang.String)
+     * @see org.apache.james.mime4j.parser.AbstractContentHandler#field(java.lang.String)
      */
     public final void field(String fieldData) {
         currHeader.addField(Field.parse(fieldData));
     }
 
     /**
-     * @see org.apache.james.mime4j.AbstractContentHandler#endHeader()
+     * @see org.apache.james.mime4j.parser.AbstractContentHandler#endHeader()
      */
     public final void endHeader() {
         Header tmp = currHeader;
@@ -86,7 +86,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     }
 
     /**
-     * @see org.apache.james.mime4j.AbstractContentHandler#body(org.apache.james.mime4j.BodyDescriptor, java.io.InputStream)
+     * @see org.apache.james.mime4j.parser.AbstractContentHandler#body(org.apache.james.mime4j.BodyDescriptor, java.io.InputStream)
      */
     public final void body(BodyDescriptor bd, InputStream is) throws IOException {
         if (MimeUtil.isBase64Encoding(bd.getTransferEncoding())) {

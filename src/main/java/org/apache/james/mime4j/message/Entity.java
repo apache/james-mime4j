@@ -20,10 +20,10 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.decoder.CodecUtil;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.util.CodecUtil;
 import org.apache.james.mime4j.util.MessageUtils;
 import org.apache.james.mime4j.util.MimeUtil;
 

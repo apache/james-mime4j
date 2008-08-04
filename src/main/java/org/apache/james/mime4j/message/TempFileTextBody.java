@@ -21,8 +21,8 @@ package org.apache.james.mime4j.message;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.decoder.CodecUtil;
 import org.apache.james.mime4j.util.CharsetUtil;
-import org.apache.james.mime4j.util.CodecUtil;
 import org.apache.james.mime4j.util.TempFile;
 import org.apache.james.mime4j.util.TempPath;
 import org.apache.james.mime4j.util.TempStorage;

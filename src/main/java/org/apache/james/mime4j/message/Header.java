@@ -31,12 +31,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.james.mime4j.AbstractContentHandler;
-import org.apache.james.mime4j.CharArrayBuffer;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.MimeStreamParser;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.parser.AbstractContentHandler;
+import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.MessageUtils;
 
