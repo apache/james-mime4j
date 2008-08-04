@@ -126,7 +126,7 @@
   implement an event handler:
 
 --------------------------------------------------------------------  
-  public class MyContentHandler extends org.apache.james.mime4j.ContentHandler {
+  public class MyContentHandler extends org.apache.james.mime4j.parser.ContentHandler {
       public body(BodyDescriptor bd, InputStream is)
               throws MimeException, IOException {
           System.out.println("Body detected, contents = "
