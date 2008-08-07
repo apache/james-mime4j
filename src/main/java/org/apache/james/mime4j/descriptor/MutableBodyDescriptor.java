@@ -18,7 +18,7 @@
  ****************************************************************/
 
 
-package org.apache.james.mime4j;
+package org.apache.james.mime4j.descriptor;
 
 /**
  * Adds mutator.

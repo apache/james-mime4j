@@ -18,7 +18,6 @@
  */
 package org.apache.james.mime4j.descriptor;
 
-import org.apache.james.mime4j.ContentDescriptor;
 import org.apache.james.mime4j.MimeException;
 
 /**

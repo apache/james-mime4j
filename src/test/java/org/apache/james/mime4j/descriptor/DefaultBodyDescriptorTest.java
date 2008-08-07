@@ -18,9 +18,6 @@
  */
 package org.apache.james.mime4j.descriptor;
 
-import org.apache.james.mime4j.BaseTestForBodyDescriptors;
-import org.apache.james.mime4j.BodyDescriptor;
-import org.apache.james.mime4j.MutableBodyDescriptor;
 import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
 
 public class DefaultBodyDescriptorTest extends BaseTestForBodyDescriptors {

@@ -19,8 +19,8 @@
 
 package org.apache.james.mime4j.parser;
 
-import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.descriptor.BodyDescriptor;
 
 import java.io.IOException;
 import java.io.InputStream;

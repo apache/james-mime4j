@@ -17,7 +17,10 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j;
+package org.apache.james.mime4j.descriptor;
+
+import org.apache.james.mime4j.descriptor.BodyDescriptor;
+import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
 
 import junit.framework.TestCase;
 

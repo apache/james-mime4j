@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j;
+package org.apache.james.mime4j.descriptor;
 
 import java.util.Map;
 

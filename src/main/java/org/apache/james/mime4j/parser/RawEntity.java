@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.parser;
 
-import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.descriptor.BodyDescriptor;
 
 import java.io.InputStream;
 

@@ -28,10 +28,10 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.LinkedList;
 
-import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
+import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.stream.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.stream.RootInputStream;
 import org.apache.james.mime4j.util.MimeUtil;

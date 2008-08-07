@@ -20,10 +20,7 @@ package org.apache.james.mime4j.descriptor;
 
 import java.io.ByteArrayInputStream;
 
-import org.apache.james.mime4j.BaseTestForBodyDescriptors;
-import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.MutableBodyDescriptor;
 import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
 import org.apache.james.mime4j.descriptor.RFC1864ContentMD5Descriptor;
 import org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor;

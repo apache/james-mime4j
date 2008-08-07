@@ -19,10 +19,10 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
+import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
 import org.apache.james.mime4j.parser.ContentHandler;
@@ -149,7 +149,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.parser.ContentHandler#startMultipart(org.apache.james.mime4j.BodyDescriptor)
+         * @see org.apache.james.mime4j.parser.ContentHandler#startMultipart(org.apache.james.mime4j.descriptor.BodyDescriptor)
          */
         public void startMultipart(final BodyDescriptor bd) {
             expect(Entity.class);
@@ -162,7 +162,7 @@ public class Message extends Entity implements Body {
         }
         
         /**
-         * @see org.apache.james.mime4j.parser.ContentHandler#body(org.apache.james.mime4j.BodyDescriptor, java.io.InputStream)
+         * @see org.apache.james.mime4j.parser.ContentHandler#body(org.apache.james.mime4j.descriptor.BodyDescriptor, java.io.InputStream)
          */
         public void body(BodyDescriptor bd, final InputStream is) throws IOException {
             expect(Entity.class);

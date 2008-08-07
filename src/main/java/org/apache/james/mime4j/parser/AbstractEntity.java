@@ -24,11 +24,11 @@ import java.util.BitSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.MutableBodyDescriptor;
+import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
 import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
+import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
 import org.apache.james.mime4j.stream.LineReaderInputStream;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharArrayBuffer;
