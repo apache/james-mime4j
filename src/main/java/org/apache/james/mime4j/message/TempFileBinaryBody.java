@@ -20,9 +20,9 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.decoder.CodecUtil;
-import org.apache.james.mime4j.util.TempFile;
-import org.apache.james.mime4j.util.TempPath;
-import org.apache.james.mime4j.util.TempStorage;
+import org.apache.james.mime4j.message.storage.TempFile;
+import org.apache.james.mime4j.message.storage.TempPath;
+import org.apache.james.mime4j.message.storage.TempStorage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +30,7 @@ import java.io.OutputStream;
 
 
 /**
- * Binary body backed by a {@link org.apache.james.mime4j.util.TempFile}.
+ * Binary body backed by a {@link org.apache.james.mime4j.message.storage.TempFile}.
  *
  * 
  * @version $Id: TempFileBinaryBody.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $

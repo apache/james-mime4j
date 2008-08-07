@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.util;
+package org.apache.james.mime4j.message.storage;
 
 import java.io.IOException;
 
