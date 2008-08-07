@@ -19,29 +19,22 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.io.FilterInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 
 /**
  * InputStream that shields its underlying input stream from
  * being closed.
- * 
- * 
- * @version $Id: CloseShieldInputStream.java,v 1.2 2004/10/02 12:41:10 ntherning Exp $
  */
-public class CloseShieldInputStream extends InputStream {
-
-    /**
-     * Underlying InputStream
-     */
-    private InputStream is;
+public class CloseShieldInputStream extends FilterInputStream {
 
     public CloseShieldInputStream(InputStream is) {
-        this.is = is;
+        super(is);
     }
 
     public InputStream getUnderlyingStream() {
-        return is;
+        return in;
     }
 
     /**
@@ -49,7 +42,7 @@ public class CloseShieldInputStream extends InputStream {
      */
     public int read() throws IOException {
         checkIfClosed();
-        return is.read();
+        return in.read();
     }
 
     /**
@@ -57,7 +50,7 @@ public class CloseShieldInputStream extends InputStream {
      */
     public int available() throws IOException {
         checkIfClosed();
-        return is.available();
+        return in.available();
     }
 
     
@@ -65,7 +58,7 @@ public class CloseShieldInputStream extends InputStream {
      * Set the underlying InputStream to null
      */
     public void close() throws IOException {
-        is = null;
+        in = null;
     }
 
     /**
@@ -73,24 +66,24 @@ public class CloseShieldInputStream extends InputStream {
      */
     public synchronized void reset() throws IOException {
         checkIfClosed();
-        is.reset();
+        in.reset();
     }
 
     /**
      * @see java.io.FilterInputStream#markSupported()
      */
     public boolean markSupported() {
-        if (is == null)
+        if (in == null)
             return false;
-        return is.markSupported();
+        return in.markSupported();
     }
 
     /**
      * @see java.io.FilterInputStream#mark(int)
      */
     public synchronized void mark(int readlimit) {
-        if (is != null)
-            is.mark(readlimit);
+        if (in != null)
+            in.mark(readlimit);
     }
 
     /**
@@ -98,7 +91,7 @@ public class CloseShieldInputStream extends InputStream {
      */
     public long skip(long n) throws IOException {
         checkIfClosed();
-        return is.skip(n);
+        return in.skip(n);
     }
 
     /**
@@ -106,7 +99,7 @@ public class CloseShieldInputStream extends InputStream {
      */
     public int read(byte b[]) throws IOException {
         checkIfClosed();
-        return is.read(b);
+        return in.read(b);
     }
 
     /**
@@ -114,7 +107,7 @@ public class CloseShieldInputStream extends InputStream {
      */
     public int read(byte b[], int off, int len) throws IOException {
         checkIfClosed();
-        return is.read(b, off, len);
+        return in.read(b, off, len);
     }
 
     /**
@@ -123,7 +116,7 @@ public class CloseShieldInputStream extends InputStream {
      * @throws IOException if the underlying InputStream is null
      */
     private void checkIfClosed() throws IOException {
-        if (is == null)
+        if (in == null)
             throw new IOException("Stream is closed");
     }
 }

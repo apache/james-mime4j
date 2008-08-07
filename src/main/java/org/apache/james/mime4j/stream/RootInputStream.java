@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -28,12 +29,8 @@ import java.io.InputStream;
  * can also be truncated. When truncated the stream will appear to have
  * reached end of file. This is used by the parser's 
  * {@link org.apache.james.mime4j.parser.MimeStreamParser#stop()} method.
- *
- * 
- * @version $Id: RootInputStream.java,v 1.2 2004/10/02 12:41:10 ntherning Exp $
  */
-public class RootInputStream extends InputStream {
-    private InputStream is = null;
+public class RootInputStream extends FilterInputStream {
     private int lineNumber = 1;
     private int prev = -1;
     private boolean truncated = false;
@@ -44,7 +41,7 @@ public class RootInputStream extends InputStream {
      * @param in the stream to read from.
      */
     public RootInputStream(InputStream is) {
-        this.is = is;
+        super(is);
     }
 
     /**
@@ -75,7 +72,7 @@ public class RootInputStream extends InputStream {
             return -1;
         }
         
-        int b = is.read();
+        int b = in.read();
         if (prev == '\r' && b == '\n') {
             lineNumber++;
         }
@@ -92,7 +89,7 @@ public class RootInputStream extends InputStream {
             return -1;
         }
         
-        int n = is.read(b, off, len);
+        int n = in.read(b, off, len);
         for (int i = off; i < off + n; i++) {
             if (prev == '\r' && b[i] == '\n') {
                 lineNumber++;
