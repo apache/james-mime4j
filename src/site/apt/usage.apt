@@ -23,10 +23,10 @@
 {Usage}
 
   Mime4j provides two different API's: An event based API by using
-  the {{{apidocs/org/apache/james/mime4j/MimeStreamParser.html}
+  the {{{apidocs/org/apache/james/mime4j/parser/MimeStreamParser.html}
   MimeStreamParser}}. Alternatively, you may use the iterative
   API, which is available through the
-  {{{apidocs/org/apache/james/mime4j/MimeTokenStream.html}
+  {{{apidocs/org/apache/james/mime4j/parser/MimeTokenStream.html}
   MimeTokenStream}}. In terms of speed, you should not note
   any differences.
 
@@ -41,7 +41,7 @@
 {Token Streams}
 
   The iterative approach is using the class
-  {{{apidocs/org/apache/james/mime4j/MimeTokenStream.html}
+  {{{apidocs/org/apache/james/mime4j/parser/MimeTokenStream.html}
   MimeTokenStream}}. Here's an example, how you could use
   the token stream:
 
@@ -121,7 +121,7 @@
 
   The event based API requires, that you provide an event handler,
   which receives events. The event handler is an object, which
-  implements the {{{apidocs/org/apache/james/mime4j/ContentHandler.html}
+  implements the {{{apidocs/org/apache/james/mime4j/parser/ContentHandler.html}
   ContentHandler}} interface. Here's an example, how you could
   implement an event handler:
 
