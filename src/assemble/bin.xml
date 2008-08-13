@@ -36,6 +36,12 @@
       </includes>
     </fileSet>
     <fileSet>
+      <directory>/</directory>
+      <includes>
+        <include>RELEASE_NOTES.txt</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>examples</directory>
     </fileSet>
     <fileSet>

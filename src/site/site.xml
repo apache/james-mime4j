@@ -31,7 +31,7 @@
   <body>
     <menu name="mime4j">
       <item name="Overview" href="/index.html"/>
-      <item name="News and Status" href="/status.html"/>
+      <item name="Status" href="/status.html"/>
       <item name="Example" href="/samples.html"/>
       <item name="Usage" href="/usage.html"/>
       <item name="Start" href="/start/index.html" collapse="true">
