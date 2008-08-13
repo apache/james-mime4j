@@ -1,6 +1,9 @@
 Release 0.4
 -------------------
 
+Mime4J is a flexible MIME parsing library written in Java. SAX, DOM and pull parsing
+styles are supported.
+
 The 0.4 release brings a number of significant improvements in terms of 
 supported capabilities, flexibility and performance: 
 
@@ -14,8 +17,20 @@ supported capabilities, flexibility and performance:
 
 * Improved parsing performance (up to 10x for large messages)
 
+* More comprehensive header parsing including support for RFC1864, RFC2045, 
+  RFC2183, RFC2557 and RFC3066
+
+* Revised packaging and exception hierarchy. MimeException now extends
+  IOException.
+
 Detailed change log can be found here:
 
 http://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310521&styleName=Html&version=12312483
 
-Mime4j API is still considered unstable and may change in the future releases.
+Notes
+-----
+ * 0.4 contains numerous API improvements and is not binary compatible with 0.3
+ * Mime4j API is still considered unstable and is likely to change in future releases
+ * DOM support has known limitations and some roundtrip issues remain to be resolved
+ * Some low level functions are available only in the pull parser (recommended for 
+   advanced users)
