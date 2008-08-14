@@ -23,7 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.james.mime4j.stream.EOLConvertingInputStream;
+import org.apache.james.mime4j.io.EOLConvertingInputStream;
 
 
 import junit.framework.TestCase;

@@ -26,11 +26,11 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
-import org.apache.james.mime4j.stream.BufferedLineReaderInputStream;
-import org.apache.james.mime4j.stream.LineReaderInputStream;
-import org.apache.james.mime4j.stream.LineReaderInputStreamAdaptor;
-import org.apache.james.mime4j.stream.MimeBoundaryInputStream;
-import org.apache.james.mime4j.stream.RootInputStream;
+import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
+import org.apache.james.mime4j.io.LineReaderInputStream;
+import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
+import org.apache.james.mime4j.io.MimeBoundaryInputStream;
+import org.apache.james.mime4j.io.RootInputStream;
 import org.apache.james.mime4j.util.MimeUtil;
 
 public class MimeEntity extends AbstractEntity {

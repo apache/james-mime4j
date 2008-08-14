@@ -29,7 +29,7 @@ import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
 import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
 import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
-import org.apache.james.mime4j.stream.LineReaderInputStream;
+import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.MessageUtils;

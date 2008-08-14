@@ -24,9 +24,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.james.mime4j.stream.BufferedLineReaderInputStream;
-import org.apache.james.mime4j.stream.LineReaderInputStream;
-import org.apache.james.mime4j.stream.MimeBoundaryInputStream;
+import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
+import org.apache.james.mime4j.io.LineReaderInputStream;
+import org.apache.james.mime4j.io.MimeBoundaryInputStream;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 

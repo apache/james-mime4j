@@ -18,7 +18,7 @@
  ****************************************************************/
 
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j.io;
 
 import java.io.InputStream;
 import java.io.IOException;

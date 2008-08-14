@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j.io;
 
 import java.io.IOException;
 import java.io.InputStream;

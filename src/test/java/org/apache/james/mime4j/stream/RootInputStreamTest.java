@@ -22,7 +22,7 @@ package org.apache.james.mime4j.stream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.apache.james.mime4j.stream.RootInputStream;
+import org.apache.james.mime4j.io.RootInputStream;
 
 
 import junit.framework.TestCase;

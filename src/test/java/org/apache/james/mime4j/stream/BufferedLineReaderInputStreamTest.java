@@ -19,8 +19,8 @@
 
 package org.apache.james.mime4j.stream;
 
-import org.apache.james.mime4j.stream.BufferedLineReaderInputStream;
-import org.apache.james.mime4j.stream.LineReaderInputStream;
+import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
+import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 import java.io.ByteArrayInputStream;
