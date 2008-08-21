@@ -192,8 +192,5 @@ public abstract class Entity {
         // we don't want it to close the inner stream so we override the behaviour
         // for the wrapping stream writer.
         if (encOut != out) encOut.close();
-        if (MimeUtil.ENC_BASE64.equals(getContentTransferEncoding())) {
-            out.write(CodecUtil.CRLF_CRLF);
-        }
     }
 }

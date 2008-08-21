@@ -19,337 +19,378 @@
 
 package org.apache.james.mime4j.decoder;
 
-import java.io.OutputStream;
-import java.io.Writer;
+import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 
 /**
- * This class has been copied from Apache MyFaces Trinidad 1.2.8
+ * This class is based on Base64 and Base64OutputStream code from Commons-Codec 1.4
  * 
- * An OutputStream that encodes data in a base64 representation.
- * It takes a Writer as its single argument to its constructor and all
- * bytes written to the stream are correspondingly converted into Base64
- * and written out to the provided writer.
+ * Provides Base64 encoding and decoding as defined by RFC 2045.
+ * 
+ * <p>
+ * This class implements section <cite>6.8. Base64 Content-Transfer-Encoding</cite> from RFC 2045 <cite>Multipurpose
+ * Internet Mail Extensions (MIME) Part One: Format of Internet Message Bodies</cite> by Freed and Borenstein.
+ * </p>
+ * 
+ * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>
+ * @author Apache Software Foundation
+ * @since 1.0-dev
+ * @version $Id$
  */
-public class Base64OutputStream extends OutputStream
-{
-  public Base64OutputStream(Writer out)
-  {
-    _out = out;
-    _numLeftoverBytes = 0;
-    _leftoverBytes = new byte[2];
-  }
-  
-  /**
-   *  Takes a byte writes it out to the writer
-   * 
-   * @param b   a byte
-   */
-  public final void write(final int b) throws IOException
-  {
-    _single[0] = (byte) b;
-    this.write(_single, 0, 1);
-  } 
-  
-  /**
-   * Writes len bytes from the specified byte array starting at offset off 
-   * to this output stream. The general contract for write(b, off, len) is 
-   * that some of the bytes in the array b are written to the output stream 
-   * in order; element b[off] is the first byte written and b[off+len-1] is 
-   * the last byte written by this operation.
-   * 
-   * The write method of OutputStream calls the write method of one argument 
-   * on each of the bytes to be written out. Subclasses are encouraged to 
-   * override this method and provide a more efficient implementation.
-   * 
-   * If b is null, a NullPointerException is thrown.
-   * 
-   * If off is negative, or len is negative, or off+len is greater than the 
-   * length of the array b, then an IndexOutOfBoundsException is thrown. 
-   * 
-   * 
-   * @param b        the data
-   * @param off      the start offset in the data
-   * @param len      the number of bytes to read
-   */
-  public final void write(final byte[] b, final int off, final int len) 
-                                      throws IOException, NullPointerException
-  {
-    if (b==null) 
-    {
-      throw new NullPointerException("BYTE_ARRAY_CANNOT_BE_NULL");
-    }
-      
-    if (off<0 || len<0 || off+len>b.length) 
-    {
-      throw new IndexOutOfBoundsException("ACTUAL_LENGTH_OFFSET: " + b.length + " | " + off + " | " + len);
-    }
-    
-    int lengthToProcess = len;
-    int index = off;
-    
-    // base case 1: if only processing one byte from byte array
-    if (lengthToProcess==1) 
-    {
-      if (_numLeftoverBytes==0) 
-      {
-        // remember this byte for next call to write
-        _numLeftoverBytes = 1;
-        _leftoverBytes[0] = b[index];
-      }
-      else if (_numLeftoverBytes==1) 
-      {
-        // remember this byte for next call to write
-        _numLeftoverBytes = 2;
-        _leftoverBytes[1] = b[index];
-      }
-      else if (_numLeftoverBytes==2) 
-      {
-        // this one byte is enough to complete a triplet
-        // so convert triplet into Base64
-        _writeBase64(_leftoverBytes[0], _leftoverBytes[1], b[index]);
-        _numLeftoverBytes=0;
-      }
-      return;
-    }  //end if (lengthToProcess==1)
-    
-    // base case 2: if only processing two bytes from byte array
-    if (lengthToProcess==2) 
-    {
-      if (_numLeftoverBytes==0) 
-      {
-        // not enough to process a triplet, so remember these two bytes 
-        // for next call to write
-        _numLeftoverBytes = 2;
-        _leftoverBytes[0] = b[index];
-        _leftoverBytes[1] = b[index+1];
-      }
-      else if (_numLeftoverBytes==1) 
-      {
-        // these two bytes form triplet combined with the leftover byte
-        _writeBase64(_leftoverBytes[0], b[index], b[index+1]);
-        _numLeftoverBytes = 0;
-      }
-      else if (_numLeftoverBytes==2) 
-      {
-        // two leftover bytes and one new byte form a triplet
-        // the second new byte is remembered for next call to write
-        _writeBase64(_leftoverBytes[0], _leftoverBytes[1], b[index]);
-        _leftoverBytes[0] = b[index+1];
-        _numLeftoverBytes = 1;
-      }
-      return;
-    }  // end if (lengthToProcess==2)
-    
-    // case involving looping
-    if (lengthToProcess>2) 
-    {
-      if (_numLeftoverBytes==1) 
-      {
-        _writeBase64(_leftoverBytes[0], b[index], b[index+1]);
-        _numLeftoverBytes = 0;
-        lengthToProcess -= 2;
-        index += 2;
-        // proceed with loop
-      }      
-      else if (_numLeftoverBytes==2) 
-      {
-        _writeBase64(_leftoverBytes[0], _leftoverBytes[1], b[index]);
-        _numLeftoverBytes = 0;
-        lengthToProcess -= 1;
-        index += 1;
-        // proceed with loop
-      }
+public class Base64OutputStream extends FilterOutputStream {
 
-      _processArray(b, index, lengthToProcess);
+    /**
+     * Chunk size per RFC 2045 section 6.8.
+     * 
+     * <p>
+     * The {@value} character limit does not count the trailing CRLF, but counts all other characters, including any
+     * equal signs.
+     * </p>
+     * 
+     * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045 section 6.8</a>
+     */
+    static final int CHUNK_SIZE = 76;
+
+    /**
+     * Chunk separator per RFC 2045 section 2.1.
+     * 
+     * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045 section 2.1</a>
+     */
+    static final byte[] CHUNK_SEPARATOR = {'\r','\n'};
+
+    /**
+     * This array is a lookup table that translates 6-bit positive integer
+     * index values into their "Base64 Alphabet" equivalents as specified
+     * in Table 1 of RFC 2045.
+     *
+     * Thanks to "commons" project in ws.apache.org for this code. 
+     * http://svn.apache.org/repos/asf/webservices/commons/trunk/modules/util/
+     */
+    private static final byte[] intToBase64 = {
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+            'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+            'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+            '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'
+    };
+
+    /**
+     * Byte used to pad output.
+     */
+    private static final byte PAD = '=';
+
+    /**
+     * This array is a lookup table that translates unicode characters
+     * drawn from the "Base64 Alphabet" (as specified in Table 1 of RFC 2045)
+     * into their 6-bit positive integer equivalents.  Characters that
+     * are not in the Base64 alphabet but fall within the bounds of the
+     * array are translated to -1.
+     *
+     * Thanks to "commons" project in ws.apache.org for this code.
+     * http://svn.apache.org/repos/asf/webservices/commons/trunk/modules/util/ 
+     */
+    private static final byte[] base64ToInt = {
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+            -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63, 52, 53, 54,
+            55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1, -1, 0, 1, 2, 3, 4,
+            5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+            24, 25, -1, -1, -1, -1, -1, -1, 26, 27, 28, 29, 30, 31, 32, 33, 34,
+            35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51
+    };
+
+    /** Mask used to extract 6 bits, used when encoding */
+    private static final int MASK_6BITS = 0x3f;
+
+    // The static final fields above are used for the original static byte[] methods on Base64.
+    // The private member fields below are used with the new streaming approach, which requires
+    // some state be preserved between calls of encode() and decode().
+
+
+    /**
+     * Line length for encoding.  Not used when decoding.  A value of zero or less implies
+     * no chunking of the base64 encoded data.
+     */
+    private final int lineLength;
+
+    /**
+     * Line separator for encoding.  Not used when decoding.  Only used if lineLength > 0.
+     */
+    private final byte[] lineSeparator;
+
+    /**
+     * Convenience variable to help us determine when our buffer is going to run out of
+     * room and needs resizing.  <code>encodeSize = 4 + lineSeparator.length;</code>
+     */
+    private final int encodeSize;
+
+    /**
+     * Buffer for streaming. 
+     */
+    private byte[] buf = new byte[1024];
+
+    /**
+     * Position where next character should be written in the buffer.
+     */
+    private int pos;
+
+    /**
+     * Variable tracks how many characters have been written to the current line.
+     * Only used when encoding.  We use it to make sure each encoded line never
+     * goes beyond lineLength (if lineLength > 0).
+     */
+    private int currentLinePos;
+
+    /**
+     * Writes to the buffer only occur after every 3 reads when encoding, an
+     * every 4 reads when decoding.  This variable helps track that.
+     */
+    private int modulus;
+
+    /**
+     * Boolean flag to indicate the EOF has been reached.  Once EOF has been
+     * reached, this Base64 object becomes useless, and must be thrown away.
+     */
+    private boolean eof;
+
+    /**
+     * Place holder for the 3 bytes we're dealing with for our base64 logic.
+     * Bitwise operations store and extract the base64 encoding or decoding from
+     * this variable.
+     */
+    private int x;
+
+    /**
+     * Default constructor:  lineLength is 76, and the lineSeparator is CRLF
+     * when encoding, and all forms can be decoded.
+     */
+    public Base64OutputStream(OutputStream os) {
+        this(os, CHUNK_SIZE, CHUNK_SEPARATOR);
     }
 
-  } //end write(byte[], int off, int len)
-  
-  public final void flush() throws IOException 
-  {
-    _out.flush();
-  }
+    /**
+     * <p>
+     * Consumer can use this constructor to choose a different lineLength
+     * when encoding (lineSeparator is still CRLF).  All forms of data can
+     * be decoded.
+     * </p><p>
+     * Note:  lineLengths that aren't multiples of 4 will still essentially
+     * end up being multiples of 4 in the encoded data.
+     * </p>
+     *
+     * @param lineLength each line of encoded data will be at most this long
+     * (rounded up to nearest multiple of 4). 
+     * If lineLength <= 0, then the output will not be divided into lines (chunks).  
+     * Ignored when decoding.
+     */
+    public Base64OutputStream(OutputStream os, int lineLength) {
+        this(os, lineLength, CHUNK_SEPARATOR);
+    }
 
-  /**
-   * Call this method to indicate end of data stream 
-   * and to append any padding characters if necessary.  This method should be 
-   * called only if there will be no subsequent calls to a write method.  
-   * Subsequent calls to the write method will result in incorrect encoding.
-   * 
-   * @deprecated use the close() method instead.
-   */
-  public void finish() throws IOException
-  {
-    close();
-  }
-  
-  /**
-   * Call this method to indicate end of data stream 
-   * and to append any padding characters if necessary.  This method should be 
-   * called only if there will be no subsequent calls to a write method.  
-   * Subsequent calls to the write method will result in incorrect encoding.
-   * 
-   */
-  public final void close() throws IOException
-  {
-    if (_numLeftoverBytes==1) 
-    {
-      // grab the one byte from the leftover array
-      byte b1 = _leftoverBytes[0];
-      
-      // convert to two base 64 chars
-      int c1, c2;
-      c1 = (b1>>2)&0x3f;
-      c2 = (b1<<4)&0x3f;
-      
-      char[] encodedChars = _fourChars;
-      
-      encodedChars[0] = _encode(c1);
-      encodedChars[1] = _encode(c2);
-      // append two padding characters
-      encodedChars[2] = '=';
-      encodedChars[3] = '=';
-      
-      _out.write(encodedChars);
-    } 
-    else if (_numLeftoverBytes==2)
-    {
-      // grab the two bytes from the leftovers array
-      byte b1, b2;
-      b1 = _leftoverBytes[0];
-      b2 = _leftoverBytes[1];
-      
-      // convert the two bytes into three base64 chars
-      int c1, c2, c3;
-      c1 = (b1>>2)&0x3f;
-      c2 = (b1<<4 | ((b2>>4)&0x0f))&0x3f;
-      c3 = (b2<<2)&0x3f;
-      
-      char[] encodedChars = _fourChars;
-      
-      encodedChars[0] = _encode(c1);
-      encodedChars[1] = _encode(c2);
-      encodedChars[2] = _encode(c3);  
-      //append one padding character
-      encodedChars[3] = '=';
-      
-      _out.write(encodedChars);
-    } 
-    _out.close();
-  }
-  
-  
-  /**
-   * Encodes three bytes in base64 representation and writes the corresponding 
-   * four base64 characters to the output writer.
-   * 
-   * @param b1  the first byte
-   * @param b2  the second byte
-   * @param b3  the third byte
-   */
-  private final void _writeBase64(final byte b1, final byte b2, final byte b3) throws IOException
-  {
-    int c1, c2, c3, c4;
-    char[] encodedChars = _fourChars;
+    /**
+     * <p>
+     * Consumer can use this constructor to choose a different lineLength
+     * and lineSeparator when encoding.  All forms of data can
+     * be decoded.
+     * </p><p>
+     * Note:  lineLengths that aren't multiples of 4 will still essentially
+     * end up being multiples of 4 in the encoded data.
+     * </p>
+     * @param lineLength    Each line of encoded data will be at most this long
+     *                      (rounded up to nearest multiple of 4).  Ignored when decoding.
+     *                      If <= 0, then output will not be divided into lines (chunks).
+     * @param lineSeparator Each line of encoded data will end with this
+     *                      sequence of bytes.
+     *                      If lineLength <= 0, then the lineSeparator is not used.
+     * @throws IllegalArgumentException The provided lineSeparator included
+     *                                  some base64 characters.  That's not going to work!
+     */
+    public Base64OutputStream(OutputStream os, int lineLength, byte[] lineSeparator) {
+        super(os);
+        this.lineLength = lineLength;
+        this.lineSeparator = new byte[lineSeparator.length];
+        System.arraycopy(lineSeparator, 0, this.lineSeparator, 0, lineSeparator.length);
+        if (lineLength > 0) {
+            this.encodeSize = 4 + lineSeparator.length;
+        } else {
+            this.encodeSize = 4;
+        }
+        if (containsBase64Byte(lineSeparator)) {
+            String sep;
+            try {
+                sep = new String(lineSeparator, "UTF-8");
+            } catch (UnsupportedEncodingException uee) {
+                sep = new String(lineSeparator);
+            }
+            throw new IllegalArgumentException("lineSeperator must not contain base64 characters: [" + sep + "]");
+        }
+    }
+
+    /** Doubles our buffer. */
+    private void resizeBuf() {
+        byte[] b = new byte[buf.length * 2];
+        System.arraycopy(buf, 0, b, 0, buf.length);
+        buf = b;
+    }
+
+    /**
+     * Returns whether or not the <code>octet</code> is in the base 64 alphabet.
+     * 
+     * @param octet
+     *            The value to test
+     * @return <code>true</code> if the value is defined in the the base 64 alphabet, <code>false</code> otherwise.
+     */
+    public static boolean isBase64(byte octet) {
+        return octet == PAD || (octet >= 0 && octet < base64ToInt.length && base64ToInt[octet] != -1);
+    }
+
+    /*
+     * Tests a given byte array to see if it contains only valid characters within the Base64 alphabet.
+     * 
+     * @param arrayOctet
+     *            byte array to test
+     * @return <code>true</code> if any byte is a valid character in the Base64 alphabet; false herwise
+     */
+    private static boolean containsBase64Byte(byte[] arrayOctet) {
+        for (int i = 0; i < arrayOctet.length; i++) {
+            if (isBase64(arrayOctet[i])) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Implementation of the Encoder Interface
+
+    private final byte[] singleByte = new byte[1];
+
+    /**
+     * Writes the specified <code>byte</code> to this output stream.
+     */
+    public void write(int i) throws IOException {
+        singleByte[0] = (byte) i;
+        write(singleByte, 0, 1);
+    }
+
     
-    c1 = (b1>>2)&0x3f;          // b1.high6
-    c2 = (b1<<4 | ((b2>>4)&0x0f) )&0x3f;  // b1.low2 + b2.high4
-    c3 = (b2<<2 | ((b3>>6)&0x03) )&0x3f;  // b2.low4 + b3.high2
-    c4 = b3&0x3f;               // b3.low6
+    /**
+     * Writes <code>len</code> bytes from the specified
+     * <code>b</code> array starting at <code>offset</code> to
+     * this output stream.
+     *
+     * @param b source byte array
+     * @param offset where to start reading the bytes
+     * @param len maximum number of bytes to write
+     * 
+     * @throws IOException if an I/O error occurs.
+     * @throws NullPointerException if the byte array parameter is null
+     * @throws IndexOutOfBoundsException if offset, len or buffer size are invalid
+     */
+    public void write(byte b[], int offset, int len) throws IOException {
+        if (eof) {
+            return;
+        }
+        if (b == null) {
+            throw new NullPointerException();
+        } else if (len < 0) {
+            // inAvail < 0 is how we're informed of EOF in the underlying data we're
+            // encoding.
+            eof = true;
+            if (buf.length - pos < encodeSize) {
+                resizeBuf();
+            }
+            switch (modulus) {
+                case 1:
+                    buf[pos++] = intToBase64[(x >> 2) & MASK_6BITS];
+                    buf[pos++] = intToBase64[(x << 4) & MASK_6BITS];
+                    buf[pos++] = PAD;
+                    buf[pos++] = PAD;
+                    break;
+
+                case 2:
+                    buf[pos++] = intToBase64[(x >> 10) & MASK_6BITS];
+                    buf[pos++] = intToBase64[(x >> 4) & MASK_6BITS];
+                    buf[pos++] = intToBase64[(x << 2) & MASK_6BITS];
+                    buf[pos++] = PAD;
+                    break;
+            }
+            if (lineLength > 0) {
+                System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
+                pos += lineSeparator.length;
+                // TODO I had to add this to make it work as the quoted printable encoder.
+                // not sure this is generally speaking ok.
+                System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
+                pos += lineSeparator.length;
+            }
+        } else if (offset < 0 || len < 0 || offset + len < 0) {
+            throw new IndexOutOfBoundsException();
+        } else if (offset > b.length || offset + len > b.length) {
+            throw new IndexOutOfBoundsException();
+        } else if (len > 0) {
+            for (int i = 0; i < len; i++) {
+                if (buf.length - pos < encodeSize) {
+                    resizeBuf();
+                }
+                modulus = (++modulus) % 3;
+                int bc = b[offset++];
+                if (bc < 0) { bc += 256; }
+                x = (x << 8) + bc;
+                if (0 == modulus) {
+                    buf[pos++] = intToBase64[(x >> 18) & MASK_6BITS];
+                    buf[pos++] = intToBase64[(x >> 12) & MASK_6BITS];
+                    buf[pos++] = intToBase64[(x >> 6) & MASK_6BITS];
+                    buf[pos++] = intToBase64[x & MASK_6BITS];
+                    currentLinePos += 4;
+                    if (lineLength > 0 && lineLength <= currentLinePos) {
+                        System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
+                        pos += lineSeparator.length;
+                        currentLinePos = 0;
+                    }
+                }
+            }
+        }
+        flushBuffer();
+    }
     
-    encodedChars[0] = _encode(c1);
-    encodedChars[1] = _encode(c2);
-    encodedChars[2] = _encode(c3);
-    encodedChars[3] = _encode(c4);
+    /**
+     * Flushes this output stream and forces any buffered output bytes
+     * to be written out to the stream.  If propogate is true, the wrapped
+     * stream will also be flushed.
+     *
+     * @param propogate boolean flag to indicate whether the wrapped
+     *                  OutputStream should also be flushed.
+     * @throws IOException if an I/O error occurs.
+     */
+    private void flushBuffer() throws IOException {
+        if (pos > 0) {
+            out.write(buf, 0, pos);
+            // buf = null;
+            pos = 0;
+        }
+    }
+
+    /**
+     * Flushes this output stream and forces any buffered output bytes
+     * to be written out to the stream.
+     *
+     * @throws IOException if an I/O error occurs.
+     */
+    public void flush() throws IOException {
+        flushBuffer();
+        out.flush();
+    }
     
-    // write array of chars to writer
-    _out.write(encodedChars);    
-  }
-  
-  /**
-   * Writes lengthToProcess number of bytes from byte array to writer 
-   * in base64 beginning with startIndex. Assumes all leftover bytes from 
-   * previous calls to write have been dealt with.  
-   * 
-   * @param b               the data
-   * @param startIndex      the start offset in the data
-   * @param lengthToProcess the number of bytes to read
-   */
-  private final void _processArray(byte[] b, int startIndex, int lengthToProcess) 
-                                                        throws IOException
-  {
-    int index = startIndex;
-  
-    // loop through remaining length of array
-    while(lengthToProcess>0) {
-      // base case: only one byte
-      if (lengthToProcess==1) 
-      {        
-        // save this byte for next call to write
-        _numLeftoverBytes = 1;
-        _leftoverBytes[0] = b[index];
-        return;
-      }
-      // base case: only two bytes
-      else if (lengthToProcess==2) 
-      {     
-        // save these two bytes for next call to write
-        _numLeftoverBytes = 2;
-        _leftoverBytes[0] = b[index];
-        _leftoverBytes[1] = b[index+1]; 
-        return;
-      } 
-      else 
-      {
-        // encode three bytes (24 bits) from input array
-        _writeBase64(b[index],b[index+1],b[index+2]);
-        
-        // finally, make some progress in loop
-        lengthToProcess -= 3;
-        index +=3;
-       }
-    } //end while
-  }
-  
-  
+    /**
+     * Closes this output stream and releases any system resources
+     * associated with the stream.
+     */
+    public void close() throws IOException {
+        // Notify encoder of EOF (-1).
+        write(singleByte, 0, -1);
+        flush();
+        out.close();
+    }
 
-  /**
-   * Encodes a six-bit pattern into a base-64 character.
-   * 
-   * @param c an integer whose lower 6 bits contain the base64 representation
-   *          all other bits should be zero
-   */
-  private static final char _encode(final int c) 
-  {
-    if (c < 26)
-      return (char)('A' + c);
-    if (c < 52)
-      return (char)('a' + (c-26));
-    if (c < 62)
-      return (char)('0' + (c-52));
-    if (c == 62)
-      return '+';
-    if (c == 63)
-      return '/';
-      
-    throw new AssertionError("Invalid B64 character code:"+c);
-  }
-
-  
-  /** stores leftover bytes from previous call to write method **/
-  private final byte[]      _leftoverBytes;
-  
-  /** indicates the number of bytes that were leftover after the last triplet 
-   * was formed in the last call to write method  **/
-  private int         _numLeftoverBytes;
-  
-  // cached four-character array
-  private final char[]      _fourChars = new char[4];
-  // cached single-byte array
-  private final byte[]      _single = new byte[1];
-
-  // Writer that will receive all completed character output
-  private final Writer      _out;  
-  
 }

@@ -20,14 +20,11 @@
 package org.apache.james.mime4j.decoder;
 
 import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.decoder.Base64InputStream;
-import org.apache.james.mime4j.decoder.CodecUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 
 import junit.framework.TestCase;
 
@@ -84,7 +81,7 @@ public class CodecUtilTest extends TestCase {
 
     private String roundtripUsingOutputStream(String input) throws IOException {
         ByteArrayOutputStream out2 = new ByteArrayOutputStream();
-        Base64OutputStream outb64 = new Base64OutputStream(new OutputStreamWriter(new LineBreakingOutputStream(out2, 76)));
+        Base64OutputStream outb64 = new Base64OutputStream(out2, 76);
         CodecUtil.copy(new ByteArrayInputStream(input.getBytes()), outb64);
         outb64.flush();
         outb64.close();
@@ -95,7 +92,6 @@ public class CodecUtilTest extends TestCase {
         String output = new String(outRoundtrip.toByteArray());
         return output;
     }
-    
     
     /**
      * This test is a proof for MIME4J-67
@@ -123,9 +119,10 @@ public class CodecUtilTest extends TestCase {
     } 
     */
     
-    /* performance test, not a unit test
+    /* performance test, not a unit test */
+    /*
     public void testPerformance() throws Exception {
-        if (true) return;
+        // if (true) return;
         byte[] bytes = new byte[10000];
         Random r = new Random(432875623874L);
         r.nextBytes(bytes);
@@ -143,7 +140,6 @@ public class CodecUtilTest extends TestCase {
             long time3 = System.currentTimeMillis();
             roundtripUsingEncoder(input);
             long time4 = System.currentTimeMillis();
-            roundtripUsingOutputStream(input);
             
             totalEncoder1 += time2-time1;
             totalStream1 += time3-time2;
@@ -151,7 +147,7 @@ public class CodecUtilTest extends TestCase {
         }
         
         System.out.println("Encoder 1st: "+totalEncoder1);
-        System.out.println("Encoder 2st: "+totalEncoder2);
+        System.out.println("Encoder 2nd: "+totalEncoder2);
         System.out.println("Stream 1st: "+totalStream1);
     }
     */

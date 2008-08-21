@@ -24,7 +24,6 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 
 /**
  * Utility methods related to codecs.
@@ -314,14 +313,7 @@ public class CodecUtil {
      * @throws IOException
      */
     public static OutputStream wrapBase64(final OutputStream out) throws IOException {
-        return new Base64OutputStream(new OutputStreamWriter(new LineBreakingOutputStream(out, 76)) {
-
-            public void close() throws IOException {
-                // do not close wrapped stream but flush them
-                flush();
-            }
-            
-        });
+        return new Base64OutputStream(out);
     }
     
     private static final class Base64Encoder {

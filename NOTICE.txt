@@ -12,10 +12,3 @@
    developed by Kent Beck, Erich Gamma, and David Saff
    License: Common Public License Version 1.0
    (http://www.opensource.org/licenses/cpl.php)
-   
-   The Base64OutputStream and Base64OutputStreamTest classes included in this
-   package is based on code from Apache MyFaces Trinidad.
-   Portions of Apache MyFaces Trinidad were originally based on the following:
-   software copyright (c) 2000-2006, Oracle Corp, <http://www.oracle.com/>.
-   and are licensed to the Apache Software Foundation under the
-   "Software Grant and Corporate Contribution License Agreement"
