@@ -84,4 +84,13 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
         final InputStream inputStream = getInputStream();
         CodecUtil.copy(inputStream,out);
     }
+
+    /**
+     * Deletes the temporary file that stores the content of this binary body.
+     * 
+     * @see org.apache.james.mime4j.message.Disposable#dispose()
+     */
+    public void dispose() {
+        tempFile.delete();
+    }
 }

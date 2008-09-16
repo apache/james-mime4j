@@ -221,4 +221,16 @@ public class Multipart implements Body {
         writer.write(epilogue);
         writer.flush();
     }
+
+    /**
+     * Disposes the BodyParts of this Multipart. Note that the dispose call does
+     * not get forwarded to the parent entity of this Multipart.
+     * 
+     * @see org.apache.james.mime4j.message.Disposable#dispose()
+     */
+    public void dispose() {
+        for (Iterator it = bodyParts.iterator(); it.hasNext();) {
+            ((BodyPart) it.next()).dispose();
+        }
+    }
 }

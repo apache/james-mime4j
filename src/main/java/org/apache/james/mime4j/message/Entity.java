@@ -36,7 +36,7 @@ import java.io.OutputStream;
  * 
  * @version $Id: Entity.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
-public abstract class Entity {
+public abstract class Entity implements Disposable {
     private Header header = null;
     private Body body = null;
     private Entity parent = null;
@@ -192,5 +192,16 @@ public abstract class Entity {
         // we don't want it to close the inner stream so we override the behaviour
         // for the wrapping stream writer.
         if (encOut != out) encOut.close();
+    }
+
+    /**
+     * Disposes the body of this entity. Note that the dispose call does not get
+     * forwarded to the parent entity of this Entity.
+     * 
+     * @see org.apache.james.mime4j.message.Disposable#dispose()
+     */
+    public void dispose() {
+        if (body != null)
+            body.dispose();
     }
 }

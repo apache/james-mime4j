@@ -44,4 +44,14 @@ public abstract class AbstractBody implements Body {
         this.parent = parent;
     }
 
+    /**
+     * Subclasses should override this method if they have allocated resources that need to be
+     * freed explicitly (e.g. cannot be simply reclaimed by the garbage collector). The default
+     * implementation of this method does nothing.
+     * 
+     * @see org.apache.james.mime4j.message.Disposable#dispose()
+     */
+    public void dispose() {
+    }
+
 }

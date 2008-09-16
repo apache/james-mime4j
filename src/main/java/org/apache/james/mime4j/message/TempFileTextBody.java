@@ -107,4 +107,13 @@ class TempFileTextBody extends AbstractBody implements TextBody {
         final InputStream inputStream = tempFile.getInputStream();
         CodecUtil.copy(inputStream,out);
     }
+
+    /**
+     * Deletes the temporary file that stores the content of this text body.
+     * 
+     * @see org.apache.james.mime4j.message.Disposable#dispose()
+     */
+    public void dispose() {
+        tempFile.delete();
+    }
 }

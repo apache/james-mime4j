@@ -30,7 +30,7 @@ import org.apache.james.mime4j.MimeException;
  * 
  * @version $Id: Body.java,v 1.4 2004/10/04 15:36:43 ntherning Exp $
  */
-public interface Body {
+public interface Body extends Disposable {
 
     /**
      * Gets the parent of this body.
