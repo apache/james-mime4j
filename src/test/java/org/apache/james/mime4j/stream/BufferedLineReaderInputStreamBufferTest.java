@@ -199,4 +199,13 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         i = inbuffer.indexOf((byte)'g', inbuffer.pos(), inbuffer.length() - 3);
         assertEquals(-1, i);
     }
+    
+    public void test0xFFInBinaryStream() throws Exception {
+        byte[] b1 = new byte[] {1, 2, 3, (byte) 0xff, 10, 1, 2, 3};
+        byte[] b2 = new byte[] {10};
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        inbuffer.fillBuffer();
+        int i = inbuffer.indexOf(b2);
+        assertEquals(4, i);
+    }
 }

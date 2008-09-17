@@ -186,7 +186,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             return -1;
         }
         
-        int[] shiftTable = new int[255];
+        int[] shiftTable = new int[256];
         for (int i = 0; i < shiftTable.length; i++) {
             shiftTable[i] = pattern.length + 1;
         }
