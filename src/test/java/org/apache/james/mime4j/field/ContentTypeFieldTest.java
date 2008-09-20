@@ -38,14 +38,14 @@ public class ContentTypeFieldTest extends TestCase {
         BasicConfigurator.configure();
     }
     
-    public void testMimeTypeWithSemiColonNoParams() {
+    public void testMimeTypeWithSemiColonNoParams() throws Exception  {
         ContentTypeField f = null;
         
         f = (ContentTypeField) Field.parse("Content-Type: text/html;");
         assertEquals("text/html", f.getMimeType());
     }
     
-    public void testGetMimeType() {
+    public void testGetMimeType() throws Exception {
         ContentTypeField f = null;
         
         f = (ContentTypeField) Field.parse("Content-Type: text/PLAIN");
@@ -62,7 +62,7 @@ public class ContentTypeFieldTest extends TestCase {
         assertEquals("", f.getMimeType());
     }
     
-    public void testGetMimeTypeStatic() {
+    public void testGetMimeTypeStatic() throws Exception {
         ContentTypeField child = null;
         ContentTypeField parent = null;
         
@@ -83,7 +83,7 @@ public class ContentTypeFieldTest extends TestCase {
         assertEquals("message/rfc822", ContentTypeField.getMimeType(child, parent));
     }
     
-    public void testGetCharsetStatic() {
+    public void testGetCharsetStatic() throws Exception {
         ContentTypeField f = null;
         
         f = (ContentTypeField) Field.parse("Content-Type: some/type; charset=iso8859-1");
@@ -93,7 +93,7 @@ public class ContentTypeFieldTest extends TestCase {
         assertEquals("us-ascii", ContentTypeField.getCharset(f));
     }
     
-    public void testGetParameter() {
+    public void testGetParameter() throws Exception {
         ContentTypeField f = null;
         
         f = (ContentTypeField) Field.parse("CONTENT-TYPE:   text / html ;"

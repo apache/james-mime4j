@@ -32,7 +32,7 @@ import junit.framework.TestCase;
  */
 public class UnstructuredFieldTest extends TestCase {
 
-    public void testGetBody() {
+    public void testGetBody() throws Exception {
         UnstructuredField f = null;
         
         f = (UnstructuredField) Field.parse("Subject: Yada\r\n yada yada\r\n");

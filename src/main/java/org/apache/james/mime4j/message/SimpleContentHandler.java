@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
@@ -72,7 +73,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     /**
      * @see org.apache.james.mime4j.parser.AbstractContentHandler#field(java.lang.String)
      */
-    public final void field(String fieldData) {
+    public final void field(String fieldData) throws MimeException {
         currHeader.addField(Field.parse(fieldData));
     }
 

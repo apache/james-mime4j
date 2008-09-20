@@ -45,7 +45,7 @@ public class MessageTest extends TestCase {
     private Header headerMultipartMixed = null;
     private Header headerMultipartDigest = null;
 
-    public void setUp() {
+    public void setUp() throws Exception {
         headerTextPlain = new Header();
         headerMessageRFC822 = new Header();
         headerEmpty = new Header();

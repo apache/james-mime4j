@@ -68,18 +68,11 @@ public class Header {
             public void endHeader() {
                 parser.stop();
             }
-            public void field(String fieldData) {
+            public void field(String fieldData) throws MimeException {
                 addField(Field.parse(fieldData));
             }
         });
-        try {
-            parser.parse(is);
-        } catch (MimeException e) {
-            IllegalStateException ise = new IllegalStateException(
-                    "Unexpected header processing error");
-            ise.initCause(e);
-            throw ise;
-        }
+        parser.parse(is);
     }
 
     /**

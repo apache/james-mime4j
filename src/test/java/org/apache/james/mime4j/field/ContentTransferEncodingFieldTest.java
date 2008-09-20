@@ -32,7 +32,7 @@ import junit.framework.TestCase;
  */
 public class ContentTransferEncodingFieldTest extends TestCase {
 
-    public void testGetEncoding() {
+    public void testGetEncoding() throws Exception {
         ContentTransferEncodingField f = null;
         
         f = (ContentTransferEncodingField) 
@@ -52,7 +52,7 @@ public class ContentTransferEncodingFieldTest extends TestCase {
         assertEquals("", f.getEncoding());
     }
     
-    public void testGetEncodingStatic() {
+    public void testGetEncodingStatic() throws Exception {
         ContentTransferEncodingField f = null;
         
         f = (ContentTransferEncodingField) 

@@ -33,7 +33,7 @@ public class HeaderTest extends TestCase {
 
     public static final String TO = "To: anyuser <any@user>";
 
-    public void testHeader() {
+    public void testHeader() throws Exception {
         Header header = new Header();
         header.addField(Field.parse(SUBJECT));
         header.addField(Field.parse(TO));

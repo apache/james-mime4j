@@ -22,6 +22,8 @@ package org.apache.james.mime4j.field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.james.mime4j.MimeException;
+
 /**
  * The base class of all field classes.
  *
@@ -82,7 +84,7 @@ public abstract class Field {
      * @return a <code>Field</code> instance.
      * @throws IllegalArgumentException on parse errors.
      */
-    public static Field parse(final String raw) {
+    public static Field parse(final String raw) throws MimeException {
         
         /*
          * Unfold the field.
@@ -94,7 +96,7 @@ public abstract class Field {
          */
         final Matcher fieldMatcher = fieldNamePattern.matcher(unfolded);
         if (!fieldMatcher.find()) {
-            throw new IllegalArgumentException("Invalid field in string");
+            throw new MimeException("Invalid field in string");
         }
         final String name = fieldMatcher.group(1);
         
