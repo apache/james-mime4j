@@ -21,11 +21,11 @@ package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.LineReaderInputStream;
+import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -158,8 +158,8 @@ public class BufferedLineReaderInputStreamTest extends TestCase {
         linebuf.clear();
         try {
             instream2.readLine(linebuf);
-            fail("IOException should have been thrown");
-        } catch (IOException ex) {
+            fail("MaxLineLimitException should have been thrown");
+        } catch (MaxLineLimitException ex) {
         }
     }
 
