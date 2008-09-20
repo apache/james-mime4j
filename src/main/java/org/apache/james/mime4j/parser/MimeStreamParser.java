@@ -45,11 +45,28 @@ public class MimeStreamParser {
 
     private ContentHandler handler = null;
     private boolean contentDecoding;
-    private final MimeTokenStream mimeTokenStream = new MimeTokenStream();
+    
+    private final MimeTokenStream mimeTokenStream;
 
-    public MimeStreamParser() {
+    public MimeStreamParser(final MimeEntityConfig config) {
         super();
+        MimeEntityConfig localConfig;
+        if (config != null) {
+            try {
+                localConfig = (MimeEntityConfig) config.clone();
+            } catch (CloneNotSupportedException ex) {
+                // should never happen
+                localConfig = new MimeEntityConfig();
+            }
+        } else {
+            localConfig = new MimeEntityConfig();
+        }
+        this.mimeTokenStream = new MimeTokenStream(localConfig);
         this.contentDecoding = false;
+    }
+    
+    public MimeStreamParser() {
+        this(null);
     }
     
     /**

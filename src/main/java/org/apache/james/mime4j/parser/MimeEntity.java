@@ -60,12 +60,13 @@ public class MimeEntity extends AbstractEntity {
             BodyDescriptor parent, 
             int startState, 
             int endState,
-            boolean maximalBodyDescriptor,
-            boolean strictParsing) {
-        super(parent, startState, endState, maximalBodyDescriptor, strictParsing);
+            MimeEntityConfig config) {
+        super(parent, startState, endState, config);
         this.rootStream = rootStream;
         this.inbuffer = inbuffer;
-        this.dataStream = new LineReaderInputStreamAdaptor(inbuffer);
+        this.dataStream = new LineReaderInputStreamAdaptor(
+                inbuffer,
+                config.getMaxLineLen());
         this.skipHeader = false;
     }
 
@@ -75,7 +76,8 @@ public class MimeEntity extends AbstractEntity {
             BodyDescriptor parent, 
             int startState, 
             int endState) {
-        this(rootStream, inbuffer, parent, startState, endState, false, false);
+        this(rootStream, inbuffer, parent, startState, endState, 
+                new MimeEntityConfig());
     }
 
     public int getRecursionMode() {
@@ -196,7 +198,11 @@ public class MimeEntity extends AbstractEntity {
         try {
             if (mimeStream != null) {
                 mimeStream = new MimeBoundaryInputStream(
-                        new BufferedLineReaderInputStream(mimeStream, bufferSize), boundary);
+                        new BufferedLineReaderInputStream(
+                                mimeStream, 
+                                bufferSize, 
+                                config.getMaxLineLen()), 
+                        boundary);
             } else {
                 inbuffer.ensureCapacity(bufferSize);
                 mimeStream = new MimeBoundaryInputStream(inbuffer, boundary);
@@ -205,12 +211,16 @@ public class MimeEntity extends AbstractEntity {
             // thrown when boundary is too long
             throw new MimeException(e.getMessage(), e);
         }
-        dataStream = new LineReaderInputStreamAdaptor(mimeStream); 
+        dataStream = new LineReaderInputStreamAdaptor(
+                mimeStream,
+                config.getMaxLineLen()); 
     }
     
     private void clearMimeStream() {
         mimeStream = null;
-        dataStream = new LineReaderInputStreamAdaptor(inbuffer); 
+        dataStream = new LineReaderInputStreamAdaptor(
+                inbuffer,
+                config.getMaxLineLen()); 
     }
     
     private void advanceToBoundary() throws IOException {
@@ -242,12 +252,14 @@ public class MimeEntity extends AbstractEntity {
         } else {
             MimeEntity message = new MimeEntity(
                     rootStream, 
-                    new BufferedLineReaderInputStream(instream, 4 * 1024),
+                    new BufferedLineReaderInputStream(
+                            instream, 
+                            4 * 1024,
+                            config.getMaxLineLen()),
                     body, 
                     EntityStates.T_START_MESSAGE, 
                     EntityStates.T_END_MESSAGE,
-                    maximalBodyDescriptor,
-                    strictParsing);
+                    config);
             message.setRecursionMode(recursionMode);
             return message;
         }
@@ -258,15 +270,17 @@ public class MimeEntity extends AbstractEntity {
             RawEntity message = new RawEntity(mimeStream);
             return message;
         } else {
-            BufferedLineReaderInputStream stream = new BufferedLineReaderInputStream(mimeStream, 4 * 1024);
+            BufferedLineReaderInputStream stream = new BufferedLineReaderInputStream(
+                    mimeStream, 
+                    4 * 1024,
+                    config.getMaxLineLen());
             MimeEntity mimeentity = new MimeEntity(
                     rootStream, 
                     stream,
                     body, 
                     EntityStates.T_START_BODYPART, 
                     EntityStates.T_END_BODYPART,
-                    maximalBodyDescriptor,
-                    strictParsing);
+                    config);
             mimeentity.setRecursionMode(recursionMode);
             return mimeentity;
         }

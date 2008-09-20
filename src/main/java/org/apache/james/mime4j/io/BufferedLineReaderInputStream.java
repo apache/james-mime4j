@@ -35,7 +35,12 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     private int bufpos;
     private int buflen;
     
-    public BufferedLineReaderInputStream(final InputStream instream, int buffersize) {
+    private final int maxLineLen;
+    
+    public BufferedLineReaderInputStream(
+            final InputStream instream, 
+            int buffersize,
+            int maxLineLen) {
         super(instream);
         if (instream == null) {
             throw new IllegalArgumentException("Input stream may not be null");
@@ -46,8 +51,15 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         this.buffer = new byte[buffersize];
         this.bufpos = 0;
         this.buflen = 0;
+        this.maxLineLen = maxLineLen;
     }
-    
+
+    public BufferedLineReaderInputStream(
+            final InputStream instream, 
+            int buffersize) {
+        this(instream, buffersize, -1);
+    }
+
     private void expand(int newlen) {
         byte newbuffer[] = new byte[newlen];
         int len = this.buflen - this.bufpos;
@@ -132,8 +144,8 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     }
 
     
-    public int readLine(final ByteArrayBuffer linebuf) throws IOException {
-        if (linebuf == null) {
+    public int readLine(final ByteArrayBuffer dst) throws IOException {
+        if (dst == null) {
             throw new IllegalArgumentException("Buffer may not be null");
         }
         int total = 0;
@@ -155,9 +167,12 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
                 chunk = length();
             }
             if (chunk > 0) {
-                linebuf.append(buf(), pos(), chunk);
+                dst.append(buf(), pos(), chunk);
                 skip(chunk);
                 total += chunk;
+            }
+            if (this.maxLineLen > 0 && dst.length() >= this.maxLineLen) {
+                throw new IOException("Maximum line length limit exceeded");
             }
         }
         if (total == 0 && bytesRead == -1) {

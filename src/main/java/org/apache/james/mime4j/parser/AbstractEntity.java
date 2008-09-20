@@ -44,8 +44,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
     protected final BodyDescriptor parent;
     protected final int startState;
     protected final int endState;
-    protected final boolean maximalBodyDescriptor;
-    protected final boolean strictParsing;
+    protected final MimeEntityConfig config;
     protected final MutableBodyDescriptor body;
     
     protected int state;
@@ -81,15 +80,13 @@ public abstract class AbstractEntity implements EntityStateMachine {
             BodyDescriptor parent,
             int startState, 
             int endState,
-            boolean maximalBodyDescriptor,
-            boolean strictParsing) {
+            MimeEntityConfig config) {
         this.log = LogFactory.getLog(getClass());        
         this.parent = parent;
         this.state = startState;
-        this.startState = startState; 
+        this.startState = startState;
         this.endState = endState;
-        this.maximalBodyDescriptor = maximalBodyDescriptor;
-        this.strictParsing = strictParsing;
+        this.config = config;
         this.body = newBodyDescriptor(parent);
         this.linebuf = new ByteArrayBuffer(64);
         this.fieldbuf = new CharArrayBuffer(64);
@@ -108,7 +105,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
      */
     protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor pParent) {
         final MutableBodyDescriptor result;
-        if (maximalBodyDescriptor) {
+        if (config.isMaximalBodyDescriptor()) {
             result = new MaximalBodyDescriptor(pParent);
         } else {
             result = new DefaultBodyDescriptor(pParent);
@@ -282,7 +279,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * @throws IOException subclasses may elect to throw this exception
      */
     protected void monitor(Event event) throws MimeException, IOException {
-        if (strictParsing) {
+        if (config.isStrictParsing()) {
             throw new MimeParseEventException(event);
         } else {
             warn(event);

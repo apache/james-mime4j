@@ -59,7 +59,9 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
     protected void runTest() throws Throwable {
         MimeStreamParser parser = null;
         TestHandler handler = null;
-        parser = new MimeStreamParser();
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setMaxLineLen(-1);
+        parser = new MimeStreamParser(config);
         handler = new TestHandler();
         
         System.out.println("Parsing " + file.getName());

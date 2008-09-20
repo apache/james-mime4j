@@ -21,6 +21,7 @@ package org.apache.james.mime4j.message;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.log4j.BasicConfigurator;
 
@@ -95,7 +96,9 @@ public class MessageParserTest extends TestCase {
         
         System.out.println("Parsing " + f.getName());
         
-        Message m = new Message(new FileInputStream(f));
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setMaxLineLen(-1);
+        Message m = new Message(new FileInputStream(f), config);
         
         String prefix = f.getName().substring(0, f.getName().length() - 4);
         String xmlFileName = fileName.substring(0, fileName.length() - 4) 

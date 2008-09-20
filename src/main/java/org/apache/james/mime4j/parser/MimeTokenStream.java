@@ -83,7 +83,9 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * @return <code>MimeTokenStream</code>, not null
      */
     public static final MimeTokenStream createMaximalDescriptorStream() {
-        return new MimeTokenStream(false, true);
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setMaximalBodyDescriptor(true);
+        return new MimeTokenStream(config);
     }
     
     /**
@@ -93,11 +95,12 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * are dedicated in the input
      */
     public static final MimeTokenStream createStrictValidationStream() {
-        return new MimeTokenStream(true, false);
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setStrictParsing(true);
+        return new MimeTokenStream(config);
     }
     
-    private final boolean strictParsing;
-    private final boolean maximalBodyDescriptor;
+    private final MimeEntityConfig config;
     private final LinkedList entities = new LinkedList();
     
     private int state = T_END_OF_STREAM;
@@ -113,12 +116,12 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * a stream that strictly validates the input.
      */
     public MimeTokenStream() {
-        this(false, false);
+        this(new MimeEntityConfig());
     }
     
-    protected MimeTokenStream(final boolean strictParsing, final boolean maximalBodyDescriptor) {
-        this.strictParsing = strictParsing;
-        this.maximalBodyDescriptor = maximalBodyDescriptor;
+    protected MimeTokenStream(final MimeEntityConfig config) {
+        super();
+        this.config = config;
     }
     
     /** Instructs the {@code MimeTokenStream} to parse the given streams contents.
@@ -148,7 +151,10 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     private void doParse(InputStream stream, String contentType) {
         entities.clear();
         rootInputStream = new RootInputStream(stream);
-        inbuffer = new BufferedLineReaderInputStream(rootInputStream, 4 * 1024);
+        inbuffer = new BufferedLineReaderInputStream(
+                rootInputStream, 
+                4 * 1024,
+                config.getMaxLineLen());
         switch (recursionMode) {
         case M_RAW:
             RawEntity rawentity = new RawEntity(inbuffer);
@@ -164,8 +170,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
                     null, 
                     T_START_MESSAGE, 
                     T_END_MESSAGE,
-                    maximalBodyDescriptor,
-                    strictParsing);
+                    config);
             mimeentity.setRecursionMode(recursionMode);
             if (contentType != null) {
                 mimeentity.skipHeader(contentType);

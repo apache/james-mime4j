@@ -21,6 +21,7 @@ package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.decoder.CodecUtil;
 import org.apache.james.mime4j.message.Message;
+import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.util.MessageUtils;
 import org.apache.log4j.BasicConfigurator;
 
@@ -59,7 +60,9 @@ public class ExampleMessagesRoundtripTest extends TestCase {
     }
    
     protected void runTest() throws Throwable {
-        Message inputMessage = new Message(new FileInputStream(file));
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setMaxLineLen(-1);
+        Message inputMessage = new Message(new FileInputStream(file), config);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         inputMessage.writeTo(out, MessageUtils.LENIENT);
         
@@ -71,12 +74,12 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             CodecUtil.copy(new FileInputStream(msgoutFile), expectedstream);
             assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
             
-            Message roundtripMessage = new Message(new FileInputStream(msgoutFile));
+            Message roundtripMessage = new Message(new FileInputStream(msgoutFile), config);
             ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
             roundtripMessage.writeTo(outRoundtrip, MessageUtils.LENIENT);
             assertEquals("Failed LENIENT roundtrip", new String(out.toByteArray()), new String(outRoundtrip.toByteArray()));
 
-            roundtripMessage = new Message(new FileInputStream(msgoutFile));
+            roundtripMessage = new Message(new FileInputStream(msgoutFile), config);
             outRoundtrip = new ByteArrayOutputStream();
             roundtripMessage.writeTo(outRoundtrip, MessageUtils.STRICT_ERROR);
             assertEquals("Failed STRICT roundtrip", new String(out.toByteArray()), new String(outRoundtrip.toByteArray()));

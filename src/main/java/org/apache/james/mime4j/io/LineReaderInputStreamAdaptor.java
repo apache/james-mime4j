@@ -34,18 +34,28 @@ import java.io.InputStream;
 public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
 
     private final LineReaderInputStream bis;
+    private final int maxLineLen;
+    
     private boolean used = false;
     private boolean eof = false;
 
-    public LineReaderInputStreamAdaptor(final InputStream is) {
+    public LineReaderInputStreamAdaptor(
+            final InputStream is,
+            int maxLineLen) {
         super(is);
         if (is instanceof LineReaderInputStream) {
             this.bis = (LineReaderInputStream) is;
         } else {
             this.bis = null;
         }
+        this.maxLineLen = maxLineLen;
     }
 
+    public LineReaderInputStreamAdaptor(
+            final InputStream is) {
+        this(is, -1);
+    }
+    
     public int read() throws IOException {
         int i = in.read();
         this.eof = i == -1;
@@ -78,6 +88,9 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
         while ((ch = in.read()) != -1) {
             dst.append(ch);
             total++;
+            if (this.maxLineLen > 0 && dst.length() >= this.maxLineLen) {
+                throw new IOException("Maximum line length limit exceeded");
+            }
             if (ch == '\n') {
                 break;
             }

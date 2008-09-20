@@ -22,6 +22,7 @@ package org.apache.james.mime4j.message;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
+import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 
 import java.io.IOException;
@@ -51,17 +52,27 @@ public class Message extends Entity implements Body {
     
     /**
      * Parses the specified MIME message stream into a <code>Message</code>
+     * instance using given {@link MimeEntityConfig}.
+     * 
+     * @param is the stream to parse.
+     * @throws IOException on I/O errors.
+     */
+    public Message(InputStream is, MimeEntityConfig config) throws MimeException, IOException {
+        MimeStreamParser parser = new MimeStreamParser(config);
+        parser.setContentHandler(new MessageBuilder(this));
+        parser.parse(is);
+    }
+
+    /**
+     * Parses the specified MIME message stream into a <code>Message</code>
      * instance.
      * 
      * @param is the stream to parse.
      * @throws IOException on I/O errors.
      */
-    public Message(InputStream is) throws MimeException, IOException {
-        MimeStreamParser parser = new MimeStreamParser();
-        parser.setContentHandler(new MessageBuilder(this));
-        parser.parse(is);
+    public Message(InputStream is) throws IOException {
+        this(is, null);
     }
-
     
     /**
      * Gets the <code>Subject</code> field.

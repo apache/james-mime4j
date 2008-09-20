@@ -24,6 +24,7 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import junit.framework.TestCase;
 
@@ -142,6 +143,27 @@ public class LineReaderInputStreamAdaptorTest extends TestCase {
 
         assertEquals(-1, instream.readLine(linebuf));
         assertEquals(-1, instream.readLine(linebuf));
+    }
+
+    public void testReadEmptyLineMaxLimit() throws Exception {
+        
+        String teststr = "1234567890\r\n";
+        byte[] raw = teststr.getBytes("US-ASCII");
+        
+        LineReaderInputStreamAdaptor instream1 = new LineReaderInputStreamAdaptor(
+                new ByteArrayInputStream(raw), 13); 
+        ByteArrayBuffer linebuf = new ByteArrayBuffer(8); 
+        linebuf.clear();
+        instream1.readLine(linebuf);
+
+        LineReaderInputStreamAdaptor instream2 = new LineReaderInputStreamAdaptor(
+                new ByteArrayInputStream(raw), 12); 
+        linebuf.clear();
+        try {
+            instream2.readLine(linebuf);
+            fail("IOException should have been thrown");
+        } catch (IOException ex) {
+        }
     }
 
 }
