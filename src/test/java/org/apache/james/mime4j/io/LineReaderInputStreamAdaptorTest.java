@@ -17,10 +17,9 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j.io;
 
-import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
-import org.apache.james.mime4j.io.LineReaderInputStream;
+import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
 import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
@@ -29,12 +28,14 @@ import java.io.ByteArrayOutputStream;
 
 import junit.framework.TestCase;
 
-public class BufferedLineReaderInputStreamTest extends TestCase {
+public class LineReaderInputStreamAdaptorTest extends TestCase {
 
     public void testBasicOperations() throws Exception {
         String text = "ah blahblah";
         byte[] b1 = text.getBytes("US-ASCII");
-        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        
+        LineReaderInputStreamAdaptor instream = new LineReaderInputStreamAdaptor(
+                new ByteArrayInputStream(b1)); 
         
         assertEquals((byte)'a', instream.read());
         assertEquals((byte)'h', instream.read());
@@ -72,7 +73,8 @@ public class BufferedLineReaderInputStreamTest extends TestCase {
         }
         byte[] raw = outstream.toByteArray();
         
-        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(raw), 16); 
+        LineReaderInputStreamAdaptor instream = new LineReaderInputStreamAdaptor(
+                new ByteArrayInputStream(raw)); 
         
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8); 
         for (int i = 0; i < teststrs.length; i++) {
@@ -90,7 +92,8 @@ public class BufferedLineReaderInputStreamTest extends TestCase {
         String teststr = "\n\n\r\n\r\r\n\n\n\n\n\n";
         byte[] raw = teststr.getBytes("US-ASCII");
         
-        LineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(raw), 4); 
+        LineReaderInputStreamAdaptor instream = new LineReaderInputStreamAdaptor(
+                new ByteArrayInputStream(raw)); 
         
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8); 
         linebuf.clear();
@@ -147,14 +150,14 @@ public class BufferedLineReaderInputStreamTest extends TestCase {
         String teststr = "1234567890\r\n";
         byte[] raw = teststr.getBytes("US-ASCII");
         
-        LineReaderInputStream instream1 = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(raw), 1024, 13); 
+        LineReaderInputStreamAdaptor instream1 = new LineReaderInputStreamAdaptor(
+                new ByteArrayInputStream(raw), 13); 
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8); 
         linebuf.clear();
         instream1.readLine(linebuf);
 
-        LineReaderInputStream instream2 = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(raw), 1024, 12); 
+        LineReaderInputStreamAdaptor instream2 = new LineReaderInputStreamAdaptor(
+                new ByteArrayInputStream(raw), 12); 
         linebuf.clear();
         try {
             instream2.readLine(linebuf);
