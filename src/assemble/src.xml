@@ -35,6 +35,7 @@
         <exclude>.*</exclude>
         <exclude>.*/**</exclude>
         <exclude>**.bak</exclude>
+        <exclude>lib/**</exclude>
       </excludes>
       <useDefaultExcludes>true</useDefaultExcludes>
     </fileSet>
