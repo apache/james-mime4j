@@ -35,7 +35,7 @@ public interface RFC2557ContentLocationDescriptor {
     public abstract String getContentLocation();
 
     /**
-     * Gets any exception thrown during the parsing of {@link #getContentLanguage()}
+     * Gets any exception thrown during the parsing of {@link #getContentLocation()}
      * @return <code>ParseException</code> when the content-language parse fails,
      * null otherwise
      */

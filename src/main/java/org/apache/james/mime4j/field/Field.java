@@ -80,7 +80,7 @@ public abstract class Field {
      *      </tr>
      * </table>
      * 
-     * @param s the string to parse.
+     * @param raw the string to parse.
      * @return a <code>Field</code> instance.
      * @throws IllegalArgumentException on parse errors.
      */

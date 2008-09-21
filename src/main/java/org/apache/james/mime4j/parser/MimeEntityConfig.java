@@ -55,7 +55,7 @@ public final class MimeEntityConfig implements Cloneable {
      * specification will be enforced, If this parameter is set to <code>false</code>
      * minor violations will result in a warning in the log.
      * 
-     * @return value of the strict parsing mode
+     * @param strictParsing value of the strict parsing mode
      */
     public void setStrictParsing(boolean strictParsing) {
         this.strictParsing = strictParsing;
@@ -77,7 +77,7 @@ public final class MimeEntityConfig implements Cloneable {
      * length limit. If this parameter is set to a non positive value the line length
      * check will be disabled.
      * 
-     * @param maximum line length limit
+     * @param maxLineLen maximum line length limit
      */
     public void setMaxLineLen(int maxLineLen) {
         this.maxLineLen = maxLineLen;
@@ -99,7 +99,7 @@ public final class MimeEntityConfig implements Cloneable {
      * limit. If this parameter is set to a non positive value the header limit check 
      * will be disabled.
      * 
-     * @param maximum header limit
+     * @param maxHeaderCount maximum header limit
      */
     public void setMaxHeaderCount(int maxHeaderCount) {
         this.maxHeaderCount = maxHeaderCount;

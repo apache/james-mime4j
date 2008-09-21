@@ -168,7 +168,8 @@ public abstract class Entity implements Disposable {
      * Write the content to the given outputstream
      * 
      * @param out the outputstream to write to
-     * @param mode output mode {@link MessageUtils}
+     * @param mode compatibility mode:
+     *   {@link MessageUtils#LENIENT}, {@link MessageUtils#STRICT_ERROR}, {@link MessageUtils#STRICT_IGNORE}  
      * @throws IOException 
      */
     public void writeTo(OutputStream out, int mode) throws IOException, MimeException {

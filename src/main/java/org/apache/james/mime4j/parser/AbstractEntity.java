@@ -218,10 +218,10 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * <p>Gets a descriptor for the current entity.
      * This method is valid if {@link #getState()} returns:</p>
      * <ul>
-     * <li>{@link #T_BODY}</li>
-     * <li>{@link #T_START_MULTIPART}</li>
-     * <li>{@link #T_EPILOGUE}</li>
-     * <li>{@link #T_PREAMBLE}</li>
+     * <li>{@link EntityStates#T_BODY}</li>
+     * <li>{@link EntityStates#T_START_MULTIPART}</li>
+     * <li>{@link EntityStates#T_EPILOGUE}</li>
+     * <li>{@link EntityStates#T_PREAMBLE}</li>
      * </ul>
      * @return <code>BodyDescriptor</code>, not nulls
      */
@@ -239,10 +239,10 @@ public abstract class AbstractEntity implements EntityStateMachine {
     }
 
     /**
-     * This method is valid, if {@link #getState()} returns {@link #T_FIELD}.
+     * This method is valid, if {@link #getState()} returns {@link EntityStates#T_FIELD}.
      * @return String with the fields raw contents.
      * @throws IllegalStateException {@link #getState()} returns another
-     *   value than {@link #T_FIELD}.
+     *   value than {@link EntityStates#T_FIELD}.
      */
     public String getField() {
         switch (getState()) {
@@ -254,10 +254,10 @@ public abstract class AbstractEntity implements EntityStateMachine {
     }
 
     /**
-     * This method is valid, if {@link #getState()} returns {@link #T_FIELD}.
+     * This method is valid, if {@link #getState()} returns {@link EntityStates#T_FIELD}.
      * @return String with the fields name.
      * @throws IllegalStateException {@link #getState()} returns another
-     *   value than {@link #T_FIELD}.
+     *   value than {@link EntityStates#T_FIELD}.
      */
     public String getFieldName() {
         switch (getState()) {
@@ -269,10 +269,10 @@ public abstract class AbstractEntity implements EntityStateMachine {
     }
 
     /**
-     * This method is valid, if {@link #getState()} returns {@link #T_FIELD}.
+     * This method is valid, if {@link #getState()} returns {@link EntityStates#T_FIELD}.
      * @return String with the fields value.
      * @throws IllegalStateException {@link #getState()} returns another
-     *   value than {@link #T_FIELD}.
+     *   value than {@link EntityStates#T_FIELD}.
      */
     public String getFieldValue() {
         switch (getState()) {

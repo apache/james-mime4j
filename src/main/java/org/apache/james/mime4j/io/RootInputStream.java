@@ -38,7 +38,7 @@ public class RootInputStream extends FilterInputStream {
     /**
      * Creates a new <code>RootInputStream</code>.
      * 
-     * @param in the stream to read from.
+     * @param is the stream to read from.
      */
     public RootInputStream(InputStream is) {
         super(is);

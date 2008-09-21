@@ -78,7 +78,7 @@ public interface RFC2183ContentDispositionDescriptor {
     public abstract DateTime getContentDispositionCreationDate();
 
     /**
-     * Gets any exception thrown during the parsing of {@link #getContentCreationModificationDate()}
+     * Gets any exception thrown during the parsing of {@link #getContentDispositionCreationDate()}
      * @return <code>ParseException</code> when the creation-date parse fails,
      * null otherwise
      */
@@ -93,7 +93,7 @@ public interface RFC2183ContentDispositionDescriptor {
     public abstract DateTime getContentDispositionReadDate();
 
     /**
-     * Gets any exception thrown during the parsing of {@link #getContentReadModificationDate()}
+     * Gets any exception thrown during the parsing of {@link #getContentDispositionReadDate()}
      * @return <code>ParseException</code> when the read-date parse fails,
      * null otherwise
      */
@@ -108,7 +108,7 @@ public interface RFC2183ContentDispositionDescriptor {
     public abstract long getContentDispositionSize();
 
     /**
-     * Gets any exception thrown during the parsing of {@link #getContentReadModificationDate()}
+     * Gets any exception thrown during the parsing of {@link #getContentDispositionSize()}
      * @return <code>ParseException</code> when the read-date parse fails,
      * null otherwise
      */

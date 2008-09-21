@@ -34,8 +34,7 @@ import java.io.InputStream;
  * <code>Message</code> object.
  * 
  * <pre>
- *      Message msg = new Message(new BufferedInputStream(
- *                                      new FileInputStream("mime.msg")));
+ *      Message msg = new Message(new FileInputStream("mime.msg"));
  * </pre>
  * 
  *

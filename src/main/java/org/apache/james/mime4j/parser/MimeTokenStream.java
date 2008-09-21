@@ -187,7 +187,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * 
      * @return <code>true</code> if in raw mode, <code>false</code>
      *         otherwise.
-     * @see #setRaw(boolean)
+     * @see #setRecursionMode(int)
      */
     public boolean isRaw() {
         return recursionMode == M_RAW;

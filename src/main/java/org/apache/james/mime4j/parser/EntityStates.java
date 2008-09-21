@@ -42,8 +42,6 @@ public interface EntityStates {
     public static final int T_END_MESSAGE = 1;
     /**
      * This token indicates, that a raw entity is currently being processed.
-     * You may call {@link #getContentStream()} to obtain the raw entity
-     * data.
      */
     public static final int T_RAW_ENTITY = 2;
     /**
@@ -53,8 +51,7 @@ public interface EntityStates {
     public static final int T_START_HEADER = 3;
     /**
      * This token indicates, that a message parts field has now
-     * been parsed. You may call {@link #getField()} to obtain the
-     * raw field contents.
+     * been parsed. 
      */
     public static final int T_FIELD = 4;
     /**
@@ -72,14 +69,12 @@ public interface EntityStates {
     public static final int T_END_MULTIPART = 7;
     /**
      * This token indicates, that a multiparts preamble is being
-     * parsed. You may call {@link #getContentStream()} to access the
-     * preamble contents.
+     * parsed. 
      */
     public static final int T_PREAMBLE = 8;
     /**
      * This token indicates, that a multiparts epilogue is being
-     * parsed. You may call {@link #getContentStream()} to access the
-     * epilogue contents.
+     * parsed. 
      */
     public static final int T_EPILOGUE = 9;
     /**
@@ -94,7 +89,6 @@ public interface EntityStates {
     public static final int T_END_BODYPART = 11;
     /**
      * This token indicates, that an atomic entity is being parsed.
-     * Use {@link #getContentStream()} to access the entity contents.
      */
     public static final int T_BODY = 12;
 
