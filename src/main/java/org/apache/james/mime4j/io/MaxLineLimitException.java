@@ -19,13 +19,13 @@
 
 package org.apache.james.mime4j.io;
 
-import java.io.IOException;
+import org.apache.james.mime4j.MimeException;
 
 /**
  * Signals a I/O error due to a line exceeding the limit on the 
  * maximum line length.
  */
-public class MaxLineLimitException extends IOException {
+public class MaxLineLimitException extends MimeException {
     
     private static final long serialVersionUID = 8039001187837730773L;
 
