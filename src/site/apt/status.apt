@@ -22,10 +22,14 @@
 
 {Status}
 
-    The 0.4 release brings a number of significant improvements in terms of 
+    The 0.4 release brought a number of significant improvements in terms of 
     supported capabilities, flexibility and performance.
 
-    The next release will be version 0.5. The main focus of the development 
-    efforts will be on further refinement of the API and improving the ability
-    of the parser to deal with malformed data streams including those 
-    intentionally crafted to cause excessive CPU and memory utilization.
+    The 0.5 release addressed a number of important issues discovered since
+    the 0.4 release. In particular it improved Mime4j ability to deal with
+    malformed data streams including those intentionally crafted to cause 
+    excessive CPU and memory utilization that can lead to DoS conditions.
+
+    The next release will be version 0.6. The main focus of the development 
+    efforts will be on further refinement of the API, MIME specification 
+    compliance, and performance improvements.
