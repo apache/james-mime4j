@@ -77,7 +77,8 @@
                 </p>
                 <p>
                   <strong>NOTE!</strong> Mime4j uses <a href="https://javacc.dev.java.net/">JavaCC</a> to generate parsers for
-                  header fields. <code>mvn eclipse:eclipse</code> currently has problems with 
+                  header fields. If you're using an old version of maven eclipse pluing
+                  <code>mvn eclipse:eclipse</code> could have problems  
                   generating proper source folders for the JavaCC generated code.
                   After running <code>mvn eclipse:eclipse</code> you must manually
                   add <code>target/generated-sources/javacc</code> and 
