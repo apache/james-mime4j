@@ -30,6 +30,8 @@ import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
 import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
 import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
 import org.apache.james.mime4j.io.LineReaderInputStream;
+import org.apache.james.mime4j.io.MaxHeaderLimitException;
+import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.MessageUtils;
@@ -55,6 +57,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
     private int lineCount;
     private String field, fieldName, fieldValue;
     private boolean endOfHeader;
+    private int headerCount;
 
     private static final BitSet fieldChars = new BitSet();
 
@@ -92,6 +95,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
         this.fieldbuf = new CharArrayBuffer(64);
         this.lineCount = 0;
         this.endOfHeader = false;
+        this.headerCount = 0;
     }
 
     public int getState() {
@@ -121,12 +125,16 @@ public abstract class AbstractEntity implements EntityStateMachine {
         if (endOfHeader) {
             return;
         }
+        int maxLineLen = config.getMaxLineLen();
         LineReaderInputStream instream = getDataStream();
         fieldbuf.clear();
         for (;;) {
             // If there's still data stuck in the line buffer
             // copy it to the field buffer
             int len = linebuf.length();
+            if (maxLineLen > 0 && fieldbuf.length() + len >= maxLineLen) {
+                throw new MaxLineLimitException("Maximum line length limit exceeded");
+            }
             if (len > 0) {
                 fieldbuf.append(linebuf, 0, len);
             }
@@ -160,11 +168,17 @@ public abstract class AbstractEntity implements EntityStateMachine {
     }
 
     protected boolean parseField() throws IOException {
+        int maxHeaderLimit = config.getMaxHeaderCount();
         for (;;) {
             if (endOfHeader) {
                 return false;
             }
+            if (headerCount >= maxHeaderLimit) {
+                throw new MaxHeaderLimitException("Maximum header limit exceeded");
+            }
+            
             fillFieldBuffer();
+            headerCount++;
             
             // Strip away line delimiter
             int len = fieldbuf.length();
