@@ -62,7 +62,7 @@ public class Header {
      * 
      * @param is the stream to read the header from.
      */
-    public Header(InputStream is) throws IOException {
+    public Header(InputStream is) throws MimeException, IOException {
         final MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             public void endHeader() {

@@ -82,7 +82,7 @@ public abstract class Field {
      * 
      * @param raw the string to parse.
      * @return a <code>Field</code> instance.
-     * @throws IllegalArgumentException on parse errors.
+     * @throws MimeException on parse errors.
      */
     public static Field parse(final String raw) throws MimeException {
         
