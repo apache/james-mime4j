@@ -37,21 +37,26 @@ public class Base64InputStream extends InputStream {
     private final InputStream s;
     private final ByteQueue byteq = new ByteQueue(3);
     private boolean done = false;
+    private boolean closed = false;
 
     public Base64InputStream(InputStream s) {
         this.s = s;
     }
 
     /**
-     * Closes the underlying stream.
+     * Terminates BASE64 coded content. This method does NOT close the underlying 
+     * input stream.
      * 
      * @throws IOException on I/O errors.
      */
     public void close() throws IOException {
-        s.close();
+        closed = true;
     }
     
     public int read() throws IOException {
+        if (closed) {
+            throw new IOException("Base64InputStream has been closed");
+        }
         if (byteq.count() == 0) {
             fillBuffer();
             if (byteq.count() == 0) {

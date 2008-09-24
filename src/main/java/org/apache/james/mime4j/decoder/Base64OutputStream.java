@@ -150,11 +150,11 @@ public class Base64OutputStream extends FilterOutputStream {
     private int modulus;
 
     /**
-     * Boolean flag to indicate the EOF has been reached.  Once EOF has been
-     * reached, this Base64 object becomes useless, and must be thrown away.
+     * Boolean flag to indicate that this Base64OutputStream has been closed.
+     * Once closed, this Base64 object becomes useless, and must be thrown away.
      */
-    private boolean eof;
-
+    private boolean closed = false;
+        
     /**
      * Place holder for the 3 bytes we're dealing with for our base64 logic.
      * Bitwise operations store and extract the base64 encoding or decoding from
@@ -289,15 +289,15 @@ public class Base64OutputStream extends FilterOutputStream {
      * @throws IndexOutOfBoundsException if offset, len or buffer size are invalid
      */
     public void write(byte b[], int offset, int len) throws IOException {
-        if (eof) {
-            return;
+        if (closed) {
+        	throw new IOException("Base64OutputStream has been closed");
         }
         if (b == null) {
             throw new NullPointerException();
         } else if (len < 0) {
-            // inAvail < 0 is how we're informed of EOF in the underlying data we're
+            // len < 0 is how we're informed of EOF in the underlying data we're
             // encoding.
-            eof = true;
+            closed = true;
             if (buf.length - pos < encodeSize) {
                 resizeBuf();
             }
@@ -383,14 +383,21 @@ public class Base64OutputStream extends FilterOutputStream {
     }
     
     /**
-     * Closes this output stream and releases any system resources
-     * associated with the stream.
+     * Terminates the BASE64 coded content and flushes the internal buffers. This method does
+     * NOT close the underlying output stream.
      */
     public void close() throws IOException {
-        // Notify encoder of EOF (-1).
-        write(singleByte, 0, -1);
-        flush();
-        out.close();
+        if (closed) {
+            return;
+        }
+
+        try {
+            // Notify encoder of EOF (-1).
+            write(singleByte, 0, -1);
+            flush();
+        } finally {
+            closed = true;
+        }
     }
 
 }

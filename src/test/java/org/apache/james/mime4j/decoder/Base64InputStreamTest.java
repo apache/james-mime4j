@@ -136,7 +136,25 @@ public class Base64InputStreamTest extends TestCase {
             assertEquals("Position " + i, bytes[i], (byte) (i + 2));
         }
     }
-    
+
+    public void testDecodePrematureClose() throws IOException {
+        ByteArrayInputStream bis = null;
+        Base64InputStream decoder = null;
+        
+        bis = new ByteArrayInputStream(
+                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ=="));
+        decoder = new Base64InputStream(bis);
+        assertEquals('T', decoder.read());
+        assertEquals('h', decoder.read());
+        decoder.close();
+        
+        try {
+            decoder.read();
+            fail();
+        } catch (IOException expected) {
+        }
+    }
+        
     private byte[] read(InputStream is) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         int b;

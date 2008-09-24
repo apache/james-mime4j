@@ -75,6 +75,22 @@ public class QuotedPrintableInputStreamTest extends TestCase {
         assertEquals("width=340 height=200\r\n", new String(read(decoder), "ISO8859-1"));
     }
 
+    public void testDecodePrematureClose() throws IOException, UnsupportedEncodingException {
+        ByteArrayInputStream bis = null;
+        QuotedPrintableInputStream decoder = null;
+
+        bis = new ByteArrayInputStream("=e1=e2=E3=E4\r\n".getBytes("US-ASCII"));
+        decoder = new QuotedPrintableInputStream(bis);
+        assertEquals('\u00e1', decoder.read());
+        assertEquals('\u00e2', decoder.read());
+        decoder.close();
+        
+        try {
+            decoder.read();
+            fail();
+        } catch (IOException expected) {
+        }
+    }
     
     private byte[] read(InputStream is) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();

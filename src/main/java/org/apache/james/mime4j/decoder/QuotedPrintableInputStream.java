@@ -39,21 +39,26 @@ public class QuotedPrintableInputStream extends InputStream {
     ByteQueue byteq = new ByteQueue();
     ByteQueue pushbackq = new ByteQueue();
     private byte state = 0;
+    private boolean closed = false;
 
     public QuotedPrintableInputStream(InputStream stream) {
         this.stream = stream;
     }
     
     /**
-     * Closes the underlying stream.
+     * Terminates Quoted-Printable coded content. This method does NOT close 
+     * the underlying input stream.
      * 
      * @throws IOException on I/O errors.
      */
     public void close() throws IOException {
-        stream.close();
+        this.closed = true;
     }
 
     public int read() throws IOException {
+        if (closed) {
+            throw new IOException("QuotedPrintableInputStream has been closed");
+        }
         fillBuffer();
         if (byteq.count() == 0)
             return -1;
