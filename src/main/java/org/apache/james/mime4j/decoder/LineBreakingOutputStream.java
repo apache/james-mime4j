@@ -32,6 +32,8 @@ import java.io.OutputStream;
  */
 public class LineBreakingOutputStream extends FilterOutputStream {
 
+    private static final byte[] CRLF = {'\r', '\n'};
+    
     private int linepos = 0;
     private int lineLength = 76;
     
@@ -49,7 +51,7 @@ public class LineBreakingOutputStream extends FilterOutputStream {
                     off += count;
                     len -= count;
                 }
-                out.write(CodecUtil.CRLF);
+                out.write(CRLF);
                 linepos = 0;
             } else {
                 out.write(b, off, len);
@@ -61,7 +63,7 @@ public class LineBreakingOutputStream extends FilterOutputStream {
 
     public final void write(final int b) throws IOException {
         if (linepos >= lineLength) {
-            out.write(CodecUtil.CRLF);
+            out.write(CRLF);
             linepos = 0;
         }
         out.write(b);
