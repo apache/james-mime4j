@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 
 /**
@@ -104,7 +105,13 @@ public final class MimeUtil {
      * See <a href='http://www.faqs.org/rfcs/rfc1864.html'>RFC1864</a>.
      */
     public static final String MIME_HEADER_MD5 = "content-md5";
+
+    // used to create unique ids
+    private static final Random random = new Random();
     
+    // used to create unique ids
+    private static int counter = 0;
+
     private MimeUtil() {
         // this is an utility class to be used statically.
         // this constructor protect from instantiation.
@@ -339,5 +346,56 @@ public final class MimeUtil {
         }
 
         return result;
+    }
+
+    /**
+     * Creates a new unique message boundary string that can be used as boundary
+     * parameter for the Content-Type header field of a message.
+     * 
+     * @return a new unique message boundary string.
+     */
+    public static String createUniqueBoundary() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("-=Part.");
+        sb.append(Integer.toHexString(nextCounterValue()));
+        sb.append('.');
+        sb.append(Long.toHexString(random.nextLong()));
+        sb.append('.');
+        sb.append(Long.toHexString(System.currentTimeMillis()));
+        sb.append('.');
+        sb.append(Long.toHexString(random.nextLong()));
+        sb.append("=-");
+        return sb.toString();
+    }
+
+    /**
+     * Creates a new unique message identifier that can be used in message
+     * header field such as Message-ID or In-Reply-To. If the given host name is
+     * not <code>null</code> it will be used as suffix for the message ID
+     * (following an at sign).
+     * 
+     * The resulting string is enclosed in angle brackets (&lt; and &gt;);
+     * 
+     * @param hostName host name to be included in the message ID or
+     *            <code>null</code> if no host name should be included.
+     * @return a new unique message identifier.
+     */
+    public static String createUniqueMessageId(String hostName) {
+        StringBuffer sb = new StringBuffer("<Mime4j.");
+        sb.append(Integer.toHexString(nextCounterValue()));
+        sb.append('.');
+        sb.append(Long.toHexString(random.nextLong()));
+        sb.append('.');
+        sb.append(Long.toHexString(System.currentTimeMillis()));
+        if (hostName != null) {
+            sb.append('@');
+            sb.append(hostName);
+        }
+        sb.append('>');
+        return sb.toString();
+    }
+
+    private static synchronized int nextCounterValue() {
+        return counter++;
     }
 }
