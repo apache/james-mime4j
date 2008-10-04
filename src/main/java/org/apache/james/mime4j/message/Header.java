@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.ContentTypeField;
@@ -49,7 +50,7 @@ import org.apache.james.mime4j.util.MessageUtils;
  */
 public class Header {
     private List fields = new LinkedList();
-    private HashMap fieldMap = new HashMap();
+    private Map/*<String, List<Field>>*/ fieldMap = new HashMap();
     
     /**
      * Creates a new empty <code>Header</code>.
@@ -132,7 +133,67 @@ public class Header {
         }
         return results;
     }
-    
+
+    /**
+     * Removes all <code>Field</code>s having the specified field name.
+     * 
+     * @param name
+     *            the field name (e.g. From, Subject).
+     * @return number of fields removed.
+     */
+    public int removeFields(String name) {
+        final String lowerCaseName = name.toLowerCase();
+        List removed = (List) fieldMap.remove(lowerCaseName);
+        if (removed == null || removed.isEmpty())
+            return 0;
+
+        for (Iterator iterator = fields.iterator(); iterator.hasNext();) {
+            Field field = (Field) iterator.next();
+            if (field.getName().equalsIgnoreCase(name))
+                iterator.remove();
+        }
+
+        return removed.size();
+    }
+
+    /**
+     * Sets or replaces a field. This method is useful for header fields such as
+     * Subject or Message-ID that should not occur more than once in a message.
+     * 
+     * If this <code>Header</code> does not already contain a header field of
+     * the same name as the given field then it is added to the end of the list
+     * of fields (same behavior as {@link #addField(Field)}). Otherwise the
+     * first occurrence of a field with the same name is replaced by the given
+     * field and all further occurrences are removed.
+     * 
+     * @param field the field to set.
+     */
+    public void setField(Field field) {
+        final String lowerCaseName = field.getName().toLowerCase();
+        List l = (List) fieldMap.get(lowerCaseName);
+        if (l == null || l.isEmpty()) {
+            addField(field);
+            return;
+        }
+
+        l.clear();
+        l.add(field);
+
+        int firstOccurrence = -1;
+        int index = 0;
+        for (Iterator iterator = fields.iterator(); iterator.hasNext(); index++) {
+            Field f = (Field) iterator.next();
+            if (f.getName().equalsIgnoreCase(field.getName())) {
+                iterator.remove();
+
+                if (firstOccurrence == -1)
+                    firstOccurrence = index;
+            }
+        }
+
+        fields.add(firstOccurrence, field);
+    }
+
     /**
      * Return Header Object as String representation. Each headerline is
      * seperated by "\r\n"

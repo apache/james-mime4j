@@ -104,4 +104,67 @@ public class HeaderTest extends TestCase {
         		"Content-type: text/plain; charset=ISO-8859-1\r\n\r\n", s);
     }
     
+    public void testRemoveFields() throws Exception {
+        Header header = new Header();
+        header.addField(Field.parse("Received: from foo by bar for james"));
+        header.addField(Field.parse("Content-type: text/plain; charset=US-ASCII"));
+        header.addField(Field.parse("ReCeIvEd: from bar by foo for james"));
+
+        assertEquals(3, header.getFields().size());
+        assertEquals(2, header.getFields("received").size());
+        assertEquals(1, header.getFields("Content-Type").size());
+
+        assertEquals(2, header.removeFields("rEcEiVeD"));
+
+        assertEquals(1, header.getFields().size());
+        assertEquals(0, header.getFields("received").size());
+        assertEquals(1, header.getFields("Content-Type").size());
+
+        assertEquals("Content-type", ((Field) header.getFields().get(0)).getName());
+    }
+
+    public void testRemoveNonExistantField() throws Exception {
+        Header header = new Header();
+        header.addField(Field.parse("Received: from foo by bar for james"));
+        header.addField(Field.parse("Content-type: text/plain; charset=US-ASCII"));
+        header.addField(Field.parse("ReCeIvEd: from bar by foo for james"));
+
+        assertEquals(0, header.removeFields("noSuchField"));
+
+        assertEquals(3, header.getFields().size());
+        assertEquals(2, header.getFields("received").size());
+        assertEquals(1, header.getFields("Content-Type").size());
+    }
+
+    public void testSetField() throws Exception {
+        Header header = new Header();
+        header.addField(Field.parse("From: mime4j@james.apache.org"));
+        header.addField(Field.parse("Received: from foo by bar for james"));
+        header.addField(Field.parse("Content-type: text/plain; charset=US-ASCII"));
+        header.addField(Field.parse("ReCeIvEd: from bar by foo for james"));
+
+        header.setField(Field.parse("received: from nobody by noone for james"));
+
+        assertEquals(3, header.getFields().size());
+        assertEquals(1, header.getFields("received").size());
+
+        assertEquals("From", ((Field) header.getFields().get(0)).getName());
+        assertEquals("received", ((Field) header.getFields().get(1)).getName());
+        assertEquals("Content-type", ((Field) header.getFields().get(2)).getName());
+    }
+
+    public void testSetNonExistantField() throws Exception {
+        Header header = new Header();
+        header.addField(Field.parse("Received: from foo by bar for james"));
+        header.addField(Field.parse("Content-type: text/plain; charset=US-ASCII"));
+        header.addField(Field.parse("ReCeIvEd: from bar by foo for james"));
+
+        header.setField(Field.parse("Message-ID: <msg9901@apache.org>"));
+
+        assertEquals(4, header.getFields().size());
+        assertEquals(1, header.getFields("message-id").size());
+
+        assertEquals("Message-ID", ((Field) header.getFields().get(3)).getName());
+    }
+    
 }
