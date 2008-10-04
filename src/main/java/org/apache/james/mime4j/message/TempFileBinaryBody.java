@@ -37,7 +37,6 @@ import java.io.OutputStream;
  */
 class TempFileBinaryBody extends AbstractBody implements BinaryBody {
     
-    private Entity parent = null;
     private TempFile tempFile = null;
 
     /**
@@ -57,20 +56,6 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
     }
     
     /**
-     * @see org.apache.james.mime4j.message.AbstractBody#getParent()
-     */
-    public Entity getParent() {
-        return parent;
-    }
-    
-    /**
-     * @see org.apache.james.mime4j.message.AbstractBody#setParent(org.apache.james.mime4j.message.Entity)
-     */
-    public void setParent(Entity parent) {
-        this.parent = parent;
-    }
-    
-    /**
      * @see org.apache.james.mime4j.message.BinaryBody#getInputStream()
      */
     public InputStream getInputStream() throws IOException {
@@ -81,6 +66,9 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
      * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream, int)
      */
     public void writeTo(OutputStream out, int mode) throws IOException {
+        if (disposed)
+            throw new IllegalStateException("TempFileBinaryBody has been disposed");
+
         final InputStream inputStream = getInputStream();
         CodecUtil.copy(inputStream,out);
     }
@@ -91,6 +79,12 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
     public void dispose() {
-        tempFile.delete();
+        try {
+            tempFile.delete();
+        } finally {
+            tempFile = null;
+
+            super.dispose();
+        }
     }
 }

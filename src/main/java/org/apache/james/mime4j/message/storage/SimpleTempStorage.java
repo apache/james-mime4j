@@ -27,7 +27,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Random;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -182,8 +185,10 @@ public class SimpleTempStorage extends TempStorage {
         
     }
     
-    private class SimpleTempFile implements TempFile {
+    private static class SimpleTempFile implements TempFile {
         private File file = null;
+
+        private static final Set filesToDelete = new HashSet();
 
         private SimpleTempFile(File file) {
             this.file = file;
@@ -212,10 +217,30 @@ public class SimpleTempStorage extends TempStorage {
         }
 
         /**
-         * Do nothing
+         * @see org.apache.james.mime4j.message.storage.TempFile#delete()
          */
         public void delete() {
-            // Not implementated
+            // deleting a file might not immediately succeed if there are still
+            // streams left open (especially under Windows). so we keep track of
+            // the files that have to be deleted and try to delete all these
+            // files each time this method gets invoked.
+
+            // a better but more complicated solution would be to start a
+            // separate thread that tries to delete the files periodically.
+
+            synchronized (filesToDelete) {
+                if (file != null) {
+                    filesToDelete.add(file);
+                    file = null;
+                }
+
+                for (Iterator iterator = filesToDelete.iterator(); iterator
+                        .hasNext();) {
+                    File file = (File) iterator.next();
+                    if (file.delete())
+                        iterator.remove();
+                }
+            }
         }
 
         /**

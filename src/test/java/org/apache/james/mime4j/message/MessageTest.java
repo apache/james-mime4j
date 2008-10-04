@@ -22,13 +22,16 @@ package org.apache.james.mime4j.message;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.util.List;
 
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.util.MessageUtils;
 
@@ -163,6 +166,47 @@ public class MessageTest extends TestCase {
         assertTrue("header added", lines.contains(testheader));
     }
 
+    public void testDisposeGetsPropagatedToBody() throws Exception {
+        DummyBody body1 = new DummyBody();
+        BodyPart part1 = new BodyPart();
+        part1.setHeader(headerEmpty);
+        part1.setBody(body1);
+
+        DummyBody body2 = new DummyBody();
+        BodyPart part2 = new BodyPart();
+        part2.setHeader(headerEmpty);
+        part2.setBody(body2);
+
+        Multipart mp = new Multipart("mixed");
+        mp.addBodyPart(part1);
+        mp.addBodyPart(part2);
+
+        Message m = new Message();
+        m.setHeader(headerMultipartMixed);
+        m.setBody(mp);
+
+        assertFalse(body1.disposed);
+        assertFalse(body2.disposed);
+
+        m.dispose();
+
+        assertTrue(body1.disposed);
+        assertTrue(body2.disposed);
+    }
+
+    public void testDisposedMessageThrowsException()
+            throws Exception {
+        byte[] inputByte = getRawMessageAsByteArray();
+        Message m = new Message(new ByteArrayInputStream(inputByte));
+        m.dispose();
+
+        try {
+            m.writeTo(new ByteArrayOutputStream(), MessageUtils.LENIENT);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+    }
+
     private byte[] getRawMessageAsByteArray() {
         StringBuffer header = new StringBuffer();
         StringBuffer body = new StringBuffer();
@@ -180,6 +224,21 @@ public class MessageTest extends TestCase {
         complete.append(body);
 
         return complete.toString().getBytes();
+    }
+
+    private static final class DummyBody extends AbstractBody {
+
+        public boolean disposed = false;
+
+        public void writeTo(OutputStream out, int mode) throws IOException,
+                MimeException {
+            out.write("dummy".getBytes("US-ASCII"));
+        }
+
+        public void dispose() {
+            disposed = true;
+        }
+
     }
 
 }

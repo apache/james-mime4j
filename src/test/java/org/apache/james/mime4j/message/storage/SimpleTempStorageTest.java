@@ -115,5 +115,18 @@ public class SimpleTempStorageTest extends TestCase {
                     fileName.matches("^test_prefix[0-9]+\\.suffix$"));
         assertTrue("Temp file doesn't exist", 
                    new File(file.getAbsolutePath()).exists());
-    }    
+    }
+    
+    public void testDeleteTempFile() throws IOException {
+        SimpleTempStorage man = new SimpleTempStorage();
+        TempPath path = man.getRootTempPath().createTempPath();
+        TempFile tempFile = path.createTempFile("test_prefix", ".suffix");
+
+        File backingFile = new File(tempFile.getAbsolutePath());
+        assertTrue(backingFile.exists());
+
+        tempFile.delete();
+        assertFalse(backingFile.exists());
+    }
+
 }

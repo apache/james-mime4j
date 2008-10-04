@@ -104,8 +104,11 @@ class TempFileTextBody extends AbstractBody implements TextBody {
      * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream, int)
      */
     public void writeTo(OutputStream out, int mode) throws IOException {
+        if (disposed)
+            throw new IllegalStateException("TempFileTextBody has been disposed");
+
         final InputStream inputStream = tempFile.getInputStream();
-        CodecUtil.copy(inputStream,out);
+        CodecUtil.copy(inputStream, out);
     }
 
     /**
@@ -114,6 +117,13 @@ class TempFileTextBody extends AbstractBody implements TextBody {
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
     public void dispose() {
-        tempFile.delete();
+        try {
+            tempFile.delete();
+        } finally {
+            mimeCharset = null;
+            tempFile = null;
+
+            super.dispose();
+        }
     }
 }

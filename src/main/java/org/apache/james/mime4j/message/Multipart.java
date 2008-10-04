@@ -51,6 +51,7 @@ public class Multipart implements Body {
     private List bodyParts = new LinkedList();
     private Entity parent = null;
     private String subType;
+    private boolean disposed = false;
 
     /**
      * Creates a new empty <code>Multipart</code> instance.
@@ -78,6 +79,9 @@ public class Multipart implements Body {
      * @param subType the sub-type.
      */
     public void setSubType(String subType) {
+        if (disposed)
+            throw new IllegalStateException("Multipart has been disposed");
+
         this.subType = subType;
     }
     
@@ -92,6 +96,9 @@ public class Multipart implements Body {
      * @see org.apache.james.mime4j.message.Body#setParent(org.apache.james.mime4j.message.Entity)
      */
     public void setParent(Entity parent) {
+        if (disposed)
+            throw new IllegalStateException("Multipart has been disposed");
+
         this.parent = parent;
         for (Iterator it = bodyParts.iterator(); it.hasNext();) {
             ((BodyPart) it.next()).setParent(parent);
@@ -113,6 +120,9 @@ public class Multipart implements Body {
      * @param epilogue the epilogue.
      */
     public void setEpilogue(String epilogue) {
+        if (disposed)
+            throw new IllegalStateException("Multipart has been disposed");
+
         this.epilogue = epilogue;
     }
     
@@ -131,6 +141,9 @@ public class Multipart implements Body {
      * @param bodyParts the new list of <code>BodyPart</code> objects.
      */
     public void setBodyParts(List bodyParts) {
+        if (disposed)
+            throw new IllegalStateException("Multipart has been disposed");
+
         this.bodyParts = bodyParts;
         for (Iterator it = bodyParts.iterator(); it.hasNext();) {
             ((BodyPart) it.next()).setParent(parent);
@@ -143,6 +156,9 @@ public class Multipart implements Body {
      * @param bodyPart the body part.
      */
     public void addBodyPart(BodyPart bodyPart) {
+        if (disposed)
+            throw new IllegalStateException("Multipart has been disposed");
+
         bodyParts.add(bodyPart);
         bodyPart.setParent(parent);
     }
@@ -162,6 +178,9 @@ public class Multipart implements Body {
      * @param preamble the preamble.
      */
     public void setPreamble(String preamble) {
+        if (disposed)
+            throw new IllegalStateException("Multipart has been disposed");
+
         this.preamble = preamble;
     }
 
@@ -175,6 +194,9 @@ public class Multipart implements Body {
      * @throws MimeException if case of a MIME protocol violation
      */
     public void writeTo(final OutputStream out, int mode) throws IOException, MimeException {
+        if (disposed)
+            throw new IllegalStateException("Multipart has been disposed");
+
         Entity e = getParent();
         
         ContentTypeField cField = (ContentTypeField) e.getHeader().getField(
@@ -229,8 +251,31 @@ public class Multipart implements Body {
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
     public void dispose() {
-        for (Iterator it = bodyParts.iterator(); it.hasNext();) {
-            ((BodyPart) it.next()).dispose();
+        if (disposed)
+            return;
+
+        try {
+            for (Iterator it = bodyParts.iterator(); it.hasNext();) {
+                ((BodyPart) it.next()).dispose();
+            }
+        } finally {
+            disposed = true;
+
+            preamble = null;
+            epilogue = null;
+            bodyParts = null;
+            parent = null;
+            subType = null;
         }
     }
+
+    /**
+     * Ensures that the <code>dispose</code> method of this multipart is
+     * called when there are no more references to it.
+     *
+     * Leave them out ATM (https://issues.apache.org/jira/browse/MIME4J-72?focusedCommentId=12636007#action_12636007)
+    protected void finalize() throws Throwable {
+        dispose();
+    }
+     */
 }
