@@ -31,6 +31,7 @@ public final class MimeEntityConfig implements Cloneable {
     private boolean strictParsing;
     private int maxLineLen;
     private int maxHeaderCount;
+    private long maxContentLen;
     
     public MimeEntityConfig() {
         super();
@@ -38,6 +39,7 @@ public final class MimeEntityConfig implements Cloneable {
         this.strictParsing = false;
         this.maxLineLen = 1000;
         this.maxHeaderCount = 1000;
+        this.maxContentLen = -1;
     }
     
     public boolean isMaximalBodyDescriptor() {
@@ -113,6 +115,28 @@ public final class MimeEntityConfig implements Cloneable {
      */
     public int getMaxHeaderCount() {
         return this.maxHeaderCount;
+    }
+
+    /**
+     * Sets the maximum line length limit. Parsing of a MIME entity will be terminated 
+     * with a {@link MimeException} if a content body exceeds the maximum length limit. 
+     * If this parameter is set to a non positive value the content length
+     * check will be disabled.
+     * 
+     * @param maxLineLen maximum line length limit
+     */
+    public void setMaxContentLen(long maxContentLen) {
+        this.maxContentLen = maxContentLen;
+    }
+
+    /** 
+     * Returns the maximum content length limit
+     * @see #setMaxContentLen(long)
+     * 
+     * @return value of the the maximum content length limit
+     */
+    public long getMaxContentLen() {
+        return maxContentLen;
     }
 
     public Object clone() throws CloneNotSupportedException {

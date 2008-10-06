@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.parser;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
@@ -483,4 +484,61 @@ public class MimeEntityTest extends TestCase {
         }
     }
 
+    public void testMaxContentLimitCheck() throws Exception {
+        String message = 
+            "To: Road Runner <runner@example.org>\r\n" +
+            "From: Wile E. Cayote <wile@example.org>\r\n" +
+            "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
+            "Subject: Mail\r\n" +
+            "Content-Type: text/plain\r\n" +
+            "\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n" +
+            "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n";
+        byte[] raw = message.getBytes("US-ASCII");
+        ByteArrayInputStream instream = new ByteArrayInputStream(raw);
+        RootInputStream rootStream = new RootInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 12); 
+        
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setMaxContentLen(100);
+        MimeEntity entity = new MimeEntity(
+                rootStream,
+                rawstream,
+                null,
+                EntityStates.T_START_MESSAGE,
+                EntityStates.T_END_MESSAGE,
+                config);
+        
+        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_END_HEADER, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_BODY, entity.getState());
+        try {
+            IOUtils.toByteArray(entity.getContentStream());
+            fail("IOException should have been thrown");
+        } catch (IOException expected) {
+        }
+    }
+    
 }

@@ -45,12 +45,12 @@ public class PartialInputStream extends PositionInputStream {
 
     public int read(byte b[], int off, int len) throws IOException {
         len = Math.min(len, getBytesLeft());
-        return super.read(b, off, len);    //To change body of overridden methods use File | Settings | File Templates.
+        return super.read(b, off, len);
     }
 
     public long skip(long n) throws IOException {
         n = Math.min(n, getBytesLeft());
-        return super.skip(n);    //To change body of overridden methods use File | Settings | File Templates.
+        return super.skip(n);
     }
 
     private int getBytesLeft() {

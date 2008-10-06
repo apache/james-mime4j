@@ -68,13 +68,15 @@ public class PositionInputStream extends FilterInputStream {
 
     public long skip(long n) throws IOException {
         final long c = in.skip(n);
-        position += c;
+        if (c > 0) 
+            position += c;
         return c;
     }
 
     public int read(byte b[], int off, int len) throws IOException {
         final int c = in.read(b, off, len);
-        position += c;
+        if (c > 0) 
+            position += c;
         return c;
     }
 

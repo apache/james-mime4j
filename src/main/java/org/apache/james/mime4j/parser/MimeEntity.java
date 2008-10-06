@@ -27,6 +27,7 @@ import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
+import org.apache.james.mime4j.io.LimitedInputStream;
 import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
@@ -228,7 +229,8 @@ public class MimeEntity extends AbstractEntity {
             if (tmpbuf == null) {
                 tmpbuf = new byte[2048];
             }
-            while (dataStream.read(tmpbuf)!= -1) {
+            InputStream instream = getLimitedContentStream();
+            while (instream.read(tmpbuf)!= -1) {
             }
         }
     }
@@ -286,13 +288,22 @@ public class MimeEntity extends AbstractEntity {
         }
     }
     
+    private InputStream getLimitedContentStream() {
+        long maxContentLimit = config.getMaxContentLen();
+        if (maxContentLimit >= 0) {
+            return new LimitedInputStream(dataStream, maxContentLimit);
+        } else {
+            return dataStream;
+        }
+    }
+    
     public InputStream getContentStream() {
         switch (state) {
         case EntityStates.T_START_MULTIPART:
         case EntityStates.T_PREAMBLE:
         case EntityStates.T_EPILOGUE:
         case EntityStates.T_BODY:
-            return this.dataStream;
+            return getLimitedContentStream();
         default:
             throw new IllegalStateException("Invalid state: " + stateToString(state));
         }
