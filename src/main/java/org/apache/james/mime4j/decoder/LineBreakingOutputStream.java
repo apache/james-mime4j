@@ -29,6 +29,8 @@ import java.io.OutputStream;
  * Default to 76 bytes lines.
  * Please note that this does not check for existing newlines and
  * simply adds CRLF every 76 bytes. 
+ * 
+ * @deprecated This class will be removed in 0.6 release
  */
 public class LineBreakingOutputStream extends FilterOutputStream {
 
