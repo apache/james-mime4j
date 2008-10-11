@@ -66,9 +66,6 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
      * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream, int)
      */
     public void writeTo(OutputStream out, int mode) throws IOException {
-        if (disposed)
-            throw new IllegalStateException("TempFileBinaryBody has been disposed");
-
         final InputStream inputStream = getInputStream();
         CodecUtil.copy(inputStream,out);
     }
@@ -79,12 +76,10 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
     public void dispose() {
-        try {
+        if (tempFile != null) {
             tempFile.delete();
-        } finally {
             tempFile = null;
-
-            super.dispose();
         }
     }
+
 }

@@ -27,5 +27,10 @@ package org.apache.james.mime4j.message;
  * holding (such as open files). 
  */
 public interface Disposable {
+    /**
+     * Free any resources this object is holding and prepares this object
+     * for garbage collection. Once an object has been disposed it can no
+     * longer be used.
+     */
     void dispose();
 }

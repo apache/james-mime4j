@@ -194,19 +194,6 @@ public class MessageTest extends TestCase {
         assertTrue(body2.disposed);
     }
 
-    public void testDisposedMessageThrowsException()
-            throws Exception {
-        byte[] inputByte = getRawMessageAsByteArray();
-        Message m = new Message(new ByteArrayInputStream(inputByte));
-        m.dispose();
-
-        try {
-            m.writeTo(new ByteArrayOutputStream(), MessageUtils.LENIENT);
-            fail();
-        } catch (IllegalStateException expected) {
-        }
-    }
-
     private byte[] getRawMessageAsByteArray() {
         StringBuffer header = new StringBuffer();
         StringBuffer body = new StringBuffer();

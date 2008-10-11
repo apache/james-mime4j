@@ -29,7 +29,6 @@ package org.apache.james.mime4j.message;
  */
 public abstract class AbstractBody implements Body {
     private Entity parent = null;
-    protected boolean disposed = false;
     
     /**
      * @see org.apache.james.mime4j.message.Body#getParent()
@@ -42,39 +41,19 @@ public abstract class AbstractBody implements Body {
      * @see org.apache.james.mime4j.message.Body#setParent(org.apache.james.mime4j.message.Entity)
      */
     public void setParent(Entity parent) {
-        if (disposed)
-            throw new IllegalStateException("AbstractBody has been disposed");
-
         this.parent = parent;
     }
 
     /**
      * Subclasses should override this method if they have allocated resources
      * that need to be freed explicitly (e.g. cannot be simply reclaimed by the
-     * garbage collector). Subclasses that override this method should invoke
-     * super.dispose().
+     * garbage collector).
      * 
-     * The default implementation marks this AbstractBody as disposed.
+     * The default implementation of this method does nothing.
      * 
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
     public void dispose() {
-        if (disposed)
-            return;
-
-        disposed = true;
-
-        parent = null;
     }
-
-    /**
-     * Ensures that the <code>dispose</code> method of this abstract body is
-     * called when there are no more references to it.
-     *
-     * Leave them out ATM (https://issues.apache.org/jira/browse/MIME4J-72?focusedCommentId=12636007#action_12636007)
-    protected void finalize() throws Throwable {
-        dispose();
-    }
-     */
 
 }
