@@ -205,7 +205,9 @@ public abstract class Entity implements Disposable {
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
     public void dispose() {
-        body.dispose();
+        if (body != null) {
+            body.dispose();
+        }
     }
 
 }
