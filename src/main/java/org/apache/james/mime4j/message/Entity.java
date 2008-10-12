@@ -40,7 +40,6 @@ public abstract class Entity implements Disposable {
     private Header header = null;
     private Body body = null;
     private Entity parent = null;
-    private boolean disposed = false;
 
     /**
      * Gets the parent entity of this entity.
@@ -59,9 +58,6 @@ public abstract class Entity implements Disposable {
      *        this will be the root entity.
      */
     public void setParent(Entity parent) {
-        if (disposed)
-            throw new IllegalStateException("Entity has been disposed");
-
         this.parent = parent;
     }
     
@@ -80,9 +76,6 @@ public abstract class Entity implements Disposable {
      * @param header the header.
      */
     public void setHeader(Header header) {
-        if (disposed)
-            throw new IllegalStateException("Entity has been disposed");
-
         this.header = header;
     }
     
@@ -101,9 +94,6 @@ public abstract class Entity implements Disposable {
      * @param body the body.
      */
     public void setBody(Body body) {
-        if (disposed)
-            throw new IllegalStateException("Entity has been disposed");
-
         this.body = body;
         body.setParent(this);
     }
@@ -183,9 +173,6 @@ public abstract class Entity implements Disposable {
      * @throws IOException 
      */
     public void writeTo(OutputStream out, int mode) throws IOException, MimeException {
-        if (disposed)
-            throw new IllegalStateException("Entity has been disposed");
-
         getHeader().writeTo(out, mode);
         
         out.flush();
@@ -218,29 +205,9 @@ public abstract class Entity implements Disposable {
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
     public void dispose() {
-        if (disposed)
-            return;
-
-        try {
-            if (body != null)
-                body.dispose();
-        } finally {
-            disposed = true;
-
-            header = null;
-            body = null;
-            parent = null;
+        if (body != null) {
+            body.dispose();
         }
     }
-
-    /**
-     * Ensures that the <code>dispose</code> method of this entity is called
-     * when there are no more references to it.
-     *
-     * Leave them out ATM (https://issues.apache.org/jira/browse/MIME4J-72?focusedCommentId=12636007#action_12636007)
-    protected void finalize() throws Throwable {
-        dispose();
-    }
-     */
 
 }

@@ -26,6 +26,8 @@ import java.io.IOException;
 /**
  * InputStream that shields its underlying input stream from
  * being closed.
+ * 
+ * @deprecated This class will be removed in 0.6 release
  */
 public class CloseShieldInputStream extends FilterInputStream {
 

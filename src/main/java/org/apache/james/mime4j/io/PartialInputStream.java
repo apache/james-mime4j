@@ -23,6 +23,9 @@ package org.apache.james.mime4j.io;
 import java.io.InputStream;
 import java.io.IOException;
 
+/**
+ * @deprecated This class will be removed in 0.6 release
+ */
 public class PartialInputStream extends PositionInputStream {
     private final long limit;
 
