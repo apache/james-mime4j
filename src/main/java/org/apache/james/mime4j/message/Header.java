@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
@@ -62,8 +63,12 @@ public class Header {
      * Creates a new <code>Header</code> from the specified stream.
      * 
      * @param is the stream to read the header from.
+     * 
+     * @throws IOException on I/O errors.
+     * @throws MimeIOException on MIME protocol violations.
      */
-    public Header(InputStream is) throws MimeException, IOException {
+    public Header(InputStream is) 
+            throws IOException, MimeIOException {
         final MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             public void endHeader() {
@@ -73,7 +78,11 @@ public class Header {
                 addField(Field.parse(fieldData));
             }
         });
-        parser.parse(is);
+        try {
+            parser.parse(is);
+        } catch (MimeException ex) {
+            throw new MimeIOException(ex);
+        }
     }
 
     /**

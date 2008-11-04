@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
@@ -55,11 +56,17 @@ public class Message extends Entity implements Body {
      * 
      * @param is the stream to parse.
      * @throws IOException on I/O errors.
+     * @throws MimeIOException on MIME protocol violations.
      */
-    public Message(InputStream is, MimeEntityConfig config) throws MimeException, IOException {
+    public Message(InputStream is, MimeEntityConfig config) 
+            throws IOException,MimeIOException {
         MimeStreamParser parser = new MimeStreamParser(config);
         parser.setContentHandler(new MessageBuilder(this));
-        parser.parse(is);
+        try {
+            parser.parse(is);
+        } catch (MimeException ex) {
+            throw new MimeIOException(ex);
+        }
     }
 
     /**

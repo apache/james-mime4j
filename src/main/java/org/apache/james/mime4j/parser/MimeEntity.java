@@ -190,7 +190,7 @@ public class MimeEntity extends AbstractEntity {
         return null;
     }
 
-    private void createMimeStream() throws IOException {
+    private void createMimeStream() throws MimeException, IOException {
         String boundary = body.getBoundary();
         int bufferSize = 2 * boundary.length();
         if (bufferSize < 4096) {

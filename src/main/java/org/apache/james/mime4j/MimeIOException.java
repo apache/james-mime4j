@@ -16,30 +16,23 @@
  */
 package org.apache.james.mime4j;
 
+import java.io.IOException;
+
 /**
- * MIME processing exception.
+ * A wrapper class based on {@link IOException} for MIME protocol 
+ * exceptions.
  */
-public class MimeException extends Exception {
+public class MimeIOException extends IOException {
 
-    private static final long serialVersionUID = 8352821278714188542L;
-
-    /**
-     * Constructs a new MIME exception with the specified detail message.
-     *
-     * @param message detail message
-     */
-    public MimeException(String message) {
-        super(message);
-    }
+    private static final long serialVersionUID = 5393613459533735409L;
 
     /**
-     * Constructs a MIME exception with the specified detail message and cause.
+     * Constructs an IO exception based on {@link MimeException}.
      *
-     * @param message detail message
-     * @param cause cause of the exception
+     * @param ex cause
      */
-    public MimeException(String message, Throwable cause) {
-        super(message);
+    public MimeIOException(MimeException cause) {
+        super(cause.getMessage());
         initCause(cause);
     }
 
