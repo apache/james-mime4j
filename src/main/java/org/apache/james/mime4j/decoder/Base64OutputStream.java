@@ -319,10 +319,8 @@ public class Base64OutputStream extends FilterOutputStream {
             if (lineLength > 0) {
                 System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
                 pos += lineSeparator.length;
-                // TODO I had to add this to make it work as the quoted printable encoder.
-                // not sure this is generally speaking ok.
-                System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
-                pos += lineSeparator.length;
+//                System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
+//                pos += lineSeparator.length;
             }
         } else if (offset < 0 || len < 0 || offset + len < 0) {
             throw new IndexOutOfBoundsException();

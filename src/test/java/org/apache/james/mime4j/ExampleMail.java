@@ -251,7 +251,6 @@ public class ExampleMail {
         "iwDgEriEecnLlefFEmGAIvqD4ggJJNMM85qLtXfX9xYGuEQ+4/kIi0g88zlXd66++QaQDG5GPZyp\r\n" +
         "rQAAAABJRU5ErkJggg==\r\n" +
         "\r\n" +
-        "\r\n" +
         "--=-tIdGYVstQJghyEDATnJ+\r\n" +
         "Content-Disposition: attachment; filename=blob.png\r\n" +
         "Content-Type: image/png; name=blob.png\r\n" +
@@ -264,7 +263,6 @@ public class ExampleMail {
         "E2QAEIO6BhZBerUf6luMw49NyTR0OLw5kJD9sqk4Ipwc6GAREv5n5piXTDOQfy1JMSs8ZgXKq2kF\r\n" +
         "iwDgEriEecnLlefFEmGAIvqD4ggJJNMM85qLtXfX9xYGuEQ+4/kIi0g88zlXd66++QaQDG5GPZyp\r\n" +
         "rQAAAABJRU5ErkJggg==\r\n" +
-        "\r\n" +
         "\r\n" +
         "--=-tIdGYVstQJghyEDATnJ+\r\n" +
         "Content-Disposition: attachment; filename=rhubarb.txt\r\n" +

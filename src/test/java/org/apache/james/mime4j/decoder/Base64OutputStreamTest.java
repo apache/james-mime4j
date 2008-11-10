@@ -38,7 +38,7 @@ public class Base64OutputStreamTest extends TestCase {
         encoder = new Base64OutputStream(bos);
         encoder.write(fromString("This is the plain text message!"));
         encoder.close();
-        assertEquals("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==\r\n\r\n", toString(bos.toByteArray()));
+        assertEquals("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==\r\n", toString(bos.toByteArray()));
     }
 
     public void testEncodeUnderlyingStreamStaysOpen() throws IOException {
@@ -60,7 +60,7 @@ public class Base64OutputStreamTest extends TestCase {
         bos.write('a');
         bos.write('d');
         bos.write('a');
-        assertEquals("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==\r\n\r\nyada", toString(bos.toByteArray()));
+        assertEquals("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==\r\nyada", toString(bos.toByteArray()));
     }
         
     private byte[] fromString(String s) {
