@@ -50,8 +50,8 @@ import org.apache.james.mime4j.util.MessageUtils;
  * @version $Id: Header.java,v 1.3 2004/10/04 15:36:44 ntherning Exp $
  */
 public class Header {
-    private List fields = new LinkedList();
-    private Map/*<String, List<Field>>*/ fieldMap = new HashMap();
+    private List<Field> fields = new LinkedList<Field>();
+    private Map<String, List<Field>> fieldMap = new HashMap<String, List<Field>>();
     
     /**
      * Creates a new empty <code>Header</code>.
@@ -71,9 +71,11 @@ public class Header {
             throws IOException, MimeIOException {
         final MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
+            @Override
             public void endHeader() {
                 parser.stop();
             }
+            @Override
             public void field(String fieldData) throws MimeException {
                 addField(Field.parse(fieldData));
             }
@@ -91,9 +93,9 @@ public class Header {
      * @param field the field to add.
      */
     public void addField(Field field) {
-        List values = (List) fieldMap.get(field.getName().toLowerCase());
+        List<Field> values = fieldMap.get(field.getName().toLowerCase());
         if (values == null) {
-            values = new LinkedList();
+            values = new LinkedList<Field>();
             fieldMap.put(field.getName().toLowerCase(), values);
         }
         values.add(field);
@@ -106,7 +108,7 @@ public class Header {
      * 
      * @return the list of <code>Field</code> objects.
      */
-    public List getFields() {
+    public List<Field> getFields() {
         return Collections.unmodifiableList(fields);
     }
 
@@ -118,9 +120,9 @@ public class Header {
      * @return the field or <code>null</code> if none found.
      */
     public Field getField(String name) {
-        List l = (List) fieldMap.get(name.toLowerCase());
+        List<Field> l = fieldMap.get(name.toLowerCase());
         if (l != null && !l.isEmpty()) {
-            return (Field) l.get(0);
+            return l.get(0);
         }
         return null;
     }
@@ -131,12 +133,12 @@ public class Header {
      * @param name the field name (e.g. From, Subject).
      * @return the list of fields.
      */
-    public List getFields(final String name) {
+    public List<Field> getFields(final String name) {
         final String lowerCaseName = name.toLowerCase();
-        final List l = (List) fieldMap.get(lowerCaseName);
-        final List results;
+        final List<Field> l = fieldMap.get(lowerCaseName);
+        final List<Field> results;
         if (l == null || l.isEmpty()) {
-            results = Collections.EMPTY_LIST;
+            results = Collections.emptyList();
         } else {
             results = Collections.unmodifiableList(l);
         }
@@ -152,12 +154,12 @@ public class Header {
      */
     public int removeFields(String name) {
         final String lowerCaseName = name.toLowerCase();
-        List removed = (List) fieldMap.remove(lowerCaseName);
+        List<Field> removed = fieldMap.remove(lowerCaseName);
         if (removed == null || removed.isEmpty())
             return 0;
 
-        for (Iterator iterator = fields.iterator(); iterator.hasNext();) {
-            Field field = (Field) iterator.next();
+        for (Iterator<Field> iterator = fields.iterator(); iterator.hasNext();) {
+            Field field = iterator.next();
             if (field.getName().equalsIgnoreCase(name))
                 iterator.remove();
         }
@@ -179,7 +181,7 @@ public class Header {
      */
     public void setField(Field field) {
         final String lowerCaseName = field.getName().toLowerCase();
-        List l = (List) fieldMap.get(lowerCaseName);
+        List<Field> l = fieldMap.get(lowerCaseName);
         if (l == null || l.isEmpty()) {
             addField(field);
             return;
@@ -190,8 +192,8 @@ public class Header {
 
         int firstOccurrence = -1;
         int index = 0;
-        for (Iterator iterator = fields.iterator(); iterator.hasNext(); index++) {
-            Field f = (Field) iterator.next();
+        for (Iterator<Field> iterator = fields.iterator(); iterator.hasNext(); index++) {
+            Field f = iterator.next();
             if (f.getName().equalsIgnoreCase(field.getName())) {
                 iterator.remove();
 
@@ -209,10 +211,11 @@ public class Header {
      * 
      * @return headers
      */
+    @Override
     public String toString() {
         CharArrayBuffer str = new CharArrayBuffer(128);
-        for (Iterator it = fields.iterator(); it.hasNext();) {
-            str.append(it.next().toString());
+        for (Field field : fields) {
+            str.append(field.toString());
             str.append("\r\n");
         }
         return str.toString();
@@ -242,9 +245,9 @@ public class Header {
      * @throws IOException if case of an I/O error
      * @throws MimeException if case of a MIME protocol violation
      */
-    public void writeTo(final OutputStream out, int mode) throws IOException, MimeException {
+    public void writeTo(final OutputStream out, Mode mode) throws IOException, MimeException {
         Charset charset = null;
-        if (mode == MessageUtils.LENIENT) {
+        if (mode == Mode.LENIENT) {
             final ContentTypeField contentTypeField = ((ContentTypeField) getField(Field.CONTENT_TYPE));
             if (contentTypeField == null) {
                 charset = MessageUtils.DEFAULT_CHARSET;
@@ -261,10 +264,9 @@ public class Header {
         }
         BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(out, charset), 8192);
-        for (Iterator it = fields.iterator(); it.hasNext();) {
-            Field field = (Field) it.next();
+        for (Field field : fields) {
             String fs = field.toString();
-            if (mode == MessageUtils.STRICT_ERROR && !MessageUtils.isASCII(fs)) {
+            if (mode == Mode.STRICT_ERROR && !MessageUtils.isASCII(fs)) {
                 throw new MimeException("Header '" + fs + "' violates RFC 822");
             }
             writer.write(fs);

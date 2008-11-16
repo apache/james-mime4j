@@ -27,7 +27,6 @@ import java.io.StringReader;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.util.MessageUtils;
 
 import junit.framework.TestCase;
 
@@ -69,7 +68,7 @@ public class MultipartFormTest extends TestCase {
         multipart.addBodyPart(p3);
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        multipart.writeTo(out, MessageUtils.LENIENT);
+        multipart.writeTo(out, Mode.LENIENT);
         out.close();
         
         String expected = "\r\n" + 
@@ -115,7 +114,7 @@ public class MultipartFormTest extends TestCase {
             return new StringReader(this.text);
         }
 
-        public void writeTo(final OutputStream out, int mode) throws IOException {
+        public void writeTo(final OutputStream out, Mode mode) throws IOException {
             if (out == null) {
                 throw new IllegalArgumentException("Output stream may not be null");
             }

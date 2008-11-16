@@ -38,6 +38,7 @@ import junit.framework.TestCase;
  */
 public class Base64InputStreamTest extends TestCase {
 
+    @Override
     public void setUp() {
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();

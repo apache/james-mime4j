@@ -52,12 +52,7 @@ public class MimeStreamParser {
         super();
         MimeEntityConfig localConfig;
         if (config != null) {
-            try {
-                localConfig = (MimeEntityConfig) config.clone();
-            } catch (CloneNotSupportedException ex) {
-                // should never happen
-                localConfig = new MimeEntityConfig();
-            }
+            localConfig = config.clone();
         } else {
             localConfig = new MimeEntityConfig();
         }

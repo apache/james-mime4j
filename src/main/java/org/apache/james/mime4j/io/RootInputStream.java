@@ -67,6 +67,7 @@ public class RootInputStream extends FilterInputStream {
     /**
      * @see java.io.InputStream#read()
      */
+    @Override
     public int read() throws IOException {
         if (truncated) {
             return -1;
@@ -84,6 +85,7 @@ public class RootInputStream extends FilterInputStream {
      * 
      * @see java.io.InputStream#read(byte[], int, int)
      */
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         if (truncated) {
             return -1;

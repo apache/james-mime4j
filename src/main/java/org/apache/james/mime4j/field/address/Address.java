@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The abstract base for classes that represent RFC2822 addresses.
@@ -33,20 +33,20 @@ public abstract class Address {
 
 	/**
 	 * Adds any mailboxes represented by this address
-	 * into the given ArrayList. Note that this method
+	 * into the given List. Note that this method
 	 * has default (package) access, so a doAddMailboxesTo
 	 * method is needed to allow the behavior to be
 	 * overridden by subclasses.
 	 */
-	final void addMailboxesTo(ArrayList results) {
+	final void addMailboxesTo(List<Mailbox> results) {
 		doAddMailboxesTo(results);
 	}
 	
 	/**
 	 * Adds any mailboxes represented by this address
-	 * into the given ArrayList. Must be overridden by
+	 * into the given List. Must be overridden by
 	 * concrete subclasses.
 	 */
-	protected abstract void doAddMailboxesTo(ArrayList results);
+	protected abstract void doAddMailboxesTo(List<Mailbox> results);
 
 }

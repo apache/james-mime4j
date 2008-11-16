@@ -134,6 +134,7 @@ public final class ByteArrayBuffer  {
         return this.len == this.buffer.length; 
     }
 
+    @Override
     public String toString() {
         return new String(toByteArray());
     }

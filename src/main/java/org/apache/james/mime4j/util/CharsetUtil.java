@@ -23,6 +23,8 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.apache.commons.logging.Log;
@@ -791,7 +793,7 @@ import org.apache.commons.logging.LogFactory;
 public class CharsetUtil {
     private static Log log = LogFactory.getLog(CharsetUtil.class);
     
-    private static class Charset implements Comparable {
+    private static class Charset implements Comparable<Charset> {
         private String canonical = null;
         private String mime = null;
         private String[] aliases = null;
@@ -802,8 +804,7 @@ public class CharsetUtil {
             this.aliases = aliases;
         }
 
-        public int compareTo(Object o) {
-            Charset c = (Charset) o;
+        public int compareTo(Charset c) {
             return this.canonical.compareTo(c.canonical);
         }
     }
@@ -1001,49 +1002,48 @@ public class CharsetUtil {
      * Contains the canonical names of character sets which can be used to 
      * decode bytes into Java chars.
      */
-    private static TreeSet decodingSupported = null;
+    private static SortedSet<String> decodingSupported = null;
     
     /**
      * Contains the canonical names of character sets which can be used to 
      * encode Java chars into bytes.
      */
-    private static TreeSet encodingSupported = null;
+    private static SortedSet<String> encodingSupported = null;
     
     /**
      * Maps character set names to Charset objects. All possible names of
      * a charset will be mapped to the Charset.
      */
-    private static HashMap charsetMap = null;
+    private static Map<String, Charset> charsetMap = null;
     
     static {
-        decodingSupported = new TreeSet();
-        encodingSupported = new TreeSet();
+        decodingSupported = new TreeSet<String>();
+        encodingSupported = new TreeSet<String>();
         byte[] dummy = new byte[] {'d', 'u', 'm', 'm', 'y'};
-        for (int i = 0; i < JAVA_CHARSETS.length; i++) {
+        for (Charset c : JAVA_CHARSETS) {
             try {
-                new String(dummy, JAVA_CHARSETS[i].canonical);
-                decodingSupported.add(JAVA_CHARSETS[i].canonical.toLowerCase());
+                new String(dummy, c.canonical);
+                decodingSupported.add(c.canonical.toLowerCase());
             } catch (UnsupportedOperationException e) {
             } catch (UnsupportedEncodingException e) {
             }
             try {
-                "dummy".getBytes(JAVA_CHARSETS[i].canonical);
-                encodingSupported.add(JAVA_CHARSETS[i].canonical.toLowerCase());
+                "dummy".getBytes(c.canonical);
+                encodingSupported.add(c.canonical.toLowerCase());
             } catch (UnsupportedOperationException e) {
             } catch (UnsupportedEncodingException e) {
             }
         }
         
-        charsetMap = new HashMap();
-        for (int i = 0; i < JAVA_CHARSETS.length; i++) {
-            Charset c = JAVA_CHARSETS[i];
+        charsetMap = new HashMap<String, Charset>();
+        for (Charset c : JAVA_CHARSETS) {
             charsetMap.put(c.canonical.toLowerCase(), c);
             if (c.mime != null) {
                 charsetMap.put(c.mime.toLowerCase(), c);
             }
             if (c.aliases != null) {
-                for (int j = 0; j < c.aliases.length; j++) {
-                    charsetMap.put(c.aliases[j].toLowerCase(), c);
+                for (String str : c.aliases) {
+                    charsetMap.put(str.toLowerCase(), c);
                 }
             }
         }
@@ -1094,7 +1094,7 @@ public class CharsetUtil {
      * @return the MIME preferred name or <code>null</code> if not known.
      */
     public static String toMimeCharset(String charsetName) {
-        Charset c = (Charset) charsetMap.get(charsetName.toLowerCase());
+        Charset c = charsetMap.get(charsetName.toLowerCase());
         if (c != null) {
             return c.mime;
         }
@@ -1113,7 +1113,7 @@ public class CharsetUtil {
      * @return the canonical Java name or <code>null</code> if not known.
      */
     public static String toJavaCharset(String charsetName) {
-        Charset c = (Charset) charsetMap.get(charsetName.toLowerCase());
+        Charset c = charsetMap.get(charsetName.toLowerCase());
         if (c != null) {
             return c.canonical;
         }
@@ -1148,7 +1148,7 @@ public class CharsetUtil {
     private static String dumpHtmlTable() {
         LinkedList l = new LinkedList(Arrays.asList(JAVA_CHARSETS));
         Collections.sort(l);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(" * <table>\n");
         sb.append(" *     <tr>\n");
         sb.append(" *         <td>Canonical (Java) name</td>\n");

@@ -24,6 +24,7 @@ import org.apache.james.mime4j.field.address.parser.ParseException;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An immutable, random-access list of Address objects.
@@ -32,17 +33,17 @@ import java.util.ArrayList;
  */
 public class AddressList {
 	
-	private ArrayList addresses;
+	private List<? extends Address> addresses;
 
 	/**
-	 * @param addresses An ArrayList that contains only Address objects. 
+	 * @param addresses A List that contains only Address objects. 
 	 * @param dontCopy true iff it is not possible for the addresses ArrayList to be modified by someone else.
 	 */
-	public AddressList(ArrayList addresses, boolean dontCopy) {
+	public AddressList(List<? extends Address> addresses, boolean dontCopy) {
 		if (addresses != null)
-			this.addresses = (dontCopy ? addresses : (ArrayList) addresses.clone());
+			this.addresses = dontCopy ? addresses : new ArrayList<Address>(addresses);
 		else
-			this.addresses = new ArrayList(0);
+			this.addresses = new ArrayList<Address>(0);
 	}
 
 	/**
@@ -58,7 +59,7 @@ public class AddressList {
 	public Address get(int index) {
 		if (0 > index || size() <= index)
 			throw new IndexOutOfBoundsException();
-		return (Address) addresses.get(index);
+		return addresses.get(index);
 	}
 
 	/**
@@ -69,19 +70,21 @@ public class AddressList {
 	public MailboxList flatten() {
 		// in the common case, all addresses are mailboxes
 		boolean groupDetected = false;
-		for (int i = 0; i < size(); i++) {
-			if (!(get(i) instanceof Mailbox)) {
+		for (Address addr : addresses) {
+			if (!(addr instanceof Mailbox)) {
 				groupDetected = true;
 				break;
 			}
 		}
 		
-		if (!groupDetected)
-			return new MailboxList(addresses, true);
+		if (!groupDetected) {
+			@SuppressWarnings("unchecked")
+			final List<Mailbox> mailboxes = (List<Mailbox>) addresses; 
+			return new MailboxList(mailboxes, true);
+		}
 		
-		ArrayList results = new ArrayList();
-		for (int i = 0; i < size(); i++) {
-			Address addr = get(i);
+		List<Mailbox> results = new ArrayList<Mailbox>();
+		for (Address addr : addresses) {
 			addr.addMailboxesTo(results);
 		}
 		
@@ -95,8 +98,7 @@ public class AddressList {
 	 * stdout, for debugging purposes.
 	 */
 	public void print() {
-		for (int i = 0; i < size(); i++) {
-			Address addr = get(i);
+		for (Address addr : addresses) {
 			System.out.println(addr.toString());
 		}
 	}

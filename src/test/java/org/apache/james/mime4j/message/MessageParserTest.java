@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.util.Iterator;
 import java.util.List;
 
 import junit.framework.Test;
@@ -60,6 +59,7 @@ public class MessageParserTest extends TestCase {
         this.file = file;
     }
 
+    @Override
     public void setUp() {
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
@@ -90,6 +90,7 @@ public class MessageParserTest extends TestCase {
         }
     }
     
+    @Override
     protected void runTest() throws IOException {
         File f = file;
         String fileName = file.getAbsolutePath();
@@ -139,7 +140,7 @@ public class MessageParserTest extends TestCase {
     private String getStructure(Entity e, String prefix, String id) 
             throws IOException {
         
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         
         if (e instanceof Message) {
             sb.append("<message>\r\n");
@@ -148,8 +149,8 @@ public class MessageParserTest extends TestCase {
         }            
         
         sb.append("<header>\r\n");
-        for (Iterator it = e.getHeader().getFields().iterator(); it.hasNext();) {
-            sb.append("<field>\r\n" + escape(((Field) it.next()).getRaw()) 
+        for (Field field : e.getHeader().getFields()) {
+            sb.append("<field>\r\n" + escape(field.getRaw()) 
                     + "</field>\r\n");
         }
         sb.append("</header>\r\n");
@@ -158,15 +159,15 @@ public class MessageParserTest extends TestCase {
             sb.append("<multipart>\r\n");
             
             Multipart multipart =(Multipart) e.getBody(); 
-            List parts =multipart.getBodyParts();
+            List<BodyPart> parts = multipart.getBodyParts();
 
             sb.append("<preamble>\r\n");
             sb.append(escape(multipart.getPreamble()));
             sb.append("</preamble>\r\n");
             
             int i = 1;
-            for (Iterator it = parts.iterator(); it.hasNext();) {
-                sb.append(getStructure((Entity) it.next(), prefix, id + "_" + (i++)));
+            for (BodyPart bodyPart : parts) {
+                sb.append(getStructure(bodyPart, prefix, id + "_" + (i++)));
             }
 
             sb.append("<epilogue>\r\n");

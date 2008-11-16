@@ -38,6 +38,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
         encoder.initEncoding(out);
     }
 
+    @Override
     public void close() throws IOException {
     	if (closed) return;
 
@@ -49,14 +50,17 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
     	}
     }
 
+    @Override
     public void flush() throws IOException {
         encoder.flushOutput();
     }
 
+    @Override
     public void write(int b) throws IOException {
         this.write(new byte[] { (byte) b }, 0, 1);
     }
 
+    @Override
     public void write(byte[] b, int off, int len) throws IOException {
         if (closed) {
             throw new IOException("QuotedPrintableOutputStream has been closed");

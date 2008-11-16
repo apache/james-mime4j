@@ -341,6 +341,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
         }
     }
 
+    @Override
     public String toString() {
         return getClass().getName() + " [" + stateToString(state)
         + "][" + body.getMimeType() + "][" + body.getBoundary() + "]";

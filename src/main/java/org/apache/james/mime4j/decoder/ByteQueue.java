@@ -54,7 +54,7 @@ public class ByteQueue {
             buf = new UnboundedFifoByteBuffer();
     }
 
-    public Iterator iterator() {
+    public Iterator<Byte> iterator() {
         return buf.iterator();
     }
 

@@ -27,7 +27,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.swing.JFrame;
@@ -146,8 +145,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
         DefaultMutableTreeNode node = new DefaultMutableTreeNode(
                 new ObjectWrapper("Header", header));
 
-        for (Iterator it = header.getFields().iterator(); it.hasNext();) {
-            Field field = (Field) it.next();
+        for (Field field : header.getFields()) {
             String name = field.getName();
             
             node.add(new DefaultMutableTreeNode(new ObjectWrapper(name, field)));
@@ -169,8 +167,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
 
         node.add(new DefaultMutableTreeNode(
                        new ObjectWrapper("Preamble", multipart.getPreamble())));
-        for (Iterator it = multipart.getBodyParts().iterator(); it.hasNext();) {
-            BodyPart part = (BodyPart) it.next();
+        for (BodyPart part : multipart.getBodyParts()) {
             node.add(createNode(part));
         }
         node.add(new DefaultMutableTreeNode(
@@ -262,7 +259,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                  * A text body. Display its contents.
                  */
                 TextBody body = (TextBody) o;
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 try {
                     Reader r = body.getReader();
                     int c;
@@ -298,11 +295,10 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                  * Content-Type field.
                  */
                 ContentTypeField field = (ContentTypeField) o;
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append("MIME type: " + field.getMimeType() + "\n");
-                Map params = field.getParameters();
-                for (Iterator it = params.keySet().iterator(); it.hasNext();) {
-                    String name = (String) it.next();
+                Map<String, String> params = field.getParameters();
+                for (String name : params.keySet()) {
                     sb.append(name + " = " + params.get(name) + "\n");
                 }
                 textView.setText(sb.toString());
@@ -313,7 +309,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                  */
                 AddressListField field = (AddressListField) o;
                 MailboxList list = field.getAddressList().flatten();
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < list.size(); i++) {
                     Mailbox mb = list.get(i);
                     sb.append(mb.getAddressString() + "\n");

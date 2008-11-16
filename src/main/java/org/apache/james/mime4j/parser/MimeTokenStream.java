@@ -101,7 +101,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     }
     
     private final MimeEntityConfig config;
-    private final LinkedList entities = new LinkedList();
+    private final LinkedList<EntityStateMachine> entities = new LinkedList<EntityStateMachine>();
     
     private int state = T_END_OF_STREAM;
     private EntityStateMachine currentStateMachine;
@@ -381,7 +381,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
             if (entities.isEmpty()) {
                 currentStateMachine = null;
             } else {
-                currentStateMachine = (EntityStateMachine) entities.getLast();
+                currentStateMachine = entities.getLast();
                 currentStateMachine.setRecursionMode(recursionMode);
             }
         }

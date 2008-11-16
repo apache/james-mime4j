@@ -33,6 +33,7 @@ import junit.framework.TestCase;
  */
 public class ContentTypeFieldTest extends TestCase {
 
+    @Override
     public void setUp() {
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();

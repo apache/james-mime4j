@@ -133,8 +133,8 @@ public class TestByteArrayBuffer extends TestCase {
         assertEquals(4, buffer.capacity()); 
         
         byte[] tmp = new byte[] { 1, 127, -1, -128, 1, -2};
-        for (int i = 0; i < tmp.length; i++) {
-            buffer.append(tmp[i]);
+        for (byte b : tmp) {
+            buffer.append(b);
         }
         assertEquals(8, buffer.capacity()); 
         assertEquals(6, buffer.length());

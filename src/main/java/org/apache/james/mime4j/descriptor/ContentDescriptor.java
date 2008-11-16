@@ -78,7 +78,7 @@ public interface ContentDescriptor {
     /**
      * Returns the map of parameters of the content-type header.
      */
-    Map getContentTypeParameters();
+    Map<String, String> getContentTypeParameters();
 
     /**
      * Returns the body descriptors content-length.

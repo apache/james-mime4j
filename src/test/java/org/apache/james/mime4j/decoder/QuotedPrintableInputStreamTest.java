@@ -38,6 +38,7 @@ import org.apache.log4j.BasicConfigurator;
  */
 public class QuotedPrintableInputStreamTest extends TestCase {
 
+    @Override
     public void setUp() {
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();

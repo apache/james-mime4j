@@ -20,9 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.decoder.CodecUtil;
-import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
-import org.apache.james.mime4j.util.MessageUtils;
 import org.apache.log4j.BasicConfigurator;
 
 import java.io.ByteArrayOutputStream;
@@ -54,17 +52,19 @@ public class ExampleMessagesRoundtripTest extends TestCase {
         this.file = testFile;
     }
 
+    @Override
     public void setUp() {
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
     }
    
+    @Override
     protected void runTest() throws Throwable {
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMaxLineLen(-1);
         Message inputMessage = new Message(new FileInputStream(file), config);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        inputMessage.writeTo(out, MessageUtils.LENIENT);
+        inputMessage.writeTo(out, Mode.LENIENT);
         
         String msgoutFile = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".out";
         String msgoutFileMime4j = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".mime4j.out";
@@ -76,12 +76,12 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             
             Message roundtripMessage = new Message(new FileInputStream(msgoutFile), config);
             ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
-            roundtripMessage.writeTo(outRoundtrip, MessageUtils.LENIENT);
+            roundtripMessage.writeTo(outRoundtrip, Mode.LENIENT);
             assertEquals("Failed LENIENT roundtrip", new String(out.toByteArray()), new String(outRoundtrip.toByteArray()));
 
             roundtripMessage = new Message(new FileInputStream(msgoutFile), config);
             outRoundtrip = new ByteArrayOutputStream();
-            roundtripMessage.writeTo(outRoundtrip, MessageUtils.STRICT_ERROR);
+            roundtripMessage.writeTo(outRoundtrip, Mode.STRICT_ERROR);
             assertEquals("Failed STRICT roundtrip", new String(out.toByteArray()), new String(outRoundtrip.toByteArray()));
 
         } catch (FileNotFoundException e) {
@@ -109,9 +109,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             File dir = TESTS_FOLDER;
             File[] files = dir.listFiles();
             
-            for (int i = 0; i < files.length; i++) {
-                File f = files[i];
-                
+            for (File f : files) {
                 if (f.getName().toLowerCase().endsWith(".msg")) {
                     addTest(new ExampleMessagesRoundtripTest(f.getName().substring(0, f.getName().length()-4), f));
                 }

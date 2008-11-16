@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -35,7 +34,7 @@ import java.util.NoSuchElementException;
  */
 public class StringArrayMap implements Serializable {
     private static final long serialVersionUID = -5833051164281786907L;
-    private final Map map = new HashMap();
+    private final Map<String, Object> map = new HashMap<String, Object>();
 
     /**
      * <p>Converts the given object into a string. The object may be either of:
@@ -56,7 +55,7 @@ public class StringArrayMap implements Serializable {
             return ((String[]) pValue)[0];
         }
         if (pValue instanceof List) {
-            return (String) ((List) pValue).get(0);
+            return (String) ((List<?>) pValue).get(0);
         }
         throw new IllegalStateException("Invalid parameter class: " + pValue.getClass().getName());
     }
@@ -80,8 +79,8 @@ public class StringArrayMap implements Serializable {
             return (String[]) pValue;
         }
         if (pValue instanceof List) {
-            final List l = (List) pValue;
-            return (String[]) l.toArray(new String[l.size()]);
+            final List<?> l = (List<?>) pValue;
+            return l.toArray(new String[l.size()]);
         }
         throw new IllegalStateException("Invalid parameter class: " + pValue.getClass().getName());
     }
@@ -94,17 +93,17 @@ public class StringArrayMap implements Serializable {
      *   <li>an array of strings, which is being converted into a string enumeration</li>
      * </ul>
      */
-    public static Enumeration asStringEnum(final Object pValue) {
+    public static Enumeration<String> asStringEnum(final Object pValue) {
         if (pValue == null) {
             return null;
         }
         if (pValue instanceof String) {
-            return new Enumeration(){
+            return new Enumeration<String>(){
                 private Object value = pValue;
                 public boolean hasMoreElements() {
                     return value != null;
                 }
-                public Object nextElement() {
+                public String nextElement() {
                     if (value == null) {
                         throw new NoSuchElementException();
                     }
@@ -116,12 +115,12 @@ public class StringArrayMap implements Serializable {
         }
         if (pValue instanceof String[]) {
             final String[] values = (String[]) pValue;
-            return new Enumeration() {
+            return new Enumeration<String>() {
                 private int offset;
                 public boolean hasMoreElements() {
                     return offset < values.length;
                 }
-                public Object nextElement() {
+                public String nextElement() {
                     if (offset >= values.length) {
                         throw new NoSuchElementException();
                     }
@@ -130,7 +129,9 @@ public class StringArrayMap implements Serializable {
             };
         }
         if (pValue instanceof List) {
-            return Collections.enumeration((List) pValue);
+            @SuppressWarnings("unchecked")
+            final List<String> stringList = (List<String>) pValue; 
+            return Collections.enumeration(stringList);
         }
         throw new IllegalStateException("Invalid parameter class: " + pValue.getClass().getName());
     }
@@ -139,34 +140,36 @@ public class StringArrayMap implements Serializable {
      * Converts the given map into a string array map: The map values
      * are string arrays.
      */
-    public static Map asMap(final Map pMap) {
-        for (Iterator iter = pMap.entrySet().iterator();  iter.hasNext();  ) {
-            final Map.Entry entry = (Map.Entry) iter.next();
+    public static Map<String, String[]> asMap(final Map<String, Object> pMap) {
+        Map<String, String[]> result = new HashMap<String, String[]>(pMap.size());
+        for (Map.Entry<String, Object> entry : pMap.entrySet()) {
             final String[] value = asStringArray(entry.getValue());
-            entry.setValue(value);
+            result.put(entry.getKey(), value);
         }
-        return Collections.unmodifiableMap(pMap);
+        return Collections.unmodifiableMap(result);
     }
 
     /**
      * Adds a value to the given map.
      */
-    protected void addMapValue(Map pMap, String pName, String pValue) {
+    protected void addMapValue(Map<String, Object> pMap, String pName, String pValue) {
         Object o = pMap.get(pName);
         if (o == null) {
             o = pValue;
         } else if (o instanceof String) {
-            final List list = new ArrayList();
+            final List<Object> list = new ArrayList<Object>();
             list.add(o);
             list.add(pValue);
             o = list;
         } else if (o instanceof List) {
-            ((List) o).add(pValue);
+            @SuppressWarnings("unchecked")
+            final List<String> stringList = (List<String>) o; 
+            stringList.add(pValue);
         } else if (o instanceof String[]) {
-            final List list = new ArrayList();
+            final List<String> list = new ArrayList<String>();
             final String[] arr = (String[]) o;
-            for (int i = 0;  i < arr.length;  i++) {
-                list.add(arr[i]);
+            for (String str : arr) {
+                list.add(str);
             }
             list.add(pValue);
             o = list;
@@ -200,7 +203,7 @@ public class StringArrayMap implements Serializable {
     /**
      * Returns the requested values as an enumeration.
      */
-    public Enumeration getValueEnum(String pName) {
+    public Enumeration<String> getValueEnum(String pName) {
         return asStringEnum(map.get(convertName(pName)));
     }
 
@@ -208,7 +211,7 @@ public class StringArrayMap implements Serializable {
      * Returns the set of registered names as an enumeration.
      * @see #getNameArray()
      */
-    public Enumeration getNames() {
+    public Enumeration<String> getNames() {
         return Collections.enumeration(map.keySet());
     }
 
@@ -217,7 +220,7 @@ public class StringArrayMap implements Serializable {
      * are the lower cased parameter/header names. The map values are
      * string arrays.
      */
-    public Map getMap() {
+    public Map<String, String[]> getMap() {
         return asMap(map);
     }
 
@@ -233,7 +236,7 @@ public class StringArrayMap implements Serializable {
      * @see #getNames()
      */
     public String[] getNameArray() {
-        final Collection c = map.keySet();
-        return (String[]) c.toArray(new String[c.size()]);
+        final Collection<String> c = map.keySet();
+        return c.toArray(new String[c.size()]);
     }
 }

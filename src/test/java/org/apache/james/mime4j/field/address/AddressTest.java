@@ -31,6 +31,7 @@ import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import junit.framework.TestCase;
 
@@ -190,7 +191,7 @@ public class AddressTest extends TestCase {
     
     public void testAddressList() throws ParseException {
         AddressList addlist = AddressList.parse("foo@example.com, bar@example.com, third@example.com");
-        ArrayList al = new ArrayList();
+        List<Address> al = new ArrayList<Address>();
         al.add(addlist.get(0));
 
         // shared arraylist
@@ -229,6 +230,7 @@ public class AddressTest extends TestCase {
             System.setOut(outPs);
             System.setErr(errPs);
             Thread t = new Thread() {
+                @Override
                 public void run() {
                     try {
                         AddressList.main(null);
@@ -292,7 +294,7 @@ public class AddressTest extends TestCase {
     }
     
     public void testDomainList() {
-        ArrayList al = new ArrayList();
+        List<String> al = new ArrayList<String>();
         al.add("example.com");
 
         // shared arraylist
@@ -330,7 +332,7 @@ public class AddressTest extends TestCase {
     }
 
     public void testMailboxList() {
-        ArrayList al = new ArrayList();
+        List<Mailbox> al = new ArrayList<Mailbox>();
         al.add(new Mailbox("local","example.com"));
 
         // shared arraylist
@@ -349,10 +351,10 @@ public class AddressTest extends TestCase {
     }
     
     public void testGroupSerialization() {
-        ArrayList al = new ArrayList();
+        List<Mailbox> al = new ArrayList<Mailbox>();
         al.add(new Mailbox("test", "example.com"));
         al.add(new NamedMailbox("Foo!", "foo", "example.com"));
-        DomainList dl = new DomainList(new ArrayList(Arrays.asList(new String[] {"foo.example.com"})), true);
+        DomainList dl = new DomainList(new ArrayList<String>(Arrays.asList(new String[] {"foo.example.com"})), true);
         NamedMailbox namedMailbox = new NamedMailbox("Foo Bar", dl, "foo2", "example.com");
         assertSame(dl, namedMailbox.getRoute());
         al.add(namedMailbox);

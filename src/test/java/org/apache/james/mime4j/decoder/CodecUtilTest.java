@@ -30,10 +30,12 @@ import junit.framework.TestCase;
 
 public class CodecUtilTest extends TestCase {
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
@@ -47,7 +49,7 @@ public class CodecUtilTest extends TestCase {
     }
     
     public void testEncodeQuotedPrintableLargeInput() throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 1024 * 5; i++) {
             sb.append((char) ('0' + (i % 10)));
         }
@@ -70,7 +72,7 @@ public class CodecUtilTest extends TestCase {
     }
     
     public void testBase64OutputStream() throws Exception {
-        StringBuffer sb = new StringBuffer(2048);
+        StringBuilder sb = new StringBuilder(2048);
         for (int i = 0; i < 128; i++) {
             sb.append("0123456789ABCDEF");
         }
@@ -98,7 +100,7 @@ public class CodecUtilTest extends TestCase {
      */
     /* Currently commented because we don't want failing tests.
     public void testBase64Encoder() throws Exception {
-        StringBuffer sb = new StringBuffer(2048);
+        StringBuilder sb = new StringBuilder(2048);
         for (int i = 0; i < 128; i++) {
             sb.append("0123456789ABCDEF");
         }
@@ -153,7 +155,7 @@ public class CodecUtilTest extends TestCase {
     */
     
     private void assertEquals(byte[] expected, byte[] actual) {
-        StringBuffer buffer = new StringBuffer(expected.length);
+        StringBuilder buffer = new StringBuilder(expected.length);
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
             buffer.append((char)actual[i]);

@@ -34,6 +34,7 @@ import org.apache.log4j.BasicConfigurator;
  */
 public class DecoderUtilTest extends TestCase {
 
+    @Override
     public void setUp() {
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();

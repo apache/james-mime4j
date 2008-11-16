@@ -33,7 +33,6 @@ import junit.framework.TestCase;
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.util.MessageUtils;
 
 /**
  * 
@@ -48,6 +47,7 @@ public class MessageTest extends TestCase {
     private Header headerMultipartMixed = null;
     private Header headerMultipartDigest = null;
 
+    @Override
     public void setUp() throws Exception {
         headerTextPlain = new Header();
         headerMessageRFC822 = new Header();
@@ -132,7 +132,7 @@ public class MessageTest extends TestCase {
         Message m = new Message(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        m.writeTo(out, MessageUtils.LENIENT);
+        m.writeTo(out, Mode.LENIENT);
 
         InputStream output = new ByteArrayInputStream(out.toByteArray());
 
@@ -158,8 +158,8 @@ public class MessageTest extends TestCase {
                 .getBody(), headerValue);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        m.writeTo(out, MessageUtils.LENIENT);
-        List lines = IOUtils.readLines((new BufferedReader(
+        m.writeTo(out, Mode.LENIENT);
+        List<?> lines = IOUtils.readLines((new BufferedReader(
                 new InputStreamReader(new ByteArrayInputStream(out
                         .toByteArray())))));
 
@@ -195,9 +195,9 @@ public class MessageTest extends TestCase {
     }
 
     private byte[] getRawMessageAsByteArray() {
-        StringBuffer header = new StringBuffer();
-        StringBuffer body = new StringBuffer();
-        StringBuffer complete = new StringBuffer();
+        StringBuilder header = new StringBuilder();
+        StringBuilder body = new StringBuilder();
+        StringBuilder complete = new StringBuilder();
 
         header.append("Date: Wed, 21 Feb 2007 11:09:27 +0100\r\n");
         header.append("From: Test <test@test>\r\n");
@@ -217,11 +217,12 @@ public class MessageTest extends TestCase {
 
         public boolean disposed = false;
 
-        public void writeTo(OutputStream out, int mode) throws IOException,
+        public void writeTo(OutputStream out, Mode mode) throws IOException,
                 MimeException {
             out.write("dummy".getBytes("US-ASCII"));
         }
 
+        @Override
         public void dispose() {
             disposed = true;
         }

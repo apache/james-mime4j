@@ -93,11 +93,13 @@ public class MultipartTokensTest extends TestCase {
     
     MimeTokenStream parser;
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         parser = new MimeTokenStream();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }

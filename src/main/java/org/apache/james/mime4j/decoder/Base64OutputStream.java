@@ -254,8 +254,8 @@ public class Base64OutputStream extends FilterOutputStream {
      * @return <code>true</code> if any byte is a valid character in the Base64 alphabet; false herwise
      */
     private static boolean containsBase64Byte(byte[] arrayOctet) {
-        for (int i = 0; i < arrayOctet.length; i++) {
-            if (isBase64(arrayOctet[i])) {
+        for (byte octet : arrayOctet) {
+            if (isBase64(octet)) {
                 return true;
             }
         }
@@ -269,6 +269,7 @@ public class Base64OutputStream extends FilterOutputStream {
     /**
      * Writes the specified <code>byte</code> to this output stream.
      */
+    @Override
     public void write(int i) throws IOException {
         singleByte[0] = (byte) i;
         write(singleByte, 0, 1);
@@ -288,6 +289,7 @@ public class Base64OutputStream extends FilterOutputStream {
      * @throws NullPointerException if the byte array parameter is null
      * @throws IndexOutOfBoundsException if offset, len or buffer size are invalid
      */
+    @Override
     public void write(byte b[], int offset, int len) throws IOException {
         if (closed) {
         	throw new IOException("Base64OutputStream has been closed");
@@ -375,6 +377,7 @@ public class Base64OutputStream extends FilterOutputStream {
      *
      * @throws IOException if an I/O error occurs.
      */
+    @Override
     public void flush() throws IOException {
         flushBuffer();
         out.flush();
@@ -384,6 +387,7 @@ public class Base64OutputStream extends FilterOutputStream {
      * Terminates the BASE64 coded content and flushes the internal buffers. This method does
      * NOT close the underlying output stream.
      */
+    @Override
     public void close() throws IOException {
         if (closed) {
             return;

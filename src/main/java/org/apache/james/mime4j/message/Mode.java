@@ -17,51 +17,18 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.io;
+package org.apache.james.mime4j.message;
 
-import java.io.InputStream;
-import java.io.IOException;
+public class Mode {
 
-public class LimitedInputStream extends PositionInputStream {
+    // because of a problem with the retrotranslator maven plugin this class
+    // uses the old typesafe enum pattern instead of a native Java 5 enum
 
-    private final long limit;
+    public static final Mode STRICT_IGNORE = new Mode();
+    public static final Mode STRICT_ERROR = new Mode();
+    public static final Mode LENIENT = new Mode();
 
-    public LimitedInputStream(InputStream instream, long limit) {
-        super(instream);
-        if (limit < 0) {
-            throw new IllegalArgumentException("Limit may not be negative");
-        }
-        this.limit = limit;
+    private Mode() {
     }
 
-    private void enforceLimit() throws IOException {
-        if (position >= limit) {
-            throw new IOException("Input stream limit exceeded");
-        }
-    }
-    
-    @Override
-    public int read() throws IOException {
-        enforceLimit();
-        return super.read();
-    }
-
-    @Override
-    public int read(byte b[], int off, int len) throws IOException {
-        enforceLimit();
-        len = Math.min(len, getBytesLeft());
-        return super.read(b, off, len);
-    }
-
-    @Override
-    public long skip(long n) throws IOException {
-        enforceLimit();
-        n = Math.min(n, getBytesLeft());
-        return super.skip(n);
-    }
-
-    private int getBytesLeft() {
-        return (int)Math.min(Integer.MAX_VALUE, limit - position);
-    }
-    
 }

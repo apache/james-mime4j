@@ -25,7 +25,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -48,7 +47,7 @@ import org.apache.james.mime4j.util.MessageUtils;
 public class Multipart implements Body {
     private String preamble = "";
     private String epilogue = "";
-    private List bodyParts = new LinkedList();
+    private List<BodyPart> bodyParts = new LinkedList<BodyPart>();
     private Entity parent = null;
     private String subType;
 
@@ -93,8 +92,8 @@ public class Multipart implements Body {
      */
     public void setParent(Entity parent) {
         this.parent = parent;
-        for (Iterator it = bodyParts.iterator(); it.hasNext();) {
-            ((BodyPart) it.next()).setParent(parent);
+        for (BodyPart bodyPart : bodyParts) {
+            bodyPart.setParent(parent);
         }
     }
 
@@ -121,7 +120,7 @@ public class Multipart implements Body {
      * 
      * @return the list of <code>BodyPart</code> objects.
      */
-    public List getBodyParts() {
+    public List<BodyPart> getBodyParts() {
         return Collections.unmodifiableList(bodyParts);
     }
     
@@ -130,10 +129,10 @@ public class Multipart implements Body {
      * 
      * @param bodyParts the new list of <code>BodyPart</code> objects.
      */
-    public void setBodyParts(List bodyParts) {
+    public void setBodyParts(List<BodyPart> bodyParts) {
         this.bodyParts = bodyParts;
-        for (Iterator it = bodyParts.iterator(); it.hasNext();) {
-            ((BodyPart) it.next()).setParent(parent);
+        for (BodyPart bodyPart : bodyParts) {
+            bodyPart.setParent(parent);
         }
     }
     
@@ -174,7 +173,7 @@ public class Multipart implements Body {
      * @throws IOException if case of an I/O error
      * @throws MimeException if case of a MIME protocol violation
      */
-    public void writeTo(final OutputStream out, int mode) throws IOException, MimeException {
+    public void writeTo(final OutputStream out, Mode mode) throws IOException, MimeException {
         Entity e = getParent();
         
         ContentTypeField cField = (ContentTypeField) e.getHeader().getField(
@@ -185,7 +184,7 @@ public class Multipart implements Body {
         String boundary = cField.getBoundary();
 
         Charset charset = null;
-        if (mode == MessageUtils.LENIENT) {
+        if (mode == Mode.LENIENT) {
             if (cField != null && cField.getCharset() != null) {
                 charset = CharsetUtil.getCharset(cField.getCharset());
             } else {
@@ -198,7 +197,7 @@ public class Multipart implements Body {
         BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(out, charset), 8192);
         
-        List bodyParts = getBodyParts();
+        List<BodyPart> bodyParts = getBodyParts();
 
         writer.write(getPreamble());
         writer.write(MessageUtils.CRLF);
@@ -208,7 +207,7 @@ public class Multipart implements Body {
             writer.write(boundary);
             writer.write(MessageUtils.CRLF);
             writer.flush();
-            final BodyPart bodyPart = (BodyPart) bodyParts.get(i);
+            final BodyPart bodyPart = bodyParts.get(i);
             bodyPart.writeTo(out, mode);
             writer.write(MessageUtils.CRLF);
         }
@@ -229,8 +228,8 @@ public class Multipart implements Body {
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
     public void dispose() {
-        for (Iterator it = bodyParts.iterator(); it.hasNext();) {
-            ((BodyPart) it.next()).dispose();
+        for (BodyPart bodyPart : bodyParts) {
+            bodyPart.dispose();
         }
     }
 

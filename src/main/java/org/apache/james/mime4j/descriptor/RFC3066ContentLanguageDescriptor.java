@@ -35,7 +35,7 @@ public interface RFC3066ContentLanguageDescriptor {
      * @return list of language tag Strings,
      * or null if no header exists
      */
-    public abstract List getContentLanguage();
+    public abstract List<String> getContentLanguage();
 
     /**
      * Gets any exception thrown during the parsing of {@link #getContentLanguage()}

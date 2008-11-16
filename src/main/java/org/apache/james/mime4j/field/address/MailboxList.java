@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.field.address;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An immutable, random-access list of Mailbox objects.
@@ -28,17 +29,17 @@ import java.util.ArrayList;
  */
 public class MailboxList {
 
-	private ArrayList mailboxes;
+	private List<Mailbox> mailboxes;
 	
 	/**
-	 * @param mailboxes An ArrayList that contains only Mailbox objects. 
+	 * @param mailboxes A List that contains only Mailbox objects. 
 	 * @param dontCopy true iff it is not possible for the mailboxes ArrayList to be modified by someone else.
 	 */
-	public MailboxList(ArrayList mailboxes, boolean dontCopy) {
+	public MailboxList(List<Mailbox> mailboxes, boolean dontCopy) {
 		if (mailboxes != null)
-			this.mailboxes = (dontCopy ? mailboxes : (ArrayList) mailboxes.clone());
+			this.mailboxes = dontCopy ? mailboxes : new ArrayList<Mailbox>(mailboxes);
 		else
-			this.mailboxes = new ArrayList(0);
+			this.mailboxes = new ArrayList<Mailbox>(0);
 	}
 	
 	/**
@@ -54,7 +55,7 @@ public class MailboxList {
 	public Mailbox get(int index) {
 		if (0 > index || size() <= index)
 			throw new IndexOutOfBoundsException();
-		return (Mailbox) mailboxes.get(index);
+		return mailboxes.get(index);
 	}
 	
 	/**

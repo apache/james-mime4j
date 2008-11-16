@@ -57,7 +57,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
     private String boundary = null;
     private String charset = US_ASCII;
     private String transferEncoding = "7bit";
-    private Map parameters = new HashMap();
+    private Map<String, String> parameters = new HashMap<String, String>();
     private boolean contentTypeSet;
     private boolean contentTransferEncSet;
     private long contentLength = -1;
@@ -120,9 +120,9 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
     private void parseContentType(String value) {
         contentTypeSet = true;
         
-        Map params = MimeUtil.getHeaderParams(value);
+        Map<String, String> params = MimeUtil.getHeaderParams(value);
         
-        String main = (String) params.get("");
+        String main = params.get("");
         String type = null;
         String subtype = null;
         if (main != null) {
@@ -144,7 +144,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
                 subtype = null;
             }
         }
-        String b = (String) params.get("boundary");
+        String b = params.get("boundary");
         
         if (main != null 
                 && ((main.startsWith("multipart/") && b != null) 
@@ -159,7 +159,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
             boundary = b;
         }
         
-        String c = (String) params.get("charset");
+        String c = params.get("charset");
         charset = null;
         if (c != null) {
             c = c.trim();
@@ -212,7 +212,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * 
      * @return parameters
      */
-    public Map getContentTypeParameters() {
+    public Map<String, String> getContentTypeParameters() {
         return parameters;
     }
     
@@ -225,6 +225,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
         return transferEncoding;
     }
     
+    @Override
     public String toString() {
         return mimeType;
     }

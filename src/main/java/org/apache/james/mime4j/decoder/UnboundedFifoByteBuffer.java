@@ -216,8 +216,8 @@ class UnboundedFifoByteBuffer {
      *
      * @return an iterator over this buffer's elements
      */
-    public Iterator iterator() {
-        return new Iterator() {
+    public Iterator<Byte> iterator() {
+        return new Iterator<Byte>() {
 
             private int index = head;
             private int lastReturnedIndex = -1;
@@ -227,7 +227,7 @@ class UnboundedFifoByteBuffer {
 
             }
 
-            public Object next() {
+            public Byte next() {
                 if (!hasNext()) {
                     throw new NoSuchElementException();
                 }

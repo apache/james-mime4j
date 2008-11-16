@@ -33,11 +33,13 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
 
     MimeTokenStream parser;
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         parser = MimeTokenStream.createMaximalDescriptorStream();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
@@ -179,10 +181,12 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         return (MaximalBodyDescriptor) descriptor;
     }
 
+    @Override
     protected MutableBodyDescriptor newBodyDescriptor() {
         return new MaximalBodyDescriptor();
     }
 
+    @Override
     protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
         return new MaximalBodyDescriptor(parent);
     }

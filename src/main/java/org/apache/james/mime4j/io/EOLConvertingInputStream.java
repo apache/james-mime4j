@@ -73,6 +73,7 @@ public class EOLConvertingInputStream extends InputStream {
      * 
      * @throws IOException on I/O errors.
      */
+    @Override
     public void close() throws IOException {
         in.close();
     }
@@ -80,6 +81,7 @@ public class EOLConvertingInputStream extends InputStream {
     /**
      * @see java.io.InputStream#read()
      */
+    @Override
     public int read() throws IOException {
         int b = in.read();
         

@@ -101,6 +101,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return this.bufpos < this.buflen;
     }
 
+    @Override
     public int read() throws IOException {
         int noRead = 0;
         while (!hasBufferedData()) {
@@ -112,6 +113,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return this.buffer[this.bufpos++] & 0xff;
     }
     
+    @Override
     public int read(final byte[] b, int off, int len) throws IOException {
         if (b == null) {
             return 0;
@@ -132,6 +134,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return chunk;
     }
     
+    @Override
     public int read(final byte[] b) throws IOException {
         if (b == null) {
             return 0;
@@ -139,11 +142,13 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return read(b, 0, b.length);
     }
     
+    @Override
     public boolean markSupported() {
         return false;
     }
 
     
+    @Override
     public int readLine(final ByteArrayBuffer dst) throws IOException {
         if (dst == null) {
             throw new IllegalArgumentException("Buffer may not be null");
@@ -300,8 +305,9 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         this.buflen = 0;
     }
     
+    @Override
     public String toString() {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("[pos: ");
         buffer.append(this.bufpos);
         buffer.append("]");

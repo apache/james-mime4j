@@ -57,7 +57,7 @@ public class LineReaderInputStreamAdaptorTest extends TestCase {
         teststrs[0] = "Hello\r\n";
         teststrs[1] = "This string should be much longer than the size of the input buffer " +
                 "which is only 16 bytes for this test\r\n";
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 15; i++) {
             sb.append("123456789 ");
         }
@@ -68,8 +68,8 @@ public class LineReaderInputStreamAdaptorTest extends TestCase {
 
         ByteArrayOutputStream outstream = new ByteArrayOutputStream();
         
-        for (int i = 0; i < teststrs.length; i++) {
-            outstream.write(teststrs[i].getBytes("US-ASCII"));
+        for (String teststr : teststrs) {
+            outstream.write(teststr.getBytes("US-ASCII"));
         }
         byte[] raw = outstream.toByteArray();
         
@@ -77,11 +77,11 @@ public class LineReaderInputStreamAdaptorTest extends TestCase {
                 new ByteArrayInputStream(raw)); 
         
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8); 
-        for (int i = 0; i < teststrs.length; i++) {
+        for (String teststr : teststrs) {
             linebuf.clear();
             instream.readLine(linebuf);
             String s = new String(linebuf.toByteArray(), "US-ASCII");
-            assertEquals(teststrs[i], s);
+            assertEquals(teststr, s);
         }
         assertEquals(-1, instream.readLine(linebuf));
         assertEquals(-1, instream.readLine(linebuf));

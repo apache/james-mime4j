@@ -30,12 +30,14 @@ public class MimeTokenStreamBodyDescriptorTest extends TestCase {
 
     MimeTokenStream parser;
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         parser = new MimeTokenStream();
         parser.parse(new ByteArrayInputStream(ExampleMail.MIME_MULTIPART_ALTERNATIVE_BYTES));
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }

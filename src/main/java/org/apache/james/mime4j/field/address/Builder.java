@@ -37,6 +37,7 @@ import org.apache.james.mime4j.field.address.parser.Token;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Transforms the JJTree-generated abstract syntax tree
@@ -55,7 +56,7 @@ class Builder {
 	
 	
 	public AddressList buildAddressList(ASTaddress_list node) {
-		ArrayList list = new ArrayList();
+		List<Address> list = new ArrayList<Address>();
 		for (int i = 0; i < node.jjtGetNumChildren(); i++) {
 			ASTaddress childNode = (ASTaddress) node.jjtGetChild(i);
 			Address address = buildAddress(childNode);
@@ -66,7 +67,7 @@ class Builder {
 
 	private Address buildAddress(ASTaddress node) {
 		ChildNodeIterator it = new ChildNodeIterator(node);
-		Node n = it.nextNode();
+		Node n = it.next();
 		if (n instanceof ASTaddr_spec) {
 			return buildAddrSpec((ASTaddr_spec)n);
 		}
@@ -75,7 +76,7 @@ class Builder {
 		}
 		else if (n instanceof ASTphrase) {
 			String name = buildString((ASTphrase)n, false);
-			Node n2 = it.nextNode();
+			Node n2 = it.next();
 			if (n2 instanceof ASTgroup_body) {
 				return new Group(name, buildGroupBody((ASTgroup_body)n2));
 			}
@@ -95,10 +96,10 @@ class Builder {
 	
 	
 	private MailboxList buildGroupBody(ASTgroup_body node) {
-		ArrayList results = new ArrayList();
+		List<Mailbox> results = new ArrayList<Mailbox>();
 		ChildNodeIterator it = new ChildNodeIterator(node);
 		while (it.hasNext()) {
-			Node n = it.nextNode();
+			Node n = it.next();
 			if (n instanceof ASTmailbox)
 				results.add(buildMailbox((ASTmailbox)n));
 			else
@@ -109,7 +110,7 @@ class Builder {
 
 	private Mailbox buildMailbox(ASTmailbox node) {
 		ChildNodeIterator it = new ChildNodeIterator(node);
-		Node n = it.nextNode();
+		Node n = it.next();
 		if (n instanceof ASTaddr_spec) {
 			return buildAddrSpec((ASTaddr_spec)n);
 		}
@@ -126,7 +127,7 @@ class Builder {
 
 	private NamedMailbox buildNameAddr(ASTname_addr node) {
 		ChildNodeIterator it = new ChildNodeIterator(node);
-		Node n = it.nextNode();
+		Node n = it.next();
 		String name;
 		if (n instanceof ASTphrase) {
 			name = buildString((ASTphrase)n, false);
@@ -135,7 +136,7 @@ class Builder {
 			throw new IllegalStateException();
 		}
 		
-		n = it.nextNode();
+		n = it.next();
 		if (n instanceof ASTangle_addr) {
             name = DecoderUtil.decodeEncodedWords(name);
 			return new NamedMailbox(name, buildAngleAddr((ASTangle_addr) n));
@@ -148,10 +149,10 @@ class Builder {
 	private Mailbox buildAngleAddr(ASTangle_addr node) {
 		ChildNodeIterator it = new ChildNodeIterator(node);
 		DomainList route = null;
-		Node n = it.nextNode();
+		Node n = it.next();
 		if (n instanceof ASTroute) {
 			route = buildRoute((ASTroute)n);
-			n = it.nextNode();
+			n = it.next();
 		}
 		else if (n instanceof ASTaddr_spec)
 			; // do nothing
@@ -165,10 +166,10 @@ class Builder {
 	}
 
 	private DomainList buildRoute(ASTroute node) {
-		ArrayList results = new ArrayList(node.jjtGetNumChildren());
+		List<String> results = new ArrayList<String>(node.jjtGetNumChildren());
 		ChildNodeIterator it = new ChildNodeIterator(node);
 		while (it.hasNext()) {
-			Node n = it.nextNode();
+			Node n = it.next();
 			if (n instanceof ASTdomain)
 				results.add(buildString((ASTdomain)n, true));
 			else
@@ -182,8 +183,8 @@ class Builder {
 	}
 	private Mailbox buildAddrSpec(DomainList route, ASTaddr_spec node) {
 		ChildNodeIterator it = new ChildNodeIterator(node);
-		String localPart = buildString((ASTlocal_part)it.nextNode(), true);
-		String domain = buildString((ASTdomain)it.nextNode(), true);
+		String localPart = buildString((ASTlocal_part)it.next(), true);
+		String domain = buildString((ASTdomain)it.next(), true);
 		return new Mailbox(route, localPart, domain);		
 	}
 
@@ -191,7 +192,7 @@ class Builder {
 	private String buildString(SimpleNode node, boolean stripSpaces) {
 		Token head = node.firstToken;
 		Token tail = node.lastToken;
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		
 		while (head != tail) {
 			out.append(head.image);
@@ -204,14 +205,14 @@ class Builder {
 		return out.toString();
 	}
 
-	private void addSpecials(StringBuffer out, Token specialToken) {
+	private void addSpecials(StringBuilder out, Token specialToken) {
 		if (specialToken != null) {
 			addSpecials(out, specialToken.specialToken);
 			out.append(specialToken.image);
 		}
 	}
 
-	private static class ChildNodeIterator implements Iterator {
+	private static class ChildNodeIterator implements Iterator<Node> {
 
 		private SimpleNode simpleNode;
 		private int index;
@@ -231,11 +232,7 @@ class Builder {
 			return index < len;
 		}
 
-		public Object next() {
-			return nextNode();
-		}
-		
-		public Node nextNode() {
+		public Node next() {
 			return simpleNode.jjtGetChild(index++);
 		}
 		

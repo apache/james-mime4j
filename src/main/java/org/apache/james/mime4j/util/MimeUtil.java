@@ -166,7 +166,7 @@ public final class MimeUtil {
      * @param pValue The field value to parse.
      * @return The result map; use the key "" to retrieve the first value.
      */
-    public static Map getHeaderParams(String pValue) {
+    public static Map<String, String> getHeaderParams(String pValue) {
         pValue = pValue.trim();
         
         /*
@@ -182,7 +182,7 @@ public final class MimeUtil {
         }
         pValue = sb.toString();
         
-        Map result = new HashMap();
+        Map<String, String> result = new HashMap<String, String>();
 
         // split main value and parameters
         String main;
@@ -211,9 +211,7 @@ public final class MimeUtil {
 
             byte state = READY_FOR_NAME;
             boolean escaped = false;
-            for (int i = 0; i < chars.length; i++) {
-                char c = chars[i];
-
+            for (char c : chars) {
                 switch (state) {
                     case ERROR:
                         if (c == ';')
@@ -355,7 +353,7 @@ public final class MimeUtil {
      * @return a new unique message boundary string.
      */
     public static String createUniqueBoundary() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("-=Part.");
         sb.append(Integer.toHexString(nextCounterValue()));
         sb.append('.');
@@ -381,7 +379,7 @@ public final class MimeUtil {
      * @return a new unique message identifier.
      */
     public static String createUniqueMessageId(String hostName) {
-        StringBuffer sb = new StringBuffer("<Mime4j.");
+        StringBuilder sb = new StringBuilder("<Mime4j.");
         sb.append(Integer.toHexString(nextCounterValue()));
         sb.append('.');
         sb.append(Long.toHexString(random.nextLong()));

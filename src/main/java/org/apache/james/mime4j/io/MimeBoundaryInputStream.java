@@ -82,12 +82,14 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
      * 
      * @throws IOException on I/O errors.
      */
+    @Override
     public void close() throws IOException {
     }
 
     /**
      * @see java.io.InputStream#markSupported()
      */
+    @Override
     public boolean markSupported() {
         return false;
     }
@@ -95,6 +97,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     /**
      * @see java.io.InputStream#read()
      */
+    @Override
     public int read() throws IOException {
         if (completed) {
             return -1;
@@ -114,6 +117,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         }
     }
     
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         if (completed) {
             return -1;
@@ -130,6 +134,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         return buffer.read(b, off, chunk);
     }
 
+    @Override
     public int readLine(final ByteArrayBuffer dst) throws IOException {
         if (dst == null) {
             throw new IllegalArgumentException("Destination buffer may not be null");
@@ -284,10 +289,11 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         return eof && !buffer.hasBufferedData();
     }
 
+    @Override
     public String toString() {
-        final StringBuffer buffer = new StringBuffer("MimeBoundaryInputStream, boundary ");
-        for (int i = 0; i < boundary.length; i++) {
-            buffer.append((char) boundary[i]);
+        final StringBuilder buffer = new StringBuilder("MimeBoundaryInputStream, boundary ");
+        for (byte b : boundary) {
+            buffer.append((char) b);
         }
         return buffer.toString();
     }

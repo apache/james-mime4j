@@ -64,6 +64,7 @@ public class NamedMailbox extends Mailbox {
 	 * 
 	 * @see Mailbox#getAddressString(boolean) 
 	 */
+	@Override
 	public String getAddressString(boolean includeRoute) {
 		return (name == null ? "" : name + " ") + super.getAddressString(includeRoute);
 	}

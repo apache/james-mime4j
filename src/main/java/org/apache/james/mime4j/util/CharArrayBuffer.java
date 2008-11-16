@@ -239,6 +239,7 @@ public final class CharArrayBuffer  {
         return new String(this.buffer, beginIndex, endIndex - beginIndex);
     }
     
+    @Override
     public String toString() {
         return new String(this.buffer, 0, this.len);
     }

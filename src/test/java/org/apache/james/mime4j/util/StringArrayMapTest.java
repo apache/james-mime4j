@@ -47,19 +47,19 @@ public class StringArrayMapTest extends TestCase {
      * Test for {@link StringArrayMap#getMap()}.
      */
     public void testGetMap() {
-        final Map map = getSampleMap().getMap();
-        final List keys = new ArrayList(map.keySet());
+        final Map<String, String[]> map = getSampleMap().getMap();
+        final List<String> keys = new ArrayList<String>(map.keySet());
         assertEquals(keys.size(), 3);
         Collections.sort(keys);
         assertEquals("foo", keys.get(0));
         assertEquals("xs", keys.get(1));
         assertEquals("xyz", keys.get(2));
-        final String[] foo = (String[]) map.get("foo");
+        final String[] foo = map.get("foo");
         assertEquals("bAr", foo[0]);
-        final String[] xs = (String[]) map.get("xs");
+        final String[] xs = map.get("xs");
         assertEquals("1", xs[0]);
         assertEquals("2", xs[1]);
-        final String[] xyz = (String[]) map.get("xyz");
+        final String[] xyz = map.get("xyz");
         assertEquals(3, xyz.length);
         assertEquals("a", xyz[0]);
         assertEquals("B", xyz[1]);
@@ -82,7 +82,7 @@ public class StringArrayMapTest extends TestCase {
      * Test case for {@link StringArrayMap#getNames()}.
      */
     public void testGetNames() {
-        final Enumeration names = getSampleMap().getNames();
+        final Enumeration<String> names = getSampleMap().getNames();
         assertEquals(new String[]{"foo", "xs", "xyz"}, names);
     }
 
@@ -129,8 +129,8 @@ public class StringArrayMapTest extends TestCase {
         assertNull(map.getValues("xz"));
     }
 
-    private void assertEquals(String[] pArray, Enumeration pEnum) {
-        final List list = new ArrayList();
+    private void assertEquals(String[] pArray, Enumeration<String> pEnum) {
+        final List<String> list = new ArrayList<String>();
         while (pEnum.hasMoreElements()) {
             list.add(pEnum.nextElement());
         }

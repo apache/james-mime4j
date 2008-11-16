@@ -37,10 +37,12 @@ public class PositionInputStream extends FilterInputStream {
         return position;
     }
 
+    @Override
     public int available() throws IOException {
         return in.available();
     }
 
+    @Override
     public int read() throws IOException {
         int b = in.read();
         if (b != -1)
@@ -48,24 +50,29 @@ public class PositionInputStream extends FilterInputStream {
         return b;
     }
 
+    @Override
     public void close() throws IOException {
         in.close();
     }
 
+    @Override
     public void reset() throws IOException {
         in.reset();
         position = markedPosition;
     }
 
+    @Override
     public boolean markSupported() {
         return in.markSupported();
     }
 
+    @Override
     public void mark(int readlimit) {
         in.mark(readlimit);
         markedPosition = position;
     }
 
+    @Override
     public long skip(long n) throws IOException {
         final long c = in.skip(n);
         if (c > 0) 
@@ -73,6 +80,7 @@ public class PositionInputStream extends FilterInputStream {
         return c;
     }
 
+    @Override
     public int read(byte b[], int off, int len) throws IOException {
         final int c = in.read(b, off, len);
         if (c > 0) 

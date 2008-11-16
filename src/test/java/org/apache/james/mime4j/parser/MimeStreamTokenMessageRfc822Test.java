@@ -30,12 +30,14 @@ public class MimeStreamTokenMessageRfc822Test extends TestCase {
 
     MimeTokenStream stream;
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         stream = new MimeTokenStream();
         stream.parse(new ByteArrayInputStream(ExampleMail.MIME_RFC822_SIMPLE_BYTES));
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }

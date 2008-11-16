@@ -29,7 +29,7 @@ import java.io.InputStream;
  * Helper class to run comparison of parsed results
  */
 class TestHandler implements ContentHandler {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
     private String escape(char c) {
         if (c == '&') {

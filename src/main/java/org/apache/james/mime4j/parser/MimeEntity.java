@@ -97,10 +97,12 @@ public class MimeEntity extends AbstractEntity {
         body.addField("Content-Type", contentType);
     }
     
+    @Override
     protected int getLineNumber() {
         return rootStream.getLineNumber();
     }
     
+    @Override
     protected LineReaderInputStream getDataStream() {
         return dataStream;
     }

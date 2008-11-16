@@ -50,10 +50,10 @@ public class HeaderTest extends TestCase {
     };
         
     private static String constructString(int [] unicodeChars) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         if (unicodeChars != null) {
-            for (int i = 0; i < unicodeChars.length; i++) {
-                buffer.append((char)unicodeChars[i]); 
+            for (int unicodeChar : unicodeChars) {
+                buffer.append((char) unicodeChar); 
             }
         }
         return buffer.toString();
@@ -70,7 +70,7 @@ public class HeaderTest extends TestCase {
         
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         
-        header.writeTo(buffer, MessageUtils.STRICT_IGNORE);
+        header.writeTo(buffer, Mode.STRICT_IGNORE);
         String s = buffer.toString(MessageUtils.ASCII.name());
         
         assertEquals("Hello: Gr?ezi_z?m?\r\n\r\n", s);
@@ -78,7 +78,7 @@ public class HeaderTest extends TestCase {
         buffer.reset();
         
         try {
-            header.writeTo(buffer, MessageUtils.STRICT_ERROR);
+            header.writeTo(buffer, Mode.STRICT_ERROR);
             fail("MimeException should have been thrown");
         } catch (MimeException expected) {
         }
@@ -97,7 +97,7 @@ public class HeaderTest extends TestCase {
         
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         
-        header.writeTo(buffer, MessageUtils.LENIENT);
+        header.writeTo(buffer, Mode.LENIENT);
         String s = buffer.toString(MessageUtils.ISO_8859_1.name());
         
         assertEquals("Hello: " + hello + "\r\n" +
@@ -120,7 +120,7 @@ public class HeaderTest extends TestCase {
         assertEquals(0, header.getFields("received").size());
         assertEquals(1, header.getFields("Content-Type").size());
 
-        assertEquals("Content-type", ((Field) header.getFields().get(0)).getName());
+        assertEquals("Content-type", header.getFields().get(0).getName());
     }
 
     public void testRemoveNonExistantField() throws Exception {
@@ -148,9 +148,9 @@ public class HeaderTest extends TestCase {
         assertEquals(3, header.getFields().size());
         assertEquals(1, header.getFields("received").size());
 
-        assertEquals("From", ((Field) header.getFields().get(0)).getName());
-        assertEquals("received", ((Field) header.getFields().get(1)).getName());
-        assertEquals("Content-type", ((Field) header.getFields().get(2)).getName());
+        assertEquals("From", header.getFields().get(0).getName());
+        assertEquals("received", header.getFields().get(1).getName());
+        assertEquals("Content-type", header.getFields().get(2).getName());
     }
 
     public void testSetNonExistantField() throws Exception {
@@ -164,7 +164,7 @@ public class HeaderTest extends TestCase {
         assertEquals(4, header.getFields().size());
         assertEquals(1, header.getFields("message-id").size());
 
-        assertEquals("Message-ID", ((Field) header.getFields().get(3)).getName());
+        assertEquals("Message-ID", header.getFields().get(3).getName());
     }
     
 }

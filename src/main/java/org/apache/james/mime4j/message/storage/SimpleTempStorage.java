@@ -115,6 +115,7 @@ public class SimpleTempStorage extends TempStorage {
     /**
      * @see org.apache.james.mime4j.message.storage.TempStorage#getRootTempPath()
      */
+    @Override
     public TempPath getRootTempPath() {
         return rootPath;
     }
@@ -188,7 +189,7 @@ public class SimpleTempStorage extends TempStorage {
     private static class SimpleTempFile implements TempFile {
         private File file = null;
 
-        private static final Set filesToDelete = new HashSet();
+        private static final Set<File> filesToDelete = new HashSet<File>();
 
         private SimpleTempFile(File file) {
             this.file = file;
@@ -234,9 +235,9 @@ public class SimpleTempStorage extends TempStorage {
                     file = null;
                 }
 
-                for (Iterator iterator = filesToDelete.iterator(); iterator
+                for (Iterator<File> iterator = filesToDelete.iterator(); iterator
                         .hasNext();) {
-                    File file = (File) iterator.next();
+                    File file = iterator.next();
                     if (file.delete())
                         iterator.remove();
                 }

@@ -46,10 +46,12 @@ public final class Event {
         this.code = code;
     }
     
+    @Override
     public int hashCode() {
         return code.hashCode();
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (obj == null) return false;
         if (this == obj) return true;
@@ -61,6 +63,7 @@ public final class Event {
         }
     }
     
+    @Override
     public String toString() {
         return code;
     }

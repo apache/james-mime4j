@@ -49,10 +49,12 @@ public class Base64InputStream extends InputStream {
      * 
      * @throws IOException on I/O errors.
      */
+    @Override
     public void close() throws IOException {
         closed = true;
     }
     
+    @Override
     public int read() throws IOException {
         if (closed) {
             throw new IOException("Base64InputStream has been closed");

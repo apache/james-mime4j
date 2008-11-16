@@ -34,10 +34,12 @@ public class QuotedPrintableTextEncodeTest extends TestCase {
 
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }
@@ -110,7 +112,7 @@ public class QuotedPrintableTextEncodeTest extends TestCase {
     }
     
     public void testCRLFShouldResetLineCount() throws Exception {
-        StringBuffer buffer = new StringBuffer(4096);
+        StringBuilder buffer = new StringBuilder(4096);
         for (int i=0;i<1000;i++) {
             buffer.append("Hugo\r\n");
         }

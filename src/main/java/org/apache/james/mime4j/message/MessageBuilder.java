@@ -35,13 +35,13 @@ import org.apache.james.mime4j.util.MimeUtil;
 public class MessageBuilder implements ContentHandler {
 
     private final Entity entity;
-    private Stack stack = new Stack();
+    private Stack<Object> stack = new Stack<Object>();
     
     public MessageBuilder(Entity entity) {
         this.entity = entity;
     }
     
-    private void expect(Class c) {
+    private void expect(Class<?> c) {
         if (!c.isInstance(stack.peek())) {
             throw new IllegalStateException("Internal stack error: "
                     + "Expected '" + c.getName() + "' found '"

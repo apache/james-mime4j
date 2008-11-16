@@ -44,7 +44,7 @@ public interface RFC2183ContentDispositionDescriptor {
      * @return parameter value strings indexed by parameter name strings,
      * not null
      */
-    public abstract Map getContentDispositionParameters();
+    public abstract Map<String, String> getContentDispositionParameters();
 
     /**
      * Gets the <code>filename</code> parameter value of the <code>content-disposition</code> field.

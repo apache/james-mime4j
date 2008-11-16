@@ -20,9 +20,9 @@
 package org.apache.james.mime4j.field;
 
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -64,10 +64,10 @@ public class ContentTypeField extends Field {
     public static final String PARAM_CHARSET = "charset";
     
     private String mimeType = "";
-    private Map parameters = null;
+    private Map<String, String> parameters = null;
     private ParseException parseException;
 
-    protected ContentTypeField(String name, String body, String raw, String mimeType, Map parameters, ParseException parseException) {
+    protected ContentTypeField(String name, String body, String raw, String mimeType, Map<String, String> parameters, ParseException parseException) {
         super(name, body, raw);
         this.mimeType = mimeType;
         this.parameters = parameters;
@@ -127,7 +127,7 @@ public class ContentTypeField extends Field {
      */
     public String getParameter(String name) {
         return parameters != null 
-                    ? (String) parameters.get(name.toLowerCase())
+                    ? parameters.get(name.toLowerCase())
                     : null;
     }
     
@@ -136,10 +136,10 @@ public class ContentTypeField extends Field {
      * 
      * @return the parameters.
      */
-    public Map getParameters() {
+    public Map<String, String> getParameters() {
         return parameters != null 
-                    ? Collections.unmodifiableMap(parameters)
-                    : Collections.EMPTY_MAP;
+                    ? Collections.<String, String> unmodifiableMap(parameters)
+                    : Collections.<String, String> emptyMap();
     }
     
     /**
@@ -205,7 +205,7 @@ public class ContentTypeField extends Field {
         public Field parse(final String name, final String body, final String raw) {
             ParseException parseException = null;
             String mimeType = "";
-            Map parameters = null;
+            Map<String, String> parameters = null;
 
             ContentTypeParser parser = new ContentTypeParser(new StringReader(body));
             try {
@@ -231,15 +231,17 @@ public class ContentTypeField extends Field {
                 if (type != null && subType != null) {
                     mimeType = (type + "/" + parser.getSubType()).toLowerCase();
 
-                    ArrayList paramNames = parser.getParamNames();
-                    ArrayList paramValues = parser.getParamValues();
+                    @SuppressWarnings("unchecked")
+                    List<String> paramNames = parser.getParamNames();
+                    @SuppressWarnings("unchecked")
+                    List<String> paramValues = parser.getParamValues();
 
                     if (paramNames != null && paramValues != null) {
                         for (int i = 0; i < paramNames.size() && i < paramValues.size(); i++) {
                             if (parameters == null)
-                                parameters = new HashMap((int)(paramNames.size() * 1.3 + 1));
-                            String paramName = ((String)paramNames.get(i)).toLowerCase();
-                            String paramValue = ((String)paramValues.get(i));
+                                parameters = new HashMap<String, String>((int)(paramNames.size() * 1.3 + 1));
+                            String paramName = paramNames.get(i).toLowerCase();
+                            String paramValue = paramValues.get(i);
                             parameters.put(paramName, paramValue);
                         }
                     }

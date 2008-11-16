@@ -21,10 +21,12 @@ package org.apache.james.mime4j.descriptor;
 import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
 
 public class DefaultBodyDescriptorTest extends BaseTestForBodyDescriptors {
+    @Override
     protected MutableBodyDescriptor newBodyDescriptor() {
         return new DefaultBodyDescriptor();
     }
 
+    @Override
     protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
         return new DefaultBodyDescriptor(parent);
     }

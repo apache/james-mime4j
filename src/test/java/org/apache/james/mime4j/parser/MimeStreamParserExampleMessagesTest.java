@@ -51,11 +51,13 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
         this.file = testFile;
     }
 
+    @Override
     public void setUp() {
         BasicConfigurator.resetConfiguration();
         BasicConfigurator.configure();
     }
    
+    @Override
     protected void runTest() throws Throwable {
         MimeStreamParser parser = null;
         TestHandler handler = null;
@@ -98,9 +100,7 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
             File dir = TESTS_FOLDER;
             File[] files = dir.listFiles();
             
-            for (int i = 0; i < files.length; i++) {
-                File f = files[i];
-                
+            for (File f : files) {
                 if (f.getName().toLowerCase().endsWith(".msg")) {
                     addTest(new MimeStreamParserExampleMessagesTest(f.getName().substring(0, f.getName().length()-4), f));
                 }

@@ -654,14 +654,12 @@ public class ExampleMail {
     
     public static final byte[] join(byte[][] byteArrays) {
         int length = 0;
-        for (int i = 0; i < byteArrays.length; i++) {
-            byte[] bytes = byteArrays[i];
+        for (byte[] bytes : byteArrays) {
             length += bytes.length;
         }
         byte[] results = new byte[length];
         int count = 0;
-        for (int i = 0; i < byteArrays.length; i++) {
-            byte[] bytes = byteArrays[i];
+        for (byte[] bytes : byteArrays) {
             System.arraycopy(bytes, 0, results, count, bytes.length);
             count += bytes.length;
         }
@@ -669,7 +667,7 @@ public class ExampleMail {
     }
     
     public static String breakLines(String original) {
-        StringBuffer buffer = new StringBuffer(original);
+        StringBuilder buffer = new StringBuilder(original);
         int count = 76;
         while(count < buffer.length()) {
             if (buffer.charAt(count) == '=') {

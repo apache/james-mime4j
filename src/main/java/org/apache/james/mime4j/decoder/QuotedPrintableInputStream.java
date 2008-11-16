@@ -51,10 +51,12 @@ public class QuotedPrintableInputStream extends InputStream {
      * 
      * @throws IOException on I/O errors.
      */
+    @Override
     public void close() throws IOException {
         this.closed = true;
     }
 
+    @Override
     public int read() throws IOException {
         if (closed) {
             throw new IOException("QuotedPrintableInputStream has been closed");

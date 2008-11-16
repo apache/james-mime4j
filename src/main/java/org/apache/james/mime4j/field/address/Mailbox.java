@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Represents a single e-mail address. 
@@ -109,10 +109,12 @@ public class Mailbox extends Address {
 			+ domain + ">";  
 	}
 	
-	protected final void doAddMailboxesTo(ArrayList results) {
+	@Override
+	protected final void doAddMailboxesTo(List<Mailbox> results) {
 		results.add(this);
 	}
 	
+	@Override
 	public String toString() {
 		return getAddressString();
 	}

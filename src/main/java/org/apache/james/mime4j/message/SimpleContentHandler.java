@@ -66,6 +66,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     /**
      * @see org.apache.james.mime4j.parser.AbstractContentHandler#startHeader()
      */
+    @Override
     public final void startHeader() {
         currHeader = new Header();
     }
@@ -73,6 +74,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     /**
      * @see org.apache.james.mime4j.parser.AbstractContentHandler#field(java.lang.String)
      */
+    @Override
     public final void field(String fieldData) throws MimeException {
         currHeader.addField(Field.parse(fieldData));
     }
@@ -80,6 +82,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     /**
      * @see org.apache.james.mime4j.parser.AbstractContentHandler#endHeader()
      */
+    @Override
     public final void endHeader() {
         Header tmp = currHeader;
         currHeader = null;
@@ -89,6 +92,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     /**
      * @see org.apache.james.mime4j.parser.AbstractContentHandler#body(org.apache.james.mime4j.descriptor.BodyDescriptor, java.io.InputStream)
      */
+    @Override
     public final void body(BodyDescriptor bd, InputStream is) throws IOException {
         if (MimeUtil.isBase64Encoding(bd.getTransferEncoding())) {
             bodyDecoded(bd, new Base64InputStream(is));

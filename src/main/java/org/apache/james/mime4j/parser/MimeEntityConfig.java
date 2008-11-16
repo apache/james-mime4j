@@ -34,7 +34,6 @@ public final class MimeEntityConfig implements Cloneable {
     private long maxContentLen;
     
     public MimeEntityConfig() {
-        super();
         this.maximalBodyDescriptor = false;
         this.strictParsing = false;
         this.maxLineLen = 1000;
@@ -139,10 +138,17 @@ public final class MimeEntityConfig implements Cloneable {
         return maxContentLen;
     }
 
-    public Object clone() throws CloneNotSupportedException {
-        return super.clone();
+    @Override
+    public MimeEntityConfig clone() {
+        try {
+            return (MimeEntityConfig) super.clone();
+        } catch (CloneNotSupportedException e) {
+            // this shouldn't happen, since we are Cloneable
+            throw new InternalError();
+        }
     }
     
+    @Override
     public String toString() {
         CharArrayBuffer buffer = new CharArrayBuffer(128);
         buffer.append("[max body descriptor: ");

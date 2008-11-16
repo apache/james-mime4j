@@ -56,6 +56,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
         this(is, -1);
     }
     
+    @Override
     public int read() throws IOException {
         int i = in.read();
         this.eof = i == -1;
@@ -63,6 +64,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
         return i;
     }
 
+    @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int i = in.read(b, off, len);
         this.eof = i == -1;
@@ -70,6 +72,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
         return i;
     }
     
+    @Override
     public int readLine(final ByteArrayBuffer dst) throws IOException {
         int i;
         if (this.bis != null) {
@@ -110,6 +113,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
         return this.used;
     }
     
+    @Override
     public String toString() {
         return "[LineReaderInputStreamAdaptor: " + bis + "]";
     }

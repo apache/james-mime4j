@@ -51,7 +51,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     private String contentDescription;
     private boolean isContentDescriptionSet;
     private String contentDispositionType;
-    private Map contentDispositionParameters;
+    private Map<String, String> contentDispositionParameters;
     private DateTime contentDispositionModificationDate;
     private MimeException contentDispositionModificationDateParseException;
     private DateTime contentDispositionCreationDate;
@@ -61,7 +61,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     private long contentDispositionSize;
     private MimeException contentDispositionSizeParseException;
     private boolean isContentDispositionSet;
-    private List contentLanguage;
+    private List<String> contentLanguage;
     private MimeException contentLanguageParseException;
     private boolean isContentLanguageSet;
     private MimeException contentLocationParseException;
@@ -84,7 +84,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         this.contentDescription = null;
         this.isContentDescriptionSet = false;
         this.contentDispositionType = null;
-        this.contentDispositionParameters = Collections.EMPTY_MAP;
+        this.contentDispositionParameters = Collections.emptyMap();
         this.contentDispositionModificationDate = null;
         this.contentDispositionModificationDateParseException = null;
         this.contentDispositionCreationDate = null;
@@ -104,6 +104,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         this.isContentMD5Set = false;
     }
     
+    @Override
     public void addField(String name, String value) {
         name = name.trim().toLowerCase();
         if (MimeUtil.MIME_HEADER_MIME_VERSION.equals(name) && !isMimeVersionSet) {
@@ -151,7 +152,9 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         if (value != null) {
             try {
                 final ContentLanguageParser parser = new ContentLanguageParser(new StringReader(value));
-                contentLanguage = parser.parse();
+                @SuppressWarnings("unchecked")
+                final List<String> stringList = (List<String>) parser.parse();
+                contentLanguage = stringList;
             } catch (MimeException e) {
                 contentLanguageParseException = e;
             }
@@ -161,10 +164,10 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     private void parseContentDisposition(final String value) {
         isContentDispositionSet = true;
         contentDispositionParameters = MimeUtil.getHeaderParams(value);
-        contentDispositionType = (String) contentDispositionParameters.get("");
+        contentDispositionType = contentDispositionParameters.get("");
         
         final String contentDispositionModificationDate 
-            = (String) contentDispositionParameters.get(MimeUtil.PARAM_MODIFICATION_DATE);
+            = contentDispositionParameters.get(MimeUtil.PARAM_MODIFICATION_DATE);
         if (contentDispositionModificationDate != null) {
             try {
                 this.contentDispositionModificationDate = parseDate(contentDispositionModificationDate);
@@ -174,7 +177,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         }
         
         final String contentDispositionCreationDate 
-            = (String) contentDispositionParameters.get(MimeUtil.PARAM_CREATION_DATE);
+            = contentDispositionParameters.get(MimeUtil.PARAM_CREATION_DATE);
         if (contentDispositionCreationDate != null) {
             try {
                 this.contentDispositionCreationDate = parseDate(contentDispositionCreationDate);
@@ -184,7 +187,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         }
         
         final String contentDispositionReadDate 
-            = (String) contentDispositionParameters.get(MimeUtil.PARAM_READ_DATE);
+            = contentDispositionParameters.get(MimeUtil.PARAM_READ_DATE);
         if (contentDispositionReadDate != null) {
             try {
                 this.contentDispositionReadDate = parseDate(contentDispositionReadDate);
@@ -193,7 +196,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
             }         
         }
         
-        final String size = (String) contentDispositionParameters.get(MimeUtil.PARAM_SIZE);
+        final String size = contentDispositionParameters.get(MimeUtil.PARAM_SIZE);
         if (size != null) {
             try {
                 contentDispositionSize = Long.parseLong(size);
@@ -293,7 +296,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     /**
      * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionParameters()
      */
-    public Map getContentDispositionParameters() {
+    public Map<String, String> getContentDispositionParameters() {
         return contentDispositionParameters;
     }
     
@@ -301,7 +304,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
      * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionFilename()
      */
     public String getContentDispositionFilename() {
-        return (String) contentDispositionParameters.get(MimeUtil.PARAM_FILENAME);
+        return contentDispositionParameters.get(MimeUtil.PARAM_FILENAME);
     }
     
     /**
@@ -363,7 +366,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     /**
      * @see org.apache.james.mime4j.descriptor.RFC3066ContentLanguageDescriptor#getContentLanguage()
      */
-    public List getContentLanguage() {
+    public List<String> getContentLanguage() {
         return contentLanguage;
     }
 

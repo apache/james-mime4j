@@ -110,10 +110,12 @@ public class DateTime {
         System.out.println(toString());
     }
 
+    @Override
     public String toString() {
         return getYear() + " " + getMonth() + " " + getDay() + "; " + getHour() + " " + getMinute() + " " + getSecond() + " " + getTimeZone();
     }
 
+    @Override
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
@@ -128,6 +130,7 @@ public class DateTime {
         return result;
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;

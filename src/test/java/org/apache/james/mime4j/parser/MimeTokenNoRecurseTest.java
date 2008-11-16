@@ -65,6 +65,7 @@ public class MimeTokenNoRecurseTest extends TestCase {
     
     MimeTokenStream stream;
     
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         stream = new MimeTokenStream();
@@ -73,6 +74,7 @@ public class MimeTokenNoRecurseTest extends TestCase {
         stream.parse(in);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
     }

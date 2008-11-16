@@ -31,6 +31,7 @@ public class MimeTokenStreamTest extends TestCase {
 
     MimeTokenStream stream;
     
+    @Override
     public void setUp() throws Exception {
         stream = new MimeTokenStream();
     }

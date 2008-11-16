@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.field.address;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An immutable, random-access list of Strings (that 
@@ -28,17 +29,17 @@ import java.util.ArrayList;
  * 
  */
 public class DomainList {
-	private ArrayList domains;
+	private List<String> domains;
 	
 	/**
-	 * @param domains An ArrayList that contains only String objects. 
+	 * @param domains A List that contains only String objects. 
 	 * @param dontCopy true iff it is not possible for the domains ArrayList to be modified by someone else.
 	 */
-	public DomainList(ArrayList domains, boolean dontCopy) {
+	public DomainList(List<String> domains, boolean dontCopy) {
 		if (domains != null)
-			this.domains = (dontCopy ? domains : (ArrayList) domains.clone());
+			this.domains = dontCopy ? domains :  new ArrayList<String>(domains);
 		else
-			this.domains = new ArrayList(0);
+			this.domains = new ArrayList<String>(0);
 	}
 	
 	/**
@@ -56,7 +57,7 @@ public class DomainList {
 	public String get(int index) {
 		if (0 > index || size() <= index)
 			throw new IndexOutOfBoundsException();
-		return (String) domains.get(index);
+		return domains.get(index);
 	}
 
 	/**
@@ -64,7 +65,7 @@ public class DomainList {
 	 * string (not including the trailing ':'). 
 	 */
 	public String toRouteString() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		for (int i = 0; i < domains.size(); i++) {
 			out.append("@");
 			out.append(get(i));

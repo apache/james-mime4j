@@ -28,10 +28,6 @@ import java.nio.charset.Charset;
  * @version $Id:$
  */
 public final class MessageUtils {
- 
-    public static final int STRICT_IGNORE     = 1;
-    public static final int STRICT_ERROR      = 2;
-    public static final int LENIENT           = 3;
     
     public static final Charset ASCII = CharsetUtil.getCharset("US-ASCII");
 

@@ -24,7 +24,6 @@ import org.apache.james.mime4j.decoder.CodecUtil;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.util.MessageUtils;
 import org.apache.james.mime4j.util.MimeUtil;
 
 import java.io.IOException;
@@ -168,11 +167,10 @@ public abstract class Entity implements Disposable {
      * Write the content to the given outputstream
      * 
      * @param out the outputstream to write to
-     * @param mode compatibility mode:
-     *   {@link MessageUtils#LENIENT}, {@link MessageUtils#STRICT_ERROR}, {@link MessageUtils#STRICT_IGNORE}  
+     * @param mode compatibility mode  
      * @throws IOException 
      */
-    public void writeTo(OutputStream out, int mode) throws IOException, MimeException {
+    public void writeTo(OutputStream out, Mode mode) throws IOException, MimeException {
         getHeader().writeTo(out, mode);
         
         out.flush();
