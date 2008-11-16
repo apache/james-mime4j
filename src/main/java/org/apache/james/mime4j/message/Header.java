@@ -228,19 +228,19 @@ public class Header {
      * Compatibility mode:
      * <ul>
      *  <li>
-     *   {@link MessageUtils#LENIENT}: use charset of the Content-Type header
+     *   {@link Mode#LENIENT}: use charset of the Content-Type header
      *  </li>
      *  <li>
-     *   {@link MessageUtils#STRICT_ERROR}: use US-ASCII and throw {@link MimeException} 
+     *   {@link Mode#STRICT_ERROR}: use US-ASCII and throw {@link MimeException} 
      *    if a non ASCII character is encountered
      *   </li>
      *  <li>
-     *   {@link MessageUtils#STRICT_ERROR}: ignore non ASCII characters if encountered
+     *   {@link Mode#STRICT_ERROR}: ignore non ASCII characters if encountered
      *   </li>
      * </ul>
      * @param out the OutputStream to write to
      * @param mode compatibility mode:
-     *   {@link MessageUtils#LENIENT}, {@link MessageUtils#STRICT_ERROR}, {@link MessageUtils#STRICT_IGNORE}  
+     *   {@link Mode#LENIENT}, {@link Mode#STRICT_ERROR}, {@link Mode#STRICT_IGNORE}  
      * 
      * @throws IOException if case of an I/O error
      * @throws MimeException if case of a MIME protocol violation

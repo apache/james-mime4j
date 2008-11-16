@@ -117,12 +117,12 @@ public final class MimeEntityConfig implements Cloneable {
     }
 
     /**
-     * Sets the maximum line length limit. Parsing of a MIME entity will be terminated 
+     * Sets the maximum content length limit. Parsing of a MIME entity will be terminated 
      * with a {@link MimeException} if a content body exceeds the maximum length limit. 
      * If this parameter is set to a non positive value the content length
      * check will be disabled.
      * 
-     * @param maxLineLen maximum line length limit
+     * @param maxContentLen maximum content length limit
      */
     public void setMaxContentLen(long maxContentLen) {
         this.maxContentLen = maxContentLen;

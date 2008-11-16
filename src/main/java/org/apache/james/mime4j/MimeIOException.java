@@ -29,7 +29,7 @@ public class MimeIOException extends IOException {
     /**
      * Constructs an IO exception based on {@link MimeException}.
      *
-     * @param ex cause
+     * @param cause the cause.
      */
     public MimeIOException(MimeException cause) {
         super(cause.getMessage());

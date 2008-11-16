@@ -21,8 +21,10 @@ package org.apache.james.mime4j.message;
 
 public class Mode {
 
-    // because of a problem with the retrotranslator maven plugin this class
-    // uses the old typesafe enum pattern instead of a native Java 5 enum
+    // For Java 1.4 compatibility reasons this class is not a native Java 5
+    // enum. While Retrotranslator is capable of replacing java.lang.Enum
+    // with its own version this translation introduces a dependency on the
+    // retrotranslator-runtime and backport-util-concurrent jars.
 
     public static final Mode STRICT_IGNORE = new Mode();
     public static final Mode STRICT_ERROR = new Mode();
