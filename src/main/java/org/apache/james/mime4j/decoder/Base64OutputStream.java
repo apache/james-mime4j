@@ -321,8 +321,6 @@ public class Base64OutputStream extends FilterOutputStream {
             if (lineLength > 0) {
                 System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
                 pos += lineSeparator.length;
-//                System.arraycopy(lineSeparator, 0, buf, pos, lineSeparator.length);
-//                pos += lineSeparator.length;
             }
         } else if (offset < 0 || len < 0 || offset + len < 0) {
             throw new IndexOutOfBoundsException();
