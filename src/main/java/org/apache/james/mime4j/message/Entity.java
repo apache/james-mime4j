@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.decoder.CodecUtil;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
@@ -168,9 +168,10 @@ public abstract class Entity implements Disposable {
      * 
      * @param out the outputstream to write to
      * @param mode compatibility mode  
-     * @throws IOException 
+     * @throws IOException if case of an I/O error
+     * @throws MimeIOException if case of a MIME protocol violation
      */
-    public void writeTo(OutputStream out, Mode mode) throws IOException, MimeException {
+    public void writeTo(OutputStream out, Mode mode) throws IOException, MimeIOException {
         getHeader().writeTo(out, mode);
         
         out.flush();

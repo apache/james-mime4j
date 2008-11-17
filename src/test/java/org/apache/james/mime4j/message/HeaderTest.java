@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.util.MessageUtils;
@@ -79,8 +79,8 @@ public class HeaderTest extends TestCase {
         
         try {
             header.writeTo(buffer, Mode.STRICT_ERROR);
-            fail("MimeException should have been thrown");
-        } catch (MimeException expected) {
+            fail("MimeIOException should have been thrown");
+        } catch (MimeIOException expected) {
         }
     }
     

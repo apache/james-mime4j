@@ -22,7 +22,7 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
 
 /**
  * Encapsulates the body of an entity (see RFC 2045).
@@ -51,7 +51,8 @@ public interface Body extends Disposable {
      * 
      * @param out the stream to write to.
      * @param mode compatibility mode  
-     * @throws IOException on I/O errors.
+     * @throws IOException if case of an I/O error
+     * @throws MimeIOException if case of a MIME protocol violation
      */
-    void writeTo(OutputStream out, Mode mode) throws IOException, MimeException;
+    void writeTo(OutputStream out, Mode mode) throws IOException, MimeIOException;
 }

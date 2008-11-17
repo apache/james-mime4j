@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.util.CharsetUtil;
@@ -171,15 +172,15 @@ public class Multipart implements Body {
      * @param mode compatibility mode
      * 
      * @throws IOException if case of an I/O error
-     * @throws MimeException if case of a MIME protocol violation
+     * @throws MimeIOException if case of a MIME protocol violation
      */
-    public void writeTo(final OutputStream out, Mode mode) throws IOException, MimeException {
+    public void writeTo(final OutputStream out, Mode mode) throws IOException, MimeIOException {
         Entity e = getParent();
         
         ContentTypeField cField = (ContentTypeField) e.getHeader().getField(
                 Field.CONTENT_TYPE);
         if (cField == null || cField.getBoundary() == null) {
-            throw new MimeException("Multipart boundary not specified");
+            throw new MimeIOException(new MimeException("Multipart boundary not specified"));
         }
         String boundary = cField.getBoundary();
 

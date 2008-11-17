@@ -31,7 +31,6 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.Field;
 
 /**
@@ -217,8 +216,7 @@ public class MessageTest extends TestCase {
 
         public boolean disposed = false;
 
-        public void writeTo(OutputStream out, Mode mode) throws IOException,
-                MimeException {
+        public void writeTo(OutputStream out, Mode mode) throws IOException {
             out.write("dummy".getBytes("US-ASCII"));
         }
 

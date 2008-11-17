@@ -243,9 +243,9 @@ public class Header {
      *   {@link Mode#LENIENT}, {@link Mode#STRICT_ERROR}, {@link Mode#STRICT_IGNORE}  
      * 
      * @throws IOException if case of an I/O error
-     * @throws MimeException if case of a MIME protocol violation
+     * @throws MimeIOException if case of a MIME protocol violation
      */
-    public void writeTo(final OutputStream out, Mode mode) throws IOException, MimeException {
+    public void writeTo(final OutputStream out, Mode mode) throws IOException, MimeIOException {
         Charset charset = null;
         if (mode == Mode.LENIENT) {
             final ContentTypeField contentTypeField = ((ContentTypeField) getField(Field.CONTENT_TYPE));
@@ -267,7 +267,7 @@ public class Header {
         for (Field field : fields) {
             String fs = field.toString();
             if (mode == Mode.STRICT_ERROR && !MessageUtils.isASCII(fs)) {
-                throw new MimeException("Header '" + fs + "' violates RFC 822");
+                throw new MimeIOException(new MimeException("Header '" + fs + "' violates RFC 822"));
             }
             writer.write(fs);
             writer.write(MessageUtils.CRLF);
