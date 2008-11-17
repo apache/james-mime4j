@@ -31,7 +31,9 @@ import java.util.NoSuchElementException;
  * An object, which may be used to implement header, or parameter
  * maps. The maps keys are the header or parameter names. The
  * maps values are strings (single value), lists, or arrays.
+ * 
  */
+@Deprecated
 public class StringArrayMap implements Serializable {
     private static final long serialVersionUID = -5833051164281786907L;
     private final Map<String, Object> map = new HashMap<String, Object>();
