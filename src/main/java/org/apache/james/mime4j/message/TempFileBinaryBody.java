@@ -19,14 +19,13 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.decoder.CodecUtil;
-import org.apache.james.mime4j.message.storage.TempFile;
-import org.apache.james.mime4j.message.storage.TempPath;
-import org.apache.james.mime4j.message.storage.TempStorage;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.apache.james.mime4j.decoder.CodecUtil;
+import org.apache.james.mime4j.message.storage.Storage;
+import org.apache.james.mime4j.message.storage.StorageProvider;
 
 
 /**
@@ -37,7 +36,7 @@ import java.io.OutputStream;
  */
 class TempFileBinaryBody extends AbstractBody implements BinaryBody {
     
-    private TempFile tempFile = null;
+    private Storage storage = null;
 
     /**
      * Use the given InputStream to build the TemporyFileBinaryBody
@@ -45,29 +44,25 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
      * @param is the InputStream to use as source
      * @throws IOException
      */
-    public TempFileBinaryBody(final InputStream is) throws IOException {
-        
-        TempPath tempPath = TempStorage.getInstance().getRootTempPath();
-        tempFile = tempPath.createTempFile("attachment", ".bin");
-        
-        OutputStream out = tempFile.getOutputStream();
-        CodecUtil.copy(is, out);
-        out.close();
+    public TempFileBinaryBody(final StorageProvider storageProvider,
+            final InputStream is) throws IOException {
+        storage = storageProvider.store(is);
     }
     
     /**
      * @see org.apache.james.mime4j.message.BinaryBody#getInputStream()
      */
     public InputStream getInputStream() throws IOException {
-        return tempFile.getInputStream();
+        return storage.getInputStream();
     }
     
     /**
      * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream, Mode)
      */
     public void writeTo(OutputStream out, Mode mode) throws IOException {
-        final InputStream inputStream = getInputStream();
-        CodecUtil.copy(inputStream,out);
+        final InputStream inputStream = storage.getInputStream();
+        CodecUtil.copy(inputStream, out);
+        inputStream.close();
     }
 
     /**
@@ -77,9 +72,9 @@ class TempFileBinaryBody extends AbstractBody implements BinaryBody {
      */
     @Override
     public void dispose() {
-        if (tempFile != null) {
-            tempFile.delete();
-            tempFile = null;
+        if (storage != null) {
+            storage.delete();
+            storage = null;
         }
     }
 

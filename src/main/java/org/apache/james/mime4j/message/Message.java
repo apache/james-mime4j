@@ -23,6 +23,8 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
+import org.apache.james.mime4j.message.storage.DefaultStorageProvider;
+import org.apache.james.mime4j.message.storage.StorageProvider;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 
@@ -49,6 +51,18 @@ public class Message extends Entity implements Body {
      */
     public Message() {
     }
+
+    /**
+     * Parses the specified MIME message stream into a <code>Message</code>
+     * instance.
+     * 
+     * @param is the stream to parse.
+     * @throws IOException on I/O errors.
+     * @throws MimeIOException on MIME protocol violations.
+     */
+    public Message(InputStream is) throws IOException, MimeIOException {
+        this(is, null, DefaultStorageProvider.getInstance());
+    }
     
     /**
      * Parses the specified MIME message stream into a <code>Message</code>
@@ -59,25 +73,31 @@ public class Message extends Entity implements Body {
      * @throws MimeIOException on MIME protocol violations.
      */
     public Message(InputStream is, MimeEntityConfig config) 
-            throws IOException,MimeIOException {
-        MimeStreamParser parser = new MimeStreamParser(config);
-        parser.setContentHandler(new MessageBuilder(this));
-        try {
-            parser.parse(is);
-        } catch (MimeException ex) {
-            throw new MimeIOException(ex);
-        }
+            throws IOException, MimeIOException {
+        this(is, config, DefaultStorageProvider.getInstance());
     }
 
     /**
      * Parses the specified MIME message stream into a <code>Message</code>
-     * instance.
+     * instance using given {@link MimeEntityConfig} and {@link StorageProvider}.
      * 
      * @param is the stream to parse.
+     * @param config {@link MimeEntityConfig} to use.
+     * @param storageProvider {@link StorageProvider} to use for storing text
+     *        and binary message bodies.
      * @throws IOException on I/O errors.
+     * @throws MimeIOException on MIME protocol violations.
      */
-    public Message(InputStream is) throws IOException {
-        this(is, null);
+     public Message(InputStream is, MimeEntityConfig config,
+            StorageProvider storageProvider) throws IOException,
+            MimeIOException {
+        try {
+            MimeStreamParser parser = new MimeStreamParser(config);
+            parser.setContentHandler(new MessageBuilder(this, storageProvider));
+            parser.parse(is);
+        } catch (MimeException e) {
+            throw new MimeIOException(e);
+        }
     }
     
     /**

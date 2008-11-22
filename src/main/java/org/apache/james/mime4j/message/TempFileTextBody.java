@@ -19,20 +19,19 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.decoder.CodecUtil;
-import org.apache.james.mime4j.message.storage.TempFile;
-import org.apache.james.mime4j.message.storage.TempPath;
-import org.apache.james.mime4j.message.storage.TempStorage;
-import org.apache.james.mime4j.util.CharsetUtil;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.decoder.CodecUtil;
+import org.apache.james.mime4j.message.storage.Storage;
+import org.apache.james.mime4j.message.storage.StorageProvider;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 
 /**
@@ -45,17 +44,12 @@ class TempFileTextBody extends AbstractBody implements TextBody {
     private static Log log = LogFactory.getLog(TempFileTextBody.class);
     
     private String mimeCharset = null;
-    private TempFile tempFile = null;
+    private Storage storage = null;
 
-    public TempFileTextBody(final InputStream is, final String mimeCharset) throws IOException {
-        
+    public TempFileTextBody(final StorageProvider storageProvider,
+            final InputStream is, final String mimeCharset) throws IOException {
+        this.storage = storageProvider.store(is);
         this.mimeCharset = mimeCharset;
-        TempPath tempPath = TempStorage.getInstance().getRootTempPath();
-        tempFile = tempPath.createTempFile("attachment", ".txt");
-        
-        OutputStream out = tempFile.getOutputStream();
-        CodecUtil.copy(is, out);
-        out.close();
     }
     
     /**
@@ -96,7 +90,7 @@ class TempFileTextBody extends AbstractBody implements TextBody {
             return new InputStreamReader(tempFile.getInputStream());
         }*/
         
-        return new InputStreamReader(tempFile.getInputStream(), javaCharset);
+        return new InputStreamReader(storage.getInputStream(), javaCharset);
     }
     
     
@@ -104,8 +98,9 @@ class TempFileTextBody extends AbstractBody implements TextBody {
      * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream, Mode)
      */
     public void writeTo(OutputStream out, Mode mode) throws IOException {
-        final InputStream inputStream = tempFile.getInputStream();
+        final InputStream inputStream = storage.getInputStream();
         CodecUtil.copy(inputStream, out);
+        inputStream.close();
     }
 
     /**
@@ -115,9 +110,9 @@ class TempFileTextBody extends AbstractBody implements TextBody {
      */
     @Override
     public void dispose() {
-        if (tempFile != null) {
-            tempFile.delete();
-            tempFile = null;
+        if (storage != null) {
+            storage.delete();
+            storage = null;
         }
     }
 

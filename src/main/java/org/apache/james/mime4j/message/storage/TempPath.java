@@ -25,6 +25,7 @@ import java.io.IOException;
  * 
  * @version $Id: TempPath.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
+@Deprecated
 public interface TempPath {
     TempPath createTempPath() throws IOException;
     TempPath createTempPath(String prefix) throws IOException;

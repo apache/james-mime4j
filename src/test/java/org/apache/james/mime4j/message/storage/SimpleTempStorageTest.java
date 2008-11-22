@@ -36,6 +36,7 @@ import junit.framework.TestCase;
  * 
  * @version $Id: SimpleTempStorageTest.java,v 1.2 2004/10/02 12:41:12 ntherning Exp $
  */
+@SuppressWarnings("deprecation")
 public class SimpleTempStorageTest extends TestCase {
 
     public void testGetRootTempPath() {
