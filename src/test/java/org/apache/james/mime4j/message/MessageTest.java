@@ -212,7 +212,7 @@ public class MessageTest extends TestCase {
         return complete.toString().getBytes();
     }
 
-    private static final class DummyBody extends AbstractBody {
+    private static final class DummyBody extends SingleBody {
 
         public boolean disposed = false;
 

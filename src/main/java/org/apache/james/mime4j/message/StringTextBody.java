@@ -30,7 +30,7 @@ import java.nio.charset.Charset;
 /**
  * Text body backed by a <code>String</code>.
  */
-class StringTextBody extends AbstractBody implements TextBody {
+class StringTextBody extends SingleBody implements TextBody {
 
     private final String text;
     private final Charset charset;
@@ -69,6 +69,11 @@ class StringTextBody extends AbstractBody implements TextBody {
 
         reader.close();
         writer.flush();
+    }
+
+    @Override
+    public StringTextBody copy() {
+        return new StringTextBody(text, charset);
     }
 
 }

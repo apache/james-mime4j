@@ -26,6 +26,7 @@ import java.nio.charset.Charset;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.message.storage.DefaultStorageProvider;
+import org.apache.james.mime4j.message.storage.MultiReferenceStorage;
 import org.apache.james.mime4j.message.storage.Storage;
 import org.apache.james.mime4j.message.storage.StorageProvider;
 import org.apache.james.mime4j.util.CharsetUtil;
@@ -58,7 +59,7 @@ public class BodyFactory {
             throw new IllegalArgumentException();
 
         Storage storage = storageProvider.store(is);
-        return new StorageBinaryBody(storage);
+        return new StorageBinaryBody(new MultiReferenceStorage(storage));
     }
 
     public TextBody textBody(InputStream is) throws IOException {
@@ -66,7 +67,8 @@ public class BodyFactory {
             throw new IllegalArgumentException();
 
         Storage storage = storageProvider.store(is);
-        return new StorageTextBody(storage, MessageUtils.DEFAULT_CHARSET);
+        return new StorageTextBody(new MultiReferenceStorage(storage),
+                MessageUtils.DEFAULT_CHARSET);
     }
 
     public TextBody textBody(InputStream is, String mimeCharset)
@@ -78,7 +80,7 @@ public class BodyFactory {
 
         Storage storage = storageProvider.store(is);
         Charset charset = toJavaCharset(mimeCharset, false);
-        return new StorageTextBody(storage, charset);
+        return new StorageTextBody(new MultiReferenceStorage(storage), charset);
     }
 
     public TextBody textBody(String text) {

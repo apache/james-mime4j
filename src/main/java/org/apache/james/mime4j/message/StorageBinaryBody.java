@@ -24,17 +24,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.james.mime4j.decoder.CodecUtil;
-import org.apache.james.mime4j.message.storage.Storage;
+import org.apache.james.mime4j.message.storage.MultiReferenceStorage;
 
 /**
  * Binary body backed by a
  * {@link org.apache.james.mime4j.message.storage.Storage}
  */
-class StorageBinaryBody extends AbstractBody implements BinaryBody {
+class StorageBinaryBody extends SingleBody implements BinaryBody {
 
-    private Storage storage = null;
+    private MultiReferenceStorage storage = null;
 
-    public StorageBinaryBody(final Storage storage) {
+    public StorageBinaryBody(final MultiReferenceStorage storage) {
         this.storage = storage;
     }
 
@@ -56,6 +56,12 @@ class StorageBinaryBody extends AbstractBody implements BinaryBody {
         InputStream in = storage.getInputStream();
         CodecUtil.copy(in, out);
         in.close();
+    }
+
+    @Override
+    public StorageBinaryBody copy() {
+        storage.addReference();
+        return new StorageBinaryBody(storage);
     }
 
     /**

@@ -19,31 +19,55 @@
 
 package org.apache.james.mime4j.message;
 
-
 /**
- * Abstract <code>Body</code> implementation providing the parent
- * functionality required by bodies.
- *
- * 
- * @version $Id: AbstractBody.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
- * @deprecated extend {@link SingleBody} instead
+ * Abstract implementation of a single message body; that is, a body that does
+ * not contain (directly or indirectly) any other child bodies. It also provides
+ * the parent functionality required by bodies.
  */
-@Deprecated
-public abstract class AbstractBody implements Body {
+public abstract class SingleBody implements Body {
+
     private Entity parent = null;
-    
+
     /**
      * @see org.apache.james.mime4j.message.Body#getParent()
      */
     public Entity getParent() {
         return parent;
     }
-    
+
     /**
      * @see org.apache.james.mime4j.message.Body#setParent(org.apache.james.mime4j.message.Entity)
      */
     public void setParent(Entity parent) {
         this.parent = parent;
+    }
+
+    /**
+     * Returns a copy of this <code>SingleBody</code> (optional operation).
+     * <p>
+     * The general contract of this method is as follows:
+     * <ul>
+     * <li>Invoking {@link #getParent()} on the copy returns <code>null</code>.
+     * That means that the copy is detached from the parent entity of this
+     * <code>SingleBody</code>. The copy may get attached to a different
+     * entity later on.</li>
+     * <li>The underlying content does not have to be copied. Instead it may be
+     * shared between multiple copies of a <code>SingleBody</code>.</li>
+     * <li>If the underlying content is shared by multiple copies the
+     * implementation has to make sure that the content gets deleted when the
+     * last copy gets disposed (and not before that).</li>
+     * </ul>
+     * <p>
+     * This implementation always throws an
+     * <code>UnsupportedOperationException</code>.
+     * 
+     * @return a copy of this <code>SingleBody</code>.
+     * @throws UnsupportedOperationException
+     *             if the <code>copy</code> operation is not supported by this
+     *             single body.
+     */
+    public SingleBody copy() {
+        throw new UnsupportedOperationException();
     }
 
     /**
