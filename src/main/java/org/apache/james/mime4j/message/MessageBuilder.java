@@ -28,7 +28,6 @@ import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.message.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.message.storage.StorageProvider;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.util.CharArrayBuffer;
@@ -37,20 +36,17 @@ import org.apache.james.mime4j.util.MimeUtil;
 public class MessageBuilder implements ContentHandler {
 
     private final Entity entity;
-    private final StorageProvider storageProvider;
+    private final BodyFactory bodyFactory;
     private Stack<Object> stack = new Stack<Object>();
     
     public MessageBuilder(Entity entity) {
         this.entity = entity;
-        this.storageProvider = DefaultStorageProvider.getInstance();
+        this.bodyFactory = new BodyFactory();
     }
     
     public MessageBuilder(Entity entity, StorageProvider storageProvider) {
-        if (storageProvider == null)
-            storageProvider = DefaultStorageProvider.getInstance();
-
         this.entity = entity;
-        this.storageProvider = storageProvider;
+        this.bodyFactory = new BodyFactory(storageProvider);
     }
     
     private void expect(Class<?> c) {
@@ -141,10 +137,9 @@ public class MessageBuilder implements ContentHandler {
         }
         
         if (bd.getMimeType().startsWith("text/")) {
-            body = new TempFileTextBody(storageProvider, decodedStream, bd
-                    .getCharset());
+            body = bodyFactory.textBody(decodedStream, bd.getCharset());
         } else {
-            body = new TempFileBinaryBody(storageProvider, decodedStream);
+            body = bodyFactory.binaryBody(decodedStream);
         }
         
         Entity entity = ((Entity) stack.peek());

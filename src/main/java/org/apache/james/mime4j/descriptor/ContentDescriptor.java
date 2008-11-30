@@ -64,7 +64,7 @@ public interface ContentDescriptor {
      * @return Character set, which has been parsed from the
      *   content-type definition. Not null for <code>TEXT</code> types, when unset will
      *   be set to default <code>us-ascii</code>. For other types, when unset,
-     *   null will be returnedsvn s
+     *   null will be returned.
      */
     String getCharset();
 

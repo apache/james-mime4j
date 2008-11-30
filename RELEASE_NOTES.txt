@@ -1,3 +1,13 @@
+Since Release 0.5
+-------------------
+
+Notes
+-----
+ * BodyFactory introduces allowing more flexible storate for Message parts. TempFileTextBody
+   and TempFileBinaryBody removed.
+   [https://issues.apache.org/jira/browse/MIME4J-87]
+ * Temporary text body storage for Message parts now defaults to US-ASCII (was ISO-8859-1)
+
 Release 0.5
 -------------------
 

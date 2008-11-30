@@ -20,12 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.StringReader;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.field.Field;
 
 import junit.framework.TestCase;
@@ -39,6 +34,8 @@ import junit.framework.TestCase;
 public class MultipartFormTest extends TestCase {
 
     public void testMultipartFormContent() throws Exception {
+        BodyFactory bodyFactory = new BodyFactory();
+        
         Message message = new Message();
         Header header = new Header();
         header.addField(
@@ -51,17 +48,17 @@ public class MultipartFormTest extends TestCase {
         Header h1 = new Header();
         h1.addField(Field.parse("Content-Type: text/plain"));
         p1.setHeader(h1);
-        p1.setBody(new StringPart("this stuff"));
+        p1.setBody(bodyFactory.textBody("this stuff"));
         BodyPart p2 = new BodyPart();
         Header h2 = new Header();
         h2.addField(Field.parse("Content-Type: text/plain"));
         p2.setHeader(h2);
-        p2.setBody(new StringPart("that stuff"));
+        p2.setBody(bodyFactory.textBody("that stuff"));
         BodyPart p3 = new BodyPart();
         Header h3 = new Header();
         h3.addField(Field.parse("Content-Type: text/plain"));
         p3.setHeader(h3);
-        p3.setBody(new StringPart("all kind of stuff"));
+        p3.setBody(bodyFactory.textBody("all kind of stuff"));
 
         multipart.addBodyPart(p1);
         multipart.addBodyPart(p2);
@@ -87,40 +84,6 @@ public class MultipartFormTest extends TestCase {
             "--foo--\r\n";
         String s = out.toString("US-ASCII");
         assertEquals(expected, s);
-    }
-    
-    public class StringPart extends AbstractBody implements TextBody {
-
-        private final String text;
-        private final String charset;
-        
-        public StringPart(final String text, String charset) {
-            super();
-            if (text == null) {
-                throw new IllegalArgumentException("Text may not be null");
-            }
-            if (charset == null) {
-                charset = "UTF-8";
-            }
-            this.text = text;
-            this.charset = charset;
-        }
-        
-        public StringPart(final String text) {
-            this(text, null);
-        }
-        
-        public Reader getReader() throws IOException {
-            return new StringReader(this.text);
-        }
-
-        public void writeTo(final OutputStream out, Mode mode) throws IOException {
-            if (out == null) {
-                throw new IllegalArgumentException("Output stream may not be null");
-            }
-            IOUtils.copy(getReader(), out, this.charset);
-        }
-        
     }
     
 }
