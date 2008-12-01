@@ -50,6 +50,7 @@ public class MultiReferenceStorage implements Storage {
      * 
      * @param storage
      *            storage back-end that should be reference counted.
+     * @throws IllegalArgumentException when storage is null
      */
     public MultiReferenceStorage(Storage storage) {
         if (storage == null)
@@ -66,11 +67,8 @@ public class MultiReferenceStorage implements Storage {
      *             if the reference counter is zero which implies that the
      *             backing storage has already been deleted.
      */
-    public synchronized void addReference() {
-        if (referenceCounter == 0)
-            throw new IllegalStateException("storage has been deleted");
-
-        referenceCounter++;
+    public void addReference() {
+        incrementCounter();
     }
 
     /**
@@ -79,14 +77,13 @@ public class MultiReferenceStorage implements Storage {
      * <p>
      * A client that holds a reference to this object must make sure not to
      * invoke this method a second time.
+     * 
+     * @throws IllegalStateException
+     *             if the reference counter is zero which implies that the
+     *             backing storage has already been deleted.
      */
-    public synchronized void delete() {
-        if (referenceCounter == 0)
-            return;
-
-        referenceCounter--;
-
-        if (referenceCounter == 0) {
+    public void delete() {
+        if (decrementCounter()) {
             storage.delete();
         }
     }
@@ -100,4 +97,27 @@ public class MultiReferenceStorage implements Storage {
         return storage.getInputStream();
     }
 
+    /**
+     * Synchronized increment of reference count.
+     */
+    private synchronized void incrementCounter() {
+        if (referenceCounter == 0)
+            throw new IllegalStateException("storage has been deleted");
+
+        referenceCounter++;
+    }
+
+    /**
+     * Synchronized decrement of reference count.
+     * @return true when counter has reached zero,
+     * false otherwise
+     * @throws IllegalArgumentException when counter
+     * is already zero
+     */
+    private synchronized boolean decrementCounter() {
+        if (referenceCounter == 0)
+            throw new IllegalStateException("storage has been deleted");
+
+        return --referenceCounter == 0;
+    }
 }
