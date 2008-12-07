@@ -193,7 +193,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
             boolean valid = true;
             field = fieldbuf.toString();
             int pos = fieldbuf.indexOf(':');
-            if (pos == -1) {
+            if (pos <= 0) {
                 monitor(Event.INALID_HEADER);
                 valid = false;
             } else {

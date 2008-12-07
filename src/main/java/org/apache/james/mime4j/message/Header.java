@@ -76,7 +76,7 @@ public class Header {
                 parser.stop();
             }
             @Override
-            public void field(String fieldData) throws MimeException {
+            public void field(String fieldData) {
                 addField(Field.parse(fieldData));
             }
         });

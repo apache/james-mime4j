@@ -22,8 +22,6 @@ package org.apache.james.mime4j.field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.james.mime4j.MimeException;
-
 /**
  * The base class of all field classes.
  *
@@ -52,7 +50,7 @@ public abstract class Field {
                                         "Content-Transfer-Encoding";
     
     private static final String FIELD_NAME_PATTERN = 
-        "^([\\x21-\\x39\\x3b-\\x7e]+)[ \t]*:";
+        "^([\\x21-\\x39\\x3b-\\x7e]+):";
     private static final Pattern fieldNamePattern = 
         Pattern.compile(FIELD_NAME_PATTERN);
         
@@ -82,9 +80,9 @@ public abstract class Field {
      * 
      * @param raw the string to parse.
      * @return a <code>Field</code> instance.
-     * @throws MimeException on parse errors.
+     * @throws IllegalArgumentException on parse errors.
      */
-    public static Field parse(final String raw) throws MimeException {
+    public static Field parse(final String raw) {
         
         /*
          * Unfold the field.
@@ -96,7 +94,11 @@ public abstract class Field {
          */
         final Matcher fieldMatcher = fieldNamePattern.matcher(unfolded);
         if (!fieldMatcher.find()) {
-            throw new MimeException("Invalid field in string");
+            // We don't have to throw a MimeException because this error can
+            // never happen when Field.parse() is called by a ContentHandler.
+            // org.apache.james.mime4j.parser.AbstractEntity drops header
+            // lines that do not start with a valid field name.
+            throw new IllegalArgumentException("Invalid field in string");
         }
         final String name = fieldMatcher.group(1);
         
