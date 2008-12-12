@@ -26,14 +26,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.message.Header;
+import org.apache.james.mime4j.parser.ContentHandler;
+
 
 /**
  * An object, which may be used to implement header, or parameter
  * maps. The maps keys are the header or parameter names. The
  * maps values are strings (single value), lists, or arrays.
- * 
+ * <p>
+ * Note that this class is not directly used anywhere in Mime4j.
+ * Instead a user might choose to use it instead of {@link Header}
+ * and {@link Field} in a custom {@link ContentHandler} implementation.
+ * See also MIME4j-24.
  */
-@Deprecated
 public class StringArrayMap implements Serializable {
     private static final long serialVersionUID = -5833051164281786907L;
     private final Map<String, Object> map = new HashMap<String, Object>();
