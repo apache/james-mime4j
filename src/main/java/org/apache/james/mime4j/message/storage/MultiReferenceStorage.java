@@ -23,19 +23,23 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * <p>A wrapper around another {@link Storage} that also maintains a reference
+ * <p>
+ * A wrapper around another {@link Storage} that also maintains a reference
  * counter. The inner storage gets deleted only if the reference counter reaches
- * zero.</p>
- * <p>Reference counting is used to delete the storage when it is no longer needed.
+ * zero.
+ * </p>
+ * <p>
+ * Reference counting is used to delete the storage when it is no longer needed.
  * So, any users of this class should note:
  * </p>
  * <ul>
  * <li>The reference count is set up one on construction. In all other cases,
  * {@link #addReference()} should be called when the storage is shared.</li>
- * <li>The caller of {@link #addReference()} should ensure that {@
- * link #delete()} is called once and only once.</li>
- * <li>Sharing the {@link Storage} instance passed into {@link #MultiReferenceStorage(Storage)}
- * may lead to miscounting and premature deletion</li>
+ * <li>The caller of {@link #addReference()} should ensure that
+ * {@link #delete()} is called once and only once.</li>
+ * <li>Sharing the {@link Storage} instance passed into
+ * {@link #MultiReferenceStorage(Storage)} may lead to miscounting and premature
+ * deletion</li>
  * </ul>
  */
 public class MultiReferenceStorage implements Storage {
@@ -50,7 +54,8 @@ public class MultiReferenceStorage implements Storage {
      * 
      * @param storage
      *            storage back-end that should be reference counted.
-     * @throws IllegalArgumentException when storage is null
+     * @throws IllegalArgumentException
+     *             when storage is null
      */
     public MultiReferenceStorage(Storage storage) {
         if (storage == null)
@@ -99,6 +104,9 @@ public class MultiReferenceStorage implements Storage {
 
     /**
      * Synchronized increment of reference count.
+     * 
+     * @throws IllegalStateException
+     *             when counter is already zero
      */
     private synchronized void incrementCounter() {
         if (referenceCounter == 0)
@@ -109,10 +117,10 @@ public class MultiReferenceStorage implements Storage {
 
     /**
      * Synchronized decrement of reference count.
-     * @return true when counter has reached zero,
-     * false otherwise
-     * @throws IllegalArgumentException when counter
-     * is already zero
+     * 
+     * @return true when counter has reached zero, false otherwise
+     * @throws IllegalStateException
+     *             when counter is already zero
      */
     private synchronized boolean decrementCounter() {
         if (referenceCounter == 0)
