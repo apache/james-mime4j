@@ -26,6 +26,7 @@ import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
+import javax.crypto.CipherOutputStream;
 import javax.crypto.KeyGenerator;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -43,7 +44,7 @@ import javax.crypto.spec.SecretKeySpec;
  * DefaultStorageProvider.setInstance(provider);
  * </pre>
  */
-public class CipherStorageProvider implements StorageProvider {
+public class CipherStorageProvider extends AbstractStorageProvider {
 
     private final StorageProvider backend;
     private final String algorithm;
@@ -83,19 +84,50 @@ public class CipherStorageProvider implements StorageProvider {
         }
     }
 
-    public Storage store(InputStream in) throws IOException {
-        try {
-            byte[] raw = keygen.generateKey().getEncoded();
-            SecretKeySpec skeySpec = new SecretKeySpec(raw, algorithm);
+    public StorageOutputStream createStorageOutputStream() throws IOException {
+        return new CipherStorageOutputStream(backend
+                .createStorageOutputStream());
+    }
 
-            Cipher cipher = Cipher.getInstance(algorithm);
-            cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+    private final class CipherStorageOutputStream extends StorageOutputStream {
+        private final StorageOutputStream storageOut;
+        private final SecretKeySpec skeySpec;
+        private final CipherOutputStream cipherOut;
 
-            InputStream encrypted = new CipherInputStream(in, cipher);
-            Storage storage = backend.store(encrypted);
-            return new CipherStorage(storage, skeySpec);
-        } catch (GeneralSecurityException e) {
-            throw (IOException) new IOException().initCause(e);
+        public CipherStorageOutputStream(StorageOutputStream out)
+                throws IOException {
+            try {
+                this.storageOut = out;
+
+                byte[] raw = keygen.generateKey().getEncoded();
+                skeySpec = new SecretKeySpec(raw, algorithm);
+
+                Cipher cipher = Cipher.getInstance(algorithm);
+                cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+
+                this.cipherOut = new CipherOutputStream(out, cipher);
+            } catch (GeneralSecurityException e) {
+                throw (IOException) new IOException().initCause(e);
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+            super.close();
+            cipherOut.close();
+        }
+
+        @Override
+        protected void write0(byte[] buffer, int offset, int length)
+                throws IOException {
+            cipherOut.write(buffer, offset, length);
+        }
+
+        @Override
+        protected Storage toStorage0() throws IOException {
+            // cipherOut has already been closed because toStorage calls close
+            Storage encrypted = storageOut.toStorage();
+            return new CipherStorage(encrypted, skeySpec);
         }
     }
 

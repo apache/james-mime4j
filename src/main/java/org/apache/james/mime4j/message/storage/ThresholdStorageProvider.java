@@ -39,7 +39,7 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
  * DefaultStorageProvider.setInstance(provider);
  * </pre>
  */
-public class ThresholdStorageProvider implements StorageProvider {
+public class ThresholdStorageProvider extends AbstractStorageProvider {
 
     private final StorageProvider backend;
     private final int thresholdSize;
@@ -74,30 +74,58 @@ public class ThresholdStorageProvider implements StorageProvider {
         this.thresholdSize = thresholdSize;
     }
 
-    public Storage store(InputStream in) throws IOException {
-        final int bufferSize = Math.min(thresholdSize, 1024);
-        byte[] buffer = new byte[bufferSize];
-        ByteArrayBuffer bab = new ByteArrayBuffer(bufferSize);
+    public StorageOutputStream createStorageOutputStream() {
+        return new ThresholdStorageOutputStream();
+    }
 
-        for (int remainingHeadSize = thresholdSize; remainingHeadSize > 0;) {
-            int bytesToRead = Math.min(remainingHeadSize, bufferSize);
-            int nBytes = in.read(buffer, 0, bytesToRead);
-            if (nBytes == -1) {
-                byte[] head = bab.buffer();
-                int headLen = bab.length();
+    private final class ThresholdStorageOutputStream extends
+            StorageOutputStream {
 
-                return new MemoryStorageProvider.MemoryStorage(head, headLen);
-            }
+        private final ByteArrayBuffer head;
+        private StorageOutputStream tail;
 
-            bab.append(buffer, 0, nBytes);
-            remainingHeadSize -= nBytes;
+        public ThresholdStorageOutputStream() {
+            final int bufferSize = Math.min(thresholdSize, 1024);
+            head = new ByteArrayBuffer(bufferSize);
         }
 
-        byte[] head = bab.buffer();
-        int headLen = bab.length();
-        Storage tail = backend.store(in);
+        @Override
+        public void close() throws IOException {
+            super.close();
 
-        return new ThresholdStorage(head, headLen, tail);
+            if (tail != null)
+                tail.close();
+        }
+
+        @Override
+        protected void write0(byte[] buffer, int offset, int length)
+                throws IOException {
+            int remainingHeadSize = thresholdSize - head.length();
+            if (remainingHeadSize > 0) {
+                int n = Math.min(remainingHeadSize, length);
+                head.append(buffer, offset, n);
+                offset += n;
+                length -= n;
+            }
+
+            if (length > 0) {
+                if (tail == null)
+                    tail = backend.createStorageOutputStream();
+
+                tail.write(buffer, offset, length);
+            }
+        }
+
+        @Override
+        protected Storage toStorage0() throws IOException {
+            if (tail == null)
+                return new MemoryStorageProvider.MemoryStorage(head.buffer(),
+                        head.length());
+
+            return new ThresholdStorage(head.buffer(), head.length(), tail
+                    .toStorage());
+        }
+
     }
 
     private static final class ThresholdStorage implements Storage {

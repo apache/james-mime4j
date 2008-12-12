@@ -43,10 +43,22 @@ public class BodyFactory {
 
     private StorageProvider storageProvider;
 
+    /**
+     * Creates a new <code>BodyFactory</code> instance that uses the default
+     * storage provider for creating message bodies from input streams.
+     */
     public BodyFactory() {
         this.storageProvider = DefaultStorageProvider.getInstance();
     }
 
+    /**
+     * Creates a new <code>BodyFactory</code> instance that uses the given
+     * storage provider for creating message bodies from input streams.
+     * 
+     * @param storageProvider
+     *            a storage provider or <code>null</code> to use the default
+     *            one.
+     */
     public BodyFactory(StorageProvider storageProvider) {
         if (storageProvider == null)
             storageProvider = DefaultStorageProvider.getInstance();
@@ -54,6 +66,17 @@ public class BodyFactory {
         this.storageProvider = storageProvider;
     }
 
+    /**
+     * Creates a {@link BinaryBody} that holds the content of the given input
+     * stream.
+     * 
+     * @param is
+     *            input stream to create a message body from.
+     * @return a {@link SingleBody} that implements the {@link BinaryBody}
+     *         interface.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
     public BinaryBody binaryBody(InputStream is) throws IOException {
         if (is == null)
             throw new IllegalArgumentException();
@@ -62,6 +85,45 @@ public class BodyFactory {
         return new StorageBinaryBody(new MultiReferenceStorage(storage));
     }
 
+    /**
+     * Creates a {@link BinaryBody} that holds the content of the given
+     * {@link Storage}.
+     * <p>
+     * Note that the caller must not invoke {@link Storage#delete() delete()} on
+     * the given <code>Storage</code> object after it has been passed to this
+     * method. Instead the message body created by this method takes care of
+     * deleting the storage when it gets disposed of (see
+     * {@link Disposable#dispose()}).
+     * 
+     * @param storage
+     *            storage to create a message body from.
+     * @return a {@link SingleBody} that implements the {@link BinaryBody}
+     *         interface.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
+    public BinaryBody binaryBody(Storage storage) throws IOException {
+        if (storage == null)
+            throw new IllegalArgumentException();
+
+        return new StorageBinaryBody(new MultiReferenceStorage(storage));
+    }
+
+    /**
+     * Creates a {@link TextBody} that holds the content of the given input
+     * stream.
+     * <p>
+     * &quot;us-ascii&quot; is used to decode the byte content of the
+     * <code>Storage</code> into a character stream when calling
+     * {@link TextBody#getReader() getReader()} on the returned object.
+     * 
+     * @param is
+     *            input stream to create a message body from.
+     * @return a {@link SingleBody} that implements the {@link TextBody}
+     *         interface.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
     public TextBody textBody(InputStream is) throws IOException {
         if (is == null)
             throw new IllegalArgumentException();
@@ -71,6 +133,25 @@ public class BodyFactory {
                 MessageUtils.DEFAULT_CHARSET);
     }
 
+    /**
+     * Creates a {@link TextBody} that holds the content of the given input
+     * stream.
+     * <p>
+     * The charset corresponding to the given MIME charset name is used to
+     * decode the byte content of the input stream into a character stream when
+     * calling {@link TextBody#getReader() getReader()} on the returned object.
+     * If the MIME charset has no corresponding Java charset or the Java charset
+     * cannot be used for decoding then &quot;us-ascii&quot; is used instead.
+     * 
+     * @param is
+     *            input stream to create a message body from.
+     * @param mimeCharset
+     *            name of a MIME charset.
+     * @return a {@link SingleBody} that implements the {@link TextBody}
+     *         interface.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
     public TextBody textBody(InputStream is, String mimeCharset)
             throws IOException {
         if (is == null)
@@ -83,6 +164,85 @@ public class BodyFactory {
         return new StorageTextBody(new MultiReferenceStorage(storage), charset);
     }
 
+    /**
+     * Creates a {@link TextBody} that holds the content of the given
+     * {@link Storage}.
+     * <p>
+     * &quot;us-ascii&quot; is used to decode the byte content of the
+     * <code>Storage</code> into a character stream when calling
+     * {@link TextBody#getReader() getReader()} on the returned object.
+     * <p>
+     * Note that the caller must not invoke {@link Storage#delete() delete()} on
+     * the given <code>Storage</code> object after it has been passed to this
+     * method. Instead the message body created by this method takes care of
+     * deleting the storage when it gets disposed of (see
+     * {@link Disposable#dispose()}).
+     * 
+     * @param storage
+     *            storage to create a message body from.
+     * @return a {@link SingleBody} that implements the {@link TextBody}
+     *         interface.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
+    public TextBody textBody(Storage storage) throws IOException {
+        if (storage == null)
+            throw new IllegalArgumentException();
+
+        return new StorageTextBody(new MultiReferenceStorage(storage),
+                MessageUtils.DEFAULT_CHARSET);
+    }
+
+    /**
+     * Creates a {@link TextBody} that holds the content of the given
+     * {@link Storage}.
+     * <p>
+     * The charset corresponding to the given MIME charset name is used to
+     * decode the byte content of the <code>Storage</code> into a character
+     * stream when calling {@link TextBody#getReader() getReader()} on the
+     * returned object. If the MIME charset has no corresponding Java charset or
+     * the Java charset cannot be used for decoding then &quot;us-ascii&quot; is
+     * used instead.
+     * <p>
+     * Note that the caller must not invoke {@link Storage#delete() delete()} on
+     * the given <code>Storage</code> object after it has been passed to this
+     * method. Instead the message body created by this method takes care of
+     * deleting the storage when it gets disposed of (see
+     * {@link Disposable#dispose()}).
+     * 
+     * @param storage
+     *            storage to create a message body from.
+     * @param mimeCharset
+     *            name of a MIME charset.
+     * @return a {@link SingleBody} that implements the {@link TextBody}
+     *         interface.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
+    public TextBody textBody(Storage storage, String mimeCharset)
+            throws IOException {
+        if (storage == null)
+            throw new IllegalArgumentException();
+        if (mimeCharset == null)
+            throw new IllegalArgumentException();
+
+        Charset charset = toJavaCharset(mimeCharset, false);
+        return new StorageTextBody(new MultiReferenceStorage(storage), charset);
+    }
+
+    /**
+     * Creates a {@link TextBody} that holds the content of the given string.
+     * <p>
+     * &quot;us-ascii&quot; is used to encode the characters of the string into
+     * a byte stream when calling
+     * {@link Body#writeTo(java.io.OutputStream, Mode) writeTo(OutputStream, Mode)}
+     * on the returned object.
+     * 
+     * @param text
+     *            text to create a message body from.
+     * @return a {@link SingleBody} that implements the {@link TextBody}
+     *         interface.
+     */
     public TextBody textBody(String text) {
         if (text == null)
             throw new IllegalArgumentException();
@@ -90,6 +250,23 @@ public class BodyFactory {
         return new StringTextBody(text, MessageUtils.DEFAULT_CHARSET);
     }
 
+    /**
+     * Creates a {@link TextBody} that holds the content of the given string.
+     * <p>
+     * The charset corresponding to the given MIME charset name is used to
+     * encode the characters of the string into a byte stream when calling
+     * {@link Body#writeTo(java.io.OutputStream, Mode) writeTo(OutputStream, Mode)}
+     * on the returned object. If the MIME charset has no corresponding Java
+     * charset or the Java charset cannot be used for encoding then
+     * &quot;us-ascii&quot; is used instead.
+     * 
+     * @param text
+     *            text to create a message body from.
+     * @param mimeCharset
+     *            name of a MIME charset.
+     * @return a {@link SingleBody} that implements the {@link TextBody}
+     *         interface.
+     */
     public TextBody textBody(String text, String mimeCharset) {
         if (text == null)
             throw new IllegalArgumentException();

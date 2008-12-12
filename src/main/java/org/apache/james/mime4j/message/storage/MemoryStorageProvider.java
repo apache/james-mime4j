@@ -35,7 +35,7 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
  * DefaultStorageProvider.setInstance(provider);
  * </pre>
  */
-public class MemoryStorageProvider implements StorageProvider {
+public class MemoryStorageProvider extends AbstractStorageProvider {
 
     /**
      * Creates a new <code>MemoryStorageProvider</code>.
@@ -43,16 +43,24 @@ public class MemoryStorageProvider implements StorageProvider {
     public MemoryStorageProvider() {
     }
 
-    public Storage store(InputStream in) throws IOException {
+    public StorageOutputStream createStorageOutputStream() {
+        return new MemoryStorageOutputStream();
+    }
+
+    private static final class MemoryStorageOutputStream extends
+            StorageOutputStream {
         ByteArrayBuffer bab = new ByteArrayBuffer(1024);
 
-        final byte[] buffer = new byte[512];
-        int inputLength;
-        while ((inputLength = in.read(buffer)) != -1) {
-            bab.append(buffer, 0, inputLength);
+        @Override
+        protected void write0(byte[] buffer, int offset, int length)
+                throws IOException {
+            bab.append(buffer, offset, length);
         }
 
-        return new MemoryStorage(bab.buffer(), bab.length());
+        @Override
+        protected Storage toStorage0() throws IOException {
+            return new MemoryStorage(bab.buffer(), bab.length());
+        }
     }
 
     static final class MemoryStorage implements Storage {

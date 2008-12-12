@@ -30,8 +30,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.apache.james.mime4j.decoder.CodecUtil;
-
 /**
  * A {@link StorageProvider} that stores the data in temporary files. The files
  * are stored either in a user-specified directory or the default temporary-file
@@ -45,7 +43,7 @@ import org.apache.james.mime4j.decoder.CodecUtil;
  * DefaultStorageProvider.setInstance(provider);
  * </pre>
  */
-public class TempFileStorageProvider implements StorageProvider {
+public class TempFileStorageProvider extends AbstractStorageProvider {
 
     private static final String DEFAULT_PREFIX = "m4j";
 
@@ -102,15 +100,40 @@ public class TempFileStorageProvider implements StorageProvider {
         this.directory = directory;
     }
 
-    public Storage store(InputStream in) throws IOException {
+    public StorageOutputStream createStorageOutputStream() throws IOException {
         File file = File.createTempFile(prefix, suffix, directory);
         file.deleteOnExit();
 
-        OutputStream out = new FileOutputStream(file);
-        CodecUtil.copy(in, out);
-        out.close();
+        return new TempFileStorageOutputStream(file);
+    }
 
-        return new TempFileStorage(file);
+    private static final class TempFileStorageOutputStream extends
+            StorageOutputStream {
+        private File file;
+        private OutputStream out;
+
+        public TempFileStorageOutputStream(File file) throws IOException {
+            this.file = file;
+            this.out = new FileOutputStream(file);
+        }
+
+        @Override
+        public void close() throws IOException {
+            super.close();
+            out.close();
+        }
+
+        @Override
+        protected void write0(byte[] buffer, int offset, int length)
+                throws IOException {
+            out.write(buffer, offset, length);
+        }
+
+        @Override
+        protected Storage toStorage0() throws IOException {
+            // out has already been closed because toStorage calls close
+            return new TempFileStorage(file);
+        }
     }
 
     private static final class TempFileStorage implements Storage {
