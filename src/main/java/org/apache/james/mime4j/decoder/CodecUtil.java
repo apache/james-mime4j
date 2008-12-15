@@ -72,11 +72,18 @@ public class CodecUtil {
         encoder.encode(in, out);
     }
     
+    /**
+     * Encodes the given stream using base64.
+     *
+     * @param in not null
+     * @param out not null
+     * @throws IOException if an I/O error occurs
+     */
     public static void encodeBase64(final InputStream in, final OutputStream out) throws IOException {
-        final Base64Encoder encoder = new Base64Encoder(DEFAULT_ENCODING_BUFFER_SIZE);
-        encoder.encode(in, out);
+        Base64OutputStream b64Out = new Base64OutputStream(out);
+        copy(in, b64Out);
+        b64Out.close();
     }
-    
     
     /**
      * Wraps the given stream in a Quoted-Printable encoder.

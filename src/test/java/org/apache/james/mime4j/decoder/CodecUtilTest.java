@@ -98,7 +98,6 @@ public class CodecUtilTest extends TestCase {
     /**
      * This test is a proof for MIME4J-67
      */
-    /* Currently commented because we don't want failing tests.
     public void testBase64Encoder() throws Exception {
         StringBuilder sb = new StringBuilder(2048);
         for (int i = 0; i < 128; i++) {
@@ -119,7 +118,6 @@ public class CodecUtilTest extends TestCase {
         String output = new String(outRoundtrip.toByteArray());
         return output;
     } 
-    */
     
     /* performance test, not a unit test */
     /*
