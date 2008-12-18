@@ -30,13 +30,13 @@ public class DefaultStorageProviderTest extends TestCase {
         DefaultStorageProvider.reset();
     }
 
-    public void testDefaultIsTempFile() throws Exception {
+    public void testDefaultInstance() throws Exception {
         System.getProperties().remove(
                 DefaultStorageProvider.DEFAULT_STORAGE_PROVIDER_PROPERTY);
         DefaultStorageProvider.reset();
 
         StorageProvider instance = DefaultStorageProvider.getInstance();
-        assertTrue(instance instanceof TempFileStorageProvider);
+        assertTrue(instance instanceof ThresholdStorageProvider);
     }
 
     public void testSetDefaultProperty() throws Exception {
