@@ -45,7 +45,7 @@ public class Base64OutputStream extends FilterOutputStream {
     // This array is a lookup table that translates 6-bit positive integer index
     // values into their "Base64 Alphabet" equivalents as specified in Table 1
     // of RFC 2045.
-    private static final byte[] BASE64_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F',
+    static final byte[] BASE64_TABLE = { 'A', 'B', 'C', 'D', 'E', 'F',
             'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
             'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
             'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's',

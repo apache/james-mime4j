@@ -27,127 +27,254 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Performs Base-64 decoding on an underlying stream.
- * 
- * 
- * @version $Id: Base64InputStream.java,v 1.3 2004/11/29 13:15:47 ntherning Exp $
  */
 public class Base64InputStream extends InputStream {
     private static Log log = LogFactory.getLog(Base64InputStream.class);
 
-    private final InputStream s;
-    private final ByteQueue byteq = new ByteQueue(3);
-    private boolean done = false;
+    private static final int ENCODED_BUFFER_SIZE = 1536;
+
+    private static final int[] BASE64_DECODE = new int[256];
+
+    static {
+        for (int i = 0; i < 256; i++)
+            BASE64_DECODE[i] = -1;
+        for (int i = 0; i < Base64OutputStream.BASE64_TABLE.length; i++)
+            BASE64_DECODE[Base64OutputStream.BASE64_TABLE[i] & 0xff] = i;
+    }
+
+    private static final byte BASE64_PAD = '=';
+
+    private static final int EOF = -1;
+
+    private final byte[] singleByte = new byte[1];
+
+    private boolean strict;
+
+    private final InputStream in;
     private boolean closed = false;
 
-    public Base64InputStream(InputStream s) {
-        this.s = s;
+    private final byte[] encoded = new byte[ENCODED_BUFFER_SIZE];
+    private int position = 0; // current index into encoded buffer
+    private int size = 0; // current size of encoded buffer
+
+    private final ByteQueue q = new ByteQueue();
+
+    private boolean eof; // end of file or pad character reached
+
+    public Base64InputStream(InputStream in) {
+        this(in, false);
     }
 
-    /**
-     * Terminates BASE64 coded content. This method does NOT close the underlying 
-     * input stream.
-     * 
-     * @throws IOException on I/O errors.
-     */
-    @Override
-    public void close() throws IOException {
-        closed = true;
+    public Base64InputStream(InputStream in, boolean strict) {
+        if (in == null)
+            throw new IllegalArgumentException();
+
+        this.in = in;
+        this.strict = strict;
     }
-    
+
     @Override
     public int read() throws IOException {
-        if (closed) {
+        if (closed)
             throw new IOException("Base64InputStream has been closed");
+
+        while (true) {
+            int bytes = read0(singleByte, 0, 1);
+            if (bytes == EOF)
+                return EOF;
+
+            if (bytes == 1)
+                return singleByte[0] & 0xff;
         }
-        if (byteq.count() == 0) {
-            fillBuffer();
-            if (byteq.count() == 0) {
-                return -1;
+    }
+
+    @Override
+    public int read(byte[] buffer) throws IOException {
+        if (closed)
+            throw new IOException("Base64InputStream has been closed");
+
+        if (buffer == null)
+            throw new NullPointerException();
+
+        if (buffer.length == 0)
+            return 0;
+
+        return read0(buffer, 0, buffer.length);
+    }
+
+    @Override
+    public int read(byte[] buffer, int offset, int length) throws IOException {
+        if (closed)
+            throw new IOException("Base64InputStream has been closed");
+
+        if (buffer == null)
+            throw new NullPointerException();
+
+        if (offset < 0 || length < 0 || offset + length > buffer.length)
+            throw new IndexOutOfBoundsException();
+
+        if (length == 0)
+            return 0;
+
+        return read0(buffer, offset, offset + length);
+    }
+
+    @Override
+    public void close() throws IOException {
+        if (closed)
+            return;
+
+        closed = true;
+    }
+
+    private int read0(final byte[] buffer, final int from, final int to)
+            throws IOException {
+        int index = from; // index into given buffer
+
+        // check if a previous invocation left decoded bytes in the queue
+
+        int qCount = q.count();
+        while (qCount-- > 0 && index < to) {
+            buffer[index++] = q.dequeue();
+        }
+
+        // eof or pad reached?
+
+        if (eof)
+            return index == from ? EOF : index - from;
+
+        // decode into given buffer
+
+        int data = 0; // holds decoded data; up to four sextets
+        int sextets = 0; // number of sextets
+
+        while (index < to) {
+            // make sure buffer not empty
+
+            while (position == size) {
+                int n = in.read(encoded, 0, encoded.length);
+                if (n == EOF) {
+                    eof = true;
+
+                    if (sextets != 0) {
+                        // error in encoded data
+                        handleUnexpectedEof(sextets);
+                    }
+
+                    return index == from ? EOF : index - from;
+                } else if (n > 0) {
+                    position = 0;
+                    size = n;
+                } else {
+                    assert n == 0;
+                }
+            }
+
+            // decode buffer
+
+            while (position < size && index < to) {
+                int value = encoded[position++] & 0xff;
+
+                if (value == BASE64_PAD) {
+                    index = decodePad(data, sextets, buffer, index, to);
+                    return index - from;
+                }
+
+                int decoded = BASE64_DECODE[value];
+                if (decoded < 0) // -1: not a base64 char
+                    continue;
+
+                data = (data << 6) | decoded;
+                sextets++;
+
+                if (sextets == 4) {
+                    sextets = 0;
+
+                    byte b1 = (byte) (data >>> 16);
+                    byte b2 = (byte) (data >>> 8);
+                    byte b3 = (byte) data;
+
+                    if (index < to - 2) {
+                        buffer[index++] = b1;
+                        buffer[index++] = b2;
+                        buffer[index++] = b3;
+                    } else {
+                        if (index < to - 1) {
+                            buffer[index++] = b1;
+                            buffer[index++] = b2;
+                            q.enqueue(b3);
+                        } else if (index < to) {
+                            buffer[index++] = b1;
+                            q.enqueue(b2);
+                            q.enqueue(b3);
+                        } else {
+                            q.enqueue(b1);
+                            q.enqueue(b2);
+                            q.enqueue(b3);
+                        }
+
+                        assert index == to;
+                        return to - from;
+                    }
+                }
             }
         }
 
-        byte val = byteq.dequeue();
-        if (val >= 0)
-            return val;
+        assert sextets == 0;
+        assert index == to;
+        return to - from;
+    }
+
+    private int decodePad(int data, int sextets, final byte[] buffer,
+            int index, final int end) throws IOException {
+        eof = true;
+
+        if (sextets == 2) {
+            // one byte encoded as "XY=="
+
+            byte b = (byte) (data >>> 4);
+            if (index < end) {
+                buffer[index++] = b;
+            } else {
+                q.enqueue(b);
+            }
+        } else if (sextets == 3) {
+            // two bytes encoded as "XYZ="
+
+            byte b1 = (byte) (data >>> 10);
+            byte b2 = (byte) ((data >>> 2) & 0xFF);
+
+            if (index < end - 1) {
+                buffer[index++] = b1;
+                buffer[index++] = b2;
+            } else if (index < end) {
+                buffer[index++] = b1;
+                q.enqueue(b2);
+            } else {
+                q.enqueue(b1);
+                q.enqueue(b2);
+            }
+        } else {
+            // error in encoded data
+            handleUnexpecedPad(sextets);
+        }
+
+        return index;
+    }
+
+    private void handleUnexpectedEof(int sextets) throws IOException {
+        if (strict)
+            throw new IOException("unexpected end of file");
         else
-            return val & 0xFF;
+            log.warn("unexpected end of file; dropping " + sextets
+                    + " sextet(s)");
     }
 
-    /**
-     * Retrieve data from the underlying stream, decode it,
-     * and put the results in the byteq.
-     * @throws IOException
-     */
-    private void fillBuffer() throws IOException {
-        byte[] data = new byte[4];
-        int pos = 0;
-
-        int i;
-        while (!done) {
-            switch (i = s.read()) {
-                case -1:
-                    if (pos > 0) {
-                        log.warn("Unexpected EOF in MIME parser, dropping " 
-                                + pos + " sextets");
-                    }
-                    return;
-                case '=':
-                    decodeAndEnqueue(data, pos);
-                    done = true;
-                    break;
-                default:
-                    byte sX = TRANSLATION[i];
-                    if (sX < 0)
-                        continue;
-                    data[pos++] = sX;
-                    if (pos == data.length) {
-                        decodeAndEnqueue(data, pos);
-                        return;
-                    }
-                    break;
-            }
-        }
+    private void handleUnexpecedPad(int sextets) throws IOException {
+        if (strict)
+            throw new IOException("unexpected padding character");
+        else
+            log.warn("unexpected padding character; dropping " + sextets
+                    + " sextet(s)");
     }
-
-    private void decodeAndEnqueue(byte[] data, int len) {
-        int accum = 0;
-        accum |= data[0] << 18;
-        accum |= data[1] << 12;
-        accum |= data[2] << 6;
-        accum |= data[3];
-
-        byte b1 = (byte)(accum >>> 16);
-        byteq.enqueue(b1);
-
-        if (len > 2) {
-            byte b2 = (byte)((accum >>> 8) & 0xFF);
-            byteq.enqueue(b2);
-
-            if (len > 3) {
-                byte b3 = (byte)(accum & 0xFF);
-                byteq.enqueue(b3);
-            }
-        }
-    }
-
-    private static byte[] TRANSLATION = {
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0x00 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0x10 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 62, -1, -1, -1, 63, /* 0x20 */
-        52, 53, 54, 55, 56, 57, 58, 59, 60, 61, -1, -1, -1, -1, -1, -1, /* 0x30 */
-        -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, /* 0x40 */
-        15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, -1, -1, -1, -1, -1, /* 0x50 */
-        -1, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, /* 0x60 */
-        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, -1, -1, -1, -1, -1, /* 0x70 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0x80 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0x90 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0xA0 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0xB0 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0xC0 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0xD0 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, /* 0xE0 */
-        -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1     /* 0xF0 */
-    };
-
-
 }

@@ -24,7 +24,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Random;
 
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.james.mime4j.decoder.Base64InputStream;
 import org.apache.log4j.BasicConfigurator;
 
@@ -154,6 +156,119 @@ public class Base64InputStreamTest extends TestCase {
             fail();
         } catch (IOException expected) {
         }
+    }
+
+    public void testRoundtripWithVariousBufferSizes() throws Exception {
+        byte[] data = new byte[3719];
+        new Random(0).nextBytes(data);
+
+        ByteArrayOutputStream eOut = new ByteArrayOutputStream();
+        CodecUtil.encodeBase64(new ByteArrayInputStream(data), eOut);
+        byte[] encoded = eOut.toByteArray();
+
+        for (int bufferSize = 1; bufferSize <= 1009; bufferSize++) {
+            ByteArrayInputStream bis = new ByteArrayInputStream(encoded);
+            Base64InputStream decoder = new Base64InputStream(bis);
+            ByteArrayOutputStream dOut = new ByteArrayOutputStream();
+
+            final byte[] buffer = new byte[bufferSize];
+            int inputLength;
+            while (-1 != (inputLength = decoder.read(buffer))) {
+                dOut.write(buffer, 0, inputLength);
+            }
+
+            byte[] decoded = dOut.toByteArray();
+
+            assertEquals(data.length, decoded.length);
+            for (int i = 0; i < data.length; i++) {
+                assertEquals(data[i], decoded[i]);
+            }
+        }
+    }
+
+    /**
+     * Tests {@link InputStream#read()}
+     */
+    public void testReadInt() throws Exception {
+        ByteArrayInputStream bis = new ByteArrayInputStream(
+                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ=="));
+        Base64InputStream decoder = new Base64InputStream(bis);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        while (true) {
+            int x = decoder.read();
+            if (x == -1)
+                break;
+            out.write(x);
+        }
+
+        assertEquals("This is the plain text message!", toString(out
+                .toByteArray()));
+    }
+
+    /**
+     * Tests {@link InputStream#read(byte[], int, int)} with various offsets
+     */
+    public void testReadOffset() throws Exception {
+        ByteArrayInputStream bis = new ByteArrayInputStream(
+                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ=="));
+        Base64InputStream decoder = new Base64InputStream(bis);
+
+        byte[] data = new byte[36];
+        for (int i = 0;;) {
+            int bytes = decoder.read(data, i, 5);
+            if (bytes == -1)
+                break;
+            i += bytes;
+        }
+
+        assertEquals("This is the plain text message!\0\0\0\0\0",
+                toString(data));
+    }
+
+    public void testStrictUnexpectedEof() throws Exception {
+        ByteArrayInputStream bis = new ByteArrayInputStream(
+                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI"));
+        Base64InputStream decoder = new Base64InputStream(bis, true);
+        try {
+            CodecUtil.copy(decoder, new NullOutputStream());
+            fail();
+        } catch (IOException expected) {
+            assertTrue(expected.getMessage().toLowerCase().contains(
+                    "end of file"));
+        }
+    }
+
+    public void testLenientUnexpectedEof() throws Exception {
+        ByteArrayInputStream bis = new ByteArrayInputStream(
+                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI"));
+        Base64InputStream decoder = new Base64InputStream(bis, false);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CodecUtil.copy(decoder, out);
+        assertEquals("This is the plain text message", toString(out
+                .toByteArray()));
+    }
+
+    public void testStrictUnexpectedPad() throws Exception {
+        ByteArrayInputStream bis = new ByteArrayInputStream(
+                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI="));
+        Base64InputStream decoder = new Base64InputStream(bis, true);
+        try {
+            CodecUtil.copy(decoder, new NullOutputStream());
+            fail();
+        } catch (IOException expected) {
+            assertTrue(expected.getMessage().toLowerCase().contains("pad"));
+        }
+    }
+
+    public void testLenientUnexpectedPad() throws Exception {
+        ByteArrayInputStream bis = new ByteArrayInputStream(
+                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI="));
+        Base64InputStream decoder = new Base64InputStream(bis, false);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CodecUtil.copy(decoder, out);
+        assertEquals("This is the plain text message", toString(out
+                .toByteArray()));
     }
         
     private byte[] read(InputStream is) throws IOException {
