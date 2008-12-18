@@ -30,8 +30,10 @@ import org.apache.commons.logging.LogFactory;
  * {@link #setInstance(StorageProvider)} when the application starts up or by
  * setting the system property
  * <code>org.apache.james.mime4j.defaultStorageProvider</code> to the class
- * name of a <code>StorageProvider</code> implementation. Otherwise
- * {@link TempFileStorageProvider} is used as default.
+ * name of a <code>StorageProvider</code> implementation.
+ * <p>
+ * If neither option is used or if the class instantiation fails this class
+ * provides a pre-configured default instance.
  */
 public class DefaultStorageProvider {
 
@@ -81,11 +83,12 @@ public class DefaultStorageProvider {
             }
         } catch (Exception e) {
             log.warn("Unable to create or instantiate StorageProvider class '"
-                    + clazz + "'. Using TempFileStorageProvider instead.", e);
+                    + clazz + "'. Using default instead.", e);
         }
 
         if (instance == null) {
-            instance = new TempFileStorageProvider();
+            StorageProvider backend = new TempFileStorageProvider();
+            instance = new ThresholdStorageProvider(backend, 1024);
         }
     }
 
