@@ -85,22 +85,30 @@ public class CipherStorageProvider extends AbstractStorageProvider {
     }
 
     public StorageOutputStream createStorageOutputStream() throws IOException {
+        SecretKeySpec skeySpec = getSecretKeySpec();
+
         return new CipherStorageOutputStream(backend
-                .createStorageOutputStream());
+                .createStorageOutputStream(), algorithm, skeySpec);
     }
 
-    private final class CipherStorageOutputStream extends StorageOutputStream {
+    private SecretKeySpec getSecretKeySpec() {
+        byte[] raw = keygen.generateKey().getEncoded();
+        return new SecretKeySpec(raw, algorithm);
+    }
+
+    private static final class CipherStorageOutputStream extends
+            StorageOutputStream {
         private final StorageOutputStream storageOut;
+        private final String algorithm;
         private final SecretKeySpec skeySpec;
         private final CipherOutputStream cipherOut;
 
-        public CipherStorageOutputStream(StorageOutputStream out)
-                throws IOException {
+        public CipherStorageOutputStream(StorageOutputStream out,
+                String algorithm, SecretKeySpec skeySpec) throws IOException {
             try {
                 this.storageOut = out;
-
-                byte[] raw = keygen.generateKey().getEncoded();
-                skeySpec = new SecretKeySpec(raw, algorithm);
+                this.algorithm = algorithm;
+                this.skeySpec = skeySpec;
 
                 Cipher cipher = Cipher.getInstance(algorithm);
                 cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
@@ -127,16 +135,19 @@ public class CipherStorageProvider extends AbstractStorageProvider {
         protected Storage toStorage0() throws IOException {
             // cipherOut has already been closed because toStorage calls close
             Storage encrypted = storageOut.toStorage();
-            return new CipherStorage(encrypted, skeySpec);
+            return new CipherStorage(encrypted, algorithm, skeySpec);
         }
     }
 
-    private final class CipherStorage implements Storage {
+    private static final class CipherStorage implements Storage {
         private Storage encrypted;
+        private final String algorithm;
         private final SecretKeySpec skeySpec;
 
-        public CipherStorage(Storage encrypted, SecretKeySpec skeySpec) {
+        public CipherStorage(Storage encrypted, String algorithm,
+                SecretKeySpec skeySpec) {
             this.encrypted = encrypted;
+            this.algorithm = algorithm;
             this.skeySpec = skeySpec;
         }
 
