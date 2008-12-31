@@ -40,14 +40,15 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
 
     @Override
     public void close() throws IOException {
-    	if (closed) return;
+        if (closed)
+            return;
 
-    	try {
+        try {
             encoder.completeEncoding();
             // do not close the wrapped stream
-    	} finally {
-    		closed = true;
-    	}
+        } finally {
+            closed = true;
+        }
     }
 
     @Override

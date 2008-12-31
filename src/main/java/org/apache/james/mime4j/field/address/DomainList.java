@@ -23,55 +23,57 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * An immutable, random-access list of Strings (that 
- * are supposedly domain names or domain literals).
- *
- * 
+ * An immutable, random-access list of Strings (that are supposedly domain names
+ * or domain literals).
  */
 public class DomainList {
-	private List<String> domains;
-	
-	/**
-	 * @param domains A List that contains only String objects. 
-	 * @param dontCopy true iff it is not possible for the domains ArrayList to be modified by someone else.
-	 */
-	public DomainList(List<String> domains, boolean dontCopy) {
-		if (domains != null)
-			this.domains = dontCopy ? domains :  new ArrayList<String>(domains);
-		else
-			this.domains = new ArrayList<String>(0);
-	}
-	
-	/**
-	 * The number of elements in this list.
-	 */
-	public int size() {
-		return domains.size();
-	}
+    private List<String> domains;
 
-	/**
-	 * Gets the domain name or domain literal at the
-	 * specified index.
-	 * @throws IndexOutOfBoundsException If index is &lt; 0 or &gt;= size().
-	 */
-	public String get(int index) {
-		if (0 > index || size() <= index)
-			throw new IndexOutOfBoundsException();
-		return domains.get(index);
-	}
+    /**
+     * @param domains
+     *            A List that contains only String objects.
+     * @param dontCopy
+     *            true iff it is not possible for the domains ArrayList to be
+     *            modified by someone else.
+     */
+    public DomainList(List<String> domains, boolean dontCopy) {
+        if (domains != null)
+            this.domains = dontCopy ? domains : new ArrayList<String>(domains);
+        else
+            this.domains = new ArrayList<String>(0);
+    }
 
-	/**
-	 * Returns the list of domains formatted as a route
-	 * string (not including the trailing ':'). 
-	 */
-	public String toRouteString() {
-		StringBuilder out = new StringBuilder();
-		for (int i = 0; i < domains.size(); i++) {
-			out.append("@");
-			out.append(get(i));
-			if (i + 1 < domains.size())
-				out.append(",");
-		}
-		return out.toString();
-	}
+    /**
+     * The number of elements in this list.
+     */
+    public int size() {
+        return domains.size();
+    }
+
+    /**
+     * Gets the domain name or domain literal at the specified index.
+     * 
+     * @throws IndexOutOfBoundsException
+     *             If index is &lt; 0 or &gt;= size().
+     */
+    public String get(int index) {
+        if (0 > index || size() <= index)
+            throw new IndexOutOfBoundsException();
+        return domains.get(index);
+    }
+
+    /**
+     * Returns the list of domains formatted as a route string (not including
+     * the trailing ':').
+     */
+    public String toRouteString() {
+        StringBuilder out = new StringBuilder();
+        for (int i = 0; i < domains.size(); i++) {
+            out.append("@");
+            out.append(get(i));
+            if (i + 1 < domains.size())
+                out.append(",");
+        }
+        return out.toString();
+    }
 }

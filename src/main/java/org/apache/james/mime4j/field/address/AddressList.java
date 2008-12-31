@@ -28,115 +28,116 @@ import java.util.List;
 
 /**
  * An immutable, random-access list of Address objects.
- *
- * 
  */
 public class AddressList {
-	
-	private List<? extends Address> addresses;
 
-	/**
-	 * @param addresses A List that contains only Address objects. 
-	 * @param dontCopy true iff it is not possible for the addresses ArrayList to be modified by someone else.
-	 */
-	public AddressList(List<? extends Address> addresses, boolean dontCopy) {
-		if (addresses != null)
-			this.addresses = dontCopy ? addresses : new ArrayList<Address>(addresses);
-		else
-			this.addresses = new ArrayList<Address>(0);
-	}
+    private List<? extends Address> addresses;
 
-	/**
-	 * The number of elements in this list.
-	 */
-	public int size() {
-		return addresses.size();
-	}
+    /**
+     * @param addresses
+     *            A List that contains only Address objects.
+     * @param dontCopy
+     *            true iff it is not possible for the addresses ArrayList to be
+     *            modified by someone else.
+     */
+    public AddressList(List<? extends Address> addresses, boolean dontCopy) {
+        if (addresses != null)
+            this.addresses = dontCopy ? addresses : new ArrayList<Address>(
+                    addresses);
+        else
+            this.addresses = new ArrayList<Address>(0);
+    }
 
-	/**
-	 * Gets an address. 
-	 */
-	public Address get(int index) {
-		if (0 > index || size() <= index)
-			throw new IndexOutOfBoundsException();
-		return addresses.get(index);
-	}
+    /**
+     * The number of elements in this list.
+     */
+    public int size() {
+        return addresses.size();
+    }
 
-	/**
-	 * Returns a flat list of all mailboxes represented
-	 * in this address list. Use this if you don't care
-	 * about grouping. 
-	 */
-	public MailboxList flatten() {
-		// in the common case, all addresses are mailboxes
-		boolean groupDetected = false;
-		for (Address addr : addresses) {
-			if (!(addr instanceof Mailbox)) {
-				groupDetected = true;
-				break;
-			}
-		}
-		
-		if (!groupDetected) {
-			@SuppressWarnings("unchecked")
-			final List<Mailbox> mailboxes = (List<Mailbox>) addresses; 
-			return new MailboxList(mailboxes, true);
-		}
-		
-		List<Mailbox> results = new ArrayList<Mailbox>();
-		for (Address addr : addresses) {
-			addr.addMailboxesTo(results);
-		}
-		
-		// copy-on-construct this time, because subclasses
-		// could have held onto a reference to the results
-		return new MailboxList(results, false);
-	}
-	
-	/**
-	 * Dumps a representation of this address list to
-	 * stdout, for debugging purposes.
-	 */
-	public void print() {
-		for (Address addr : addresses) {
-			System.out.println(addr.toString());
-		}
-	}
+    /**
+     * Gets an address.
+     */
+    public Address get(int index) {
+        if (0 > index || size() <= index)
+            throw new IndexOutOfBoundsException();
+        return addresses.get(index);
+    }
 
+    /**
+     * Returns a flat list of all mailboxes represented in this address list.
+     * Use this if you don't care about grouping.
+     */
+    public MailboxList flatten() {
+        // in the common case, all addresses are mailboxes
+        boolean groupDetected = false;
+        for (Address addr : addresses) {
+            if (!(addr instanceof Mailbox)) {
+                groupDetected = true;
+                break;
+            }
+        }
 
+        if (!groupDetected) {
+            @SuppressWarnings("unchecked")
+            final List<Mailbox> mailboxes = (List<Mailbox>) addresses;
+            return new MailboxList(mailboxes, true);
+        }
 
-	/**
-	 * Parse the address list string, such as the value 
-	 * of a From, To, Cc, Bcc, Sender, or Reply-To
-	 * header.
-	 * 
-	 * The string MUST be unfolded already.
-	 */
-	public static AddressList parse(String rawAddressList) throws ParseException {
-		AddressListParser parser = new AddressListParser(new StringReader(rawAddressList));
-		return Builder.getInstance().buildAddressList(parser.parse());
-	}
-	
-	/**
-	 * Test console.
-	 */
-	public static void main(String[] args) throws Exception {
-		java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
-		while (true) {
-			try {
-				System.out.print("> ");
-				String line = reader.readLine();
-				if (line.length() == 0 || line.toLowerCase().equals("exit") || line.toLowerCase().equals("quit")) {
-					System.out.println("Goodbye.");
-					return;
-				}
-				AddressList list = parse(line);
-				list.print();
-			}
-			catch(Exception e) {
-				e.printStackTrace();
-				Thread.sleep(300);
-			}
-		}
-	}
+        List<Mailbox> results = new ArrayList<Mailbox>();
+        for (Address addr : addresses) {
+            addr.addMailboxesTo(results);
+        }
+
+        // copy-on-construct this time, because subclasses
+        // could have held onto a reference to the results
+        return new MailboxList(results, false);
+    }
+
+    /**
+     * Dumps a representation of this address list to stdout, for debugging
+     * purposes.
+     */
+    public void print() {
+        for (Address addr : addresses) {
+            System.out.println(addr.toString());
+        }
+    }
+
+    /**
+     * Parse the address list string, such as the value of a From, To, Cc, Bcc,
+     * Sender, or Reply-To header.
+     * 
+     * The string MUST be unfolded already.
+     */
+    public static AddressList parse(String rawAddressList)
+            throws ParseException {
+        AddressListParser parser = new AddressListParser(new StringReader(
+                rawAddressList));
+        return Builder.getInstance().buildAddressList(parser.parse());
+    }
+
+    /**
+     * Test console.
+     */
+    public static void main(String[] args) throws Exception {
+        java.io.BufferedReader reader = new java.io.BufferedReader(
+                new java.io.InputStreamReader(System.in));
+        while (true) {
+            try {
+                System.out.print("> ");
+                String line = reader.readLine();
+                if (line.length() == 0 || line.toLowerCase().equals("exit")
+                        || line.toLowerCase().equals("quit")) {
+                    System.out.println("Goodbye.");
+                    return;
+                }
+                AddressList list = parse(line);
+                list.print();
+            } catch (Exception e) {
+                e.printStackTrace();
+                Thread.sleep(300);
+            }
+        }
+    }
 }

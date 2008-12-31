@@ -101,7 +101,7 @@ public class HeaderTest extends TestCase {
         String s = buffer.toString(MessageUtils.ISO_8859_1.name());
         
         assertEquals("Hello: " + hello + "\r\n" +
-        		"Content-type: text/plain; charset=ISO-8859-1\r\n\r\n", s);
+                "Content-type: text/plain; charset=ISO-8859-1\r\n\r\n", s);
     }
     
     public void testRemoveFields() throws Exception {

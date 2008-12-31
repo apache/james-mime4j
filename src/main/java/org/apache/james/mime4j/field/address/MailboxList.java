@@ -24,49 +24,51 @@ import java.util.List;
 
 /**
  * An immutable, random-access list of Mailbox objects.
- *
- * 
  */
 public class MailboxList {
 
-	private List<Mailbox> mailboxes;
-	
-	/**
-	 * @param mailboxes A List that contains only Mailbox objects. 
-	 * @param dontCopy true iff it is not possible for the mailboxes ArrayList to be modified by someone else.
-	 */
-	public MailboxList(List<Mailbox> mailboxes, boolean dontCopy) {
-		if (mailboxes != null)
-			this.mailboxes = dontCopy ? mailboxes : new ArrayList<Mailbox>(mailboxes);
-		else
-			this.mailboxes = new ArrayList<Mailbox>(0);
-	}
-	
-	/**
-	 * The number of elements in this list.
-	 */
-	public int size() {
-		return mailboxes.size();
-	}
-	
-	/**
-	 * Gets an address. 
-	 */
-	public Mailbox get(int index) {
-		if (0 > index || size() <= index)
-			throw new IndexOutOfBoundsException();
-		return mailboxes.get(index);
-	}
-	
-	/**
-	 * Dumps a representation of this mailbox list to
-	 * stdout, for debugging purposes.
-	 */
-	public void print() {
-		for (int i = 0; i < size(); i++) {
-			Mailbox mailbox = get(i);
-			System.out.println(mailbox.toString());
-		}
-	}
+    private List<Mailbox> mailboxes;
+
+    /**
+     * @param mailboxes
+     *            A List that contains only Mailbox objects.
+     * @param dontCopy
+     *            true iff it is not possible for the mailboxes ArrayList to be
+     *            modified by someone else.
+     */
+    public MailboxList(List<Mailbox> mailboxes, boolean dontCopy) {
+        if (mailboxes != null)
+            this.mailboxes = dontCopy ? mailboxes : new ArrayList<Mailbox>(
+                    mailboxes);
+        else
+            this.mailboxes = new ArrayList<Mailbox>(0);
+    }
+
+    /**
+     * The number of elements in this list.
+     */
+    public int size() {
+        return mailboxes.size();
+    }
+
+    /**
+     * Gets an address.
+     */
+    public Mailbox get(int index) {
+        if (0 > index || size() <= index)
+            throw new IndexOutOfBoundsException();
+        return mailboxes.get(index);
+    }
+
+    /**
+     * Dumps a representation of this mailbox list to stdout, for debugging
+     * purposes.
+     */
+    public void print() {
+        for (int i = 0; i < size(); i++) {
+            Mailbox mailbox = get(i);
+            System.out.println(mailbox.toString());
+        }
+    }
 
 }

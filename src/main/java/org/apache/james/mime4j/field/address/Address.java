@@ -22,31 +22,26 @@ package org.apache.james.mime4j.field.address;
 import java.util.List;
 
 /**
- * The abstract base for classes that represent RFC2822 addresses.
- * This includes groups and mailboxes.
+ * The abstract base for classes that represent RFC2822 addresses. This includes
+ * groups and mailboxes.
  * 
  * Currently, no public methods are introduced on this class.
- * 
- * 
  */
 public abstract class Address {
 
-	/**
-	 * Adds any mailboxes represented by this address
-	 * into the given List. Note that this method
-	 * has default (package) access, so a doAddMailboxesTo
-	 * method is needed to allow the behavior to be
-	 * overridden by subclasses.
-	 */
-	final void addMailboxesTo(List<Mailbox> results) {
-		doAddMailboxesTo(results);
-	}
-	
-	/**
-	 * Adds any mailboxes represented by this address
-	 * into the given List. Must be overridden by
-	 * concrete subclasses.
-	 */
-	protected abstract void doAddMailboxesTo(List<Mailbox> results);
+    /**
+     * Adds any mailboxes represented by this address into the given List. Note
+     * that this method has default (package) access, so a doAddMailboxesTo
+     * method is needed to allow the behavior to be overridden by subclasses.
+     */
+    final void addMailboxesTo(List<Mailbox> results) {
+        doAddMailboxesTo(results);
+    }
+
+    /**
+     * Adds any mailboxes represented by this address into the given List. Must
+     * be overridden by concrete subclasses.
+     */
+    protected abstract void doAddMailboxesTo(List<Mailbox> results);
 
 }
