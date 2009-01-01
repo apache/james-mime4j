@@ -334,6 +334,7 @@
           <excludes>
             <!-- test resources created by JAMES committers / we can't include ALv2 headers there -->
             <exclude>src/test/resources/testmsgs/*</exclude>
+            <exclude>benchmarks/resources/*.msg</exclude>
             <!-- 3rd party descriptors distributed via maven repositories
                  and included "as is" -->
             <exclude>stage/commons-io/poms/commons-io-1.2.pom</exclude>
