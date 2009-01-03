@@ -147,6 +147,15 @@ public class Multipart implements Body {
     }
     
     /**
+     * Returns the number of body parts.
+     * 
+     * @return number of <code>BodyPart</code> objects.
+     */
+    public int getCount() {
+        return bodyParts.size();
+    }
+    
+    /**
      * Gets the list of body parts. The list is immutable.
      * 
      * @return the list of <code>BodyPart</code> objects.
@@ -173,8 +182,74 @@ public class Multipart implements Body {
      * @param bodyPart the body part.
      */
     public void addBodyPart(BodyPart bodyPart) {
+        if (bodyPart == null)
+            throw new IllegalArgumentException();
+        
         bodyParts.add(bodyPart);
         bodyPart.setParent(parent);
+    }
+    
+    /**
+     * Inserts a body part at the specified position in the list of body parts.
+     * 
+     * @param bodyPart
+     *            the body part.
+     * @param index
+     *            index at which the specified body part is to be inserted.
+     * @throws IndexOutOfBoundsException
+     *             if the index is out of range (index &lt; 0 || index &gt;
+     *             getCount()).
+     */
+    public void addBodyPart(BodyPart bodyPart, int index) {
+        if (bodyPart == null)
+            throw new IllegalArgumentException();
+        
+        bodyParts.add(index, bodyPart);
+        bodyPart.setParent(parent);
+    }
+    
+    /**
+     * Removes the body part at the specified position in the list of body
+     * parts.
+     * 
+     * @param index
+     *            index of the body part to be removed.
+     * @return the removed body part.
+     * @throws IndexOutOfBoundsException
+     *             if the index is out of range (index &lt; 0 || index &gt;=
+     *             getCount()).
+     */
+    public BodyPart removeBodyPart(int index) {
+        BodyPart bodyPart = bodyParts.remove(index);
+        bodyPart.setParent(null);
+        return bodyPart;
+    }
+    
+    /**
+     * Replaces the body part at the specified position in the list of body
+     * parts with the specified body part.
+     * 
+     * @param bodyPart
+     *            body part to be stored at the specified position.
+     * @param index
+     *            index of body part to replace.
+     * @return the replaced body part.
+     * @throws IndexOutOfBoundsException
+     *             if the index is out of range (index &lt; 0 || index &gt;=
+     *             getCount()).
+     */
+    public BodyPart replaceBodyPart(BodyPart bodyPart, int index) {
+        if (bodyPart == null)
+            throw new IllegalArgumentException();
+
+        BodyPart replacedBodyPart = bodyParts.set(index, bodyPart);
+        if (bodyPart == replacedBodyPart)
+            throw new IllegalArgumentException("Cannot replace body part with itself");
+
+        bodyPart.setParent(parent);
+        replacedBodyPart.setParent(null);
+
+        return replacedBodyPart;
     }
     
     /**
