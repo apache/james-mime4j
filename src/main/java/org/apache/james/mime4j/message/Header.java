@@ -60,6 +60,22 @@ public class Header {
     }
 
     /**
+     * Creates a new <code>Header</code> from the specified
+     * <code>Header</code>. The <code>Header</code> instance is initialized
+     * with a copy of the list of {@link Field}s of the specified
+     * <code>Header</code>. The <code>Field</code> objects are not copied
+     * because they are immutable and can safely be shared between headers.
+     * 
+     * @param other
+     *            header to copy.
+     */
+    public Header(Header other) {
+        for (Field otherField : other.fields) {
+            addField(otherField);
+        }
+    }
+
+    /**
      * Creates a new <code>Header</code> from the specified stream.
      * 
      * @param is the stream to read the header from.

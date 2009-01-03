@@ -41,6 +41,41 @@ public abstract class Entity implements Disposable {
     private Entity parent = null;
 
     /**
+     * Creates a new <code>Entity</code>. Typically invoked implicitly by a
+     * subclass constructor.
+     */
+    protected Entity() {
+    }
+
+    /**
+     * Creates a new <code>Entity</code> from the specified
+     * <code>Entity</code>. The <code>Entity</code> instance is initialized
+     * with copies of header and body of the specified <code>Entity</code>.
+     * The parent entity of the new entity is <code>null</code>.
+     * 
+     * @param other
+     *            entity to copy.
+     * @throws UnsupportedOperationException
+     *             if <code>other</code> contains a {@link SingleBody} that
+     *             does not support the {@link SingleBody#copy() copy()}
+     *             operation.
+     * @throws IllegalArgumentException
+     *             if <code>other</code> contains a <code>Body</code> that
+     *             is neither a {@link Message}, {@link Multipart} or
+     *             {@link SingleBody}.
+     */
+    protected Entity(Entity other) {
+        if (other.header != null) {
+            header = new Header(other.header);
+        }
+
+        if (other.body != null) {
+            Body bodyCopy = BodyCopier.copy(other.body);
+            setBody(bodyCopy);
+        }
+    }
+
+    /**
      * Gets the parent entity of this entity.
      * Returns <code>null</code> if this is the root entity.
      * 

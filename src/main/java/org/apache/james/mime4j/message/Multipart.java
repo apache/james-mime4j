@@ -60,6 +60,36 @@ public class Multipart implements Body {
     }
 
     /**
+     * Creates a new <code>Multipart</code> from the specified
+     * <code>Multipart</code>. The <code>Multipart</code> instance is
+     * initialized with copies of preamble, epilogue, sub type and the list of
+     * body parts of the specified <code>Multipart</code>. The parent entity
+     * of the new multipart is <code>null</code>.
+     * 
+     * @param other
+     *            multipart to copy.
+     * @throws UnsupportedOperationException
+     *             if <code>other</code> contains a {@link SingleBody} that
+     *             does not support the {@link SingleBody#copy() copy()}
+     *             operation.
+     * @throws IllegalArgumentException
+     *             if <code>other</code> contains a <code>Body</code> that
+     *             is neither a {@link Message}, {@link Multipart} or
+     *             {@link SingleBody}.
+     */
+    public Multipart(Multipart other) {
+        preamble = other.preamble;
+        epilogue = other.epilogue;
+        
+        for (BodyPart otherBodyPart : other.bodyParts) {
+            BodyPart bodyPartCopy = new BodyPart(otherBodyPart);
+            addBodyPart(bodyPartCopy);
+        }
+        
+        subType = other.subType;
+    }
+
+    /**
      * Gets the multipart sub-type. E.g. <code>alternative</code> (the default)
      * or <code>parallel</code>. See RFC 2045 for common sub-types and their
      * meaning.

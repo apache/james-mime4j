@@ -53,6 +53,27 @@ public class Message extends Entity implements Body {
     }
 
     /**
+     * Creates a new <code>Message</code> from the specified
+     * <code>Message</code>. The <code>Message</code> instance is initialized
+     * with copies of header and body of the specified <code>Message</code>.
+     * The parent entity of the new message is <code>null</code>.
+     * 
+     * @param other
+     *            message to copy.
+     * @throws UnsupportedOperationException
+     *             if <code>other</code> contains a {@link SingleBody} that
+     *             does not support the {@link SingleBody#copy() copy()}
+     *             operation.
+     * @throws IllegalArgumentException
+     *             if <code>other</code> contains a <code>Body</code> that
+     *             is neither a {@link Message}, {@link Multipart} or
+     *             {@link SingleBody}.
+     */
+    public Message(Message other) {
+        super(other);
+    }
+
+    /**
      * Parses the specified MIME message stream into a <code>Message</code>
      * instance.
      * 

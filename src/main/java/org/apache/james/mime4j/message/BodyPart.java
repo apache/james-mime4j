@@ -29,4 +29,31 @@ package org.apache.james.mime4j.message;
  */
 public class BodyPart extends Entity {
 
+    /**
+     * Creates a new empty <code>BodyPart</code>.
+     */
+    public BodyPart() {
+    }
+
+    /**
+     * Creates a new <code>BodyPart</code> from the specified
+     * <code>BodyPart</code>. The <code>BodyPart</code> instance is initialized
+     * with copies of header and body of the specified <code>BodyPart</code>.
+     * The parent entity of the new body part is <code>null</code>.
+     * 
+     * @param other
+     *            body part to copy.
+     * @throws UnsupportedOperationException
+     *             if <code>other</code> contains a {@link SingleBody} that
+     *             does not support the {@link SingleBody#copy() copy()}
+     *             operation.
+     * @throws IllegalArgumentException
+     *             if <code>other</code> contains a <code>Body</code> that
+     *             is neither a {@link Message}, {@link Multipart} or
+     *             {@link SingleBody}.
+     */
+    public BodyPart(BodyPart other) {
+        super(other);
+    }
+
 }
