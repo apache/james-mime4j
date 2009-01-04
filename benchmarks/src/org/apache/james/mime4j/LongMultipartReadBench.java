@@ -60,14 +60,25 @@ public class LongMultipartReadBench {
         System.out.println("No of repetitions: " + repetitions);
         System.out.println("Content length: " + content.length);
         System.out.println("Test: " + test.getClass().getSimpleName());
+        
+        System.out.print("Warmup... ");
+        long t0 = System.currentTimeMillis();
+        while (System.currentTimeMillis() - t0 < 1500) {
+            test.run(content, 10);
+        }
+        System.out.println("done");
+
         System.out.println("--------------------------------");
 
         long start = System.currentTimeMillis();
         test.run(content, repetitions);
         long finish = System.currentTimeMillis();
 
-        System.out.println("Execution time: "
-                + ((double) (finish - start) / 1000) + " s");
+        double seconds = (finish - start) / 1000.0;
+        double mb = content.length * repetitions / 1024.0 / 1024;
+        System.out.printf("Execution time: %f sec\n", seconds);
+        System.out.printf("%.2f messages/sec\n", repetitions / seconds);
+        System.out.printf("%.2f mb/sec\n", mb / seconds);
     }
 
     private static Test createTest(int testNumber) {
