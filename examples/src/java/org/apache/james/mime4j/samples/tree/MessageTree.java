@@ -67,6 +67,8 @@ import org.apache.james.mime4j.message.TextBody;
  * @version $Id: MessageTree.java 509117 2007-02-19 07:41:05Z norman $
  */
 public class MessageTree extends JPanel implements TreeSelectionListener {
+    private static final long serialVersionUID = 1L;
+
     private JPanel contentPane;
     private JTextArea textView;
     private JTree tree;
