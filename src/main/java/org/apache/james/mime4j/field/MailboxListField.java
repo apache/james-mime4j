@@ -25,41 +25,54 @@ import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.MailboxList;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 
+/**
+ * Mailbox-list field such as <code>From</code> or <code>Resent-From</code>.
+ */
 public class MailboxListField extends Field {
-    
+    private static Log log = LogFactory.getLog(MailboxListField.class);
+
+    private boolean parsed = false;
+
     private MailboxList mailboxList;
     private ParseException parseException;
 
-    protected MailboxListField(final String name, final String body, final String raw, final MailboxList mailboxList, final ParseException parseException) {
+    MailboxListField(final String name, final String body, final String raw) {
         super(name, body, raw);
-        this.mailboxList = mailboxList;
-        this.parseException = parseException;
     }
 
     public MailboxList getMailboxList() {
+        if (!parsed)
+            parse();
+
         return mailboxList;
     }
 
     public ParseException getParseException() {
+        if (!parsed)
+            parse();
+
         return parseException;
     }
-    
-    public static class Parser implements FieldParser {
-        private static Log log = LogFactory.getLog(Parser.class);
 
-        public Field parse(final String name, final String body, final String raw) {
-            MailboxList mailboxList = null;
-            ParseException parseException = null;
-            try {
-                mailboxList = AddressList.parse(body).flatten();
+    private void parse() {
+        String body = getBody();
+
+        try {
+            mailboxList = AddressList.parse(body).flatten();
+        } catch (ParseException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Parsing value '" + body + "': " + e.getMessage());
             }
-            catch (ParseException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Parsing value '" + body + "': "+ e.getMessage());
-                }
-                parseException = e;
-            }
-            return new MailboxListField(name, body, raw, mailboxList, parseException);
+            parseException = e;
+        }
+
+        parsed = true;
+    }
+
+    public static class Parser implements FieldParser {
+        public Field parse(final String name, final String body,
+                final String raw) {
+            return new MailboxListField(name, body, raw);
         }
     }
 }

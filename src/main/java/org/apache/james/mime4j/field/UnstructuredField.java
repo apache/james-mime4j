@@ -21,19 +21,15 @@ package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.decoder.DecoderUtil;
 
-
 /**
  * Simple unstructured field such as <code>Subject</code>.
- *
- * 
- * @version $Id: UnstructuredField.java,v 1.3 2004/10/25 07:26:46 ntherning Exp $
  */
 public class UnstructuredField extends Field {
     private String value;
-    
-    protected UnstructuredField(String name, String body, String raw, String value) {
+
+    UnstructuredField(String name, String body, String raw) {
         super(name, body, raw);
-        this.value = value;
+        value = DecoderUtil.decodeEncodedWords(body);
     }
 
     public String getValue() {
@@ -41,9 +37,9 @@ public class UnstructuredField extends Field {
     }
 
     public static class Parser implements FieldParser {
-        public Field parse(final String name, final String body, final String raw) {
-            final String value = DecoderUtil.decodeEncodedWords(body);
-            return new UnstructuredField(name, body, raw, value);
+        public Field parse(final String name, final String body,
+                final String raw) {
+            return new UnstructuredField(name, body, raw);
         }
     }
 }

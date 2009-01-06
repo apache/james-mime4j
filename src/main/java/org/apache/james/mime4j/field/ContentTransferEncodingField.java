@@ -21,20 +21,15 @@ package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.util.MimeUtil;
 
-
-
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.
- *
- * 
- * @version $Id: ContentTransferEncodingField.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
  */
 public class ContentTransferEncodingField extends Field {
     private String encoding;
-    
-    protected ContentTransferEncodingField(String name, String body, String raw, String encoding) {
+
+    ContentTransferEncodingField(String name, String body, String raw) {
         super(name, body, raw);
-        this.encoding = encoding;
+        encoding = body.trim().toLowerCase();
     }
 
     /**
@@ -45,11 +40,11 @@ public class ContentTransferEncodingField extends Field {
     public String getEncoding() {
         return encoding;
     }
-    
+
     /**
-     * Gets the encoding of the given field if. Returns the default 
-     * <code>7bit</code> if not set or if
-     * <code>f</code> is <code>null</code>.
+     * Gets the encoding of the given field if. Returns the default
+     * <code>7bit</code> if not set or if <code>f</code> is
+     * <code>null</code>.
      * 
      * @return the encoding.
      */
@@ -59,11 +54,11 @@ public class ContentTransferEncodingField extends Field {
         }
         return MimeUtil.ENC_7BIT;
     }
-    
+
     public static class Parser implements FieldParser {
-        public Field parse(final String name, final String body, final String raw) {
-            final String encoding = body.trim().toLowerCase();
-            return new ContentTransferEncodingField(name, body, raw, encoding);
+        public Field parse(final String name, final String body,
+                final String raw) {
+            return new ContentTransferEncodingField(name, body, raw);
         }
     }
 }

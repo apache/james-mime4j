@@ -28,45 +28,60 @@ import org.apache.james.mime4j.field.datetime.parser.TokenMgrError;
 import java.io.StringReader;
 import java.util.Date;
 
+/**
+ * Date-time field such as <code>Date</code> or <code>Resent-Date</code>.
+ */
 public class DateTimeField extends Field {
+    private static Log log = LogFactory.getLog(DateTimeField.class);
+
+    private boolean parsed = false;
+
     private Date date;
     private ParseException parseException;
 
-    protected DateTimeField(String name, String body, String raw, Date date, ParseException parseException) {
+    DateTimeField(String name, String body, String raw) {
         super(name, body, raw);
-        this.date = date;
-        this.parseException = parseException;
     }
 
     public Date getDate() {
+        if (!parsed)
+            parse();
+
         return date;
     }
 
     public ParseException getParseException() {
+        if (!parsed)
+            parse();
+
         return parseException;
     }
 
-    public static class Parser implements FieldParser {
-        private static Log log = LogFactory.getLog(Parser.class);
+    private void parse() {
+        String body = getBody();
 
-        public Field parse(final String name, final String body, final String raw) {
-            Date date = null;
-            ParseException parseException = null;
-            try {
-                try {
-                    date = new DateTimeParser(new StringReader(body)).parseAll().getDate();
-                }
-                catch (TokenMgrError err) {
-                    throw new ParseException(err.getMessage());
-                }
+        try {
+            date = new DateTimeParser(new StringReader(body)).parseAll()
+                    .getDate();
+        } catch (ParseException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Parsing value '" + body + "': " + e.getMessage());
             }
-            catch (ParseException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Parsing value '" + body + "': "+ e.getMessage());
-                }
-                parseException = e;
+            parseException = e;
+        } catch (TokenMgrError e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Parsing value '" + body + "': " + e.getMessage());
             }
-            return new DateTimeField(name, body, raw, date, parseException);
+            parseException = new ParseException(e.getMessage());
+        }
+
+        parsed = true;
+    }
+
+    public static class Parser implements FieldParser {
+        public Field parse(final String name, final String body,
+                final String raw) {
+            return new DateTimeField(name, body, raw);
         }
     }
 }

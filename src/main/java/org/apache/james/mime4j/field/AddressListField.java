@@ -24,40 +24,54 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 
+/**
+ * Address list field such as <code>To</code> or <code>Reply-To</code>.
+ */
 public class AddressListField extends Field {
+    private static Log log = LogFactory.getLog(AddressListField.class);
+
+    private boolean parsed = false;
+
     private AddressList addressList;
     private ParseException parseException;
 
-    protected AddressListField(String name, String body, String raw, AddressList addressList, ParseException parseException) {
+    AddressListField(String name, String body, String raw) {
         super(name, body, raw);
-        this.addressList = addressList;
-        this.parseException = parseException;
     }
 
     public AddressList getAddressList() {
+        if (!parsed)
+            parse();
+
         return addressList;
     }
 
     public ParseException getParseException() {
+        if (!parsed)
+            parse();
+
         return parseException;
     }
 
-    public static class Parser implements FieldParser {
-        private static Log log = LogFactory.getLog(Parser.class);
+    private void parse() {
+        String body = getBody();
 
-        public Field parse(final String name, final String body, final String raw) {
-            AddressList addressList = null;
-            ParseException parseException = null;
-            try {
-                addressList = AddressList.parse(body);
+        try {
+            addressList = AddressList.parse(body);
+        } catch (ParseException e) {
+            if (log.isDebugEnabled()) {
+                log.debug("Parsing value '" + body + "': " + e.getMessage());
             }
-            catch (ParseException e) {
-                if (log.isDebugEnabled()) {
-                    log.debug("Parsing value '" + body + "': "+ e.getMessage());
-                }
-                parseException = e;
-            }
-            return new AddressListField(name, body, raw, addressList, parseException);
+            parseException = e;
+        }
+
+        parsed = true;
+    }
+
+    public static class Parser implements FieldParser {
+        public Field parse(final String name, final String body,
+                final String raw) {
+            return new AddressListField(name, body, raw);
         }
     }
 }
