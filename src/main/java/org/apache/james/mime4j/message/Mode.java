@@ -19,18 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-public class Mode {
-
-    // For Java 1.4 compatibility reasons this class is not a native Java 5
-    // enum. While Retrotranslator is capable of replacing java.lang.Enum
-    // with its own version this translation introduces a dependency on the
-    // retrotranslator-runtime and backport-util-concurrent jars.
-
-    public static final Mode STRICT_IGNORE = new Mode();
-    public static final Mode STRICT_ERROR = new Mode();
-    public static final Mode LENIENT = new Mode();
-
-    private Mode() {
-    }
-
+public enum Mode {
+    STRICT_IGNORE, STRICT_ERROR, LENIENT;
 }
