@@ -199,8 +199,9 @@ public class ContentTypeField extends Field {
      */
     public static String getCharset(ContentTypeField f) {
         if (f != null) {
-            if (f.getCharset() != null && f.getCharset().length() > 0) {
-                return f.getCharset();
+            String charset = f.getCharset();
+            if (charset != null && charset.length() > 0) {
+                return charset;
             }
         }
         return "us-ascii";
