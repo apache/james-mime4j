@@ -20,13 +20,15 @@
 package org.apache.james.mime4j.field.address;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * An immutable, random-access list of Strings (that are supposedly domain names
  * or domain literals).
  */
-public class DomainList {
+public class DomainList implements Iterable<String> {
     private List<String> domains;
 
     /**
@@ -62,6 +64,15 @@ public class DomainList {
         return domains.get(index);
     }
 
+    /**
+     * Returns an iterator over the domains in this list.
+     *
+     * @return an iterator over the domains in this list.
+     */
+    public Iterator<String> iterator() {
+        return Collections.unmodifiableList(domains).iterator();
+    }
+    
     /**
      * Returns the list of domains formatted as a route string (not including
      * the trailing ':').

@@ -24,12 +24,14 @@ import org.apache.james.mime4j.field.address.parser.ParseException;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * An immutable, random-access list of Address objects.
  */
-public class AddressList {
+public class AddressList implements Iterable<Address> {
 
     private List<? extends Address> addresses;
 
@@ -62,6 +64,15 @@ public class AddressList {
         if (0 > index || size() <= index)
             throw new IndexOutOfBoundsException();
         return addresses.get(index);
+    }
+
+    /**
+     * Returns an iterator over the addresses in this list.
+     *
+     * @return an iterator over the addresses in this list.
+     */
+    public Iterator<Address> iterator() {
+        return Collections.unmodifiableList(addresses).iterator();
     }
 
     /**
