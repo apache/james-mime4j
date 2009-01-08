@@ -32,7 +32,6 @@ import java.io.InputStream;
  */
 public class RootInputStream extends FilterInputStream {
     private int lineNumber = 1;
-    private int prev = -1;
     private boolean truncated = false;
 
     /**
@@ -74,10 +73,9 @@ public class RootInputStream extends FilterInputStream {
         }
         
         int b = in.read();
-        if (prev == '\r' && b == '\n') {
+        if (b == '\n') {
             lineNumber++;
         }
-        prev = b;
         return b;
     }
     
@@ -93,10 +91,9 @@ public class RootInputStream extends FilterInputStream {
         
         int n = in.read(b, off, len);
         for (int i = off; i < off + n; i++) {
-            if (prev == '\r' && b[i] == '\n') {
+            if (b[i] == '\n') {
                 lineNumber++;
             }
-            prev = b[i];
         }
         return n;
     }
