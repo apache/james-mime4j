@@ -28,6 +28,7 @@
 options {
 	STATIC=false;
 	LOOKAHEAD=1;
+	JDK_VERSION = "1.5";
 	VISITOR=true;
 	MULTI=true;
 	NODE_SCOPE_HOOK=true;

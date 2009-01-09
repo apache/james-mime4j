@@ -19,7 +19,7 @@
 
 options {
   static=false;
-  JDK_VERSION = "1.4";
+  JDK_VERSION = "1.5";
   OUTPUT_DIRECTORY = "../../../../../../../../../target/generated-sources/javacc";
 }
 

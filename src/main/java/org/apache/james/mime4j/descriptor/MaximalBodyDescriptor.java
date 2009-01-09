@@ -152,9 +152,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
         if (value != null) {
             try {
                 final ContentLanguageParser parser = new ContentLanguageParser(new StringReader(value));
-                @SuppressWarnings("unchecked")
-                final List<String> stringList = (List<String>) parser.parse();
-                contentLanguage = stringList;
+                contentLanguage = parser.parse();
             } catch (MimeException e) {
                 contentLanguageParseException = e;
             }

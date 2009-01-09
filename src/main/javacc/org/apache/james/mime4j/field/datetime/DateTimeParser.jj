@@ -28,6 +28,7 @@
 options {
 	STATIC=false;
 	LOOKAHEAD=1;
+	JDK_VERSION = "1.5";
 	OUTPUT_DIRECTORY = "../../../../../../../../../target/generated-sources/javacc";
 	//DEBUG_PARSER=true;
 	//DEBUG_TOKEN_MANAGER=true;
@@ -55,8 +56,6 @@ PARSER_BEGIN(DateTimeParser)
 package org.apache.james.mime4j.field.datetime.parser;
 
 import org.apache.james.mime4j.field.datetime.DateTime;
-
-import java.util.Calendar;
 
 public class DateTimeParser {
     private static final boolean ignoreMilitaryZoneOffset = true;

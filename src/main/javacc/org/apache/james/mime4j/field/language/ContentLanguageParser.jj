@@ -19,7 +19,7 @@
 
 options {
   static=false;
-  JDK_VERSION = "1.4";
+  JDK_VERSION = "1.5";
   OUTPUT_DIRECTORY = "../../../../../../../../../target/generated-sources/javacc";
 }
 
@@ -48,13 +48,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ContentLanguageParser {
-	private ArrayList languages = new ArrayList();
+	private List<String> languages = new ArrayList<String>();
 	
 	/**
 	 * Parses the input into a list of language tags.
 	 * @return list of language tag Strings
 	 */
-	public List parse() throws ParseException {
+	public List<String> parse() throws ParseException {
 		try {
 			return doParse();
 		} catch (TokenMgrError e) {
@@ -67,7 +67,7 @@ public class ContentLanguageParser {
 }
 PARSER_END(ContentLanguageParser)
 
-private List doParse() :
+private List<String> doParse() :
 {
 }
 {

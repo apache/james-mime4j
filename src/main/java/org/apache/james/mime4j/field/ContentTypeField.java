@@ -231,9 +231,7 @@ public class ContentTypeField extends Field {
         if (type != null && subType != null) {
             mimeType = (type + "/" + subType).toLowerCase();
 
-            @SuppressWarnings("unchecked")
             List<String> paramNames = parser.getParamNames();
-            @SuppressWarnings("unchecked")
             List<String> paramValues = parser.getParamValues();
 
             if (paramNames != null && paramValues != null) {
