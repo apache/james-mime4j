@@ -111,12 +111,12 @@ public class TransformMessage {
 
         // Create a unique message ID for the new message.
         Header header = message.getHeader();
-        Field messageId = Field.parse("Message-ID: "
-                + MimeUtil.createUniqueMessageId(HOSTNAME));
+        Field messageId = Field.parse("Message-ID", MimeUtil
+                .createUniqueMessageId(HOSTNAME));
         header.setField(messageId);
 
         // Set a new subject; note the usage of setField instead of addField
-        header.setField(Field.parse("Subject: Transformed message"));
+        header.setField(Field.parse("Subject", "Transformed message"));
 
         return message;
     }
@@ -127,10 +127,10 @@ public class TransformMessage {
      */
     private static Message createTemplate() throws IOException {
         Header header = new Header();
-        header.addField(Field
-                .parse("Content-Type: multipart/mixed;\r\n\tboundary=\""
+        header.addField(Field.parse("Content-Type",
+                "multipart/mixed;\r\n\tboundary=\""
                         + MimeUtil.createUniqueBoundary() + "\""));
-        header.addField(Field.parse("Subject: Template message"));
+        header.addField(Field.parse("Subject", "Template message"));
 
         Multipart multipart = new Multipart("mixed");
 
@@ -155,7 +155,7 @@ public class TransformMessage {
      */
     private static BodyPart createTextPart(String text) {
         Header header = new Header();
-        header.addField(Field.parse("Content-Type: text/plain"));
+        header.addField(Field.parse("Content-Type", "text/plain"));
 
         Body body = new BodyFactory().textBody(text);
 
@@ -172,8 +172,8 @@ public class TransformMessage {
     private static BodyPart createRandomBinaryPart(int numberOfBytes)
             throws IOException {
         Header header = new Header();
-        header.addField(Field.parse("Content-Type: application/octet-stream"));
-        header.addField(Field.parse("Content-Transfer-Encoding: base64"));
+        header.addField(Field.parse("Content-Type", "application/octet-stream"));
+        header.addField(Field.parse("Content-Transfer-Encoding", "base64"));
 
         byte[] data = new byte[numberOfBytes];
         new Random().nextBytes(data);

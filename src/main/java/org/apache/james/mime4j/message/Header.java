@@ -92,7 +92,7 @@ public class Header {
                 parser.stop();
             }
             @Override
-            public void field(String fieldData) {
+            public void field(String fieldData) throws MimeException {
                 addField(Field.parse(fieldData));
             }
         });

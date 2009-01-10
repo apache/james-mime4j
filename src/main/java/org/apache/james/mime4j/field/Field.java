@@ -22,6 +22,8 @@ package org.apache.james.mime4j.field;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.james.mime4j.MimeException;
+
 /**
  * The base class of all field classes.
  *
@@ -80,9 +82,9 @@ public abstract class Field {
      * 
      * @param raw the string to parse.
      * @return a <code>Field</code> instance.
-     * @throws IllegalArgumentException on parse errors.
+     * @throws MimeException if the raw string cannot be split into field name and body.
      */
-    public static Field parse(final String raw) {
+    public static Field parse(final String raw) throws MimeException {
         
         /*
          * Unfold the field.
@@ -94,11 +96,7 @@ public abstract class Field {
          */
         final Matcher fieldMatcher = fieldNamePattern.matcher(unfolded);
         if (!fieldMatcher.find()) {
-            // We don't have to throw a MimeException because this error can
-            // never happen when Field.parse() is called by a ContentHandler.
-            // org.apache.james.mime4j.parser.AbstractEntity drops header
-            // lines that do not start with a valid field name.
-            throw new IllegalArgumentException("Invalid field in string");
+            throw new MimeException("Invalid field in string");
         }
         final String name = fieldMatcher.group(1);
         
@@ -109,7 +107,39 @@ public abstract class Field {
         
         return parser.parse(name, body, raw);
     }
-    
+
+    /**
+     * Parses the given field name and field body strings and returns an
+     * instance of the <code>Field</code> class. The type of the class
+     * returned depends on the field name (see {@link #parse(String)}.
+     * <p>
+     * This method is convenient for creating or manipulating messages because
+     * contrary to {@link #parse(String)} it does not throw a
+     * {@link MimeException}.
+     * <p>
+     * Note that this method does not fold the header field; the specified field
+     * body should already have been folded into multiple lines prior to calling
+     * this method if folding is desired.
+     * 
+     * @param name
+     *            the field name.
+     * @param body
+     *            the field body (a.k.a value).
+     * @return a <code>Field</code> instance.
+     */
+    public static Field parse(String name, String body) {
+        if (body.length() > 0 && body.charAt(0) == ' ') {
+            body = body.substring(1);
+        }
+
+        String raw = name + ": " + body;
+
+        // Unfold body
+        body = body.replaceAll("\r|\n", "");
+
+        return parser.parse(name, body, raw);
+    }
+
     /**
      * Gets the default parser used to parse fields.
      * @return the default field parser

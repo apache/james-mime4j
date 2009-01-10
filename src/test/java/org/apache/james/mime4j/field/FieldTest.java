@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
@@ -45,9 +46,8 @@ public class FieldTest extends TestCase {
         
         try {
             f = Field.parse("Yada yada yada");
-            fail("IllegalArgumentException not thrown when using an invalid "
-                    + "field");
-        } catch (IllegalArgumentException e) {
+            fail("MimeException not thrown when using an invalid field");
+        } catch (MimeException e) {
         }
     }
 
