@@ -27,6 +27,8 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
+import org.apache.james.mime4j.util.CharsetUtil;
+
 /**
  * Text body backed by a <code>String</code>.
  */
@@ -38,6 +40,13 @@ class StringTextBody extends SingleBody implements TextBody {
     public StringTextBody(final String text, Charset charset) {
         this.text = text;
         this.charset = charset;
+    }
+
+    /**
+     * @see org.apache.james.mime4j.message.TextBody#getMimeCharset()
+     */
+    public String getMimeCharset() {
+        return CharsetUtil.toMimeCharset(charset.name());
     }
 
     /**

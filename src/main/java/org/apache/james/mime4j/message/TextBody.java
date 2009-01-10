@@ -30,7 +30,13 @@ import java.io.Reader;
  * @version $Id: TextBody.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public interface TextBody extends Body {
-    
+    /**
+     * Returns the MIME charset of this text body.
+     * 
+     * @return the MIME charset.
+     */
+    String getMimeCharset();
+
     /**
      * Gets a <code>Reader</code> which may be used to read out the contents
      * of this body.

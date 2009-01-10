@@ -131,7 +131,83 @@ public abstract class Entity implements Disposable {
         this.body = body;
         body.setParent(this);
     }
-    
+
+    /**
+     * Sets the specified message as body of this entity and the content type to
+     * &quot;message/rfc822&quot;. A <code>Header</code> is created if this
+     * entity does not already have one.
+     * 
+     * @param message
+     *            the message to set as body.
+     */
+    public void setMessage(Message message) {
+        setBody(message, "message/rfc822");
+    }
+
+    /**
+     * Sets the specified multipart as body of this entity. Also sets the
+     * content type accordingly and creates a message boundary string. A
+     * <code>Header</code> is created if this message does not already have
+     * one.
+     * 
+     * @param multipart
+     *            the multipart to set as body.
+     */
+    public void setMultipart(Multipart multipart) {
+        String contentType = "multipart/" + multipart.getSubType()
+                + ";\r\n\tboundary=\"" + MimeUtil.createUniqueBoundary() + "\"";
+
+        setBody(multipart, contentType);
+    }
+
+    /**
+     * Sets the specified <code>TextBody</code> as body of this entity and the
+     * content type to &quot;text/plain&quot;. A <code>Header</code> is
+     * created if this message does not already have one.
+     * 
+     * @param textBody
+     *            the <code>TextBody</code> to set as body.
+     * @see BodyFactory#textBody(String)
+     */
+    public void setText(TextBody textBody) {
+        setText(textBody, "plain");
+    }
+
+    /**
+     * Sets the specified <code>TextBody</code> as body of this entity. Also
+     * sets the content type according to the specified sub-type. A
+     * <code>Header</code> is created if this message does not already have
+     * one.
+     * 
+     * @param textBody
+     *            the <code>TextBody</code> to set as body.
+     * @see BodyFactory#textBody(String)
+     */
+    public void setText(TextBody textBody, String subType) {
+        String contentType = "text/" + subType;
+        String mimeCharset = textBody.getMimeCharset();
+        if (mimeCharset != null && !mimeCharset.equalsIgnoreCase("us-ascii")) {
+            contentType += "; charset=\"" + mimeCharset + "\"";
+        }
+
+        setBody(textBody, contentType);
+    }
+
+    /**
+     * Sets the body of this entity and sets the content-type to the specified
+     * value. A <code>Header</code> is created if this entity does not already
+     * have one.
+     * 
+     * @param body
+     *            the body.
+     */
+    public void setBody(Body body, String contentType) {
+        setBody(body);
+
+        Header header = obtainHeader();
+        header.setField(Field.parse("Content-Type", contentType));
+    }
+
     /**
      * Determines the MIME type of this <code>Entity</code>. The MIME type
      * is derived by looking at the parent's Content-Type field if no
@@ -242,6 +318,19 @@ public abstract class Entity implements Disposable {
         if (body != null) {
             body.dispose();
         }
+    }
+
+    /**
+     * Obtains the header of this entity. Creates and sets a new header if this
+     * entity's header is currently <code>null</code>.
+     * 
+     * @return the header of this entity; never <code>null</code>.
+     */
+    protected Header obtainHeader() {
+        if (header == null) {
+            header = new Header();
+        }
+        return header;
     }
 
 }

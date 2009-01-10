@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 
 import org.apache.james.mime4j.decoder.CodecUtil;
 import org.apache.james.mime4j.message.storage.MultiReferenceStorage;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * Text body backed by a {@link org.apache.james.mime4j.message.storage.Storage}.
@@ -40,6 +41,13 @@ class StorageTextBody extends SingleBody implements TextBody {
     public StorageTextBody(MultiReferenceStorage storage, Charset charset) {
         this.storage = storage;
         this.charset = charset;
+    }
+
+    /**
+     * @see org.apache.james.mime4j.message.TextBody#getMimeCharset()
+     */
+    public String getMimeCharset() {
+        return CharsetUtil.toMimeCharset(charset.name());
     }
 
     /**
@@ -67,7 +75,7 @@ class StorageTextBody extends SingleBody implements TextBody {
         storage.addReference();
         return new StorageTextBody(storage, charset);
     }
-    
+
     /**
      * Deletes the Storage that holds the content of this text body.
      * 

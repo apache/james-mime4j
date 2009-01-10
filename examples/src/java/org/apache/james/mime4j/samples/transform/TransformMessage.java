@@ -31,6 +31,7 @@ import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Mode;
 import org.apache.james.mime4j.message.Multipart;
+import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.message.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.message.storage.StorageProvider;
 import org.apache.james.mime4j.message.storage.TempFileStorageProvider;
@@ -127,9 +128,6 @@ public class TransformMessage {
      */
     private static Message createTemplate() throws IOException {
         Header header = new Header();
-        header.addField(Field.parse("Content-Type",
-                "multipart/mixed;\r\n\tboundary=\""
-                        + MimeUtil.createUniqueBoundary() + "\""));
         header.addField(Field.parse("Subject", "Template message"));
 
         Multipart multipart = new Multipart("mixed");
@@ -145,7 +143,7 @@ public class TransformMessage {
 
         Message message = new Message();
         message.setHeader(header);
-        message.setBody(multipart);
+        message.setMultipart(multipart);
 
         return message;
     }
@@ -154,14 +152,10 @@ public class TransformMessage {
      * Creates a text part from the specified string.
      */
     private static BodyPart createTextPart(String text) {
-        Header header = new Header();
-        header.addField(Field.parse("Content-Type", "text/plain"));
-
-        Body body = new BodyFactory().textBody(text);
+        TextBody body = new BodyFactory().textBody(text);
 
         BodyPart bodyPart = new BodyPart();
-        bodyPart.setHeader(header);
-        bodyPart.setBody(body);
+        bodyPart.setText(body);
 
         return bodyPart;
     }
@@ -172,7 +166,6 @@ public class TransformMessage {
     private static BodyPart createRandomBinaryPart(int numberOfBytes)
             throws IOException {
         Header header = new Header();
-        header.addField(Field.parse("Content-Type", "application/octet-stream"));
         header.addField(Field.parse("Content-Transfer-Encoding", "base64"));
 
         byte[] data = new byte[numberOfBytes];
@@ -182,7 +175,7 @@ public class TransformMessage {
 
         BodyPart bodyPart = new BodyPart();
         bodyPart.setHeader(header);
-        bodyPart.setBody(body);
+        bodyPart.setBody(body, "application/octet-stream");
 
         return bodyPart;
     }
