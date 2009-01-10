@@ -24,9 +24,9 @@ import java.io.ByteArrayOutputStream;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.message.storage.MemoryStorageProvider;
-import org.apache.james.mime4j.message.storage.MultiReferenceStorage;
-import org.apache.james.mime4j.message.storage.Storage;
+import org.apache.james.mime4j.storage.MemoryStorageProvider;
+import org.apache.james.mime4j.storage.MultiReferenceStorage;
+import org.apache.james.mime4j.storage.Storage;
 import org.apache.james.mime4j.util.MessageUtils;
 
 public class SingleBodyCopyTest extends TestCase {

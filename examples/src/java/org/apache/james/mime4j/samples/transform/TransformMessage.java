@@ -32,10 +32,10 @@ import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Mode;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
-import org.apache.james.mime4j.message.storage.DefaultStorageProvider;
-import org.apache.james.mime4j.message.storage.StorageProvider;
-import org.apache.james.mime4j.message.storage.TempFileStorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
+import org.apache.james.mime4j.storage.DefaultStorageProvider;
+import org.apache.james.mime4j.storage.StorageProvider;
+import org.apache.james.mime4j.storage.TempFileStorageProvider;
 
 /**
  * This code should illustrate how to transform a message into another message

@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message.storage;
+package org.apache.james.mime4j.storage;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -36,7 +36,7 @@ import java.util.Set;
  * directory (specified by system property <code>java.io.tmpdir</code>).
  * <p>
  * Example usage:
- * 
+ *
  * <pre>
  * File directory = new File(&quot;/tmp/mime4j&quot;);
  * StorageProvider provider = new TempFileStorageProvider(directory);
@@ -70,7 +70,7 @@ public class TempFileStorageProvider extends AbstractStorageProvider {
     /**
      * Creates a new <code>TempFileStorageProvider</code> using the given
      * values.
-     * 
+     *
      * @param prefix
      *            prefix for generating the temporary file's name; must be at
      *            least three characters long.

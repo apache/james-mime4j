@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message.storage;
+package org.apache.james.mime4j.storage;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -29,7 +29,7 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
  * A {@link StorageProvider} that stores the data entirely in memory.
  * <p>
  * Example usage:
- * 
+ *
  * <pre>
  * StorageProvider provider = new MemoryStorageProvider();
  * DefaultStorageProvider.setInstance(provider);

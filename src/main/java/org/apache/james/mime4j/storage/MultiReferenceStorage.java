@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message.storage;
+package org.apache.james.mime4j.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -51,7 +51,7 @@ public class MultiReferenceStorage implements Storage {
      * Creates a new <code>MultiReferenceStorage</code> instance for the given
      * back-end. The reference counter is initially set to one so the caller
      * does not have to call {@link #addReference()} after this constructor.
-     * 
+     *
      * @param storage
      *            storage back-end that should be reference counted.
      * @throws IllegalArgumentException
@@ -67,7 +67,7 @@ public class MultiReferenceStorage implements Storage {
 
     /**
      * Increments the reference counter.
-     * 
+     *
      * @throws IllegalStateException
      *             if the reference counter is zero which implies that the
      *             backing storage has already been deleted.
@@ -82,7 +82,7 @@ public class MultiReferenceStorage implements Storage {
      * <p>
      * A client that holds a reference to this object must make sure not to
      * invoke this method a second time.
-     * 
+     *
      * @throws IllegalStateException
      *             if the reference counter is zero which implies that the
      *             backing storage has already been deleted.
@@ -95,7 +95,7 @@ public class MultiReferenceStorage implements Storage {
 
     /**
      * Returns the input stream of the inner <code>Storage</code> object.
-     * 
+     *
      * @return an input stream.
      */
     public InputStream getInputStream() throws IOException {
@@ -104,7 +104,7 @@ public class MultiReferenceStorage implements Storage {
 
     /**
      * Synchronized increment of reference count.
-     * 
+     *
      * @throws IllegalStateException
      *             when counter is already zero
      */
@@ -117,7 +117,7 @@ public class MultiReferenceStorage implements Storage {
 
     /**
      * Synchronized decrement of reference count.
-     * 
+     *
      * @return true when counter has reached zero, false otherwise
      * @throws IllegalStateException
      *             when counter is already zero

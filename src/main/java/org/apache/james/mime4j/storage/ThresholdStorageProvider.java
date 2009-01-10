@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message.storage;
+package org.apache.james.mime4j.storage;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -32,7 +32,7 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
  * if a certain threshold size gets exceeded.
  * <p>
  * Example usage:
- * 
+ *
  * <pre>
  * StorageProvider tempStore = new TempFileStorageProvider();
  * StorageProvider provider = new ThresholdStorageProvider(tempStore, 4096);
@@ -55,7 +55,7 @@ public class ThresholdStorageProvider extends AbstractStorageProvider {
     /**
      * Creates a new <code>ThresholdStorageProvider</code> for the given
      * back-end and threshold size.
-     * 
+     *
      * @param backend
      *            used to store the remainder of the data if the threshold size
      *            gets exceeded.

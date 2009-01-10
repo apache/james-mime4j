@@ -17,35 +17,37 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message.storage;
+package org.apache.james.mime4j.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Provides a strategy for storing the contents of an <code>InputStream</code>
- * or retrieving the content written to an <code>OutputStream</code>.
+ * Can be used to read data that has been stored by a {@link StorageProvider}.
  */
-public interface StorageProvider {
+public interface Storage {
     /**
-     * Stores the contents of the given <code>InputStream</code>.
-     * 
-     * @param in stream containing the data to store.
-     * @return a {@link Storage} instance that can be used to retrieve the
-     *         stored content.
-     * @throws IOException if an I/O error occurs.
-     */
-    Storage store(InputStream in) throws IOException;
-
-    /**
-     * Creates a {@link StorageOutputStream} where data to be stored can be
-     * written to. Subsequently the user can call
-     * {@link StorageOutputStream#toStorage() toStorage()} on that object to get
-     * a {@link Storage} instance that holds the data that has been written.
-     * 
-     * @return a {@link StorageOutputStream} where data can be written to.
+     * Returns an <code>InputStream</code> that can be used to read the stored
+     * data. The input stream should be closed by the caller when it is no
+     * longer needed.
+     * <p>
+     * Note: The stream should NOT be wrapped in a
+     * <code>BufferedInputStream</code> by the caller. If the implementing
+     * <code>Storage</code> creates a stream which would benefit from being
+     * buffered it is the <code>Storage</code>'s responsibility to wrap it.
+     *
+     * @return an <code>InputStream</code> for reading the stored data.
      * @throws IOException
      *             if an I/O error occurs.
+     * @throws IllegalStateException
+     *             if this <code>Storage</code> instance has been deleted.
      */
-    StorageOutputStream createStorageOutputStream() throws IOException;
+    InputStream getInputStream() throws IOException;
+
+    /**
+     * Deletes the data held by this <code>Storage</code> as soon as possible.
+     * Deleting an already deleted <code>Storage</code> has no effect.
+     */
+    void delete();
+
 }

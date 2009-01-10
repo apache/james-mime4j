@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message.storage;
+package org.apache.james.mime4j.storage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,7 +54,7 @@ public class DefaultStorageProvider {
 
     /**
      * Returns the default {@link StorageProvider} instance.
-     * 
+     *
      * @return the default {@link StorageProvider} instance.
      */
     public static StorageProvider getInstance() {
@@ -63,7 +63,7 @@ public class DefaultStorageProvider {
 
     /**
      * Sets the default {@link StorageProvider} instance.
-     * 
+     *
      * @param instance
      *            the default {@link StorageProvider} instance.
      */

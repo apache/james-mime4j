@@ -17,45 +17,35 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message.storage;
+package org.apache.james.mime4j.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.james.mime4j.decoder.CodecUtil;
-
 /**
- * Abstract implementation of {@link StorageProvider} that implements
- * {@link StorageProvider#store(InputStream) store(InputStream)} by copying the
- * input stream to a {@link StorageOutputStream} obtained from
- * {@link StorageProvider#createStorageOutputStream() createStorageOutputStream()}.
+ * Provides a strategy for storing the contents of an <code>InputStream</code>
+ * or retrieving the content written to an <code>OutputStream</code>.
  */
-public abstract class AbstractStorageProvider implements StorageProvider {
-
+public interface StorageProvider {
     /**
-     * Sole constructor.
-     */
-    protected AbstractStorageProvider() {
-    }
-
-    /**
-     * This implementation creates a {@link StorageOutputStream} by calling
-     * {@link StorageProvider#createStorageOutputStream() createStorageOutputStream()}
-     * and copies the content of the given input stream to that output stream.
-     * It then calls {@link StorageOutputStream#toStorage()} on the output
-     * stream and returns this object.
-     * 
-     * @param in
-     *            stream containing the data to store.
+     * Stores the contents of the given <code>InputStream</code>.
+     *
+     * @param in stream containing the data to store.
      * @return a {@link Storage} instance that can be used to retrieve the
      *         stored content.
+     * @throws IOException if an I/O error occurs.
+     */
+    Storage store(InputStream in) throws IOException;
+
+    /**
+     * Creates a {@link StorageOutputStream} where data to be stored can be
+     * written to. Subsequently the user can call
+     * {@link StorageOutputStream#toStorage() toStorage()} on that object to get
+     * a {@link Storage} instance that holds the data that has been written.
+     *
+     * @return a {@link StorageOutputStream} where data can be written to.
      * @throws IOException
      *             if an I/O error occurs.
      */
-    public final Storage store(InputStream in) throws IOException {
-        StorageOutputStream out = createStorageOutputStream();
-        CodecUtil.copy(in, out);
-        return out.toStorage();
-    }
-
+    StorageOutputStream createStorageOutputStream() throws IOException;
 }

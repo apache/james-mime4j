@@ -23,10 +23,10 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
-import org.apache.james.mime4j.message.storage.DefaultStorageProvider;
-import org.apache.james.mime4j.message.storage.StorageProvider;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.storage.DefaultStorageProvider;
+import org.apache.james.mime4j.storage.StorageProvider;
 
 import java.io.IOException;
 import java.io.InputStream;

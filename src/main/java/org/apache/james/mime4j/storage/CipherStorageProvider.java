@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message.storage;
+package org.apache.james.mime4j.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,10 +33,10 @@ import javax.crypto.spec.SecretKeySpec;
 /**
  * A {@link StorageProvider} that transparently scrambles and unscrambles the
  * data stored by another <code>StorageProvider</code>.
- * 
+ *
  * <p>
  * Example usage:
- * 
+ *
  * <pre>
  * StorageProvider mistrusted = new TempFileStorageProvider();
  * StorageProvider enciphered = new CipherStorageProvider(mistrusted);
@@ -53,7 +53,7 @@ public class CipherStorageProvider extends AbstractStorageProvider {
     /**
      * Creates a new <code>CipherStorageProvider</code> for the given back-end
      * using the Blowfish cipher algorithm.
-     * 
+     *
      * @param backend
      *            back-end storage strategy to encrypt.
      */
@@ -64,7 +64,7 @@ public class CipherStorageProvider extends AbstractStorageProvider {
     /**
      * Creates a new <code>CipherStorageProvider</code> for the given back-end
      * and cipher algorithm.
-     * 
+     *
      * @param backend
      *            back-end storage strategy to encrypt.
      * @param algorithm

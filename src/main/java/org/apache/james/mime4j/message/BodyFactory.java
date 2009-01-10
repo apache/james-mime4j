@@ -25,10 +25,10 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.message.storage.DefaultStorageProvider;
-import org.apache.james.mime4j.message.storage.MultiReferenceStorage;
-import org.apache.james.mime4j.message.storage.Storage;
-import org.apache.james.mime4j.message.storage.StorageProvider;
+import org.apache.james.mime4j.storage.DefaultStorageProvider;
+import org.apache.james.mime4j.storage.MultiReferenceStorage;
+import org.apache.james.mime4j.storage.Storage;
+import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.MessageUtils;
 

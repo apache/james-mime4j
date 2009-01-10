@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message.storage;
+package org.apache.james.mime4j.storage;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -56,7 +56,7 @@ public abstract class StorageOutputStream extends OutputStream {
      * for some implementations it is not possible to create another
      * <code>Storage</code> object that can be read from and deleted
      * independently (e.g. if the implementation writes to a file).
-     * 
+     *
      * @return a <code>Storage</code> object as described above.
      * @throws IOException
      *             if an I/O error occurs.
@@ -125,7 +125,7 @@ public abstract class StorageOutputStream extends OutputStream {
      * <p>
      * This implementation never throws an {@link IOException} but a subclass
      * might.
-     * 
+     *
      * @throws IOException
      *             if an I/O error occurs.
      */
@@ -141,7 +141,7 @@ public abstract class StorageOutputStream extends OutputStream {
      * {@link #write(byte[], int, int)}. All the required preconditions have
      * already been checked by these methods, including the check if the output
      * stream has already been closed.
-     * 
+     *
      * @param buffer
      *            buffer containing bytes to write.
      * @param offset
@@ -160,7 +160,7 @@ public abstract class StorageOutputStream extends OutputStream {
      * <code>StorageOutputStream</code>. This method gets called by
      * {@link #toStorage()} after the preconditions have been checked. The
      * implementation can also be sure that this methods gets invoked only once.
-     * 
+     *
      * @return a <code>Storage</code> object as described above.
      * @throws IOException
      *             if an I/O error occurs.
