@@ -19,18 +19,21 @@
  ****************************************************************/
 package org.apache.james.mime4j.field.datetime.parser;
 
-import org.apache.james.mime4j.MimeException;
-
 /**
  * This exception is thrown when parse errors are encountered.
  * You can explicitly create objects of this exception type by
  * calling the method generateParseException in the generated
  * parser.
  *
- * This class was modified to extend MimeException
- * and to add a seriaVersionUID.
+ * Changes for Mime4J:
+ *   extends org.apache.james.mime4j.field.ParseException
+ *   added serialVersionUID
+ *   added constructor ParseException(Throwable)
+ *   default detail message is "Cannot parse field"
  */
-public class ParseException extends MimeException {
+public class ParseException extends org.apache.james.mime4j.field.ParseException {
+
+  private static final long serialVersionUID = 1L;
 
   /**
    * This constructor is used by the method "generateParseException"
@@ -49,7 +52,7 @@ public class ParseException extends MimeException {
                         String[] tokenImageVal
                        )
   {
-    super("Cannot parse field");
+    super("");
     specialConstructor = true;
     currentToken = currentTokenVal;
     expectedTokenSequences = expectedTokenSequencesVal;
@@ -68,6 +71,11 @@ public class ParseException extends MimeException {
 
   public ParseException() {
     super("Cannot parse field");
+    specialConstructor = false;
+  }
+
+  public ParseException(Throwable cause) {
+    super(cause);
     specialConstructor = false;
   }
 

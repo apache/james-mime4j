@@ -48,6 +48,7 @@ public class MailboxField extends Field {
         return mailbox;
     }
 
+    @Override
     public ParseException getParseException() {
         if (!parsed)
             parse();

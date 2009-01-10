@@ -33,6 +33,15 @@ public class MimeException extends Exception {
     }
 
     /**
+     * Constructs a MIME exception with the specified cause.
+     *
+     * @param cause cause of the exception
+     */
+    public MimeException(Throwable cause) {
+        super(cause);
+    }
+    
+    /**
      * Constructs a MIME exception with the specified detail message and cause.
      *
      * @param message detail message
