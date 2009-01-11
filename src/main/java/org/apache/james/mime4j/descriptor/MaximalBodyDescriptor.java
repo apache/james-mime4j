@@ -37,8 +37,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * Parses and stores values for standard MIME header values.
  * 
  */
-public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2045MimeDescriptor, 
-        RFC2183ContentDispositionDescriptor, RFC3066ContentLanguageDescriptor, RFC2557ContentLocationDescriptor, RFC1864ContentMD5Descriptor {
+public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
 
     private static final int DEFAULT_MINOR_VERSION = 0;
     private static final int DEFAULT_MAJOR_VERSION = 1;
@@ -250,147 +249,212 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor implements RFC2
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getMimeMajorVersion()
+     * Gets the MIME major version
+     * as specified by the <code>MIME-Version</code>
+     * header.
+     * Defaults to one.
+     * @return positive integer
      */
     public int getMimeMajorVersion() {
         return mimeMajorVersion;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getMimeMinorVersion()
+     * Gets the MIME minor version
+     * as specified by the <code>MIME-Version</code>
+     * header. 
+     * Defaults to zero.
+     * @return positive integer
      */
     public int getMimeMinorVersion() {
         return mimeMinorVersion;
     }
     
+
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getMimeVersionParseException()
+     * When the MIME version header exists but cannot be parsed
+     * this field will be contain the exception.
+     * @return <code>MimeException</code> if the mime header cannot
+     * be parsed, null otherwise
      */
     public MimeException getMimeVersionParseException() {
         return mimeVersionException;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getContentDescription()
+     * Gets the value of the <a href='http://www.faqs.org/rfcs/rfc2045'>RFC</a> 
+     * <code>Content-Description</code> header.
+     * @return value of the <code>Content-Description</code> when present,
+     * null otherwise
      */
     public String getContentDescription() {
         return contentDescription;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2045MimeDescriptor#getContentId()
+     * Gets the value of the <a href='http://www.faqs.org/rfcs/rfc2045'>RFC</a> 
+     * <code>Content-ID</code> header.
+     * @return value of the <code>Content-ID</code> when present,
+     * null otherwise
      */
     public String getContentId() {
         return contentId;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionType()
+     * Gets the disposition type of the <code>content-disposition</code> field.
+     * The value is case insensitive and will be converted to lower case.
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>.
+     * @return content disposition type, 
+     * or null when this has not been set
      */
     public String getContentDispositionType() {
         return contentDispositionType;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionParameters()
+     * Gets the parameters of the <code>content-disposition</code> field.
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>.
+     * @return parameter value strings indexed by parameter name strings,
+     * not null
      */
     public Map<String, String> getContentDispositionParameters() {
         return contentDispositionParameters;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionFilename()
+     * Gets the <code>filename</code> parameter value of the <code>content-disposition</code> field.
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>.
+     * @return filename parameter value, 
+     * or null when it is not present
      */
     public String getContentDispositionFilename() {
         return contentDispositionParameters.get(MimeUtil.PARAM_FILENAME);
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionModificationDate()
+     * Gets the <code>modification-date</code> parameter value of the <code>content-disposition</code> field.
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>.
+     * @return modification-date parameter value,
+     * or null when this is not present
      */
     public DateTime getContentDispositionModificationDate() {
         return contentDispositionModificationDate;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionModificationDateParseException()
+     * Gets any exception thrown during the parsing of {@link #getContentDispositionModificationDate()}
+     * @return <code>ParseException</code> when the modification-date parse fails,
+     * null otherwise
      */
     public MimeException getContentDispositionModificationDateParseException() {
         return contentDispositionModificationDateParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionCreationDate()
+     * Gets the <code>creation-date</code> parameter value of the <code>content-disposition</code> field.
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>.
+     * @return creation-date parameter value,
+     * or null when this is not present
      */
     public DateTime getContentDispositionCreationDate() {
         return contentDispositionCreationDate;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionCreationDateParseException()
+     * Gets any exception thrown during the parsing of {@link #getContentDispositionCreationDate()}
+     * @return <code>ParseException</code> when the creation-date parse fails,
+     * null otherwise
      */
     public MimeException getContentDispositionCreationDateParseException() {
         return contentDispositionCreationDateParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionReadDate()
+     * Gets the <code>read-date</code> parameter value of the <code>content-disposition</code> field.
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>.
+     * @return read-date parameter value,
+     * or null when this is not present
      */
     public DateTime getContentDispositionReadDate() {
         return contentDispositionReadDate;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionReadDateParseException()
+     * Gets any exception thrown during the parsing of {@link #getContentDispositionReadDate()}
+     * @return <code>ParseException</code> when the read-date parse fails,
+     * null otherwise
      */
     public MimeException getContentDispositionReadDateParseException() {
         return contentDispositionReadDateParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionSize()
+     * Gets the <code>size</code> parameter value of the <code>content-disposition</code> field.
+     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>.
+     * @return size parameter value,
+     * or -1 if this size has not been set
      */
     public long getContentDispositionSize() {
         return contentDispositionSize;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor#getContentDispositionSizeParseException()
+     * Gets any exception thrown during the parsing of {@link #getContentDispositionSize()}
+     * @return <code>ParseException</code> when the read-date parse fails,
+     * null otherwise
      */
     public MimeException getContentDispositionSizeParseException() {
         return contentDispositionSizeParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC3066ContentLanguageDescriptor#getContentLanguage()
+     * Get the <code>content-language</code> header values.
+     * Each applicable language tag will be returned in order.
+     * See <a href='http://tools.ietf.org/html/rfc4646'>RFC4646</a> 
+     * <cite>http://tools.ietf.org/html/rfc4646</cite>.
+     * @return list of language tag Strings,
+     * or null if no header exists
      */
     public List<String> getContentLanguage() {
         return contentLanguage;
     }
 
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC3066ContentLanguageDescriptor#getContentLanguageParseException()
+     * Gets any exception thrown during the parsing of {@link #getContentLanguage()}
+     * @return <code>ParseException</code> when the content-language parse fails,
+     * null otherwise
      */
     public MimeException getContentLanguageParseException() {
         return contentLanguageParseException;
     }
     
+
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2557ContentLocationDescriptor#getContentLocation()
+     * Get the <code>content-location</code> header value.
+     * See <a href='http://tools.ietf.org/html/rfc2557'>RFC2557</a> 
+     * @return the URL content-location
+     * or null if no header exists
      */
     public String getContentLocation() {
         return contentLocation;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC2557ContentLocationDescriptor#getContentLocationParseException()
+     * Gets any exception thrown during the parsing of {@link #getContentLocation()}
+     * @return <code>ParseException</code> when the content-language parse fails,
+     * null otherwise
      */
     public MimeException getContentLocationParseException() {
         return contentLocationParseException;
     }
     
     /**
-     * @see org.apache.james.mime4j.descriptor.RFC1864ContentMD5Descriptor#getContentMD5Raw()
+     * Gets the raw, Base64 encoded value of the
+     * <code>Content-MD5</code> field.
+     * See <a href='http://tools.ietf.org/html/rfc1864'>RFC1864</a>.
+     * @return raw encoded content-md5
+     * or null if no header exists
      */
     public String getContentMD5Raw() {
         return contentMD5Raw;

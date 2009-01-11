@@ -22,10 +22,6 @@ import java.io.ByteArrayInputStream;
 
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
-import org.apache.james.mime4j.descriptor.RFC1864ContentMD5Descriptor;
-import org.apache.james.mime4j.descriptor.RFC2183ContentDispositionDescriptor;
-import org.apache.james.mime4j.descriptor.RFC2557ContentLocationDescriptor;
-import org.apache.james.mime4j.descriptor.RFC3066ContentLanguageDescriptor;
 import org.apache.james.mime4j.field.datetime.DateTime;
 import org.apache.james.mime4j.parser.MimeTokenStream;
 
@@ -82,19 +78,19 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
     }
     
     public void testContentDispositionType() throws Exception {
-        RFC2183ContentDispositionDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_BASE64_LATIN1_BYTES);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_BASE64_LATIN1_BYTES);
         assertEquals("inline", descriptor.getContentDispositionType());
     }
     
     public void testContentDispositionTypeCaseConversion() throws Exception {
-        RFC2183ContentDispositionDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_BASE64_LATIN1_BYTES);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_BASE64_LATIN1_BYTES);
         assertEquals("Should be converted to lower case", "inline", descriptor.getContentDispositionType());
         assertNotNull(descriptor.getContentDispositionParameters());
         assertEquals(0, descriptor.getContentDispositionParameters().size());
     }
     
     public void testContentDispositionParameters() throws Exception {
-        RFC2183ContentDispositionDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS_BYTES);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS_BYTES);
         assertEquals("inline", descriptor.getContentDispositionType());
         assertNotNull(descriptor.getContentDispositionParameters());
         assertEquals(3, descriptor.getContentDispositionParameters().size());
@@ -104,7 +100,7 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
     }
     
     public void testContentDispositionStandardParameters() throws Exception {
-        RFC2183ContentDispositionDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, 1);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, 1);
         assertEquals("attachment", descriptor.getContentDispositionType());
         assertNotNull(descriptor.getContentDispositionParameters());
         assertEquals(5, descriptor.getContentDispositionParameters().size());
@@ -116,7 +112,7 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
     }
     
     public void testLanguageParameters() throws Exception {
-        RFC3066ContentLanguageDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, 3);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, 3);
         assertNotNull(descriptor.getContentLanguage());
         assertEquals(3, descriptor.getContentLanguage().size());
         assertEquals("en", descriptor.getContentLanguage().get(0));
@@ -125,27 +121,27 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
     }
     
     public void testContentLocationRelativeUrl() throws Exception {
-        RFC2557ContentLocationDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 0);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 0);
         assertEquals("relative/url", descriptor.getContentLocation());
     }
     
     public void testContentLocationAbsoluteUrl() throws Exception {
-        RFC2557ContentLocationDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 1);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 1);
         assertEquals("http://www.example.org/absolute/rhubard.txt", descriptor.getContentLocation());
     }
     
     public void testContentLocationWithComment() throws Exception {
-        RFC2557ContentLocationDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 3);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 3);
         assertEquals("http://www.example.org/absolute/comments/rhubard.txt", descriptor.getContentLocation());
     }
     
     public void testContentLocationFoldedUrl() throws Exception {
-        RFC2557ContentLocationDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 4);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.MULTIPART_WITH_CONTENT_LOCATION_BYTES, 4);
         assertEquals("http://www.example.org/this/is/a/very/long/url/split/over/two/lines/", descriptor.getContentLocation());
     }
     
     public void testContentMD5Url() throws Exception {
-        RFC1864ContentMD5Descriptor descriptor = describe(ExampleMail.ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS_BYTES);
+        MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS_BYTES);
         assertEquals(ExampleMail.MD5_CONTENT, descriptor.getContentMD5Raw());
     }
     
