@@ -151,7 +151,7 @@ public abstract class Entity implements Disposable {
     /**
      * Sets the specified multipart as body of this entity. Also sets the
      * content type accordingly and creates a message boundary string. A
-     * <code>Header</code> is created if this message does not already have
+     * <code>Header</code> is created if this entity does not already have
      * one.
      * 
      * @param multipart
@@ -168,7 +168,7 @@ public abstract class Entity implements Disposable {
     /**
      * Sets the specified multipart as body of this entity. Also sets the
      * content type accordingly and creates a message boundary string. A
-     * <code>Header</code> is created if this message does not already have
+     * <code>Header</code> is created if this entity does not already have
      * one.
      * 
      * @param multipart
@@ -189,7 +189,7 @@ public abstract class Entity implements Disposable {
     /**
      * Sets the specified <code>TextBody</code> as body of this entity and the
      * content type to &quot;text/plain&quot;. A <code>Header</code> is
-     * created if this message does not already have one.
+     * created if this entity does not already have one.
      * 
      * @param textBody
      *            the <code>TextBody</code> to set as body.
@@ -202,7 +202,7 @@ public abstract class Entity implements Disposable {
     /**
      * Sets the specified <code>TextBody</code> as body of this entity. Also
      * sets the content type according to the specified sub-type. A
-     * <code>Header</code> is created if this message does not already have
+     * <code>Header</code> is created if this entity does not already have
      * one.
      * 
      * @param textBody
