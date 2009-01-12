@@ -19,8 +19,10 @@
 
 package org.apache.james.mime4j.field;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -75,6 +77,56 @@ public class FieldsTest extends TestCase {
         assertTrue(field.isValidField());
 
         assertEquals("Content-Transfer-Encoding: base64", field.getRaw());
+    }
+
+    public void testDateString() throws Exception {
+        DateTimeField field = Fields.date("Thu, 1 Jan 1970 00:00:00 +0000");
+        assertTrue(field.isValidField());
+
+        assertEquals("Date: Thu, 1 Jan 1970 00:00:00 +0000", field.getRaw());
+        assertEquals(new Date(0), field.getDate());
+    }
+
+    public void testDateStringString() throws Exception {
+        DateTimeField field = Fields.date("Resent-Date",
+                "Thu, 1 Jan 1970 00:00:00 +0000");
+        assertTrue(field.isValidField());
+
+        assertEquals("Resent-Date: Thu, 1 Jan 1970 00:00:00 +0000", field
+                .getRaw());
+        assertEquals(new Date(0), field.getDate());
+    }
+
+    public void testDateStringDateTimeZone() throws Exception {
+        DateTimeField field = Fields.date("Date", new Date(0), TimeZone
+                .getTimeZone("GMT"));
+        assertTrue(field.isValidField());
+
+        assertEquals("Date: Thu, 1 Jan 1970 00:00:00 +0000", field.getRaw());
+        assertEquals(new Date(0), field.getDate());
+
+        field = Fields.date("Resent-Date", new Date(0), TimeZone
+                .getTimeZone("GMT+1"));
+        assertTrue(field.isValidField());
+
+        assertEquals("Resent-Date: Thu, 1 Jan 1970 01:00:00 +0100", field
+                .getRaw());
+        assertEquals(new Date(0), field.getDate());
+    }
+
+    public void testDateDST() throws Exception {
+        long millis = 1216221153000l;
+        DateTimeField field = Fields.date("Date", new Date(millis), TimeZone
+                .getTimeZone("CET"));
+        assertTrue(field.isValidField());
+
+        assertEquals("Date: Wed, 16 Jul 2008 17:12:33 +0200", field.getRaw());
+        assertEquals(new Date(millis), field.getDate());
+    }
+
+    public void testInvalidDate() throws Exception {
+        DateTimeField field = Fields.date("Thu, Jan 1 1969 00:00:00 +0000");
+        assertFalse(field.isValidField());
     }
 
 }

@@ -19,7 +19,14 @@
 
 package org.apache.james.mime4j.field;
 
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -57,6 +64,30 @@ public class Fields {
                 Field.CONTENT_TRANSFER_ENCODING, contentTransferEncoding);
     }
 
+    public static DateTimeField date(String fieldValue) {
+        return date("Date", fieldValue);
+    }
+
+    public static DateTimeField date(String fieldName, String fieldValue) {
+        return (DateTimeField) Field.parse(fieldName, fieldValue);
+    }
+
+    public static DateTimeField date(Date date) {
+        return date("Date", date, null);
+    }
+
+    public static DateTimeField date(String fieldName, Date date) {
+        return date(fieldName, date, null);
+    }
+
+    public static DateTimeField date(String fieldName, Date date, TimeZone zone) {
+        DateFormat df = RFC822_DATE_FORMAT.get();
+        if (zone != null) {
+            df.setTimeZone(zone);
+        }
+        return date(fieldName, df.format(date));
+    }
+
     private static String quote(String value) {
         for (int idx = 0; idx < value.length(); idx++) {
             if (isSpecial(value.charAt(idx))) {
@@ -72,4 +103,41 @@ public class Fields {
         final String tspecials = "()<>@,;:\\\"/[]?="; // rfc 2045
         return ch < 32 || ch >= 127 || tspecials.indexOf(ch) != -1;
     }
+
+    private static final ThreadLocal<DateFormat> RFC822_DATE_FORMAT = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new Rfc822DateFormat();
+        }
+    };
+
+    private static final class Rfc822DateFormat extends SimpleDateFormat {
+        private static final long serialVersionUID = 1L;
+
+        public Rfc822DateFormat() {
+            super("EEE, d MMM yyyy HH:mm:ss ", Locale.US);
+        }
+
+        @Override
+        public StringBuffer format(Date date, StringBuffer toAppendTo,
+                FieldPosition pos) {
+            StringBuffer sb = super.format(date, toAppendTo, pos);
+
+            int zoneMillis = calendar.get(GregorianCalendar.ZONE_OFFSET);
+            int dstMillis = calendar.get(GregorianCalendar.DST_OFFSET);
+            int minutes = (zoneMillis + dstMillis) / 1000 / 60;
+
+            if (minutes < 0) {
+                sb.append('-');
+                minutes = -minutes;
+            } else {
+                sb.append('+');
+            }
+
+            sb.append(String.format("%02d%02d", minutes / 60, minutes % 60));
+
+            return sb;
+        }
+    }
+
 }
