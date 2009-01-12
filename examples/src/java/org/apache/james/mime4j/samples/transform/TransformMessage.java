@@ -152,10 +152,11 @@ public class TransformMessage {
      * Creates a text part from the specified string.
      */
     private static BodyPart createTextPart(String text) {
-        TextBody body = new BodyFactory().textBody(text);
+        TextBody body = new BodyFactory().textBody(text, "UTF-8");
 
         BodyPart bodyPart = new BodyPart();
         bodyPart.setText(body);
+        bodyPart.setContentTransferEncoding("quoted-printable");
 
         return bodyPart;
     }
@@ -165,17 +166,15 @@ public class TransformMessage {
      */
     private static BodyPart createRandomBinaryPart(int numberOfBytes)
             throws IOException {
-        Header header = new Header();
-        header.addField(Field.parse("Content-Transfer-Encoding", "base64"));
-
         byte[] data = new byte[numberOfBytes];
         new Random().nextBytes(data);
+
         Body body = new BodyFactory()
                 .binaryBody(new ByteArrayInputStream(data));
 
         BodyPart bodyPart = new BodyPart();
-        bodyPart.setHeader(header);
         bodyPart.setBody(body, "application/octet-stream");
+        bodyPart.setContentTransferEncoding("base64");
 
         return bodyPart;
     }

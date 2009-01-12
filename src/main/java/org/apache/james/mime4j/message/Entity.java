@@ -19,15 +19,19 @@
 
 package org.apache.james.mime4j.message;
 
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.decoder.CodecUtil;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.util.MimeUtil;
-
-import java.io.IOException;
-import java.io.OutputStream;
 
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
@@ -141,7 +145,7 @@ public abstract class Entity implements Disposable {
      *            the message to set as body.
      */
     public void setMessage(Message message) {
-        setBody(message, "message/rfc822");
+        setBody(message, "message/rfc822", null);
     }
 
     /**
@@ -154,10 +158,32 @@ public abstract class Entity implements Disposable {
      *            the multipart to set as body.
      */
     public void setMultipart(Multipart multipart) {
-        String contentType = "multipart/" + multipart.getSubType()
-                + ";\r\n\tboundary=\"" + MimeUtil.createUniqueBoundary() + "\"";
+        String mimeType = "multipart/" + multipart.getSubType();
+        Map<String, String> parameters = Collections.singletonMap("boundary",
+                MimeUtil.createUniqueBoundary());
 
-        setBody(multipart, contentType);
+        setBody(multipart, mimeType, parameters);
+    }
+
+    /**
+     * Sets the specified multipart as body of this entity. Also sets the
+     * content type accordingly and creates a message boundary string. A
+     * <code>Header</code> is created if this message does not already have
+     * one.
+     * 
+     * @param multipart
+     *            the multipart to set as body.
+     * @param parameters
+     *            additional parameters for the Content-Type header field.
+     */
+    public void setMultipart(Multipart multipart, Map<String, String> parameters) {
+        String mimeType = "multipart/" + multipart.getSubType();
+        if (!parameters.containsKey("boundary")) {
+            parameters = new HashMap<String, String>(parameters);
+            parameters.put("boundary", MimeUtil.createUniqueBoundary());
+        }
+
+        setBody(multipart, mimeType, parameters);
     }
 
     /**
@@ -181,16 +207,21 @@ public abstract class Entity implements Disposable {
      * 
      * @param textBody
      *            the <code>TextBody</code> to set as body.
+     * @param subtype
+     *            the text subtype (e.g. &quot;plain&quot;, &quot;html&quot; or
+     *            &quot;xml&quot;).
      * @see BodyFactory#textBody(String)
      */
-    public void setText(TextBody textBody, String subType) {
-        String contentType = "text/" + subType;
+    public void setText(TextBody textBody, String subtype) {
+        String mimeType = "text/" + subtype;
+
+        Map<String, String> parameters = null;
         String mimeCharset = textBody.getMimeCharset();
         if (mimeCharset != null && !mimeCharset.equalsIgnoreCase("us-ascii")) {
-            contentType += "; charset=\"" + mimeCharset + "\"";
+            parameters = Collections.singletonMap("charset", mimeCharset);
         }
 
-        setBody(textBody, contentType);
+        setBody(textBody, mimeType, parameters);
     }
 
     /**
@@ -200,12 +231,33 @@ public abstract class Entity implements Disposable {
      * 
      * @param body
      *            the body.
+     * @param mimeType
+     *            the MIME media type of the specified body
+     *            (&quot;type/subtype&quot;).
      */
-    public void setBody(Body body, String contentType) {
+    public void setBody(Body body, String mimeType) {
+        setBody(body, mimeType, null);
+    }
+
+    /**
+     * Sets the body of this entity and sets the content-type to the specified
+     * value. A <code>Header</code> is created if this entity does not already
+     * have one.
+     * 
+     * @param body
+     *            the body.
+     * @param mimeType
+     *            the MIME media type of the specified body
+     *            (&quot;type/subtype&quot;).
+     * @param parameters
+     *            additional parameters for the Content-Type header field.
+     */
+    public void setBody(Body body, String mimeType,
+            Map<String, String> parameters) {
         setBody(body);
 
         Header header = obtainHeader();
-        header.setField(Field.parse("Content-Type", contentType));
+        header.setField(Fields.contentType(mimeType, parameters));
     }
 
     /**
@@ -247,7 +299,19 @@ public abstract class Entity implements Disposable {
         
         return ContentTransferEncodingField.getEncoding(f);
     }
-    
+
+    /**
+     * Sets the transfer encoding of this <code>Entity</code> to the specified
+     * value.
+     * 
+     * @param contentTransferEncoding
+     *            transfer encoding to use.
+     */
+    public void setContentTransferEncoding(String contentTransferEncoding) {
+        Header header = obtainHeader();
+        header.setField(Fields.contentTransferEncoding(contentTransferEncoding));
+    }
+
     /**
      * Determines if the MIME type of this <code>Entity</code> matches the
      * given one. MIME types are case-insensitive.
