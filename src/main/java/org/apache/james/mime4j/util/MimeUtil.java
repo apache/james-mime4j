@@ -393,6 +393,60 @@ public final class MimeUtil {
         return sb.toString();
     }
 
+    /**
+     * Splits the specified string into a multiple-line representation with
+     * lines no longer than 78 characters (see <a
+     * href='http://www.faqs.org/rfcs/rfc5322.html'>RFC 5322</a> section
+     * 2.2.3.). If the string contains non-whitespace sequences longer than 78
+     * characters a line break is inserted at the whitespace character following
+     * the sequence resulting in a line longer than 78 characters.
+     * 
+     * @param s
+     *            string to split.
+     * @param usedCharacters
+     *            number of characters already used up. Usually the number of
+     *            characters for header field name plus colon and one space.
+     * @return a multiple-line representation of the given string.
+     */
+    public static String fold(String s, int usedCharacters) {
+        final int maxCharacters = 78;
+
+        final int length = s.length();
+        if (usedCharacters + length <= maxCharacters)
+            return s;
+
+        StringBuilder sb = new StringBuilder();
+
+        int lastLineBreak = -usedCharacters;
+        int wspIdx = indexOfWsp(s, 0);
+        while (true) {
+            if (wspIdx == length) {
+                sb.append(s.substring(Math.max(0, lastLineBreak)));
+                return sb.toString();
+            }
+
+            int nextWspIdx = indexOfWsp(s, wspIdx + 1);
+
+            if (nextWspIdx - lastLineBreak > maxCharacters) {
+                sb.append(s.substring(Math.max(0, lastLineBreak), wspIdx));
+                sb.append("\r\n");
+                lastLineBreak = wspIdx;
+            }
+
+            wspIdx = nextWspIdx;
+        }
+    }
+
+    private static int indexOfWsp(String s, int fromIndex) {
+        final int len = s.length();
+        for (int index = fromIndex; index < len; index++) {
+            char c = s.charAt(index);
+            if (c == ' ' || c == '\t')
+                return index;
+        }
+        return len;
+    }
+
     private static synchronized int nextCounterValue() {
         return counter++;
     }
