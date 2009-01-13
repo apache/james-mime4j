@@ -25,6 +25,8 @@ import org.apache.james.mime4j.decoder.DecoderUtil;
  * Simple unstructured field such as <code>Subject</code>.
  */
 public class UnstructuredField extends Field {
+    private boolean parsed = false;
+
     private String value;
 
     UnstructuredField(String name, String body, String raw) {
@@ -33,7 +35,18 @@ public class UnstructuredField extends Field {
     }
 
     public String getValue() {
+        if (!parsed)
+            parse();
+
         return value;
+    }
+
+    private void parse() {
+        String body = getBody();
+
+        value = DecoderUtil.decodeEncodedWords(body);
+
+        parsed = true;
     }
 
     public static class Parser implements FieldParser {
