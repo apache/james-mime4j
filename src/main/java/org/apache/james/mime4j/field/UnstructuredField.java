@@ -31,7 +31,6 @@ public class UnstructuredField extends Field {
 
     UnstructuredField(String name, String body, String raw) {
         super(name, body, raw);
-        value = DecoderUtil.decodeEncodedWords(body);
     }
 
     public String getValue() {
