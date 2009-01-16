@@ -22,11 +22,11 @@ import junit.framework.TestCase;
 public class MimeUtilTest extends TestCase {
 
     public void testFold() throws Exception {
-        assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 70));
-        assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 71));
-        assertEquals("this\r\n is a test", MimeUtil.fold("this is a test", 72));
+        assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 68));
+        assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 69));
+        assertEquals("this\r\n is a test", MimeUtil.fold("this is a test", 70));
         assertEquals("this  \r\n   is a test", MimeUtil.fold(
-                "this     is a test", 72));
+                "this     is a test", 70));
     }
 
     public void testFoldOverlyLongNonWhitespace() throws Exception {

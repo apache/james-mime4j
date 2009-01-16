@@ -395,11 +395,12 @@ public final class MimeUtil {
 
     /**
      * Splits the specified string into a multiple-line representation with
-     * lines no longer than 78 characters (see <a
-     * href='http://www.faqs.org/rfcs/rfc5322.html'>RFC 5322</a> section
-     * 2.2.3.). If the string contains non-whitespace sequences longer than 78
-     * characters a line break is inserted at the whitespace character following
-     * the sequence resulting in a line longer than 78 characters.
+     * lines no longer than 76 characters (because the line might contain
+     * encoded words; see <a href='http://www.faqs.org/rfcs/rfc2047.html'>RFC
+     * 2047</a> section 2). If the string contains non-whitespace sequences
+     * longer than 76 characters a line break is inserted at the whitespace
+     * character following the sequence resulting in a line longer than 76
+     * characters.
      * 
      * @param s
      *            string to split.
@@ -409,7 +410,7 @@ public final class MimeUtil {
      * @return a multiple-line representation of the given string.
      */
     public static String fold(String s, int usedCharacters) {
-        final int maxCharacters = 78;
+        final int maxCharacters = 76;
 
         final int length = s.length();
         if (usedCharacters + length <= maxCharacters)
