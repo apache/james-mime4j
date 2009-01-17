@@ -129,4 +129,28 @@ public class FieldsTest extends TestCase {
         assertFalse(field.isValidField());
     }
 
+    public void testMessageId() throws Exception {
+        Field messageId = Fields.messageId("acme.org");
+
+        String raw = messageId.getRaw();
+        assertTrue(raw.startsWith("Message-ID: <Mime4j."));
+        assertTrue(raw.endsWith("@acme.org>"));
+    }
+
+    public void testSubject() throws Exception {
+        assertEquals("Subject: ", Fields.subject("").getRaw());
+        assertEquals("Subject: test", Fields.subject("test").getRaw());
+        assertEquals("Subject: =?ISO-8859-1?Q?Sm=F8rebr=F8d?=", Fields.subject(
+                "Sm\370rebr\370d").getRaw());
+
+        String seventyNine = "123456789012345678901234567890123456789012345678901234567890123456789";
+        assertEquals("Subject: " + seventyNine, Fields.subject(seventyNine)
+                .getRaw());
+
+        String eighty = seventyNine + "0";
+        String expected = "Subject: =?US-ASCII?Q?12345678901234567890123456789012345?="
+                + "\r\n =?US-ASCII?Q?67890123456789012345678901234567890?=";
+        assertEquals(expected, Fields.subject(eighty).getRaw());
+    }
+
 }

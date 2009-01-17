@@ -28,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.decoder.EncoderUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 public class Fields {
@@ -35,8 +36,8 @@ public class Fields {
     }
 
     public static ContentTypeField contentType(String contentType) {
-        String body = MimeUtil.fold(contentType,
-                Field.CONTENT_TYPE.length() + 2);
+        int usedCharacters = Field.CONTENT_TYPE.length() + 2;
+        String body = MimeUtil.fold(contentType, usedCharacters);
 
         return (ContentTypeField) Field.parse(Field.CONTENT_TYPE, body);
     }
@@ -65,7 +66,7 @@ public class Fields {
     }
 
     public static DateTimeField date(String fieldValue) {
-        return date("Date", fieldValue);
+        return date(Field.DATE, fieldValue);
     }
 
     public static DateTimeField date(String fieldName, String fieldValue) {
@@ -73,7 +74,7 @@ public class Fields {
     }
 
     public static DateTimeField date(Date date) {
-        return date("Date", date, null);
+        return date(Field.DATE, date, null);
     }
 
     public static DateTimeField date(String fieldName, Date date) {
@@ -86,6 +87,20 @@ public class Fields {
             df.setTimeZone(zone);
         }
         return date(fieldName, df.format(date));
+    }
+
+    public static Field messageId(String hostname) {
+        return Field.parse(Field.MESSAGE_ID, MimeUtil
+                .createUniqueMessageId(hostname));
+    }
+
+    public static UnstructuredField subject(String subject) {
+        int usedCharacters = Field.SUBJECT.length() + 2;
+        String encoded = EncoderUtil.encodeIfNecessary(subject,
+                EncoderUtil.Usage.TEXT_TOKEN, usedCharacters);
+        String rawValue = MimeUtil.fold(encoded, usedCharacters);
+
+        return (UnstructuredField) Field.parse(Field.SUBJECT, rawValue);
     }
 
     private static String quote(String value) {

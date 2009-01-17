@@ -50,7 +50,9 @@ public abstract class Field {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_TRANSFER_ENCODING = 
                                         "Content-Transfer-Encoding";
-    
+
+    public static final String MESSAGE_ID = "Message-ID";
+
     private static final String FIELD_NAME_PATTERN = 
         "^([\\x21-\\x39\\x3b-\\x7e]+):";
     private static final Pattern fieldNamePattern = 
