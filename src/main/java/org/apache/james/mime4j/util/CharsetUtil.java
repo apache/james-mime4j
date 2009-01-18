@@ -1146,7 +1146,7 @@ public class CharsetUtil {
     
     /*
     private static String dumpHtmlTable() {
-        LinkedList l = new LinkedList(Arrays.asList(JAVA_CHARSETS));
+        List<Charset> l = new LinkedList<Charset>(Arrays.asList(JAVA_CHARSETS));
         Collections.sort(l);
         StringBuilder sb = new StringBuilder();
         sb.append(" * <table>\n");
@@ -1156,8 +1156,7 @@ public class CharsetUtil {
         sb.append(" *         <td>Aliases</td>\n");
         sb.append(" *     </tr>\n");
 
-        for (Iterator it = l.iterator(); it.hasNext();) {
-            Charset c = (Charset) it.next();
+        for (Charset c : l) {
             sb.append(" *     <tr>\n");
             sb.append(" *         <td>" + c.canonical + "</td>\n");
             sb.append(" *         <td>" + (c.mime == null ? "?" : c.mime)+ "</td>\n");
@@ -1174,5 +1173,6 @@ public class CharsetUtil {
     
     public static void main(String[] args) {
         System.out.println(dumpHtmlTable());
-    }*/
+    }
+    */
 }
