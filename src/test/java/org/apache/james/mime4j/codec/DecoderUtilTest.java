@@ -77,14 +77,35 @@ public class DecoderUtilTest extends TestCase {
                 DecoderUtil.decodeEncodedWords("=?US-ASCII?B?QSBzaG9ydCB0ZXh0?="));
         assertEquals("A short text again!", 
                 DecoderUtil.decodeEncodedWords("=?US-ASCII?b?QSBzaG9ydCB0ZXh0IGFnYWluIQ==?="));
-        assertEquals("", DecoderUtil.decodeEncodedWords("=?iso8859-1?Q?="));
-        assertEquals("", DecoderUtil.decodeEncodedWords("=?iso8859-1?b?="));
-        assertEquals("", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?"));
+
+        // invalid encoded words should be returned unchanged
+        assertEquals("=?iso8859-1?Q?=", DecoderUtil.decodeEncodedWords("=?iso8859-1?Q?="));
+        assertEquals("=?iso8859-1?b?=", DecoderUtil.decodeEncodedWords("=?iso8859-1?b?="));
+        assertEquals("=?ISO-8859-1?Q?", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?"));
+        assertEquals("=?ISO-8859-1?R?abc?=", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?R?abc?="));
+
+        // encoded-text requires at least one character according to rfc 2047
+        assertEquals("=?ISO-8859-1?Q??=", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q??="));
+        assertEquals("=?ISO-8859-1?B??=", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?B??="));
         
-        /*
-         * Bug detected on June 7, 2005. Decoding the following string caused
-         * OutOfMemoryError.
-         */
+        // white space between encoded words should be removed (MIME4J-104)
+        assertEquals("a", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?="));
+        assertEquals("a b", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?= b"));
+        assertEquals("ab", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?= =?ISO-8859-1?Q?b?="));
+        assertEquals("ab", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?=  =?ISO-8859-1?Q?b?="));
+        assertEquals("ab", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?=\r\n  =?ISO-8859-1?Q?b?="));
+        assertEquals("a b", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a_b?="));
+        assertEquals("a b", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?= =?ISO-8859-2?Q?_b?="));
+
+        // non white space between encoded words should be retained
+        assertEquals("a b c", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?= b =?ISO-8859-1?Q?c?="));
+
+        // text before and after encoded words should be retained
+        assertEquals(" a b c ", DecoderUtil.decodeEncodedWords(" =?ISO-8859-1?Q?a?= b =?ISO-8859-1?Q?c?= "));
+        assertEquals("! a b c !", DecoderUtil.decodeEncodedWords("! =?ISO-8859-1?Q?a?= b =?ISO-8859-1?Q?c?= !"));
+        
+        // Bug detected on June 7, 2005. Decoding the following string caused
+        // OutOfMemoryError.
         assertEquals("=3?!!\\=?\"!g6P\"!Xp:\"!", DecoderUtil.decodeEncodedWords("=3?!!\\=?\"!g6P\"!Xp:\"!"));
     }    
 }

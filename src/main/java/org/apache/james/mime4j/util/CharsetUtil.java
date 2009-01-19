@@ -1131,6 +1131,28 @@ public class CharsetUtil {
     }
 
     /**
+     * Returns <code>true</code> if the specified string consists entirely of
+     * whitespace characters.
+     * 
+     * @param s
+     *            string to test.
+     * @return <code>true</code> if the specified string consists entirely of
+     *         whitespace characters, <code>false</code> otherwise.
+     */
+    public static boolean isWhitespace(final String s) {
+        if (s == null) {
+            throw new IllegalArgumentException("String may not be null");
+        }
+        final int len = s.length();
+        for (int i = 0; i < len; i++) {
+            if (!isWhitespace(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
      * Determines if the VM supports encoding (chars to bytes) the 
      * specified character set. NOTE: the given character set name may 
      * not be known to the VM even if this method returns <code>true</code>.
