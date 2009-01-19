@@ -19,13 +19,12 @@
 
 package org.apache.james.mime4j.message;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.message.Header;
-import org.apache.james.mime4j.util.MessageUtils;
-
-import junit.framework.TestCase;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 public class HeaderTest extends TestCase {
 
@@ -71,7 +70,7 @@ public class HeaderTest extends TestCase {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         
         header.writeTo(buffer, Mode.STRICT_IGNORE);
-        String s = buffer.toString(MessageUtils.ASCII.name());
+        String s = buffer.toString(CharsetUtil.US_ASCII.name());
         
         assertEquals("Hello: Gr?ezi_z?m?\r\n\r\n", s);
 
@@ -89,7 +88,7 @@ public class HeaderTest extends TestCase {
         Header header = new Header();
         header.addField(Field.parse("Hello: " + hello));
         header.addField(Field.parse("Content-type: text/plain; charset=" + 
-                MessageUtils.ISO_8859_1.name()));
+                CharsetUtil.ISO_8859_1.name()));
         
         Field field = header.getField("Hello");
         assertNotNull(field);
@@ -98,7 +97,7 @@ public class HeaderTest extends TestCase {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         
         header.writeTo(buffer, Mode.LENIENT);
-        String s = buffer.toString(MessageUtils.ISO_8859_1.name());
+        String s = buffer.toString(CharsetUtil.ISO_8859_1.name());
         
         assertEquals("Hello: " + hello + "\r\n" +
                 "Content-type: text/plain; charset=ISO-8859-1\r\n\r\n", s);

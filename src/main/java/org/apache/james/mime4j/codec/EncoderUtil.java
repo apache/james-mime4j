@@ -29,10 +29,6 @@ import org.apache.james.mime4j.util.CharsetUtil;
  * href='http://www.faqs.org/rfcs/rfc2047.html'>RFC 2047</a>.
  */
 public class EncoderUtil {
-    private static final Charset CS_US_ASCII = Charset.forName("us-ascii");
-    private static final Charset CS_8859_1 = Charset.forName("iso-8859-1");
-    private static final Charset CS_UTF_8 = Charset.forName("utf-8");
-
     private static final byte[] BASE64_TABLE = Base64OutputStream.BASE64_TABLE;
     private static final char BASE64_PAD = '=';
 
@@ -410,13 +406,13 @@ public class EncoderUtil {
         for (int index = 0; index < len; index++) {
             char ch = text.charAt(index);
             if (ch > 0xff) {
-                return CS_UTF_8;
+                return CharsetUtil.UTF_8;
             }
             if (ch > 0x7f) {
                 ascii = false;
             }
         }
-        return ascii ? CS_US_ASCII : CS_8859_1;
+        return ascii ? CharsetUtil.US_ASCII : CharsetUtil.ISO_8859_1;
     }
 
     private static Encoding determineEncoding(byte[] bytes, Usage usage) {

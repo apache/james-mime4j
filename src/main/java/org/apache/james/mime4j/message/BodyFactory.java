@@ -30,7 +30,6 @@ import org.apache.james.mime4j.storage.MultiReferenceStorage;
 import org.apache.james.mime4j.storage.Storage;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.CharsetUtil;
-import org.apache.james.mime4j.util.MessageUtils;
 
 /**
  * Factory for creating message bodies.
@@ -39,7 +38,7 @@ public class BodyFactory {
 
     private static Log log = LogFactory.getLog(BodyFactory.class);
 
-    private static final Charset FALLBACK_CHARSET = MessageUtils.DEFAULT_CHARSET;
+    private static final Charset FALLBACK_CHARSET = CharsetUtil.DEFAULT_CHARSET;
 
     private StorageProvider storageProvider;
 
@@ -130,7 +129,7 @@ public class BodyFactory {
 
         Storage storage = storageProvider.store(is);
         return new StorageTextBody(new MultiReferenceStorage(storage),
-                MessageUtils.DEFAULT_CHARSET);
+                CharsetUtil.DEFAULT_CHARSET);
     }
 
     /**
@@ -190,7 +189,7 @@ public class BodyFactory {
             throw new IllegalArgumentException();
 
         return new StorageTextBody(new MultiReferenceStorage(storage),
-                MessageUtils.DEFAULT_CHARSET);
+                CharsetUtil.DEFAULT_CHARSET);
     }
 
     /**
@@ -247,7 +246,7 @@ public class BodyFactory {
         if (text == null)
             throw new IllegalArgumentException();
 
-        return new StringTextBody(text, MessageUtils.DEFAULT_CHARSET);
+        return new StringTextBody(text, CharsetUtil.DEFAULT_CHARSET);
     }
 
     /**

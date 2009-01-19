@@ -24,15 +24,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.MimeTokenStream;
-
-import junit.framework.TestCase;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 public class MultipartStreamTest extends TestCase {
 
-    private static final Charset US_ASCII = Charset.forName("us-ascii");
+    private static final Charset US_ASCII = CharsetUtil.US_ASCII;
     
     private static final String BODY = "A Preamble\r\n" +
                 "--1729\r\n\r\n" +

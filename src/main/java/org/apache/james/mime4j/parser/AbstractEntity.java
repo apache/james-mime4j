@@ -34,7 +34,7 @@ import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharArrayBuffer;
-import org.apache.james.mime4j.util.MessageUtils;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * Abstract MIME entity.
@@ -159,7 +159,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
             lineCount++;
             if (lineCount > 1) {
                 int ch = linebuf.byteAt(0);
-                if (ch != MessageUtils.SP && ch != MessageUtils.HT) {
+                if (ch != CharsetUtil.SP && ch != CharsetUtil.HT) {
                     // new header detected
                     break;
                 }

@@ -25,13 +25,12 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.apache.commons.io.IOUtils;
-
 import junit.framework.TestCase;
 
-public class QuotedPrintableEncodeTest extends TestCase {
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.util.CharsetUtil;
 
-    private static final Charset US_ASCII = Charset.forName("US-ASCII");
+public class QuotedPrintableEncodeTest extends TestCase {
     
     @Override
     protected void setUp() throws Exception {
@@ -108,7 +107,7 @@ public class QuotedPrintableEncodeTest extends TestCase {
     }
     
     private void checkRoundtrip(String content) throws Exception {
-        checkRoundtrip(content, US_ASCII);
+        checkRoundtrip(content, CharsetUtil.US_ASCII);
     }
 
     private void checkRoundtrip(String content, Charset charset) throws Exception {

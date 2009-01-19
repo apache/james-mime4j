@@ -33,7 +33,6 @@ import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.util.CharsetUtil;
-import org.apache.james.mime4j.util.MessageUtils;
 
 /**
  * Represents a MIME multipart body (see RFC 2045).A multipart body has a 
@@ -294,10 +293,10 @@ public class Multipart implements Body {
             if (cField != null && cField.getCharset() != null) {
                 charset = CharsetUtil.getCharset(cField.getCharset());
             } else {
-                charset = MessageUtils.ISO_8859_1;
+                charset = CharsetUtil.ISO_8859_1;
             }
         } else {
-            charset = MessageUtils.DEFAULT_CHARSET;
+            charset = CharsetUtil.DEFAULT_CHARSET;
         }
         
         BufferedWriter writer = new BufferedWriter(
@@ -306,22 +305,22 @@ public class Multipart implements Body {
         List<BodyPart> bodyParts = getBodyParts();
 
         writer.write(getPreamble());
-        writer.write(MessageUtils.CRLF);
+        writer.write(CharsetUtil.CRLF);
 
         for (int i = 0; i < bodyParts.size(); i++) {
             writer.write("--");
             writer.write(boundary);
-            writer.write(MessageUtils.CRLF);
+            writer.write(CharsetUtil.CRLF);
             writer.flush();
             final BodyPart bodyPart = bodyParts.get(i);
             bodyPart.writeTo(out, mode);
-            writer.write(MessageUtils.CRLF);
+            writer.write(CharsetUtil.CRLF);
         }
 
         writer.write("--");
         writer.write(boundary);
         writer.write("--");
-        writer.write(MessageUtils.CRLF);
+        writer.write(CharsetUtil.CRLF);
         final String epilogue = getEpilogue();
         writer.write(epilogue);
         writer.flush();

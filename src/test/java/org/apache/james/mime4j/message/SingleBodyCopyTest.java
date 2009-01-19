@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 import org.apache.james.mime4j.storage.MemoryStorageProvider;
 import org.apache.james.mime4j.storage.MultiReferenceStorage;
 import org.apache.james.mime4j.storage.Storage;
-import org.apache.james.mime4j.util.MessageUtils;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 public class SingleBodyCopyTest extends TestCase {
 
@@ -46,12 +46,12 @@ public class SingleBodyCopyTest extends TestCase {
         MultiReferenceStorage multiReferenceStorage = new MultiReferenceStorage(
                 storage);
         SingleBody body = new StorageTextBody(multiReferenceStorage,
-                MessageUtils.ASCII);
+                CharsetUtil.US_ASCII);
         copyTest(body);
     }
 
     public void testCopyStringTextBody() throws Exception {
-        SingleBody body = new StringTextBody("test", MessageUtils.ASCII);
+        SingleBody body = new StringTextBody("test", CharsetUtil.US_ASCII);
         copyTest(body);
     }
 
@@ -70,7 +70,7 @@ public class SingleBodyCopyTest extends TestCase {
         MultiReferenceStorage multiReferenceStorage = new MultiReferenceStorage(
                 storage);
         SingleBody body = new StorageTextBody(multiReferenceStorage,
-                MessageUtils.ASCII);
+                CharsetUtil.US_ASCII);
         disposeTest(body, storage);
     }
 

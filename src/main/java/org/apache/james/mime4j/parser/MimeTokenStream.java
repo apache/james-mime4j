@@ -34,6 +34,7 @@ import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.RootInputStream;
+import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -305,7 +306,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
         final String mimeCharset = bodyDescriptor.getCharset();
         final Charset charset;
         if (mimeCharset == null || "".equals(mimeCharset)) {
-            charset = Charset.forName("US-ASCII");
+            charset = CharsetUtil.US_ASCII;
         } else {
             charset = Charset.forName(mimeCharset);
         }

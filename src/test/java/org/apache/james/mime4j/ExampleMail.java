@@ -21,6 +21,8 @@ package org.apache.james.mime4j;
 import java.nio.charset.Charset;
 import java.util.Locale;
 
+import org.apache.james.mime4j.util.CharsetUtil;
+
 public class ExampleMail {
     
     public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MULTIPART_MIXED = "--4.66920160910299\r\n" + 
@@ -116,8 +118,8 @@ public class ExampleMail {
     public static final String MD5_CONTENT = "Q2hlY2sgSW50ZWdyaXR5IQ==";
     public static final String CONTENT_DESCRIPTION = "Blah blah blah";
     public static final String CONTENT_ID = "<f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>";
-    public static final Charset US_ASCII = Charset.forName("US-ASCII");
-    public static final Charset LATIN1 = Charset.forName("ISO-8859-1");
+    public static final Charset US_ASCII = CharsetUtil.US_ASCII;
+    public static final Charset LATIN1 = CharsetUtil.ISO_8859_1;
     
     public static final String MIME_MULTIPART_EMBEDDED_MESSAGES = 
         "From: Timothy Tayler <timothy@example.org>\r\n" + 

@@ -1055,7 +1055,81 @@ public class CharsetUtil {
                         + encodingSupported);
         }
     }
-    
+
+    /** carriage return - line feed sequence */
+    public static final String CRLF = "\r\n";
+
+    /** US-ASCII CR, carriage return (13) */
+    public static final int CR = '\r';
+
+    /** US-ASCII LF, line feed (10) */
+    public static final int LF = '\n';
+
+    /** US-ASCII SP, space (32) */
+    public static final int SP = ' ';
+
+    /** US-ASCII HT, horizontal-tab (9) */
+    public static final int HT = '\t';
+
+    public static final java.nio.charset.Charset US_ASCII = java.nio.charset.Charset
+            .forName("US-ASCII");
+
+    public static final java.nio.charset.Charset ISO_8859_1 = java.nio.charset.Charset
+            .forName("ISO-8859-1");
+
+    public static final java.nio.charset.Charset UTF_8 = java.nio.charset.Charset
+            .forName("UTF-8");
+
+    public static final java.nio.charset.Charset DEFAULT_CHARSET = US_ASCII;
+
+    /**
+     * Returns <code>true</code> if the specified character falls into the US
+     * ASCII character set (Unicode range 0000 to 007f).
+     * 
+     * @param ch
+     *            character to test.
+     * @return <code>true</code> if the specified character falls into the US
+     *         ASCII character set, <code>false</code> otherwise.
+     */
+    public static boolean isASCII(char ch) {
+        return (0xFF80 & ch) == 0;
+    }
+
+    /**
+     * Returns <code>true</code> if the specified string consists entirely of
+     * US ASCII characters.
+     * 
+     * @param s
+     *            string to test.
+     * @return <code>true</code> if the specified string consists entirely of
+     *         US ASCII characters, <code>false</code> otherwise.
+     */
+    public static boolean isASCII(final String s) {
+        if (s == null) {
+            throw new IllegalArgumentException("String may not be null");
+        }
+        final int len = s.length();
+        for (int i = 0; i < len; i++) {
+            if (!isASCII(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns <code>true</code> if the specified character is a whitespace
+     * character (CR, LF, SP or HT).
+     * 
+     * @param ch
+     *            character to test.
+     * @return <code>true</code> if the specified character is a whitespace
+     *         character, <code>false</code> otherwise.
+     */
+    public static boolean isWhitespace(char ch) {
+        return ch == SP || ch == HT || ch == CR || ch == LF;
+    }
+
     /**
      * Determines if the VM supports encoding (chars to bytes) the 
      * specified character set. NOTE: the given character set name may 

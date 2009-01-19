@@ -40,7 +40,6 @@ import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
-import org.apache.james.mime4j.util.MessageUtils;
 
 
 /**
@@ -266,29 +265,29 @@ public class Header {
         if (mode == Mode.LENIENT) {
             final ContentTypeField contentTypeField = ((ContentTypeField) getField(Field.CONTENT_TYPE));
             if (contentTypeField == null) {
-                charset = MessageUtils.DEFAULT_CHARSET;
+                charset = CharsetUtil.DEFAULT_CHARSET;
             } else {
                 final String contentTypeFieldCharset = contentTypeField.getCharset();
                 if (contentTypeField != null && contentTypeFieldCharset != null) {
                     charset = CharsetUtil.getCharset(contentTypeFieldCharset);
                 } else {
-                    charset = MessageUtils.ISO_8859_1;
+                    charset = CharsetUtil.ISO_8859_1;
                 }
             }
         } else {
-            charset = MessageUtils.DEFAULT_CHARSET;
+            charset = CharsetUtil.DEFAULT_CHARSET;
         }
         BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(out, charset), 8192);
         for (Field field : fields) {
             String fs = field.toString();
-            if (mode == Mode.STRICT_ERROR && !MessageUtils.isASCII(fs)) {
+            if (mode == Mode.STRICT_ERROR && !CharsetUtil.isASCII(fs)) {
                 throw new MimeIOException(new MimeException("Header '" + fs + "' violates RFC 822"));
             }
             writer.write(fs);
-            writer.write(MessageUtils.CRLF);
+            writer.write(CharsetUtil.CRLF);
         }
-        writer.write(MessageUtils.CRLF);
+        writer.write(CharsetUtil.CRLF);
         writer.flush();
     }
 }

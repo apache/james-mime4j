@@ -230,10 +230,10 @@ public final class CharArrayBuffer  {
         if (beginIndex > endIndex) {
             throw new IndexOutOfBoundsException();
         }
-        while (beginIndex < endIndex && MessageUtils.isWhitespace(this.buffer[beginIndex])) {
+        while (beginIndex < endIndex && CharsetUtil.isWhitespace(this.buffer[beginIndex])) {
             beginIndex++;
         }
-        while (endIndex > beginIndex && MessageUtils.isWhitespace(this.buffer[endIndex - 1])) {
+        while (endIndex > beginIndex && CharsetUtil.isWhitespace(this.buffer[endIndex - 1])) {
             endIndex--;
         }
         return new String(this.buffer, beginIndex, endIndex - beginIndex);

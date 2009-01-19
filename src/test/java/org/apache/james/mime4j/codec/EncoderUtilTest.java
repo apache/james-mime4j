@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.apache.james.mime4j.codec.EncoderUtil.Encoding;
 import org.apache.james.mime4j.codec.EncoderUtil.Usage;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 public class EncoderUtilTest extends TestCase {
 
@@ -56,7 +57,7 @@ public class EncoderUtilTest extends TestCase {
 
     public void testEncodeEncodedWordForceCharset() throws Exception {
         assertTrue(EncoderUtil.encodeEncodedWord("only ascii",
-                Usage.TEXT_TOKEN, 0, Charset.forName("UTF-8"), null)
+                Usage.TEXT_TOKEN, 0, CharsetUtil.UTF_8, null)
                 .startsWith("=?UTF-8?"));
     }
 
