@@ -21,7 +21,7 @@ package org.apache.james.mime4j.codec;
 
 import java.util.Iterator;
 
-public class ByteQueue {
+public class ByteQueue implements Iterable<Byte> {
 
     private UnboundedFifoByteBuffer buf;
     private int initialCapacity = -1;
