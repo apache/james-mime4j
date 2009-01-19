@@ -23,7 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.james.mime4j.decoder.CodecUtil;
+import org.apache.james.mime4j.codec.CodecUtil;
 
 import junit.framework.TestCase;
 

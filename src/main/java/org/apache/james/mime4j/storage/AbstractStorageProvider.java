@@ -22,7 +22,7 @@ package org.apache.james.mime4j.storage;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.james.mime4j.decoder.CodecUtil;
+import org.apache.james.mime4j.codec.CodecUtil;
 
 /**
  * Abstract implementation of {@link StorageProvider} that implements

@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.james.mime4j.MimeIOException;
-import org.apache.james.mime4j.decoder.CodecUtil;
+import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;

@@ -26,7 +26,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
-import org.apache.james.mime4j.decoder.CodecUtil;
+import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.storage.MultiReferenceStorage;
 import org.apache.james.mime4j.util.CharsetUtil;
 

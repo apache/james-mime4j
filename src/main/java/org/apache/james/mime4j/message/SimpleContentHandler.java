@@ -20,8 +20,8 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.decoder.Base64InputStream;
-import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
+import org.apache.james.mime4j.codec.Base64InputStream;
+import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.AbstractContentHandler;

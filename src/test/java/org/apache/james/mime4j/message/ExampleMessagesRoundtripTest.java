@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.decoder.CodecUtil;
+import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.log4j.BasicConfigurator;
 

@@ -27,8 +27,8 @@ import java.io.OutputStream;
 import java.util.Random;
 
 import org.apache.commons.io.output.NullOutputStream;
-import org.apache.james.mime4j.decoder.Base64InputStream;
-import org.apache.james.mime4j.decoder.CodecUtil;
+import org.apache.james.mime4j.codec.Base64InputStream;
+import org.apache.james.mime4j.codec.CodecUtil;
 
 public class Base64InputStreamBench {
 

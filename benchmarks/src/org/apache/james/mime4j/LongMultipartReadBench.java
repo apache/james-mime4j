@@ -24,7 +24,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.james.mime4j.decoder.CodecUtil;
+import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.message.Message;

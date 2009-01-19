@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.field;
 
-import org.apache.james.mime4j.decoder.DecoderUtil;
+import org.apache.james.mime4j.codec.DecoderUtil;
 
 /**
  * Simple unstructured field such as <code>Subject</code>.

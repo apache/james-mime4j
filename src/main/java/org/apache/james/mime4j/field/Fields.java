@@ -28,7 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.james.mime4j.decoder.EncoderUtil;
+import org.apache.james.mime4j.codec.EncoderUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 public class Fields {

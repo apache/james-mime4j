@@ -17,12 +17,11 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.decoder;
+package org.apache.james.mime4j.codec;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-
 
 /**
  * Performs Quoted-Printable encoding on an underlying stream.

@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
-import org.apache.james.mime4j.decoder.DecoderUtil;
+import org.apache.james.mime4j.codec.DecoderUtil;
 import org.apache.james.mime4j.field.address.parser.ASTaddr_spec;
 import org.apache.james.mime4j.field.address.parser.ASTaddress;
 import org.apache.james.mime4j.field.address.parser.ASTaddress_list;

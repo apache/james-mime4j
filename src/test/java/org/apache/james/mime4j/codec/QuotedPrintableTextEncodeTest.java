@@ -16,7 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.james.mime4j.decoder;
+
+package org.apache.james.mime4j.codec;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,12 +26,10 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.decoder.CodecUtil;
-import org.apache.james.mime4j.decoder.QuotedPrintableInputStream;
 
 import junit.framework.TestCase;
 
-public class QuotedPrintableEncodeTest extends TestCase {
+public class QuotedPrintableTextEncodeTest extends TestCase {
 
     private static final Charset US_ASCII = Charset.forName("US-ASCII");
     
@@ -46,14 +45,14 @@ public class QuotedPrintableEncodeTest extends TestCase {
     
     public void testEscapedSoftBreak() throws Exception {
         byte[] content = new byte[500];
-        Arrays.fill(content, (byte)0x20);
+        Arrays.fill(content, (byte)0x18);
         byte[] expected = new byte[1557];
         int index = 0;
         for (int l=0;l<20;l++) {
             for (int i=0;i<25;i++) {
                 expected[index++] = '=';
-                expected[index++] = '2';
-                expected[index++] = '0';
+                expected[index++] = '1';
+                expected[index++] = '8';
             }
             if (l<19) {
                 expected[index++] = '=';
@@ -98,14 +97,50 @@ public class QuotedPrintableEncodeTest extends TestCase {
     }
     
     public void testEncodeSpace() throws Exception {
-        checkRoundtrip("                 ");
+        checkRoundtrip("                 A");
     }
     
     public void testLetterEncoding() throws Exception {
         for (byte b=0;b<Byte.MAX_VALUE;b++) {
             byte[] content = {b};
-            checkRoundtrip(content);
+            // White space is only escaped when followed by CRLF
+            if (b != 32 && b != 9) { 
+                checkRoundtrip(content);
+            }
         }
+    }
+    
+    public void testCRLFShouldResetLineCount() throws Exception {
+        StringBuilder buffer = new StringBuilder(4096);
+        for (int i=0;i<1000;i++) {
+            buffer.append("Hugo\r\n");
+        }
+        String longLine = buffer.toString();
+        check(longLine, longLine);
+    }
+    
+    public void testDontEscapeLF() throws Exception {
+        check("Ready\nFor\n", "Ready\nFor\n");
+    }
+    
+    public void testDontEscapeCR() throws Exception {
+        check("Ready\rFor\r", "Ready\rFor\r");
+    }
+    
+    public void testEscapeSpaceAtLineEnd() throws Exception {
+        check("      \r\n", "     =20\r\n");
+    }
+    
+    public void testDontEscapeSpaceBeforeLineEnd() throws Exception {
+        check("      ", "      ");
+    }
+    
+    public void testDontEscapeTabsBeforeLineEnd() throws Exception {
+        check("\t\t\t\t", "\t\t\t\t");
+    }
+    
+    public void testDontWhiteSpaceBeforeLineEnd() throws Exception {
+        check("  \t\t  \t", "  \t\t  \t");
     }
     
     private void checkRoundtrip(String content) throws Exception {
@@ -119,7 +154,7 @@ public class QuotedPrintableEncodeTest extends TestCase {
     private void checkRoundtrip(byte[] content) throws Exception {
         InputStream in = new ByteArrayInputStream(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.encodeQuotedPrintableBinary(in, out);
+        CodecUtil.encodeQuotedPrintable(in, out);
         // read back through decoder
         in = new QuotedPrintableInputStream(new ByteArrayInputStream(out.toByteArray()));
         out = new ByteArrayOutputStream();
@@ -127,10 +162,15 @@ public class QuotedPrintableEncodeTest extends TestCase {
         assertEquals(content, out.toByteArray());
     }
     
+    private void check(String content, String expected) throws Exception {
+        check(US_ASCII.encode(content).array(), US_ASCII.encode(expected).array());
+    }
+
+    
     private void check(byte[] content, byte[] expected) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.encodeQuotedPrintableBinary(in, out);
+        CodecUtil.encodeQuotedPrintable(in, out);
         assertEquals(expected, out.toByteArray());
     }
     
