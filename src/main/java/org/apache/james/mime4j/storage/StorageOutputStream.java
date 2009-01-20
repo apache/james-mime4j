@@ -49,14 +49,14 @@ public abstract class StorageOutputStream extends OutputStream {
 
     /**
      * Closes this output stream if it has not already been closed and returns a
-     * {@link Storage} object contains the bytes that have been written to this
-     * output stream.
+     * {@link Storage} object which contains the bytes that have been written to
+     * this output stream.
      * <p>
      * Note that this method may not be invoked a second time. This is because
      * for some implementations it is not possible to create another
      * <code>Storage</code> object that can be read from and deleted
      * independently (e.g. if the implementation writes to a file).
-     *
+     * 
      * @return a <code>Storage</code> object as described above.
      * @throws IOException
      *             if an I/O error occurs.
@@ -125,7 +125,7 @@ public abstract class StorageOutputStream extends OutputStream {
      * <p>
      * This implementation never throws an {@link IOException} but a subclass
      * might.
-     *
+     * 
      * @throws IOException
      *             if an I/O error occurs.
      */
@@ -141,7 +141,7 @@ public abstract class StorageOutputStream extends OutputStream {
      * {@link #write(byte[], int, int)}. All the required preconditions have
      * already been checked by these methods, including the check if the output
      * stream has already been closed.
-     *
+     * 
      * @param buffer
      *            buffer containing bytes to write.
      * @param offset
@@ -160,7 +160,7 @@ public abstract class StorageOutputStream extends OutputStream {
      * <code>StorageOutputStream</code>. This method gets called by
      * {@link #toStorage()} after the preconditions have been checked. The
      * implementation can also be sure that this methods gets invoked only once.
-     *
+     * 
      * @return a <code>Storage</code> object as described above.
      * @throws IOException
      *             if an I/O error occurs.

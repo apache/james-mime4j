@@ -370,8 +370,8 @@ public abstract class Entity implements Disposable {
     }
 
     /**
-     * Disposes the body of this entity. Note that the dispose call does not get
-     * forwarded to the parent entity of this Entity.
+     * Disposes of the body of this entity. Note that the dispose call does not
+     * get forwarded to the parent entity of this Entity.
      * 
      * Subclasses that need to free resources should override this method and
      * invoke super.dispose().

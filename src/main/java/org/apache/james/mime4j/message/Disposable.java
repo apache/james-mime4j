@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.message;
 
 /**
- * A <tt>Disposable</tt> is an object that should be disposed explicitly
+ * A <tt>Disposable</tt> is an object that should be disposed of explicitly
  * when it is no longer needed.
  * 
  * The dispose method is invoked to release resources that the object is
@@ -29,7 +29,7 @@ package org.apache.james.mime4j.message;
 public interface Disposable {
     /**
      * Free any resources this object is holding and prepares this object
-     * for garbage collection. Once an object has been disposed it can no
+     * for garbage collection. Once an object has been disposed of it can no
      * longer be used.
      */
     void dispose();

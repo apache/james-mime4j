@@ -55,7 +55,7 @@ public abstract class SingleBody implements Body {
      * shared between multiple copies of a <code>SingleBody</code>.</li>
      * <li>If the underlying content is shared by multiple copies the
      * implementation has to make sure that the content gets deleted when the
-     * last copy gets disposed (and not before that).</li>
+     * last copy gets disposed of (and not before that).</li>
      * </ul>
      * <p>
      * This implementation always throws an

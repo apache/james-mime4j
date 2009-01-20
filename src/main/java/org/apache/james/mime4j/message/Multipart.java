@@ -327,8 +327,8 @@ public class Multipart implements Body {
     }
 
     /**
-     * Disposes the BodyParts of this Multipart. Note that the dispose call does
-     * not get forwarded to the parent entity of this Multipart.
+     * Disposes of the BodyParts of this Multipart. Note that the dispose call
+     * does not get forwarded to the parent entity of this Multipart.
      * 
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
