@@ -21,18 +21,16 @@ package org.apache.james.mime4j.samples.transform;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Random;
 
-import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.message.Body;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
-import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Mode;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
-import org.apache.james.mime4j.util.MimeUtil;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.storage.TempFileStorageProvider;
@@ -110,14 +108,10 @@ public class TransformMessage {
         // it should be disposed of.
         removed.dispose();
 
-        // Create a unique message ID for the new message.
-        Header header = message.getHeader();
-        Field messageId = Field.parse("Message-ID", MimeUtil
-                .createUniqueMessageId(HOSTNAME));
-        header.setField(messageId);
-
-        // Set a new subject; note the usage of setField instead of addField
-        header.setField(Field.parse("Subject", "Transformed message"));
+        // Set some headers on the transformed message
+        message.createMessageId(HOSTNAME);
+        message.setSubject("Transformed message");
+        message.setDate(new Date());
 
         return message;
     }
@@ -127,9 +121,6 @@ public class TransformMessage {
      * two binary).
      */
     private static Message createTemplate() throws IOException {
-        Header header = new Header();
-        header.addField(Field.parse("Subject", "Template message"));
-
         Multipart multipart = new Multipart("mixed");
 
         BodyPart part1 = createTextPart("This is the first part of the template..");
@@ -142,8 +133,9 @@ public class TransformMessage {
         multipart.addBodyPart(part3);
 
         Message message = new Message();
-        message.setHeader(header);
         message.setMultipart(multipart);
+
+        message.setSubject("Template message");
 
         return message;
     }

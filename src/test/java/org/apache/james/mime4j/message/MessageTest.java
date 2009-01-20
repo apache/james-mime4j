@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -163,6 +165,70 @@ public class MessageTest extends TestCase {
                         .toByteArray())))));
 
         assertTrue("header added", lines.contains(testheader));
+    }
+
+    public void testGetMessageId() throws Exception {
+        Message m = new Message();
+        assertNull(m.getMessageId());
+
+        String id = "<msg17@localhost>";
+        Header header = new Header();
+        header.setField(Field.parse("Message-ID", id));
+        m.setHeader(header);
+        assertEquals(id, m.getMessageId());
+    }
+
+    public void testCreateMessageId() throws Exception {
+        Message m = new Message();
+        m.createMessageId("hostname");
+
+        String id = m.getMessageId();
+        assertNotNull(id);
+        assertTrue(id.startsWith("<Mime4j."));
+        assertTrue(id.endsWith("@hostname>"));
+    }
+
+    public void testGetSubject() throws Exception {
+        Message m = new Message();
+        assertNull(m.getSubject());
+
+        String subject = "testing 1 2";
+        Header header = new Header();
+        header.setField(Field.parse("Subject", subject));
+        m.setHeader(header);
+        assertEquals(subject, m.getSubject());
+
+        header.setField(Field.parse("Subject", "=?windows-1252?Q?99_=80?="));
+        assertEquals("99 \u20ac", m.getSubject());
+    }
+
+    public void testSetSubject() throws Exception {
+        Message m = new Message();
+        m.setSubject("Semmelbr\366sel");
+
+        assertEquals("Semmelbr\366sel", m.getSubject());
+        assertEquals("=?ISO-8859-1?Q?Semmelbr=F6sel?=", m.getHeader().getField(
+                "Subject").getBody());
+    }
+
+    public void testGetDate() throws Exception {
+        Message m = new Message();
+        assertNull(m.getDate());
+
+        Header header = new Header();
+        header.setField(Field.parse("Date", "Thu, 1 Jan 1970 05:30:00 +0530"));
+        m.setHeader(header);
+
+        assertEquals(new Date(0), m.getDate());
+    }
+
+    public void testSetDate() throws Exception {
+        Message m = new Message();
+        m.setDate(new Date(86400000), TimeZone.getTimeZone("GMT"));
+
+        assertEquals(new Date(86400000), m.getDate());
+        assertEquals("Fri, 2 Jan 1970 00:00:00 +0000", m.getHeader().getField(
+                "Date").getBody());
     }
 
     public void testDisposeGetsPropagatedToBody() throws Exception {

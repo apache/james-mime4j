@@ -390,7 +390,7 @@ public abstract class Entity implements Disposable {
      * 
      * @return the header of this entity; never <code>null</code>.
      */
-    protected Header obtainHeader() {
+    Header obtainHeader() {
         if (header == null) {
             header = new Header();
         }
