@@ -38,7 +38,6 @@ import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 
@@ -228,7 +227,7 @@ public class Header {
      */
     @Override
     public String toString() {
-        CharArrayBuffer str = new CharArrayBuffer(128);
+        StringBuilder str = new StringBuilder(128);
         for (Field field : fields) {
             str.append(field.toString());
             str.append("\r\n");

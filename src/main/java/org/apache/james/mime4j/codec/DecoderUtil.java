@@ -26,7 +26,6 @@ import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
@@ -125,7 +124,7 @@ public class DecoderUtil {
         /*
          * Replace _ with =20
          */
-        CharArrayBuffer sb = new CharArrayBuffer(128);
+        StringBuilder sb = new StringBuilder(128);
         for (int i = 0; i < encodedWord.length(); i++) {
             char c = encodedWord.charAt(i);
             if (c == '_') {

@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.util.CharArrayBuffer;
 
 /**
  * MIME entity configuration
@@ -150,7 +149,7 @@ public final class MimeEntityConfig implements Cloneable {
     
     @Override
     public String toString() {
-        CharArrayBuffer buffer = new CharArrayBuffer(128);
+        StringBuilder buffer = new StringBuilder(128);
         buffer.append("[max body descriptor: ");
         buffer.append(Boolean.toString(this.maximalBodyDescriptor));
         buffer.append("][strict parsing: ");

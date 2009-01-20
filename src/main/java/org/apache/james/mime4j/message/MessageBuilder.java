@@ -30,7 +30,6 @@ import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.storage.StorageProvider;
-import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.MimeUtil;
 
 public class MessageBuilder implements ContentHandler {
@@ -177,7 +176,7 @@ public class MessageBuilder implements ContentHandler {
      */
     public void epilogue(InputStream is) throws MimeException, IOException {
         expect(Multipart.class);
-        CharArrayBuffer sb = new CharArrayBuffer(128);
+        StringBuilder sb = new StringBuilder(128);
         int b;
         while ((b = is.read()) != -1) {
             sb.append((char) b);
@@ -190,7 +189,7 @@ public class MessageBuilder implements ContentHandler {
      */
     public void preamble(InputStream is) throws MimeException, IOException {
         expect(Multipart.class);
-        CharArrayBuffer sb = new CharArrayBuffer(128);
+        StringBuilder sb = new StringBuilder(128);
         int b;
         while ((b = is.read()) != -1) {
             sb.append((char) b);

@@ -172,7 +172,7 @@ public final class MimeUtil {
         /*
          * Unfold Content-Type value
          */
-        CharArrayBuffer sb = new CharArrayBuffer(128);
+        StringBuilder sb = new StringBuilder(128);
         for (int i = 0; i < pValue.length(); i++) {
             char c = pValue.charAt(i);
             if (c == '\r' || c == '\n') {
@@ -198,8 +198,8 @@ public final class MimeUtil {
         result.put("", main);
         if (rest != null) {
             char[] chars = rest.toCharArray();
-            CharArrayBuffer paramName = new CharArrayBuffer(64);
-            CharArrayBuffer paramValue = new CharArrayBuffer(64);
+            StringBuilder paramName = new StringBuilder(64);
+            StringBuilder paramValue = new StringBuilder(64);
 
             final byte READY_FOR_NAME = 0;
             final byte IN_NAME = 1;
@@ -225,8 +225,8 @@ public final class MimeUtil {
                             break;
                         }
 
-                        paramName = new CharArrayBuffer(64);
-                        paramValue = new CharArrayBuffer(64);
+                        paramName.setLength(0);
+                        paramValue.setLength(0);
 
                         state = IN_NAME;
                         // fall-through
