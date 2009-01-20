@@ -69,7 +69,8 @@ public class Group extends Address {
 
     @Override
     protected void doAddMailboxesTo(List<Mailbox> results) {
-        for (int i = 0; i < mailboxList.size(); i++)
-            results.add(mailboxList.get(i));
+        for (Mailbox mailbox : mailboxList) {
+            results.add(mailbox);
+        }
     }
 }
