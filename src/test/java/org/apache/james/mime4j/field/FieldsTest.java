@@ -54,6 +54,18 @@ public class FieldsTest extends TestCase {
         assertEquals(expectedRaw, field.getRaw());
     }
 
+    public void testContentTypeStringParametersWithSpaces() throws Exception {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("param", "value with space chars");
+        ContentTypeField field = Fields.contentType("multipart/mixed",
+                parameters);
+        assertTrue(field.isValidField());
+
+        String expectedRaw = "Content-Type: multipart/mixed; "
+                + "param=\"value with space chars\"";
+        assertEquals(expectedRaw, field.getRaw());
+    }
+
     public void testContentTypeStringNullParameters() throws Exception {
         ContentTypeField field = Fields.contentType("text/plain", null);
         assertTrue(field.isValidField());
