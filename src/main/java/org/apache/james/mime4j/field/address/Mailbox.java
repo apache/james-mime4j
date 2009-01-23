@@ -195,6 +195,20 @@ public class Mailbox extends Address {
         return getCanonicalizedAddress().hashCode();
     }
 
+    /**
+     * Indicates whether some other object is "equal to" this mailbox.
+     * <p>
+     * An object is considered to be equal to this mailbox if it is an instance
+     * of class <code>Mailbox</code> that holds the same address as this one.
+     * The domain is considered to be case-insensitive but the local-part is not
+     * (because of RFC 5321: <cite>the local-part of a mailbox MUST BE treated
+     * as case sensitive</cite>).
+     * 
+     * @param obj
+     *            the object to test for equality.
+     * @return <code>true</code> if the specified object is a
+     *         <code>Mailbox</code> that holds the same address as this one.
+     */
     @Override
     public boolean equals(Object obj) {
         if (obj == this)
@@ -213,7 +227,11 @@ public class Mailbox extends Address {
     }
 
     private Object getCanonicalizedAddress() {
-        return getAddress().toLowerCase(Locale.US);
+        if (domain == null) {
+            return localPart;
+        } else {
+            return localPart + '@' + domain.toLowerCase(Locale.US);
+        }
     }
 
 }
