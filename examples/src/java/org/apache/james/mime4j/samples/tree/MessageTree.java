@@ -87,6 +87,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
             this.object = object;
         }
         
+        @Override
         public String toString() {
             return text;
         }
