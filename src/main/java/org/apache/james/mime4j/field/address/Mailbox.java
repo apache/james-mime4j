@@ -21,6 +21,7 @@ package org.apache.james.mime4j.field.address;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Represents a single e-mail address.
@@ -190,8 +191,29 @@ public class Mailbox extends Address {
     }
 
     @Override
+    public int hashCode() {
+        return getCanonicalizedAddress().hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this)
+            return true;
+        if (!(obj instanceof Mailbox))
+            return false;
+
+        Mailbox other = (Mailbox) obj;
+        return getCanonicalizedAddress()
+                .equals(other.getCanonicalizedAddress());
+    }
+
+    @Override
     protected final void doAddMailboxesTo(List<Mailbox> results) {
         results.add(this);
+    }
+
+    private Object getCanonicalizedAddress() {
+        return getAddress().toLowerCase(Locale.US);
     }
 
 }
