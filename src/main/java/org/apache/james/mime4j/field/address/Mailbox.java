@@ -19,18 +19,26 @@
 
 package org.apache.james.mime4j.field.address;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
  * Represents a single e-mail address.
  */
 public class Mailbox extends Address {
-    private DomainList route;
-    private String localPart;
-    private String domain;
+
+    private static final long serialVersionUID = 1L;
+
+    private static final DomainList EMPTY_ROUTE_LIST = new DomainList(
+            Collections.<String> emptyList(), true);
+
+    private final String name;
+    private final DomainList route;
+    private final String localPart;
+    private final String domain;
 
     /**
-     * Creates a mailbox without a route. Routes are obsolete.
+     * Creates an unnamed mailbox without a route. Routes are obsolete.
      * 
      * @param localPart
      *            The part of the e-mail address to the left of the "@".
@@ -38,27 +46,82 @@ public class Mailbox extends Address {
      *            The part of the e-mail address to the right of the "@".
      */
     public Mailbox(String localPart, String domain) {
-        this(null, localPart, domain);
+        this(null, null, localPart, domain);
     }
 
     /**
-     * Creates a mailbox with a route. Routes are obsolete.
+     * Creates an unnamed mailbox with a route. Routes are obsolete.
      * 
      * @param route
-     *            The zero or more domains that make up the route. Can be null.
+     *            The zero or more domains that make up the route. May be
+     *            <code>null</code>.
      * @param localPart
      *            The part of the e-mail address to the left of the "@".
      * @param domain
      *            The part of the e-mail address to the right of the "@".
      */
     public Mailbox(DomainList route, String localPart, String domain) {
-        this.route = route;
-        this.localPart = localPart;
-        this.domain = domain;
+        this(null, route, localPart, domain);
     }
 
     /**
-     * Returns the route list.
+     * Creates a named mailbox without a route. Routes are obsolete.
+     * 
+     * @param name
+     *            the name of the e-mail address. May be <code>null</code>.
+     * @param localPart
+     *            The part of the e-mail address to the left of the "@".
+     * @param domain
+     *            The part of the e-mail address to the right of the "@".
+     */
+    public Mailbox(String name, String localPart, String domain) {
+        this(name, null, localPart, domain);
+    }
+
+    /**
+     * Creates a named mailbox with a route. Routes are obsolete.
+     * 
+     * @param name
+     *            the name of the e-mail address. May be <code>null</code>.
+     * @param route
+     *            The zero or more domains that make up the route. May be
+     *            <code>null</code>.
+     * @param localPart
+     *            The part of the e-mail address to the left of the "@".
+     * @param domain
+     *            The part of the e-mail address to the right of the "@".
+     */
+    public Mailbox(String name, DomainList route, String localPart,
+            String domain) {
+        if (localPart == null || localPart.length() == 0)
+            throw new IllegalArgumentException();
+
+        this.name = name == null || name.length() == 0 ? null : name;
+        this.route = route == null ? EMPTY_ROUTE_LIST : route;
+        this.localPart = localPart;
+        this.domain = domain == null || domain.length() == 0 ? null : domain;
+    }
+
+    /**
+     * Creates a named mailbox based on an unnamed mailbox. Package private;
+     * internally used by Builder.
+     */
+    Mailbox(String name, Mailbox baseMailbox) {
+        this(name, baseMailbox.getRoute(), baseMailbox.getLocalPart(),
+                baseMailbox.getDomain());
+    }
+
+    /**
+     * Returns the name of the mailbox or <code>null</code> if it does not
+     * have a name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Returns the route list. If the mailbox does not have a route an empty
+     * domain list is returned.
      */
     public DomainList getRoute() {
         return route;
@@ -79,37 +142,51 @@ public class Mailbox extends Address {
     }
 
     /**
-     * Formats the address as a string, not including the route.
+     * Returns the address in the form <i>localPart@domain</i>.
      * 
-     * @see #getAddressString(boolean)
+     * @return the address part of this mailbox.
      */
-    public String getAddressString() {
-        return getAddressString(false);
+    public String getAddress() {
+        if (domain == null) {
+            return localPart;
+        } else {
+            return localPart + '@' + domain;
+        }
     }
 
-    /**
-     * Note that this value may not be usable for transport purposes, only
-     * display purposes.
-     * 
-     * For example, if the unparsed address was
-     * 
-     * <"Joe Cheng"@joecheng.com>
-     * 
-     * this method would return
-     * 
-     * <Joe Cheng@joecheng.com>
-     * 
-     * which is not valid for transport; the local part would need to be
-     * re-quoted.
-     * 
-     * @param includeRoute
-     *            true if the route should be included if it exists.
-     */
-    public String getAddressString(boolean includeRoute) {
-        return "<"
-                + (!includeRoute || route == null ? "" : route.toRouteString()
-                        + ":") + localPart + (domain == null ? "" : "@")
-                + domain + ">";
+    @Override
+    public String getDisplayString(boolean includeRoute) {
+        includeRoute &= route != null;
+        boolean includeAngleBrackets = name != null || includeRoute;
+
+        StringBuilder sb = new StringBuilder();
+
+        if (name != null) {
+            sb.append(name);
+            sb.append(' ');
+        }
+
+        if (includeAngleBrackets) {
+            sb.append('<');
+        }
+
+        if (includeRoute) {
+            sb.append(route.toRouteString());
+            sb.append(':');
+        }
+
+        sb.append(localPart);
+
+        if (domain != null) {
+            sb.append('@');
+            sb.append(domain);
+        }
+
+        if (includeAngleBrackets) {
+            sb.append('>');
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -117,8 +194,4 @@ public class Mailbox extends Address {
         results.add(this);
     }
 
-    @Override
-    public String toString() {
-        return getAddressString();
-    }
 }

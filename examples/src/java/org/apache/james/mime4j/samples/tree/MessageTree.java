@@ -315,7 +315,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < list.size(); i++) {
                     Mailbox mb = list.get(i);
-                    sb.append(mb.getAddressString() + "\n");
+                    sb.append(mb.getDisplayString() + "\n");
                 }
                 textView.setText(sb.toString());
                 

@@ -75,8 +75,7 @@ class Builder {
                 return new Group(name, buildGroupBody((ASTgroup_body) n2));
             } else if (n2 instanceof ASTangle_addr) {
                 name = DecoderUtil.decodeEncodedWords(name);
-                return new NamedMailbox(name,
-                        buildAngleAddr((ASTangle_addr) n2));
+                return new Mailbox(name, buildAngleAddr((ASTangle_addr) n2));
             } else {
                 throw new IllegalStateException();
             }
@@ -112,7 +111,7 @@ class Builder {
         }
     }
 
-    private NamedMailbox buildNameAddr(ASTname_addr node) {
+    private Mailbox buildNameAddr(ASTname_addr node) {
         ChildNodeIterator it = new ChildNodeIterator(node);
         Node n = it.next();
         String name;
@@ -125,7 +124,7 @@ class Builder {
         n = it.next();
         if (n instanceof ASTangle_addr) {
             name = DecoderUtil.decodeEncodedWords(name);
-            return new NamedMailbox(name, buildAngleAddr((ASTangle_addr) n));
+            return new Mailbox(name, buildAngleAddr((ASTangle_addr) n));
         } else {
             throw new IllegalStateException();
         }

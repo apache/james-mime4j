@@ -25,8 +25,11 @@ import java.util.List;
  * A named group of zero or more mailboxes.
  */
 public class Group extends Address {
-    private String name;
-    private MailboxList mailboxList;
+
+    private static final long serialVersionUID = 1L;
+
+    private final String name;
+    private final MailboxList mailboxList;
 
     /**
      * @param name
@@ -35,6 +38,11 @@ public class Group extends Address {
      *            The mailboxes in this group.
      */
     public Group(String name, MailboxList mailboxes) {
+        if (name == null)
+            throw new IllegalArgumentException();
+        if (mailboxes == null)
+            throw new IllegalArgumentException();
+
         this.name = name;
         this.mailboxList = mailboxes;
     }
@@ -54,17 +62,23 @@ public class Group extends Address {
     }
 
     @Override
-    public String toString() {
-        StringBuilder buf = new StringBuilder();
-        buf.append(name);
-        buf.append(":");
-        for (int i = 0; i < mailboxList.size(); i++) {
-            buf.append(mailboxList.get(i).toString());
-            if (i + 1 < mailboxList.size())
-                buf.append(",");
+    public String getDisplayString(boolean includeRoute) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Mailbox mailbox : mailboxList) {
+            if (sb.length() == 0) {
+                sb.append(name);
+                sb.append(':');
+            } else {
+                sb.append(',');
+            }
+
+            sb.append(mailbox.getDisplayString(includeRoute));
         }
-        buf.append(";");
-        return buf.toString();
+
+        sb.append(";");
+
+        return sb.toString();
     }
 
     @Override
@@ -73,4 +87,5 @@ public class Group extends Address {
             results.add(mailbox);
         }
     }
+
 }

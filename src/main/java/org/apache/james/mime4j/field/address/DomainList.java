@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -28,8 +29,11 @@ import java.util.List;
  * An immutable, random-access list of Strings (that are supposedly domain names
  * or domain literals).
  */
-public class DomainList implements Iterable<String> {
-    private List<String> domains;
+public class DomainList implements Iterable<String>, Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    private final List<String> domains;
 
     /**
      * @param domains
@@ -42,7 +46,7 @@ public class DomainList implements Iterable<String> {
         if (domains != null)
             this.domains = dontCopy ? domains : new ArrayList<String>(domains);
         else
-            this.domains = new ArrayList<String>(0);
+            this.domains = Collections.emptyList();
     }
 
     /**
@@ -66,25 +70,30 @@ public class DomainList implements Iterable<String> {
 
     /**
      * Returns an iterator over the domains in this list.
-     *
+     * 
      * @return an iterator over the domains in this list.
      */
     public Iterator<String> iterator() {
         return Collections.unmodifiableList(domains).iterator();
     }
-    
+
     /**
      * Returns the list of domains formatted as a route string (not including
      * the trailing ':').
      */
     public String toRouteString() {
-        StringBuilder out = new StringBuilder();
-        for (int i = 0; i < domains.size(); i++) {
-            out.append("@");
-            out.append(get(i));
-            if (i + 1 < domains.size())
-                out.append(",");
+        StringBuilder sb = new StringBuilder();
+
+        for (String domain : domains) {
+            if (sb.length() > 0) {
+                sb.append(',');
+            }
+
+            sb.append("@");
+            sb.append(domain);
         }
-        return out.toString();
+
+        return sb.toString();
     }
+
 }

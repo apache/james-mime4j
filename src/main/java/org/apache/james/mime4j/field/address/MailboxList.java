@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -27,9 +28,11 @@ import java.util.List;
 /**
  * An immutable, random-access list of Mailbox objects.
  */
-public class MailboxList implements Iterable<Mailbox> {
+public class MailboxList implements Iterable<Mailbox>, Serializable {
 
-    private List<Mailbox> mailboxes;
+    private static final long serialVersionUID = 1L;
+
+    private final List<Mailbox> mailboxes;
 
     /**
      * @param mailboxes
@@ -43,7 +46,7 @@ public class MailboxList implements Iterable<Mailbox> {
             this.mailboxes = dontCopy ? mailboxes : new ArrayList<Mailbox>(
                     mailboxes);
         else
-            this.mailboxes = new ArrayList<Mailbox>(0);
+            this.mailboxes = Collections.emptyList();
     }
 
     /**
@@ -64,7 +67,7 @@ public class MailboxList implements Iterable<Mailbox> {
 
     /**
      * Returns an iterator over the mailboxes in this list.
-     *
+     * 
      * @return an iterator over the mailboxes in this list.
      */
     public Iterator<Mailbox> iterator() {

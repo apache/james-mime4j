@@ -45,7 +45,7 @@ public class AddressTest extends TestCase {
     public void testParse1() throws ParseException {
         AddressList addrList = AddressList.parse("John Doe <jdoe@machine(comment).  example>");
         assertEquals(1, addrList.size());
-        NamedMailbox mailbox = (NamedMailbox)addrList.get(0);
+        Mailbox mailbox = (Mailbox)addrList.get(0);
         assertEquals("John Doe", mailbox.getName());
         assertEquals("jdoe", mailbox.getLocalPart());
         assertEquals("machine.example", mailbox.getDomain());
@@ -54,7 +54,7 @@ public class AddressTest extends TestCase {
     public void testParse2() throws ParseException {
         AddressList addrList = AddressList.parse("Mary Smith \t    \t\t  <mary@example.net>");
         assertEquals(1, addrList.size());
-        NamedMailbox mailbox = (NamedMailbox)addrList.get(0);
+        Mailbox mailbox = (Mailbox)addrList.get(0);
         assertEquals("Mary Smith", mailbox.getName());
         assertEquals("mary", mailbox.getLocalPart());
         assertEquals("example.net", mailbox.getDomain());
@@ -76,19 +76,18 @@ public class AddressTest extends TestCase {
         assertEquals("Marketing  folks", group.getName());
         assertEquals(2, group.getMailboxes().size());
 
-        NamedMailbox namedMailbox1 = (NamedMailbox)group.getMailboxes().get(0);
-        NamedMailbox namedMailbox2 = (NamedMailbox)group.getMailboxes().get(1);
+        Mailbox mailbox1 = (Mailbox)group.getMailboxes().get(0);
+        Mailbox mailbox2 = (Mailbox)group.getMailboxes().get(1);
 
-        assertEquals("Jane Smith", namedMailbox1.getName());
-        assertEquals("jane", namedMailbox1.getLocalPart());
-        assertEquals("example.net", namedMailbox1.getDomain());
+        assertEquals("Jane Smith", mailbox1.getName());
+        assertEquals("jane", mailbox1.getLocalPart());
+        assertEquals("example.net", mailbox1.getDomain());
 
-        assertEquals(" Jack \"Jackie\" Jones ", namedMailbox2.getName());
-        assertEquals("jjones", namedMailbox2.getLocalPart());
-        assertEquals("example.com", namedMailbox2.getDomain());
+        assertEquals(" Jack \"Jackie\" Jones ", mailbox2.getName());
+        assertEquals("jjones", mailbox2.getLocalPart());
+        assertEquals("example.com", mailbox2.getDomain());
 
         Mailbox mailbox = (Mailbox)addrList.get(1);
-        assertFalse(mailbox instanceof NamedMailbox);
         assertEquals("john", mailbox.getLocalPart());
         assertEquals("example.net", mailbox.getDomain());
         assertEquals(2, mailbox.getRoute().size());
@@ -353,13 +352,13 @@ public class AddressTest extends TestCase {
     public void testGroupSerialization() {
         List<Mailbox> al = new ArrayList<Mailbox>();
         al.add(new Mailbox("test", "example.com"));
-        al.add(new NamedMailbox("Foo!", "foo", "example.com"));
+        al.add(new Mailbox("Foo!", "foo", "example.com"));
         DomainList dl = new DomainList(new ArrayList<String>(Arrays.asList(new String[] {"foo.example.com"})), true);
-        NamedMailbox namedMailbox = new NamedMailbox("Foo Bar", dl, "foo2", "example.com");
-        assertSame(dl, namedMailbox.getRoute());
-        al.add(namedMailbox);
+        Mailbox mailbox = new Mailbox("Foo Bar", dl, "foo2", "example.com");
+        assertSame(dl, mailbox.getRoute());
+        al.add(mailbox);
         Group g = new Group("group", new MailboxList(al, false));
-        assertEquals("group:<test@example.com>,Foo! <foo@example.com>,Foo Bar <foo2@example.com>;", g.toString());
+        assertEquals("group:test@example.com,Foo! <foo@example.com>,Foo Bar <foo2@example.com>;", g.getDisplayString());
     }
     
     public void testEmptyQuotedStringBeforeDotAtomInLocalPart() throws Exception {

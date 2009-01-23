@@ -19,15 +19,14 @@
 
 package org.apache.james.mime4j.field.address;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * The abstract base for classes that represent RFC2822 addresses. This includes
  * groups and mailboxes.
- * 
- * Currently, no public methods are introduced on this class.
  */
-public abstract class Address {
+public abstract class Address implements Serializable {
 
     /**
      * Adds any mailboxes represented by this address into the given List. Note
@@ -43,5 +42,45 @@ public abstract class Address {
      * be overridden by concrete subclasses.
      */
     protected abstract void doAddMailboxesTo(List<Mailbox> results);
+
+    /**
+     * Formats the address as a human readable string, not including the route.
+     * The resulting string is intended for display purposes only and cannot be
+     * used for transport purposes.
+     * 
+     * @return a string representation of this address intended to be displayed
+     * @see #getDisplayString(boolean)
+     */
+    public final String getDisplayString() {
+        return getDisplayString(false);
+    }
+
+    /**
+     * Formats the address as a human readable string, not including the route.
+     * The resulting string is intended for display purposes only and cannot be
+     * used for transport purposes.
+     * 
+     * For example, if the unparsed address was
+     * 
+     * <"Joe Cheng"@joecheng.com>
+     * 
+     * this method would return
+     * 
+     * <Joe Cheng@joecheng.com>
+     * 
+     * which is not valid for transport; the local part would need to be
+     * re-quoted.
+     * 
+     * @param includeRoute
+     *            <code>true</code> if the route should be included if it
+     *            exists, <code>false</code> otherwise.
+     * @return a string representation of this address intended to be displayed.
+     */
+    public abstract String getDisplayString(boolean includeRoute);
+
+    @Override
+    public String toString() {
+        return getDisplayString(false);
+    }
 
 }

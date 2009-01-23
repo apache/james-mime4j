@@ -22,6 +22,7 @@ package org.apache.james.mime4j.field.address;
 import org.apache.james.mime4j.field.address.parser.AddressListParser;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 
+import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,9 +32,11 @@ import java.util.List;
 /**
  * An immutable, random-access list of Address objects.
  */
-public class AddressList implements Iterable<Address> {
+public class AddressList implements Iterable<Address>, Serializable {
 
-    private List<? extends Address> addresses;
+    private static final long serialVersionUID = 1L;
+
+    private final List<? extends Address> addresses;
 
     /**
      * @param addresses
@@ -47,7 +50,7 @@ public class AddressList implements Iterable<Address> {
             this.addresses = dontCopy ? addresses : new ArrayList<Address>(
                     addresses);
         else
-            this.addresses = new ArrayList<Address>(0);
+            this.addresses = Collections.emptyList();
     }
 
     /**
@@ -68,7 +71,7 @@ public class AddressList implements Iterable<Address> {
 
     /**
      * Returns an iterator over the addresses in this list.
-     *
+     * 
      * @return an iterator over the addresses in this list.
      */
     public Iterator<Address> iterator() {
