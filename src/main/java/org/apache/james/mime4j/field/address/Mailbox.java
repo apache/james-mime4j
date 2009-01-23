@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.james.mime4j.codec.EncoderUtil;
+
 /**
  * Represents a single e-mail address.
  */
@@ -184,6 +186,32 @@ public class Mailbox extends Address {
         }
 
         if (includeAngleBrackets) {
+            sb.append('>');
+        }
+
+        return sb.toString();
+    }
+
+    @Override
+    public String getEncodedString() {
+        StringBuilder sb = new StringBuilder();
+
+        if (name != null) {
+            sb.append(EncoderUtil.encodeAddressDisplayName(name));
+            sb.append(" <");
+        }
+
+        sb.append(EncoderUtil.encodeAddressLocalPart(localPart));
+
+        // domain = dot-atom / domain-literal
+        // domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
+        // dtext = %d33-90 / %d94-126
+        if (domain != null) {
+            sb.append('@');
+            sb.append(domain);
+        }
+
+        if (name != null) {
             sb.append('>');
         }
 

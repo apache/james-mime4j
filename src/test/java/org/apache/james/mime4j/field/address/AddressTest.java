@@ -372,4 +372,30 @@ public class AddressTest extends TestCase {
         } catch (ParseException pe) {
         }
     }
+    
+    public void testMailboxGetEncodedString() throws Exception {
+        assertEquals("john.doe@acme.org", new Mailbox("john.doe", "acme.org")
+                .getEncodedString());
+        assertEquals("\"john doe\"@acme.org", new Mailbox("john doe",
+                "acme.org").getEncodedString());
+        assertEquals("John Doe <john.doe@acme.org>", new Mailbox("John Doe",
+                "john.doe", "acme.org").getEncodedString());
+        assertEquals("\"John Doe @Home\" <john.doe@acme.org>", new Mailbox(
+                "John Doe @Home", "john.doe", "acme.org").getEncodedString());
+        assertEquals("=?ISO-8859-1?Q?Hans_M=FCller?= <hans.mueller@acme.org>",
+                new Mailbox("Hans M\374ller", "hans.mueller", "acme.org")
+                        .getEncodedString());
+    }
+
+    public void testGroupGetEncodedString() throws Exception {
+        List<Mailbox> al = new ArrayList<Mailbox>();
+        al.add(new Mailbox("test", "example.com"));
+        al.add(new Mailbox("Foo!", "foo", "example.com"));
+        al.add(new Mailbox("Hans M\374ller", "hans.mueller", "acme.org"));
+        Group g = new Group("group @work", new MailboxList(al, false));
+        assertEquals("\"group @work\":test@example.com,Foo! <foo@example.com>"
+                + ",=?ISO-8859-1?Q?Hans_M=FCller?= <hans.mueller@acme.org>;", g
+                .getEncodedString());
+    }
+    
 }

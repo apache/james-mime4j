@@ -78,6 +78,17 @@ public abstract class Address implements Serializable {
      */
     public abstract String getDisplayString(boolean includeRoute);
 
+    /**
+     * Returns a string representation of this address that can be used for
+     * transport purposes. The route is never included in this representation
+     * because routes are obsolete and RFC 5322 states that obsolete syntactic
+     * forms MUST NOT be generated.
+     * 
+     * @return a string representation of this address intended for transport
+     *         purposes.
+     */
+    public abstract String getEncodedString();
+
     @Override
     public String toString() {
         return getDisplayString(false);

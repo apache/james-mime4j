@@ -54,6 +54,8 @@ public class EncoderUtil {
 
     private static final BitSet TOKEN_CHARS = initChars("()<>@,;:\\\"/[]?=");
 
+    private static final BitSet ATEXT_CHARS = initChars("()<>@.,;:\\\"[]");
+
     private static BitSet initChars(String specials) {
         BitSet bs = new BitSet(128);
         for (char ch = 33; ch < 127; ch++) {
@@ -92,6 +94,54 @@ public class EncoderUtil {
     }
 
     private EncoderUtil() {
+    }
+
+    /**
+     * Encodes the display-name portion of an address. See <a
+     * href='http://www.faqs.org/rfcs/rfc5322.html'>RFC 5322</a> section 3.4
+     * and <a href='http://www.faqs.org/rfcs/rfc2047.html'>RFC 2047</a> section
+     * 5.3. The specified string should not be folded.
+     * 
+     * @param displayName
+     *            display-name to encode.
+     * @return encoded display-name.
+     */
+    public static String encodeAddressDisplayName(String displayName) {
+        // display-name = phrase
+        // phrase = 1*( encoded-word / word )
+        // word = atom / quoted-string
+        // atom = [CFWS] 1*atext [CFWS]
+        // CFWS = comment or folding white space
+
+        if (isAtomPhrase(displayName)) {
+            return displayName;
+        } else if (hasToBeEncoded(displayName, 0)) {
+            return encodeEncodedWord(displayName, Usage.WORD_ENTITY);
+        } else {
+            return quote(displayName);
+        }
+    }
+
+    /**
+     * Encodes the local part of an address specification as described in RFC
+     * 5322 section 3.4.1. Leading and trailing CFWS should have been removed
+     * before calling this method. The specified string should not contain any
+     * illegal (control or non-ASCII) characters.
+     * 
+     * @param localPart
+     *            the local part to encode
+     * @return the encoded local part.
+     */
+    public static String encodeAddressLocalPart(String localPart) {
+        // local-part = dot-atom / quoted-string
+        // dot-atom = [CFWS] dot-atom-text [CFWS]
+        // CFWS = comment or folding white space
+
+        if (isDotAtomText(localPart)) {
+            return localPart;
+        } else {
+            return quote(localPart);
+        }
     }
 
     /**
@@ -371,6 +421,45 @@ public class EncoderUtil {
         return true;
     }
 
+    private static boolean isAtomPhrase(String str) {
+        // atom = [CFWS] 1*atext [CFWS]
+
+        final int length = str.length();
+        for (int idx = 0; idx < length; idx++) {
+            char ch = str.charAt(idx);
+            if (!ATEXT_CHARS.get(ch) && !CharsetUtil.isWhitespace(ch))
+                return false;
+        }
+
+        return true;
+    }
+
+    // RFC 5322 section 3.2.3
+    private static boolean isDotAtomText(String str) {
+        // dot-atom-text = 1*atext *("." 1*atext)
+        // atext = ALPHA / DIGIT / "!" / "#" / "$" / "%" / "&" / "'" / "*" /
+        // "+" / "-" / "/" / "=" / "?" / "^" / "_" / "`" / "{" / "|" / "}" / "~"
+
+        char prev = '.';
+
+        final int length = str.length();
+        for (int idx = 0; idx < length; idx++) {
+            char ch = str.charAt(idx);
+
+            if (ch == '.') {
+                if (prev == '.' || idx == length - 1)
+                    return false;
+            } else {
+                if (!ATEXT_CHARS.get(ch))
+                    return false;
+            }
+
+            prev = ch;
+        }
+
+        return true;
+    }
+
     // RFC 5322 section 3.2.4
     private static String quote(String str) {
         // quoted-string = [CFWS] DQUOTE *([FWS] qcontent) [FWS] DQUOTE [CFWS]
@@ -383,7 +472,7 @@ public class EncoderUtil {
         String escaped = str.replaceAll("[\\\\\"]", "\\\\$0");
         return "\"" + escaped + "\"";
     }
-    
+
     private static String encodeB(String prefix, String text,
             int usedCharacters, Charset charset, byte[] bytes) {
         int encodedLength = bEncodedLength(bytes);

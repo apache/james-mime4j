@@ -30,6 +30,28 @@ import org.apache.james.mime4j.util.CharsetUtil;
 
 public class EncoderUtilTest extends TestCase {
 
+    public void testEncodeAddressDisplayName() throws Exception {
+        assertEquals("", EncoderUtil.encodeAddressDisplayName(""));
+        assertEquals("test", EncoderUtil.encodeAddressDisplayName("test"));
+        assertEquals(" test ", EncoderUtil.encodeAddressDisplayName(" test "));
+        assertEquals(" test\ttest ", EncoderUtil
+                .encodeAddressDisplayName(" test\ttest "));
+        assertEquals("\"test()\"", EncoderUtil
+                .encodeAddressDisplayName("test()"));
+        assertEquals("=?ISO-8859-1?Q?Semmelbr=F6sel?=", EncoderUtil
+                .encodeAddressDisplayName("Semmelbr\366sel"));
+        // dollar sign as to be encoded as =24 when used as a word in a phrase
+        assertEquals("=?UTF-8?Q?Dollar_=24_Euro_=E2=82=AC?=", EncoderUtil
+                .encodeAddressDisplayName("Dollar $ Euro \u20ac"));
+    }
+
+    public void testEncodeAddressLocalPart() throws Exception {
+        assertEquals("john.wayne", EncoderUtil
+                .encodeAddressLocalPart("john.wayne"));
+        assertEquals("\"clint eastwood\"", EncoderUtil
+                .encodeAddressLocalPart("clint eastwood"));
+    }
+
     public void testEncodeContentTypeParameterValue() throws Exception {
         assertEquals("test", EncoderUtil
                 .encodeContentTypeParameterValue("test"));

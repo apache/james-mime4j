@@ -21,6 +21,8 @@ package org.apache.james.mime4j.field.address;
 
 import java.util.List;
 
+import org.apache.james.mime4j.codec.EncoderUtil;
+
 /**
  * A named group of zero or more mailboxes.
  */
@@ -79,6 +81,25 @@ public class Group extends Address {
         sb.append(";");
 
         return sb.toString();
+    }
+
+    @Override
+    public String getEncodedString() {
+        StringBuilder buf = new StringBuilder();
+
+        for (Mailbox mailbox : mailboxList) {
+            if (buf.length() == 0) {
+                buf.append(EncoderUtil.encodeAddressDisplayName(name));
+                buf.append(':');
+            } else {
+                buf.append(',');
+            }
+            buf.append(mailbox.getEncodedString());
+        }
+
+        buf.append(';');
+
+        return buf.toString();
     }
 
     @Override
