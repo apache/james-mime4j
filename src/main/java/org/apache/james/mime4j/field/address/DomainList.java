@@ -96,4 +96,9 @@ public class DomainList implements Iterable<String>, Serializable {
         return sb.toString();
     }
 
+    @Override
+    public String toString() {
+        return toRouteString();
+    }
+
 }
