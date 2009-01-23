@@ -21,12 +21,14 @@ package org.apache.james.mime4j.codec;
 
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.util.BitSet;
 
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
- * Static methods for encoding encoded-words as defined in <a
- * href='http://www.faqs.org/rfcs/rfc2047.html'>RFC 2047</a>.
+ * Static methods for encoding header field values. This includes encoded-words
+ * as defined in <a href='http://www.faqs.org/rfcs/rfc2047.html'>RFC 2047</a>
+ * or display-names of an e-mail address, for example.
  */
 public class EncoderUtil {
     private static final byte[] BASE64_TABLE = Base64OutputStream.BASE64_TABLE;
@@ -49,6 +51,18 @@ public class EncoderUtil {
     private static final String ENC_WORD_SUFFIX = "?=";
 
     private static final int ENCODED_WORD_MAX_LENGTH = 75; // RFC 2047
+
+    private static final BitSet TOKEN_CHARS = initChars("()<>@,;:\\\"/[]?=");
+
+    private static BitSet initChars(String specials) {
+        BitSet bs = new BitSet(128);
+        for (char ch = 33; ch < 127; ch++) {
+            if (specials.indexOf(ch) == -1) {
+                bs.set(ch);
+            }
+        }
+        return bs;
+    }
 
     /**
      * Selects one of the two encodings specified in RFC 2047.
@@ -78,6 +92,24 @@ public class EncoderUtil {
     }
 
     private EncoderUtil() {
+    }
+
+    /**
+     * Encodes the specified string as a value of a Content-Type parameter as
+     * described in RFC 2045 section 5.1. The specified string should not
+     * contain any illegal (control or non-ASCII) characters.
+     * 
+     * @param value
+     *            string to encode.
+     * @return encoded result.
+     */
+    public static String encodeContentTypeParameterValue(String value) {
+        // value := token / quoted-string
+        if (isToken(value)) {
+            return value;
+        } else {
+            return quote(value);
+        }
     }
 
     /**
@@ -323,6 +355,35 @@ public class EncoderUtil {
         return sb.toString();
     }
 
+    // RFC 2045 section 5.1
+    private static boolean isToken(String str) {
+        // token := 1*<any (US-ASCII) CHAR except SPACE, CTLs, or tspecials>
+        // tspecials := "(" / ")" / "<" / ">" / "@" / "," / ";" / ":" / "\" /
+        // <"> / "/" / "[" / "]" / "?" / "="
+        // CTL := 0.- 31., 127.
+
+        final int length = str.length();
+        for (int idx = 0; idx < length; idx++) {
+            char ch = str.charAt(idx);
+            if (!TOKEN_CHARS.get(ch))
+                return false;
+        }
+        return true;
+    }
+
+    // RFC 5322 section 3.2.4
+    private static String quote(String str) {
+        // quoted-string = [CFWS] DQUOTE *([FWS] qcontent) [FWS] DQUOTE [CFWS]
+        // qcontent = qtext / quoted-pair
+        // qtext = %d33 / %d35-91 / %d93-126
+        // quoted-pair = ("\" (VCHAR / WSP))
+        // VCHAR = %x21-7E
+        // DQUOTE = %x22
+
+        String escaped = str.replaceAll("[\\\\\"]", "\\\\$0");
+        return "\"" + escaped + "\"";
+    }
+    
     private static String encodeB(String prefix, String text,
             int usedCharacters, Charset charset, byte[] bytes) {
         int encodedLength = bEncodedLength(bytes);

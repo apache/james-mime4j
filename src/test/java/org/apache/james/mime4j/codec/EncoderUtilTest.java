@@ -30,6 +30,19 @@ import org.apache.james.mime4j.util.CharsetUtil;
 
 public class EncoderUtilTest extends TestCase {
 
+    public void testEncodeContentTypeParameterValue() throws Exception {
+        assertEquals("test", EncoderUtil
+                .encodeContentTypeParameterValue("test"));
+        assertEquals("\"test test\"", EncoderUtil
+                .encodeContentTypeParameterValue("test test"));
+        assertEquals("\"=test\"", EncoderUtil
+                .encodeContentTypeParameterValue("=test"));
+        assertEquals("\"\\\\test\"", EncoderUtil
+                .encodeContentTypeParameterValue("\\test"));
+        assertEquals("\"\\\"\\\\\\\"\"", EncoderUtil
+                .encodeContentTypeParameterValue("\"\\\""));
+    }
+
     public void testHasToBeEncoded() throws Exception {
         assertFalse(EncoderUtil.hasToBeEncoded("", 0));
         assertFalse(EncoderUtil.hasToBeEncoded("only ascii characters", 0));
@@ -57,8 +70,8 @@ public class EncoderUtilTest extends TestCase {
 
     public void testEncodeEncodedWordForceCharset() throws Exception {
         assertTrue(EncoderUtil.encodeEncodedWord("only ascii",
-                Usage.TEXT_TOKEN, 0, CharsetUtil.UTF_8, null)
-                .startsWith("=?UTF-8?"));
+                Usage.TEXT_TOKEN, 0, CharsetUtil.UTF_8, null).startsWith(
+                "=?UTF-8?"));
     }
 
     public void testEncodeEncodedWordDetectEncoding() throws Exception {

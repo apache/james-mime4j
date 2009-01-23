@@ -22,7 +22,6 @@ package org.apache.james.mime4j.field;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
-import java.util.BitSet;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -33,18 +32,6 @@ import org.apache.james.mime4j.codec.EncoderUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 public class Fields {
-
-    private static final BitSet TOKEN_CHARS;
-
-    static {
-        final String specials = "()<>@,;:\\\"/[]?=";
-        TOKEN_CHARS = new BitSet(128);
-        for (char ch = 33; ch < 127; ch++) {
-            if (specials.indexOf(ch) == -1) {
-                TOKEN_CHARS.set(ch);
-            }
-        }
-    }
 
     private Fields() {
     }
@@ -66,7 +53,7 @@ public class Fields {
                 sb.append("; ");
                 sb.append(entry.getKey());
                 sb.append('=');
-                sb.append(encodeValue(entry.getValue()));
+                sb.append(EncoderUtil.encodeContentTypeParameterValue(entry.getValue()));
             }
             String contentType = sb.toString();
             return contentType(contentType);
@@ -115,40 +102,6 @@ public class Fields {
         String rawValue = MimeUtil.fold(encoded, usedCharacters);
 
         return (UnstructuredField) Field.parse(Field.SUBJECT, rawValue);
-    }
-
-    // value := token / quoted-string
-    private static String encodeValue(String value) {
-        if (isToken(value)) {
-            return value;
-        } else {
-            return quote(value);
-        }
-    }
-
-    // token := 1*<any (US-ASCII) CHAR except SPACE, CTLs, or tspecials>
-    // tspecials := "(" / ")" / "<" / ">" / "@" / "," / ";" / ":" / "\" / <"> /
-    // "/" / "[" / "]" / "?" / "="
-    // CTL := 0.- 31., 127.
-    private static boolean isToken(String str) {
-        final int length = str.length();
-        for (int idx = 0; idx < length; idx++) {
-            char ch = str.charAt(idx);
-            if (!TOKEN_CHARS.get(ch))
-                return false;
-        }
-        return true;
-    }
-
-    // quoted-string = [CFWS] DQUOTE *([FWS] qcontent) [FWS] DQUOTE [CFWS]
-    // qcontent = qtext / quoted-pair
-    // qtext = %d33 / %d35-91 / %d93-126
-    // quoted-pair = ("\" (VCHAR / WSP))
-    // VCHAR = %x21-7E
-    // DQUOTE = %x22
-    private static String quote(String str) {
-        String escaped = str.replaceAll("[\\\"]", "\\\\$0");
-        return "\"" + escaped + "\"";
     }
 
     private static final ThreadLocal<DateFormat> RFC822_DATE_FORMAT = new ThreadLocal<DateFormat>() {
