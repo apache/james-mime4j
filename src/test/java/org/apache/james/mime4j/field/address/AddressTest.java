@@ -397,5 +397,11 @@ public class AddressTest extends TestCase {
                 + ",=?ISO-8859-1?Q?Hans_M=FCller?= <hans.mueller@acme.org>;", g
                 .getEncodedString());
     }
+
+    public void testEmptyGroupGetEncodedString() throws Exception {
+        MailboxList emptyMailboxes = new MailboxList(null, true);
+        Group g = new Group("Undisclosed recipients", emptyMailboxes);
+        assertEquals("Undisclosed recipients:;", g.getEncodedString());
+    }
     
 }

@@ -67,10 +67,13 @@ public class Group extends Address {
     public String getDisplayString(boolean includeRoute) {
         StringBuilder sb = new StringBuilder();
 
+        sb.append(name);
+        sb.append(':');
+
+        boolean first = true;
         for (Mailbox mailbox : mailboxList) {
-            if (sb.length() == 0) {
-                sb.append(name);
-                sb.append(':');
+            if (first) {
+                first = false;
             } else {
                 sb.append(',');
             }
@@ -85,21 +88,25 @@ public class Group extends Address {
 
     @Override
     public String getEncodedString() {
-        StringBuilder buf = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
+        sb.append(EncoderUtil.encodeAddressDisplayName(name));
+        sb.append(':');
+
+        boolean first = true;
         for (Mailbox mailbox : mailboxList) {
-            if (buf.length() == 0) {
-                buf.append(EncoderUtil.encodeAddressDisplayName(name));
-                buf.append(':');
+            if (first) {
+                first = false;
             } else {
-                buf.append(',');
+                sb.append(',');
             }
-            buf.append(mailbox.getEncodedString());
+
+            sb.append(mailbox.getEncodedString());
         }
 
-        buf.append(';');
+        sb.append(';');
 
-        return buf.toString();
+        return sb.toString();
     }
 
     @Override
