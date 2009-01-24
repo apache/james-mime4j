@@ -358,7 +358,7 @@ public class AddressTest extends TestCase {
         assertSame(dl, mailbox.getRoute());
         al.add(mailbox);
         Group g = new Group("group", new MailboxList(al, false));
-        assertEquals("group:test@example.com,Foo! <foo@example.com>,Foo Bar <foo2@example.com>;", g.getDisplayString());
+        assertEquals("group: test@example.com, Foo! <foo@example.com>, Foo Bar <foo2@example.com>;", g.getDisplayString());
     }
     
     public void testEmptyQuotedStringBeforeDotAtomInLocalPart() throws Exception {
@@ -393,9 +393,9 @@ public class AddressTest extends TestCase {
         al.add(new Mailbox("Foo!", "foo", "example.com"));
         al.add(new Mailbox("Hans M\374ller", "hans.mueller", "acme.org"));
         Group g = new Group("group @work", new MailboxList(al, false));
-        assertEquals("\"group @work\":test@example.com,Foo! <foo@example.com>"
-                + ",=?ISO-8859-1?Q?Hans_M=FCller?= <hans.mueller@acme.org>;", g
-                .getEncodedString());
+        assertEquals("\"group @work\": test@example.com, "
+                + "Foo! <foo@example.com>, =?ISO-8859-1?Q?Hans_M=FCller?="
+                + " <hans.mueller@acme.org>;", g.getEncodedString());
     }
 
     public void testEmptyGroupGetEncodedString() throws Exception {

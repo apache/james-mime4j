@@ -78,6 +78,7 @@ public class Group extends Address {
                 sb.append(',');
             }
 
+            sb.append(' ');
             sb.append(mailbox.getDisplayString(includeRoute));
         }
 
@@ -101,6 +102,7 @@ public class Group extends Address {
                 sb.append(',');
             }
 
+            sb.append(' ');
             sb.append(mailbox.getEncodedString());
         }
 
