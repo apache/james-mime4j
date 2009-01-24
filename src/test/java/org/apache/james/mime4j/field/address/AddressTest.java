@@ -404,4 +404,37 @@ public class AddressTest extends TestCase {
         assertEquals("Undisclosed recipients:;", g.getEncodedString());
     }
     
+    public void testParseGroup() throws Exception {
+        Group group = Group
+                .parse("group: john.doe@acme.org, Mary Smith <mary@example.net>;");
+        assertEquals("group", group.getName());
+
+        MailboxList mailboxes = group.getMailboxes();
+        assertEquals(2, mailboxes.size());
+
+        Mailbox mailbox1 = mailboxes.get(0);
+        assertNull(mailbox1.getName());
+        assertEquals("john.doe@acme.org", mailbox1.getAddress());
+
+        Mailbox mailbox2 = mailboxes.get(1);
+        assertEquals("Mary Smith", mailbox2.getName());
+        assertEquals("mary@example.net", mailbox2.getAddress());
+    }
+
+    public void testParseMailbox() throws Exception {
+        Mailbox mailbox1 = Mailbox.parse("john.doe@acme.org");
+        assertNull(mailbox1.getName());
+        assertEquals("john.doe@acme.org", mailbox1.getAddress());
+
+        Mailbox mailbox2 = Mailbox.parse("Mary Smith <mary@example.net>");
+        assertEquals("Mary Smith", mailbox2.getName());
+        assertEquals("mary@example.net", mailbox2.getAddress());
+
+        // non-ascii should be allowed in quoted strings
+        Mailbox mailbox3 = Mailbox
+                .parse("\"Hans M\374ller\" <hans.mueller@acme.org>");
+        assertEquals("Hans M\374ller", mailbox3.getName());
+        assertEquals("hans.mueller@acme.org", mailbox3.getAddress());
+    }
+    
 }

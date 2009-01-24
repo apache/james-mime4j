@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
+import org.apache.james.mime4j.field.address.parser.ParseException;
 
 /**
  * Represents a single e-mail address.
@@ -112,6 +113,30 @@ public class Mailbox extends Address {
     Mailbox(String name, Mailbox baseMailbox) {
         this(name, baseMailbox.getRoute(), baseMailbox.getLocalPart(),
                 baseMailbox.getDomain());
+    }
+
+    /**
+     * Parses the specified raw string into a mailbox address.
+     * 
+     * @param rawMailboxString
+     *            string to parse.
+     * @return a <code>Mailbox</code> object for the specified string.
+     * @throws IllegalArgumentException
+     *             if the raw string does not represent a single mailbox
+     *             address.
+     */
+    public static Mailbox parse(String rawMailboxString) {
+        try {
+            AddressList addressList = AddressList.parse(rawMailboxString);
+            if (addressList.size() != 1)
+                throw new IllegalArgumentException("Not a single address");
+            Address address = addressList.get(0);
+            if (!(address instanceof Mailbox))
+                throw new IllegalArgumentException("Not a mailbox address");
+            return (Mailbox) address;
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     /**
