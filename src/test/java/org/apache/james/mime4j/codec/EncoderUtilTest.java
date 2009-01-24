@@ -38,6 +38,10 @@ public class EncoderUtilTest extends TestCase {
                 .encodeAddressDisplayName(" test\ttest "));
         assertEquals("\"test()\"", EncoderUtil
                 .encodeAddressDisplayName("test()"));
+        assertEquals("\"John Q. Public\"", EncoderUtil
+                .encodeAddressDisplayName("John Q. Public"));
+        assertEquals("\"Giant; \\\"Big\\\" Box\"", EncoderUtil
+                .encodeAddressDisplayName("Giant; \"Big\" Box"));
         assertEquals("=?ISO-8859-1?Q?Semmelbr=F6sel?=", EncoderUtil
                 .encodeAddressDisplayName("Semmelbr\366sel"));
         // dollar sign as to be encoded as =24 when used as a word in a phrase
