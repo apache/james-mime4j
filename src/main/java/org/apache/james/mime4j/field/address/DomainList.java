@@ -20,16 +20,16 @@
 package org.apache.james.mime4j.field.address;
 
 import java.io.Serializable;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * An immutable, random-access list of Strings (that are supposedly domain names
  * or domain literals).
  */
-public class DomainList implements Iterable<String>, Serializable {
+public class DomainList extends AbstractList<String> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,6 +52,7 @@ public class DomainList implements Iterable<String>, Serializable {
     /**
      * The number of elements in this list.
      */
+    @Override
     public int size() {
         return domains.size();
     }
@@ -62,19 +63,9 @@ public class DomainList implements Iterable<String>, Serializable {
      * @throws IndexOutOfBoundsException
      *             If index is &lt; 0 or &gt;= size().
      */
+    @Override
     public String get(int index) {
-        if (0 > index || size() <= index)
-            throw new IndexOutOfBoundsException();
         return domains.get(index);
-    }
-
-    /**
-     * Returns an iterator over the domains in this list.
-     * 
-     * @return an iterator over the domains in this list.
-     */
-    public Iterator<String> iterator() {
-        return Collections.unmodifiableList(domains).iterator();
     }
 
     /**

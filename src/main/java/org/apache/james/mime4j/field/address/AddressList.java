@@ -24,15 +24,15 @@ import org.apache.james.mime4j.field.address.parser.ParseException;
 
 import java.io.Serializable;
 import java.io.StringReader;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * An immutable, random-access list of Address objects.
  */
-public class AddressList implements Iterable<Address>, Serializable {
+public class AddressList extends AbstractList<Address> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,6 +56,7 @@ public class AddressList implements Iterable<Address>, Serializable {
     /**
      * The number of elements in this list.
      */
+    @Override
     public int size() {
         return addresses.size();
     }
@@ -63,19 +64,9 @@ public class AddressList implements Iterable<Address>, Serializable {
     /**
      * Gets an address.
      */
+    @Override
     public Address get(int index) {
-        if (0 > index || size() <= index)
-            throw new IndexOutOfBoundsException();
         return addresses.get(index);
-    }
-
-    /**
-     * Returns an iterator over the addresses in this list.
-     * 
-     * @return an iterator over the addresses in this list.
-     */
-    public Iterator<Address> iterator() {
-        return Collections.unmodifiableList(addresses).iterator();
     }
 
     /**

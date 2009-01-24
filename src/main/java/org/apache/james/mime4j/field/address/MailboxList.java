@@ -20,15 +20,15 @@
 package org.apache.james.mime4j.field.address;
 
 import java.io.Serializable;
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * An immutable, random-access list of Mailbox objects.
  */
-public class MailboxList implements Iterable<Mailbox>, Serializable {
+public class MailboxList extends AbstractList<Mailbox> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -52,6 +52,7 @@ public class MailboxList implements Iterable<Mailbox>, Serializable {
     /**
      * The number of elements in this list.
      */
+    @Override
     public int size() {
         return mailboxes.size();
     }
@@ -59,19 +60,9 @@ public class MailboxList implements Iterable<Mailbox>, Serializable {
     /**
      * Gets an address.
      */
+    @Override
     public Mailbox get(int index) {
-        if (0 > index || size() <= index)
-            throw new IndexOutOfBoundsException();
         return mailboxes.get(index);
-    }
-
-    /**
-     * Returns an iterator over the mailboxes in this list.
-     * 
-     * @return an iterator over the mailboxes in this list.
-     */
-    public Iterator<Mailbox> iterator() {
-        return Collections.unmodifiableList(mailboxes).iterator();
     }
 
     /**
