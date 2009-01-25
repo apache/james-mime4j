@@ -66,6 +66,16 @@ public class BodyFactory {
     }
 
     /**
+     * Returns the <code>StorageProvider</code> this <code>BodyFactory</code>
+     * uses to create message bodies from inout streams.
+     * 
+     * @return a <code>StorageProvider</code>.
+     */
+    public StorageProvider getStorageProvider() {
+        return storageProvider;
+    }
+
+    /**
      * Creates a {@link BinaryBody} that holds the content of the given input
      * stream.
      * 
