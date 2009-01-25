@@ -34,16 +34,9 @@ public class EncoderUtil {
     private static final byte[] BASE64_TABLE = Base64OutputStream.BASE64_TABLE;
     private static final char BASE64_PAD = '=';
 
-    private static final boolean[] ENCODE_Q_REGULAR = initQTable("=_?");
-    private static final boolean[] ENCODE_Q_RESTRICTED = initQTable("=_?\"#$%&'(),.:;<>@[\\]^`{|}~");
+    private static final BitSet Q_REGULAR_CHARS = initChars("=_?");
 
-    private static boolean[] initQTable(String needToEncode) {
-        boolean[] table = new boolean[128];
-        for (int i = 0; i < 128; i++) {
-            table[i] = i < 32 || i >= 127 || needToEncode.indexOf(i) != -1;
-        }
-        return table;
-    }
+    private static final BitSet Q_RESTRICTED_CHARS = initChars("=_?\"#$%&'(),.:;<>@[\\]^`{|}~");
 
     private static final int MAX_USED_CHARACTERS = 50;
 
@@ -383,8 +376,8 @@ public class EncoderUtil {
      * @return encoded string.
      */
     public static String encodeQ(byte[] bytes, Usage usage) {
-        boolean[] encode = usage == Usage.TEXT_TOKEN ? ENCODE_Q_REGULAR
-                : ENCODE_Q_RESTRICTED;
+        BitSet qChars = usage == Usage.TEXT_TOKEN ? Q_REGULAR_CHARS
+                : Q_RESTRICTED_CHARS;
 
         StringBuilder sb = new StringBuilder();
 
@@ -393,7 +386,7 @@ public class EncoderUtil {
             int v = bytes[idx] & 0xff;
             if (v == 32) {
                 sb.append('_');
-            } else if (v >= 128 || encode[v]) {
+            } else if (!qChars.get(v)) {
                 sb.append('=');
                 sb.append(hexDigit(v >>> 4));
                 sb.append(hexDigit(v & 0xf));
@@ -522,8 +515,8 @@ public class EncoderUtil {
     }
 
     private static int qEncodedLength(byte[] bytes, Usage usage) {
-        boolean[] encode = usage == Usage.TEXT_TOKEN ? ENCODE_Q_REGULAR
-                : ENCODE_Q_RESTRICTED;
+        BitSet qChars = usage == Usage.TEXT_TOKEN ? Q_REGULAR_CHARS
+                : Q_RESTRICTED_CHARS;
 
         int count = 0;
 
@@ -531,7 +524,7 @@ public class EncoderUtil {
             int v = bytes[idx] & 0xff;
             if (v == 32) {
                 count++;
-            } else if (v >= 128 || encode[v]) {
+            } else if (!qChars.get(v)) {
                 count += 3;
             } else {
                 count++;
@@ -569,13 +562,13 @@ public class EncoderUtil {
         if (bytes.length == 0)
             return Encoding.Q;
 
-        boolean[] encode = usage == Usage.TEXT_TOKEN ? ENCODE_Q_REGULAR
-                : ENCODE_Q_RESTRICTED;
+        BitSet qChars = usage == Usage.TEXT_TOKEN ? Q_REGULAR_CHARS
+                : Q_RESTRICTED_CHARS;
 
         int qEncoded = 0;
         for (int i = 0; i < bytes.length; i++) {
             int v = bytes[i] & 0xff;
-            if (v >= 128 || encode[v]) {
+            if (v != 32 && !qChars.get(v)) {
                 qEncoded++;
             }
         }
