@@ -19,12 +19,16 @@
 
 package org.apache.james.mime4j.field;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
 import junit.framework.TestCase;
+
+import org.apache.james.mime4j.field.address.Group;
+import org.apache.james.mime4j.field.address.Mailbox;
 
 public class FieldsTest extends TestCase {
 
@@ -163,6 +167,141 @@ public class FieldsTest extends TestCase {
         String expected = "Subject: =?US-ASCII?Q?12345678901234567890123456789012345?="
                 + "\r\n =?US-ASCII?Q?67890123456789012345678901234567890?=";
         assertEquals(expected, Fields.subject(eighty).getRaw());
+    }
+
+    public void testSender() throws Exception {
+        MailboxField field = Fields.sender(Mailbox
+                .parse("JD <john.doe@acme.org>"));
+        assertEquals("Sender: JD <john.doe@acme.org>", field.getRaw());
+    }
+
+    public void testFrom() throws Exception {
+        Mailbox mailbox1 = Mailbox.parse("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = Mailbox.parse("Mary Smith <mary@example.net>");
+
+        MailboxListField field = Fields.from(mailbox1);
+        assertEquals("From: JD <john.doe@acme.org>", field.getRaw());
+
+        field = Fields.from(mailbox1, mailbox2);
+        assertEquals("From: JD <john.doe@acme.org>, "
+                + "Mary Smith <mary@example.net>", field.getRaw());
+
+        field = Fields.from(Arrays.asList(mailbox1, mailbox2));
+        assertEquals("From: JD <john.doe@acme.org>, "
+                + "Mary Smith <mary@example.net>", field.getRaw());
+    }
+
+    public void testTo() throws Exception {
+        Mailbox mailbox1 = Mailbox.parse("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.org");
+        Mailbox mailbox3 = Mailbox.parse("Mary Smith <mary@example.net>");
+        Group group = new Group("The Does", mailbox1, mailbox2);
+
+        AddressListField field = Fields.to(group);
+        assertEquals("To: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;", field.getRaw());
+
+        field = Fields.to(group, mailbox3);
+        assertEquals("To: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
+                field.getRaw());
+
+        field = Fields.to(Arrays.asList(group, mailbox3));
+        assertEquals("To: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
+                field.getRaw());
+    }
+
+    public void testCc() throws Exception {
+        Mailbox mailbox1 = Mailbox.parse("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.org");
+        Mailbox mailbox3 = Mailbox.parse("Mary Smith <mary@example.net>");
+        Group group = new Group("The Does", mailbox1, mailbox2);
+
+        AddressListField field = Fields.cc(group);
+        assertEquals("Cc: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;", field.getRaw());
+
+        field = Fields.cc(group, mailbox3);
+        assertEquals("Cc: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
+                field.getRaw());
+
+        field = Fields.cc(Arrays.asList(group, mailbox3));
+        assertEquals("Cc: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
+                field.getRaw());
+    }
+
+    public void testBcc() throws Exception {
+        Mailbox mailbox1 = Mailbox.parse("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.org");
+        Mailbox mailbox3 = Mailbox.parse("Mary Smith <mary@example.net>");
+        Group group = new Group("The Does", mailbox1, mailbox2);
+
+        AddressListField field = Fields.bcc(group);
+        assertEquals("Bcc: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;", field.getRaw());
+
+        field = Fields.bcc(group, mailbox3);
+        assertEquals("Bcc: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
+                field.getRaw());
+
+        field = Fields.bcc(Arrays.asList(group, mailbox3));
+        assertEquals("Bcc: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
+                field.getRaw());
+    }
+
+    public void testReplyTo() throws Exception {
+        Mailbox mailbox1 = Mailbox.parse("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.org");
+        Mailbox mailbox3 = Mailbox.parse("Mary Smith <mary@example.net>");
+        Group group = new Group("The Does", mailbox1, mailbox2);
+
+        AddressListField field = Fields.replyTo(group);
+        assertEquals("Reply-To: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;", field.getRaw());
+
+        field = Fields.replyTo(group, mailbox3);
+        assertEquals("Reply-To: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;, Mary\r\n Smith <mary@example.net>",
+                field.getRaw());
+
+        field = Fields.replyTo(Arrays.asList(group, mailbox3));
+        assertEquals("Reply-To: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;, Mary\r\n Smith <mary@example.net>",
+                field.getRaw());
+    }
+
+    public void testMailbox() throws Exception {
+        MailboxField field = Fields.mailbox("Resent-Sender", Mailbox
+                .parse("JD <john.doe@acme.org>"));
+        assertEquals("Resent-Sender: JD <john.doe@acme.org>", field.getRaw());
+    }
+
+    public void testMailboxList() throws Exception {
+        Mailbox mailbox1 = Mailbox.parse("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = Mailbox.parse("Mary Smith <mary@example.net>");
+
+        MailboxListField field = Fields.mailboxList("Resent-From", Arrays
+                .asList(mailbox1, mailbox2));
+        assertEquals("Resent-From: JD <john.doe@acme.org>, "
+                + "Mary Smith <mary@example.net>", field.getRaw());
+    }
+
+    public void testAddressList() throws Exception {
+        Mailbox mailbox1 = Mailbox.parse("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.org");
+        Mailbox mailbox3 = Mailbox.parse("Mary Smith <mary@example.net>");
+        Group group = new Group("The Does", mailbox1, mailbox2);
+
+        AddressListField field = Fields.addressList("Resent-To", Arrays.asList(
+                group, mailbox3));
+        assertEquals("Resent-To: The Does: JD <john.doe@acme.org>, "
+                + "jane.doe@example.org;, Mary\r\n Smith <mary@example.net>",
+                field.getRaw());
     }
 
 }

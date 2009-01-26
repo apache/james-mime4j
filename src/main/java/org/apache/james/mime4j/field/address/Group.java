@@ -19,6 +19,9 @@
 
 package org.apache.james.mime4j.field.address;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
@@ -33,6 +36,26 @@ public class Group extends Address {
 
     private final String name;
     private final MailboxList mailboxList;
+
+    /**
+     * @param name
+     *            The group name.
+     * @param mailboxes
+     *            The mailboxes in this group.
+     */
+    public Group(String name, Mailbox... mailboxes) {
+        this(name, new MailboxList(Arrays.asList(mailboxes), true));
+    }
+
+    /**
+     * @param name
+     *            The group name.
+     * @param mailboxes
+     *            The mailboxes in this group.
+     */
+    public Group(String name, Collection<Mailbox> mailboxes) {
+        this(name, new MailboxList(new ArrayList<Mailbox>(mailboxes), true));
+    }
 
     /**
      * @param name

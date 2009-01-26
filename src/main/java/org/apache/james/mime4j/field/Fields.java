@@ -22,6 +22,8 @@ package org.apache.james.mime4j.field;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -29,6 +31,8 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
+import org.apache.james.mime4j.field.address.Address;
+import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.util.MimeUtil;
 
 public class Fields {
@@ -105,6 +109,133 @@ public class Fields {
         return parse(UnstructuredField.class, Field.SUBJECT, rawValue);
     }
 
+    public static MailboxField sender(Mailbox mailbox) {
+        return mailbox(Field.SENDER, mailbox);
+    }
+
+    public static MailboxListField from(Mailbox mailbox) {
+        return mailboxList(Field.FROM, Collections.singleton(mailbox));
+    }
+
+    public static MailboxListField from(Mailbox... mailboxes) {
+        return mailboxList(Field.FROM, Arrays.asList(mailboxes));
+    }
+
+    public static MailboxListField from(Iterable<Mailbox> mailboxes) {
+        return mailboxList(Field.FROM, mailboxes);
+    }
+
+    public static AddressListField to(Address address) {
+        return addressList(Field.TO, Collections.singleton(address));
+    }
+
+    public static AddressListField to(Address... addresses) {
+        return addressList(Field.TO, Arrays.asList(addresses));
+    }
+
+    public static AddressListField to(Iterable<Address> addresses) {
+        return addressList(Field.TO, addresses);
+    }
+
+    public static AddressListField cc(Address address) {
+        return addressList(Field.CC, Collections.singleton(address));
+    }
+
+    public static AddressListField cc(Address... addresses) {
+        return addressList(Field.CC, Arrays.asList(addresses));
+    }
+
+    public static AddressListField cc(Iterable<Address> addresses) {
+        return addressList(Field.CC, addresses);
+    }
+
+    public static AddressListField bcc(Address address) {
+        return addressList(Field.BCC, Collections.singleton(address));
+    }
+
+    public static AddressListField bcc(Address... addresses) {
+        return addressList(Field.BCC, Arrays.asList(addresses));
+    }
+
+    public static AddressListField bcc(Iterable<Address> addresses) {
+        return addressList(Field.BCC, addresses);
+    }
+
+    public static AddressListField replyTo(Address address) {
+        return addressList(Field.REPLY_TO, Collections.singleton(address));
+    }
+
+    public static AddressListField replyTo(Address... addresses) {
+        return addressList(Field.REPLY_TO, Arrays.asList(addresses));
+    }
+
+    public static AddressListField replyTo(Iterable<Address> addresses) {
+        return addressList(Field.REPLY_TO, addresses);
+    }
+
+    /**
+     * Creates a mailbox field from the specified field name and mailbox
+     * address. Valid field names are <code>Sender</code> and
+     * <code>Resent-Sender</code>.
+     * 
+     * @param fieldName
+     *            the name of the mailbox field (<code>Sender</code> or
+     *            <code>Resent-Sender</code>).
+     * @param mailbox
+     *            mailbox address for the field value.
+     * @return the newly created mailbox field.
+     */
+    public static MailboxField mailbox(String fieldName, Mailbox mailbox) {
+        String value = encodeAddresses(Collections.singleton(mailbox));
+
+        String folded = MimeUtil.fold(value, fieldName.length() + 2);
+        return parse(MailboxField.class, fieldName, folded);
+    }
+
+    /**
+     * Creates a mailbox-list field from the specified field name and mailbox
+     * addresses. Valid field names are <code>From</code> and
+     * <code>Resent-From</code>.
+     * 
+     * @param fieldName
+     *            the name of the mailbox field (<code>From</code> or
+     *            <code>Resent-From</code>).
+     * @param mailboxes
+     *            mailbox addresses for the field value.
+     * @return the newly created mailbox-list field.
+     */
+    public static MailboxListField mailboxList(String fieldName,
+            Iterable<Mailbox> mailboxes) {
+        String value = encodeAddresses(mailboxes);
+
+        String folded = MimeUtil.fold(value, fieldName.length() + 2);
+        return parse(MailboxListField.class, fieldName, folded);
+    }
+
+    /**
+     * Creates an address-list field from the specified field name and mailbox
+     * or group addresses. Valid field names are <code>To</code>,
+     * <code>Cc</code>, <code>Bcc</code>, <code>Reply-To</code>,
+     * <code>Resent-To</code>, <code>Resent-Cc</code> and
+     * <code>Resent-Bcc</code>.
+     * 
+     * @param fieldName
+     *            the name of the mailbox field (<code>To</code>,
+     *            <code>Cc</code>, <code>Bcc</code>, <code>Reply-To</code>,
+     *            <code>Resent-To</code>, <code>Resent-Cc</code> or
+     *            <code>Resent-Bcc</code>).
+     * @param addresses
+     *            mailbox or group addresses for the field value.
+     * @return the newly created address-list field.
+     */
+    public static AddressListField addressList(String fieldName,
+            Iterable<Address> addresses) {
+        String value = encodeAddresses(addresses);
+
+        String folded = MimeUtil.fold(value, fieldName.length() + 2);
+        return parse(AddressListField.class, fieldName, folded);
+    }
+
     private static <F extends Field> F parse(Class<F> fieldClass,
             String fieldName, String fieldBody) {
         Field field = Field.parse(fieldName, fieldBody);
@@ -114,6 +245,19 @@ public class Fields {
         }
 
         return fieldClass.cast(field);
+    }
+
+    private static String encodeAddresses(Iterable<? extends Address> addresses) {
+        StringBuilder sb = new StringBuilder();
+
+        for (Address address : addresses) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            sb.append(address.getEncodedString());
+        }
+
+        return sb.toString();
     }
 
     private static final ThreadLocal<DateFormat> RFC822_DATE_FORMAT = new ThreadLocal<DateFormat>() {
