@@ -38,7 +38,7 @@ public class MailboxList extends AbstractList<Mailbox> implements Serializable {
      * @param mailboxes
      *            A List that contains only Mailbox objects.
      * @param dontCopy
-     *            true iff it is not possible for the mailboxes ArrayList to be
+     *            true iff it is not possible for the mailboxes list to be
      *            modified by someone else.
      */
     public MailboxList(List<Mailbox> mailboxes, boolean dontCopy) {

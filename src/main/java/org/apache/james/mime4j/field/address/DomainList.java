@@ -39,7 +39,7 @@ public class DomainList extends AbstractList<String> implements Serializable {
      * @param domains
      *            A List that contains only String objects.
      * @param dontCopy
-     *            true iff it is not possible for the domains ArrayList to be
+     *            true iff it is not possible for the domains list to be
      *            modified by someone else.
      */
     public DomainList(List<String> domains, boolean dontCopy) {

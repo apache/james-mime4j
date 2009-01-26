@@ -42,7 +42,7 @@ public class AddressList extends AbstractList<Address> implements Serializable {
      * @param addresses
      *            A List that contains only Address objects.
      * @param dontCopy
-     *            true iff it is not possible for the addresses ArrayList to be
+     *            true iff it is not possible for the addresses list to be
      *            modified by someone else.
      */
     public AddressList(List<? extends Address> addresses, boolean dontCopy) {
