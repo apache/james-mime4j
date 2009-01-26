@@ -40,20 +40,21 @@ public class Fields {
         int usedCharacters = Field.CONTENT_TYPE.length() + 2;
         String body = MimeUtil.fold(contentType, usedCharacters);
 
-        return (ContentTypeField) Field.parse(Field.CONTENT_TYPE, body);
+        return parse(ContentTypeField.class, Field.CONTENT_TYPE, body);
     }
 
     public static ContentTypeField contentType(String mimeType,
             Map<String, String> parameters) {
         if (parameters == null || parameters.isEmpty()) {
-            return (ContentTypeField) Field.parse(Field.CONTENT_TYPE, mimeType);
+            return parse(ContentTypeField.class, Field.CONTENT_TYPE, mimeType);
         } else {
             StringBuilder sb = new StringBuilder(mimeType);
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
                 sb.append("; ");
                 sb.append(entry.getKey());
                 sb.append('=');
-                sb.append(EncoderUtil.encodeContentTypeParameterValue(entry.getValue()));
+                sb.append(EncoderUtil.encodeContentTypeParameterValue(entry
+                        .getValue()));
             }
             String contentType = sb.toString();
             return contentType(contentType);
@@ -62,7 +63,7 @@ public class Fields {
 
     public static ContentTransferEncodingField contentTransferEncoding(
             String contentTransferEncoding) {
-        return (ContentTransferEncodingField) Field.parse(
+        return parse(ContentTransferEncodingField.class,
                 Field.CONTENT_TRANSFER_ENCODING, contentTransferEncoding);
     }
 
@@ -71,7 +72,7 @@ public class Fields {
     }
 
     public static DateTimeField date(String fieldName, String fieldValue) {
-        return (DateTimeField) Field.parse(fieldName, fieldValue);
+        return parse(DateTimeField.class, fieldName, fieldValue);
     }
 
     public static DateTimeField date(Date date) {
@@ -101,7 +102,18 @@ public class Fields {
                 EncoderUtil.Usage.TEXT_TOKEN, usedCharacters);
         String rawValue = MimeUtil.fold(encoded, usedCharacters);
 
-        return (UnstructuredField) Field.parse(Field.SUBJECT, rawValue);
+        return parse(UnstructuredField.class, Field.SUBJECT, rawValue);
+    }
+
+    private static <F extends Field> F parse(Class<F> fieldClass,
+            String fieldName, String fieldBody) {
+        Field field = Field.parse(fieldName, fieldBody);
+        if (!fieldClass.isInstance(field)) {
+            throw new IllegalArgumentException("Illegal field name: "
+                    + fieldName);
+        }
+
+        return fieldClass.cast(field);
     }
 
     private static final ThreadLocal<DateFormat> RFC822_DATE_FORMAT = new ThreadLocal<DateFormat>() {
