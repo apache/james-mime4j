@@ -80,7 +80,7 @@ public class MultipartMessage {
 
         // second part is image/png (image is created on the fly)
         BufferedImage image = renderSampleImage();
-        BodyPart imagePart = createImageBodyPart(bodyFactory, image);
+        BodyPart imagePart = createImagePart(bodyFactory, image);
         multipart.addBodyPart(imagePart);
 
         // setMultipart also sets the Content-Type header field
@@ -113,7 +113,7 @@ public class MultipartMessage {
     /**
      * Creates a binary part from the specified image.
      */
-    private static BodyPart createImageBodyPart(BodyFactory bodyFactory,
+    private static BodyPart createImagePart(BodyFactory bodyFactory,
             BufferedImage image) throws IOException {
         // Create a binary message body from the image
         StorageProvider storageProvider = bodyFactory.getStorageProvider();
