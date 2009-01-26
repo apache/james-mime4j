@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -34,6 +35,8 @@ import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.address.Group;
+import org.apache.james.mime4j.field.address.Mailbox;
 
 /**
  * 
@@ -204,11 +207,14 @@ public class MessageTest extends TestCase {
 
     public void testSetSubject() throws Exception {
         Message m = new Message();
-        m.setSubject("Semmelbr\366sel");
 
+        m.setSubject("Semmelbr\366sel");
         assertEquals("Semmelbr\366sel", m.getSubject());
         assertEquals("=?ISO-8859-1?Q?Semmelbr=F6sel?=", m.getHeader().getField(
                 "Subject").getBody());
+
+        m.setSubject(null);
+        assertNull(m.getHeader().getField("Subject"));
     }
 
     public void testGetDate() throws Exception {
@@ -224,11 +230,221 @@ public class MessageTest extends TestCase {
 
     public void testSetDate() throws Exception {
         Message m = new Message();
-        m.setDate(new Date(86400000), TimeZone.getTimeZone("GMT"));
 
+        m.setDate(new Date(86400000), TimeZone.getTimeZone("GMT"));
         assertEquals(new Date(86400000), m.getDate());
         assertEquals("Fri, 2 Jan 1970 00:00:00 +0000", m.getHeader().getField(
                 "Date").getBody());
+
+        m.setDate(null);
+        assertNull(m.getHeader().getField("Date"));
+    }
+
+    public void testGetSender() throws Exception {
+        Message m = new Message();
+        assertNull(m.getSender());
+
+        Header header = new Header();
+        header.setField(Field.parse("Sender", "john.doe@example.net"));
+        m.setHeader(header);
+
+        assertEquals("john.doe@example.net", m.getSender().getAddress());
+    }
+
+    public void testSetSender() throws Exception {
+        Message m = new Message();
+
+        m.setSender(Mailbox.parse("john.doe@example.net"));
+        assertEquals("john.doe@example.net", m.getHeader().getField("Sender")
+                .getBody());
+
+        m.setSender(null);
+        assertNull(m.getHeader().getField("Sender"));
+    }
+
+    public void testGetFrom() throws Exception {
+        Message m = new Message();
+        assertNull(m.getFrom());
+
+        Header header = new Header();
+        header.setField(Field.parse("From", "john.doe@example.net"));
+        m.setHeader(header);
+
+        assertEquals("john.doe@example.net", m.getFrom().get(0).getAddress());
+    }
+
+    public void testSetFrom() throws Exception {
+        Message m = new Message();
+
+        Mailbox mailbox1 = Mailbox.parse("john.doe@example.net");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.net");
+
+        m.setFrom(mailbox1);
+        assertEquals("john.doe@example.net", m.getHeader().getField("From")
+                .getBody());
+
+        m.setFrom(mailbox1, mailbox2);
+        assertEquals("john.doe@example.net, jane.doe@example.net", m
+                .getHeader().getField("From").getBody());
+
+        m.setFrom(Arrays.asList(mailbox1, mailbox2));
+        assertEquals("john.doe@example.net, jane.doe@example.net", m
+                .getHeader().getField("From").getBody());
+
+        m.setFrom((Mailbox) null);
+        assertNull(m.getHeader().getField("From"));
+    }
+
+    public void testGetTo() throws Exception {
+        Message m = new Message();
+        assertNull(m.getTo());
+
+        Header header = new Header();
+        header.setField(Field.parse("To", "john.doe@example.net"));
+        m.setHeader(header);
+
+        assertEquals("john.doe@example.net", ((Mailbox) m.getTo().get(0))
+                .getAddress());
+    }
+
+    public void testSetTo() throws Exception {
+        Message m = new Message();
+
+        Mailbox mailbox1 = Mailbox.parse("john.doe@example.net");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.net");
+        Group group = new Group("Does", mailbox1, mailbox2);
+        Mailbox mailbox3 = Mailbox.parse("Mary Smith <mary@example.net>");
+
+        m.setTo(group);
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
+                .getHeader().getField("To").getBody());
+
+        m.setTo(group, mailbox3);
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+                + "Mary Smith <mary@example.net>", m.getHeader().getField("To")
+                .getBody());
+
+        m.setTo(Arrays.asList(group, mailbox3));
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+                + "Mary Smith <mary@example.net>", m.getHeader().getField("To")
+                .getBody());
+
+        m.setTo((Mailbox) null);
+        assertNull(m.getHeader().getField("To"));
+    }
+
+    public void testGetCc() throws Exception {
+        Message m = new Message();
+        assertNull(m.getCc());
+
+        Header header = new Header();
+        header.setField(Field.parse("Cc", "john.doe@example.net"));
+        m.setHeader(header);
+
+        assertEquals("john.doe@example.net", ((Mailbox) m.getCc().get(0))
+                .getAddress());
+    }
+
+    public void testSetCc() throws Exception {
+        Message m = new Message();
+
+        Mailbox mailbox1 = Mailbox.parse("john.doe@example.net");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.net");
+        Group group = new Group("Does", mailbox1, mailbox2);
+        Mailbox mailbox3 = Mailbox.parse("Mary Smith <mary@example.net>");
+
+        m.setCc(group);
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
+                .getHeader().getField("Cc").getBody());
+
+        m.setCc(group, mailbox3);
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+                + "Mary Smith <mary@example.net>", m.getHeader().getField("Cc")
+                .getBody());
+
+        m.setCc(Arrays.asList(group, mailbox3));
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+                + "Mary Smith <mary@example.net>", m.getHeader().getField("Cc")
+                .getBody());
+
+        m.setCc((Mailbox) null);
+        assertNull(m.getHeader().getField("Cc"));
+    }
+
+    public void testGetBcc() throws Exception {
+        Message m = new Message();
+        assertNull(m.getBcc());
+
+        Header header = new Header();
+        header.setField(Field.parse("Bcc", "john.doe@example.net"));
+        m.setHeader(header);
+
+        assertEquals("john.doe@example.net", ((Mailbox) m.getBcc().get(0))
+                .getAddress());
+    }
+
+    public void testSetBcc() throws Exception {
+        Message m = new Message();
+
+        Mailbox mailbox1 = Mailbox.parse("john.doe@example.net");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.net");
+        Group group = new Group("Does", mailbox1, mailbox2);
+        Mailbox mailbox3 = Mailbox.parse("Mary Smith <mary@example.net>");
+
+        m.setBcc(group);
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
+                .getHeader().getField("Bcc").getBody());
+
+        m.setBcc(group, mailbox3);
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+                + "Mary Smith <mary@example.net>", m.getHeader()
+                .getField("Bcc").getBody());
+
+        m.setBcc(Arrays.asList(group, mailbox3));
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+                + "Mary Smith <mary@example.net>", m.getHeader()
+                .getField("Bcc").getBody());
+
+        m.setBcc((Mailbox) null);
+        assertNull(m.getHeader().getField("Bcc"));
+    }
+
+    public void testGetReplyTo() throws Exception {
+        Message m = new Message();
+        assertNull(m.getReplyTo());
+
+        Header header = new Header();
+        header.setField(Field.parse("Reply-To", "john.doe@example.net"));
+        m.setHeader(header);
+
+        assertEquals("john.doe@example.net", ((Mailbox) m.getReplyTo().get(0))
+                .getAddress());
+    }
+
+    public void testSetReplyTo() throws Exception {
+        Message m = new Message();
+
+        Mailbox mailbox1 = Mailbox.parse("john.doe@example.net");
+        Mailbox mailbox2 = Mailbox.parse("jane.doe@example.net");
+        Group group = new Group("Does", mailbox1, mailbox2);
+        Mailbox mailbox3 = Mailbox.parse("Mary Smith <mary@example.net>");
+
+        m.setReplyTo(group);
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
+                .getHeader().getField("Reply-To").getBody());
+
+        m.setReplyTo(group, mailbox3);
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+                + "Mary Smith <mary@example.net>", m.getHeader().getField(
+                "Reply-To").getBody());
+
+        m.setReplyTo(Arrays.asList(group, mailbox3));
+        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+                + "Mary Smith <mary@example.net>", m.getHeader().getField(
+                "Reply-To").getBody());
+
+        m.setReplyTo((Mailbox) null);
+        assertNull(m.getHeader().getField("Reply-To"));
     }
 
     public void testDisposeGetsPropagatedToBody() throws Exception {

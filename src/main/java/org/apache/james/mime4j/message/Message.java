@@ -21,15 +21,25 @@ package org.apache.james.mime4j.message;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.field.AddressListField;
 import org.apache.james.mime4j.field.DateTimeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.field.MailboxField;
+import org.apache.james.mime4j.field.MailboxListField;
 import org.apache.james.mime4j.field.UnstructuredField;
+import org.apache.james.mime4j.field.address.Address;
+import org.apache.james.mime4j.field.address.AddressList;
+import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.field.address.MailboxList;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
@@ -143,7 +153,7 @@ public class Message extends Entity implements Body {
      * A <code>Header</code> is created if this message does not already have
      * one.
      * 
-     * @param hostName
+     * @param hostname
      *            host name to be included in the identifier or
      *            <code>null</code> if no host name should be included.
      */
@@ -229,6 +239,168 @@ public class Message extends Entity implements Body {
             header.removeFields(Field.DATE);
         } else {
             header.setField(Fields.date(Field.DATE, date, zone));
+        }
+    }
+
+    public Mailbox getSender() {
+        return getMailbox(Field.SENDER);
+    }
+
+    public void setSender(Mailbox sender) {
+        setMailbox(Field.SENDER, sender);
+    }
+
+    public MailboxList getFrom() {
+        return getMailboxList(Field.FROM);
+    }
+
+    public void setFrom(Mailbox from) {
+        setMailboxList(Field.FROM, from);
+    }
+
+    public void setFrom(Mailbox... from) {
+        setMailboxList(Field.FROM, from);
+    }
+
+    public void setFrom(Collection<Mailbox> from) {
+        setMailboxList(Field.FROM, from);
+    }
+
+    public AddressList getTo() {
+        return getAddressList(Field.TO);
+    }
+
+    public void setTo(Address to) {
+        setAddressList(Field.TO, to);
+    }
+
+    public void setTo(Address... to) {
+        setAddressList(Field.TO, to);
+    }
+
+    public void setTo(Collection<Address> to) {
+        setAddressList(Field.TO, to);
+    }
+
+    public AddressList getCc() {
+        return getAddressList(Field.CC);
+    }
+
+    public void setCc(Address cc) {
+        setAddressList(Field.CC, cc);
+    }
+
+    public void setCc(Address... cc) {
+        setAddressList(Field.CC, cc);
+    }
+
+    public void setCc(Collection<Address> cc) {
+        setAddressList(Field.CC, cc);
+    }
+
+    public AddressList getBcc() {
+        return getAddressList(Field.BCC);
+    }
+
+    public void setBcc(Address bcc) {
+        setAddressList(Field.BCC, bcc);
+    }
+
+    public void setBcc(Address... bcc) {
+        setAddressList(Field.BCC, bcc);
+    }
+
+    public void setBcc(Collection<Address> bcc) {
+        setAddressList(Field.BCC, bcc);
+    }
+
+    public AddressList getReplyTo() {
+        return getAddressList(Field.REPLY_TO);
+    }
+
+    public void setReplyTo(Address replyTo) {
+        setAddressList(Field.REPLY_TO, replyTo);
+    }
+
+    public void setReplyTo(Address... replyTo) {
+        setAddressList(Field.REPLY_TO, replyTo);
+    }
+
+    public void setReplyTo(Collection<Address> replyTo) {
+        setAddressList(Field.REPLY_TO, replyTo);
+    }
+
+    private Mailbox getMailbox(String fieldName) {
+        MailboxField field = obtainField(fieldName);
+        if (field == null)
+            return null;
+
+        return field.getMailbox();
+    }
+
+    private void setMailbox(String fieldName, Mailbox mailbox) {
+        Header header = obtainHeader();
+
+        if (mailbox == null) {
+            header.removeFields(fieldName);
+        } else {
+            header.setField(Fields.mailbox(fieldName, mailbox));
+        }
+    }
+
+    private MailboxList getMailboxList(String fieldName) {
+        MailboxListField field = obtainField(fieldName);
+        if (field == null)
+            return null;
+
+        return field.getMailboxList();
+    }
+
+    private void setMailboxList(String fieldName, Mailbox mailbox) {
+        setMailboxList(fieldName, mailbox == null ? null : Collections
+                .singleton(mailbox));
+    }
+
+    private void setMailboxList(String fieldName, Mailbox... mailboxes) {
+        setMailboxList(fieldName, mailboxes == null ? null : Arrays
+                .asList(mailboxes));
+    }
+
+    private void setMailboxList(String fieldName, Collection<Mailbox> mailboxes) {
+        Header header = obtainHeader();
+
+        if (mailboxes == null || mailboxes.isEmpty()) {
+            header.removeFields(fieldName);
+        } else {
+            header.setField(Fields.mailboxList(fieldName, mailboxes));
+        }
+    }
+
+    private AddressList getAddressList(String fieldName) {
+        AddressListField field = obtainField(fieldName);
+        if (field == null)
+            return null;
+
+        return field.getAddressList();
+    }
+
+    private void setAddressList(String fieldName, Address address) {
+        setAddressList(fieldName, address == null ? null : Collections
+                .singleton(address));
+    }
+
+    private void setAddressList(String fieldName, Address... addresses) {
+        setAddressList(fieldName, addresses == null ? null : Arrays
+                .asList(addresses));
+    }
+
+    private void setAddressList(String fieldName, Collection<Address> addresses) {
+        Header header = obtainHeader();
+
+        if (addresses == null || addresses.isEmpty()) {
+            header.removeFields(fieldName);
+        } else {
+            header.setField(Fields.addressList(fieldName, addresses));
         }
     }
 
