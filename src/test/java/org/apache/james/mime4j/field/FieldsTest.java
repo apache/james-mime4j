@@ -160,7 +160,7 @@ public class FieldsTest extends TestCase {
                 "Sm\370rebr\370d").getRaw());
 
         String seventyEight = "12345678901234567890123456789012345678901234567890123456789012345678";
-        assertEquals("Subject: " + seventyEight, Fields.subject(seventyEight)
+        assertEquals("Subject:\r\n " + seventyEight, Fields.subject(seventyEight)
                 .getRaw());
 
         String seventyNine = seventyEight + "9";

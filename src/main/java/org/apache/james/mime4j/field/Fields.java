@@ -30,6 +30,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.EncoderUtil;
 import org.apache.james.mime4j.field.address.Address;
 import org.apache.james.mime4j.field.address.Mailbox;
@@ -41,10 +42,7 @@ public class Fields {
     }
 
     public static ContentTypeField contentType(String contentType) {
-        int usedCharacters = Field.CONTENT_TYPE.length() + 2;
-        String body = MimeUtil.fold(contentType, usedCharacters);
-
-        return parse(ContentTypeField.class, Field.CONTENT_TYPE, body);
+        return parse(ContentTypeField.class, Field.CONTENT_TYPE, contentType);
     }
 
     public static ContentTypeField contentType(String mimeType,
@@ -96,17 +94,16 @@ public class Fields {
     }
 
     public static Field messageId(String hostname) {
-        return Field.parse(Field.MESSAGE_ID, MimeUtil
-                .createUniqueMessageId(hostname));
+        String fieldValue = MimeUtil.createUniqueMessageId(hostname);
+        return parse(UnstructuredField.class, Field.MESSAGE_ID, fieldValue);
     }
 
     public static UnstructuredField subject(String subject) {
         int usedCharacters = Field.SUBJECT.length() + 2;
-        String encoded = EncoderUtil.encodeIfNecessary(subject,
+        String fieldValue = EncoderUtil.encodeIfNecessary(subject,
                 EncoderUtil.Usage.TEXT_TOKEN, usedCharacters);
-        String rawValue = MimeUtil.fold(encoded, usedCharacters);
 
-        return parse(UnstructuredField.class, Field.SUBJECT, rawValue);
+        return parse(UnstructuredField.class, Field.SUBJECT, fieldValue);
     }
 
     public static MailboxField sender(Mailbox mailbox) {
@@ -186,10 +183,8 @@ public class Fields {
      * @return the newly created mailbox field.
      */
     public static MailboxField mailbox(String fieldName, Mailbox mailbox) {
-        String value = encodeAddresses(Collections.singleton(mailbox));
-
-        String folded = MimeUtil.fold(value, fieldName.length() + 2);
-        return parse(MailboxField.class, fieldName, folded);
+        String fieldValue = encodeAddresses(Collections.singleton(mailbox));
+        return parse(MailboxField.class, fieldName, fieldValue);
     }
 
     /**
@@ -206,10 +201,8 @@ public class Fields {
      */
     public static MailboxListField mailboxList(String fieldName,
             Iterable<Mailbox> mailboxes) {
-        String value = encodeAddresses(mailboxes);
-
-        String folded = MimeUtil.fold(value, fieldName.length() + 2);
-        return parse(MailboxListField.class, fieldName, folded);
+        String fieldValue = encodeAddresses(mailboxes);
+        return parse(MailboxListField.class, fieldName, fieldValue);
     }
 
     /**
@@ -230,21 +223,26 @@ public class Fields {
      */
     public static AddressListField addressList(String fieldName,
             Iterable<Address> addresses) {
-        String value = encodeAddresses(addresses);
-
-        String folded = MimeUtil.fold(value, fieldName.length() + 2);
-        return parse(AddressListField.class, fieldName, folded);
+        String fieldValue = encodeAddresses(addresses);
+        return parse(AddressListField.class, fieldName, fieldValue);
     }
 
     private static <F extends Field> F parse(Class<F> fieldClass,
             String fieldName, String fieldBody) {
-        Field field = Field.parse(fieldName, fieldBody);
-        if (!fieldClass.isInstance(field)) {
+        try {
+            String raw = MimeUtil.fold(fieldName + ": " + fieldBody, 0);
+
+            Field field = Field.parse(raw);
+            if (!fieldClass.isInstance(field)) {
+                throw new IllegalArgumentException("Incompatible field name: "
+                        + fieldName);
+            }
+
+            return fieldClass.cast(field);
+        } catch (MimeException e) {
             throw new IllegalArgumentException("Illegal field name: "
                     + fieldName);
         }
-
-        return fieldClass.cast(field);
     }
 
     private static String encodeAddresses(Iterable<? extends Address> addresses) {
