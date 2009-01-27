@@ -159,14 +159,14 @@ public class FieldsTest extends TestCase {
         assertEquals("Subject: =?ISO-8859-1?Q?Sm=F8rebr=F8d?=", Fields.subject(
                 "Sm\370rebr\370d").getRaw());
 
-        String seventyNine = "123456789012345678901234567890123456789012345678901234567890123456789";
-        assertEquals("Subject: " + seventyNine, Fields.subject(seventyNine)
+        String seventyEight = "12345678901234567890123456789012345678901234567890123456789012345678";
+        assertEquals("Subject: " + seventyEight, Fields.subject(seventyEight)
                 .getRaw());
 
-        String eighty = seventyNine + "0";
-        String expected = "Subject: =?US-ASCII?Q?12345678901234567890123456789012345?="
-                + "\r\n =?US-ASCII?Q?67890123456789012345678901234567890?=";
-        assertEquals(expected, Fields.subject(eighty).getRaw());
+        String seventyNine = seventyEight + "9";
+        String expected = "Subject: =?US-ASCII?Q?1234567890123456789012345678901234?="
+                + "\r\n =?US-ASCII?Q?56789012345678901234567890123456789?=";
+        assertEquals(expected, Fields.subject(seventyNine).getRaw());
     }
 
     public void testSender() throws Exception {

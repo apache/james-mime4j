@@ -181,7 +181,7 @@ public class EncoderUtil {
      * Determines if the specified string has to encoded into an encoded-word.
      * Returns <code>true</code> if the text contains characters that don't
      * fall into the printable ASCII character set or if the text contains a
-     * 'word' (sequence of non-whitespace characters) longer than 78 characters
+     * 'word' (sequence of non-whitespace characters) longer than 77 characters
      * (including characters already used up in the line).
      * 
      * @param text
@@ -205,10 +205,11 @@ public class EncoderUtil {
                 nonWhiteSpaceCount = 0;
             } else {
                 nonWhiteSpaceCount++;
-                if (nonWhiteSpaceCount > 78) {
-                    // line cannot be folded into multiple lines with no more
-                    // than 78 characters each. encoding as encoded-words makes
-                    // that possible.
+                if (nonWhiteSpaceCount > 77) {
+                    // Line cannot be folded into multiple lines with no more
+                    // than 78 characters each. Encoding as encoded-words makes
+                    // that possible. One character has to be reserved for
+                    // folding white space; that leaves 77 characters.
                     return true;
                 }
 

@@ -76,9 +76,9 @@ public class EncoderUtilTest extends TestCase {
         assertTrue(EncoderUtil.hasToBeEncoded("non-printable ascii: \010", 0));
         assertTrue(EncoderUtil.hasToBeEncoded("non-ascii: \u20ac", 0));
 
-        assertFalse(EncoderUtil.hasToBeEncoded("1234567890123456789012345678",
+        assertFalse(EncoderUtil.hasToBeEncoded("123456789012345678901234567",
                 50));
-        assertTrue(EncoderUtil.hasToBeEncoded("12345678901234567890123456789",
+        assertTrue(EncoderUtil.hasToBeEncoded("1234567890123456789012345678",
                 50));
         assertFalse(EncoderUtil.hasToBeEncoded(
                 "\t12345678901234567890123456789", 50));
