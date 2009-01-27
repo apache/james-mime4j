@@ -138,20 +138,22 @@ public class EncoderUtil {
     }
 
     /**
-     * Encodes the specified string as a value of a Content-Type parameter as
-     * described in RFC 2045 section 5.1. The specified string should not
+     * Encodes the specified strings into a header parameter as described in RFC
+     * 2045 section 5.1 and RFC 2183 section 2. The specified strings should not
      * contain any illegal (control or non-ASCII) characters.
      * 
+     * @param name
+     *            parameter name.
      * @param value
-     *            string to encode.
+     *            parameter value.
      * @return encoded result.
      */
-    public static String encodeContentTypeParameterValue(String value) {
+    public static String encodeHeaderParameter(String name, String value) {
         // value := token / quoted-string
         if (isToken(value)) {
-            return value;
+            return name + "=" + value;
         } else {
-            return quote(value);
+            return name + "=" + quote(value);
         }
     }
 

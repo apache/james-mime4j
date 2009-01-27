@@ -53,10 +53,8 @@ public class Fields {
             StringBuilder sb = new StringBuilder(mimeType);
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
                 sb.append("; ");
-                sb.append(entry.getKey());
-                sb.append('=');
-                sb.append(EncoderUtil.encodeContentTypeParameterValue(entry
-                        .getValue()));
+                sb.append(EncoderUtil.encodeHeaderParameter(entry.getKey(),
+                        entry.getValue()));
             }
             String contentType = sb.toString();
             return contentType(contentType);

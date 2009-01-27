@@ -56,17 +56,16 @@ public class EncoderUtilTest extends TestCase {
                 .encodeAddressLocalPart("clint eastwood"));
     }
 
-    public void testEncodeContentTypeParameterValue() throws Exception {
-        assertEquals("test", EncoderUtil
-                .encodeContentTypeParameterValue("test"));
-        assertEquals("\"test test\"", EncoderUtil
-                .encodeContentTypeParameterValue("test test"));
-        assertEquals("\"=test\"", EncoderUtil
-                .encodeContentTypeParameterValue("=test"));
-        assertEquals("\"\\\\test\"", EncoderUtil
-                .encodeContentTypeParameterValue("\\test"));
-        assertEquals("\"\\\"\\\\\\\"\"", EncoderUtil
-                .encodeContentTypeParameterValue("\"\\\""));
+    public void testEncodeHeaderParameter() throws Exception {
+        assertEquals("p=test", EncoderUtil.encodeHeaderParameter("p", "test"));
+        assertEquals("p=\"test test\"", EncoderUtil.encodeHeaderParameter("p",
+                "test test"));
+        assertEquals("p=\"=test\"", EncoderUtil.encodeHeaderParameter("p",
+                "=test"));
+        assertEquals("p=\"\\\\test\"", EncoderUtil.encodeHeaderParameter("p",
+                "\\test"));
+        assertEquals("p=\"\\\"\\\\\\\"\"", EncoderUtil.encodeHeaderParameter(
+                "p", "\"\\\""));
     }
 
     public void testHasToBeEncoded() throws Exception {
