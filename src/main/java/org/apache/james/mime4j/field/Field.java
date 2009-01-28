@@ -47,9 +47,10 @@ public abstract class Field {
     public static final String RESENT_DATE = "Resent-Date";
 
     public static final String SUBJECT = "Subject";
+
     public static final String CONTENT_TYPE = "Content-Type";
-    public static final String CONTENT_TRANSFER_ENCODING = 
-                                        "Content-Transfer-Encoding";
+    public static final String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
+    public static final String CONTENT_DISPOSITION = "Content-Disposition";
 
     public static final String MESSAGE_ID = "Message-ID";
 
@@ -79,6 +80,7 @@ public abstract class Field {
      *   <tr><th>Class returned</th><th>Field names</th></tr>
      *   <tr><td>{@link ContentTypeField}</td><td>Content-Type</td></tr>
      *   <tr><td>{@link ContentTransferEncodingField}</td><td>Content-Transfer-Encoding</td></tr>
+     *   <tr><td>{@link ContentDispositionField}</td><td>Content-Disposition</td></tr>
      *   <tr><td>{@link DateTimeField}</td><td>Date, Resent-Date</td></tr>
      *   <tr><td>{@link MailboxField}</td><td>Sender, Resent-Sender</td></tr>
      *   <tr><td>{@link MailboxListField}</td><td>From, Resent-From</td></tr>

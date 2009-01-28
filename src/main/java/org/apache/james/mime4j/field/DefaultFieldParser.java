@@ -24,6 +24,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
     public DefaultFieldParser() {
         setFieldParser(Field.CONTENT_TRANSFER_ENCODING, new ContentTransferEncodingField.Parser());
         setFieldParser(Field.CONTENT_TYPE, new ContentTypeField.Parser());
+        setFieldParser(Field.CONTENT_DISPOSITION, new ContentDispositionField.Parser());
         
         final DateTimeField.Parser dateTimeParser = new DateTimeField.Parser();
         setFieldParser(Field.DATE, dateTimeParser);
