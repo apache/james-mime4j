@@ -74,12 +74,16 @@ public abstract class Field {
      * Parses the given string and returns an instance of the 
      * <code>Field</code> class. The type of the class returned depends on
      * the field name:
+     * <p>
      * <table>
-     *      <tr>
-     *          <td><em>Field name</em></td><td><em>Class returned</em></td>
-     *          <td>Content-Type</td><td>org.apache.james.mime4j.field.ContentTypeField</td>
-     *          <td>other</td><td>org.apache.james.mime4j.field.UnstructuredField</td>
-     *      </tr>
+     *   <tr><th>Class returned</th><th>Field names</th></tr>
+     *   <tr><td>{@link ContentTypeField}</td><td>Content-Type</td></tr>
+     *   <tr><td>{@link ContentTransferEncodingField}</td><td>Content-Transfer-Encoding</td></tr>
+     *   <tr><td>{@link DateTimeField}</td><td>Date, Resent-Date</td></tr>
+     *   <tr><td>{@link MailboxField}</td><td>Sender, Resent-Sender</td></tr>
+     *   <tr><td>{@link MailboxListField}</td><td>From, Resent-From</td></tr>
+     *   <tr><td>{@link AddressListField}</td><td>To, Cc, Bcc, Reply-To, Resent-To, Resent-Cc, Resent-Bcc</td></tr>
+     *   <tr><td>{@link UnstructuredField}</td><td>Subject and others</td></tr>
      * </table>
      * 
      * @param raw the string to parse.
@@ -114,7 +118,7 @@ public abstract class Field {
     /**
      * Parses the given field name and field body strings and returns an
      * instance of the <code>Field</code> class. The type of the class
-     * returned depends on the field name (see {@link #parse(String)}.
+     * returned depends on the field name (see {@link #parse(String)}).
      * <p>
      * This method is convenient for creating or manipulating messages because
      * contrary to {@link #parse(String)} it does not throw a
