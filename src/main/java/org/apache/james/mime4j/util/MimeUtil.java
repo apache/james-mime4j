@@ -19,13 +19,19 @@
 
 package org.apache.james.mime4j.util;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+import java.text.DateFormat;
+import java.text.FieldPosition;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * A utility class, which provides some MIME related application logic.
@@ -394,6 +400,24 @@ public final class MimeUtil {
     }
 
     /**
+     * Formats the specified date into a RFC 822 date-time string.
+     * 
+     * @param date
+     *            date to be formatted into a string.
+     * @param zone
+     *            the time zone to use or <code>null</code> to use the default
+     *            time zone.
+     * @return the formatted time string.
+     */
+    public static String formatDate(Date date, TimeZone zone) {
+        DateFormat df = RFC822_DATE_FORMAT.get();
+        if (zone != null) {
+            df.setTimeZone(zone);
+        }
+        return df.format(date);
+    }
+
+    /**
      * Splits the specified string into a multiple-line representation with
      * lines no longer than 76 characters (because the line might contain
      * encoded words; see <a href='http://www.faqs.org/rfcs/rfc2047.html'>RFC
@@ -450,5 +474,41 @@ public final class MimeUtil {
 
     private static synchronized int nextCounterValue() {
         return counter++;
+    }
+
+    private static final ThreadLocal<DateFormat> RFC822_DATE_FORMAT = new ThreadLocal<DateFormat>() {
+        @Override
+        protected DateFormat initialValue() {
+            return new Rfc822DateFormat();
+        }
+    };
+
+    private static final class Rfc822DateFormat extends SimpleDateFormat {
+        private static final long serialVersionUID = 1L;
+
+        public Rfc822DateFormat() {
+            super("EEE, d MMM yyyy HH:mm:ss ", Locale.US);
+        }
+
+        @Override
+        public StringBuffer format(Date date, StringBuffer toAppendTo,
+                FieldPosition pos) {
+            StringBuffer sb = super.format(date, toAppendTo, pos);
+
+            int zoneMillis = calendar.get(GregorianCalendar.ZONE_OFFSET);
+            int dstMillis = calendar.get(GregorianCalendar.DST_OFFSET);
+            int minutes = (zoneMillis + dstMillis) / 1000 / 60;
+
+            if (minutes < 0) {
+                sb.append('-');
+                minutes = -minutes;
+            } else {
+                sb.append('+');
+            }
+
+            sb.append(String.format("%02d%02d", minutes / 60, minutes % 60));
+
+            return sb;
+        }
     }
 }
