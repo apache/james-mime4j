@@ -411,9 +411,13 @@ public final class MimeUtil {
      */
     public static String formatDate(Date date, TimeZone zone) {
         DateFormat df = RFC822_DATE_FORMAT.get();
-        if (zone != null) {
+
+        if (zone == null) {
+            df.setTimeZone(TimeZone.getDefault());
+        } else {
             df.setTimeZone(zone);
         }
+
         return df.format(date);
     }
 
