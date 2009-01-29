@@ -62,6 +62,29 @@ public class Fields {
                 Field.CONTENT_TRANSFER_ENCODING, contentTransferEncoding);
     }
 
+    public static ContentDispositionField contentDisposition(
+            String contentDisposition) {
+        return parse(ContentDispositionField.class, Field.CONTENT_DISPOSITION,
+                contentDisposition);
+    }
+
+    public static ContentDispositionField contentDisposition(
+            String dispositionType, Map<String, String> parameters) {
+        if (parameters == null || parameters.isEmpty()) {
+            return parse(ContentDispositionField.class,
+                    Field.CONTENT_DISPOSITION, dispositionType);
+        } else {
+            StringBuilder sb = new StringBuilder(dispositionType);
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                sb.append("; ");
+                sb.append(EncoderUtil.encodeHeaderParameter(entry.getKey(),
+                        entry.getValue()));
+            }
+            String contentDisposition = sb.toString();
+            return contentDisposition(contentDisposition);
+        }
+    }
+
     public static DateTimeField date(Date date) {
         return date(Field.DATE, date, null);
     }

@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 
 import org.apache.james.mime4j.field.address.Group;
 import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.util.MimeUtil;
 
 public class FieldsTest extends TestCase {
 
@@ -93,6 +94,50 @@ public class FieldsTest extends TestCase {
         assertTrue(field.isValidField());
 
         assertEquals("Content-Transfer-Encoding: base64", field.getRaw());
+    }
+
+    public void testContentDispositionString() throws Exception {
+        ContentDispositionField field = Fields.contentDisposition("inline; "
+                + "filename=\"testing 1 2.dat\"; size=12345; "
+                + "creation-date=\"Thu, 1 Jan 1970 00:00:00 +0000\"");
+        assertTrue(field.isValidField());
+
+        String expectedRaw = "Content-Disposition: inline; filename="
+                + "\"testing 1 2.dat\"; size=12345;\r\n creation-date="
+                + "\"Thu, 1 Jan 1970 00:00:00 +0000\"";
+        assertEquals(expectedRaw, field.getRaw());
+    }
+
+    public void testContentDispositionStringParameters() throws Exception {
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("creation-date", MimeUtil.formatDate(new Date(0),
+                TimeZone.getTimeZone("GMT")));
+        ContentDispositionField field = Fields.contentDisposition("attachment",
+                parameters);
+        assertTrue(field.isValidField());
+
+        String expectedRaw = "Content-Disposition: attachment; "
+                + "creation-date=\"Thu, 1 Jan 1970 00:00:00\r\n +0000\"";
+        assertEquals(expectedRaw, field.getRaw());
+
+        assertEquals(new Date(0), field.getCreationDate());
+    }
+
+    public void testContentDispositionStringNullParameters() throws Exception {
+        ContentDispositionField field = Fields.contentDisposition("inline",
+                null);
+        assertTrue(field.isValidField());
+
+        String expectedRaw = "Content-Disposition: inline";
+        assertEquals(expectedRaw, field.getRaw());
+    }
+
+    public void testInvalidContentDisposition() throws Exception {
+        ContentDispositionField field = Fields.contentDisposition("inline; "
+                + "filename=some file.dat");
+        assertFalse(field.isValidField());
+
+        assertEquals("inline", field.getDispositionType());
     }
 
     public void testDateString() throws Exception {
@@ -160,8 +205,8 @@ public class FieldsTest extends TestCase {
                 "Sm\370rebr\370d").getRaw());
 
         String seventyEight = "12345678901234567890123456789012345678901234567890123456789012345678";
-        assertEquals("Subject:\r\n " + seventyEight, Fields.subject(seventyEight)
-                .getRaw());
+        assertEquals("Subject:\r\n " + seventyEight, Fields.subject(
+                seventyEight).getRaw());
 
         String seventyNine = seventyEight + "9";
         String expected = "Subject: =?US-ASCII?Q?1234567890123456789012345678901234?="
