@@ -279,7 +279,7 @@ public class Header {
         BufferedWriter writer = new BufferedWriter(
                 new OutputStreamWriter(out, charset), 8192);
         for (Field field : fields) {
-            String fs = field.toString();
+            String fs = field.getRaw();
             if (mode == Mode.STRICT_ERROR && !CharsetUtil.isASCII(fs)) {
                 throw new MimeIOException(new MimeException("Header '" + fs + "' violates RFC 822"));
             }
