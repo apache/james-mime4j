@@ -42,6 +42,9 @@ public class Fields {
 
     public static ContentTypeField contentType(String mimeType,
             Map<String, String> parameters) {
+        if (!isValidMimeType(mimeType))
+            throw new IllegalArgumentException();
+
         if (parameters == null || parameters.isEmpty()) {
             return parse(ContentTypeField.class, Field.CONTENT_TYPE, mimeType);
         } else {
@@ -237,6 +240,19 @@ public class Fields {
             Iterable<Address> addresses) {
         String fieldValue = encodeAddresses(addresses);
         return parse(AddressListField.class, fieldName, fieldValue);
+    }
+
+    private static boolean isValidMimeType(String mimeType) {
+        if (mimeType == null)
+            return false;
+
+        int idx = mimeType.indexOf('/');
+        if (idx == -1)
+            return false;
+
+        String type = mimeType.substring(0, idx);
+        String subType = mimeType.substring(idx + 1);
+        return EncoderUtil.isToken(type) && EncoderUtil.isToken(subType);
     }
 
     private static <F extends Field> F parse(Class<F> fieldClass,

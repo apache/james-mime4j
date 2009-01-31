@@ -22,6 +22,7 @@ package org.apache.james.mime4j.codec;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.BitSet;
+import java.util.Locale;
 
 import org.apache.james.mime4j.util.CharsetUtil;
 
@@ -149,6 +150,8 @@ public class EncoderUtil {
      * @return encoded result.
      */
     public static String encodeHeaderParameter(String name, String value) {
+        name = name.toLowerCase(Locale.US);
+
         // value := token / quoted-string
         if (isToken(value)) {
             return name + "=" + value;
@@ -401,33 +404,50 @@ public class EncoderUtil {
         return sb.toString();
     }
 
-    // RFC 2045 section 5.1
-    private static boolean isToken(String str) {
+    /**
+     * Tests whether the specified string is a token as defined in RFC 2045
+     * section 5.1.
+     * 
+     * @param str
+     *            string to test.
+     * @return <code>true</code> if the specified string is a RFC 2045 token,
+     *         <code>false</code> otherwise.
+     */
+    public static boolean isToken(String str) {
         // token := 1*<any (US-ASCII) CHAR except SPACE, CTLs, or tspecials>
         // tspecials := "(" / ")" / "<" / ">" / "@" / "," / ";" / ":" / "\" /
         // <"> / "/" / "[" / "]" / "?" / "="
         // CTL := 0.- 31., 127.
 
         final int length = str.length();
+        if (length == 0)
+            return false;
+
         for (int idx = 0; idx < length; idx++) {
             char ch = str.charAt(idx);
             if (!TOKEN_CHARS.get(ch))
                 return false;
         }
+
         return true;
     }
 
     private static boolean isAtomPhrase(String str) {
         // atom = [CFWS] 1*atext [CFWS]
 
+        boolean containsAText = false;
+
         final int length = str.length();
         for (int idx = 0; idx < length; idx++) {
             char ch = str.charAt(idx);
-            if (!ATEXT_CHARS.get(ch) && !CharsetUtil.isWhitespace(ch))
+            if (ATEXT_CHARS.get(ch)) {
+                containsAText = true;
+            } else if (!CharsetUtil.isWhitespace(ch)) {
                 return false;
+            }
         }
 
-        return true;
+        return containsAText;
     }
 
     // RFC 5322 section 3.2.3
@@ -439,6 +459,9 @@ public class EncoderUtil {
         char prev = '.';
 
         final int length = str.length();
+        if (length == 0)
+            return false;
+
         for (int idx = 0; idx < length; idx++) {
             char ch = str.charAt(idx);
 

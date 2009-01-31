@@ -31,7 +31,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
 public class EncoderUtilTest extends TestCase {
 
     public void testEncodeAddressDisplayName() throws Exception {
-        assertEquals("", EncoderUtil.encodeAddressDisplayName(""));
+        assertEquals("\"\"", EncoderUtil.encodeAddressDisplayName(""));
         assertEquals("test", EncoderUtil.encodeAddressDisplayName("test"));
         assertEquals(" test ", EncoderUtil.encodeAddressDisplayName(" test "));
         assertEquals(" test\ttest ", EncoderUtil
