@@ -155,7 +155,7 @@ public final class MimeUtil {
      * Returns, whether the given transfer-encoding is "quoted-printable".
      */
     public static boolean isQuotedPrintableEncoded(String pTransferEncoding) {
-        return ENC_QUOTED_PRINTABLE.equals(pTransferEncoding);
+        return ENC_QUOTED_PRINTABLE.equalsIgnoreCase(pTransferEncoding);
     }
 
     /**
