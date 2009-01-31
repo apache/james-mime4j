@@ -47,7 +47,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
  * 
  * @version $Id: Header.java,v 1.3 2004/10/04 15:36:44 ntherning Exp $
  */
-public class Header {
+public class Header implements Iterable<Field> {
     private List<Field> fields = new LinkedList<Field>();
     private Map<String, List<Field>> fieldMap = new HashMap<String, List<Field>>();
     
@@ -157,6 +157,15 @@ public class Header {
             results = Collections.unmodifiableList(l);
         }
         return results;
+    }
+
+    /**
+     * Returns an iterator over the list of fields of this header.
+     * 
+     * @return an iterator.
+     */
+    public Iterator<Field> iterator() {
+        return Collections.unmodifiableList(fields).iterator();
     }
 
     /**
