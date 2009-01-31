@@ -68,9 +68,6 @@ public class MessageTest extends TestCase {
         headerMultipartDigest.addField(
                 Field.parse("Content-Type: multipart/digest; boundary=foo"));
     }
-    
-    public void testGetParts() {
-    }
 
     public void testGetMimeType() {
         Message parent = null;
