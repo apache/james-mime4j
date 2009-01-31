@@ -404,14 +404,4 @@ public class Message extends Entity implements Body {
         }
     }
 
-    private <F extends Field> F obtainField(String fieldName) {
-        Header header = getHeader();
-        if (header == null)
-            return null;
-
-        @SuppressWarnings("unchecked")
-        F field = (F) header.getField(fieldName);
-        return field;
-    }
-
 }

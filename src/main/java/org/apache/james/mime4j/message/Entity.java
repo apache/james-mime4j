@@ -22,11 +22,13 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.field.ContentDispositionField;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
@@ -313,6 +315,156 @@ public abstract class Entity implements Disposable {
     }
 
     /**
+     * Return the disposition type of the content disposition of this
+     * <code>Entity</code>.
+     * 
+     * @return the disposition type or <code>null</code> if no disposition
+     *         type has been set.
+     */
+    public String getDispositionType() {
+        ContentDispositionField field = obtainField(Field.CONTENT_DISPOSITION);
+        if (field == null)
+            return null;
+
+        return field.getDispositionType();
+    }
+    
+    /**
+     * Sets the content disposition of this <code>Entity</code> to the
+     * specified disposition type. No filename, size or date parameters
+     * are included in the content disposition.
+     * 
+     * @param dispositionType
+     *            disposition type value (usually <code>inline</code> or
+     *            <code>attachment</code>).
+     */
+    public void setContentDisposition(String dispositionType) {
+        Header header = obtainHeader();
+        header.setField(Fields.contentDisposition(dispositionType, null, -1,
+                null, null, null));
+    }
+
+    /**
+     * Sets the content disposition of this <code>Entity</code> to the
+     * specified disposition type and filename. No size or date parameters are
+     * included in the content disposition.
+     * 
+     * @param dispositionType
+     *            disposition type value (usually <code>inline</code> or
+     *            <code>attachment</code>).
+     * @param filename
+     *            filename parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     */
+    public void setContentDisposition(String dispositionType, String filename) {
+        Header header = obtainHeader();
+        header.setField(Fields.contentDisposition(dispositionType, filename,
+                -1, null, null, null));
+    }
+
+    /**
+     * Sets the content disposition of this <code>Entity</code> to the
+     * specified values. No date parameters are included in the content
+     * disposition.
+     * 
+     * @param dispositionType
+     *            disposition type value (usually <code>inline</code> or
+     *            <code>attachment</code>).
+     * @param filename
+     *            filename parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     * @param size
+     *            size parameter value or <code>-1</code> if the parameter
+     *            should not be included.
+     */
+    public void setContentDisposition(String dispositionType, String filename,
+            long size) {
+        Header header = obtainHeader();
+        header.setField(Fields.contentDisposition(dispositionType, filename,
+                size, null, null, null));
+    }
+
+    /**
+     * Sets the content disposition of this <code>Entity</code> to the
+     * specified values.
+     * 
+     * @param dispositionType
+     *            disposition type value (usually <code>inline</code> or
+     *            <code>attachment</code>).
+     * @param filename
+     *            filename parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     * @param size
+     *            size parameter value or <code>-1</code> if the parameter
+     *            should not be included.
+     * @param creationDate
+     *            creation-date parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     * @param modificationDate
+     *            modification-date parameter value or <code>null</code> if
+     *            the parameter should not be included.
+     * @param readDate
+     *            read-date parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     */
+    public void setContentDisposition(String dispositionType, String filename,
+            long size, Date creationDate, Date modificationDate, Date readDate) {
+        Header header = obtainHeader();
+        header.setField(Fields.contentDisposition(dispositionType, filename,
+                size, creationDate, modificationDate, readDate));
+    }
+
+    /**
+     * Returns the filename parameter of the content disposition of this
+     * <code>Entity</code>.
+     * 
+     * @return the filename parameter of the content disposition or
+     *         <code>null</code> if the filename has not been set.
+     */
+    public String getFilename() {
+        ContentDispositionField field = obtainField(Field.CONTENT_DISPOSITION);
+        if (field == null)
+            return null;
+
+        return field.getFilename();
+    }
+    
+    /**
+     * Sets the filename parameter of the content disposition of this
+     * <code>Entity</code> to the specified value. If this entity does not
+     * have a content disposition header field a new one with disposition type
+     * <code>attachment</code> is created.
+     * 
+     * @param filename
+     *            filename parameter value or <code>null</code> if the
+     *            parameter should be removed.
+     */
+    public void setFilename(String filename) {
+        Header header = obtainHeader();
+        ContentDispositionField field = (ContentDispositionField) header
+                .getField(Field.CONTENT_DISPOSITION);
+        if (field == null) {
+            if (filename != null) {
+                header.setField(Fields.contentDisposition(
+                        ContentDispositionField.DISPOSITION_TYPE_ATTACHMENT,
+                        filename, -1, null, null, null));
+            }
+        } else {
+            String dispositionType = field.getDispositionType();
+            Map<String, String> parameters = new HashMap<String, String>(field
+                    .getParameters());
+            if (filename == null) {
+                parameters.remove(ContentDispositionField.PARAM_FILENAME);
+            } else {
+                parameters
+                        .put(ContentDispositionField.PARAM_FILENAME, filename);
+            }
+            header.setField(Fields.contentDisposition(dispositionType,
+                    parameters));
+        }
+    }
+
+    /**
      * Determines if the MIME type of this <code>Entity</code> matches the
      * given one. MIME types are case-insensitive.
      * 
@@ -395,6 +547,26 @@ public abstract class Entity implements Disposable {
             header = new Header();
         }
         return header;
+    }
+
+    /**
+     * Obtains the header field with the specified name.
+     * 
+     * @param <F>
+     *            concrete field type.
+     * @param fieldName
+     *            name of the field to retrieve.
+     * @return the header field or <code>null</code> if this entity has no
+     *         header or the header contains no such field.
+     */
+    <F extends Field> F obtainField(String fieldName) {
+        Header header = getHeader();
+        if (header == null)
+            return null;
+
+        @SuppressWarnings("unchecked")
+        F field = (F) header.getField(fieldName);
+        return field;
     }
 
 }

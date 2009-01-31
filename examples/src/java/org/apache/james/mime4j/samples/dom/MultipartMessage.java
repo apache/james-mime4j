@@ -125,6 +125,10 @@ public class MultipartMessage {
         bodyPart.setBody(body, "image/png");
         bodyPart.setContentTransferEncoding("base64");
 
+        // Specify a filename in the Content-Disposition header (implicitly sets
+        // the disposition type to "attachment")
+        bodyPart.setFilename("smiley.png");
+
         return bodyPart;
     }
 

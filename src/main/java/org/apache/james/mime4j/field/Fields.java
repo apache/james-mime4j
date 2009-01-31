@@ -22,6 +22,7 @@ package org.apache.james.mime4j.field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -73,6 +74,9 @@ public class Fields {
 
     public static ContentDispositionField contentDisposition(
             String dispositionType, Map<String, String> parameters) {
+        if (!isValidDispositionType(dispositionType))
+            throw new IllegalArgumentException();
+
         if (parameters == null || parameters.isEmpty()) {
             return parse(ContentDispositionField.class,
                     Field.CONTENT_DISPOSITION, dispositionType);
@@ -86,6 +90,44 @@ public class Fields {
             String contentDisposition = sb.toString();
             return contentDisposition(contentDisposition);
         }
+    }
+
+    public static ContentDispositionField contentDisposition(
+            String dispositionType, String filename) {
+        return contentDisposition(dispositionType, filename, -1, null, null,
+                null);
+    }
+
+    public static ContentDispositionField contentDisposition(
+            String dispositionType, String filename, long size) {
+        return contentDisposition(dispositionType, filename, size, null, null,
+                null);
+    }
+
+    public static ContentDispositionField contentDisposition(
+            String dispositionType, String filename, long size,
+            Date creationDate, Date modificationDate, Date readDate) {
+        Map<String, String> parameters = new HashMap<String, String>();
+        if (filename != null) {
+            parameters.put(ContentDispositionField.PARAM_FILENAME, filename);
+        }
+        if (size >= 0) {
+            parameters.put(ContentDispositionField.PARAM_SIZE, Long
+                    .toString(size));
+        }
+        if (creationDate != null) {
+            parameters.put(ContentDispositionField.PARAM_CREATION_DATE,
+                    MimeUtil.formatDate(creationDate, null));
+        }
+        if (modificationDate != null) {
+            parameters.put(ContentDispositionField.PARAM_MODIFICATION_DATE,
+                    MimeUtil.formatDate(modificationDate, null));
+        }
+        if (readDate != null) {
+            parameters.put(ContentDispositionField.PARAM_READ_DATE, MimeUtil
+                    .formatDate(readDate, null));
+        }
+        return contentDisposition(dispositionType, parameters);
     }
 
     public static DateTimeField date(Date date) {
@@ -253,6 +295,13 @@ public class Fields {
         String type = mimeType.substring(0, idx);
         String subType = mimeType.substring(idx + 1);
         return EncoderUtil.isToken(type) && EncoderUtil.isToken(subType);
+    }
+
+    private static boolean isValidDispositionType(String dispositionType) {
+        if (dispositionType == null)
+            return false;
+
+        return EncoderUtil.isToken(dispositionType);
     }
 
     private static <F extends Field> F parse(Class<F> fieldClass,

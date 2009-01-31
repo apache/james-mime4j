@@ -125,11 +125,43 @@ public class FieldsTest extends TestCase {
 
     public void testContentDispositionStringNullParameters() throws Exception {
         ContentDispositionField field = Fields.contentDisposition("inline",
-                null);
+                (Map<String, String>) null);
         assertTrue(field.isValidField());
 
         String expectedRaw = "Content-Disposition: inline";
         assertEquals(expectedRaw, field.getRaw());
+    }
+
+    public void testContentDispositionFilename() throws Exception {
+        ContentDispositionField field = Fields.contentDisposition("attachment",
+                "some file.dat");
+        assertTrue(field.isValidField());
+
+        assertEquals("attachment", field.getDispositionType());
+        assertEquals("some file.dat", field.getFilename());
+    }
+
+    public void testContentDispositionFilenameSize() throws Exception {
+        ContentDispositionField field = Fields.contentDisposition("attachment",
+                "some file.dat", 300);
+        assertTrue(field.isValidField());
+
+        assertEquals("attachment", field.getDispositionType());
+        assertEquals("some file.dat", field.getFilename());
+        assertEquals(300, field.getSize());
+    }
+
+    public void testContentDispositionFilenameSizeDate() throws Exception {
+        ContentDispositionField field = Fields.contentDisposition("attachment",
+                "some file.dat", 300, new Date(1000), new Date(2000), new Date(3000));
+        assertTrue(field.isValidField());
+
+        assertEquals("attachment", field.getDispositionType());
+        assertEquals("some file.dat", field.getFilename());
+        assertEquals(300, field.getSize());
+        assertEquals(new Date(1000), field.getCreationDate());
+        assertEquals(new Date(2000), field.getModificationDate());
+        assertEquals(new Date(3000), field.getReadDate());
     }
 
     public void testInvalidContentDisposition() throws Exception {
