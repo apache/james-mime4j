@@ -237,24 +237,11 @@ public class Header {
     
     
     /**
-     * Write the Header to the given OutputStream. 
-     * <p>
-     * Compatibility mode:
-     * <ul>
-     *  <li>
-     *   {@link Mode#LENIENT}: use charset of the Content-Type header
-     *  </li>
-     *  <li>
-     *   {@link Mode#STRICT_ERROR}: use US-ASCII and throw {@link MimeException} 
-     *    if a non ASCII character is encountered
-     *   </li>
-     *  <li>
-     *   {@link Mode#STRICT_ERROR}: ignore non ASCII characters if encountered
-     *   </li>
-     * </ul>
+     * Write the Header to the given OutputStream using the specified 
+     * compatibility mode. 
+     *
      * @param out the OutputStream to write to
-     * @param mode compatibility mode:
-     *   {@link Mode#LENIENT}, {@link Mode#STRICT_ERROR}, {@link Mode#STRICT_IGNORE}  
+     * @param mode compatibility mode  
      * 
      * @throws IOException if case of an I/O error
      * @throws MimeIOException if case of a MIME protocol violation
