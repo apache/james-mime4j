@@ -25,7 +25,6 @@ import java.util.Date;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.Message;
-import org.apache.james.mime4j.message.Mode;
 import org.apache.james.mime4j.message.TextBody;
 
 /**
@@ -62,7 +61,7 @@ public class TextPlainMessage {
 
         // 4) print message to standard output
 
-        message.writeTo(System.out, Mode.STRICT_ERROR);
+        message.writeTo(System.out);
 
         // 5) message is no longer needed and should be disposed of
 

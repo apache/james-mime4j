@@ -64,7 +64,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
         config.setMaxLineLen(-1);
         Message inputMessage = new Message(new FileInputStream(file), config);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        inputMessage.writeTo(out, Mode.LENIENT);
+        MessageWriter.LENIENT.writeEntity(inputMessage, out);
         
         String msgoutFile = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".out";
         String msgoutFileMime4j = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".mime4j.out";
@@ -76,12 +76,12 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             
             Message roundtripMessage = new Message(new FileInputStream(msgoutFile), config);
             ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
-            roundtripMessage.writeTo(outRoundtrip, Mode.LENIENT);
+            MessageWriter.LENIENT.writeEntity(roundtripMessage, outRoundtrip);
             assertEquals("Failed LENIENT roundtrip", new String(out.toByteArray()), new String(outRoundtrip.toByteArray()));
 
             roundtripMessage = new Message(new FileInputStream(msgoutFile), config);
             outRoundtrip = new ByteArrayOutputStream();
-            roundtripMessage.writeTo(outRoundtrip, Mode.STRICT_ERROR);
+            MessageWriter.STRICT_ERROR.writeEntity(roundtripMessage, outRoundtrip);
             assertEquals("Failed STRICT roundtrip", new String(out.toByteArray()), new String(outRoundtrip.toByteArray()));
 
         } catch (FileNotFoundException e) {

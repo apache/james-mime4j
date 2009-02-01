@@ -57,11 +57,8 @@ class StorageTextBody extends SingleBody implements TextBody {
         return new InputStreamReader(storage.getInputStream(), charset);
     }
 
-    /**
-     * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream,
-     *      Mode)
-     */
-    public void writeTo(OutputStream out, Mode mode) throws IOException {
+    @Override
+    public void writeTo(OutputStream out) throws IOException {
         if (out == null)
             throw new IllegalArgumentException();
 

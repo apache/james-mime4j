@@ -133,7 +133,7 @@ public class MessageTest extends TestCase {
         Message m = new Message(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        m.writeTo(out, Mode.LENIENT);
+        m.writeTo(out);
 
         InputStream output = new ByteArrayInputStream(out.toByteArray());
 
@@ -159,7 +159,7 @@ public class MessageTest extends TestCase {
                 .getBody(), headerValue);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        m.writeTo(out, Mode.LENIENT);
+        m.writeTo(out);
         List<?> lines = IOUtils.readLines((new BufferedReader(
                 new InputStreamReader(new ByteArrayInputStream(out
                         .toByteArray())))));
@@ -495,7 +495,8 @@ public class MessageTest extends TestCase {
 
         public boolean disposed = false;
 
-        public void writeTo(OutputStream out, Mode mode) throws IOException {
+        @Override
+        public void writeTo(OutputStream out) throws IOException {
             out.write("dummy".getBytes("US-ASCII"));
         }
 

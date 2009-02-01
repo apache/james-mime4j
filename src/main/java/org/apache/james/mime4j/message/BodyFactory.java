@@ -244,8 +244,8 @@ public class BodyFactory {
      * <p>
      * &quot;us-ascii&quot; is used to encode the characters of the string into
      * a byte stream when calling
-     * {@link Body#writeTo(java.io.OutputStream, Mode) writeTo(OutputStream, Mode)}
-     * on the returned object.
+     * {@link SingleBody#writeTo(java.io.OutputStream) writeTo(OutputStream)} on
+     * the returned object.
      * 
      * @param text
      *            text to create a message body from.
@@ -264,8 +264,8 @@ public class BodyFactory {
      * <p>
      * The charset corresponding to the given MIME charset name is used to
      * encode the characters of the string into a byte stream when calling
-     * {@link Body#writeTo(java.io.OutputStream, Mode) writeTo(OutputStream, Mode)}
-     * on the returned object. If the MIME charset has no corresponding Java
+     * {@link SingleBody#writeTo(java.io.OutputStream) writeTo(OutputStream)} on
+     * the returned object. If the MIME charset has no corresponding Java
      * charset or the Java charset cannot be used for encoding then
      * &quot;us-ascii&quot; is used instead.
      * 

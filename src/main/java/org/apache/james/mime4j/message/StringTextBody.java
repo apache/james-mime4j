@@ -56,11 +56,8 @@ class StringTextBody extends SingleBody implements TextBody {
         return new StringReader(text);
     }
 
-    /**
-     * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream,
-     *      Mode)
-     */
-    public void writeTo(OutputStream out, Mode mode) throws IOException {
+    @Override
+    public void writeTo(OutputStream out) throws IOException {
         if (out == null)
             throw new IllegalArgumentException();
 

@@ -45,11 +45,8 @@ class StorageBinaryBody extends SingleBody implements BinaryBody {
         return storage.getInputStream();
     }
 
-    /**
-     * @see org.apache.james.mime4j.message.Body#writeTo(java.io.OutputStream,
-     *      Mode)
-     */
-    public void writeTo(OutputStream out, Mode mode) throws IOException {
+    @Override
+    public void writeTo(OutputStream out) throws IOException {
         if (out == null)
             throw new IllegalArgumentException();
 

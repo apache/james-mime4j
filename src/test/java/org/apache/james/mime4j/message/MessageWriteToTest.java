@@ -42,7 +42,7 @@ public class MessageWriteToTest extends TestCase {
         Message message = createMessage(ExampleMail.RFC822_SIMPLE_BYTES);
         assertFalse("Not multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        message.writeTo(out, Mode.STRICT_IGNORE);
+        MessageWriter.STRICT_IGNORE.writeEntity(message, out);
         assertEquals(out.toByteArray(), ExampleMail.RFC822_SIMPLE_BYTES);
     }
     
@@ -50,7 +50,7 @@ public class MessageWriteToTest extends TestCase {
         Message message = createMessage(ExampleMail.RFC822_SIMPLE_BYTES);
         assertFalse("Not multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        message.writeTo(out, Mode.STRICT_ERROR);
+        MessageWriter.STRICT_ERROR.writeEntity(message, out);
         assertEquals(out.toByteArray(), ExampleMail.RFC822_SIMPLE_BYTES);
     }
     
@@ -58,7 +58,7 @@ public class MessageWriteToTest extends TestCase {
         Message message = createMessage(ExampleMail.RFC822_SIMPLE_BYTES);
         assertFalse("Not multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        message.writeTo(out, Mode.LENIENT);
+        MessageWriter.LENIENT.writeEntity(message, out);
         assertEquals(out.toByteArray(), ExampleMail.RFC822_SIMPLE_BYTES);
     }
     
@@ -75,7 +75,7 @@ public class MessageWriteToTest extends TestCase {
         Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
         assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        message.writeTo(out, Mode.LENIENT);
+        MessageWriter.LENIENT.writeEntity(message, out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
     }
     
@@ -83,7 +83,7 @@ public class MessageWriteToTest extends TestCase {
         Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
         assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        message.writeTo(out, Mode.STRICT_ERROR);
+        MessageWriter.STRICT_ERROR.writeEntity(message, out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
     }
     
@@ -91,7 +91,7 @@ public class MessageWriteToTest extends TestCase {
         Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
         assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        message.writeTo(out, Mode.STRICT_IGNORE);
+        MessageWriter.STRICT_IGNORE.writeEntity(message, out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
     }
     

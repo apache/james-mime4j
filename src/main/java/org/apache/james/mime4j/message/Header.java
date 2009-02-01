@@ -19,12 +19,8 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,20 +30,15 @@ import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
-import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.util.CharsetUtil;
-
 
 /**
  * The header of an entity (see RFC 2045).
- *
- * 
- * @version $Id: Header.java,v 1.3 2004/10/04 15:36:44 ntherning Exp $
  */
 public class Header implements Iterable<Field> {
+
     private List<Field> fields = new LinkedList<Field>();
     private Map<String, List<Field>> fieldMap = new HashMap<String, List<Field>>();
     
@@ -243,46 +234,5 @@ public class Header implements Iterable<Field> {
         }
         return str.toString();
     }
-    
-    
-    /**
-     * Write the Header to the given OutputStream using the specified 
-     * compatibility mode. 
-     *
-     * @param out the OutputStream to write to
-     * @param mode compatibility mode  
-     * 
-     * @throws IOException if case of an I/O error
-     * @throws MimeIOException if case of a MIME protocol violation
-     */
-    public void writeTo(final OutputStream out, Mode mode) throws IOException, MimeIOException {
-        Charset charset = null;
-        if (mode == Mode.LENIENT) {
-            final ContentTypeField contentTypeField = ((ContentTypeField) getField(Field.CONTENT_TYPE));
-            if (contentTypeField == null) {
-                charset = CharsetUtil.DEFAULT_CHARSET;
-            } else {
-                final String contentTypeFieldCharset = contentTypeField.getCharset();
-                if (contentTypeField != null && contentTypeFieldCharset != null) {
-                    charset = CharsetUtil.getCharset(contentTypeFieldCharset);
-                } else {
-                    charset = CharsetUtil.ISO_8859_1;
-                }
-            }
-        } else {
-            charset = CharsetUtil.DEFAULT_CHARSET;
-        }
-        BufferedWriter writer = new BufferedWriter(
-                new OutputStreamWriter(out, charset), 8192);
-        for (Field field : fields) {
-            String fs = field.getRaw();
-            if (mode == Mode.STRICT_ERROR && !CharsetUtil.isASCII(fs)) {
-                throw new MimeIOException(new MimeException("Header '" + fs + "' violates RFC 822"));
-            }
-            writer.write(fs);
-            writer.write(CharsetUtil.CRLF);
-        }
-        writer.write(CharsetUtil.CRLF);
-        writer.flush();
-    }
+
 }

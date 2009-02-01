@@ -21,16 +21,10 @@ package org.apache.james.mime4j.message;
 
 import java.io.ByteArrayOutputStream;
 
-import org.apache.james.mime4j.field.Field;
-
 import junit.framework.TestCase;
 
-/**
- * 
- *
- * 
- * @version $Id:$
- */
+import org.apache.james.mime4j.field.Field;
+
 public class MultipartFormTest extends TestCase {
 
     public void testMultipartFormContent() throws Exception {
@@ -65,7 +59,7 @@ public class MultipartFormTest extends TestCase {
         multipart.addBodyPart(p3);
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        multipart.writeTo(out, Mode.LENIENT);
+        MessageWriter.LENIENT.writeMultipart(multipart, out);
         out.close();
         
         String expected = "\r\n" + 

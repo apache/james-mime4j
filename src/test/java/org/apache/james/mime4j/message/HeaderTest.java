@@ -44,22 +44,10 @@ public class HeaderTest extends TestCase {
                 .toString());
     }
     
-    static final int SWISS_GERMAN_HELLO [] = {
-        0x47, 0x72, 0xFC, 0x65, 0x7A, 0x69, 0x5F, 0x7A, 0xE4, 0x6D, 0xE4
-    };
-        
-    private static String constructString(int [] unicodeChars) {
-        StringBuilder buffer = new StringBuilder();
-        if (unicodeChars != null) {
-            for (int unicodeChar : unicodeChars) {
-                buffer.append((char) unicodeChar); 
-            }
-        }
-        return buffer.toString();
-    }
+    private static final String SWISS_GERMAN_HELLO = "Gr\374ezi_z\344m\344";
 
     public void testWriteInStrictMode() throws Exception {
-        String hello = constructString(SWISS_GERMAN_HELLO);
+        String hello = SWISS_GERMAN_HELLO;
         Header header = new Header();
         header.addField(Field.parse("Hello: " + hello));
         
@@ -69,7 +57,7 @@ public class HeaderTest extends TestCase {
         
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         
-        header.writeTo(buffer, Mode.STRICT_IGNORE);
+        MessageWriter.STRICT_IGNORE.writeHeader(header, buffer);
         String s = buffer.toString(CharsetUtil.US_ASCII.name());
         
         assertEquals("Hello: Gr?ezi_z?m?\r\n\r\n", s);
@@ -77,14 +65,14 @@ public class HeaderTest extends TestCase {
         buffer.reset();
         
         try {
-            header.writeTo(buffer, Mode.STRICT_ERROR);
+            MessageWriter.STRICT_ERROR.writeHeader(header, buffer);
             fail("MimeIOException should have been thrown");
         } catch (MimeIOException expected) {
         }
     }
     
     public void testWriteInLenientMode() throws Exception {
-        String hello = constructString(SWISS_GERMAN_HELLO);
+        String hello = SWISS_GERMAN_HELLO;
         Header header = new Header();
         header.addField(Field.parse("Hello: " + hello));
         header.addField(Field.parse("Content-type: text/plain; charset=" + 
@@ -96,7 +84,7 @@ public class HeaderTest extends TestCase {
         
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         
-        header.writeTo(buffer, Mode.LENIENT);
+        MessageWriter.LENIENT.writeHeader(header, buffer);
         String s = buffer.toString(CharsetUtil.ISO_8859_1.name());
         
         assertEquals("Hello: " + hello + "\r\n" +

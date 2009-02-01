@@ -21,6 +21,7 @@ package org.apache.james.mime4j.message;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -133,7 +134,23 @@ public class Message extends Entity implements Body {
             throw new MimeIOException(e);
         }
     }
-    
+
+    /**
+     * Write the content to the given output stream using the
+     * {@link MessageWriter#STRICT_ERROR STRICT_ERROR} message writer.
+     * 
+     * @param out
+     *            the output stream to write to.
+     * @throws IOException
+     *             in case of an I/O error
+     * @throws MimeIOException
+     *             in case of a MIME protocol violation
+     * @see MessageWriter
+     */
+    public void writeTo(OutputStream out) throws IOException, MimeIOException {
+        MessageWriter.STRICT_ERROR.writeEntity(this, out);
+    }
+
     /**
      * Returns the value of the <i>Message-ID</i> header field of this message
      * or <code>null</code> if it is not present.

@@ -19,16 +19,12 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
-import org.apache.james.mime4j.MimeIOException;
-
 /**
  * Encapsulates the body of an entity (see RFC 2045).
- *
- * 
- * @version $Id: Body.java,v 1.4 2004/10/04 15:36:43 ntherning Exp $
+ * <p>
+ * A body can be a {@link Message}, a {@link Multipart} or a {@link SingleBody}.
+ * This interface should not be implemented directly by classes other than
+ * those.
  */
 public interface Body extends Disposable {
 
@@ -38,21 +34,13 @@ public interface Body extends Disposable {
      * @return the parent.
      */
     Entity getParent();
-    
+
     /**
      * Sets the parent of this body.
      * 
-     * @param parent the parent.
+     * @param parent
+     *            the parent.
      */
     void setParent(Entity parent);
-    
-    /**
-     * Writes this body to the given stream in MIME message format.
-     * 
-     * @param out the stream to write to.
-     * @param mode compatibility mode  
-     * @throws IOException if case of an I/O error
-     * @throws MimeIOException if case of a MIME protocol violation
-     */
-    void writeTo(OutputStream out, Mode mode) throws IOException, MimeIOException;
+
 }

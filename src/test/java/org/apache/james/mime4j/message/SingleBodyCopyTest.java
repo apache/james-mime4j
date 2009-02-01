@@ -91,11 +91,11 @@ public class SingleBodyCopyTest extends TestCase {
     private void sameContentTest(SingleBody expectedBody, SingleBody actualBody)
             throws Exception {
         ByteArrayOutputStream expBaos = new ByteArrayOutputStream();
-        expectedBody.writeTo(expBaos, Mode.STRICT_ERROR);
+        expectedBody.writeTo(expBaos);
         byte[] expected = expBaos.toByteArray();
 
         ByteArrayOutputStream actBaos = new ByteArrayOutputStream();
-        actualBody.writeTo(actBaos, Mode.STRICT_ERROR);
+        actualBody.writeTo(actBaos);
         byte[] actual = actBaos.toByteArray();
 
         assertEquals(expected.length, actual.length);

@@ -19,6 +19,9 @@
 
 package org.apache.james.mime4j.message;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 /**
  * Abstract implementation of a single message body; that is, a body that does
  * not contain (directly or indirectly) any other child bodies. It also provides
@@ -41,6 +44,14 @@ public abstract class SingleBody implements Body {
     public void setParent(Entity parent) {
         this.parent = parent;
     }
+
+    /**
+     * Writes this single body to the given stream.
+     * 
+     * @param out the stream to write to.
+     * @throws IOException in case of an I/O error
+     */
+    public abstract void writeTo(OutputStream out) throws IOException;
 
     /**
      * Returns a copy of this <code>SingleBody</code> (optional operation).

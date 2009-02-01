@@ -19,15 +19,11 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.james.mime4j.MimeIOException;
-import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.field.ContentDispositionField;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
@@ -37,9 +33,6 @@ import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
- *
- * 
- * @version $Id: Entity.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public abstract class Entity implements Disposable {
     private Header header = null;
@@ -488,37 +481,6 @@ public abstract class Entity implements Disposable {
             (ContentTypeField) getHeader().getField(Field.CONTENT_TYPE);
         return f != null && f.getBoundary() != null 
             && getMimeType().startsWith(ContentTypeField.TYPE_MULTIPART_PREFIX);
-    }
-    
-    /**
-     * Write the content to the given outputstream
-     * 
-     * @param out the outputstream to write to
-     * @param mode compatibility mode  
-     * @throws IOException if case of an I/O error
-     * @throws MimeIOException if case of a MIME protocol violation
-     */
-    public void writeTo(OutputStream out, Mode mode) throws IOException, MimeIOException {
-        getHeader().writeTo(out, mode);
-        
-        out.flush();
-        
-        final Body body = getBody();
-
-        OutputStream encOut;
-        if (MimeUtil.ENC_BASE64.equals(getContentTransferEncoding())) {
-            encOut = CodecUtil.wrapBase64(out);
-        } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(getContentTransferEncoding())) {
-            encOut = CodecUtil.wrapQuotedPrintable(out, (body instanceof BinaryBody));
-        } else {
-            encOut = out;
-        }
-        body.writeTo(encOut, mode);
-        encOut.flush();
-        // the Base64 output streams requires closing of the stream but
-        // we don't want it to close the inner stream so we override the behaviour
-        // for the wrapping stream writer.
-        if (encOut != out) encOut.close();
     }
 
     /**
