@@ -27,10 +27,9 @@
     <body>
         <section name="Mime4j">
             <p>
-                <strong>NOTE:</strong> mime4j is a subproject of 
-                <a href="http://james.apache.org/">Apache James</a>. Please use
-                the <a href="http://james.apache.org/mail.html">James mailing list</a> 
-                for mime4j related questions.
+                Apache Mime4j is developed by the 
+                <a href="http://james.apache.org/">Apache James</a> team but now has a
+                dedicated <a href="http://james.apache.org/mail.html#Mime4j">mailing list</a>.
             </p>
             <p> mime4j provides a parser, 
                 <a href="apidocs/org/apache/james/mime4j/parser/MimeStreamParser.html">
