@@ -22,17 +22,27 @@ package org.apache.james.mime4j;
 import java.io.IOException;
 
 /**
- * A wrapper class based on {@link IOException} for MIME protocol 
- * exceptions.
+ * A wrapper class based on {@link IOException} for MIME protocol exceptions.
  */
 public class MimeIOException extends IOException {
 
     private static final long serialVersionUID = 5393613459533735409L;
 
     /**
+     * Creates a new MimeIOException from the specified detail message.
+     * 
+     * @param message
+     *            detail message.
+     */
+    public MimeIOException(String message) {
+        this(new MimeException(message));
+    }
+
+    /**
      * Constructs an IO exception based on {@link MimeException}.
-     *
-     * @param cause the cause.
+     * 
+     * @param cause
+     *            the cause.
      */
     public MimeIOException(MimeException cause) {
         super(cause.getMessage());
