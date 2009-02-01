@@ -89,8 +89,8 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.0.2</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>${compileSource}</source>
+          <target>${compileSource}</target>
           <encoding>iso8859-1</encoding>
         </configuration>
       </plugin>      
@@ -310,7 +310,7 @@
         <artifactId>maven-pmd-plugin</artifactId>
         <version>2.4</version>
         <configuration>
-          <targetjdk>1.4</targetjdk>
+          <targetJdk>${compileSource}</targetJdk>
           <rulesets>
             <ruleset>/rulesets/basic.xml</ruleset>
             <ruleset>/rulesets/controversial.xml</ruleset>
@@ -376,5 +376,8 @@
             <archive>http://mail-archives.apache.org/mod_mbox/james-server-dev/</archive>
     </mailingList>
   </mailingLists>
-
+  
+  <properties>
+    <compileSource>1.5</compileSource>
+  </properties>
 </project>
