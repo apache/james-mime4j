@@ -27,19 +27,19 @@ public interface RecursionMode {
     /** 
      * Recursively parse every <code>message/rfc822</code> part 
      */
-    public static final int M_RECURSE = 0;
+    int M_RECURSE = 0;
     /**
      * Do not recurse <code>message/rfc822</code> parts 
      */
-    public static final int M_NO_RECURSE = 1;
+    int M_NO_RECURSE = 1;
     /** 
      * Parse into raw entities
      */
-    public static final int M_RAW = 2;
+    int M_RAW = 2;
     /**
      * Do not recurse <code>message/rfc822</code> parts
      * and treat multiparts as a single flat body. 
      */
-    public static final int M_FLAT = 3;
+    int M_FLAT = 3;
     
 }
