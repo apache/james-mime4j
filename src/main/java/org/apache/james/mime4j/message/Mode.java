@@ -19,19 +19,19 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
 
 /**
  * Different compatibility modes for writing a message that determine how to
  * encode header fields as well as preamble and epilogue of a multipart.
  */
 public enum Mode {
-    /** Ignore non ASCII characters if encountered. */
+    /** Use US-ASCII but ignore non ASCII characters. */
     STRICT_IGNORE,
 
     /**
-     * Use US-ASCII and throw {@link MimeException} if a non ASCII character is
-     * encountered.
+     * Use US-ASCII and throw {@link MimeIOException} if a non ASCII character
+     * is encountered.
      */
     STRICT_ERROR,
 
