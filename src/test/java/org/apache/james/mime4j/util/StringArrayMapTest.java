@@ -30,9 +30,6 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-/**
- * Test case for {@link StringArray}.
- */
 public class StringArrayMapTest extends TestCase {
     private StringArrayMap getSampleMap() {
         final StringArrayMap map = new StringArrayMap();
@@ -45,9 +42,6 @@ public class StringArrayMapTest extends TestCase {
         return map;
     }
 
-    /**
-     * Test for {@link StringArrayMap#getMap()}.
-     */
     public void testGetMap() {
         final Map<String, String[]> map = getSampleMap().getMap();
         final List<String> keys = new ArrayList<String>(map.keySet());
@@ -68,9 +62,6 @@ public class StringArrayMapTest extends TestCase {
         assertEquals("c", xyz[2]);
     }
 
-    /**
-     * Test case for {@link StringArrayMap#getNameArray()}.
-     */
     public void testGetNameArray() {
         final String[] names = getSampleMap().getNameArray();
         assertEquals(3, names.length);
@@ -80,17 +71,11 @@ public class StringArrayMapTest extends TestCase {
         assertEquals("xyz", names[2]);
     }
 
-    /**
-     * Test case for {@link StringArrayMap#getNames()}.
-     */
     public void testGetNames() {
         final Enumeration<String> names = getSampleMap().getNames();
         assertEquals(new String[]{"foo", "xs", "xyz"}, names);
     }
 
-    /**
-     * Test case for {@link StringArrayMap#getValue(String)}.
-     */
     public void testGetValue() {
         final StringArrayMap map = getSampleMap();
         assertEquals("bAr", map.getValue("foo"));
@@ -101,9 +86,6 @@ public class StringArrayMapTest extends TestCase {
         assertNull(map.getValue("xz"));
     }
 
-    /**
-     * Test case for {@link StringArrayMap#getValue(String)}.
-     */
     public void testGetValues() {
         final StringArrayMap map = getSampleMap();
         final String[] foo = map.getValues("foo");
@@ -143,9 +125,6 @@ public class StringArrayMapTest extends TestCase {
         }
     }
 
-    /**
-     * Test case for {@link StringArrayMap#getValueEnum(String)}.
-     */
     public void testGetValueEnum() {
         final StringArrayMap map = getSampleMap();
         assertEquals(new String[]{"bAr"}, map.getValueEnum("foo"));
