@@ -29,9 +29,14 @@ import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.ContentHandler;
+import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
 
+/**
+ * A <code>ContentHandler</code> for building an <code>Entity</code> to be
+ * used in conjunction with a {@link MimeStreamParser}.
+ */
 public class MessageBuilder implements ContentHandler {
 
     private final Entity entity;
