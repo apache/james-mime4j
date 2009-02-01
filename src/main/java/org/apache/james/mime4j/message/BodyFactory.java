@@ -67,7 +67,7 @@ public class BodyFactory {
 
     /**
      * Returns the <code>StorageProvider</code> this <code>BodyFactory</code>
-     * uses to create message bodies from inout streams.
+     * uses to create message bodies from input streams.
      * 
      * @return a <code>StorageProvider</code>.
      */
