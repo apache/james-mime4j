@@ -137,8 +137,9 @@ class Builder {
         if (n instanceof ASTroute) {
             route = buildRoute((ASTroute) n);
             n = it.next();
-        } else if (n instanceof ASTaddr_spec)
-            ; // do nothing
+        } else if (n instanceof ASTaddr_spec) {
+            // do nothing
+        }
         else
             throw new IllegalStateException();
 

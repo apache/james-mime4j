@@ -76,8 +76,8 @@ public class AddressTest extends TestCase {
         assertEquals("Marketing  folks", group.getName());
         assertEquals(2, group.getMailboxes().size());
 
-        Mailbox mailbox1 = (Mailbox)group.getMailboxes().get(0);
-        Mailbox mailbox2 = (Mailbox)group.getMailboxes().get(1);
+        Mailbox mailbox1 = group.getMailboxes().get(0);
+        Mailbox mailbox2 = group.getMailboxes().get(1);
 
         assertEquals("Jane Smith", mailbox1.getName());
         assertEquals("jane", mailbox1.getLocalPart());

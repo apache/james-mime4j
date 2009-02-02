@@ -172,6 +172,7 @@ public final class MimeUtil {
      * @param pValue The field value to parse.
      * @return The result map; use the key "" to retrieve the first value.
      */
+    @SuppressWarnings("fallthrough")
     public static Map<String, String> getHeaderParams(String pValue) {
         pValue = pValue.trim();
         

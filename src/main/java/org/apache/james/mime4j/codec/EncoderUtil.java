@@ -68,7 +68,7 @@ public class EncoderUtil {
         B,
         /** The Q encoding (similar to quoted-printable defined in RFC 2045). */
         Q
-    };
+    }
 
     /**
      * Indicates the intended usage of an encoded word.
