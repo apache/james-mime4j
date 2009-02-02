@@ -48,7 +48,7 @@ public class UnstructuredField extends Field {
         parsed = true;
     }
 
-    public static class Parser implements FieldParser {
+    static class Parser implements FieldParser {
         public Field parse(final String name, final String body,
                 final String raw) {
             return new UnstructuredField(name, body, raw);

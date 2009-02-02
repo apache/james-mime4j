@@ -248,7 +248,7 @@ public class ContentTypeField extends Field {
         parsed = true;
     }
 
-    public static class Parser implements FieldParser {
+    static class Parser implements FieldParser {
         public Field parse(final String name, final String body,
                 final String raw) {
             return new ContentTypeField(name, body, raw);
