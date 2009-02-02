@@ -81,8 +81,7 @@ public class BodyFactory {
      * 
      * @param is
      *            input stream to create a message body from.
-     * @return a {@link SingleBody} that implements the {@link BinaryBody}
-     *         interface.
+     * @return a binary body.
      * @throws IOException
      *             if an I/O error occurs.
      */
@@ -106,8 +105,7 @@ public class BodyFactory {
      * 
      * @param storage
      *            storage to create a message body from.
-     * @return a {@link SingleBody} that implements the {@link BinaryBody}
-     *         interface.
+     * @return a binary body.
      * @throws IOException
      *             if an I/O error occurs.
      */
@@ -128,8 +126,7 @@ public class BodyFactory {
      * 
      * @param is
      *            input stream to create a message body from.
-     * @return a {@link SingleBody} that implements the {@link TextBody}
-     *         interface.
+     * @return a text body.
      * @throws IOException
      *             if an I/O error occurs.
      */
@@ -156,8 +153,7 @@ public class BodyFactory {
      *            input stream to create a message body from.
      * @param mimeCharset
      *            name of a MIME charset.
-     * @return a {@link SingleBody} that implements the {@link TextBody}
-     *         interface.
+     * @return a text body.
      * @throws IOException
      *             if an I/O error occurs.
      */
@@ -189,8 +185,7 @@ public class BodyFactory {
      * 
      * @param storage
      *            storage to create a message body from.
-     * @return a {@link SingleBody} that implements the {@link TextBody}
-     *         interface.
+     * @return a text body.
      * @throws IOException
      *             if an I/O error occurs.
      */
@@ -223,8 +218,7 @@ public class BodyFactory {
      *            storage to create a message body from.
      * @param mimeCharset
      *            name of a MIME charset.
-     * @return a {@link SingleBody} that implements the {@link TextBody}
-     *         interface.
+     * @return a text body.
      * @throws IOException
      *             if an I/O error occurs.
      */
@@ -249,8 +243,7 @@ public class BodyFactory {
      * 
      * @param text
      *            text to create a message body from.
-     * @return a {@link SingleBody} that implements the {@link TextBody}
-     *         interface.
+     * @return a text body.
      */
     public TextBody textBody(String text) {
         if (text == null)
@@ -273,8 +266,7 @@ public class BodyFactory {
      *            text to create a message body from.
      * @param mimeCharset
      *            name of a MIME charset.
-     * @return a {@link SingleBody} that implements the {@link TextBody}
-     *         interface.
+     * @return a text body.
      */
     public TextBody textBody(String text, String mimeCharset) {
         if (text == null)

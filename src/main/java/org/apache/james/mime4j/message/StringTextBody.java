@@ -32,7 +32,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
 /**
  * Text body backed by a <code>String</code>.
  */
-class StringTextBody extends SingleBody implements TextBody {
+class StringTextBody extends TextBody {
 
     private final String text;
     private final Charset charset;
@@ -42,16 +42,12 @@ class StringTextBody extends SingleBody implements TextBody {
         this.charset = charset;
     }
 
-    /**
-     * @see org.apache.james.mime4j.message.TextBody#getMimeCharset()
-     */
+    @Override
     public String getMimeCharset() {
         return CharsetUtil.toMimeCharset(charset.name());
     }
 
-    /**
-     * @see org.apache.james.mime4j.message.TextBody#getReader()
-     */
+    @Override
     public Reader getReader() throws IOException {
         return new StringReader(text);
     }

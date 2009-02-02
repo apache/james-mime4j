@@ -30,17 +30,15 @@ import org.apache.james.mime4j.storage.MultiReferenceStorage;
  * Binary body backed by a
  * {@link org.apache.james.mime4j.storage.Storage}
  */
-class StorageBinaryBody extends SingleBody implements BinaryBody {
+class StorageBinaryBody extends BinaryBody {
 
-    private MultiReferenceStorage storage = null;
+    private MultiReferenceStorage storage;
 
     public StorageBinaryBody(final MultiReferenceStorage storage) {
         this.storage = storage;
     }
 
-    /**
-     * @see org.apache.james.mime4j.message.BinaryBody#getInputStream()
-     */
+    @Override
     public InputStream getInputStream() throws IOException {
         return storage.getInputStream();
     }

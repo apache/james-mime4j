@@ -22,21 +22,16 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 /**
- * Interface implemented by bodies containing binary data.
- *
- * 
- * @version $Id: BinaryBody.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
+ * A body containing binary data.
  */
-public interface BinaryBody extends Body {
-    
+public abstract class BinaryBody extends SingleBody {
     /**
-     * Gets a <code>InputStream</code> which reads the bytes of the
-     * body.
+     * Gets a <code>InputStream</code> which reads the bytes of the body.
      * 
      * @return the stream, transfer decoded
-     * @throws IOException on I/O errors.
+     * @throws IOException
+     *             on I/O errors.
      */
-    InputStream getInputStream() throws IOException;
+    public abstract InputStream getInputStream() throws IOException;
 }

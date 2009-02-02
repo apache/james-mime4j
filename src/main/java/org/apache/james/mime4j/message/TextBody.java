@@ -22,27 +22,24 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.Reader;
 
-
 /**
  * Encapsulates the contents of a <code>text/*</code> entity body.
- *
- * 
- * @version $Id: TextBody.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
-public interface TextBody extends Body {
+public abstract class TextBody extends SingleBody {
     /**
      * Returns the MIME charset of this text body.
      * 
      * @return the MIME charset.
      */
-    String getMimeCharset();
+    public abstract String getMimeCharset();
 
     /**
      * Gets a <code>Reader</code> which may be used to read out the contents
      * of this body.
      * 
      * @return the <code>Reader</code>.
-     * @throws IOException on I/O errors.
+     * @throws IOException
+     *             on I/O errors.
      */
-    Reader getReader() throws IOException;
+    public abstract Reader getReader() throws IOException;
 }
