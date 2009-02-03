@@ -175,19 +175,8 @@ public final class MimeUtil {
     @SuppressWarnings("fallthrough")
     public static Map<String, String> getHeaderParams(String pValue) {
         pValue = pValue.trim();
-        
-        /*
-         * Unfold Content-Type value
-         */
-        StringBuilder sb = new StringBuilder(128);
-        for (int i = 0; i < pValue.length(); i++) {
-            char c = pValue.charAt(i);
-            if (c == '\r' || c == '\n') {
-                continue;
-            }
-            sb.append(c);
-        }
-        pValue = sb.toString();
+
+        pValue = unfold(pValue);
         
         Map<String, String> result = new HashMap<String, String>();
 
@@ -465,6 +454,43 @@ public final class MimeUtil {
 
             wspIdx = nextWspIdx;
         }
+    }
+
+    /**
+     * Unfold a multiple-line representation into a single line.
+     * 
+     * @param s
+     *            string to unfold.
+     * @return unfolded string.
+     */
+    public static String unfold(String s) {
+        final int length = s.length();
+        for (int idx = 0; idx < length; idx++) {
+            char c = s.charAt(idx);
+            if (c == '\r' || c == '\n') {
+                return unfold0(s, idx);
+            }
+        }
+
+        return s;
+    }
+
+    private static String unfold0(String s, int crlfIdx) {
+        final int length = s.length();
+        StringBuilder sb = new StringBuilder(length);
+
+        if (crlfIdx > 0) {
+            sb.append(s.substring(0, crlfIdx));
+        }
+
+        for (int idx = crlfIdx + 1; idx < length; idx++) {
+            char c = s.charAt(idx);
+            if (c != '\r' && c != '\n') {
+                sb.append(c);
+            }
+        }
+
+        return sb.toString();
     }
 
     private static int indexOfWsp(String s, int fromIndex) {

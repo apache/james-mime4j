@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * The base class of all field classes.
@@ -98,7 +99,7 @@ public abstract class Field {
         /*
          * Unfold the field.
          */
-        final String unfolded = raw.replaceAll("\r|\n", "");
+        final String unfolded = MimeUtil.unfold(raw);
         
         /*
          * Split into name and value.
@@ -144,7 +145,7 @@ public abstract class Field {
         String raw = name + ": " + body;
 
         // Unfold body
-        body = body.replaceAll("\r|\n", "");
+        body = MimeUtil.unfold(body);
 
         return parser.parse(name, body, raw);
     }

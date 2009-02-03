@@ -17,7 +17,6 @@
  * under the License.                                           *
  ****************************************************************/
 
-
 package org.apache.james.mime4j.util;
 
 import junit.framework.TestCase;
@@ -42,6 +41,30 @@ public class MimeUtilTest extends TestCase {
                 "testing 1 2\r\n %s\r\n testing\r\n %s", ninety, ninety);
 
         assertEquals(expected, MimeUtil.fold(input, 0));
+    }
+
+    public void testUnfold() throws Exception {
+        assertEquals("", MimeUtil.unfold(""));
+        assertEquals("x", MimeUtil.unfold("x"));
+        assertEquals(" x ", MimeUtil.unfold(" x "));
+
+        assertEquals("", MimeUtil.unfold("\r"));
+        assertEquals("", MimeUtil.unfold("\n"));
+        assertEquals("", MimeUtil.unfold("\r\n"));
+
+        assertEquals(" ", MimeUtil.unfold(" \n"));
+        assertEquals(" ", MimeUtil.unfold("\n "));
+        assertEquals(" ", MimeUtil.unfold(" \r\n"));
+        assertEquals(" ", MimeUtil.unfold("\r\n "));
+
+        assertEquals("this is a test", MimeUtil.unfold("this is\r\n a test"));
+        assertEquals("this is a test", MimeUtil.unfold("this is\r\n a test"));
+        assertEquals("this is a test", MimeUtil.unfold("this\r\n is a test"));
+        assertEquals("this     is a test", MimeUtil
+                .unfold("this  \r\n   is a test"));
+
+        assertEquals("this is a test", MimeUtil
+                .unfold("this\r\n is\r\n a\r\n test"));
     }
 
 }
