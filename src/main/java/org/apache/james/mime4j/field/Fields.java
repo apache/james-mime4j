@@ -66,12 +66,34 @@ public class Fields {
                 Field.CONTENT_TRANSFER_ENCODING, contentTransferEncoding);
     }
 
+    /**
+     * Creates a content disposition field from the specified raw value. The
+     * specified string gets folded into a multiple-line representation if
+     * necessary but is otherwise taken as is.
+     * 
+     * @param contentDisposition
+     *            raw content disposition containing a disposition type and
+     *            optional parameters.
+     * @return the newly created content disposition field.
+     */
     public static ContentDispositionField contentDisposition(
             String contentDisposition) {
         return parse(ContentDispositionField.class, Field.CONTENT_DISPOSITION,
                 contentDisposition);
     }
 
+    /**
+     * Creates a content disposition field from the specified disposition type
+     * and parameters.
+     * 
+     * @param dispositionType
+     *            a disposition type (usually <code>&quot;inline&quot;</code>
+     *            or <code>&quot;attachment&quot;</code>).
+     * @param parameters
+     *            map containing disposition parameters such as
+     *            <code>&quot;filename&quot;</code>.
+     * @return the newly created content disposition field.
+     */
     public static ContentDispositionField contentDisposition(
             String dispositionType, Map<String, String> parameters) {
         if (!isValidDispositionType(dispositionType))
@@ -92,18 +114,65 @@ public class Fields {
         }
     }
 
+    /**
+     * Creates a content disposition field from the specified disposition type
+     * and filename.
+     * 
+     * @param dispositionType
+     *            a disposition type (usually <code>&quot;inline&quot;</code>
+     *            or <code>&quot;attachment&quot;</code>).
+     * @param filename
+     *            filename parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     * @return the newly created content disposition field.
+     */
     public static ContentDispositionField contentDisposition(
             String dispositionType, String filename) {
         return contentDisposition(dispositionType, filename, -1, null, null,
                 null);
     }
 
+    /**
+     * Creates a content disposition field from the specified values.
+     * 
+     * @param dispositionType
+     *            a disposition type (usually <code>&quot;inline&quot;</code>
+     *            or <code>&quot;attachment&quot;</code>).
+     * @param filename
+     *            filename parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     * @param size
+     *            size parameter value or <code>-1</code> if the parameter
+     *            should not be included.
+     */
     public static ContentDispositionField contentDisposition(
             String dispositionType, String filename, long size) {
         return contentDisposition(dispositionType, filename, size, null, null,
                 null);
     }
 
+    /**
+     * Creates a content disposition field from the specified values.
+     * 
+     * @param dispositionType
+     *            a disposition type (usually <code>&quot;inline&quot;</code>
+     *            or <code>&quot;attachment&quot;</code>).
+     * @param filename
+     *            filename parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     * @param size
+     *            size parameter value or <code>-1</code> if the parameter
+     *            should not be included.
+     * @param creationDate
+     *            creation-date parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     * @param modificationDate
+     *            modification-date parameter value or <code>null</code> if
+     *            the parameter should not be included.
+     * @param readDate
+     *            read-date parameter value or <code>null</code> if the
+     *            parameter should not be included.
+     */
     public static ContentDispositionField contentDisposition(
             String dispositionType, String filename, long size,
             Date creationDate, Date modificationDate, Date readDate) {
