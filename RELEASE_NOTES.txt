@@ -3,9 +3,28 @@ Since Release 0.5
 
 Notes
 -----
- * BodyFactory introduces allowing more flexible storate for Message parts. TempFileTextBody
+ * The former interfaces TextBody and BinaryBody have been changed into abstract subclasses
+   of class SingleBody. Code that implements these interfaces has to be changed accordingly.
+   [https://issues.apache.org/jira/browse/MIME4J-111]
+ * A dedicated class for writing a message has been introduced. Class MessageWriter has now
+   to be used instead of Body.writeTo(OutputStream, int). A short-cut method
+   Message.writeTo(OutputStream) without a mode parameter is also available.
+   [https://issues.apache.org/jira/browse/MIME4J-110]
+ * Class NamedMailbox has been removed. Class Mailbox now has an additional name property.
+   [https://issues.apache.org/jira/browse/MIME4J-107]
+ * Class MessageUtils has been removed. The methods and constants can now be found in class
+   CharsetUtil in the same package.
+   [https://issues.apache.org/jira/browse/MIME4J-106]
+ * Package org.apache.james.mime4j.decoder has been renamed in org.apache.james.mime4j.codec.
+   [https://issues.apache.org/jira/browse/MIME4J-105]
+ * Class AbstractBody has been superseded by SingleBody. AbstractBody has been removed.
+ * BodyFactory introduced allowing more flexible storage for Message parts. TempFileTextBody
    and TempFileBinaryBody removed.
    [https://issues.apache.org/jira/browse/MIME4J-87]
+ * Mime4j now has a more flexible mechanism for storing message bodies. Class TempStorage
+   has been superseded by StorageProvider in package org.apache.james.mime4j.storage.
+   The classes TempStorage, TempPath, TempFile and SimpleTempStorage have been removed.
+   [https://issues.apache.org/jira/browse/MIME4J-83]
  * Temporary text body storage for Message parts now defaults to US-ASCII (was ISO-8859-1)
 
 Release 0.5
