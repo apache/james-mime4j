@@ -1,5 +1,9 @@
-Since Release 0.5
+Release 0.6
 -------------------
+
+Detailed change log can be found here:
+
+http://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310521&styleName=Html&version=12313434
 
 Notes
 -----
