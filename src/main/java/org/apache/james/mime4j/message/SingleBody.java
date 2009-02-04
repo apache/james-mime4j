@@ -32,6 +32,12 @@ public abstract class SingleBody implements Body {
     private Entity parent = null;
 
     /**
+     * Sole constructor.
+     */
+    protected SingleBody() {
+    }
+
+    /**
      * @see org.apache.james.mime4j.message.Body#getParent()
      */
     public Entity getParent() {
@@ -48,8 +54,10 @@ public abstract class SingleBody implements Body {
     /**
      * Writes this single body to the given stream.
      * 
-     * @param out the stream to write to.
-     * @throws IOException in case of an I/O error
+     * @param out
+     *            the stream to write to.
+     * @throws IOException
+     *             in case of an I/O error
      */
     public abstract void writeTo(OutputStream out) throws IOException;
 

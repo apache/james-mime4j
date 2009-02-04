@@ -26,6 +26,13 @@ import java.io.InputStream;
  * A body containing binary data.
  */
 public abstract class BinaryBody extends SingleBody {
+
+    /**
+     * Sole constructor.
+     */
+    protected BinaryBody() {
+    }
+
     /**
      * Gets a <code>InputStream</code> which reads the bytes of the body.
      * 
@@ -34,4 +41,5 @@ public abstract class BinaryBody extends SingleBody {
      *             on I/O errors.
      */
     public abstract InputStream getInputStream() throws IOException;
+
 }

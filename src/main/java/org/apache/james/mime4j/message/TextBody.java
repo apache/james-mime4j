@@ -26,6 +26,13 @@ import java.io.Reader;
  * Encapsulates the contents of a <code>text/*</code> entity body.
  */
 public abstract class TextBody extends SingleBody {
+
+    /**
+     * Sole constructor.
+     */
+    protected TextBody() {
+    }
+
     /**
      * Returns the MIME charset of this text body.
      * 
@@ -42,4 +49,5 @@ public abstract class TextBody extends SingleBody {
      *             on I/O errors.
      */
     public abstract Reader getReader() throws IOException;
+
 }
