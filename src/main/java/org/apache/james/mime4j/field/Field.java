@@ -27,9 +27,6 @@ import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * The base class of all field classes.
- *
- * 
- * @version $Id: Field.java,v 1.6 2004/10/25 07:26:46 ntherning Exp $
  */
 public abstract class Field {
     public static final String SENDER = "Sender";

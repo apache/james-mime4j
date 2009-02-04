@@ -62,9 +62,6 @@ import org.apache.james.mime4j.message.TextBody;
  * node in the tree shows information on that node in the right panel.
  *
  * Some of this code have been copied from the Java tutorial's JTree section.
- *
- * 
- * @version $Id: MessageTree.java 509117 2007-02-19 07:41:05Z norman $
  */
 public class MessageTree extends JPanel implements TreeSelectionListener {
     private static final long serialVersionUID = 1L;

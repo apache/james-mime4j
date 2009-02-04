@@ -53,10 +53,6 @@ import org.apache.james.mime4j.storage.StorageProvider;
  * <pre>
  *      Message msg = new Message(new FileInputStream("mime.msg"));
  * </pre>
- * 
- *
- * 
- * @version $Id: Message.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public class Message extends Entity implements Body {
     

@@ -32,12 +32,6 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 import junit.framework.TestCase;
 
-/**
- * 
- *
- * 
- * @version $Id: MimeBoundaryInputStreamTest.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
- */
 public class MimeBoundaryInputStreamTest extends TestCase {
 
     public void testBasicReading() throws IOException {

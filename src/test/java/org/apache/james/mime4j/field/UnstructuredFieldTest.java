@@ -24,12 +24,6 @@ import org.apache.james.mime4j.field.UnstructuredField;
 
 import junit.framework.TestCase;
 
-/**
- * 
- *
- * 
- * @version $Id: UnstructuredFieldTest.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
- */
 public class UnstructuredFieldTest extends TestCase {
 
     public void testGetBody() throws Exception {

@@ -74,8 +74,6 @@ import org.apache.james.mime4j.util.MimeUtil;
  * state. However, they are definitely <em>not</em> thread safe. If you
  * have a multi threaded application, then the suggested use is to have
  * one instance per thread.</p>
- * 
- * @version $Id: MimeStreamParser.java,v 1.8 2005/02/11 10:12:02 ntherning Exp $
  */
 public class MimeTokenStream implements EntityStates, RecursionMode {
     

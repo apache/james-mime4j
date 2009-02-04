@@ -24,9 +24,6 @@ import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
 
 import junit.framework.TestCase;
 
-/**
- * @version $Id: BodyDescriptorTest.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
- */
 public abstract class BaseTestForBodyDescriptors extends TestCase {
 
     protected abstract MutableBodyDescriptor newBodyDescriptor();

@@ -25,12 +25,6 @@ import org.apache.log4j.BasicConfigurator;
 
 import junit.framework.TestCase;
 
-/**
- * 
- *
- * 
- * @version $Id: ContentTypeFieldTest.java,v 1.4 2004/11/09 12:57:41 ntherning Exp $
- */
 public class ContentTypeFieldTest extends TestCase {
 
     @Override

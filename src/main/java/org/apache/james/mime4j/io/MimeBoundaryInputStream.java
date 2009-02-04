@@ -27,8 +27,6 @@ import java.io.IOException;
  * Stream that constrains itself to a single MIME body part.
  * After the stream ends (i.e. read() returns -1) {@link #isLastPart()}
  * can be used to determine if a final boundary has been seen or not.
- * 
- * @version $Id: MimeBoundaryInputStream.java,v 1.2 2004/11/29 13:15:42 ntherning Exp $
  */
 public class MimeBoundaryInputStream extends LineReaderInputStream {
 

@@ -23,11 +23,9 @@ import java.util.Map;
 
 /**
  * Represents common content properties. 
- *
- * 
- * @version $Id:$
  */
 public interface ContentDescriptor {
+
     /**
      * Returns the body descriptors MIME type.
      * @see #getMediaType()
@@ -86,5 +84,5 @@ public interface ContentDescriptor {
      *   content-length header.
      */
     long getContentLength();
-    
+
 }

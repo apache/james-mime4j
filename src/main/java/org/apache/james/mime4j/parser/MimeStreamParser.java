@@ -38,8 +38,6 @@ import java.io.InputStream;
  *      parser.setContentHandler(handler);
  *      parser.parse(new FileInputStream("mime.msg"));
  * </pre>
- * 
- * @version $Id: MimeStreamParser.java,v 1.8 2005/02/11 10:12:02 ntherning Exp $
  */
 public class MimeStreamParser {
 

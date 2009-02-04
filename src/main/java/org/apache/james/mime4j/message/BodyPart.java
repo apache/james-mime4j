@@ -19,13 +19,8 @@
 
 package org.apache.james.mime4j.message;
 
-
-
 /**
  * Represents a MIME body part  (see RFC 2045).
- *
- * 
- * @version $Id: BodyPart.java,v 1.3 2004/10/02 12:41:11 ntherning Exp $
  */
 public class BodyPart extends Entity {
 

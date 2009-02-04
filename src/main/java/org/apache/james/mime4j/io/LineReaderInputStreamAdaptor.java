@@ -28,8 +28,6 @@ import java.io.InputStream;
  * <code>InputStream</code> used by the MIME parser to detect whether the
  * underlying data stream was used (read from) and whether the end of the 
  * stream was reached.
- * 
- * @version $Id$
  */
 public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
 

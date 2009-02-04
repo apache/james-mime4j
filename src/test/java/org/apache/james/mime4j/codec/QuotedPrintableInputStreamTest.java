@@ -29,12 +29,6 @@ import junit.framework.TestCase;
 
 import org.apache.log4j.BasicConfigurator;
 
-/**
- * 
- *
- * 
- * @version $Id: QuotedPrintableInputStreamTest.java,v 1.3 2004/10/04 15:36:44 ntherning Exp $
- */
 public class QuotedPrintableInputStreamTest extends TestCase {
 
     @Override

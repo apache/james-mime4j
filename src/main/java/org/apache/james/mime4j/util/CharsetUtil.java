@@ -786,9 +786,6 @@ import org.apache.commons.logging.LogFactory;
  *         <td></td>
  *     </tr>
  * </table>
- * 
- * 
- * @version $Id: CharsetUtil.java,v 1.1 2004/10/25 07:26:46 ntherning Exp $
  */
 public class CharsetUtil {
     private static Log log = LogFactory.getLog(CharsetUtil.class);

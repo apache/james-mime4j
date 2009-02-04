@@ -31,12 +31,6 @@ import org.apache.log4j.BasicConfigurator;
 
 import junit.framework.TestCase;
 
-/**
- * 
- *
- * 
- * @version $Id: Base64InputStreamTest.java,v 1.3 2004/10/04 15:36:44 ntherning Exp $
- */
 public class Base64InputStreamTest extends TestCase {
 
     @Override

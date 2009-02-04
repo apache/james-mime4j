@@ -27,10 +27,6 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * Performs Quoted-Printable decoding on an underlying stream.
- * 
- * 
- * 
- * @version $Id: QuotedPrintableInputStream.java,v 1.3 2004/11/29 13:15:47 ntherning Exp $
  */
 public class QuotedPrintableInputStream extends InputStream {
     private static Log log = LogFactory.getLog(QuotedPrintableInputStream.class);

@@ -40,13 +40,6 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-/**
- * 
- * 
- *
- * 
- * @version $Id: MessageParserTest.java,v 1.4 2004/10/25 07:26:47 ntherning Exp $
- */
 public class MessageParserTest extends TestCase {
     private File file = null;
 

@@ -29,9 +29,6 @@ import org.apache.james.mime4j.util.MimeUtil;
 /**
  * Encapsulates the values of the MIME-specific header fields 
  * (which starts with <code>Content-</code>). 
- *
- * 
- * @version $Id: BodyDescriptor.java,v 1.4 2005/02/11 10:08:37 ntherning Exp $
  */
 public class DefaultBodyDescriptor implements MutableBodyDescriptor {
     private static final String US_ASCII = "us-ascii";

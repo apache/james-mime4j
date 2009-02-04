@@ -38,12 +38,6 @@ import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.address.Group;
 import org.apache.james.mime4j.field.address.Mailbox;
 
-/**
- * 
- *
- * 
- * @version $Id: MessageTest.java,v 1.4 2004/10/02 12:41:11 ntherning Exp $
- */
 public class MessageTest extends TestCase {
     private Header headerTextPlain = null;
     private Header headerMessageRFC822 = null;

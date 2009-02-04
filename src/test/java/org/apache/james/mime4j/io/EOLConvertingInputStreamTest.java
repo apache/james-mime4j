@@ -28,12 +28,6 @@ import org.apache.james.mime4j.io.EOLConvertingInputStream;
 
 import junit.framework.TestCase;
 
-/**
- * 
- *
- * 
- * @version $Id: EOLConvertingInputStreamTest.java,v 1.2 2004/10/02 12:41:11 ntherning Exp $
- */
 public class EOLConvertingInputStreamTest extends TestCase {
 
     public void testRead() throws IOException {

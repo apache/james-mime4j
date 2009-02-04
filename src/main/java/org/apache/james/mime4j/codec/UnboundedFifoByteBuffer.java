@@ -44,13 +44,6 @@ import java.util.NoSuchElementException;
  * This buffer prevents null objects from being added.
  *
  * @since Commons Collections 3.0 (previously in main package v2.1)
- * @version $Revision: 1.1 $ $Date: 2004/08/24 06:52:02 $
- *
- * 
- * 
- * 
- * 
- * 
  */
 class UnboundedFifoByteBuffer {
 

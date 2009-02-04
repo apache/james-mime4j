@@ -78,9 +78,6 @@ import java.io.InputStream;
  * messages and RFC 822 and 2822 for the general structure of Internet mail
  * messages.
  * </p>
- *
- * 
- * @version $Id: ContentHandler.java,v 1.3 2004/10/02 12:41:10 ntherning Exp $
  */
 public interface ContentHandler {
 
