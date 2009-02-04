@@ -26,7 +26,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
-import org.apache.james.mime4j.io.RootInputStream;
+import org.apache.james.mime4j.io.LineNumberInputStream;
 import org.apache.james.mime4j.parser.EntityStateMachine;
 import org.apache.james.mime4j.parser.EntityStates;
 import org.apache.james.mime4j.parser.MimeEntity;
@@ -47,11 +47,11 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        RootInputStream rootStream = new RootInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 12); 
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
         
         MimeEntity entity = new MimeEntity(
-                rootStream,
+                lineInput,
                 rawstream,
                 null,
                 EntityStates.T_START_MESSAGE,
@@ -134,11 +134,11 @@ public class MimeEntityTest extends TestCase {
             "Goodbye!";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        RootInputStream rootStream = new RootInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 24); 
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 24); 
         
         MimeEntity entity = new MimeEntity(
-                rootStream,
+                lineInput,
                 rawstream,
                 null,
                 EntityStates.T_START_MESSAGE,
@@ -247,11 +247,11 @@ public class MimeEntityTest extends TestCase {
             "Goodbye!";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        RootInputStream rootStream = new RootInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 24); 
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 24); 
         
         MimeEntity entity = new MimeEntity(
-                rootStream,
+                lineInput,
                 rawstream,
                 null,
                 EntityStates.T_START_MESSAGE,
@@ -344,13 +344,13 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        RootInputStream rootStream = new RootInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 12); 
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
         
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMaxLineLen(50);
         MimeEntity entity = new MimeEntity(
-                rootStream,
+                lineInput,
                 rawstream,
                 null,
                 EntityStates.T_START_MESSAGE,
@@ -398,13 +398,13 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        RootInputStream rootStream = new RootInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 12); 
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
         
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMaxLineLen(50);
         MimeEntity entity = new MimeEntity(
-                rootStream,
+                lineInput,
                 rawstream,
                 null,
                 EntityStates.T_START_MESSAGE,
@@ -456,13 +456,13 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        RootInputStream rootStream = new RootInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 12); 
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
         
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMaxHeaderCount(20);
         MimeEntity entity = new MimeEntity(
-                rootStream,
+                lineInput,
                 rawstream,
                 null,
                 EntityStates.T_START_MESSAGE,
@@ -504,13 +504,13 @@ public class MimeEntityTest extends TestCase {
             "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        RootInputStream rootStream = new RootInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(rootStream, 12); 
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
         
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMaxContentLen(100);
         MimeEntity entity = new MimeEntity(
-                rootStream,
+                lineInput,
                 rawstream,
                 null,
                 EntityStates.T_START_MESSAGE,

@@ -28,6 +28,8 @@ import java.util.List;
  */
 public abstract class Address implements Serializable {
 
+    private static final long serialVersionUID = 634090661990433426L;
+
     /**
      * Adds any mailboxes represented by this address into the given List. Note
      * that this method has default (package) access, so a doAddMailboxesTo

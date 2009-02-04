@@ -33,7 +33,8 @@ import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
-import org.apache.james.mime4j.io.RootInputStream;
+import org.apache.james.mime4j.io.LineNumberInputStream;
+import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -106,7 +107,6 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     private EntityStateMachine currentStateMachine;
     private int recursionMode = M_RECURSE;
     private BufferedLineReaderInputStream inbuffer;
-    private RootInputStream rootInputStream;
     
     /**
      * Constructs a standard (lax) stream.
@@ -149,9 +149,16 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
 
     private void doParse(InputStream stream, String contentType) {
         entities.clear();
-        rootInputStream = new RootInputStream(stream);
+
+        LineNumberSource lineSource = null;
+        if (config.isCountLineNumbers()) {
+            LineNumberInputStream lineInput = new LineNumberInputStream(stream);
+            lineSource = lineInput;
+            stream = lineInput;
+        }
+
         inbuffer = new BufferedLineReaderInputStream(
-                rootInputStream, 
+                stream, 
                 4 * 1024,
                 config.getMaxLineLen());
         switch (recursionMode) {
@@ -164,7 +171,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
             // expected to be called only at start of paring
         case M_RECURSE:
             MimeEntity mimeentity = new MimeEntity(
-                    rootInputStream,
+                    lineSource,
                     inbuffer,
                     null, 
                     T_START_MESSAGE, 
@@ -234,8 +241,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * {@link ContentHandler#startMessage()}, etc.
      */
     public void stop() {
-        inbuffer.clear();
-        rootInputStream.truncate();
+        inbuffer.truncate();
     }
 
     /**

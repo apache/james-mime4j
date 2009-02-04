@@ -22,64 +22,47 @@ package org.apache.james.mime4j.io;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.apache.james.mime4j.io.RootInputStream;
-
+import org.apache.james.mime4j.io.LineNumberInputStream;
 
 import junit.framework.TestCase;
 
-public class RootInputStreamTest extends TestCase {
-
-    public void testTruncate() throws IOException {
-        String s = "Yada yada yada";
-        RootInputStream is = 
-            new RootInputStream(new ByteArrayInputStream(s.getBytes()));
-        assertEquals(s.charAt(0), (char) is.read());
-        assertEquals(s.charAt(1), (char) is.read());
-        assertEquals(s.charAt(2), (char) is.read());
-        assertEquals(s.charAt(3), (char) is.read());
-        is.truncate();
-        assertEquals(-1, is.read());
-        byte[] buf = new byte[100];
-        assertEquals(-1, is.read(buf));
-        assertEquals(-1, is.read(buf, 2, 5));
-    }
-
+public class LineNumberInputStreamTest extends TestCase {
     /**
      * Tests that reading single bytes updates the line number appropriately.
      */
     public void testReadSingleByte() throws IOException {
         String s = "Yada\r\nyada\r\nyada\r\n";
-        RootInputStream is = 
-            new RootInputStream(new ByteArrayInputStream(s.getBytes()));
-        
+        LineNumberInputStream is = new LineNumberInputStream(
+                new ByteArrayInputStream(s.getBytes()));
+
         for (int i = 0; i < 6; i++) {
             assertEquals(1, is.getLineNumber());
             is.read();
         }
-        
+
         for (int i = 6; i < 12; i++) {
             assertEquals(2, is.getLineNumber());
             is.read();
         }
-        
+
         for (int i = 12; i < 18; i++) {
             assertEquals(3, is.getLineNumber());
             is.read();
         }
-        
+
         assertEquals(4, is.getLineNumber());
         assertEquals(-1, is.read());
     }
-    
+
     /**
-     * Tests that reading multiple bytes at once 
-     * updates the line number appropriately.
+     * Tests that reading multiple bytes at once updates the line number
+     * appropriately.
      */
     public void testReadManyBytes() throws IOException {
         String s = "Yada\r\nyada\r\nyada\r\n";
-        RootInputStream is = 
-            new RootInputStream(new ByteArrayInputStream(s.getBytes()));
-        
+        LineNumberInputStream is = new LineNumberInputStream(
+                new ByteArrayInputStream(s.getBytes()));
+
         byte[] buf = new byte[4];
         assertEquals(1, is.getLineNumber());
         is.read(buf);
@@ -92,7 +75,7 @@ public class RootInputStreamTest extends TestCase {
         assertEquals(3, is.getLineNumber());
         is.read(buf);
         assertEquals(4, is.getLineNumber());
-        
+
         assertEquals(-1, is.read());
     }
 }

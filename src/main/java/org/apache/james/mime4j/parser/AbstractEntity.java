@@ -117,6 +117,10 @@ public abstract class AbstractEntity implements EntityStateMachine {
         return result;
     }
 
+    /**
+     * Returns the current line number or <code>-1</code> if line number
+     * information is not available.
+     */
     protected abstract int getLineNumber();
     
     protected abstract LineReaderInputStream getDataStream();
@@ -308,15 +312,18 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * or for logging
      */
     protected String message(Event event) {
-        String preamble = "Line " + getLineNumber() + ": ";
         final String message;
         if (event == null) {
             message = "Event is unexpectedly null.";
         } else {
             message = event.toString();
         }
-        final String result = preamble + message;
-        return result;
+
+        int lineNumber = getLineNumber();
+        if (lineNumber <= 0)
+            return message;
+        else
+            return "Line " + lineNumber + ": " + message;
     }
     
     /**

@@ -25,70 +25,37 @@ import java.io.InputStream;
 
 /**
  * <code>InputStream</code> used by the parser to wrap the original user
- * supplied stream. This stream keeps track of the current line number and
- * can also be truncated. When truncated the stream will appear to have
- * reached end of file. This is used by the parser's 
- * {@link org.apache.james.mime4j.parser.MimeStreamParser#stop()} method.
+ * supplied stream. This stream keeps track of the current line number.
  */
-public class RootInputStream extends FilterInputStream {
+public class LineNumberInputStream extends FilterInputStream implements
+        LineNumberSource {
     private int lineNumber = 1;
-    private boolean truncated = false;
 
     /**
-     * Creates a new <code>RootInputStream</code>.
+     * Creates a new <code>LineNumberInputStream</code>.
      * 
-     * @param is the stream to read from.
+     * @param is
+     *            the stream to read from.
      */
-    public RootInputStream(InputStream is) {
+    public LineNumberInputStream(InputStream is) {
         super(is);
     }
 
-    /**
-     * Gets the current line number starting at 1 
-     * (the number of <code>\r\n</code> read so far plus 1).
-     * 
-     * @return the current line number.
-     */
     public int getLineNumber() {
         return lineNumber;
     }
-    
-    /**
-     * Truncates this <code>InputStream</code>. After this call any 
-     * call to {@link #read()}, {@link #read(byte[])} or 
-     * {@link #read(byte[], int, int)} will return
-     * -1 as if end-of-file had been reached.
-     */
-    public void truncate() {
-        this.truncated = true;
-    }
-    
-    /**
-     * @see java.io.InputStream#read()
-     */
+
     @Override
     public int read() throws IOException {
-        if (truncated) {
-            return -1;
-        }
-        
         int b = in.read();
         if (b == '\n') {
             lineNumber++;
         }
         return b;
     }
-    
-    /**
-     * 
-     * @see java.io.InputStream#read(byte[], int, int)
-     */
+
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        if (truncated) {
-            return -1;
-        }
-        
         int n = in.read(b, off, len);
         for (int i = off; i < off + n; i++) {
             if (b[i] == '\n') {

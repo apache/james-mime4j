@@ -31,6 +31,7 @@ public final class MimeEntityConfig implements Cloneable {
     private int maxLineLen;
     private int maxHeaderCount;
     private long maxContentLen;
+    private boolean countLineNumbers;
     
     public MimeEntityConfig() {
         this.maximalBodyDescriptor = false;
@@ -38,6 +39,7 @@ public final class MimeEntityConfig implements Cloneable {
         this.maxLineLen = 1000;
         this.maxHeaderCount = 1000;
         this.maxContentLen = -1;
+        this.countLineNumbers = false;
     }
     
     public boolean isMaximalBodyDescriptor() {
@@ -137,6 +139,26 @@ public final class MimeEntityConfig implements Cloneable {
         return maxContentLen;
     }
 
+    /**
+     * Defines whether the parser should count line numbers. If enabled line
+     * numbers are included in the debug output.
+     * 
+     * @param countLineNumbers
+     *            value of the line number counting mode.
+     */
+    public void setCountLineNumbers(boolean countLineNumbers) {
+        this.countLineNumbers = countLineNumbers;
+    }
+
+    /**
+     * Returns the value of the line number counting mode.
+     * 
+     * @return value of the line number counting mode.
+     */
+    public boolean isCountLineNumbers() {
+        return countLineNumbers;
+    }
+
     @Override
     public MimeEntityConfig clone() {
         try {
@@ -149,15 +171,11 @@ public final class MimeEntityConfig implements Cloneable {
     
     @Override
     public String toString() {
-        StringBuilder buffer = new StringBuilder(128);
-        buffer.append("[max body descriptor: ");
-        buffer.append(Boolean.toString(this.maximalBodyDescriptor));
-        buffer.append("][strict parsing: ");
-        buffer.append(Boolean.toString(this.strictParsing));
-        buffer.append("][max header length: ");
-        buffer.append(Integer.toString(this.maxLineLen));
-        buffer.append("]");
-        return buffer.toString();
+        return "[max body descriptor: " + maximalBodyDescriptor
+                + ", strict parsing: " + strictParsing + ", max line length: "
+                + maxLineLen + ", max header count: " + maxHeaderCount
+                + ", max content length: " + maxContentLen
+                + ", count line numbers: " + countLineNumbers + "]";
     }
     
 }

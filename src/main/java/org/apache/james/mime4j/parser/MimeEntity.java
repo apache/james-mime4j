@@ -28,10 +28,10 @@ import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.LimitedInputStream;
+import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
-import org.apache.james.mime4j.io.RootInputStream;
 import org.apache.james.mime4j.util.MimeUtil;
 
 public class MimeEntity extends AbstractEntity {
@@ -45,7 +45,7 @@ public class MimeEntity extends AbstractEntity {
      */
     private static final int T_IN_MESSAGE = -3;
 
-    private final RootInputStream rootStream;
+    private final LineNumberSource lineSource;
     private final BufferedLineReaderInputStream inbuffer;
     
     private int recursionMode;
@@ -56,14 +56,14 @@ public class MimeEntity extends AbstractEntity {
     private byte[] tmpbuf;
     
     public MimeEntity(
-            RootInputStream rootStream,
+            LineNumberSource lineSource,
             BufferedLineReaderInputStream inbuffer,
             BodyDescriptor parent, 
             int startState, 
             int endState,
             MimeEntityConfig config) {
         super(parent, startState, endState, config);
-        this.rootStream = rootStream;
+        this.lineSource = lineSource;
         this.inbuffer = inbuffer;
         this.dataStream = new LineReaderInputStreamAdaptor(
                 inbuffer,
@@ -72,12 +72,12 @@ public class MimeEntity extends AbstractEntity {
     }
 
     public MimeEntity(
-            RootInputStream rootStream,
+            LineNumberSource lineSource,
             BufferedLineReaderInputStream inbuffer,
             BodyDescriptor parent, 
             int startState, 
             int endState) {
-        this(rootStream, inbuffer, parent, startState, endState, 
+        this(lineSource, inbuffer, parent, startState, endState, 
                 new MimeEntityConfig());
     }
 
@@ -99,7 +99,10 @@ public class MimeEntity extends AbstractEntity {
     
     @Override
     protected int getLineNumber() {
-        return rootStream.getLineNumber();
+        if (lineSource == null)
+            return -1;
+        else
+            return lineSource.getLineNumber();
     }
     
     @Override
@@ -255,7 +258,7 @@ public class MimeEntity extends AbstractEntity {
             return message;
         } else {
             MimeEntity message = new MimeEntity(
-                    rootStream, 
+                    lineSource, 
                     new BufferedLineReaderInputStream(
                             instream, 
                             4 * 1024,
@@ -279,7 +282,7 @@ public class MimeEntity extends AbstractEntity {
                     4 * 1024,
                     config.getMaxLineLen());
             MimeEntity mimeentity = new MimeEntity(
-                    rootStream, 
+                    lineSource, 
                     stream,
                     body, 
                     EntityStates.T_START_BODYPART, 

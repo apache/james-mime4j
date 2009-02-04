@@ -30,6 +30,8 @@ import java.io.InputStream;
  */
 public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
+    private boolean truncated;
+    
     private byte[] buffer;
     
     private int bufpos;
@@ -52,6 +54,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         this.bufpos = 0;
         this.buflen = 0;
         this.maxLineLen = maxLineLen;
+        this.truncated = false;
     }
 
     public BufferedLineReaderInputStream(
@@ -101,8 +104,16 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return this.bufpos < this.buflen;
     }
 
+    public void truncate() {
+        clear();
+        this.truncated = true;
+    }
+    
     @Override
     public int read() throws IOException {
+        if (this.truncated) {
+            return -1;
+        }
         int noRead = 0;
         while (!hasBufferedData()) {
             noRead = fillBuffer();
@@ -115,6 +126,9 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     
     @Override
     public int read(final byte[] b, int off, int len) throws IOException {
+        if (this.truncated) {
+            return -1;
+        }
         if (b == null) {
             return 0;
         }
@@ -136,6 +150,9 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     
     @Override
     public int read(final byte[] b) throws IOException {
+        if (this.truncated) {
+            return -1;
+        }
         if (b == null) {
             return 0;
         }
@@ -152,6 +169,9 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     public int readLine(final ByteArrayBuffer dst) throws IOException {
         if (dst == null) {
             throw new IllegalArgumentException("Buffer may not be null");
+        }
+        if (this.truncated) {
+            return -1;
         }
         int total = 0;
         boolean found = false;
