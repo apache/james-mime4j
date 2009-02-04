@@ -209,7 +209,8 @@ public class Message extends Entity implements Body {
      * this message does not already have one.
      * 
      * @param subject
-     *            subject to set.
+     *            subject to set or <code>null</code> to remove the subject
+     *            header field.
      */
     public void setSubject(String subject) {
         Header header = obtainHeader();
@@ -241,7 +242,8 @@ public class Message extends Entity implements Body {
      * <code>Date</code> object into a string.
      * 
      * @param date
-     *            date to set.
+     *            date to set or <code>null</code> to remove the date header
+     *            field.
      */
     public void setDate(Date date) {
         setDate(date, null);
@@ -253,7 +255,8 @@ public class Message extends Entity implements Body {
      * object into a string.
      * 
      * @param date
-     *            date to set.
+     *            date to set or <code>null</code> to remove the date header
+     *            field.
      * @param zone
      *            a time zone.
      */
@@ -267,90 +270,260 @@ public class Message extends Entity implements Body {
         }
     }
 
+    /**
+     * Returns the value of the <i>Sender</i> header field of this message as
+     * <code>Mailbox</code> object or <code>null</code> if it is not
+     * present.
+     * 
+     * @return the sender of this message.
+     */
     public Mailbox getSender() {
         return getMailbox(Field.SENDER);
     }
 
+    /**
+     * Sets the <i>Sender</i> header field of this message to the specified
+     * mailbox address.
+     * 
+     * @param sender
+     *            address to set or <code>null</code> to remove the header
+     *            field.
+     */
     public void setSender(Mailbox sender) {
         setMailbox(Field.SENDER, sender);
     }
 
+    /**
+     * Returns the value of the <i>From</i> header field of this message as
+     * <code>MailboxList</code> object or <code>null</code> if it is not
+     * present.
+     * 
+     * @return value of the from field of this message.
+     */
     public MailboxList getFrom() {
         return getMailboxList(Field.FROM);
     }
 
+    /**
+     * Sets the <i>From</i> header field of this message to the specified
+     * mailbox address.
+     * 
+     * @param from
+     *            address to set or <code>null</code> to remove the header
+     *            field.
+     */
     public void setFrom(Mailbox from) {
         setMailboxList(Field.FROM, from);
     }
 
+    /**
+     * Sets the <i>From</i> header field of this message to the specified
+     * mailbox addresses.
+     * 
+     * @param from
+     *            addresses to set or <code>null</code> or no arguments to
+     *            remove the header field.
+     */
     public void setFrom(Mailbox... from) {
         setMailboxList(Field.FROM, from);
     }
 
+    /**
+     * Sets the <i>From</i> header field of this message to the specified
+     * mailbox addresses.
+     * 
+     * @param from
+     *            addresses to set or <code>null</code> or an empty collection
+     *            to remove the header field.
+     */
     public void setFrom(Collection<Mailbox> from) {
         setMailboxList(Field.FROM, from);
     }
 
+    /**
+     * Returns the value of the <i>To</i> header field of this message as
+     * <code>AddressList</code> object or <code>null</code> if it is not
+     * present.
+     * 
+     * @return value of the to field of this message.
+     */
     public AddressList getTo() {
         return getAddressList(Field.TO);
     }
 
+    /**
+     * Sets the <i>To</i> header field of this message to the specified
+     * address.
+     * 
+     * @param to
+     *            address to set or <code>null</code> to remove the header
+     *            field.
+     */
     public void setTo(Address to) {
         setAddressList(Field.TO, to);
     }
 
+    /**
+     * Sets the <i>To</i> header field of this message to the specified
+     * addresses.
+     * 
+     * @param to
+     *            addresses to set or <code>null</code> or no arguments to
+     *            remove the header field.
+     */
     public void setTo(Address... to) {
         setAddressList(Field.TO, to);
     }
 
+    /**
+     * Sets the <i>To</i> header field of this message to the specified
+     * addresses.
+     * 
+     * @param to
+     *            addresses to set or <code>null</code> or an empty collection
+     *            to remove the header field.
+     */
     public void setTo(Collection<Address> to) {
         setAddressList(Field.TO, to);
     }
 
+    /**
+     * Returns the value of the <i>Cc</i> header field of this message as
+     * <code>AddressList</code> object or <code>null</code> if it is not
+     * present.
+     * 
+     * @return value of the cc field of this message.
+     */
     public AddressList getCc() {
         return getAddressList(Field.CC);
     }
 
+    /**
+     * Sets the <i>Cc</i> header field of this message to the specified
+     * address.
+     * 
+     * @param cc
+     *            address to set or <code>null</code> to remove the header
+     *            field.
+     */
     public void setCc(Address cc) {
         setAddressList(Field.CC, cc);
     }
 
+    /**
+     * Sets the <i>Cc</i> header field of this message to the specified
+     * addresses.
+     * 
+     * @param cc
+     *            addresses to set or <code>null</code> or no arguments to
+     *            remove the header field.
+     */
     public void setCc(Address... cc) {
         setAddressList(Field.CC, cc);
     }
 
+    /**
+     * Sets the <i>Cc</i> header field of this message to the specified
+     * addresses.
+     * 
+     * @param cc
+     *            addresses to set or <code>null</code> or an empty collection
+     *            to remove the header field.
+     */
     public void setCc(Collection<Address> cc) {
         setAddressList(Field.CC, cc);
     }
 
+    /**
+     * Returns the value of the <i>Bcc</i> header field of this message as
+     * <code>AddressList</code> object or <code>null</code> if it is not
+     * present.
+     * 
+     * @return value of the bcc field of this message.
+     */
     public AddressList getBcc() {
         return getAddressList(Field.BCC);
     }
 
+    /**
+     * Sets the <i>Bcc</i> header field of this message to the specified
+     * address.
+     * 
+     * @param bcc
+     *            address to set or <code>null</code> to remove the header
+     *            field.
+     */
     public void setBcc(Address bcc) {
         setAddressList(Field.BCC, bcc);
     }
 
+    /**
+     * Sets the <i>Bcc</i> header field of this message to the specified
+     * addresses.
+     * 
+     * @param bcc
+     *            addresses to set or <code>null</code> or no arguments to
+     *            remove the header field.
+     */
     public void setBcc(Address... bcc) {
         setAddressList(Field.BCC, bcc);
     }
 
+    /**
+     * Sets the <i>Bcc</i> header field of this message to the specified
+     * addresses.
+     * 
+     * @param bcc
+     *            addresses to set or <code>null</code> or an empty collection
+     *            to remove the header field.
+     */
     public void setBcc(Collection<Address> bcc) {
         setAddressList(Field.BCC, bcc);
     }
 
+    /**
+     * Returns the value of the <i>Reply-To</i> header field of this message as
+     * <code>AddressList</code> object or <code>null</code> if it is not
+     * present.
+     * 
+     * @return value of the reply to field of this message.
+     */
     public AddressList getReplyTo() {
         return getAddressList(Field.REPLY_TO);
     }
 
+    /**
+     * Sets the <i>Reply-To</i> header field of this message to the specified
+     * address.
+     * 
+     * @param replyTo
+     *            address to set or <code>null</code> to remove the header
+     *            field.
+     */
     public void setReplyTo(Address replyTo) {
         setAddressList(Field.REPLY_TO, replyTo);
     }
 
+    /**
+     * Sets the <i>Reply-To</i> header field of this message to the specified
+     * addresses.
+     * 
+     * @param replyTo
+     *            addresses to set or <code>null</code> or no arguments to
+     *            remove the header field.
+     */
     public void setReplyTo(Address... replyTo) {
         setAddressList(Field.REPLY_TO, replyTo);
     }
 
+    /**
+     * Sets the <i>Reply-To</i> header field of this message to the specified
+     * addresses.
+     * 
+     * @param replyTo
+     *            addresses to set or <code>null</code> or an empty collection
+     *            to remove the header field.
+     */
     public void setReplyTo(Collection<Address> replyTo) {
         setAddressList(Field.REPLY_TO, replyTo);
     }

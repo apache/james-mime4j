@@ -283,7 +283,7 @@ public class Fields {
     /**
      * Creates a <i>Message-ID</i> field for the specified host name.
      * 
-     * @param hostName
+     * @param hostname
      *            host name to be included in the message ID or
      *            <code>null</code> if no host name should be included.
      * @return the newly created <i>Message-ID</i> field.
