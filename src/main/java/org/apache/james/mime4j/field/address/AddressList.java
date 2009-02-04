@@ -119,7 +119,7 @@ public class AddressList extends AbstractList<Address> implements Serializable {
             throws ParseException {
         AddressListParser parser = new AddressListParser(new StringReader(
                 rawAddressList));
-        return Builder.getInstance().buildAddressList(parser.parse());
+        return Builder.getInstance().buildAddressList(parser.parseAddressList());
     }
 
     /**

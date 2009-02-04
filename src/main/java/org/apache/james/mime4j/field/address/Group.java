@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
-import org.apache.james.mime4j.field.address.parser.ParseException;
 
 /**
  * A named group of zero or more mailboxes.
@@ -83,17 +82,11 @@ public class Group extends Address {
      *             if the raw string does not represent a single group address.
      */
     public static Group parse(String rawGroupString) {
-        try {
-            AddressList addressList = AddressList.parse(rawGroupString);
-            if (addressList.size() != 1)
-                throw new IllegalArgumentException("Not a single address");
-            Address address = addressList.get(0);
-            if (!(address instanceof Group))
-                throw new IllegalArgumentException("Not a group address");
-            return (Group) address;
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
+        Address address = Address.parse(rawGroupString);
+        if (!(address instanceof Group))
+            throw new IllegalArgumentException("Not a group address");
+
+        return (Group) address;
     }
 
     /**

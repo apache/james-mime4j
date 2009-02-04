@@ -61,7 +61,7 @@ class Builder {
         return new AddressList(list, true);
     }
 
-    private Address buildAddress(ASTaddress node) {
+    public Address buildAddress(ASTaddress node) {
         ChildNodeIterator it = new ChildNodeIterator(node);
         Node n = it.next();
         if (n instanceof ASTaddr_spec) {
@@ -97,7 +97,7 @@ class Builder {
         return new MailboxList(results, true);
     }
 
-    private Mailbox buildMailbox(ASTmailbox node) {
+    public Mailbox buildMailbox(ASTmailbox node) {
         ChildNodeIterator it = new ChildNodeIterator(node);
         Node n = it.next();
         if (n instanceof ASTaddr_spec) {

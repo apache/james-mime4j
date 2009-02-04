@@ -403,6 +403,27 @@ public class AddressTest extends TestCase {
         Group g = new Group("Undisclosed recipients", emptyMailboxes);
         assertEquals("Undisclosed recipients:;", g.getEncodedString());
     }
+
+    public void testParseAddress() throws Exception {
+        Address address = Address.parse("Mary Smith <mary@example.net>");
+        assertTrue(address instanceof Mailbox);
+        assertEquals("Mary Smith", ((Mailbox) address).getName());
+        assertEquals("mary@example.net", ((Mailbox) address).getAddress());
+
+        address = Address.parse("group: Mary Smith <mary@example.net>;");
+        assertTrue(address instanceof Group);
+        assertEquals("group", ((Group) address).getName());
+        assertEquals("Mary Smith", ((Group) address).getMailboxes().get(0)
+                .getName());
+        assertEquals("mary@example.net", ((Group) address).getMailboxes()
+                .get(0).getAddress());
+
+        try {
+            Group.parse("john.doe@acme.org, jane.doe@acme.org");
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+    }
     
     public void testParseGroup() throws Exception {
         Group group = Group
@@ -419,6 +440,18 @@ public class AddressTest extends TestCase {
         Mailbox mailbox2 = mailboxes.get(1);
         assertEquals("Mary Smith", mailbox2.getName());
         assertEquals("mary@example.net", mailbox2.getAddress());
+
+        try {
+            Group.parse("john.doe@acme.org");
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            Group.parse("g1: john.doe@acme.org;, g2: mary@example.net;");
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
     }
 
     public void testParseMailbox() throws Exception {
@@ -435,6 +468,18 @@ public class AddressTest extends TestCase {
                 .parse("\"Hans M\374ller\" <hans.mueller@acme.org>");
         assertEquals("Hans M\374ller", mailbox3.getName());
         assertEquals("hans.mueller@acme.org", mailbox3.getAddress());
+
+        try {
+            Mailbox.parse("g: Mary Smith <mary@example.net>;");
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+
+        try {
+            Mailbox.parse("Mary Smith <mary@example.net>, hans.mueller@acme.org");
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
     }
     
 }
