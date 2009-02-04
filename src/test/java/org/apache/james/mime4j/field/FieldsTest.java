@@ -172,24 +172,6 @@ public class FieldsTest extends TestCase {
         assertEquals("inline", field.getDispositionType());
     }
 
-    public void testDateString() throws Exception {
-        DateTimeField field = Fields.date("Thu, 1 Jan 1970 00:00:00 +0000");
-        assertTrue(field.isValidField());
-
-        assertEquals("Date: Thu, 1 Jan 1970 00:00:00 +0000", field.getRaw());
-        assertEquals(new Date(0), field.getDate());
-    }
-
-    public void testDateStringString() throws Exception {
-        DateTimeField field = Fields.date("Resent-Date",
-                "Thu, 1 Jan 1970 00:00:00 +0000");
-        assertTrue(field.isValidField());
-
-        assertEquals("Resent-Date: Thu, 1 Jan 1970 00:00:00 +0000", field
-                .getRaw());
-        assertEquals(new Date(0), field.getDate());
-    }
-
     public void testDateStringDateTimeZone() throws Exception {
         DateTimeField field = Fields.date("Date", new Date(0), TimeZone
                 .getTimeZone("GMT"));
@@ -215,11 +197,6 @@ public class FieldsTest extends TestCase {
 
         assertEquals("Date: Wed, 16 Jul 2008 17:12:33 +0200", field.getRaw());
         assertEquals(new Date(millis), field.getDate());
-    }
-
-    public void testInvalidDate() throws Exception {
-        DateTimeField field = Fields.date("Thu, Jan 1 1969 00:00:00 +0000");
-        assertFalse(field.isValidField());
     }
 
     public void testMessageId() throws Exception {

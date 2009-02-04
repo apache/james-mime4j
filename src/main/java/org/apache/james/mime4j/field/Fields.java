@@ -32,15 +32,40 @@ import org.apache.james.mime4j.field.address.Address;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.util.MimeUtil;
 
+/**
+ * Factory for concrete {@link Field} instances.
+ */
 public class Fields {
 
     private Fields() {
     }
 
+    /**
+     * Creates a <i>Content-Type</i> field from the specified raw field value.
+     * The specified string gets folded into a multiple-line representation if
+     * necessary but is otherwise taken as is.
+     * 
+     * @param contentType
+     *            raw content type containing a MIME type and optional
+     *            parameters.
+     * @return the newly created <i>Content-Type</i> field.
+     */
     public static ContentTypeField contentType(String contentType) {
         return parse(ContentTypeField.class, Field.CONTENT_TYPE, contentType);
     }
 
+    /**
+     * Creates a <i>Content-Type</i> field from the specified MIME type and
+     * parameters.
+     * 
+     * @param mimeType
+     *            a MIME type (such as <code>&quot;text/plain&quot;</code> or
+     *            <code>&quot;application/octet-stream&quot;</code>).
+     * @param parameters
+     *            map containing content-type parameters such as
+     *            <code>&quot;boundary&quot;</code>.
+     * @return the newly created <i>Content-Type</i> field.
+     */
     public static ContentTypeField contentType(String mimeType,
             Map<String, String> parameters) {
         if (!isValidMimeType(mimeType))
@@ -60,6 +85,15 @@ public class Fields {
         }
     }
 
+    /**
+     * Creates a <i>Content-Transfer-Encoding</i> field from the specified raw
+     * field value.
+     * 
+     * @param contentTransferEncoding
+     *            an encoding mechanism such as <code>&quot;7-bit&quot;</code>
+     *            or <code>&quot;quoted-printable&quot;</code>.
+     * @return the newly created <i>Content-Transfer-Encoding</i> field.
+     */
     public static ContentTransferEncodingField contentTransferEncoding(
             String contentTransferEncoding) {
         return parse(ContentTransferEncodingField.class,
@@ -67,14 +101,14 @@ public class Fields {
     }
 
     /**
-     * Creates a content disposition field from the specified raw value. The
-     * specified string gets folded into a multiple-line representation if
-     * necessary but is otherwise taken as is.
+     * Creates a <i>Content-Disposition</i> field from the specified raw field
+     * value. The specified string gets folded into a multiple-line
+     * representation if necessary but is otherwise taken as is.
      * 
      * @param contentDisposition
      *            raw content disposition containing a disposition type and
      *            optional parameters.
-     * @return the newly created content disposition field.
+     * @return the newly created <i>Content-Disposition</i> field.
      */
     public static ContentDispositionField contentDisposition(
             String contentDisposition) {
@@ -83,8 +117,8 @@ public class Fields {
     }
 
     /**
-     * Creates a content disposition field from the specified disposition type
-     * and parameters.
+     * Creates a <i>Content-Disposition</i> field from the specified
+     * disposition type and parameters.
      * 
      * @param dispositionType
      *            a disposition type (usually <code>&quot;inline&quot;</code>
@@ -92,7 +126,7 @@ public class Fields {
      * @param parameters
      *            map containing disposition parameters such as
      *            <code>&quot;filename&quot;</code>.
-     * @return the newly created content disposition field.
+     * @return the newly created <i>Content-Disposition</i> field.
      */
     public static ContentDispositionField contentDisposition(
             String dispositionType, Map<String, String> parameters) {
@@ -115,8 +149,8 @@ public class Fields {
     }
 
     /**
-     * Creates a content disposition field from the specified disposition type
-     * and filename.
+     * Creates a <i>Content-Disposition</i> field from the specified
+     * disposition type and filename.
      * 
      * @param dispositionType
      *            a disposition type (usually <code>&quot;inline&quot;</code>
@@ -124,7 +158,7 @@ public class Fields {
      * @param filename
      *            filename parameter value or <code>null</code> if the
      *            parameter should not be included.
-     * @return the newly created content disposition field.
+     * @return the newly created <i>Content-Disposition</i> field.
      */
     public static ContentDispositionField contentDisposition(
             String dispositionType, String filename) {
@@ -133,7 +167,7 @@ public class Fields {
     }
 
     /**
-     * Creates a content disposition field from the specified values.
+     * Creates a <i>Content-Disposition</i> field from the specified values.
      * 
      * @param dispositionType
      *            a disposition type (usually <code>&quot;inline&quot;</code>
@@ -144,6 +178,7 @@ public class Fields {
      * @param size
      *            size parameter value or <code>-1</code> if the parameter
      *            should not be included.
+     * @return the newly created <i>Content-Disposition</i> field.
      */
     public static ContentDispositionField contentDisposition(
             String dispositionType, String filename, long size) {
@@ -152,7 +187,7 @@ public class Fields {
     }
 
     /**
-     * Creates a content disposition field from the specified values.
+     * Creates a <i>Content-Disposition</i> field from the specified values.
      * 
      * @param dispositionType
      *            a disposition type (usually <code>&quot;inline&quot;</code>
@@ -172,6 +207,7 @@ public class Fields {
      * @param readDate
      *            read-date parameter value or <code>null</code> if the
      *            parameter should not be included.
+     * @return the newly created <i>Content-Disposition</i> field.
      */
     public static ContentDispositionField contentDisposition(
             String dispositionType, String filename, long size,
@@ -199,31 +235,72 @@ public class Fields {
         return contentDisposition(dispositionType, parameters);
     }
 
+    /**
+     * Creates a <i>Date</i> field from the specified <code>Date</code>
+     * value. The default time zone of the host is used to format the date.
+     * 
+     * @param date
+     *            date value for the header field.
+     * @return the newly created <i>Date</i> field.
+     */
     public static DateTimeField date(Date date) {
         return date(Field.DATE, date, null);
     }
 
+    /**
+     * Creates a date field from the specified field name and <code>Date</code>
+     * value. The default time zone of the host is used to format the date.
+     * 
+     * @param fieldName
+     *            a field name such as <code>Date</code> or
+     *            <code>Resent-Date</code>.
+     * @param date
+     *            date value for the header field.
+     * @return the newly created date field.
+     */
     public static DateTimeField date(String fieldName, Date date) {
         return date(fieldName, date, null);
     }
 
+    /**
+     * Creates a date field from the specified field name, <code>Date</code>
+     * and <code>TimeZone</code> values.
+     * 
+     * @param fieldName
+     *            a field name such as <code>Date</code> or
+     *            <code>Resent-Date</code>.
+     * @param date
+     *            date value for the header field.
+     * @param zone
+     *            the time zone to be used for formatting the date.
+     * @return the newly created date field.
+     */
     public static DateTimeField date(String fieldName, Date date, TimeZone zone) {
-        return date(fieldName, MimeUtil.formatDate(date, zone));
+        return parse(DateTimeField.class, fieldName, MimeUtil.formatDate(date,
+                zone));
     }
 
-    public static DateTimeField date(String fieldValue) {
-        return date(Field.DATE, fieldValue);
-    }
-
-    public static DateTimeField date(String fieldName, String fieldValue) {
-        return parse(DateTimeField.class, fieldName, fieldValue);
-    }
-
+    /**
+     * Creates a <i>Message-ID</i> field for the specified host name.
+     * 
+     * @param hostName
+     *            host name to be included in the message ID or
+     *            <code>null</code> if no host name should be included.
+     * @return the newly created <i>Message-ID</i> field.
+     */
     public static Field messageId(String hostname) {
         String fieldValue = MimeUtil.createUniqueMessageId(hostname);
         return parse(UnstructuredField.class, Field.MESSAGE_ID, fieldValue);
     }
 
+    /**
+     * Creates a <i>Subject</i> field from the specified string value. The
+     * specified string may contain non-ASCII characters.
+     * 
+     * @param subject
+     *            the subject string.
+     * @return the newly created <i>Subject</i> field.
+     */
     public static UnstructuredField subject(String subject) {
         int usedCharacters = Field.SUBJECT.length() + 2;
         String fieldValue = EncoderUtil.encodeIfNecessary(subject,
@@ -232,66 +309,181 @@ public class Fields {
         return parse(UnstructuredField.class, Field.SUBJECT, fieldValue);
     }
 
+    /**
+     * Creates a <i>Sender</i> field for the specified mailbox address.
+     * 
+     * @param mailbox
+     *            address to be included in the field.
+     * @return the newly created <i>Sender</i> field.
+     */
     public static MailboxField sender(Mailbox mailbox) {
         return mailbox(Field.SENDER, mailbox);
     }
 
+    /**
+     * Creates a <i>From</i> field for the specified mailbox address.
+     * 
+     * @param mailbox
+     *            address to be included in the field.
+     * @return the newly created <i>From</i> field.
+     */
     public static MailboxListField from(Mailbox mailbox) {
         return mailboxList(Field.FROM, Collections.singleton(mailbox));
     }
 
+    /**
+     * Creates a <i>From</i> field for the specified mailbox addresses.
+     * 
+     * @param mailboxes
+     *            addresses to be included in the field.
+     * @return the newly created <i>From</i> field.
+     */
     public static MailboxListField from(Mailbox... mailboxes) {
         return mailboxList(Field.FROM, Arrays.asList(mailboxes));
     }
 
+    /**
+     * Creates a <i>From</i> field for the specified mailbox addresses.
+     * 
+     * @param mailboxes
+     *            addresses to be included in the field.
+     * @return the newly created <i>From</i> field.
+     */
     public static MailboxListField from(Iterable<Mailbox> mailboxes) {
         return mailboxList(Field.FROM, mailboxes);
     }
 
+    /**
+     * Creates a <i>To</i> field for the specified mailbox or group address.
+     * 
+     * @param address
+     *            mailbox or group address to be included in the field.
+     * @return the newly created <i>To</i> field.
+     */
     public static AddressListField to(Address address) {
         return addressList(Field.TO, Collections.singleton(address));
     }
 
+    /**
+     * Creates a <i>To</i> field for the specified mailbox or group addresses.
+     * 
+     * @param addresses
+     *            mailbox or group addresses to be included in the field.
+     * @return the newly created <i>To</i> field.
+     */
     public static AddressListField to(Address... addresses) {
         return addressList(Field.TO, Arrays.asList(addresses));
     }
 
+    /**
+     * Creates a <i>To</i> field for the specified mailbox or group addresses.
+     * 
+     * @param addresses
+     *            mailbox or group addresses to be included in the field.
+     * @return the newly created <i>To</i> field.
+     */
     public static AddressListField to(Iterable<Address> addresses) {
         return addressList(Field.TO, addresses);
     }
 
+    /**
+     * Creates a <i>Cc</i> field for the specified mailbox or group address.
+     * 
+     * @param address
+     *            mailbox or group address to be included in the field.
+     * @return the newly created <i>Cc</i> field.
+     */
     public static AddressListField cc(Address address) {
         return addressList(Field.CC, Collections.singleton(address));
     }
 
+    /**
+     * Creates a <i>Cc</i> field for the specified mailbox or group addresses.
+     * 
+     * @param addresses
+     *            mailbox or group addresses to be included in the field.
+     * @return the newly created <i>Cc</i> field.
+     */
     public static AddressListField cc(Address... addresses) {
         return addressList(Field.CC, Arrays.asList(addresses));
     }
 
+    /**
+     * Creates a <i>Cc</i> field for the specified mailbox or group addresses.
+     * 
+     * @param addresses
+     *            mailbox or group addresses to be included in the field.
+     * @return the newly created <i>Cc</i> field.
+     */
     public static AddressListField cc(Iterable<Address> addresses) {
         return addressList(Field.CC, addresses);
     }
 
+    /**
+     * Creates a <i>Bcc</i> field for the specified mailbox or group address.
+     * 
+     * @param address
+     *            mailbox or group address to be included in the field.
+     * @return the newly created <i>Bcc</i> field.
+     */
     public static AddressListField bcc(Address address) {
         return addressList(Field.BCC, Collections.singleton(address));
     }
 
+    /**
+     * Creates a <i>Bcc</i> field for the specified mailbox or group addresses.
+     * 
+     * @param addresses
+     *            mailbox or group addresses to be included in the field.
+     * @return the newly created <i>Bcc</i> field.
+     */
     public static AddressListField bcc(Address... addresses) {
         return addressList(Field.BCC, Arrays.asList(addresses));
     }
 
+    /**
+     * Creates a <i>Bcc</i> field for the specified mailbox or group addresses.
+     * 
+     * @param addresses
+     *            mailbox or group addresses to be included in the field.
+     * @return the newly created <i>Bcc</i> field.
+     */
     public static AddressListField bcc(Iterable<Address> addresses) {
         return addressList(Field.BCC, addresses);
     }
 
+    /**
+     * Creates a <i>Reply-To</i> field for the specified mailbox or group
+     * address.
+     * 
+     * @param address
+     *            mailbox or group address to be included in the field.
+     * @return the newly created <i>Reply-To</i> field.
+     */
     public static AddressListField replyTo(Address address) {
         return addressList(Field.REPLY_TO, Collections.singleton(address));
     }
 
+    /**
+     * Creates a <i>Reply-To</i> field for the specified mailbox or group
+     * addresses.
+     * 
+     * @param addresses
+     *            mailbox or group addresses to be included in the field.
+     * @return the newly created <i>Reply-To</i> field.
+     */
     public static AddressListField replyTo(Address... addresses) {
         return addressList(Field.REPLY_TO, Arrays.asList(addresses));
     }
 
+    /**
+     * Creates a <i>Reply-To</i> field for the specified mailbox or group
+     * addresses.
+     * 
+     * @param addresses
+     *            mailbox or group addresses to be included in the field.
+     * @return the newly created <i>Reply-To</i> field.
+     */
     public static AddressListField replyTo(Iterable<Address> addresses) {
         return addressList(Field.REPLY_TO, addresses);
     }
