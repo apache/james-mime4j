@@ -126,6 +126,9 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <excludePackageNames>org.apache.james.mime4j.field.address.parser:org.apache.james.mime4j.field.contentdisposition.parser:org.apache.james.mime4j.field.contenttype.parser:org.apache.james.mime4j.field.datetime.parser:org.apache.james.mime4j.field.language.parser:org.apache.james.mime4j.field.mimeversion.parser:org.apache.james.mime4j.field.structured.parser</excludePackageNames>
+        </configuration>
       </plugin>
       <!-- Add NOTICE and LICENSE to generated JAR -->
       <plugin>
