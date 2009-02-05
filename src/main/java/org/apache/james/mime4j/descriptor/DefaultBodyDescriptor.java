@@ -104,7 +104,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
                 transferEncoding = value;
             }
             
-        } else if (name.equals("content-length")  &&  contentLength != -1) {
+        } else if (name.equals("content-length") && contentLength == -1) {
             try {
                 contentLength = Long.parseLong(value.trim());
             } catch (NumberFormatException e) {

@@ -185,6 +185,20 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         
     }
     
+    public void testGetContentLength() throws Exception {
+        MutableBodyDescriptor bd = null;
+
+        bd = newBodyDescriptor();
+        assertEquals(-1, bd.getContentLength());
+
+        bd.addField("Content-Length", "9901");
+        assertEquals(9901, bd.getContentLength());
+
+        // only the first content-length counts
+        bd.addField("Content-Length", "1239901");
+        assertEquals(9901, bd.getContentLength());
+    }
+    
     public void testDoDefaultToUsAsciiWhenUntyped() throws Exception {
         MutableBodyDescriptor descriptor = newBodyDescriptor();
         descriptor.addField("To", "me@example.org");
