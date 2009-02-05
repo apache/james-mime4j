@@ -44,7 +44,7 @@ PARSER_BEGIN(StructuredFieldParser)
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
-package org.apache.james.mime4j.field.structured;
+package org.apache.james.mime4j.field.structured.parser;
 
 /**
  * Parses generic structure fields.

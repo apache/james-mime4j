@@ -23,6 +23,9 @@ import java.io.StringReader;
 
 import junit.framework.TestCase;
 
+import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
+import org.apache.james.mime4j.field.mimeversion.parser.ParseException;
+
 public class MimeVersionParserTest extends TestCase {
 
     @Override

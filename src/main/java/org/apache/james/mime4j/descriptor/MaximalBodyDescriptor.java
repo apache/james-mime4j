@@ -28,9 +28,9 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.datetime.DateTime;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
-import org.apache.james.mime4j.field.language.ContentLanguageParser;
-import org.apache.james.mime4j.field.mimeversion.MimeVersionParser;
-import org.apache.james.mime4j.field.structured.StructuredFieldParser;
+import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
+import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
+import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
 import org.apache.james.mime4j.util.MimeUtil;
 
 

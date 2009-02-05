@@ -23,6 +23,8 @@ import java.io.StringReader;
 
 import junit.framework.TestCase;
 
+import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
+
 public class StructuredFieldParserTest extends TestCase {
 
     @Override

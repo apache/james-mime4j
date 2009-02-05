@@ -42,7 +42,7 @@ PARSER_BEGIN(MimeVersionParser)
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
-package org.apache.james.mime4j.field.mimeversion;
+package org.apache.james.mime4j.field.mimeversion.parser;
 
 public class MimeVersionParser {
 	public static final int INITIAL_VERSION_VALUE = -1;
