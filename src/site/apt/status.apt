@@ -30,6 +30,10 @@
     malformed data streams including those intentionally crafted to cause 
     excessive CPU and memory utilization that can lead to DoS conditions.
 
-    The next release will be version 0.6. The main focus of the development 
-    efforts will be on further refinement of the API, MIME specification 
-    compliance, and performance improvements.
+    The 0.6 release brought another round of API enhancements and performance 
+    optimizations. As of this release Mime4j requires a Java 1.5 compatible 
+    runtime.    
+    
+    The next release will be version 0.7. The main focus of the development 
+    efforts will be on optimization of MIME header parsing and further 
+    enhancement of DOM capabilities.
