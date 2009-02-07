@@ -52,6 +52,24 @@
                             you want the study the structure of MIME messages.
                             </td>
                     </tr>
+                    <tr>
+                        <td>
+                            <code>org.apache.james.mime4j.samples.transform.TransformMessage</code>
+                        </td>
+                        <td>Illustrate how to transform a message into another message without 
+                            modifying the original.
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <code>org.apache.james.mime4j.samples.dom.TextPlainMessage</code>
+                        </td>
+                        <td>Illustrate the use of mime4j DOM API. This example generates a message 
+                        very similar to the one from 
+                        <a href="http://www.rfc-editor.org/rfc/rfc5322.txt">RFC 5322</a>
+                        Appendix A.1.1.
+                        </td>
+                    </tr>
                <!--      <tr>
                         <td>
                             <code>org.apache.james.mime4j.samples.sax.Mime2Sax</code>
