@@ -11,6 +11,17 @@ requires a Java 1.5 compatible runtime.
 
 Notes
 -----
+
+ * Mime4j API is still considered unstable and is likely to change in future releases
+ * The DOM API has been now been comprehensively refactored and the known limitations 
+   addressed. Please report any remaining issues to 
+   https://issues.apache.org/jira/browse/MIME4J.
+ * Some low level functions are available only in the pull parser (recommended for
+   advanced users)
+ * 0.6 contains a mixture of approaches to the parsing of advanced MIME field types. 
+   Limitations are known with these approaches with some relatively uncommon use cases. 
+   A consistent and comprehensive rewrite is planned for 0.7 which should consolidate 
+   and address these.
  * The former interfaces TextBody and BinaryBody have been changed into abstract subclasses
    of class SingleBody. Code that implements these interfaces has to be changed accordingly.
    [https://issues.apache.org/jira/browse/MIME4J-111]
