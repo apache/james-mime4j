@@ -115,11 +115,7 @@ public final class CharArrayBuffer  {
             expand(newlen);
         }
         for (int i1 = off, i2 = oldlen; i2 < newlen; i1++, i2++) {
-            int ch = b[i1]; 
-            if (ch < 0) {
-                ch = 256 + ch;
-            }
-            this.buffer[i2] = (char) ch;
+            this.buffer[i2] = (char) (b[i1] & 0xff);
         }
         this.len = newlen;
     }
