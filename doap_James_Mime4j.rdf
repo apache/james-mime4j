@@ -61,6 +61,16 @@ a tree representation of an e-mail message
     <!-- Multiple releases can be listed, each in its own section -->
     <release>
       <Version>
+        <name>Apache James Mime4j 0.5</name>
+        <created>2008-10-18</created>
+        <revision>0.5</revision>
+      </Version>
+      <Version>
+        <name>Apache James Mime4j 0.4</name>
+        <created>2008-08-20</created>
+        <revision>0.3</revision>
+      </Version>
+      <Version>
         <name>Apache James Mime4j 0.3</name>
         <created>2007-05-31</created>
         <revision>0.3</revision>
