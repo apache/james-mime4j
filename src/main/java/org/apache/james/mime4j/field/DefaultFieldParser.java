@@ -22,29 +22,29 @@ package org.apache.james.mime4j.field;
 public class DefaultFieldParser extends DelegatingFieldParser {
     
     public DefaultFieldParser() {
-        setFieldParser(AbstractField.CONTENT_TRANSFER_ENCODING, new ContentTransferEncodingField.Parser());
-        setFieldParser(AbstractField.CONTENT_TYPE, new ContentTypeField.Parser());
-        setFieldParser(AbstractField.CONTENT_DISPOSITION, new ContentDispositionField.Parser());
+        setFieldParser(FieldName.CONTENT_TRANSFER_ENCODING, new ContentTransferEncodingField.Parser());
+        setFieldParser(FieldName.CONTENT_TYPE, new ContentTypeField.Parser());
+        setFieldParser(FieldName.CONTENT_DISPOSITION, new ContentDispositionField.Parser());
         
         final DateTimeField.Parser dateTimeParser = new DateTimeField.Parser();
-        setFieldParser(AbstractField.DATE, dateTimeParser);
-        setFieldParser(AbstractField.RESENT_DATE, dateTimeParser);
+        setFieldParser(FieldName.DATE, dateTimeParser);
+        setFieldParser(FieldName.RESENT_DATE, dateTimeParser);
         
         final MailboxListField.Parser mailboxListParser = new MailboxListField.Parser();
-        setFieldParser(AbstractField.FROM, mailboxListParser);
-        setFieldParser(AbstractField.RESENT_FROM, mailboxListParser);
+        setFieldParser(FieldName.FROM, mailboxListParser);
+        setFieldParser(FieldName.RESENT_FROM, mailboxListParser);
         
         final MailboxField.Parser mailboxParser = new MailboxField.Parser();
-        setFieldParser(AbstractField.SENDER, mailboxParser);
-        setFieldParser(AbstractField.RESENT_SENDER, mailboxParser);
+        setFieldParser(FieldName.SENDER, mailboxParser);
+        setFieldParser(FieldName.RESENT_SENDER, mailboxParser);
         
         final AddressListField.Parser addressListParser = new AddressListField.Parser();
-        setFieldParser(AbstractField.TO, addressListParser);
-        setFieldParser(AbstractField.RESENT_TO, addressListParser);
-        setFieldParser(AbstractField.CC, addressListParser);
-        setFieldParser(AbstractField.RESENT_CC, addressListParser);
-        setFieldParser(AbstractField.BCC, addressListParser);
-        setFieldParser(AbstractField.RESENT_BCC, addressListParser);
-        setFieldParser(AbstractField.REPLY_TO, addressListParser);
+        setFieldParser(FieldName.TO, addressListParser);
+        setFieldParser(FieldName.RESENT_TO, addressListParser);
+        setFieldParser(FieldName.CC, addressListParser);
+        setFieldParser(FieldName.RESENT_CC, addressListParser);
+        setFieldParser(FieldName.BCC, addressListParser);
+        setFieldParser(FieldName.RESENT_BCC, addressListParser);
+        setFieldParser(FieldName.REPLY_TO, addressListParser);
     }
 }

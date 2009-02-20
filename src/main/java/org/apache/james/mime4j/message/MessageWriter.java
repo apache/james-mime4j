@@ -32,7 +32,7 @@ import java.nio.charset.CodingErrorAction;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.field.ContentTypeField;
-import org.apache.james.mime4j.field.AbstractField;
+import org.apache.james.mime4j.field.FieldName;
 import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -225,7 +225,7 @@ public class MessageWriter {
     public void writeHeader(Header header, OutputStream out)
             throws IOException, MimeIOException {
         Writer writer = getWriter((ContentTypeField) header
-                .getField(AbstractField.CONTENT_TYPE), out);
+                .getField(FieldName.CONTENT_TYPE), out);
 
         try {
             for (Field field : header) {
@@ -272,7 +272,7 @@ public class MessageWriter {
                     "Missing header in parent entity");
 
         ContentTypeField contentType = (ContentTypeField) header
-                .getField(AbstractField.CONTENT_TYPE);
+                .getField(FieldName.CONTENT_TYPE);
         if (contentType == null)
             throw new IllegalArgumentException(
                     "Content-Type field not specified");
