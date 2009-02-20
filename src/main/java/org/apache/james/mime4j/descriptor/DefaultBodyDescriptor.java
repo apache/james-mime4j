@@ -90,8 +90,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * Should be called for each <code>Content-</code> header field of 
      * a MIME message or part.
      * 
-     * @param name the field name.
-     * @param value the field value.
+     * @param field the MIME field.
      */
     public void addField(Field field) {
         String name = field.getName();

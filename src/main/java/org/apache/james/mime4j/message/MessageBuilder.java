@@ -92,7 +92,7 @@ public class MessageBuilder implements ContentHandler {
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#field(java.lang.String)
+     * @see org.apache.james.mime4j.parser.ContentHandler#field(Field)
      */
     public void field(Field field) throws MimeException {
         expect(Header.class);
