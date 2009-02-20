@@ -34,7 +34,7 @@ public interface Field {
     /**
      * Gets the unparsed and possibly encoded (see RFC 2047) field body string.
      * 
-     * @return the unfolded unparsed field body string.
+     * @return the unparsed field body string.
      */
     String getBody();
 
