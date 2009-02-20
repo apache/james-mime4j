@@ -55,7 +55,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
     private final CharArrayBuffer fieldbuf;
 
     private int lineCount;
-    private String field, fieldName, fieldValue;
+    private Field field;
     private boolean endOfHeader;
     private int headerCount;
 
@@ -195,7 +195,10 @@ public abstract class AbstractEntity implements EntityStateMachine {
             fieldbuf.setLength(len);
             
             boolean valid = true;
-            field = fieldbuf.toString();
+            
+            String fieldName = null;
+            String fieldValue = null;
+            
             int pos = fieldbuf.indexOf(':');
             if (pos <= 0) {
                 monitor(Event.INALID_HEADER);
@@ -212,7 +215,8 @@ public abstract class AbstractEntity implements EntityStateMachine {
                 fieldValue = fieldbuf.substring(pos + 1, fieldbuf.length());
             }
             if (valid) {
-                body.addField(fieldName, fieldValue);            
+                field = new RawField(fieldName, fieldValue, fieldbuf.toString());
+                body.addField(field);            
                 return true;
             }
         }
@@ -248,40 +252,10 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * @throws IllegalStateException {@link #getState()} returns another
      *   value than {@link EntityStates#T_FIELD}.
      */
-    public String getField() {
+    public Field getField() {
         switch (getState()) {
         case EntityStates.T_FIELD:
             return field;
-        default:
-            throw new IllegalStateException("Invalid state :" + stateToString(state));
-        }
-    }
-
-    /**
-     * This method is valid, if {@link #getState()} returns {@link EntityStates#T_FIELD}.
-     * @return String with the fields name.
-     * @throws IllegalStateException {@link #getState()} returns another
-     *   value than {@link EntityStates#T_FIELD}.
-     */
-    public String getFieldName() {
-        switch (getState()) {
-        case EntityStates.T_FIELD:
-            return fieldName;
-        default:
-            throw new IllegalStateException("Invalid state :" + stateToString(state));
-        }
-    }
-
-    /**
-     * This method is valid, if {@link #getState()} returns {@link EntityStates#T_FIELD}.
-     * @return String with the fields value.
-     * @throws IllegalStateException {@link #getState()} returns another
-     *   value than {@link EntityStates#T_FIELD}.
-     */
-    public String getFieldValue() {
-        switch (getState()) {
-        case EntityStates.T_FIELD:
-            return fieldValue;
         default:
             throw new IllegalStateException("Invalid state :" + stateToString(state));
         }

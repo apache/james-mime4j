@@ -339,30 +339,10 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * @throws IllegalStateException {@link #getState()} returns another
      *   value than {@link #T_FIELD}.
      */
-    public String getField() {
+    public Field getField() {
         return currentStateMachine.getField();
     }
     
-    /**
-     * This method is valid, if {@link #getState()} returns {@link #T_FIELD}.
-     * @return String with the fields name.
-     * @throws IllegalStateException {@link #getState()} returns another
-     *   value than {@link #T_FIELD}.
-     */
-    public String getFieldName() {
-        return currentStateMachine.getFieldName();
-    }
-
-    /**
-     * This method is valid, if {@link #getState()} returns {@link #T_FIELD}.
-     * @return String with the fields value.
-     * @throws IllegalStateException {@link #getState()} returns another
-     *   value than {@link #T_FIELD}.
-     */
-    public String getFieldValue() {
-        return currentStateMachine.getFieldValue();
-    }
-
     /**
      * This method advances the token stream to the next token.
      * @throws IllegalStateException The method has been called, although

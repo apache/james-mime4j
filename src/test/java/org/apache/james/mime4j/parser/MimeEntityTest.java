@@ -63,33 +63,33 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityStates.T_START_HEADER, entity.getState());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("To", entity.getFieldName());
-        assertEquals(" Road Runner <runner@example.org>", entity.getFieldValue());
+        assertEquals("To", entity.getField().getName());
+        assertEquals(" Road Runner <runner@example.org>", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("From", entity.getFieldName());
-        assertEquals(" Wile E. Cayote <wile@example.org>", entity.getFieldValue());
+        assertEquals("From", entity.getField().getName());
+        assertEquals(" Wile E. Cayote <wile@example.org>", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("Date", entity.getFieldName());
-        assertEquals(" Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getFieldValue());
+        assertEquals("Date", entity.getField().getName());
+        assertEquals(" Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("Subject", entity.getFieldName());
-        assertEquals(" Mail", entity.getFieldValue());
+        assertEquals("Subject", entity.getField().getName());
+        assertEquals(" Mail", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("Content-Type", entity.getFieldName());
-        assertEquals(" text/plain", entity.getFieldValue());
+        assertEquals("Content-Type", entity.getField().getName());
+        assertEquals(" text/plain", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_END_HEADER, entity.getState());
         try {
-            entity.getFieldName();
+            entity.getField().getName();
             fail("IllegalStateException should have been thrown");
         } catch (IllegalStateException expected) {
         }
         try {
-            entity.getFieldValue();
+            entity.getField().getBody();
             fail("IllegalStateException should have been thrown");
         } catch (IllegalStateException expected) {
         }
@@ -149,24 +149,24 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityStates.T_START_HEADER, entity.getState());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("To", entity.getFieldName());
-        assertEquals(" Road Runner <runner@example.org>", entity.getFieldValue());
+        assertEquals("To", entity.getField().getName());
+        assertEquals(" Road Runner <runner@example.org>", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("From", entity.getFieldName());
-        assertEquals(" Wile E. Cayote <wile@example.org>", entity.getFieldValue());
+        assertEquals("From", entity.getField().getName());
+        assertEquals(" Wile E. Cayote <wile@example.org>", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("Date", entity.getFieldName());
-        assertEquals(" Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getFieldValue());
+        assertEquals("Date", entity.getField().getName());
+        assertEquals(" Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("Subject", entity.getFieldName());
-        assertEquals(" Mail", entity.getFieldValue());
+        assertEquals("Subject", entity.getField().getName());
+        assertEquals(" Mail", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("Content-Type", entity.getFieldName());
-        assertEquals(" multipart/mixed;boundary=1729", entity.getFieldValue());
+        assertEquals("Content-Type", entity.getField().getName());
+        assertEquals(" multipart/mixed;boundary=1729", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_END_HEADER, entity.getState());
         entity.advance();
@@ -183,8 +183,8 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityStates.T_START_HEADER, p1.getState());
         p1.advance();
         assertEquals(EntityStates.T_FIELD, p1.getState());
-        assertEquals("Content-Type", p1.getFieldName());
-        assertEquals(" text/plain; charset=US-ASCII", p1.getFieldValue());
+        assertEquals("Content-Type", p1.getField().getName());
+        assertEquals(" text/plain; charset=US-ASCII", p1.getField().getBody());
         p1.advance();
         assertEquals(EntityStates.T_END_HEADER, p1.getState());
         p1.advance();
@@ -203,8 +203,8 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityStates.T_START_HEADER, p2.getState());
         p2.advance();
         assertEquals(EntityStates.T_FIELD, p2.getState());
-        assertEquals("Content-Type", p2.getFieldName());
-        assertEquals(" text/plain; charset=US-ASCII", p2.getFieldValue());
+        assertEquals("Content-Type", p2.getField().getName());
+        assertEquals(" text/plain; charset=US-ASCII", p2.getField().getBody());
         p2.advance();
         assertEquals(EntityStates.T_END_HEADER, p2.getState());
         p2.advance();
@@ -264,24 +264,24 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityStates.T_START_HEADER, entity.getState());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("To", entity.getFieldName());
-        assertEquals(" Road Runner <runner@example.org>", entity.getFieldValue());
+        assertEquals("To", entity.getField().getName());
+        assertEquals(" Road Runner <runner@example.org>", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("From", entity.getFieldName());
-        assertEquals(" Wile E. Cayote <wile@example.org>", entity.getFieldValue());
+        assertEquals("From", entity.getField().getName());
+        assertEquals(" Wile E. Cayote <wile@example.org>", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("Date", entity.getFieldName());
-        assertEquals(" Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getFieldValue());
+        assertEquals("Date", entity.getField().getName());
+        assertEquals(" Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("Subject", entity.getFieldName());
-        assertEquals(" Mail", entity.getFieldValue());
+        assertEquals("Subject", entity.getField().getName());
+        assertEquals(" Mail", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        assertEquals("Content-Type", entity.getFieldName());
-        assertEquals(" multipart/mixed;boundary=1729", entity.getFieldValue());
+        assertEquals("Content-Type", entity.getField().getName());
+        assertEquals(" multipart/mixed;boundary=1729", entity.getField().getBody());
         entity.advance();
         assertEquals(EntityStates.T_END_HEADER, entity.getState());
         entity.advance();
@@ -297,8 +297,6 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityStates.T_RAW_ENTITY, p1.getState());
         assertNull(p1.getBodyDescriptor());
         assertNull(p1.getField());
-        assertNull(p1.getFieldName());
-        assertNull(p1.getFieldValue());
         assertEquals(
                 "Content-Type: text/plain; charset=US-ASCII\r\n" +
                 "\r\n" +
@@ -312,8 +310,6 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityStates.T_RAW_ENTITY, p2.getState());
         assertNull(p2.getBodyDescriptor());
         assertNull(p2.getField());
-        assertNull(p2.getFieldName());
-        assertNull(p2.getFieldValue());
         assertEquals(
                 "Content-Type: text/plain; charset=US-ASCII\r\n" +
                 "\r\n" +

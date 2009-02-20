@@ -31,8 +31,8 @@ import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
 import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.MimeUtil;
-
 
 /**
  * Parses and stores values for standard MIME header values.
@@ -105,7 +105,9 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
     }
     
     @Override
-    public void addField(String name, String value) {
+    public void addField(Field field) {
+        String name = field.getName();
+        String value = field.getBody();
         name = name.trim().toLowerCase();
         if (MimeUtil.MIME_HEADER_MIME_VERSION.equals(name) && !isMimeVersionSet) {
             parseMimeVersion(value);
@@ -122,7 +124,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         } else if (MimeUtil.MIME_HEADER_MD5.equals(name) && !isContentMD5Set) {
             parseMD5(value);
         } else {
-            super.addField(name, value);
+            super.addField(field);
         }
     }
     

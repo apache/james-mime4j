@@ -23,8 +23,8 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
-import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.MimeUtil;
 
 import java.io.InputStream;
@@ -72,11 +72,11 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     }
 
     /**
-     * @see org.apache.james.mime4j.parser.AbstractContentHandler#field(java.lang.String)
+     * @see org.apache.james.mime4j.parser.AbstractContentHandler#field(Field)
      */
     @Override
-    public final void field(String fieldData) throws MimeException {
-        currHeader.addField(Field.parse(fieldData));
+    public final void field(Field field) throws MimeException {
+        currHeader.addField(field);
     }
 
     /**

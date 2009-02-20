@@ -27,8 +27,9 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
-import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.parser.ContentHandler;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -93,9 +94,10 @@ public class MessageBuilder implements ContentHandler {
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#field(java.lang.String)
      */
-    public void field(String fieldData) throws MimeException {
+    public void field(Field field) throws MimeException {
         expect(Header.class);
-        ((Header) stack.peek()).addField(Field.parse(fieldData));
+        Field parsedfield = AbstractField.parse(field.getRaw()); 
+        ((Header) stack.peek()).addField(parsedfield);
     }
     
     /**

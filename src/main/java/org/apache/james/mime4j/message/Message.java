@@ -32,7 +32,7 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.AddressListField;
 import org.apache.james.mime4j.field.DateTimeField;
-import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.MailboxField;
 import org.apache.james.mime4j.field.MailboxListField;
@@ -110,8 +110,9 @@ public class Message extends Entity implements Body {
      * @throws MimeIOException
      *             on MIME protocol violations.
      */
-    public Message(InputStream is, MimeEntityConfig config) throws IOException,
-            MimeIOException {
+    public Message(
+            InputStream is, 
+            MimeEntityConfig config) throws IOException, MimeIOException {
         this(is, config, DefaultStorageProvider.getInstance());
     }
 
@@ -131,7 +132,9 @@ public class Message extends Entity implements Body {
      * @throws MimeIOException
      *             on MIME protocol violations.
      */
-    public Message(InputStream is, MimeEntityConfig config,
+    public Message(
+            InputStream is, 
+            MimeEntityConfig config,
             StorageProvider storageProvider) throws IOException,
             MimeIOException {
         try {
@@ -166,7 +169,7 @@ public class Message extends Entity implements Body {
      * @return the identifier of this message.
      */
     public String getMessageId() {
-        Field field = obtainField(Field.MESSAGE_ID);
+        AbstractField field = obtainField(AbstractField.MESSAGE_ID);
         if (field == null)
             return null;
 
@@ -195,7 +198,7 @@ public class Message extends Entity implements Body {
      * @return the subject of this message.
      */
     public String getSubject() {
-        UnstructuredField field = obtainField(Field.SUBJECT);
+        UnstructuredField field = obtainField(AbstractField.SUBJECT);
         if (field == null)
             return null;
 
@@ -216,7 +219,7 @@ public class Message extends Entity implements Body {
         Header header = obtainHeader();
 
         if (subject == null) {
-            header.removeFields(Field.SUBJECT);
+            header.removeFields(AbstractField.SUBJECT);
         } else {
             header.setField(Fields.subject(subject));
         }
@@ -229,7 +232,7 @@ public class Message extends Entity implements Body {
      * @return the date of this message.
      */
     public Date getDate() {
-        DateTimeField dateField = obtainField(Field.DATE);
+        DateTimeField dateField = obtainField(AbstractField.DATE);
         if (dateField == null)
             return null;
 
@@ -264,9 +267,9 @@ public class Message extends Entity implements Body {
         Header header = obtainHeader();
 
         if (date == null) {
-            header.removeFields(Field.DATE);
+            header.removeFields(AbstractField.DATE);
         } else {
-            header.setField(Fields.date(Field.DATE, date, zone));
+            header.setField(Fields.date(AbstractField.DATE, date, zone));
         }
     }
 
@@ -278,7 +281,7 @@ public class Message extends Entity implements Body {
      * @return the sender of this message.
      */
     public Mailbox getSender() {
-        return getMailbox(Field.SENDER);
+        return getMailbox(AbstractField.SENDER);
     }
 
     /**
@@ -290,7 +293,7 @@ public class Message extends Entity implements Body {
      *            field.
      */
     public void setSender(Mailbox sender) {
-        setMailbox(Field.SENDER, sender);
+        setMailbox(AbstractField.SENDER, sender);
     }
 
     /**
@@ -301,7 +304,7 @@ public class Message extends Entity implements Body {
      * @return value of the from field of this message.
      */
     public MailboxList getFrom() {
-        return getMailboxList(Field.FROM);
+        return getMailboxList(AbstractField.FROM);
     }
 
     /**
@@ -313,7 +316,7 @@ public class Message extends Entity implements Body {
      *            field.
      */
     public void setFrom(Mailbox from) {
-        setMailboxList(Field.FROM, from);
+        setMailboxList(AbstractField.FROM, from);
     }
 
     /**
@@ -325,7 +328,7 @@ public class Message extends Entity implements Body {
      *            remove the header field.
      */
     public void setFrom(Mailbox... from) {
-        setMailboxList(Field.FROM, from);
+        setMailboxList(AbstractField.FROM, from);
     }
 
     /**
@@ -337,7 +340,7 @@ public class Message extends Entity implements Body {
      *            to remove the header field.
      */
     public void setFrom(Collection<Mailbox> from) {
-        setMailboxList(Field.FROM, from);
+        setMailboxList(AbstractField.FROM, from);
     }
 
     /**
@@ -348,7 +351,7 @@ public class Message extends Entity implements Body {
      * @return value of the to field of this message.
      */
     public AddressList getTo() {
-        return getAddressList(Field.TO);
+        return getAddressList(AbstractField.TO);
     }
 
     /**
@@ -360,7 +363,7 @@ public class Message extends Entity implements Body {
      *            field.
      */
     public void setTo(Address to) {
-        setAddressList(Field.TO, to);
+        setAddressList(AbstractField.TO, to);
     }
 
     /**
@@ -372,7 +375,7 @@ public class Message extends Entity implements Body {
      *            remove the header field.
      */
     public void setTo(Address... to) {
-        setAddressList(Field.TO, to);
+        setAddressList(AbstractField.TO, to);
     }
 
     /**
@@ -384,7 +387,7 @@ public class Message extends Entity implements Body {
      *            to remove the header field.
      */
     public void setTo(Collection<Address> to) {
-        setAddressList(Field.TO, to);
+        setAddressList(AbstractField.TO, to);
     }
 
     /**
@@ -395,7 +398,7 @@ public class Message extends Entity implements Body {
      * @return value of the cc field of this message.
      */
     public AddressList getCc() {
-        return getAddressList(Field.CC);
+        return getAddressList(AbstractField.CC);
     }
 
     /**
@@ -407,7 +410,7 @@ public class Message extends Entity implements Body {
      *            field.
      */
     public void setCc(Address cc) {
-        setAddressList(Field.CC, cc);
+        setAddressList(AbstractField.CC, cc);
     }
 
     /**
@@ -419,7 +422,7 @@ public class Message extends Entity implements Body {
      *            remove the header field.
      */
     public void setCc(Address... cc) {
-        setAddressList(Field.CC, cc);
+        setAddressList(AbstractField.CC, cc);
     }
 
     /**
@@ -431,7 +434,7 @@ public class Message extends Entity implements Body {
      *            to remove the header field.
      */
     public void setCc(Collection<Address> cc) {
-        setAddressList(Field.CC, cc);
+        setAddressList(AbstractField.CC, cc);
     }
 
     /**
@@ -442,7 +445,7 @@ public class Message extends Entity implements Body {
      * @return value of the bcc field of this message.
      */
     public AddressList getBcc() {
-        return getAddressList(Field.BCC);
+        return getAddressList(AbstractField.BCC);
     }
 
     /**
@@ -454,7 +457,7 @@ public class Message extends Entity implements Body {
      *            field.
      */
     public void setBcc(Address bcc) {
-        setAddressList(Field.BCC, bcc);
+        setAddressList(AbstractField.BCC, bcc);
     }
 
     /**
@@ -466,7 +469,7 @@ public class Message extends Entity implements Body {
      *            remove the header field.
      */
     public void setBcc(Address... bcc) {
-        setAddressList(Field.BCC, bcc);
+        setAddressList(AbstractField.BCC, bcc);
     }
 
     /**
@@ -478,7 +481,7 @@ public class Message extends Entity implements Body {
      *            to remove the header field.
      */
     public void setBcc(Collection<Address> bcc) {
-        setAddressList(Field.BCC, bcc);
+        setAddressList(AbstractField.BCC, bcc);
     }
 
     /**
@@ -489,7 +492,7 @@ public class Message extends Entity implements Body {
      * @return value of the reply to field of this message.
      */
     public AddressList getReplyTo() {
-        return getAddressList(Field.REPLY_TO);
+        return getAddressList(AbstractField.REPLY_TO);
     }
 
     /**
@@ -501,7 +504,7 @@ public class Message extends Entity implements Body {
      *            field.
      */
     public void setReplyTo(Address replyTo) {
-        setAddressList(Field.REPLY_TO, replyTo);
+        setAddressList(AbstractField.REPLY_TO, replyTo);
     }
 
     /**
@@ -513,7 +516,7 @@ public class Message extends Entity implements Body {
      *            remove the header field.
      */
     public void setReplyTo(Address... replyTo) {
-        setAddressList(Field.REPLY_TO, replyTo);
+        setAddressList(AbstractField.REPLY_TO, replyTo);
     }
 
     /**
@@ -525,7 +528,7 @@ public class Message extends Entity implements Body {
      *            to remove the header field.
      */
     public void setReplyTo(Collection<Address> replyTo) {
-        setAddressList(Field.REPLY_TO, replyTo);
+        setAddressList(AbstractField.REPLY_TO, replyTo);
     }
 
     private Mailbox getMailbox(String fieldName) {

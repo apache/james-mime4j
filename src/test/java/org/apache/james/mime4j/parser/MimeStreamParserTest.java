@@ -139,8 +139,8 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(String fieldData) {
-                assertEquals(expected.removeFirst(), fieldData);
+            public void field(Field field) {
+                assertEquals(expected.removeFirst(), field.getRaw());
             }
         });
         
@@ -163,8 +163,8 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(String fieldData) {
-                assertEquals(expected.removeFirst(), fieldData);
+            public void field(Field field) {
+                assertEquals(expected.removeFirst(), field.getRaw());
             }
         });
         
@@ -187,8 +187,8 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(String fieldData) {
-                assertEquals(expected.removeFirst(), fieldData);
+            public void field(Field field) {
+                assertEquals(expected.removeFirst(), field.getRaw());
             }
         });
         
@@ -248,8 +248,8 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(String fieldData) {
-                assertEquals(expected.removeFirst(), fieldData);
+            public void field(Field field) {
+                assertEquals(expected.removeFirst(), field.getRaw());
             }
         });
         
@@ -297,7 +297,7 @@ public class MimeStreamParserTest extends TestCase {
             }
 
             @Override
-            public void field(String fieldData) {
+            public void field(Field field) {
                 fail("field shouldn't be called for empty stream");
             }
 
@@ -340,7 +340,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(String fieldData) {
+            public void field(Field field) {
                 fail("No fields should be reported");
             }
             @Override
@@ -371,8 +371,8 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(String fieldData) {
-                assertEquals(expected.removeFirst(), fieldData);
+            public void field(Field field) {
+                assertEquals(expected.removeFirst(), field.getRaw());
             }
             @Override
             public void body(BodyDescriptor bd, InputStream is) throws IOException {
@@ -399,8 +399,8 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(String fieldData) {
-                assertEquals(expected.removeFirst(), fieldData);
+            public void field(Field field) {
+                assertEquals(expected.removeFirst(), field.getRaw());
             }
         });
         
@@ -418,8 +418,8 @@ public class MimeStreamParserTest extends TestCase {
         parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(String fieldData) {
-                assertEquals(expected.removeFirst(), fieldData);
+            public void field(Field field) {
+                assertEquals(expected.removeFirst(), field.getRaw());
             }
         });
         

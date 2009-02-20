@@ -22,6 +22,8 @@ package org.apache.james.mime4j.field;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.james.mime4j.parser.Field;
+
 public class DelegatingFieldParser implements FieldParser {
     
     private Map<String, FieldParser> parsers = new HashMap<String, FieldParser>();

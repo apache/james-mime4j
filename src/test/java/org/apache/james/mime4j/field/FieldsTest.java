@@ -200,7 +200,7 @@ public class FieldsTest extends TestCase {
     }
 
     public void testMessageId() throws Exception {
-        Field messageId = Fields.messageId("acme.org");
+        AbstractField messageId = Fields.messageId("acme.org");
 
         String raw = messageId.getRaw();
         assertTrue(raw.startsWith("Message-ID: <Mime4j."));

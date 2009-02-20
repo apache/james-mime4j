@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.log4j.BasicConfigurator;

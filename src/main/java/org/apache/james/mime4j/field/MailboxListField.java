@@ -28,7 +28,7 @@ import org.apache.james.mime4j.field.address.parser.ParseException;
 /**
  * Mailbox-list field such as <code>From</code> or <code>Resent-From</code>.
  */
-public class MailboxListField extends Field {
+public class MailboxListField extends AbstractField {
     private static Log log = LogFactory.getLog(MailboxListField.class);
 
     private boolean parsed = false;
@@ -71,7 +71,7 @@ public class MailboxListField extends Field {
     }
 
     static class Parser implements FieldParser {
-        public Field parse(final String name, final String body,
+        public AbstractField parse(final String name, final String body,
                 final String raw) {
             return new MailboxListField(name, body, raw);
         }

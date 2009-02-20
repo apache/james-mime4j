@@ -23,12 +23,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * The base class of all field classes.
  */
-public abstract class Field {
+public abstract class AbstractField implements Field {
     public static final String SENDER = "Sender";
     public static final String FROM = "From";
     public static final String TO = "To";
@@ -63,7 +64,7 @@ public abstract class Field {
     private final String body;
     private final String raw;
     
-    protected Field(final String name, final String body, final String raw) {
+    protected AbstractField(final String name, final String body, final String raw) {
         this.name = name;
         this.body = body;
         this.raw = raw;

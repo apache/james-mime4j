@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.field;
 
-import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.field.UnstructuredField;
 
 import junit.framework.TestCase;
@@ -29,13 +29,13 @@ public class UnstructuredFieldTest extends TestCase {
     public void testGetBody() throws Exception {
         UnstructuredField f = null;
         
-        f = (UnstructuredField) Field.parse("Subject: Yada\r\n yada yada\r\n");
+        f = (UnstructuredField) AbstractField.parse("Subject: Yada\r\n yada yada\r\n");
         assertEquals("Testing folding value 1", "Yada yada yada", f.getValue());
         
-        f = (UnstructuredField) Field.parse("Subject:  \r\n\tyada");
+        f = (UnstructuredField) AbstractField.parse("Subject:  \r\n\tyada");
         assertEquals("Testing folding value 2", " \tyada", f.getValue());
         
-        f = (UnstructuredField) Field.parse("Subject:yada");
+        f = (UnstructuredField) AbstractField.parse("Subject:yada");
         assertEquals("Testing value without a leading ' '", "yada", f.getValue());
     }
 

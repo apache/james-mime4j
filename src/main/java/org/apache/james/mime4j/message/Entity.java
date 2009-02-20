@@ -27,7 +27,7 @@ import java.util.Map;
 import org.apache.james.mime4j.field.ContentDispositionField;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
-import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -264,10 +264,10 @@ public abstract class Entity implements Disposable {
      */
     public String getMimeType() {
         ContentTypeField child = 
-            (ContentTypeField) getHeader().getField(Field.CONTENT_TYPE);
+            (ContentTypeField) getHeader().getField(AbstractField.CONTENT_TYPE);
         ContentTypeField parent = getParent() != null 
             ? (ContentTypeField) getParent().getHeader().
-                                                getField(Field.CONTENT_TYPE)
+                                                getField(AbstractField.CONTENT_TYPE)
             : null;
         
         return ContentTypeField.getMimeType(child, parent);
@@ -280,7 +280,7 @@ public abstract class Entity implements Disposable {
      */
     public String getCharset() {
         return ContentTypeField.getCharset( 
-            (ContentTypeField) getHeader().getField(Field.CONTENT_TYPE));
+            (ContentTypeField) getHeader().getField(AbstractField.CONTENT_TYPE));
     }
     
     /**
@@ -290,7 +290,7 @@ public abstract class Entity implements Disposable {
      */
     public String getContentTransferEncoding() {
         ContentTransferEncodingField f = (ContentTransferEncodingField) 
-                        getHeader().getField(Field.CONTENT_TRANSFER_ENCODING);
+                        getHeader().getField(AbstractField.CONTENT_TRANSFER_ENCODING);
         
         return ContentTransferEncodingField.getEncoding(f);
     }
@@ -315,7 +315,7 @@ public abstract class Entity implements Disposable {
      *         type has been set.
      */
     public String getDispositionType() {
-        ContentDispositionField field = obtainField(Field.CONTENT_DISPOSITION);
+        ContentDispositionField field = obtainField(AbstractField.CONTENT_DISPOSITION);
         if (field == null)
             return null;
 
@@ -415,7 +415,7 @@ public abstract class Entity implements Disposable {
      *         <code>null</code> if the filename has not been set.
      */
     public String getFilename() {
-        ContentDispositionField field = obtainField(Field.CONTENT_DISPOSITION);
+        ContentDispositionField field = obtainField(AbstractField.CONTENT_DISPOSITION);
         if (field == null)
             return null;
 
@@ -435,7 +435,7 @@ public abstract class Entity implements Disposable {
     public void setFilename(String filename) {
         Header header = obtainHeader();
         ContentDispositionField field = (ContentDispositionField) header
-                .getField(Field.CONTENT_DISPOSITION);
+                .getField(AbstractField.CONTENT_DISPOSITION);
         if (field == null) {
             if (filename != null) {
                 header.setField(Fields.contentDisposition(
@@ -478,7 +478,7 @@ public abstract class Entity implements Disposable {
      */
     public boolean isMultipart() {
         ContentTypeField f = 
-            (ContentTypeField) getHeader().getField(Field.CONTENT_TYPE);
+            (ContentTypeField) getHeader().getField(AbstractField.CONTENT_TYPE);
         return f != null && f.getBoundary() != null 
             && getMimeType().startsWith(ContentTypeField.TYPE_MULTIPART_PREFIX);
     }
@@ -521,7 +521,7 @@ public abstract class Entity implements Disposable {
      * @return the header field or <code>null</code> if this entity has no
      *         header or the header contains no such field.
      */
-    <F extends Field> F obtainField(String fieldName) {
+    <F extends AbstractField> F obtainField(String fieldName) {
         Header header = getHeader();
         if (header == null)
             return null;

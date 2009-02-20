@@ -24,7 +24,7 @@ import org.apache.james.mime4j.codec.DecoderUtil;
 /**
  * Simple unstructured field such as <code>Subject</code>.
  */
-public class UnstructuredField extends Field {
+public class UnstructuredField extends AbstractField {
     private boolean parsed = false;
 
     private String value;
@@ -49,7 +49,7 @@ public class UnstructuredField extends Field {
     }
 
     static class Parser implements FieldParser {
-        public Field parse(final String name, final String body,
+        public AbstractField parse(final String name, final String body,
                 final String raw) {
             return new UnstructuredField(name, body, raw);
         }

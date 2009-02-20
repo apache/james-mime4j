@@ -94,7 +94,10 @@ public class MimeEntity extends AbstractEntity {
             throw new IllegalStateException("Invalid state: " + stateToString(state));
         }
         skipHeader = true;
-        body.addField("Content-Type", contentType);
+        body.addField(new RawField(
+                "Content-Type", 
+                contentType,
+                "Content-Type: " +contentType));
     }
     
     @Override

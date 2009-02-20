@@ -24,7 +24,7 @@ import org.apache.james.mime4j.util.MimeUtil;
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.
  */
-public class ContentTransferEncodingField extends Field {
+public class ContentTransferEncodingField extends AbstractField {
     private String encoding;
 
     ContentTransferEncodingField(String name, String body, String raw) {
@@ -56,7 +56,7 @@ public class ContentTransferEncodingField extends Field {
     }
 
     static class Parser implements FieldParser {
-        public Field parse(final String name, final String body,
+        public AbstractField parse(final String name, final String body,
                 final String raw) {
             return new ContentTransferEncodingField(name, body, raw);
         }

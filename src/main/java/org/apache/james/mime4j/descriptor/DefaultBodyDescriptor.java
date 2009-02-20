@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -92,8 +93,10 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * @param name the field name.
      * @param value the field value.
      */
-    public void addField(String name, String value) {
-        
+    public void addField(Field field) {
+        String name = field.getName();
+        String value = field.getBody();
+
         name = name.trim().toLowerCase();
         
         if (name.equals("content-transfer-encoding") && !contentTransferEncSet) {

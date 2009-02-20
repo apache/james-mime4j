@@ -17,20 +17,38 @@
  * under the License.                                           *
  ****************************************************************/
 
-
-package org.apache.james.mime4j.descriptor;
-
-import org.apache.james.mime4j.parser.Field;
+package org.apache.james.mime4j.parser;
 
 /**
- * Adds mutator.
+ * The basic immutable MIME field.
  */
-public interface MutableBodyDescriptor extends BodyDescriptor {
+public class RawField implements Field {
+    
+    private final String name;
+    private final String body;
+    private final String raw;
+    
+    public RawField(String name, String body, String raw) {
+        super();
+        this.name = name;
+        this.body = body;
+        this.raw = raw;
+    }
+    
+    public String getName() {
+        return this.name;
+    }
 
-    /**
-     * Adds a field to the body descriptor.
-     * @param Field the MIME field.
-     */
-    void addField(Field field);
+    public String getBody() {
+        return this.body;
+    }
 
+    public String getRaw() {
+        return this.raw;
+    }
+    
+    public String toString() {
+        return this.raw;
+    }
+    
 }

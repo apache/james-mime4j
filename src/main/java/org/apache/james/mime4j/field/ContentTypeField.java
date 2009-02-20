@@ -34,7 +34,7 @@ import org.apache.james.mime4j.field.contenttype.parser.TokenMgrError;
 /**
  * Represents a <code>Content-Type</code> field.
  */
-public class ContentTypeField extends Field {
+public class ContentTypeField extends AbstractField {
     private static Log log = LogFactory.getLog(ContentTypeField.class);
 
     /** The prefix of all <code>multipart</code> MIME types. */
@@ -249,7 +249,7 @@ public class ContentTypeField extends Field {
     }
 
     static class Parser implements FieldParser {
-        public Field parse(final String name, final String body,
+        public AbstractField parse(final String name, final String body,
                 final String raw) {
             return new ContentTypeField(name, body, raw);
         }

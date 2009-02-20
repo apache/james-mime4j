@@ -17,20 +17,32 @@
  * under the License.                                           *
  ****************************************************************/
 
-
-package org.apache.james.mime4j.descriptor;
-
-import org.apache.james.mime4j.parser.Field;
+package org.apache.james.mime4j.parser;
 
 /**
- * Adds mutator.
+ * Abstract MIME field.
  */
-public interface MutableBodyDescriptor extends BodyDescriptor {
+public interface Field {
+    
+    /**
+     * Gets the name of the field (<code>Subject</code>, <code>From</code>, etc).
+     * 
+     * @return the field name.
+     */
+    String getName();
 
     /**
-     * Adds a field to the body descriptor.
-     * @param Field the MIME field.
+     * Gets the unparsed and possibly encoded (see RFC 2047) field body string.
+     * 
+     * @return the unfolded unparsed field body string.
      */
-    void addField(Field field);
+    String getBody();
 
+    /**
+     * Gets the original raw field string.
+     * 
+     * @return the original raw field string.
+     */
+    String getRaw();
+    
 }

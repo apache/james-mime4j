@@ -90,8 +90,8 @@ class TestHandler implements ContentHandler {
     public void startHeader() {
         sb.append("<header>\r\n");
     }
-    public void field(String fieldData) {
-        sb.append("<field>\r\n" + escape(fieldData) + "</field>\r\n");
+    public void field(Field field) {
+        sb.append("<field>\r\n" + escape(field.getRaw()) + "</field>\r\n");
     }
     public void endHeader() {
         sb.append("</header>\r\n");

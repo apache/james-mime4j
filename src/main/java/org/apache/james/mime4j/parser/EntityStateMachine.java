@@ -98,26 +98,6 @@ public interface EntityStateMachine {
      * @throws IllegalStateException if a header field cannot be
      *  obtained at the current stage of the parsing process. 
      */
-    String getField() throws IllegalStateException;
-    
-    /**
-     * Returns name of the current header field.
-     * 
-     * @return field name
-     * 
-     * @throws IllegalStateException if a header field cannot be
-     *  obtained at the current stage of the parsing process. 
-     */
-    String getFieldName() throws IllegalStateException;
-
-    /**
-     * Returns value of the current header field.
-     * 
-     * @return field value
-     * 
-     * @throws IllegalStateException if a header field cannot be
-     *  obtained at the current stage of the parsing process. 
-     */
-    String getFieldValue() throws IllegalStateException;
+    Field getField() throws IllegalStateException;
     
 }

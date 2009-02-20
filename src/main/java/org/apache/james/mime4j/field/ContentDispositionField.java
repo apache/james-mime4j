@@ -37,7 +37,7 @@ import org.apache.james.mime4j.field.ParseException;
 /**
  * Represents a <code>Content-Disposition</code> field.
  */
-public class ContentDispositionField extends Field {
+public class ContentDispositionField extends AbstractField {
     private static Log log = LogFactory.getLog(ContentDispositionField.class);
 
     /** The <code>inline</code> disposition type. */
@@ -318,7 +318,7 @@ public class ContentDispositionField extends Field {
     }
 
     static class Parser implements FieldParser {
-        public Field parse(final String name, final String body,
+        public AbstractField parse(final String name, final String body,
                 final String raw) {
             return new ContentDispositionField(name, body, raw);
         }

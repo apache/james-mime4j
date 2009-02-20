@@ -121,12 +121,10 @@ public interface ContentHandler {
     /**
      * Called for each field of a header.
      * 
-     * @param fieldData the raw contents of the field 
-     *        (<code>Field-Name: field value</code>). The value will not be 
-     *        unfolded.
+     * @param field the MIME field.
      * @throws MimeException on processing errors
      */
-    void field(String fieldData) throws MimeException;
+    void field(Field field) throws MimeException;
 
     /**
      * Called when there are no more header fields in a message or body part.

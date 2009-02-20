@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
-import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.AbstractField;
 
 import junit.framework.TestCase;
 
@@ -30,19 +30,19 @@ public class ContentTransferEncodingFieldTest extends TestCase {
         ContentTransferEncodingField f = null;
         
         f = (ContentTransferEncodingField) 
-                    Field.parse("Content-Transfer-Encoding: 8bit");
+                    AbstractField.parse("Content-Transfer-Encoding: 8bit");
         assertEquals("8bit", f.getEncoding());
         
         f = (ContentTransferEncodingField) 
-                    Field.parse("Content-Transfer-Encoding:    BaSE64   ");
+                    AbstractField.parse("Content-Transfer-Encoding:    BaSE64   ");
         assertEquals("base64", f.getEncoding());
         
         f = (ContentTransferEncodingField) 
-                    Field.parse("Content-Transfer-Encoding:       ");
+                    AbstractField.parse("Content-Transfer-Encoding:       ");
         assertEquals("", f.getEncoding());
         
         f = (ContentTransferEncodingField) 
-                    Field.parse("Content-Transfer-Encoding:");
+                    AbstractField.parse("Content-Transfer-Encoding:");
         assertEquals("", f.getEncoding());
     }
     
@@ -50,18 +50,18 @@ public class ContentTransferEncodingFieldTest extends TestCase {
         ContentTransferEncodingField f = null;
         
         f = (ContentTransferEncodingField) 
-                    Field.parse("Content-Transfer-Encoding: 8bit");
+                    AbstractField.parse("Content-Transfer-Encoding: 8bit");
         assertEquals("8bit", ContentTransferEncodingField.getEncoding(f));
         
         f = null;
         assertEquals("7bit", ContentTransferEncodingField.getEncoding(f));
         
         f = (ContentTransferEncodingField) 
-                    Field.parse("Content-Transfer-Encoding:       ");
+                    AbstractField.parse("Content-Transfer-Encoding:       ");
         assertEquals("7bit", ContentTransferEncodingField.getEncoding(f));
         
         f = (ContentTransferEncodingField) 
-                    Field.parse("Content-Transfer-Encoding:");
+                    AbstractField.parse("Content-Transfer-Encoding:");
         assertEquals("7bit", ContentTransferEncodingField.getEncoding(f));
     }
 

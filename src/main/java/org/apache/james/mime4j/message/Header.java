@@ -30,8 +30,8 @@ import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
-import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 
 /**
@@ -81,8 +81,8 @@ public class Header implements Iterable<Field> {
                 parser.stop();
             }
             @Override
-            public void field(String fieldData) throws MimeException {
-                addField(Field.parse(fieldData));
+            public void field(Field field) throws MimeException {
+                addField(field);
             }
         });
         try {

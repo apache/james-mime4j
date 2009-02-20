@@ -31,7 +31,7 @@ import java.util.Date;
 /**
  * Date-time field such as <code>Date</code> or <code>Resent-Date</code>.
  */
-public class DateTimeField extends Field {
+public class DateTimeField extends AbstractField {
     private static Log log = LogFactory.getLog(DateTimeField.class);
 
     private boolean parsed = false;
@@ -80,7 +80,7 @@ public class DateTimeField extends Field {
     }
 
     static class Parser implements FieldParser {
-        public Field parse(final String name, final String body,
+        public AbstractField parse(final String name, final String body,
                 final String raw) {
             return new DateTimeField(name, body, raw);
         }

@@ -34,7 +34,7 @@ import java.util.TimeZone;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.field.address.Group;
 import org.apache.james.mime4j.field.address.Mailbox;
 
@@ -54,13 +54,13 @@ public class MessageTest extends TestCase {
         headerMultipartDigest = new Header();
         
         headerTextPlain.addField(
-                Field.parse("Content-Type: text/plain"));
+                AbstractField.parse("Content-Type: text/plain"));
         headerMessageRFC822.addField(
-                Field.parse("Content-Type: message/RFC822"));
+                AbstractField.parse("Content-Type: message/RFC822"));
         headerMultipartMixed.addField(
-                Field.parse("Content-Type: multipart/mixed; boundary=foo"));
+                AbstractField.parse("Content-Type: multipart/mixed; boundary=foo"));
         headerMultipartDigest.addField(
-                Field.parse("Content-Type: multipart/digest; boundary=foo"));
+                AbstractField.parse("Content-Type: multipart/digest; boundary=foo"));
     }
 
     public void testGetMimeType() {
@@ -147,7 +147,7 @@ public class MessageTest extends TestCase {
         byte[] inputByte = getRawMessageAsByteArray();
 
         Message m = new Message(new ByteArrayInputStream(inputByte));
-        m.getHeader().addField(Field.parse(testheader));
+        m.getHeader().addField(AbstractField.parse(testheader));
 
         assertEquals("header added", m.getHeader().getField(headerName)
                 .getBody(), headerValue);
@@ -167,7 +167,7 @@ public class MessageTest extends TestCase {
 
         String id = "<msg17@localhost>";
         Header header = new Header();
-        header.setField(Field.parse("Message-ID", id));
+        header.setField(AbstractField.parse("Message-ID", id));
         m.setHeader(header);
         assertEquals(id, m.getMessageId());
     }
@@ -188,11 +188,11 @@ public class MessageTest extends TestCase {
 
         String subject = "testing 1 2";
         Header header = new Header();
-        header.setField(Field.parse("Subject", subject));
+        header.setField(AbstractField.parse("Subject", subject));
         m.setHeader(header);
         assertEquals(subject, m.getSubject());
 
-        header.setField(Field.parse("Subject", "=?windows-1252?Q?99_=80?="));
+        header.setField(AbstractField.parse("Subject", "=?windows-1252?Q?99_=80?="));
         assertEquals("99 \u20ac", m.getSubject());
     }
 
@@ -213,7 +213,7 @@ public class MessageTest extends TestCase {
         assertNull(m.getDate());
 
         Header header = new Header();
-        header.setField(Field.parse("Date", "Thu, 1 Jan 1970 05:30:00 +0530"));
+        header.setField(AbstractField.parse("Date", "Thu, 1 Jan 1970 05:30:00 +0530"));
         m.setHeader(header);
 
         assertEquals(new Date(0), m.getDate());
@@ -236,7 +236,7 @@ public class MessageTest extends TestCase {
         assertNull(m.getSender());
 
         Header header = new Header();
-        header.setField(Field.parse("Sender", "john.doe@example.net"));
+        header.setField(AbstractField.parse("Sender", "john.doe@example.net"));
         m.setHeader(header);
 
         assertEquals("john.doe@example.net", m.getSender().getAddress());
@@ -258,7 +258,7 @@ public class MessageTest extends TestCase {
         assertNull(m.getFrom());
 
         Header header = new Header();
-        header.setField(Field.parse("From", "john.doe@example.net"));
+        header.setField(AbstractField.parse("From", "john.doe@example.net"));
         m.setHeader(header);
 
         assertEquals("john.doe@example.net", m.getFrom().get(0).getAddress());
@@ -291,7 +291,7 @@ public class MessageTest extends TestCase {
         assertNull(m.getTo());
 
         Header header = new Header();
-        header.setField(Field.parse("To", "john.doe@example.net"));
+        header.setField(AbstractField.parse("To", "john.doe@example.net"));
         m.setHeader(header);
 
         assertEquals("john.doe@example.net", ((Mailbox) m.getTo().get(0))
@@ -329,7 +329,7 @@ public class MessageTest extends TestCase {
         assertNull(m.getCc());
 
         Header header = new Header();
-        header.setField(Field.parse("Cc", "john.doe@example.net"));
+        header.setField(AbstractField.parse("Cc", "john.doe@example.net"));
         m.setHeader(header);
 
         assertEquals("john.doe@example.net", ((Mailbox) m.getCc().get(0))
@@ -367,7 +367,7 @@ public class MessageTest extends TestCase {
         assertNull(m.getBcc());
 
         Header header = new Header();
-        header.setField(Field.parse("Bcc", "john.doe@example.net"));
+        header.setField(AbstractField.parse("Bcc", "john.doe@example.net"));
         m.setHeader(header);
 
         assertEquals("john.doe@example.net", ((Mailbox) m.getBcc().get(0))
@@ -405,7 +405,7 @@ public class MessageTest extends TestCase {
         assertNull(m.getReplyTo());
 
         Header header = new Header();
-        header.setField(Field.parse("Reply-To", "john.doe@example.net"));
+        header.setField(AbstractField.parse("Reply-To", "john.doe@example.net"));
         m.setHeader(header);
 
         assertEquals("john.doe@example.net", ((Mailbox) m.getReplyTo().get(0))

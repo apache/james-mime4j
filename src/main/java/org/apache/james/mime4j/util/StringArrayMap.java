@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.parser.ContentHandler;
 
@@ -40,7 +40,7 @@ import org.apache.james.mime4j.parser.ContentHandler;
  * <p>
  * Note that this class is not directly used anywhere in Mime4j.
  * Instead a user might choose to use it instead of {@link Header}
- * and {@link Field} in a custom {@link ContentHandler} implementation.
+ * and {@link AbstractField} in a custom {@link ContentHandler} implementation.
  * See also MIME4j-24.
  */
 public class StringArrayMap implements Serializable {
