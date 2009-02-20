@@ -24,11 +24,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.field.ContentDispositionField;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
-import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -521,7 +522,7 @@ public abstract class Entity implements Disposable {
      * @return the header field or <code>null</code> if this entity has no
      *         header or the header contains no such field.
      */
-    <F extends AbstractField> F obtainField(String fieldName) {
+    <F extends Field> F obtainField(String fieldName) {
         Header header = getHeader();
         if (header == null)
             return null;

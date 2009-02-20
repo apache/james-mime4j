@@ -29,6 +29,7 @@ import junit.framework.TestCase;
 
 import org.apache.james.mime4j.field.address.Group;
 import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.MimeUtil;
 
 public class FieldsTest extends TestCase {
@@ -200,7 +201,7 @@ public class FieldsTest extends TestCase {
     }
 
     public void testMessageId() throws Exception {
-        AbstractField messageId = Fields.messageId("acme.org");
+        Field messageId = Fields.messageId("acme.org");
 
         String raw = messageId.getRaw();
         assertTrue(raw.startsWith("Message-ID: <Mime4j."));

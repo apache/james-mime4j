@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.MailboxList;
 import org.apache.james.mime4j.field.address.parser.ParseException;
+import org.apache.james.mime4j.parser.Field;
 
 /**
  * Mailbox-list field such as <code>From</code> or <code>Resent-From</code>.
@@ -71,7 +72,7 @@ public class MailboxListField extends AbstractField {
     }
 
     static class Parser implements FieldParser {
-        public AbstractField parse(final String name, final String body,
+        public Field parse(final String name, final String body,
                 final String raw) {
             return new MailboxListField(name, body, raw);
         }

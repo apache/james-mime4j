@@ -43,7 +43,6 @@ import javax.swing.tree.TreeSelectionModel;
 import org.apache.james.mime4j.field.AddressListField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.DateTimeField;
-import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.field.UnstructuredField;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.MailboxList;
@@ -322,8 +321,8 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                 textView.setText(date.toString());                
             } else if (o instanceof UnstructuredField){
                 textView.setText(((UnstructuredField) o).getValue());                
-            } else if (o instanceof AbstractField){
-                textView.setText(((AbstractField) o).getBody());                
+            } else if (o instanceof Field){
+                textView.setText(((Field) o).getBody());                
             } else {
                 /*
                  * The Object should be a Header or a String containing a 

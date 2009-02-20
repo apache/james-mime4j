@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field;
 
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -56,7 +57,7 @@ public class ContentTransferEncodingField extends AbstractField {
     }
 
     static class Parser implements FieldParser {
-        public AbstractField parse(final String name, final String body,
+        public Field parse(final String name, final String body,
                 final String raw) {
             return new ContentTransferEncodingField(name, body, raw);
         }

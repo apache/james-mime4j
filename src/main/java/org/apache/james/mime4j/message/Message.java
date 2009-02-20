@@ -30,9 +30,9 @@ import java.util.TimeZone;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.field.AddressListField;
 import org.apache.james.mime4j.field.DateTimeField;
-import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.MailboxField;
 import org.apache.james.mime4j.field.MailboxListField;
@@ -41,6 +41,7 @@ import org.apache.james.mime4j.field.address.Address;
 import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.MailboxList;
+import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
@@ -110,9 +111,8 @@ public class Message extends Entity implements Body {
      * @throws MimeIOException
      *             on MIME protocol violations.
      */
-    public Message(
-            InputStream is, 
-            MimeEntityConfig config) throws IOException, MimeIOException {
+    public Message(InputStream is, MimeEntityConfig config) throws IOException,
+            MimeIOException {
         this(is, config, DefaultStorageProvider.getInstance());
     }
 
@@ -132,9 +132,7 @@ public class Message extends Entity implements Body {
      * @throws MimeIOException
      *             on MIME protocol violations.
      */
-    public Message(
-            InputStream is, 
-            MimeEntityConfig config,
+    public Message(InputStream is, MimeEntityConfig config,
             StorageProvider storageProvider) throws IOException,
             MimeIOException {
         try {
@@ -169,7 +167,7 @@ public class Message extends Entity implements Body {
      * @return the identifier of this message.
      */
     public String getMessageId() {
-        AbstractField field = obtainField(AbstractField.MESSAGE_ID);
+        Field field = obtainField(AbstractField.MESSAGE_ID);
         if (field == null)
             return null;
 

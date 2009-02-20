@@ -96,8 +96,8 @@ public class MessageBuilder implements ContentHandler {
      */
     public void field(Field field) throws MimeException {
         expect(Header.class);
-        Field parsedfield = AbstractField.parse(field.getRaw()); 
-        ((Header) stack.peek()).addField(parsedfield);
+        Field parsedField = AbstractField.parse(field.getRaw()); 
+        ((Header) stack.peek()).addField(parsedField);
     }
     
     /**

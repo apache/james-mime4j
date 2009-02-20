@@ -34,7 +34,7 @@ import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
- * Factory for concrete {@link AbstractField} instances.
+ * Factory for concrete {@link Field} instances.
  */
 public class Fields {
 
@@ -289,7 +289,7 @@ public class Fields {
      *            <code>null</code> if no host name should be included.
      * @return the newly created <i>Message-ID</i> field.
      */
-    public static AbstractField messageId(String hostname) {
+    public static Field messageId(String hostname) {
         String fieldValue = MimeUtil.createUniqueMessageId(hostname);
         return parse(UnstructuredField.class, AbstractField.MESSAGE_ID, fieldValue);
     }
@@ -566,7 +566,7 @@ public class Fields {
         return EncoderUtil.isToken(dispositionType);
     }
 
-    private static <F extends AbstractField> F parse(Class<F> fieldClass,
+    private static <F extends Field> F parse(Class<F> fieldClass,
             String fieldName, String fieldBody) {
         try {
             String raw = MimeUtil.fold(fieldName + ": " + fieldBody, 0);
