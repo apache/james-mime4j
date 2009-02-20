@@ -26,6 +26,44 @@ import junit.framework.TestCase;
 
 public class EntityTest extends TestCase {
 
+    public void testSetBody() throws Exception {
+        Entity entity = new BodyPart();
+        assertNull(entity.getBody());
+
+        Body body = new BodyFactory().textBody("test");
+        assertNull(body.getParent());
+
+        entity.setBody(body);
+        assertSame(body, entity.getBody());
+        assertSame(entity, body.getParent());
+    }
+
+    public void testSetBodyTwice() throws Exception {
+        Entity entity = new BodyPart();
+
+        Body b1 = new BodyFactory().textBody("foo");
+        Body b2 = new BodyFactory().textBody("bar");
+
+        entity.setBody(b1);
+        try {
+            entity.setBody(b2);
+            fail();
+        } catch (IllegalStateException expected) {
+        }
+    }
+
+    public void testRemoveBody() throws Exception {
+        Entity entity = new BodyPart();
+        Body body = new BodyFactory().textBody("test");
+        entity.setBody(body);
+
+        Body removed = entity.removeBody();
+        assertSame(body, removed);
+
+        assertNull(entity.getBody());
+        assertNull(removed.getParent());
+    }
+
     public void testGetDispositionType() throws Exception {
         Entity entity = new BodyPart();
 

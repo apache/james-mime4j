@@ -126,10 +126,32 @@ public abstract class Entity implements Disposable {
      * Sets the body of this entity.
      * 
      * @param body the body.
+     * @throws IllegalStateException if the body has already been set.
      */
     public void setBody(Body body) {
+        if (this.body != null)
+            throw new IllegalStateException("body already set");
+
         this.body = body;
         body.setParent(this);
+    }
+
+    /**
+     * Removes and returns the body of this entity. The removed body may be
+     * attached to another entity. If it is no longer needed it should be
+     * {@link Disposable#dispose() disposed} of.
+     * 
+     * @return the removed body or <code>null</code> if no body was set.
+     */
+    public Body removeBody() {
+        if (body == null)
+            return null;
+
+        Body body = this.body;
+        this.body = null;
+        body.setParent(null);
+
+        return body;
     }
 
     /**
