@@ -23,18 +23,18 @@ package org.apache.james.mime4j.parser;
  * The basic immutable MIME field.
  */
 public class RawField implements Field {
-    
+
     private final String name;
     private final String body;
     private final String raw;
-    
+
     public RawField(String name, String body, String raw) {
         super();
         this.name = name;
         this.body = body;
         this.raw = raw;
     }
-    
+
     public String getName() {
         return this.name;
     }
@@ -46,9 +46,10 @@ public class RawField implements Field {
     public String getRaw() {
         return this.raw;
     }
-    
+
+    @Override
     public String toString() {
         return this.raw;
     }
-    
+
 }
