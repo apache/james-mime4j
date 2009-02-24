@@ -19,15 +19,15 @@
 
 package org.apache.james.mime4j.field;
 
+import java.io.StringReader;
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import org.apache.james.mime4j.field.datetime.parser.TokenMgrError;
 import org.apache.james.mime4j.parser.Field;
-
-import java.io.StringReader;
-import java.util.Date;
 
 /**
  * Date-time field such as <code>Date</code> or <code>Resent-Date</code>.
@@ -80,10 +80,10 @@ public class DateTimeField extends AbstractField {
         parsed = true;
     }
 
-    static class Parser implements FieldParser {
+    static final FieldParser PARSER = new FieldParser() {
         public Field parse(final String name, final String body,
                 final String raw) {
             return new DateTimeField(name, body, raw);
         }
-    }
+    };
 }

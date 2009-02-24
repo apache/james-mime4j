@@ -56,10 +56,10 @@ public class ContentTransferEncodingField extends AbstractField {
         return MimeUtil.ENC_7BIT;
     }
 
-    static class Parser implements FieldParser {
+    static final FieldParser PARSER = new FieldParser() {
         public Field parse(final String name, final String body,
                 final String raw) {
             return new ContentTransferEncodingField(name, body, raw);
         }
-    }
+    };
 }

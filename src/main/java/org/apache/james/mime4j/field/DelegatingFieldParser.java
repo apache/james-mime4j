@@ -27,7 +27,7 @@ import org.apache.james.mime4j.parser.Field;
 public class DelegatingFieldParser implements FieldParser {
     
     private Map<String, FieldParser> parsers = new HashMap<String, FieldParser>();
-    private FieldParser defaultParser = new UnstructuredField.Parser();
+    private FieldParser defaultParser = UnstructuredField.PARSER;
     
     /**
      * Sets the parser used for the field named <code>name</code>.

@@ -25,8 +25,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
-import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.EncoderUtil;
 import org.apache.james.mime4j.field.address.Address;
 import org.apache.james.mime4j.field.address.Mailbox;
@@ -37,6 +37,9 @@ import org.apache.james.mime4j.util.MimeUtil;
  * Factory for concrete {@link Field} instances.
  */
 public class Fields {
+
+    private static final Pattern FIELD_NAME_PATTERN = Pattern
+            .compile("[\\x21-\\x39\\x3b-\\x7e]+");
 
     private Fields() {
     }
@@ -52,7 +55,8 @@ public class Fields {
      * @return the newly created <i>Content-Type</i> field.
      */
     public static ContentTypeField contentType(String contentType) {
-        return parse(ContentTypeField.class, FieldName.CONTENT_TYPE, contentType);
+        return parse(ContentTypeField.PARSER, FieldName.CONTENT_TYPE,
+                contentType);
     }
 
     /**
@@ -73,7 +77,8 @@ public class Fields {
             throw new IllegalArgumentException();
 
         if (parameters == null || parameters.isEmpty()) {
-            return parse(ContentTypeField.class, FieldName.CONTENT_TYPE, mimeType);
+            return parse(ContentTypeField.PARSER, FieldName.CONTENT_TYPE,
+                    mimeType);
         } else {
             StringBuilder sb = new StringBuilder(mimeType);
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
@@ -97,7 +102,7 @@ public class Fields {
      */
     public static ContentTransferEncodingField contentTransferEncoding(
             String contentTransferEncoding) {
-        return parse(ContentTransferEncodingField.class,
+        return parse(ContentTransferEncodingField.PARSER,
                 FieldName.CONTENT_TRANSFER_ENCODING, contentTransferEncoding);
     }
 
@@ -113,8 +118,8 @@ public class Fields {
      */
     public static ContentDispositionField contentDisposition(
             String contentDisposition) {
-        return parse(ContentDispositionField.class, FieldName.CONTENT_DISPOSITION,
-                contentDisposition);
+        return parse(ContentDispositionField.PARSER,
+                FieldName.CONTENT_DISPOSITION, contentDisposition);
     }
 
     /**
@@ -135,7 +140,7 @@ public class Fields {
             throw new IllegalArgumentException();
 
         if (parameters == null || parameters.isEmpty()) {
-            return parse(ContentDispositionField.class,
+            return parse(ContentDispositionField.PARSER,
                     FieldName.CONTENT_DISPOSITION, dispositionType);
         } else {
             StringBuilder sb = new StringBuilder(dispositionType);
@@ -245,7 +250,7 @@ public class Fields {
      * @return the newly created <i>Date</i> field.
      */
     public static DateTimeField date(Date date) {
-        return date(FieldName.DATE, date, null);
+        return date0(FieldName.DATE, date, null);
     }
 
     /**
@@ -260,7 +265,8 @@ public class Fields {
      * @return the newly created date field.
      */
     public static DateTimeField date(String fieldName, Date date) {
-        return date(fieldName, date, null);
+        checkValidFieldName(fieldName);
+        return date0(fieldName, date, null);
     }
 
     /**
@@ -277,8 +283,8 @@ public class Fields {
      * @return the newly created date field.
      */
     public static DateTimeField date(String fieldName, Date date, TimeZone zone) {
-        return parse(DateTimeField.class, fieldName, MimeUtil.formatDate(date,
-                zone));
+        checkValidFieldName(fieldName);
+        return date0(fieldName, date, zone);
     }
 
     /**
@@ -291,7 +297,7 @@ public class Fields {
      */
     public static Field messageId(String hostname) {
         String fieldValue = MimeUtil.createUniqueMessageId(hostname);
-        return parse(UnstructuredField.class, FieldName.MESSAGE_ID, fieldValue);
+        return parse(UnstructuredField.PARSER, FieldName.MESSAGE_ID, fieldValue);
     }
 
     /**
@@ -307,7 +313,7 @@ public class Fields {
         String fieldValue = EncoderUtil.encodeIfNecessary(subject,
                 EncoderUtil.Usage.TEXT_TOKEN, usedCharacters);
 
-        return parse(UnstructuredField.class, FieldName.SUBJECT, fieldValue);
+        return parse(UnstructuredField.PARSER, FieldName.SUBJECT, fieldValue);
     }
 
     /**
@@ -318,7 +324,7 @@ public class Fields {
      * @return the newly created <i>Sender</i> field.
      */
     public static MailboxField sender(Mailbox mailbox) {
-        return mailbox(FieldName.SENDER, mailbox);
+        return mailbox0(FieldName.SENDER, mailbox);
     }
 
     /**
@@ -329,7 +335,7 @@ public class Fields {
      * @return the newly created <i>From</i> field.
      */
     public static MailboxListField from(Mailbox mailbox) {
-        return mailboxList(FieldName.FROM, Collections.singleton(mailbox));
+        return mailboxList0(FieldName.FROM, Collections.singleton(mailbox));
     }
 
     /**
@@ -340,7 +346,7 @@ public class Fields {
      * @return the newly created <i>From</i> field.
      */
     public static MailboxListField from(Mailbox... mailboxes) {
-        return mailboxList(FieldName.FROM, Arrays.asList(mailboxes));
+        return mailboxList0(FieldName.FROM, Arrays.asList(mailboxes));
     }
 
     /**
@@ -351,7 +357,7 @@ public class Fields {
      * @return the newly created <i>From</i> field.
      */
     public static MailboxListField from(Iterable<Mailbox> mailboxes) {
-        return mailboxList(FieldName.FROM, mailboxes);
+        return mailboxList0(FieldName.FROM, mailboxes);
     }
 
     /**
@@ -362,7 +368,7 @@ public class Fields {
      * @return the newly created <i>To</i> field.
      */
     public static AddressListField to(Address address) {
-        return addressList(FieldName.TO, Collections.singleton(address));
+        return addressList0(FieldName.TO, Collections.singleton(address));
     }
 
     /**
@@ -373,7 +379,7 @@ public class Fields {
      * @return the newly created <i>To</i> field.
      */
     public static AddressListField to(Address... addresses) {
-        return addressList(FieldName.TO, Arrays.asList(addresses));
+        return addressList0(FieldName.TO, Arrays.asList(addresses));
     }
 
     /**
@@ -384,7 +390,7 @@ public class Fields {
      * @return the newly created <i>To</i> field.
      */
     public static AddressListField to(Iterable<Address> addresses) {
-        return addressList(FieldName.TO, addresses);
+        return addressList0(FieldName.TO, addresses);
     }
 
     /**
@@ -395,7 +401,7 @@ public class Fields {
      * @return the newly created <i>Cc</i> field.
      */
     public static AddressListField cc(Address address) {
-        return addressList(FieldName.CC, Collections.singleton(address));
+        return addressList0(FieldName.CC, Collections.singleton(address));
     }
 
     /**
@@ -406,7 +412,7 @@ public class Fields {
      * @return the newly created <i>Cc</i> field.
      */
     public static AddressListField cc(Address... addresses) {
-        return addressList(FieldName.CC, Arrays.asList(addresses));
+        return addressList0(FieldName.CC, Arrays.asList(addresses));
     }
 
     /**
@@ -417,7 +423,7 @@ public class Fields {
      * @return the newly created <i>Cc</i> field.
      */
     public static AddressListField cc(Iterable<Address> addresses) {
-        return addressList(FieldName.CC, addresses);
+        return addressList0(FieldName.CC, addresses);
     }
 
     /**
@@ -428,7 +434,7 @@ public class Fields {
      * @return the newly created <i>Bcc</i> field.
      */
     public static AddressListField bcc(Address address) {
-        return addressList(FieldName.BCC, Collections.singleton(address));
+        return addressList0(FieldName.BCC, Collections.singleton(address));
     }
 
     /**
@@ -439,7 +445,7 @@ public class Fields {
      * @return the newly created <i>Bcc</i> field.
      */
     public static AddressListField bcc(Address... addresses) {
-        return addressList(FieldName.BCC, Arrays.asList(addresses));
+        return addressList0(FieldName.BCC, Arrays.asList(addresses));
     }
 
     /**
@@ -450,7 +456,7 @@ public class Fields {
      * @return the newly created <i>Bcc</i> field.
      */
     public static AddressListField bcc(Iterable<Address> addresses) {
-        return addressList(FieldName.BCC, addresses);
+        return addressList0(FieldName.BCC, addresses);
     }
 
     /**
@@ -462,7 +468,7 @@ public class Fields {
      * @return the newly created <i>Reply-To</i> field.
      */
     public static AddressListField replyTo(Address address) {
-        return addressList(FieldName.REPLY_TO, Collections.singleton(address));
+        return addressList0(FieldName.REPLY_TO, Collections.singleton(address));
     }
 
     /**
@@ -474,7 +480,7 @@ public class Fields {
      * @return the newly created <i>Reply-To</i> field.
      */
     public static AddressListField replyTo(Address... addresses) {
-        return addressList(FieldName.REPLY_TO, Arrays.asList(addresses));
+        return addressList0(FieldName.REPLY_TO, Arrays.asList(addresses));
     }
 
     /**
@@ -486,7 +492,7 @@ public class Fields {
      * @return the newly created <i>Reply-To</i> field.
      */
     public static AddressListField replyTo(Iterable<Address> addresses) {
-        return addressList(FieldName.REPLY_TO, addresses);
+        return addressList0(FieldName.REPLY_TO, addresses);
     }
 
     /**
@@ -502,8 +508,8 @@ public class Fields {
      * @return the newly created mailbox field.
      */
     public static MailboxField mailbox(String fieldName, Mailbox mailbox) {
-        String fieldValue = encodeAddresses(Collections.singleton(mailbox));
-        return parse(MailboxField.class, fieldName, fieldValue);
+        checkValidFieldName(fieldName);
+        return mailbox0(fieldName, mailbox);
     }
 
     /**
@@ -520,8 +526,8 @@ public class Fields {
      */
     public static MailboxListField mailboxList(String fieldName,
             Iterable<Mailbox> mailboxes) {
-        String fieldValue = encodeAddresses(mailboxes);
-        return parse(MailboxListField.class, fieldName, fieldValue);
+        checkValidFieldName(fieldName);
+        return mailboxList0(fieldName, mailboxes);
     }
 
     /**
@@ -542,8 +548,36 @@ public class Fields {
      */
     public static AddressListField addressList(String fieldName,
             Iterable<Address> addresses) {
+        checkValidFieldName(fieldName);
+        return addressList0(fieldName, addresses);
+    }
+
+    private static DateTimeField date0(String fieldName, Date date,
+            TimeZone zone) {
+        final String formattedDate = MimeUtil.formatDate(date, zone);
+        return parse(DateTimeField.PARSER, fieldName, formattedDate);
+    }
+
+    private static MailboxField mailbox0(String fieldName, Mailbox mailbox) {
+        String fieldValue = encodeAddresses(Collections.singleton(mailbox));
+        return parse(MailboxField.PARSER, fieldName, fieldValue);
+    }
+
+    private static MailboxListField mailboxList0(String fieldName,
+            Iterable<Mailbox> mailboxes) {
+        String fieldValue = encodeAddresses(mailboxes);
+        return parse(MailboxListField.PARSER, fieldName, fieldValue);
+    }
+
+    private static AddressListField addressList0(String fieldName,
+            Iterable<Address> addresses) {
         String fieldValue = encodeAddresses(addresses);
-        return parse(AddressListField.class, fieldName, fieldValue);
+        return parse(AddressListField.PARSER, fieldName, fieldValue);
+    }
+
+    private static void checkValidFieldName(String fieldName) {
+        if (!FIELD_NAME_PATTERN.matcher(fieldName).matches())
+            throw new IllegalArgumentException("Invalid field name");
     }
 
     private static boolean isValidMimeType(String mimeType) {
@@ -566,22 +600,15 @@ public class Fields {
         return EncoderUtil.isToken(dispositionType);
     }
 
-    private static <F extends Field> F parse(Class<F> fieldClass,
+    private static <F extends Field> F parse(FieldParser parser,
             String fieldName, String fieldBody) {
-        try {
-            String raw = MimeUtil.fold(fieldName + ": " + fieldBody, 0);
+        String raw = MimeUtil.fold(fieldName + ": " + fieldBody, 0);
 
-            Field field = AbstractField.parse(raw);
-            if (!fieldClass.isInstance(field)) {
-                throw new IllegalArgumentException("Incompatible field name: "
-                        + fieldName);
-            }
+        Field field = parser.parse(fieldName, fieldBody, raw);
 
-            return fieldClass.cast(field);
-        } catch (MimeException e) {
-            throw new IllegalArgumentException("Illegal field name: "
-                    + fieldName);
-        }
+        @SuppressWarnings("unchecked")
+        F f = (F) field;
+        return f;
     }
 
     private static String encodeAddresses(Iterable<? extends Address> addresses) {

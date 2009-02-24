@@ -359,4 +359,12 @@ public class FieldsTest extends TestCase {
                 field.getRaw());
     }
 
+    public void testInvalidFieldName() throws Exception {
+        try {
+            Fields.date("invalid field name", new Date());
+            fail();
+        } catch (IllegalArgumentException expected) {
+        }
+    }
+
 }
