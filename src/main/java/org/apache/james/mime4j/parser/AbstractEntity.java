@@ -33,7 +33,6 @@ import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
-import org.apache.james.mime4j.util.CharArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
@@ -52,7 +51,6 @@ public abstract class AbstractEntity implements EntityStateMachine {
     protected int state;
 
     private final ByteArrayBuffer linebuf;
-    private final CharArrayBuffer fieldbuf;
 
     private int lineCount;
     private Field field;
@@ -92,7 +90,6 @@ public abstract class AbstractEntity implements EntityStateMachine {
         this.config = config;
         this.body = newBodyDescriptor(parent);
         this.linebuf = new ByteArrayBuffer(64);
-        this.fieldbuf = new CharArrayBuffer(64);
         this.lineCount = 0;
         this.endOfHeader = false;
         this.headerCount = 0;
@@ -125,13 +122,14 @@ public abstract class AbstractEntity implements EntityStateMachine {
     
     protected abstract LineReaderInputStream getDataStream();
     
-    private void fillFieldBuffer() throws IOException, MimeException {
-        if (endOfHeader) {
-            return;
-        }
+    private ByteArrayBuffer fillFieldBuffer() throws IOException, MimeException {
+        if (endOfHeader) 
+            throw new IllegalStateException();
+
         int maxLineLen = config.getMaxLineLen();
         LineReaderInputStream instream = getDataStream();
-        fieldbuf.clear();
+        ByteArrayBuffer fieldbuf = new ByteArrayBuffer(64);
+
         for (;;) {
             // If there's still data stuck in the line buffer
             // copy it to the field buffer
@@ -140,7 +138,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
                 throw new MaxLineLimitException("Maximum line length limit exceeded");
             }
             if (len > 0) {
-                fieldbuf.append(linebuf, 0, len);
+                fieldbuf.append(linebuf.buffer(), 0, len);
             }
             linebuf.clear();
             if (instream.readLine(linebuf) == -1) {
@@ -169,6 +167,8 @@ public abstract class AbstractEntity implements EntityStateMachine {
                 }
             }
         }
+
+        return fieldbuf;
     }
 
     protected boolean parseField() throws MimeException, IOException {
@@ -180,42 +180,37 @@ public abstract class AbstractEntity implements EntityStateMachine {
             if (headerCount >= maxHeaderLimit) {
                 throw new MaxHeaderLimitException("Maximum header limit exceeded");
             }
-            
-            fillFieldBuffer();
+
+            ByteArrayBuffer fieldbuf = fillFieldBuffer();
             headerCount++;
-            
+
             // Strip away line delimiter
             int len = fieldbuf.length();
-            if (len > 0 && fieldbuf.charAt(len - 1) == '\n') {
+            if (len > 0 && fieldbuf.byteAt(len - 1) == '\n') {
                 len--;
             }
-            if (len > 0 && fieldbuf.charAt(len - 1) == '\r') {
+            if (len > 0 && fieldbuf.byteAt(len - 1) == '\r') {
                 len--;
             }
             fieldbuf.setLength(len);
             
             boolean valid = true;
             
-            String fieldName = null;
-            String fieldValue = null;
-            
-            int pos = fieldbuf.indexOf(':');
+            int pos = fieldbuf.indexOf((byte) ':');
             if (pos <= 0) {
                 monitor(Event.INALID_HEADER);
                 valid = false;
             } else {
-                fieldName = fieldbuf.substring(0, pos);
-                for (int i = 0; i < fieldName.length(); i++) {
-                    if (!fieldChars.get(fieldName.charAt(i))) {
+                for (int i = 0; i < pos; i++) {
+                    if (!fieldChars.get(fieldbuf.byteAt(i) & 0xff)) {
                         monitor(Event.INALID_HEADER);
                         valid = false;
                         break;
                     }
                 }
-                fieldValue = fieldbuf.substring(pos + 1, fieldbuf.length());
             }
             if (valid) {
-                field = new RawField(fieldName, fieldValue, fieldbuf.toString());
+                field = new RawField(fieldbuf, pos);
                 body.addField(field);            
                 return true;
             }

@@ -19,10 +19,11 @@
 
 package org.apache.james.mime4j.util;
 
+
 /**
  * A resizable byte array.
  */
-public final class ByteArrayBuffer  {
+public final class ByteArrayBuffer implements ByteSequence {
     
     private byte[] buffer;
     private int len;
@@ -33,6 +34,26 @@ public final class ByteArrayBuffer  {
             throw new IllegalArgumentException("Buffer capacity may not be negative");
         }
         this.buffer = new byte[capacity]; 
+    }
+
+    public ByteArrayBuffer(byte[] bytes, boolean dontCopy) {
+        this(bytes, bytes.length, dontCopy);
+    }
+    
+    public ByteArrayBuffer(byte[] bytes, int len, boolean dontCopy) {
+        if (bytes == null)
+            throw new IllegalArgumentException();
+        if (len < 0 || len > bytes.length)
+            throw new IllegalArgumentException();
+
+        if (dontCopy) {
+            this.buffer = bytes;
+        } else {
+            this.buffer = new byte[len];
+            System.arraycopy(bytes, 0, this.buffer, 0, len);
+        }
+
+        this.len = len;
     }
 
     private void expand(int newlen) {
@@ -103,7 +124,10 @@ public final class ByteArrayBuffer  {
         return b;
     }
     
-    public int byteAt(int i) {
+    public byte byteAt(int i) {
+        if (i < 0 || i >= this.len)
+            throw new IndexOutOfBoundsException();
+
         return this.buffer[i];
     }
     
@@ -118,7 +142,29 @@ public final class ByteArrayBuffer  {
     public byte[] buffer() {
         return this.buffer;
     }
-        
+
+    public int indexOf(byte b) {
+        return indexOf(b, 0, this.len);
+    }
+
+    public int indexOf(byte b, int beginIndex, int endIndex) {
+        if (beginIndex < 0) {
+            beginIndex = 0;
+        }
+        if (endIndex > this.len) {
+            endIndex = this.len;
+        }
+        if (beginIndex > endIndex) {
+            return -1;
+        }
+        for (int i = beginIndex; i < endIndex; i++) {
+            if (this.buffer[i] == b) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     public void setLength(int len) {
         if (len < 0 || len > this.buffer.length) {
             throw new IndexOutOfBoundsException();
@@ -138,5 +184,5 @@ public final class ByteArrayBuffer  {
     public String toString() {
         return new String(toByteArray());
     }
-    
+
 }

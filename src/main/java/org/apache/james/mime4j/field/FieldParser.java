@@ -20,9 +20,10 @@
 package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.util.ByteSequence;
 
 public interface FieldParser {
     
-    Field parse(final String name, final String body, final String raw);
+    Field parse(final String name, final String body, final ByteSequence raw);
     
 }

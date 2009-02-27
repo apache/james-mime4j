@@ -24,6 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Address list field such as <code>To</code> or <code>Reply-To</code>.
@@ -36,7 +37,7 @@ public class AddressListField extends AbstractField {
     private AddressList addressList;
     private ParseException parseException;
 
-    AddressListField(String name, String body, String raw) {
+    AddressListField(String name, String body, ByteSequence raw) {
         super(name, body, raw);
     }
 
@@ -72,7 +73,7 @@ public class AddressListField extends AbstractField {
 
     static final FieldParser PARSER = new FieldParser() {
         public Field parse(final String name, final String body,
-                final String raw) {
+                final ByteSequence raw) {
             return new AddressListField(name, body, raw);
         }
     };

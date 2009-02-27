@@ -33,6 +33,7 @@ import org.apache.james.mime4j.field.contentdisposition.parser.ContentDispositio
 import org.apache.james.mime4j.field.contentdisposition.parser.TokenMgrError;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Represents a <code>Content-Disposition</code> field.
@@ -76,7 +77,7 @@ public class ContentDispositionField extends AbstractField {
     private boolean readDateParsed;
     private Date readDate;
 
-    ContentDispositionField(String name, String body, String raw) {
+    ContentDispositionField(String name, String body, ByteSequence raw) {
         super(name, body, raw);
     }
 
@@ -319,7 +320,7 @@ public class ContentDispositionField extends AbstractField {
 
     static final FieldParser PARSER = new FieldParser() {
         public Field parse(final String name, final String body,
-                final String raw) {
+                final ByteSequence raw) {
             return new ContentDispositionField(name, body, raw);
         }
     };

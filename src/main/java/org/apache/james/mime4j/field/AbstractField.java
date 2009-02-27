@@ -24,6 +24,8 @@ import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -31,23 +33,37 @@ import org.apache.james.mime4j.util.MimeUtil;
  */
 public abstract class AbstractField implements Field {
 
-    private static final String FIELD_NAME_PATTERN = 
-        "^([\\x21-\\x39\\x3b-\\x7e]+):";
-    private static final Pattern fieldNamePattern = 
-        Pattern.compile(FIELD_NAME_PATTERN);
-        
+    private static final Pattern FIELD_NAME_PATTERN = Pattern
+            .compile("^([\\x21-\\x39\\x3b-\\x7e]+):");
+
     private static final DefaultFieldParser parser = new DefaultFieldParser();
     
     private final String name;
     private final String body;
-    private final String raw;
+    private final ByteSequence raw;
     
-    protected AbstractField(final String name, final String body, final String raw) {
+    protected AbstractField(final String name, final String body, final ByteSequence raw) {
         this.name = name;
         this.body = body;
         this.raw = raw;
     }
-    
+
+    /**
+     * Parses the given byte sequence and returns an instance of the
+     * <code>Field</code> class. The type of the class returned depends on the
+     * field name; see {@link #parse(String)} for a table of field names and
+     * their corresponding classes.
+     * 
+     * @param raw the bytes to parse.
+     * @return a <code>Field</code> instance.
+     * @throws MimeException if the raw string cannot be split into field name and body.
+     * @see #isValidField()
+     */
+    public static Field parse(final ByteSequence raw) throws MimeException {
+        String rawStr = ContentUtil.decode(raw);
+        return parse(raw, rawStr);
+    }
+
     /**
      * Parses the given string and returns an instance of the 
      * <code>Field</code> class. The type of the class returned depends on
@@ -65,69 +81,19 @@ public abstract class AbstractField implements Field {
      *   <tr><td>{@link UnstructuredField}</td><td>Subject and others</td></tr>
      * </table>
      * 
-     * @param raw the string to parse.
+     * @param rawStr the string to parse.
      * @return a <code>Field</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
      * @see #isValidField()
      */
-    public static Field parse(final String raw) throws MimeException {
-        
-        /*
-         * Unfold the field.
-         */
-        final String unfolded = MimeUtil.unfold(raw);
-        
-        /*
-         * Split into name and value.
-         */
-        final Matcher fieldMatcher = fieldNamePattern.matcher(unfolded);
-        if (!fieldMatcher.find()) {
-            throw new MimeException("Invalid field in string");
-        }
-        final String name = fieldMatcher.group(1);
-        
-        String body = unfolded.substring(fieldMatcher.end());
-        if (body.length() > 0 && body.charAt(0) == ' ') {
-            body = body.substring(1);
-        }
-        
-        return parser.parse(name, body, raw);
-    }
-
-    /**
-     * Parses the given field name and field body strings and returns an
-     * instance of the <code>Field</code> class. The type of the class
-     * returned depends on the field name (see {@link #parse(String)}).
-     * <p>
-     * This method is convenient for creating or manipulating messages because
-     * contrary to {@link #parse(String)} it does not throw a
-     * {@link MimeException}.
-     * <p>
-     * Note that this method does not fold the header field; the specified field
-     * body should already have been folded into multiple lines prior to calling
-     * this method if folding is desired.
-     * 
-     * @param name
-     *            the field name.
-     * @param body
-     *            the field body (a.k.a value).
-     * @return a <code>Field</code> instance.
-     */
-    public static Field parse(String name, String body) {
-        if (body.length() > 0 && body.charAt(0) == ' ') {
-            body = body.substring(1);
-        }
-
-        String raw = name + ": " + body;
-
-        // Unfold body
-        body = MimeUtil.unfold(body);
-
-        return parser.parse(name, body, raw);
+    public static Field parse(final String rawStr) throws MimeException {
+        ByteSequence raw = ContentUtil.encode(rawStr);
+        return parse(raw, rawStr);
     }
 
     /**
      * Gets the default parser used to parse fields.
+     * 
      * @return the default field parser
      */
     public static DefaultFieldParser getParser() {
@@ -149,7 +115,7 @@ public abstract class AbstractField implements Field {
      * 
      * @return the original raw field string.
      */
-    public String getRaw() {
+    public ByteSequence getRaw() {
         return raw;
     }
     
@@ -227,11 +193,33 @@ public abstract class AbstractField implements Field {
         return FieldName.TO.equalsIgnoreCase(name);
     }
     
-    /**
-     * @see #getRaw()
-     */
     @Override
     public String toString() {
-        return raw;
+        return name + ": " + body;
     }
+
+    private static Field parse(final ByteSequence raw, final String rawStr)
+            throws MimeException {
+        /*
+         * Unfold the field.
+         */
+        final String unfolded = MimeUtil.unfold(rawStr);
+
+        /*
+         * Split into name and value.
+         */
+        final Matcher fieldMatcher = FIELD_NAME_PATTERN.matcher(unfolded);
+        if (!fieldMatcher.find()) {
+            throw new MimeException("Invalid field in string");
+        }
+        final String name = fieldMatcher.group(1);
+
+        String body = unfolded.substring(fieldMatcher.end());
+        if (body.length() > 0 && body.charAt(0) == ' ') {
+            body = body.substring(1);
+        }
+
+        return parser.parse(name, body, raw);
+    }
+
 }

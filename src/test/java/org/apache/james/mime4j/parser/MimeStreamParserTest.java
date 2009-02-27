@@ -22,6 +22,8 @@ package org.apache.james.mime4j.parser;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.log4j.BasicConfigurator;
 
 import java.io.ByteArrayInputStream;
@@ -140,7 +142,7 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), field.getRaw());
+                assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
         
@@ -164,7 +166,7 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), field.getRaw());
+                assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
         
@@ -188,7 +190,7 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), field.getRaw());
+                assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
         
@@ -249,7 +251,7 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), field.getRaw());
+                assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
         
@@ -372,7 +374,7 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), field.getRaw());
+                assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
             @Override
             public void body(BodyDescriptor bd, InputStream is) throws IOException {
@@ -400,7 +402,7 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), field.getRaw());
+                assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
         
@@ -419,7 +421,7 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), field.getRaw());
+                assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
         
@@ -464,6 +466,10 @@ public class MimeStreamParserTest extends TestCase {
         String result = handler.sb.toString();
         
         assertEquals(expected, result);
+    }
+    
+    protected String decode(ByteSequence byteSequence) {
+        return ContentUtil.decode(byteSequence);
     }
     
 }

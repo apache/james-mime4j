@@ -22,7 +22,6 @@ package org.apache.james.mime4j.message;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.AbstractField;
 import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.CharsetUtil;
@@ -47,7 +46,7 @@ public class HeaderTest extends TestCase {
     
     private static final String SWISS_GERMAN_HELLO = "Gr\374ezi_z\344m\344";
 
-    public void testWriteInStrictMode() throws Exception {
+    public void testWriteSpecialCharacters() throws Exception {
         String hello = SWISS_GERMAN_HELLO;
         Header header = new Header();
         header.addField(AbstractField.parse("Hello: " + hello));
@@ -58,40 +57,12 @@ public class HeaderTest extends TestCase {
         
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         
-        MessageWriter.STRICT_IGNORE.writeHeader(header, buffer);
+        MessageWriter.DEFAULT.writeHeader(header, buffer);
         String s = buffer.toString(CharsetUtil.US_ASCII.name());
         
         assertEquals("Hello: Gr?ezi_z?m?\r\n\r\n", s);
+    }
 
-        buffer.reset();
-        
-        try {
-            MessageWriter.STRICT_ERROR.writeHeader(header, buffer);
-            fail("MimeIOException should have been thrown");
-        } catch (MimeIOException expected) {
-        }
-    }
-    
-    public void testWriteInLenientMode() throws Exception {
-        String hello = SWISS_GERMAN_HELLO;
-        Header header = new Header();
-        header.addField(AbstractField.parse("Hello: " + hello));
-        header.addField(AbstractField.parse("Content-type: text/plain; charset=" + 
-                CharsetUtil.ISO_8859_1.name()));
-        
-        Field field = header.getField("Hello");
-        assertNotNull(field);
-        assertEquals(hello, field.getBody());
-        
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
-        
-        MessageWriter.LENIENT.writeHeader(header, buffer);
-        String s = buffer.toString(CharsetUtil.ISO_8859_1.name());
-        
-        assertEquals("Hello: " + hello + "\r\n" +
-                "Content-type: text/plain; charset=ISO-8859-1\r\n\r\n", s);
-    }
-    
     public void testRemoveFields() throws Exception {
         Header header = new Header();
         header.addField(AbstractField.parse("Received: from foo by bar for james"));

@@ -21,6 +21,7 @@ package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.parser.ContentHandler;
+import org.apache.james.mime4j.util.ContentUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,7 +92,9 @@ class TestHandler implements ContentHandler {
         sb.append("<header>\r\n");
     }
     public void field(Field field) {
-        sb.append("<field>\r\n" + escape(field.getRaw()) + "</field>\r\n");
+        sb.append("<field>\r\n"
+                + escape(ContentUtil.decode(field.getRaw()))
+                + "</field>\r\n");
     }
     public void endHeader() {
         sb.append("</header>\r\n");

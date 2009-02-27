@@ -146,18 +146,16 @@ public class Message extends Entity implements Body {
 
     /**
      * Write the content to the given output stream using the
-     * {@link MessageWriter#STRICT_ERROR STRICT_ERROR} message writer.
+     * {@link MessageWriter#DEFAULT default} message writer.
      * 
      * @param out
      *            the output stream to write to.
      * @throws IOException
      *             in case of an I/O error
-     * @throws MimeIOException
-     *             in case of a MIME protocol violation
      * @see MessageWriter
      */
-    public void writeTo(OutputStream out) throws IOException, MimeIOException {
-        MessageWriter.STRICT_ERROR.writeEntity(this, out);
+    public void writeTo(OutputStream out) throws IOException {
+        MessageWriter.DEFAULT.writeEntity(this, out);
     }
 
     /**

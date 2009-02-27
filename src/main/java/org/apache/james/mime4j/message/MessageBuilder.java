@@ -32,6 +32,8 @@ import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.StorageProvider;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -183,12 +185,8 @@ public class MessageBuilder implements ContentHandler {
      */
     public void epilogue(InputStream is) throws MimeException, IOException {
         expect(Multipart.class);
-        StringBuilder sb = new StringBuilder(128);
-        int b;
-        while ((b = is.read()) != -1) {
-            sb.append((char) b);
-        }
-        ((Multipart) stack.peek()).setEpilogue(sb.toString());
+        ByteSequence bytes = loadStream(is);
+        ((Multipart) stack.peek()).setEpilogueRaw(bytes);
     }
     
     /**
@@ -196,12 +194,8 @@ public class MessageBuilder implements ContentHandler {
      */
     public void preamble(InputStream is) throws MimeException, IOException {
         expect(Multipart.class);
-        StringBuilder sb = new StringBuilder(128);
-        int b;
-        while ((b = is.read()) != -1) {
-            sb.append((char) b);
-        }
-        ((Multipart) stack.peek()).setPreamble(sb.toString());
+        ByteSequence bytes = loadStream(is);
+        ((Multipart) stack.peek()).setPreambleRaw(bytes);
     }
     
     /**
@@ -210,6 +204,17 @@ public class MessageBuilder implements ContentHandler {
      */
     public void raw(InputStream is) throws MimeException, IOException {
         throw new UnsupportedOperationException("Not supported");
+    }
+
+    private static ByteSequence loadStream(InputStream in) throws IOException {
+        ByteArrayBuffer bab = new ByteArrayBuffer(64);
+
+        int b;
+        while ((b = in.read()) != -1) {
+            bab.append(b);
+        }
+
+        return bab;
     }
 
 }

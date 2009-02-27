@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.parser;
 
+import org.apache.james.mime4j.util.ByteSequence;
+
 /**
  * Abstract MIME field.
  */
@@ -39,10 +41,10 @@ public interface Field {
     String getBody();
 
     /**
-     * Gets the original raw field string.
+     * Gets the original raw field bytes.
      * 
-     * @return the original raw field string.
+     * @return the original raw field bytes.
      */
-    String getRaw();
+    ByteSequence getRaw();
     
 }

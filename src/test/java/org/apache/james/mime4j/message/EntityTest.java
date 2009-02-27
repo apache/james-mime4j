@@ -70,7 +70,7 @@ public class EntityTest extends TestCase {
         assertNull(entity.getDispositionType());
 
         Header header = new Header();
-        header.setField(AbstractField.parse("Content-Disposition", "inline"));
+        header.setField(AbstractField.parse("Content-Disposition: inline"));
         entity.setHeader(header);
 
         assertEquals("inline", entity.getDispositionType());
@@ -100,8 +100,8 @@ public class EntityTest extends TestCase {
         assertNull(entity.getFilename());
 
         Header header = new Header();
-        header.setField(AbstractField.parse("Content-Disposition",
-                "attachment; filename=\"some file.dat\""));
+        header.setField(AbstractField.parse("Content-Disposition: attachment; "
+                + "filename=\"some file.dat\""));
         entity.setHeader(header);
 
         assertEquals("some file.dat", entity.getFilename());

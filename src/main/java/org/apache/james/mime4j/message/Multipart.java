@@ -23,24 +23,37 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
+
 /**
- * Represents a MIME multipart body (see RFC 2045).A multipart body has a 
+ * Represents a MIME multipart body (see RFC 2045).A multipart body has a
  * ordered list of body parts. The multipart body also has a preamble and
- * epilogue. The preamble consists of whatever characters appear before the 
- * first body part while the epilogue consists of whatever characters come
- * after the last body part.
+ * epilogue. The preamble consists of whatever characters appear before the
+ * first body part while the epilogue consists of whatever characters come after
+ * the last body part.
  */
 public class Multipart implements Body {
-    private String preamble = "";
-    private String epilogue = "";
+
     private List<BodyPart> bodyParts = new LinkedList<BodyPart>();
     private Entity parent = null;
+
+    private ByteSequence preamble;
+    private transient String preambleStrCache;
+    private ByteSequence epilogue;
+    private transient String epilogueStrCache;
+
     private String subType;
 
     /**
      * Creates a new empty <code>Multipart</code> instance.
      */
     public Multipart(String subType) {
+        preamble = ByteSequence.EMPTY;
+        preambleStrCache = "";
+        epilogue = ByteSequence.EMPTY;
+        epilogueStrCache = "";
+
         this.subType = subType;
     }
 
@@ -64,45 +77,48 @@ public class Multipart implements Body {
      */
     public Multipart(Multipart other) {
         preamble = other.preamble;
+        preambleStrCache = other.preambleStrCache;
         epilogue = other.epilogue;
-        
+        epilogueStrCache = other.epilogueStrCache;
+
         for (BodyPart otherBodyPart : other.bodyParts) {
             BodyPart bodyPartCopy = new BodyPart(otherBodyPart);
             addBodyPart(bodyPartCopy);
         }
-        
+
         subType = other.subType;
     }
 
     /**
-     * Gets the multipart sub-type. E.g. <code>alternative</code> (the default)
-     * or <code>parallel</code>. See RFC 2045 for common sub-types and their
-     * meaning.
+     * Gets the multipart sub-type. E.g. <code>alternative</code> (the
+     * default) or <code>parallel</code>. See RFC 2045 for common sub-types
+     * and their meaning.
      * 
      * @return the multipart sub-type.
      */
     public String getSubType() {
         return subType;
     }
-    
+
     /**
-     * Sets the multipart sub-type. E.g. <code>alternative</code>
-     * or <code>parallel</code>. See RFC 2045 for common sub-types and their
+     * Sets the multipart sub-type. E.g. <code>alternative</code> or
+     * <code>parallel</code>. See RFC 2045 for common sub-types and their
      * meaning.
      * 
-     * @param subType the sub-type.
+     * @param subType
+     *            the sub-type.
      */
     public void setSubType(String subType) {
         this.subType = subType;
     }
-    
+
     /**
      * @see org.apache.james.mime4j.message.Body#getParent()
      */
     public Entity getParent() {
         return parent;
     }
-    
+
     /**
      * @see org.apache.james.mime4j.message.Body#setParent(org.apache.james.mime4j.message.Entity)
      */
@@ -114,24 +130,6 @@ public class Multipart implements Body {
     }
 
     /**
-     * Gets the epilogue.
-     * 
-     * @return the epilogue.
-     */
-    public String getEpilogue() {
-        return epilogue;
-    }
-    
-    /**
-     * Sets the epilogue.
-     * 
-     * @param epilogue the epilogue.
-     */
-    public void setEpilogue(String epilogue) {
-        this.epilogue = epilogue;
-    }
-    
-    /**
      * Returns the number of body parts.
      * 
      * @return number of <code>BodyPart</code> objects.
@@ -139,7 +137,7 @@ public class Multipart implements Body {
     public int getCount() {
         return bodyParts.size();
     }
-    
+
     /**
      * Gets the list of body parts. The list is immutable.
      * 
@@ -148,11 +146,12 @@ public class Multipart implements Body {
     public List<BodyPart> getBodyParts() {
         return Collections.unmodifiableList(bodyParts);
     }
-    
+
     /**
      * Sets the list of body parts.
      * 
-     * @param bodyParts the new list of <code>BodyPart</code> objects.
+     * @param bodyParts
+     *            the new list of <code>BodyPart</code> objects.
      */
     public void setBodyParts(List<BodyPart> bodyParts) {
         this.bodyParts = bodyParts;
@@ -160,20 +159,21 @@ public class Multipart implements Body {
             bodyPart.setParent(parent);
         }
     }
-    
+
     /**
      * Adds a body part to the end of the list of body parts.
      * 
-     * @param bodyPart the body part.
+     * @param bodyPart
+     *            the body part.
      */
     public void addBodyPart(BodyPart bodyPart) {
         if (bodyPart == null)
             throw new IllegalArgumentException();
-        
+
         bodyParts.add(bodyPart);
         bodyPart.setParent(parent);
     }
-    
+
     /**
      * Inserts a body part at the specified position in the list of body parts.
      * 
@@ -188,11 +188,11 @@ public class Multipart implements Body {
     public void addBodyPart(BodyPart bodyPart, int index) {
         if (bodyPart == null)
             throw new IllegalArgumentException();
-        
+
         bodyParts.add(index, bodyPart);
         bodyPart.setParent(parent);
     }
-    
+
     /**
      * Removes the body part at the specified position in the list of body
      * parts.
@@ -209,7 +209,7 @@ public class Multipart implements Body {
         bodyPart.setParent(null);
         return bodyPart;
     }
-    
+
     /**
      * Replaces the body part at the specified position in the list of body
      * parts with the specified body part.
@@ -229,30 +229,79 @@ public class Multipart implements Body {
 
         BodyPart replacedBodyPart = bodyParts.set(index, bodyPart);
         if (bodyPart == replacedBodyPart)
-            throw new IllegalArgumentException("Cannot replace body part with itself");
+            throw new IllegalArgumentException(
+                    "Cannot replace body part with itself");
 
         bodyPart.setParent(parent);
         replacedBodyPart.setParent(null);
 
         return replacedBodyPart;
     }
-    
+
+    // package private for now; might become public someday
+    ByteSequence getPreambleRaw() {
+        return preamble;
+    }
+
+    void setPreambleRaw(ByteSequence preamble) {
+        this.preamble = preamble;
+        this.preambleStrCache = null;
+    }
+
     /**
      * Gets the preamble.
      * 
      * @return the preamble.
      */
     public String getPreamble() {
-        return preamble;
+        if (preambleStrCache == null) {
+            preambleStrCache = ContentUtil.decode(preamble);
+        }
+        return preambleStrCache;
     }
-    
+
     /**
      * Sets the preamble.
      * 
-     * @param preamble the preamble.
+     * @param preamble
+     *            the preamble.
      */
     public void setPreamble(String preamble) {
-        this.preamble = preamble;
+        this.preamble = ContentUtil.encode(preamble);
+        this.preambleStrCache = preamble;
+    }
+
+    // package private for now; might become public someday
+    ByteSequence getEpilogueRaw() {
+        return epilogue;
+    }
+
+    void setEpilogueRaw(ByteSequence epilogue) {
+        this.epilogue = epilogue;
+        this.epilogueStrCache = null;
+    }
+
+    /**
+     * Gets the epilogue.
+     * 
+     * @return the epilogue.
+     */
+    public String getEpilogue() {
+        if (epilogueStrCache == null) {
+            epilogueStrCache = ContentUtil.decode(epilogue);
+        }
+        return epilogueStrCache;
+    }
+
+    /**
+     * Sets the epilogue.
+     * 
+     * @param epilogue
+     *            the epilogue.
+     */
+    public void setEpilogue(String epilogue) {
+        this.epilogue = ContentUtil.encode(epilogue);
+        this.epilogueStrCache = epilogue;
     }
 
     /**

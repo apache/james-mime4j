@@ -21,6 +21,7 @@ package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.codec.DecoderUtil;
 import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Simple unstructured field such as <code>Subject</code>.
@@ -30,7 +31,7 @@ public class UnstructuredField extends AbstractField {
 
     private String value;
 
-    UnstructuredField(String name, String body, String raw) {
+    UnstructuredField(String name, String body, ByteSequence raw) {
         super(name, body, raw);
     }
 
@@ -51,7 +52,7 @@ public class UnstructuredField extends AbstractField {
 
     static final FieldParser PARSER = new FieldParser() {
         public Field parse(final String name, final String body,
-                final String raw) {
+                final ByteSequence raw) {
             return new UnstructuredField(name, body, raw);
         }
     };

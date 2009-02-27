@@ -17,60 +17,42 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
-
-import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.ContentUtil;
+package org.apache.james.mime4j.util;
 
 /**
- * The basic immutable MIME field.
+ * An immutable sequence of bytes.
  */
-class RawField implements Field {
+public interface ByteSequence {
 
-    private final ByteSequence raw;
-    private int colonIdx;
+    /**
+     * An empty byte sequence.
+     */
+    ByteSequence EMPTY = new EmptyByteSequence();
 
-    private String name;
-    private String body;
+    /**
+     * Returns the length of this byte sequence.
+     * 
+     * @return the number of <code>byte</code>s in this sequence.
+     */
+    int length();
 
-    public RawField(ByteSequence raw, int colonIdx) {
-        this.raw = raw;
-        this.colonIdx = colonIdx;
-    }
+    /**
+     * Returns the <code>byte</code> value at the specified index.
+     * 
+     * @param index
+     *            the index of the <code>byte</code> value to be returned.
+     * @return the corresponding <code>byte</code> value
+     * @throws IndexOutOfBoundsException
+     *             if <code>index < 0 || index >= length()</code>.
+     */
+    byte byteAt(int index);
 
-    public String getName() {
-        if (name == null) {
-            name = parseName();
-        }
-
-        return name;
-    }
-
-    public String getBody() {
-        if (body == null) {
-            body = parseBody();
-        }
-
-        return body;
-    }
-
-    public ByteSequence getRaw() {
-        return raw;
-    }
-
-    @Override
-    public String toString() {
-        return getName() + ':' + getBody();
-    }
-
-    private String parseName() {
-        return ContentUtil.decode(raw, 0, colonIdx);
-    }
-
-    private String parseBody() {
-        int offset = colonIdx + 1;
-        int length = raw.length() - offset;
-        return ContentUtil.decode(raw, offset, length);
-    }
+    /**
+     * Copies the contents of this byte sequence into a newly allocated byte
+     * array and returns that array.
+     * 
+     * @return a byte array holding a copy of this byte sequence.
+     */
+    byte[] toByteArray();
 
 }

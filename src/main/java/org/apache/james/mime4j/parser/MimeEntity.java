@@ -32,6 +32,8 @@ import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 public class MimeEntity extends AbstractEntity {
@@ -94,12 +96,10 @@ public class MimeEntity extends AbstractEntity {
             throw new IllegalStateException("Invalid state: " + stateToString(state));
         }
         skipHeader = true;
-        body.addField(new RawField(
-                "Content-Type", 
-                contentType,
-                "Content-Type: " +contentType));
+        ByteSequence raw = ContentUtil.encode("Content-Type: " + contentType);
+        body.addField(new RawField(raw, 12));
     }
-    
+
     @Override
     protected int getLineNumber() {
         if (lineSource == null)

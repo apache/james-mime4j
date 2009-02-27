@@ -17,60 +17,20 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.util;
 
-import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.ContentUtil;
+final class EmptyByteSequence implements ByteSequence {
+    private static final byte[] EMPTY_BYTES = {};
 
-/**
- * The basic immutable MIME field.
- */
-class RawField implements Field {
-
-    private final ByteSequence raw;
-    private int colonIdx;
-
-    private String name;
-    private String body;
-
-    public RawField(ByteSequence raw, int colonIdx) {
-        this.raw = raw;
-        this.colonIdx = colonIdx;
+    public int length() {
+        return 0;
     }
 
-    public String getName() {
-        if (name == null) {
-            name = parseName();
-        }
-
-        return name;
+    public byte byteAt(int index) {
+        throw new IndexOutOfBoundsException();
     }
 
-    public String getBody() {
-        if (body == null) {
-            body = parseBody();
-        }
-
-        return body;
+    public byte[] toByteArray() {
+        return EMPTY_BYTES;
     }
-
-    public ByteSequence getRaw() {
-        return raw;
-    }
-
-    @Override
-    public String toString() {
-        return getName() + ':' + getBody();
-    }
-
-    private String parseName() {
-        return ContentUtil.decode(raw, 0, colonIdx);
-    }
-
-    private String parseBody() {
-        int offset = colonIdx + 1;
-        int length = raw.length() - offset;
-        return ContentUtil.decode(raw, offset, length);
-    }
-
 }

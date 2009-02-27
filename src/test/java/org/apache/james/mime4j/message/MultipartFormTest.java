@@ -59,7 +59,7 @@ public class MultipartFormTest extends TestCase {
         multipart.addBodyPart(p3);
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        MessageWriter.LENIENT.writeMultipart(multipart, out);
+        MessageWriter.DEFAULT.writeMultipart(multipart, out);
         out.close();
         
         String expected = "\r\n" + 

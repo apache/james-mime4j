@@ -28,6 +28,7 @@ import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import org.apache.james.mime4j.field.datetime.parser.TokenMgrError;
 import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Date-time field such as <code>Date</code> or <code>Resent-Date</code>.
@@ -40,7 +41,7 @@ public class DateTimeField extends AbstractField {
     private Date date;
     private ParseException parseException;
 
-    DateTimeField(String name, String body, String raw) {
+    DateTimeField(String name, String body, ByteSequence raw) {
         super(name, body, raw);
     }
 
@@ -82,7 +83,7 @@ public class DateTimeField extends AbstractField {
 
     static final FieldParser PARSER = new FieldParser() {
         public Field parse(final String name, final String body,
-                final String raw) {
+                final ByteSequence raw) {
             return new DateTimeField(name, body, raw);
         }
     };

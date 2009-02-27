@@ -19,77 +19,36 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.CharacterCodingException;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CodingErrorAction;
 
-import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.FieldName;
 import org.apache.james.mime4j.parser.Field;
-import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * Writes a message (or a part of a message) to an output stream.
  * <p>
- * This class cannot be instantiated; instead the three static instances
- * {@link #STRICT_ERROR}, {@link #STRICT_IGNORE} or {@link #LENIENT} implement
- * different strategies for encoding header fields and preamble and epilogue of
- * a multipart.
+ * This class cannot be instantiated; instead the static instance
+ * {@link #DEFAULT} implements the default strategy for writing a message.
  * <p>
- * This class can also be subclassed to implement custom strategies for writing
+ * This class may be subclassed to implement custom strategies for writing
  * messages.
  */
 public class MessageWriter {
 
-    private static final Charset LENIENT_FALLBACK_CHARSET = CharsetUtil.ISO_8859_1;
-    private static final String CRLF = CharsetUtil.CRLF;
-    private static final int WRITER_BUFFER_SIZE = 4096;
+    private static final byte[] CRLF = { '\r', '\n' };
+    private static final byte[] DASHES = { '-', '-' };
 
     /**
-     * A message writer that uses US-ASCII for encoding and throws
-     * {@link MimeIOException} if a non ASCII character is encountered.
+     * The default message writer.
      */
-    public static final MessageWriter STRICT_ERROR = new MessageWriter();
-
-    /**
-     * A message writer that uses US-ASCII for encoding but ignores non ASCII
-     * characters.
-     */
-    public static final MessageWriter STRICT_IGNORE = new MessageWriter() {
-        @Override
-        protected CharsetEncoder getCharsetEncoder(ContentTypeField contentType) {
-            return ignoreEncoder(CharsetUtil.DEFAULT_CHARSET);
-        }
-    };
-
-    /**
-     * A message writer that uses the charset of the Content-Type header for
-     * encoding.
-     */
-    public static final MessageWriter LENIENT = new MessageWriter() {
-        @Override
-        protected CharsetEncoder getCharsetEncoder(ContentTypeField contentType) {
-            if (contentType == null) {
-                return ignoreEncoder(LENIENT_FALLBACK_CHARSET);
-            } else {
-                String charset = contentType.getCharset();
-                if (charset != null) {
-                    return ignoreEncoder(CharsetUtil.getCharset(charset));
-                } else {
-                    return ignoreEncoder(LENIENT_FALLBACK_CHARSET);
-                }
-            }
-        }
-    };
+    public static final MessageWriter DEFAULT = new MessageWriter();
 
     /**
      * Protected constructor prevents direct instantiation.
@@ -107,11 +66,8 @@ public class MessageWriter {
      *            the OutputStream to write to.
      * @throws IOException
      *             if an I/O error occurs.
-     * @throws MimeIOException
-     *             in case of a MIME protocol violation
      */
-    public void writeBody(Body body, OutputStream out) throws IOException,
-            MimeIOException {
+    public void writeBody(Body body, OutputStream out) throws IOException {
         if (body instanceof Message) {
             writeEntity((Message) body, out);
         } else if (body instanceof Multipart) {
@@ -120,8 +76,6 @@ public class MessageWriter {
             ((SingleBody) body).writeTo(out);
         } else
             throw new IllegalArgumentException("Unsupported body class");
-
-        out.flush();
     }
 
     /**
@@ -134,17 +88,13 @@ public class MessageWriter {
      *            the OutputStream to write to.
      * @throws IOException
      *             if an I/O error occurs.
-     * @throws MimeIOException
-     *             in case of a MIME protocol violation
      */
-    public void writeEntity(Entity entity, OutputStream out)
-            throws IOException, MimeIOException {
+    public void writeEntity(Entity entity, OutputStream out) throws IOException {
         final Header header = entity.getHeader();
         if (header == null)
             throw new IllegalArgumentException("Missing header");
 
         writeHeader(header, out);
-        out.flush();
 
         final Body body = entity.getBody();
         if (body == null)
@@ -171,42 +121,31 @@ public class MessageWriter {
      *            the OutputStream to write to.
      * @throws IOException
      *             if an I/O error occurs.
-     * @throws MimeIOException
-     *             in case of a MIME protocol violation
      */
     public void writeMultipart(Multipart multipart, OutputStream out)
-            throws IOException, MimeIOException {
+            throws IOException {
         ContentTypeField contentType = getContentType(multipart);
 
-        String boundary = getBoundary(contentType);
+        ByteSequence boundary = getBoundary(contentType);
 
-        Writer writer = getWriter(contentType, out);
+        writeBytes(multipart.getPreambleRaw(), out);
+        out.write(CRLF);
 
-        try {
-            writer.write(multipart.getPreamble());
-            writer.write(CRLF);
+        for (BodyPart bodyPart : multipart.getBodyParts()) {
+            out.write(DASHES);
+            writeBytes(boundary, out);
+            out.write(CRLF);
 
-            for (BodyPart bodyPart : multipart.getBodyParts()) {
-                writer.write("--");
-                writer.write(boundary);
-                writer.write(CRLF);
-                writer.flush();
-
-                writeEntity(bodyPart, out);
-                writer.write(CRLF);
-            }
-
-            writer.write("--");
-            writer.write(boundary);
-            writer.write("--");
-            writer.write(CRLF);
-
-            writer.write(multipart.getEpilogue());
-
-            writer.flush();
-        } catch (CharacterCodingException e) {
-            throw new MimeIOException("Multipart violates RFC 822");
+            writeEntity(bodyPart, out);
+            out.write(CRLF);
         }
+
+        out.write(DASHES);
+        writeBytes(boundary, out);
+        out.write(DASHES);
+        out.write(CRLF);
+
+        writeBytes(multipart.getEpilogueRaw(), out);
     }
 
     /**
@@ -219,37 +158,17 @@ public class MessageWriter {
      *            the OutputStream to write to.
      * @throws IOException
      *             if an I/O error occurs.
-     * @throws MimeIOException
-     *             in case of a MIME protocol violation
      */
-    public void writeHeader(Header header, OutputStream out)
-            throws IOException, MimeIOException {
-        Writer writer = getWriter((ContentTypeField) header
-                .getField(FieldName.CONTENT_TYPE), out);
-
-        try {
-            for (Field field : header) {
-                writer.write(field.getRaw());
-                writer.write(CRLF);
-            }
-
-            writer.write(CRLF);
-            writer.flush();
-        } catch (CharacterCodingException e) {
-            throw new MimeIOException("Header violates RFC 822");
+    public void writeHeader(Header header, OutputStream out) throws IOException {
+        for (Field field : header) {
+            writeBytes(field.getRaw(), out);
+            out.write(CRLF);
         }
+
+        out.write(CRLF);
     }
 
-    CharsetEncoder getCharsetEncoder(ContentTypeField contentType) {
-        return CharsetUtil.DEFAULT_CHARSET.newEncoder();
-    }
-
-    CharsetEncoder ignoreEncoder(Charset charset) {
-        return charset.newEncoder().onMalformedInput(CodingErrorAction.REPLACE)
-                .onUnmappableCharacter(CodingErrorAction.REPLACE);
-    }
-
-    private OutputStream encodeStream(OutputStream out, String encoding,
+    protected OutputStream encodeStream(OutputStream out, String encoding,
             boolean binaryBody) throws IOException {
         if (MimeUtil.isBase64Encoding(encoding)) {
             return CodecUtil.wrapBase64(out);
@@ -280,20 +199,23 @@ public class MessageWriter {
         return contentType;
     }
 
-    private String getBoundary(ContentTypeField contentType) {
+    private ByteSequence getBoundary(ContentTypeField contentType) {
         String boundary = contentType.getBoundary();
         if (boundary == null)
             throw new IllegalArgumentException(
                     "Multipart boundary not specified");
 
-        return boundary;
+        return ContentUtil.encode(boundary);
     }
 
-    private Writer getWriter(ContentTypeField contentType, OutputStream out) {
-        CharsetEncoder encoder = getCharsetEncoder(contentType);
-
-        return new BufferedWriter(new OutputStreamWriter(out, encoder),
-                WRITER_BUFFER_SIZE);
+    private void writeBytes(ByteSequence byteSequence, OutputStream out)
+            throws IOException {
+        if (byteSequence instanceof ByteArrayBuffer) {
+            ByteArrayBuffer bab = (ByteArrayBuffer) byteSequence;
+            out.write(bab.buffer(), 0, bab.length());
+        } else {
+            out.write(byteSequence.toByteArray());
+        }
     }
 
 }
