@@ -90,28 +90,6 @@ public final class ByteArrayBuffer implements ByteSequence {
         this.len = newlen;
     }
 
-    public void append(final char[] b, int off, int len) {
-        if (b == null) {
-            return;
-        }
-        if ((off < 0) || (off > b.length) || (len < 0) ||
-                ((off + len) < 0) || ((off + len) > b.length)) {
-            throw new IndexOutOfBoundsException();
-        }
-        if (len == 0) {
-            return;
-        }
-        int oldlen = this.len;
-        int newlen = oldlen + len;
-        if (newlen > this.buffer.length) {
-            expand(newlen);
-        }
-        for (int i1 = off, i2 = oldlen; i2 < newlen; i1++, i2++) {
-            this.buffer[i2] = (byte) b[i1];
-        }
-        this.len = newlen;
-    }
-
     public void clear() {
         this.len = 0;
     }
