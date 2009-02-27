@@ -153,46 +153,6 @@ public abstract class AbstractField implements Field {
         return null;
     }
 
-    /**
-     * Determines if this is a <code>Content-Type</code> field.
-     * 
-     * @return <code>true</code> if this is a <code>Content-Type</code> field,
-     *         <code>false</code> otherwise.
-     */
-    public boolean isContentType() {
-        return FieldName.CONTENT_TYPE.equalsIgnoreCase(name);
-    }
-    
-    /**
-     * Determines if this is a <code>Subject</code> field.
-     * 
-     * @return <code>true</code> if this is a <code>Subject</code> field,
-     *         <code>false</code> otherwise.
-     */
-    public boolean isSubject() {
-        return FieldName.SUBJECT.equalsIgnoreCase(name);
-    }
-    
-    /**
-     * Determines if this is a <code>From</code> field.
-     * 
-     * @return <code>true</code> if this is a <code>From</code> field,
-     *         <code>false</code> otherwise.
-     */
-    public boolean isFrom() {
-        return FieldName.FROM.equalsIgnoreCase(name);
-    }
-    
-    /**
-     * Determines if this is a <code>To</code> field.
-     * 
-     * @return <code>true</code> if this is a <code>To</code> field,
-     *         <code>false</code> otherwise.
-     */
-    public boolean isTo() {
-        return FieldName.TO.equalsIgnoreCase(name);
-    }
-    
     @Override
     public String toString() {
         return name + ": " + body;
