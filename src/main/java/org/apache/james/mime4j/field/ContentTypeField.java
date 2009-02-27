@@ -30,7 +30,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.contenttype.parser.ContentTypeParser;
 import org.apache.james.mime4j.field.contenttype.parser.ParseException;
 import org.apache.james.mime4j.field.contenttype.parser.TokenMgrError;
-import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
@@ -251,7 +250,7 @@ public class ContentTypeField extends AbstractField {
     }
 
     static final FieldParser PARSER = new FieldParser() {
-        public Field parse(final String name, final String body,
+        public ParsedField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new ContentTypeField(name, body, raw);
         }

@@ -27,7 +27,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import org.apache.james.mime4j.field.datetime.parser.TokenMgrError;
-import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
@@ -82,7 +81,7 @@ public class DateTimeField extends AbstractField {
     }
 
     static final FieldParser PARSER = new FieldParser() {
-        public Field parse(final String name, final String body,
+        public ParsedField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new DateTimeField(name, body, raw);
         }

@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.codec.DecoderUtil;
-import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
@@ -51,7 +50,7 @@ public class UnstructuredField extends AbstractField {
     }
 
     static final FieldParser PARSER = new FieldParser() {
-        public Field parse(final String name, final String body,
+        public ParsedField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new UnstructuredField(name, body, raw);
         }

@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -31,7 +30,7 @@ import org.apache.james.mime4j.util.MimeUtil;
 /**
  * The base class of all field classes.
  */
-public abstract class AbstractField implements Field {
+public abstract class AbstractField implements ParsedField {
 
     private static final Pattern FIELD_NAME_PATTERN = Pattern
             .compile("^([\\x21-\\x39\\x3b-\\x7e]+):");
@@ -55,11 +54,11 @@ public abstract class AbstractField implements Field {
      * their corresponding classes.
      * 
      * @param raw the bytes to parse.
-     * @return a <code>Field</code> instance.
+     * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
      * @see #isValidField()
      */
-    public static Field parse(final ByteSequence raw) throws MimeException {
+    public static ParsedField parse(final ByteSequence raw) throws MimeException {
         String rawStr = ContentUtil.decode(raw);
         return parse(raw, rawStr);
     }
@@ -82,11 +81,11 @@ public abstract class AbstractField implements Field {
      * </table>
      * 
      * @param rawStr the string to parse.
-     * @return a <code>Field</code> instance.
+     * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
      * @see #isValidField()
      */
-    public static Field parse(final String rawStr) throws MimeException {
+    public static ParsedField parse(final String rawStr) throws MimeException {
         ByteSequence raw = ContentUtil.encode(rawStr);
         return parse(raw, rawStr);
     }
@@ -130,24 +129,14 @@ public abstract class AbstractField implements Field {
     }
 
     /**
-     * Returns <code>true</code> if this field is valid, i.e. no errors were
-     * encountered while parsing the field value.
-     * 
-     * @return <code>true</code> if this field is valid, <code>false</code>
-     *         otherwise.
-     * @see #getParseException()
+     * @see ParsedField#isValidField() 
      */
     public boolean isValidField() {
         return getParseException() == null;
     }
 
     /**
-     * Returns the exception that was thrown by the field parser while parsing
-     * the field value. The result is <code>null</code> if the field is valid
-     * and no errors were encountered.
-     * 
-     * @return the exception that was thrown by the field parser or
-     *         <code>null</code> if the field is valid.
+     * @see ParsedField#getParseException() 
      */
     public ParseException getParseException() {
         return null;
@@ -158,7 +147,7 @@ public abstract class AbstractField implements Field {
         return name + ": " + body;
     }
 
-    private static Field parse(final ByteSequence raw, final String rawStr)
+    private static ParsedField parse(final ByteSequence raw, final String rawStr)
             throws MimeException {
         /*
          * Unfold the field.
