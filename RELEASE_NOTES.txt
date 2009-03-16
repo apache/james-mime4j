@@ -1,0 +1,117 @@
+Release 0.6
+-------------------
+
+Mime4J is a flexible MIME parsing library written in Java. SAX, DOM and pull parsing styles are 
+supported.
+
+The 0.6 release brings another round of API enhancements and performance optimizations. There has 
+been a number of notable improvements in the DOM support. MIME stream parser is expected to be
+50% faster when line counting is disabled. Please also note that as of this release Mime4j 
+requires a Java 1.5 compatible runtime.
+
+Notes
+-----
+
+ * Mime4j API is still considered unstable and is likely to change in future releases
+ * The DOM API has been now been comprehensively refactored and the known limitations 
+   addressed. Please report any remaining issues to 
+   https://issues.apache.org/jira/browse/MIME4J.
+ * Some low level functions are available only in the pull parser (recommended for
+   advanced users)
+ * 0.6 contains a mixture of approaches to the parsing of advanced MIME field types. 
+   Limitations are known with these approaches with some relatively uncommon use cases. 
+   A consistent and comprehensive rewrite is planned for 0.7 which should consolidate 
+   and address these.
+ * The former interfaces TextBody and BinaryBody have been changed into abstract subclasses
+   of class SingleBody. Code that implements these interfaces has to be changed accordingly.
+   [https://issues.apache.org/jira/browse/MIME4J-111]
+ * A dedicated class for writing a message has been introduced. Class MessageWriter has now
+   to be used instead of Body.writeTo(OutputStream, int). A short-cut method
+   Message.writeTo(OutputStream) without a mode parameter is also available.
+   [https://issues.apache.org/jira/browse/MIME4J-110]
+ * Class NamedMailbox has been removed. Class Mailbox now has an additional name property.
+   [https://issues.apache.org/jira/browse/MIME4J-107]
+ * Class MessageUtils has been removed. The methods and constants can now be found in class
+   CharsetUtil in the same package.
+   [https://issues.apache.org/jira/browse/MIME4J-106]
+ * Package org.apache.james.mime4j.decoder has been renamed in org.apache.james.mime4j.codec.
+   [https://issues.apache.org/jira/browse/MIME4J-105]
+ * Class AbstractBody has been superseded by SingleBody. AbstractBody has been removed.
+ * BodyFactory introduced allowing more flexible storage for Message parts. TempFileTextBody
+   and TempFileBinaryBody removed.
+   [https://issues.apache.org/jira/browse/MIME4J-87]
+ * Mime4j now has a more flexible mechanism for storing message bodies. Class TempStorage
+   has been superseded by StorageProvider in package org.apache.james.mime4j.storage.
+   The classes TempStorage, TempPath, TempFile and SimpleTempStorage have been removed.
+   [https://issues.apache.org/jira/browse/MIME4J-83]
+ * Temporary text body storage for Message parts now defaults to US-ASCII (was ISO-8859-1)
+
+Detailed change log can be found here:
+
+http://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310521&styleName=Html&version=12313434
+
+
+Release 0.5
+-------------------
+
+Mime4J is a flexible MIME parsing library written in Java. SAX, DOM and pull parsing
+styles are supported.
+
+
+The 0.5 release addresses a number of important issues discovered since 0.4. In 
+particular, it improves Mime4j ability to deal with malformed data streams including 
+those intentionally crafted to cause excessive CPU and memory utilization that can 
+lead to DoS conditions.
+
+This release also fixes a serious bug that can prevent Mime4j from correctly 
+processing binary content.
+
+Detailed change log can be found here:
+
+https://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310521&styleName=Html&version=12313178
+
+Notes
+-----
+ * Mime4j API is still considered unstable and is likely to change in future releases
+ * DOM support has known limitations and some roundtrip issues remain to be resolved
+ * Some low level functions are available only in the pull parser (recommended for 
+   advanced users)
+
+
+
+Release 0.4
+-------------------
+
+Mime4J is a flexible MIME parsing library written in Java. SAX, DOM and pull parsing
+styles are supported.
+
+The 0.4 release brings a number of significant improvements in terms of 
+supported capabilities, flexibility and performance: 
+
+* Revised and improved public API with support for pull parsing
+
+* Support for parsing of 'headless' messages transmitted using non SMTP 
+  transports such as HTTP
+
+* Reduced external dependencies. Mime4j is no longer directly dependent on log4j 
+  and commons-io
+
+* Improved parsing performance (up to 10x for large messages)
+
+* More comprehensive header parsing including support for RFC1864, RFC2045, 
+  RFC2183, RFC2557 and RFC3066
+
+* Revised packaging and exception hierarchy. MimeException now extends
+  IOException.
+
+Detailed change log can be found here:
+
+http://issues.apache.org/jira/secure/ReleaseNote.jspa?projectId=12310521&styleName=Html&version=12312483
+
+Notes
+-----
+ * 0.4 contains numerous API improvements and is not binary compatible with 0.3
+ * Mime4j API is still considered unstable and is likely to change in future releases
+ * DOM support has known limitations and some roundtrip issues remain to be resolved
+ * Some low level functions are available only in the pull parser (recommended for 
+   advanced users)
