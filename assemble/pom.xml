@@ -27,68 +27,45 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
-  <artifactId>apache-mime4j-core</artifactId>
-  <name>Apache JAMES Mime4j (Core)</name>
+  <artifactId>apache-mime4j</artifactId>
+  <name>Apache JAMES Mime4j (Assembly)</name>
   <version>0.7-SNAPSHOT</version>
   <description>Java stream based MIME message parser</description>
-
-   <build>
+  <packaging>pom</packaging>
+     
+  <build>
     <plugins>
-       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-        <version>2.4.1</version>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.2-beta-2</version>
+        <configuration>
+          <descriptorSourceDirectory>${basedir}/src/assemble/</descriptorSourceDirectory>
+          <tarLongFileMode>gnu</tarLongFileMode>
+        </configuration>
         <executions>
           <execution>
-            <id>generate-jjtree</id>
-            <phase>generate-sources</phase>
+            <id>make-assembly</id> <!-- this is used for inheritance merges -->
+            <phase>package</phase> <!-- append to the packaging phase. -->
             <goals>
-              <goal>jjtree-javacc</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>generate-javacc</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>javacc</goal>
+              <goal>attached</goal> <!-- goals == mojos -->
             </goals>
           </execution>
         </executions>
       </plugin>
     </plugins>
   </build>  
-
+  
   <dependencies>
-  <!-- 
-  Dependency version numbers don't seem to be inherited correctly from the project :-/
-  Any ideas?
-   -->
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>apache-mime4j-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>1.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.14</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <type>jar</type>
-      <!--  Removed as a workaround for an unidentified M2 bug -->
-      <scope>test</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>1.2</version>
-      <scope>test</scope>
-      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

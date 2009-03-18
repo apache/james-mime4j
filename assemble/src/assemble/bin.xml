@@ -28,30 +28,20 @@
   </formats>
   <fileSets>
     <fileSet>
-      <directory>target/maven-shared-archive-resources/META-INF/</directory>
+      <directory>${project.basedir}/..</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
-        <include>*</include>
-      </includes>
-    </fileSet>
-    <fileSet>
-      <includes>
+        <include>LICENSE.*</include>
+        <include>NOTICE.*</include>
         <include>RELEASE_NOTES.txt</include>
       </includes>
     </fileSet>
     <fileSet>
-      <directory>examples</directory>
-    </fileSet>
-    <fileSet>
-      <directory>target</directory>
-      <outputDirectory></outputDirectory>
+      <directory>${project.basedir}/../core/target</directory>
+      <outputDirectory>/</outputDirectory>
       <includes>
-        <include>${artifactId}-${version}.jar</include>
+        <include>apache-mime4j*.jar</include>
       </includes>
-    </fileSet>
-    <fileSet>
-      <directory>target/apidocs</directory>
-      <outputDirectory>javadocs</outputDirectory>
     </fileSet>
   </fileSets>
   <dependencySets>
@@ -59,6 +49,9 @@
       <outputDirectory>/lib/</outputDirectory>
       <useProjectArtifact>false</useProjectArtifact>
       <scope>runtime</scope>
+      <excludes>
+        <exclude>apache-mime4j*</exclude>
+      </excludes>
     </dependencySet>
   </dependencySets>
 </assembly>

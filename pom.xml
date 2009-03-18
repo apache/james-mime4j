@@ -39,6 +39,7 @@
   
   <modules>
     <module>core</module>
+    <module>assemble</module>
   </modules>
     
   <distributionManagement>
