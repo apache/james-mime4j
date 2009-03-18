@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl"?>
+<rdf:RDF xml:lang="en"
+         xmlns="http://usefulinc.com/ns/doap#" 
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+         xmlns:asfext="http://projects.apache.org/ns/asfext#"
+         xmlns:foaf="http://xmlns.com/foaf/0.1/">
+<!--
+   $HeadURL$
+   $Revision$
+   $Date$
+
+   ====================================================================
+   Licensed to the Apache Software Foundation (ASF) under one
+   or more contributor license agreements.  See the NOTICE file
+   distributed with this work for additional information
+   regarding copyright ownership.  The ASF licenses this file
+   to you under the Apache License, Version 2.0 (the
+   "License"); you may not use this file except in compliance
+   with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing,
+   software distributed under the License is distributed on an
+   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+   KIND, either express or implied.  See the License for the
+   specific language governing permissions and limitations
+   under the License.
+   ====================================================================
+
+   This software consists of voluntary contributions made by many
+   individuals on behalf of the Apache Software Foundation.  For more
+   information on the Apache Software Foundation, please see
+   <http://www.apache.org />.
+-->
+
+  <Project rdf:about="http://james.apache.org/mime4j/">
+    <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
+    <name>Apache James Mime4j</name>
+    <homepage rdf:resource="http://james.apache.org/mime4j/" />
+    <asfext:pmc rdf:resource="http://james.apache.org" />
+    <shortdesc>
+Mime4j can be used to parse e-mail message streams in plain rfc822 and MIME format
+and to build a tree representation of an e-mail message.
+    </shortdesc>
+    <description>
+Mime4j provides a parser for e-mail message streams in plain rfc822 and MIME format. 
+The parser uses a callback mechanism to report parsing events such as the start of 
+an entity header, the start of a body. The parser has been designed to be extremely 
+tolerant against messages violating the standards. Mime4j can also be used to build 
+a tree representation of an e-mail message
+    </description>
+    <bug-database rdf:resource="http://issues.apache.org/jira/browse/MIME4J" />
+    <mailing-list rdf:resource="http://james.apache.org/mime4j/mail-lists.html" />
+    <download-page rdf:resource="http://james.apache.org/download.cgi" />
+    <programming-language>Java</programming-language>
+    <category rdf:resource="http://projects.apache.org/category/mail" />
+    <category rdf:resource="http://projects.apache.org/category/library" />
+
+    <!-- Multiple releases can be listed, each in its own section -->
+    <release>
+      <Version>
+        <name>Apache James Mime4j 0.5</name>
+        <created>2008-10-18</created>
+        <revision>0.5</revision>
+      </Version>
+      <Version>
+        <name>Apache James Mime4j 0.4</name>
+        <created>2008-08-20</created>
+        <revision>0.4</revision>
+      </Version>
+      <Version>
+        <name>Apache James Mime4j 0.3</name>
+        <created>2007-05-31</created>
+        <revision>0.3</revision>
+      </Version>
+      <Version>
+        <name>Apache James Mime4j 0.2</name>
+        <created>2006-01-09</created>
+        <revision>0.2</revision>
+      </Version>
+    </release>
+
+    <repository>
+      <SVNRepository>
+        <location rdf:resource="http://svn.apache.org/repos/asf/james/mime4j/trunk"/>
+        <browse rdf:resource="http://svn.apache.org/viewvc/james/mime4j/trunk"/>
+      </SVNRepository>
+    </repository>
+
+    <asfext:implements>
+      <asfext:Standard>
+        <asfext:title>Standard for ARPA Internet Text Messages</asfext:title>
+        <asfext:body>IETF</asfext:body>
+        <asfext:id>RFC 822</asfext:id>
+        <asfext:url rdf:resource="http://tools.ietf.org/html/rfc822"/>
+      </asfext:Standard>
+    </asfext:implements>
+    <asfext:implements>
+      <asfext:Standard>
+        <asfext:title>Internet Message Format</asfext:title>
+        <asfext:body>IETF</asfext:body>
+        <asfext:id>RFC 2822</asfext:id>
+        <asfext:url rdf:resource="http://tools.ietf.org/html/rfc2822"/>
+      </asfext:Standard>
+    </asfext:implements>
+    <asfext:implements>
+      <asfext:Standard>
+        <asfext:title>Multipurpose Internet Mail Extensions (MIME) Part One: Format of Internet Message Bodies</asfext:title>
+        <asfext:body>IETF</asfext:body>
+        <asfext:id>RFC 2045</asfext:id>
+        <asfext:url rdf:resource="http://tools.ietf.org/html/rfc2045"/>
+      </asfext:Standard>
+    </asfext:implements>
+    <asfext:implements>
+      <asfext:Standard>
+        <asfext:title>Multipurpose Internet Mail Extensions (MIME) Part Two: Media Types</asfext:title>
+        <asfext:body>IETF</asfext:body>
+        <asfext:id>RFC 2046</asfext:id>
+        <asfext:url rdf:resource="http://tools.ietf.org/html/rfc2046"/>
+      </asfext:Standard>
+    </asfext:implements>
+    <asfext:implements>
+      <asfext:Standard>
+        <asfext:title>Multipurpose Internet Mail Extensions (MIME) Part Three: Message Header Extensions for Non-ASCII Text</asfext:title>
+        <asfext:body>IETF</asfext:body>
+        <asfext:id>RFC 2047</asfext:id>
+        <asfext:url rdf:resource="http://tools.ietf.org/html/rfc2047"/>
+      </asfext:Standard>
+    </asfext:implements>
+
+  </Project>
+</rdf:RDF>

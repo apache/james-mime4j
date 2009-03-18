@@ -1,0 +1,44 @@
+Building Apache Mime4j 
+======================
+
+(1) Requisites
+--------------
+Mime4j utilizes Maven 2 as a distribution management and packaging tool. Version 2.0.7 
+or above is recommended. 
+
+JDK 1.5 or above is required in order to compile Mime4j.
+
+Maven installation and configuration instructions can be found here:
+
+http://maven.apache.org/run-maven/index.html
+
+(2) Executing test cases
+
+Execute the following command in order to compile and test the components:
+
+mvn test
+
+(3) Building packages 
+
+Execute the following command in order to build JAR and assembly packages:
+
+mvn package
+
+One can also utilize the 'local' profile to build JAR and assembly packages
+in the off-line mode:
+
+mvn -Plocal package
+
+Redistributables will be placed in the target folder. 
+
+(4) Building documentation 
+
+Execute the following command in order to generate javadoc:
+
+mvn javadoc:javadoc
+
+(5) Building project web site 
+
+Execute the following command in order to generate the project web site:
+
+mvn site

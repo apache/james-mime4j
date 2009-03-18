@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- 
+/****************************************************************
+ * Licensed to the Apache Software Foundation (ASF) under one   *
+ * or more contributor license agreements.  See the NOTICE file *
+ * distributed with this work for additional information        *
+ * regarding copyright ownership.  The ASF licenses this file   *
+ * to you under the Apache License, Version 2.0 (the            *
+ * "License"); you may not use this file except in compliance   *
+ * with the License.  You may obtain a copy of the License at   *
+ *                                                              *
+ *   http://www.apache.org/licenses/LICENSE-2.0                 *
+ *                                                              *
+ * Unless required by applicable law or agreed to in writing,   *
+ * software distributed under the License is distributed on an  *
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY       *
+ * KIND, either express or implied.  See the License for the    *
+ * specific language governing permissions and limitations      *
+ * under the License.                                           *
+ ****************************************************************/
+
+ -->
+<document>
+    <properties>
+        <title>Getting Started with mime4j</title>
+    </properties>
+    <body>
+        <section name="Getting Started with mime4j">
+            <subsection name="Overview of the Getting Started Documentation">
+                <table>
+                    <tr>
+                        <th>Document</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="download.html">Download</a>
+                        </td>
+                        <td> Before you can start using mime4j, you'll have to
+                            download the distribution to your system (unless you
+                            plan on building the project from source). This
+                            document provides links to the various distributions
+                            available. </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <a href="build.html">Building mime4j</a>
+                        </td>
+                        <td>
+				Describes how to build mime4j from the sources. 
+                        </td>
+                    </tr>
+                </table>
+            </subsection>
+        </section>
+    </body>
+</document>

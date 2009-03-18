@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.    
+-->
+<project name="James mime4j">
+  <bannerLeft>
+    <name>JAMES Mime4J</name>
+    <src>images/james-mime4j-logo.gif</src>
+    <href>http://james.apache.org/</href>
+  </bannerLeft>
+  <bannerRight>
+    <name>The Apache Software Foundation</name>
+    <src>images/asf-logo-reduced.gif</src>
+    <href>http://www.apache.org/index.html</href>
+  </bannerRight> 
+  <body>
+    <menu name="mime4j">
+      <item name="Overview" href="/index.html"/>
+      <item name="Status" href="/status.html"/>
+      <item name="Example" href="/samples.html"/>
+      <item name="Usage" href="/usage.html"/>
+      <item name="Start" href="/start/index.html" collapse="true">
+        <item name="Download" href="/start/download.html" collapse="true"/>
+        <item name="Build" href="/start/build.html" collapse="true"/>
+      </item>
+    </menu>
+    
+    ${reports}
+    
+    <menu name="Related Projects">
+    	<item name="httpmime" href="http://hc.apache.org/httpcomponents-client/httpmime/index.html" />
+    </menu>
+  </body>
+</project>
