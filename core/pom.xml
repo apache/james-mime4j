@@ -76,6 +76,10 @@
   </build>  
 
   <dependencies>
+  <!-- 
+  Dependency version numbers don't seem to be inherited correctly from the project :-/
+  Any ideas?
+   -->
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
