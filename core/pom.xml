@@ -19,12 +19,12 @@
     under the License.    
   -->
   <parent>
-    <artifactId>james-project</artifactId>
+    <artifactId>apache-mime4j-project</artifactId>
     <groupId>org.apache.james</groupId>
-    <version>1.2</version>
+    <version>0.7-SNAPSHOT</version>
     <!-- Either this really points to the james-project/pom.xml or you
          will have to tune the local repository, later, in this file -->
-    <relativePath>../james-project/project/pom.xml</relativePath>
+    <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
