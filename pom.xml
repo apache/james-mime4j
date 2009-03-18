@@ -201,7 +201,7 @@
               -DartifactId=james-project 
               -Dversion=1.2
        -->
-      <url>file://${basedir}/core/stage</url>
+      <url>file://${basedir}/stage</url>
       <layout>legacy</layout>
       <snapshots>
         <enabled>true</enabled>
@@ -262,12 +262,12 @@
             <exclude>core/benchmarks/resources/*.msg</exclude>
             <!-- 3rd party descriptors distributed via maven repositories
                  and included "as is" -->
-            <exclude>core/stage/commons-io/poms/commons-io-1.2.pom</exclude>
-            <exclude>core/stage/commons-logging/poms/commons-logging-1.1.pom</exclude>
-            <exclude>core/stage/org.apache.james/xmls/james-parent-1.1-site.xml</exclude>
-            <exclude>core/stage/org.apache.james/xmls/james-parent-1.1-site_en.xml</exclude>
-            <exclude>core/stage/org.apache.james/xmls/james-project-1.2-site.xml</exclude>
-            <exclude>core/stage/org.apache.james/xmls/james-project-1.2-site_en.xml</exclude>
+            <exclude>stage/commons-io/poms/commons-io-1.2.pom</exclude>
+            <exclude>stage/commons-logging/poms/commons-logging-1.1.pom</exclude>
+            <exclude>stage/org.apache.james/xmls/james-parent-1.1-site.xml</exclude>
+            <exclude>stage/org.apache.james/xmls/james-parent-1.1-site_en.xml</exclude>
+            <exclude>stage/org.apache.james/xmls/james-project-1.2-site.xml</exclude>
+            <exclude>stage/org.apache.james/xmls/james-project-1.2-site_en.xml</exclude>
             <exclude>release.properties</exclude>
             <exclude>**/.*/**/*</exclude>
           </excludes>
