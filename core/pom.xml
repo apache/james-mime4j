@@ -75,40 +75,6 @@
     </plugins>
   </build>  
 
-  <repositories>
-    <repository>
-      <id>local-mime4j-stage-repository</id>
-      <name>Local mime4j stage repository</name>
-      <!-- Please note that due to http://jira.codehaus.org/browse/MNG-2896 -->
-      <!-- If you don't have james-project checked out in ../james-project -->
-      <!-- you will have to place your absolute path to the project instead -->
-      <!-- of ${basedir}, or, otherwise, manually install the parent poms -->
-      <!--
-           mvn -fignorepom.xml install:install-file 
-              -Dfile=stage\org.apache.james\poms\james-parent-1.1.pom 
-              -Dpackaging=pom 
-              -DgroupId=org.apache.james 
-              -DartifactId=james-parent 
-              -Dversion=1.1
-           mvn -fignorepom.xml install:install-file 
-              -Dfile=stage\org.apache.james\poms\james-project-1.2.pom 
-              -Dpackaging=pom 
-              -DgroupId=org.apache.james 
-              -DartifactId=james-project 
-              -Dversion=1.2
-       -->
-      <url>file://${basedir}/stage</url>
-      <layout>legacy</layout>
-      <snapshots>
-        <enabled>true</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-    </repository>
-  </repositories>
   <dependencies>
     <dependency>
       <groupId>commons-logging</groupId>
