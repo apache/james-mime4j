@@ -216,7 +216,7 @@
   
   <dependencies>
     <!-- 
-  Dependency version number don't seem to be inherited correctly from the project :-/
+  Dependency version numbers don't seem to be inherited correctly from the project :-/
   Any ideas?
    -->
     <dependency>
