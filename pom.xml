@@ -292,19 +292,31 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>2.4.3</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
         <version>2.4.3</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
       </plugin> 
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.5</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jxr-plugin</artifactId>
         <version>2.1</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -320,6 +332,7 @@
           <linkXref>true</linkXref>
           <sourceEncoding>utf-8</sourceEncoding>
           <minimumTokens>100</minimumTokens>
+          <aggregate>true</aggregate>
         </configuration>
       </plugin>
       <plugin>
@@ -331,6 +344,9 @@
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>taglist-maven-plugin</artifactId>
         <version>2.2</version>
+        <configuration>
+          <aggregate>true</aggregate>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
