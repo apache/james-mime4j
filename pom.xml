@@ -215,40 +215,38 @@
     </repository>
   </repositories>
   
-  <dependencies>
-    <!-- 
-  Dependency version numbers don't seem to be inherited correctly from the project :-/
-  Any ideas?
-   -->
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.1.1</version>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>1.2.14</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <type>jar</type>
-      <!--  Removed as a workaround for an unidentified M2 bug -->
-      <scope>test</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>1.2</version>
-      <scope>test</scope>
-      <optional>true</optional>
-    </dependency>
-  </dependencies>
-  
+  <dependencyManagement> 
+    <dependencies>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.14</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>3.8.1</version>
+        <type>jar</type>
+        <!--  Removed as a workaround for an unidentified M2 bug -->
+        <scope>test</scope>
+        <optional>true</optional>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>1.2</version>
+        <scope>test</scope>
+        <optional>true</optional>
+      </dependency>
+    </dependencies>
+  </dependencyManagement> 
+    
   <reporting>
     <plugins>
       <plugin>
