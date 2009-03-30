@@ -27,36 +27,10 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
-  <artifactId>apache-mime4j-core</artifactId>
-  <name>Apache JAMES Mime4j (Core)</name>
+  <artifactId>apache-mime4j-benchmark</artifactId>
+  <name>Apache JAMES Mime4j (Benchmarks)</name>
   <version>0.7-SNAPSHOT</version>
-  <description>Java stream based MIME message parser</description>
-
-   <build>
-    <plugins>
-       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>javacc-maven-plugin</artifactId>
-        <version>2.4.1</version>
-        <executions>
-          <execution>
-            <id>generate-jjtree</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>jjtree-javacc</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>generate-javacc</id>
-            <phase>generate-sources</phase>
-            <goals>
-              <goal>javacc</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>  
+  <description>Benchmarks for MIME4J stream based MIME message parser</description>
 
   <dependencies>
     <dependency>
@@ -64,23 +38,15 @@
       <artifactId>commons-logging</artifactId>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <type>jar</type>
-      <!--  Removed as a workaround for an unidentified M2 bug -->
-      <scope>test</scope>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <scope>test</scope>
-      <optional>true</optional>
+      <optional>false</optional>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>apache-mime4j-core</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>

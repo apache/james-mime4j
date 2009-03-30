@@ -39,6 +39,7 @@
   
   <modules>
     <module>core</module>
+    <module>benchmark</module>
     <module>examples</module>
     <module>assemble</module>
   </modules>
