@@ -61,6 +61,11 @@
       <artifactId>apache-mime4j-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>apache-mime4j-examples</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     
     <dependency>
       <groupId>commons-logging</groupId>
