@@ -370,4 +370,23 @@
   <properties>
     <compileSource>1.5</compileSource>
   </properties>
+  
+  <profiles>
+    <profile>
+      <id>hudson</id>
+      <repositories>
+        <repository>
+          <id>local-mime4j-stage-repository</id>
+          <name>Local mime4j stage repository</name>
+          <url>file://${basedir}/stage</url>
+          <snapshots>
+            <enabled>false</enabled>
+            <checksumPolicy>ignore</checksumPolicy>
+          </snapshots>
+        </repository>
+      </repositories>
+  
+    </profile>
+  </profiles>
+  
 </project>
