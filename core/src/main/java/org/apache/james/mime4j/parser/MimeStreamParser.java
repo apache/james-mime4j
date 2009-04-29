@@ -19,11 +19,14 @@
 
 package org.apache.james.mime4j.parser;
 
-import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.descriptor.BodyDescriptor;
-
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.SequenceInputStream;
+
+import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.descriptor.BodyDescriptor;
+import org.apache.james.mime4j.field.FieldName;
 
 /**
  * <p>
@@ -43,18 +46,18 @@ public class MimeStreamParser {
 
     private ContentHandler handler = null;
     private boolean contentDecoding;
+    private final MimeEntityConfig mimeEntityConfig;
     
     private final MimeTokenStream mimeTokenStream;
 
     public MimeStreamParser(final MimeEntityConfig config) {
         super();
-        MimeEntityConfig localConfig;
         if (config != null) {
-            localConfig = config.clone();
+            mimeEntityConfig = config.clone();
         } else {
-            localConfig = new MimeEntityConfig();
+            mimeEntityConfig = new MimeEntityConfig();
         }
-        this.mimeTokenStream = new MimeTokenStream(localConfig);
+        this.mimeTokenStream = new MimeTokenStream(mimeEntityConfig);
         this.contentDecoding = false;
     }
     
@@ -79,14 +82,24 @@ public class MimeStreamParser {
     }
 
     /**
-     * Parses a stream of bytes containing a MIME message.
+     * Parses a stream of bytes containing a MIME message. If the mime config of this
+     * object contains a not null defaultContentType
+     * ({@link MimeEntityConfig#getDefaultContentType()}) a headless parsing is performed.
      * 
      * @param is the stream to parse.
      * @throws MimeException if the message can not be processed
      * @throws IOException on I/O errors.
      */
     public void parse(InputStream is) throws MimeException, IOException {
-        mimeTokenStream.parse(is);
+        boolean headless = mimeEntityConfig.getDefaultContentType() != null;
+        InputStream inputStream = is;
+        if (headless) {
+            ByteArrayInputStream headerInputStream = new ByteArrayInputStream(
+                    (FieldName.CONTENT_TYPE + ": " + mimeEntityConfig.getDefaultContentType()
+                            + "\r\n\r\n").getBytes("iso-8859-1"));
+            inputStream = new SequenceInputStream(headerInputStream, is);
+        }
+        mimeTokenStream.parse(inputStream);
         OUTER: for (;;) {
             int state = mimeTokenStream.getState();
             switch (state) {

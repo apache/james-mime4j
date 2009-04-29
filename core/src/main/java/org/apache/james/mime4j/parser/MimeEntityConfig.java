@@ -32,6 +32,7 @@ public final class MimeEntityConfig implements Cloneable {
     private int maxHeaderCount;
     private long maxContentLen;
     private boolean countLineNumbers;
+    private String defaultContentType;
     
     public MimeEntityConfig() {
         this.maximalBodyDescriptor = false;
@@ -157,6 +158,31 @@ public final class MimeEntityConfig implements Cloneable {
      */
     public boolean isCountLineNumbers() {
         return countLineNumbers;
+    }
+
+    /**
+     * Returns the value of the default content type. 
+     * When not null, indicates that the parsing should be headless.
+     * 
+     * @return default content type when parsing headless,
+     * null otherwise
+     * @see MimeStreamParser#parse(java.io.InputStream)
+     */
+    public String getDefaultContentType() {
+        return defaultContentType;
+    }
+
+    /**
+     * Defines a default content type. 
+     * When not null, indicates that the parsing should be headless.
+     * 
+     * @param defaultContentType
+     *            value of the default content type when parsing headless,
+     *            null otherwise
+     * @see MimeStreamParser#parse(java.io.InputStream)
+     */
+    public void setDefaultContentType(String defaultContentType) {
+        this.defaultContentType = defaultContentType;
     }
 
     @Override
