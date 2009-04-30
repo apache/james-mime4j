@@ -369,6 +369,7 @@
   
   <properties>
     <compileSource>1.5</compileSource>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   
   <profiles>
