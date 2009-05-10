@@ -1,3 +1,11 @@
+Next Release
+------------
+
+Mime4J storage contains support for encrypted storage through the standard Java cryptography
+API. When used in conjunction with a JRE with strong cryptography enabled, this library will
+use strong cryptography. See README.
+
+
 Release 0.6
 -------------------
 
