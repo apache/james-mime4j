@@ -25,7 +25,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -490,8 +489,8 @@ public class MessageTest extends TestCase {
         public boolean disposed = false;
 
         @Override
-        public void writeTo(OutputStream out) throws IOException {
-            out.write("dummy".getBytes("US-ASCII"));
+        public InputStream getInputStream() throws IOException {
+            return new ByteArrayInputStream("dummy".getBytes("US-ASCII"));
         }
 
         @Override

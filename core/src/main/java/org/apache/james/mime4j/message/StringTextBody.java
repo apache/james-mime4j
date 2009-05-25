@@ -19,7 +19,9 @@
 
 package org.apache.james.mime4j.message;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
@@ -45,6 +47,11 @@ class StringTextBody extends TextBody {
     @Override
     public String getMimeCharset() {
         return CharsetUtil.toMimeCharset(charset.name());
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(text.getBytes(charset));
     }
 
     @Override

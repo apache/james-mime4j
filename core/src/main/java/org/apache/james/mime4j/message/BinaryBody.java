@@ -19,9 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /**
  * A body containing binary data.
  */
@@ -32,14 +29,5 @@ public abstract class BinaryBody extends SingleBody {
      */
     protected BinaryBody() {
     }
-
-    /**
-     * Gets a <code>InputStream</code> which reads the bytes of the body.
-     * 
-     * @return the stream, transfer decoded
-     * @throws IOException
-     *             on I/O errors.
-     */
-    public abstract InputStream getInputStream() throws IOException;
 
 }

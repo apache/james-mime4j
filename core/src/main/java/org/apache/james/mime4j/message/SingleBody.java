@@ -20,7 +20,10 @@
 package org.apache.james.mime4j.message;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+
+import org.apache.james.mime4j.codec.CodecUtil;
 
 /**
  * Abstract implementation of a single message body; that is, a body that does
@@ -52,14 +55,32 @@ public abstract class SingleBody implements Body {
     }
 
     /**
-     * Writes this single body to the given stream.
+     * Gets a <code>InputStream</code> which reads the bytes of the body.
+     * 
+     * @return the stream, transfer decoded
+     * @throws IOException
+     *             on I/O errors.
+     */
+    public abstract InputStream getInputStream() throws IOException;
+
+    /**
+     * Writes this single body to the given stream. The default implementation copies
+     * the input stream obtained by {@link #getInputStream()} to the specified output
+     * stream. May be overwritten by a subclass to improve performance.
      * 
      * @param out
      *            the stream to write to.
      * @throws IOException
      *             in case of an I/O error
      */
-    public abstract void writeTo(OutputStream out) throws IOException;
+    public void writeTo(OutputStream out) throws IOException {
+        if (out == null)
+            throw new IllegalArgumentException();
+
+        InputStream in = getInputStream();
+        CodecUtil.copy(in, out);
+        in.close();
+    }
 
     /**
      * Returns a copy of this <code>SingleBody</code> (optional operation).
