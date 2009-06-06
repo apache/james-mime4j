@@ -51,8 +51,7 @@ public class MimeException extends Exception {
      * @param cause cause of the exception
      */
     public MimeException(String message, Throwable cause) {
-        super(message);
-        initCause(cause);
+        super(message, cause);
     }
 
 }

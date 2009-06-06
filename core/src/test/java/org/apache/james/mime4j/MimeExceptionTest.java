@@ -19,32 +19,28 @@
 
 package org.apache.james.mime4j;
 
-import java.io.IOException;
+import junit.framework.TestCase;
 
-/**
- * A wrapper class based on {@link IOException} for MIME protocol exceptions.
- */
-public class MimeIOException extends IOException {
+public class MimeExceptionTest extends TestCase {
 
-    private static final long serialVersionUID = 5393613459533735409L;
-
-    /**
-     * Creates a new MimeIOException from the specified detail message.
-     * 
-     * @param message detail message.
-     */
-    public MimeIOException(String message) {
-        this(new MimeException(message));
+    public void testMimeExceptionString() {
+        MimeException e = new MimeException("message");
+        assertEquals("message", e.getMessage());
+        assertNull(e.getCause());
     }
 
-    /**
-     * Constructs an IO exception based on {@link MimeException}.
-     * 
-     * @param cause the cause.
-     */
-    public MimeIOException(MimeException cause) {
-        super(cause == null ? null : cause.getMessage());
-		initCause(cause);
+    public void testMimeExceptionThrowable() {
+        NullPointerException npe = new NullPointerException("npe");
+        MimeException e = new MimeException(npe);
+        assertSame(npe, e.getCause());
+        assertNotNull(e.getMessage());
+    }
+
+    public void testMimeExceptionStringThrowable() {
+        NullPointerException npe = new NullPointerException("npe");
+        MimeException e = new MimeException("message",npe);
+        assertEquals("message", e.getMessage());
+        assertSame(npe, e.getCause());
     }
 
 }
