@@ -41,8 +41,11 @@ public abstract class LineReaderInputStream extends FilterInputStream {
      * @return number of bytes copied or <code>-1</code> if the end of 
      * the stream has been reached.
      * 
+     * @throws MaxLineLimitException if the line exceeds a limit on
+     *   the line length imposed by a subclass.
      * @throws IOException in case of an I/O error.
      */
-    public abstract int readLine(final ByteArrayBuffer dst) throws IOException;
-    
+    public abstract int readLine(final ByteArrayBuffer dst)
+            throws MaxLineLimitException, IOException;
+
 }

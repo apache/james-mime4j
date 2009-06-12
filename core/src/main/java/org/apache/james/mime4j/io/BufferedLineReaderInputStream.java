@@ -164,9 +164,9 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return false;
     }
 
-    
     @Override
-    public int readLine(final ByteArrayBuffer dst) throws IOException {
+    public int readLine(final ByteArrayBuffer dst)
+            throws MaxLineLimitException, IOException {
         if (dst == null) {
             throw new IllegalArgumentException("Buffer may not be null");
         }

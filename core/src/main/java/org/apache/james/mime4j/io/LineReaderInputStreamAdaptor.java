@@ -71,7 +71,8 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
     }
     
     @Override
-    public int readLine(final ByteArrayBuffer dst) throws IOException {
+    public int readLine(final ByteArrayBuffer dst)
+            throws MaxLineLimitException, IOException {
         int i;
         if (this.bis != null) {
              i = this.bis.readLine(dst);
@@ -83,7 +84,8 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
         return i;
     }
 
-    private int doReadLine(final ByteArrayBuffer dst) throws IOException {
+    private int doReadLine(final ByteArrayBuffer dst)
+            throws MaxLineLimitException, IOException {
         int total = 0;
         int ch;
         while ((ch = in.read()) != -1) {

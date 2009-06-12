@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
@@ -366,8 +367,9 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityStates.T_FIELD, entity.getState());
         try {
             entity.advance();
-            fail("MaxLineLimitException should have been thrown");
-        } catch (MaxLineLimitException expected) {
+            fail("MimeException caused by MaxLineLimitException should have been thrown");
+        } catch (MimeException expected) {
+            assertTrue(expected.getCause() instanceof MaxLineLimitException);
         }
     }
     
@@ -420,8 +422,9 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityStates.T_FIELD, entity.getState());
         try {
             entity.advance();
-            fail("MaxLineLimitException should have been thrown");
-        } catch (MaxLineLimitException expected) {
+            fail("MimeException caused by MaxLineLimitException should have been thrown");
+        } catch (MimeException expected) {
+            assertTrue(expected.getCause() instanceof MaxLineLimitException);
         }
     }
 

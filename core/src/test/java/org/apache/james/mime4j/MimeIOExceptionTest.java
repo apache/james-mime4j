@@ -23,14 +23,6 @@ import junit.framework.TestCase;
 
 public class MimeIOExceptionTest extends TestCase {
 
-    public void testMimeIOExceptionString() {
-        MimeIOException e =  new MimeIOException("message");
-        assertEquals("message", e.getMessage());
-        assertNotNull(e.getCause());
-        assertTrue(e.getCause() instanceof MimeException);
-        assertEquals("message", e.getCause().getMessage());
-    }
-
     public void testMimeIOExceptionMimeException() {
         MimeException cause = new MimeException("cause");
         MimeIOException e = new MimeIOException(cause);

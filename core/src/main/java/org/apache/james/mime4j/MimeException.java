@@ -19,8 +19,18 @@
 
 package org.apache.james.mime4j;
 
+import org.apache.james.mime4j.parser.ContentHandler;
+
 /**
  * MIME processing exception.
+ * <p>
+ * A <code>MimeException</code> may be thrown by a {@link ContentHandler} to
+ * indicate that it has failed to process a message event and that no further
+ * events should be generated.
+ * <p>
+ * <code>MimeException</code> also gets thrown by the parser to indicate MIME
+ * protocol errors, e.g. if a message boundary is too long or a header field
+ * cannot be parsed.
  */
 public class MimeException extends Exception {
 

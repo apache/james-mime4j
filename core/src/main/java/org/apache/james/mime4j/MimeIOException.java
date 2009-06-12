@@ -23,19 +23,16 @@ import java.io.IOException;
 
 /**
  * A wrapper class based on {@link IOException} for MIME protocol exceptions.
+ * <p>
+ * This exception is used to signal a <code>MimeException</code> in methods
+ * that only permit <code>IOException</code> to be thrown.
+ * <p>
+ * The cause of a <code>MimeIOException</code> is always a
+ * <code>MimeException</code> therefore.
  */
 public class MimeIOException extends IOException {
 
     private static final long serialVersionUID = 5393613459533735409L;
-
-    /**
-     * Creates a new MimeIOException from the specified detail message.
-     * 
-     * @param message detail message.
-     */
-    public MimeIOException(String message) {
-        this(new MimeException(message));
-    }
 
     /**
      * Constructs an IO exception based on {@link MimeException}.
@@ -44,7 +41,18 @@ public class MimeIOException extends IOException {
      */
     public MimeIOException(MimeException cause) {
         super(cause == null ? null : cause.getMessage());
-		initCause(cause);
+        initCause(cause);
+    }
+
+    /**
+     * Returns the <code>MimeException</code> that caused this
+     * <code>MimeIOException</code>.
+     * 
+     * @return the cause of this <code>MimeIOException</code>.
+     */
+    @Override
+    public MimeException getCause() {
+        return (MimeException) super.getCause();
     }
 
 }

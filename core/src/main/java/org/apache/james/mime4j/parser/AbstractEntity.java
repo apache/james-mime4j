@@ -130,42 +130,47 @@ public abstract class AbstractEntity implements EntityStateMachine {
         LineReaderInputStream instream = getDataStream();
         ByteArrayBuffer fieldbuf = new ByteArrayBuffer(64);
 
-        for (;;) {
-            // If there's still data stuck in the line buffer
-            // copy it to the field buffer
-            int len = linebuf.length();
-            if (maxLineLen > 0 && fieldbuf.length() + len >= maxLineLen) {
-                throw new MaxLineLimitException("Maximum line length limit exceeded");
-            }
-            if (len > 0) {
-                fieldbuf.append(linebuf.buffer(), 0, len);
-            }
-            linebuf.clear();
-            if (instream.readLine(linebuf) == -1) {
-                monitor(Event.HEADERS_PREMATURE_END);
-                endOfHeader = true;
-                break;
-            }
-            len = linebuf.length();
-            if (len > 0 && linebuf.byteAt(len - 1) == '\n') {
-                len--;
-            }
-            if (len > 0 && linebuf.byteAt(len - 1) == '\r') {
-                len--;
-            }
-            if (len == 0) {
-                // empty line detected 
-                endOfHeader = true;
-                break;
-            }
-            lineCount++;
-            if (lineCount > 1) {
-                int ch = linebuf.byteAt(0);
-                if (ch != CharsetUtil.SP && ch != CharsetUtil.HT) {
-                    // new header detected
+        try {
+            for (;;) {
+                // If there's still data stuck in the line buffer
+                // copy it to the field buffer
+                int len = linebuf.length();
+                if (maxLineLen > 0 && fieldbuf.length() + len >= maxLineLen) {
+                    throw new MaxLineLimitException("Maximum line length limit exceeded");
+                }
+                if (len > 0) {
+                    fieldbuf.append(linebuf.buffer(), 0, len);
+                }
+                linebuf.clear();
+                if (instream.readLine(linebuf) == -1) {
+                    monitor(Event.HEADERS_PREMATURE_END);
+                    endOfHeader = true;
                     break;
                 }
+                len = linebuf.length();
+                if (len > 0 && linebuf.byteAt(len - 1) == '\n') {
+                    len--;
+                }
+                if (len > 0 && linebuf.byteAt(len - 1) == '\r') {
+                    len--;
+                }
+                if (len == 0) {
+                    // empty line detected 
+                    endOfHeader = true;
+                    break;
+                }
+                lineCount++;
+                if (lineCount > 1) {
+                    int ch = linebuf.byteAt(0);
+                    if (ch != CharsetUtil.SP && ch != CharsetUtil.HT) {
+                        // new header detected
+                        break;
+                    }
+                }
             }
+        }
+        catch (MaxLineLimitException e) {
+            throw new MimeException(e);
         }
 
         return fieldbuf;
