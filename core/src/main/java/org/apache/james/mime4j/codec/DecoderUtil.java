@@ -54,10 +54,9 @@ public class DecoderUtil {
                 baos.write(b);
             }
         } catch (IOException e) {
-            /*
-             * This should never happen!
-             */
+            // This should never happen!
             log.error(e);
+            throw new IllegalStateException(e);
         }
         
         return baos.toByteArray();
@@ -83,10 +82,9 @@ public class DecoderUtil {
                 baos.write(b);
             }
         } catch (IOException e) {
-            /*
-             * This should never happen!
-             */
+            // This should never happen!
             log.error(e);
+            throw new IllegalStateException(e);
         }
         
         return baos.toByteArray();
