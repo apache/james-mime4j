@@ -40,7 +40,7 @@ public class DecoderUtil {
      * @param s the string to decode.
      * @return the decoded bytes.
      */
-    public static byte[] decodeBaseQuotedPrintable(String s) {
+    public static byte[] decodeQuotedPrintable(String s) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
         try {
@@ -134,7 +134,7 @@ public class DecoderUtil {
             }
         }
         
-        return new String(decodeBaseQuotedPrintable(sb.toString()), charset);
+        return new String(decodeQuotedPrintable(sb.toString()), charset);
     }
     
     /**
