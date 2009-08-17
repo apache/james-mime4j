@@ -33,18 +33,6 @@ public class DecoderUtilTest extends TestCase {
         BasicConfigurator.configure();
     }
 
-    /*
-    public void testDecodeEncodedWords() {
-        String s = "=?ISO-2022-JP?B?GyRCTCQbKEobJEI+NRsoShskQkJ6GyhKGyRCOS0bKEo=?= "
-                 + "=?ISO-2022-JP?B?GyRCOXAbKEobJEIiKBsoShskQiU1GyhKGyRCJSQbKEo=?= "
-                 + "=?ISO-2022-JP?B?GyRCJUkbKEobJEIlUxsoShskQiU4GyhKGyRCJU0bKEo=?= "  
-                 + "=?ISO-2022-JP?B?GyRCJTkbKEobJEIkThsoShskQjdoGyhKGyRCRGobKEo=?= "
-                 + "=?ISO-2022-JP?B?GyRCSEcbKEobJEIkRxsoShskQiQ5GyhKGyRCISobKEo=?=";      
-        
-        s = DecoderUtil.decodeEncodedWords(s);
-        System.out.println(s);
-    }*/
-
     public void testDecodeB() throws UnsupportedEncodingException {
         String s = DecoderUtil.decodeB("VGhpcyBpcyB0aGUgcGxhaW4gd"
                     + "GV4dCBtZXNzYWdlIQ==", "ISO8859-1");
@@ -73,6 +61,18 @@ public class DecoderUtilTest extends TestCase {
                 DecoderUtil.decodeEncodedWords("=?US-ASCII?B?QSBzaG9ydCB0ZXh0?="));
         assertEquals("A short text again!", 
                 DecoderUtil.decodeEncodedWords("=?US-ASCII?b?QSBzaG9ydCB0ZXh0IGFnYWluIQ==?="));
+    }
+
+    public void testDecodeJapaneseEncodedWords() {
+        String enc = "=?ISO-2022-JP?B?GyRCTCQbKEobJEI+NRsoShskQkJ6GyhKGyRCOS0bKEo=?= "
+                 + "=?ISO-2022-JP?B?GyRCOXAbKEobJEIiKBsoShskQiU1GyhKGyRCJSQbKEo=?= "
+                 + "=?ISO-2022-JP?B?GyRCJUkbKEobJEIlUxsoShskQiU4GyhKGyRCJU0bKEo=?= "  
+                 + "=?ISO-2022-JP?B?GyRCJTkbKEobJEIkThsoShskQjdoGyhKGyRCRGobKEo=?= "
+                 + "=?ISO-2022-JP?B?GyRCSEcbKEobJEIkRxsoShskQiQ5GyhKGyRCISobKEo=?=";      
+
+        String dec = DecoderUtil.decodeEncodedWords(enc);
+        assertEquals("\u672A\u627F\u8AFE\u5E83\u544A\u203B\u30B5\u30A4\u30C9\u30D3"
+                + "\u30B8\u30CD\u30B9\u306E\u6C7A\u5B9A\u7248\u3067\u3059\uFF01", dec);
     }
 
     public void testInvalidEncodedWordsAreIgnored() {
