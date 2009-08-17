@@ -91,36 +91,36 @@ public class DecoderUtil {
     }
     
     /**
-     * Decodes an encoded word encoded with the 'B' encoding (described in 
+     * Decodes an encoded text encoded with the 'B' encoding (described in 
      * RFC 2047) found in a header field body.
      * 
-     * @param encodedWord the encoded word to decode.
+     * @param encodedText the encoded text to decode.
      * @param charset the Java charset to use.
      * @return the decoded string.
      * @throws UnsupportedEncodingException if the given Java charset isn't 
      *         supported.
      */
-    public static String decodeB(String encodedWord, String charset) 
+    public static String decodeB(String encodedText, String charset) 
             throws UnsupportedEncodingException {
-        byte[] decodedBytes = decodeBase64(encodedWord);
+        byte[] decodedBytes = decodeBase64(encodedText);
         return new String(decodedBytes, charset);
     }
     
     /**
-     * Decodes an encoded word encoded with the 'Q' encoding (described in 
+     * Decodes an encoded text encoded with the 'Q' encoding (described in 
      * RFC 2047) found in a header field body.
      * 
-     * @param encodedWord the encoded word to decode.
+     * @param encodedText the encoded text to decode.
      * @param charset the Java charset to use.
      * @return the decoded string.
      * @throws UnsupportedEncodingException if the given Java charset isn't 
      *         supported.
      */
-    public static String decodeQ(String encodedWord, String charset)
+    public static String decodeQ(String encodedText, String charset)
             throws UnsupportedEncodingException {
-        encodedWord = replaceUnderscores(encodedWord);
+        encodedText = replaceUnderscores(encodedText);
         
-        byte[] decodedBytes = decodeQuotedPrintable(encodedWord);
+        byte[] decodedBytes = decodeQuotedPrintable(encodedText);
         return new String(decodedBytes, charset);
     }
     
