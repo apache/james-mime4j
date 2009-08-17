@@ -102,8 +102,8 @@ public class DecoderUtil {
      */
     public static String decodeB(String encodedWord, String charset) 
             throws UnsupportedEncodingException {
-        
-        return new String(decodeBase64(encodedWord), charset);
+        byte[] decodedBytes = decodeBase64(encodedWord);
+        return new String(decodedBytes, charset);
     }
     
     /**
@@ -118,21 +118,10 @@ public class DecoderUtil {
      */
     public static String decodeQ(String encodedWord, String charset)
             throws UnsupportedEncodingException {
-           
-        /*
-         * Replace _ with =20
-         */
-        StringBuilder sb = new StringBuilder(128);
-        for (int i = 0; i < encodedWord.length(); i++) {
-            char c = encodedWord.charAt(i);
-            if (c == '_') {
-                sb.append("=20");
-            } else {
-                sb.append(c);
-            }
-        }
+        encodedWord = replaceUnderscores(encodedWord);
         
-        return new String(decodeQuotedPrintable(sb.toString()), charset);
+        byte[] decodedBytes = decodeQuotedPrintable(encodedWord);
+        return new String(decodedBytes, charset);
     }
     
     /**
@@ -246,5 +235,23 @@ public class DecoderUtil {
             }
             return null;
         }
+    }
+
+    // Replace _ with =20
+    private static String replaceUnderscores(String str) {
+        // probably faster than String#replace(CharSequence, CharSequence)
+
+        StringBuilder sb = new StringBuilder(128);
+
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            if (c == '_') {
+                sb.append("=20");
+            } else {
+                sb.append(c);
+            }
+        }
+        
+        return sb.toString();
     }
 }
