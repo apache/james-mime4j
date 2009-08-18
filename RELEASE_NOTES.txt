@@ -5,6 +5,11 @@ Mime4J storage contains support for encrypted storage through the standard Java 
 API. When used in conjunction with a JRE with strong cryptography enabled, this library will
 use strong cryptography. See README.
 
+Notes
+-----
+
+ * The method decodeBaseQuotedPrintable() of class o.a.j.mime4j.codec.DecoderUtil has been renamed
+   in decodeQuotedPrintable(). Please adjust your code accordingly in case you use this method.
 
 Release 0.6
 -------------------
