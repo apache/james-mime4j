@@ -80,6 +80,7 @@ public class DecoderUtilTest extends TestCase {
         assertEquals("=?iso8859-1?b?=", DecoderUtil.decodeEncodedWords("=?iso8859-1?b?="));
         assertEquals("=?ISO-8859-1?Q?", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?"));
         assertEquals("=?ISO-8859-1?R?abc?=", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?R?abc?="));
+        assertEquals("test =?ISO-8859-1?R?abc?=", DecoderUtil.decodeEncodedWords("test =?ISO-8859-1?R?abc?="));
     }
 
     public void testEmptyEncodedTextIsIgnored() {
@@ -101,6 +102,7 @@ public class DecoderUtilTest extends TestCase {
 
     public void testNonWhiteSpaceBetweenEncodedWordsIsRetained() {
         assertEquals("a b c", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?= b =?ISO-8859-1?Q?c?="));
+        assertEquals("a\rb\nc", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?=\rb\n=?ISO-8859-1?Q?c?="));
     }
 
     public void testTextBeforeAndAfterEncodedWordIsRetained() {
