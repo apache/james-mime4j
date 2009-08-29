@@ -100,6 +100,16 @@ public class DecoderUtilTest extends TestCase {
         assertEquals("a b", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?= =?ISO-8859-2?Q?_b?="));
     }
 
+    // see MIME4J-138
+    public void testEncodedTextMayStartWithAnEqualsSign() {
+        assertEquals(" foo", DecoderUtil.decodeEncodedWords("=?utf-8?Q?=20foo?="));
+        assertEquals("Re: How to place a view at the bottom with a 100% width",
+            DecoderUtil.decodeEncodedWords("=?utf-8?Q?Re:=20How=20to=20place=20a=20view=20at=20the=20bottom?= "
+                    + "=?utf-8?Q?=20with=20a=20100%=20width?="));
+        assertEquals("Test \u00fc and more",
+            DecoderUtil.decodeEncodedWords("Test =?ISO-8859-1?Q?=FC_?= =?ISO-8859-1?Q?and_more?="));
+    }
+
     public void testNonWhiteSpaceBetweenEncodedWordsIsRetained() {
         assertEquals("a b c", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?= b =?ISO-8859-1?Q?c?="));
         assertEquals("a\rb\nc", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?=\rb\n=?ISO-8859-1?Q?c?="));

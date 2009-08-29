@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,7 +35,10 @@ import org.apache.james.mime4j.util.CharsetUtil;
  */
 public class DecoderUtil {
     private static Log log = LogFactory.getLog(DecoderUtil.class);
-    
+
+    private static final Pattern PATTERN_ENCODED_WORD = Pattern.compile(
+            "(.*?)=\\?([^\\?]+?)\\?(\\w)\\?([^\\?]+?)\\?=", Pattern.DOTALL);
+
     /**
      * Decodes a string containing quoted-printable encoded data. 
      * 
@@ -123,71 +128,57 @@ public class DecoderUtil {
         byte[] decodedBytes = decodeQuotedPrintable(encodedText);
         return new String(decodedBytes, charset);
     }
-    
+
     /**
-     * Decodes a string containing encoded words as defined by RFC 2047.
-     * Encoded words in have the form 
-     * =?charset?enc?Encoded word?= where enc is either 'Q' or 'q' for 
-     * quoted-printable and 'B' or 'b' for Base64.
+     * Decodes a string containing encoded words as defined by RFC 2047. Encoded
+     * words have the form =?charset?enc?encoded-text?= where enc is either 'Q'
+     * or 'q' for quoted-printable and 'B' or 'b' for base64.
      * 
      * @param body the string to decode.
      * @return the decoded string.
      */
     public static String decodeEncodedWords(String body) {
-        int previousEnd = 0;
-        boolean previousWasEncoded = false;
+        int tailIndex = 0;
+        boolean lastMatchValid = false;
 
         StringBuilder sb = new StringBuilder();
 
-        while (true) {
-            int begin = body.indexOf("=?", previousEnd);
-            int end = begin == -1 ? -1 : body.indexOf("?=", begin + 2);
-            if (end == -1) {
-                if (previousEnd == 0)
-                    return body;
+        for (Matcher matcher = PATTERN_ENCODED_WORD.matcher(body); matcher.find();) {
+            String separator = matcher.group(1);
+            String mimeCharset = matcher.group(2);
+            String encoding = matcher.group(3);
+            String encodedText = matcher.group(4);
 
-                sb.append(body.substring(previousEnd));
-                return sb.toString();
-            }
-            end += 2;
-
-            String sep = body.substring(previousEnd, begin);
-
-            String decoded = decodeEncodedWord(body, begin, end);
+            String decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText);
             if (decoded == null) {
-                sb.append(sep);
-                sb.append(body.substring(begin, end));
+                sb.append(matcher.group(0));
             } else {
-                if (!previousWasEncoded || !CharsetUtil.isWhitespace(sep)) {
-                    sb.append(sep);
+                if (!lastMatchValid || !CharsetUtil.isWhitespace(separator)) {
+                    sb.append(separator);
                 }
                 sb.append(decoded);
             }
 
-            previousEnd = end;
-            previousWasEncoded = decoded != null;
+            tailIndex = matcher.end();
+            lastMatchValid = decoded != null;
+        }
+
+        if (tailIndex == 0) {
+            return body;
+        } else {
+            sb.append(body.substring(tailIndex));
+            return sb.toString();
         }
     }
 
     // return null on error
-    private static String decodeEncodedWord(String body, int begin, int end) {
-        int qm1 = body.indexOf('?', begin + 2);
-        if (qm1 == end - 2)
-            return null;
-
-        int qm2 = body.indexOf('?', qm1 + 1);
-        if (qm2 == end - 2)
-            return null;
-
-        String mimeCharset = body.substring(begin + 2, qm1);
-        String encoding = body.substring(qm1 + 1, qm2);
-        String encodedText = body.substring(qm2 + 1, end - 2);
-
+    private static String tryDecodeEncodedWord(final String mimeCharset,
+            final String encoding, final String encodedText) {
         String charset = CharsetUtil.toJavaCharset(mimeCharset);
         if (charset == null) {
             if (log.isWarnEnabled()) {
                 log.warn("MIME charset '" + mimeCharset + "' in encoded word '"
-                        + body.substring(begin, end) + "' doesn't have a "
+                        + recombine(mimeCharset, encoding, encodedText) + "' doesn't have a "
                         + "corresponding Java charset");
             }
             return null;
@@ -195,7 +186,7 @@ public class DecoderUtil {
             if (log.isWarnEnabled()) {
                 log.warn("Current JDK doesn't support decoding of charset '"
                         + charset + "' (MIME charset '" + mimeCharset
-                        + "' in encoded word '" + body.substring(begin, end)
+                        + "' in encoded word '" + recombine(mimeCharset, encoding, encodedText)
                         + "')");
             }
             return null;
@@ -204,7 +195,7 @@ public class DecoderUtil {
         if (encodedText.length() == 0) {
             if (log.isWarnEnabled()) {
                 log.warn("Missing encoded text in encoded word: '"
-                        + body.substring(begin, end) + "'");
+                        + recombine(mimeCharset, encoding, encodedText) + "'");
             }
             return null;
         }
@@ -217,7 +208,7 @@ public class DecoderUtil {
             } else {
                 if (log.isWarnEnabled()) {
                     log.warn("Warning: Unknown encoding in encoded word '"
-                            + body.substring(begin, end) + "'");
+                            + recombine(mimeCharset, encoding, encodedText) + "'");
                 }
                 return null;
             }
@@ -225,16 +216,21 @@ public class DecoderUtil {
             // should not happen because of isDecodingSupported check above
             if (log.isWarnEnabled()) {
                 log.warn("Unsupported encoding in encoded word '"
-                        + body.substring(begin, end) + "'", e);
+                        + recombine(mimeCharset, encoding, encodedText) + "'", e);
             }
             return null;
         } catch (RuntimeException e) {
             if (log.isWarnEnabled()) {
                 log.warn("Could not decode encoded word '"
-                        + body.substring(begin, end) + "'", e);
+                        + recombine(mimeCharset, encoding, encodedText) + "'", e);
             }
             return null;
         }
+    }
+
+    private static String recombine(final String mimeCharset,
+            final String encoding, final String encodedText) {
+        return "=?" + mimeCharset + "?" + encoding + "?" + encodedText + "?=";
     }
 
     // Replace _ with =20
