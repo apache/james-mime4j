@@ -25,10 +25,10 @@ import java.util.Map;
 import org.apache.james.mime4j.util.ByteSequence;
 
 public class DelegatingFieldParser implements FieldParser {
-    
+    private static final FieldParser DEFAULT_PARSER = UnstructuredField.PARSER;
+
     private Map<String, FieldParser> parsers = new HashMap<String, FieldParser>();
-    private FieldParser defaultParser = UnstructuredField.PARSER;
-    
+
     /**
      * Sets the parser used for the field named <code>name</code>.
      * @param name the name of the field
@@ -40,8 +40,8 @@ public class DelegatingFieldParser implements FieldParser {
     
     public FieldParser getParser(final String name) {
         final FieldParser field = parsers.get(name.toLowerCase());
-        if(field==null) {
-            return defaultParser;
+        if (field == null) {
+            return DEFAULT_PARSER;
         }
         return field;
     }
