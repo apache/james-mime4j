@@ -35,7 +35,7 @@ public abstract class AbstractField implements ParsedField {
     private static final Pattern FIELD_NAME_PATTERN = Pattern
             .compile("^([\\x21-\\x39\\x3b-\\x7e]+):");
 
-    private static final DefaultFieldParser parser = new DefaultFieldParser();
+    private static final DefaultFieldParser PARSER = new DefaultFieldParser();
     
     private final String name;
     private final String body;
@@ -96,7 +96,7 @@ public abstract class AbstractField implements ParsedField {
      * @return the default field parser
      */
     public static DefaultFieldParser getParser() {
-        return parser;
+        return PARSER;
     }
     
     /**
@@ -168,7 +168,7 @@ public abstract class AbstractField implements ParsedField {
             body = body.substring(1);
         }
 
-        return parser.parse(name, body, raw);
+        return PARSER.parse(name, body, raw);
     }
 
 }
