@@ -30,6 +30,7 @@ import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
 import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
 import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
 import org.apache.james.mime4j.io.LineReaderInputStream;
+import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
@@ -136,7 +137,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
                 // copy it to the field buffer
                 int len = linebuf.length();
                 if (maxHeaderLen > 0 && fieldbuf.length() + len >= maxHeaderLen) {
-                    throw new MaxLineLimitException("Maximum header length limit exceeded");
+                    throw new MaxHeaderLengthLimitException("Maximum header length limit exceeded");
                 }
                 if (len > 0) {
                     fieldbuf.append(linebuf.buffer(), 0, len);
