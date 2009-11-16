@@ -43,10 +43,30 @@ public final class MimeEntityConfig implements Cloneable {
         this.countLineNumbers = false;
     }
     
+    /**
+     * Returns <code>true</code> if the maximum body descriptor should be
+     * used, <code>false</code> for the default body descriptor.
+     *
+     * @see #setMaximalBodyDescriptor(boolean)
+     *
+     * @return value of maximum body descriptor.
+     */
     public boolean isMaximalBodyDescriptor() {
         return this.maximalBodyDescriptor;
     }
-    
+
+    /**
+     * Specified whether the parser should use an instance of
+     * {@link MaximalBodyDescriptor} instead of {@link DefaultBodyDescriptor} to
+     * encapsulate the values of MIME-specific header fields.
+     * <p>
+     * The body descriptor can be retrieved by calling
+     * {@link MimeTokenStream#getBodyDescriptor()}.
+     *
+     * @param maximalBodyDescriptor <code>true</code> to use an instance of
+     *            {@link MaximalBodyDescriptor}, <code>false</code> for an
+     *            instance of {@link DefaultBodyDescriptor}.
+     */
     public void setMaximalBodyDescriptor(boolean maximalBodyDescriptor) {
         this.maximalBodyDescriptor = maximalBodyDescriptor;
     }
