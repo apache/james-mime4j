@@ -52,6 +52,16 @@ public final class MimeEntityConfig implements Cloneable {
     }
     
     /**
+     * Returns the value of the strict parsing mode
+     * @see #setStrictParsing(boolean)
+     * 
+     * @return value of the strict parsing mode
+     */
+    public boolean isStrictParsing() {
+        return this.strictParsing;
+    }
+
+    /**
      * Defines whether minor violations of the MIME specification should be 
      * tolerated or should result in a {@link MimeException}. If this parameter
      * is set to <code>true</code>, a strict interpretation of the MIME 
@@ -64,16 +74,16 @@ public final class MimeEntityConfig implements Cloneable {
         this.strictParsing = strictParsing;
     }
 
-    /**
-     * Returns the value of the strict parsing mode
-     * @see #setStrictParsing(boolean)
+    /** 
+     * Returns the maximum line length limit
+     * @see #setMaxLineLen(int)
      * 
-     * @return value of the strict parsing mode
+     * @return value of the the maximum line length limit
      */
-    public boolean isStrictParsing() {
-        return this.strictParsing;
+    public int getMaxLineLen() {
+        return this.maxLineLen;
     }
-    
+
     /**
      * Sets the maximum line length limit. Parsing of a MIME entity will be terminated 
      * with a {@link MimeException} if a line is encountered that exceeds the maximum
@@ -87,13 +97,13 @@ public final class MimeEntityConfig implements Cloneable {
     }
     
     /** 
-     * Returns the maximum line length limit
-     * @see #setMaxLineLen(int)
+     * Returns the maximum header limit
+     * @see #setMaxHeaderCount(int)
      * 
-     * @return value of the the maximum line length limit
+     * @return value of the the maximum header limit
      */
-    public int getMaxLineLen() {
-        return this.maxLineLen;
+    public int getMaxHeaderCount() {
+        return this.maxHeaderCount;
     }
 
     /**
@@ -109,13 +119,13 @@ public final class MimeEntityConfig implements Cloneable {
     }
 
     /** 
-     * Returns the maximum header limit
-     * @see #setMaxHeaderCount(int)
+     * Returns the maximum content length limit
+     * @see #setMaxContentLen(long)
      * 
-     * @return value of the the maximum header limit
+     * @return value of the the maximum content length limit
      */
-    public int getMaxHeaderCount() {
-        return this.maxHeaderCount;
+    public long getMaxContentLen() {
+        return maxContentLen;
     }
 
     /**
@@ -130,14 +140,13 @@ public final class MimeEntityConfig implements Cloneable {
         this.maxContentLen = maxContentLen;
     }
 
-    /** 
-     * Returns the maximum content length limit
-     * @see #setMaxContentLen(long)
+    /**
+     * Returns the value of the line number counting mode.
      * 
-     * @return value of the the maximum content length limit
+     * @return value of the line number counting mode.
      */
-    public long getMaxContentLen() {
-        return maxContentLen;
+    public boolean isCountLineNumbers() {
+        return countLineNumbers;
     }
 
     /**
@@ -149,15 +158,6 @@ public final class MimeEntityConfig implements Cloneable {
      */
     public void setCountLineNumbers(boolean countLineNumbers) {
         this.countLineNumbers = countLineNumbers;
-    }
-
-    /**
-     * Returns the value of the line number counting mode.
-     * 
-     * @return value of the line number counting mode.
-     */
-    public boolean isCountLineNumbers() {
-        return countLineNumbers;
     }
 
     /**
