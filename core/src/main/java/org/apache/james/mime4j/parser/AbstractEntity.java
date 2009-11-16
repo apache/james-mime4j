@@ -178,12 +178,12 @@ public abstract class AbstractEntity implements EntityStateMachine {
     }
 
     protected boolean parseField() throws MimeException, IOException {
-        int maxHeaderLimit = config.getMaxHeaderCount();
+        int maxHeaderCount = config.getMaxHeaderCount();
         for (;;) {
             if (endOfHeader) {
                 return false;
             }
-            if (headerCount >= maxHeaderLimit) {
+            if (maxHeaderCount > 0 && headerCount >= maxHeaderCount) {
                 throw new MaxHeaderLimitException("Maximum header limit exceeded");
             }
 
