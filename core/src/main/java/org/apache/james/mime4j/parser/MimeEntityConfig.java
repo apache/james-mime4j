@@ -20,6 +20,8 @@
 package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
+import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
 
 /**
  * MIME entity configuration
@@ -41,6 +43,7 @@ public final class MimeEntityConfig implements Cloneable {
         this.maxHeaderCount = 1000;
         this.maxContentLen = -1;
         this.countLineNumbers = false;
+        this.defaultContentType = null;
     }
     
     /**
@@ -62,6 +65,8 @@ public final class MimeEntityConfig implements Cloneable {
      * <p>
      * The body descriptor can be retrieved by calling
      * {@link MimeTokenStream#getBodyDescriptor()}.
+     * <p>
+     * Default value: <code>false</code>
      *
      * @param maximalBodyDescriptor <code>true</code> to use an instance of
      *            {@link MaximalBodyDescriptor}, <code>false</code> for an
@@ -87,6 +92,8 @@ public final class MimeEntityConfig implements Cloneable {
      * is set to <code>true</code>, a strict interpretation of the MIME 
      * specification will be enforced, If this parameter is set to <code>false</code>
      * minor violations will result in a warning in the log.
+     * <p>
+     * Default value: <code>false</code>
      * 
      * @param strictParsing value of the strict parsing mode
      */
@@ -109,6 +116,8 @@ public final class MimeEntityConfig implements Cloneable {
      * with a {@link MimeException} if a line is encountered that exceeds the maximum
      * length limit. If this parameter is set to a non positive value the line length
      * check will be disabled.
+     * <p>
+     * Default value: <code>1000</code>
      * 
      * @param maxLineLen maximum line length limit
      */
@@ -131,6 +140,8 @@ public final class MimeEntityConfig implements Cloneable {
      * with a {@link MimeException} if the number of headers exceeds the maximum
      * limit. If this parameter is set to a non positive value the header limit check 
      * will be disabled.
+     * <p>
+     * Default value: <code>1000</code>
      * 
      * @param maxHeaderCount maximum header limit
      */
@@ -153,6 +164,8 @@ public final class MimeEntityConfig implements Cloneable {
      * with a {@link MimeException} if a content body exceeds the maximum length limit. 
      * If this parameter is set to a non positive value the content length
      * check will be disabled.
+     * <p>
+     * Default value: <code>-1</code>
      * 
      * @param maxContentLen maximum content length limit
      */
@@ -172,6 +185,8 @@ public final class MimeEntityConfig implements Cloneable {
     /**
      * Defines whether the parser should count line numbers. If enabled line
      * numbers are included in the debug output.
+     * <p>
+     * Default value: <code>false</code>
      * 
      * @param countLineNumbers
      *            value of the line number counting mode.
@@ -195,6 +210,8 @@ public final class MimeEntityConfig implements Cloneable {
     /**
      * Defines a default content type. 
      * When not null, indicates that the parsing should be headless.
+     * <p>
+     * Default value: <code>null</code>
      * 
      * @param defaultContentType
      *            value of the default content type when parsing headless,
