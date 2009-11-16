@@ -126,7 +126,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
         if (endOfHeader) 
             throw new IllegalStateException();
 
-        int maxLineLen = config.getMaxLineLen();
+        int maxHeaderLen = config.getMaxHeaderLen();
         LineReaderInputStream instream = getDataStream();
         ByteArrayBuffer fieldbuf = new ByteArrayBuffer(64);
 
@@ -135,8 +135,8 @@ public abstract class AbstractEntity implements EntityStateMachine {
                 // If there's still data stuck in the line buffer
                 // copy it to the field buffer
                 int len = linebuf.length();
-                if (maxLineLen > 0 && fieldbuf.length() + len >= maxLineLen) {
-                    throw new MaxLineLimitException("Maximum line length limit exceeded");
+                if (maxHeaderLen > 0 && fieldbuf.length() + len >= maxHeaderLen) {
+                    throw new MaxLineLimitException("Maximum header length limit exceeded");
                 }
                 if (len > 0) {
                     fieldbuf.append(linebuf.buffer(), 0, len);

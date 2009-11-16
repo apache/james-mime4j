@@ -330,6 +330,9 @@ public class MimeEntityTest extends TestCase {
     }
 
     public void testMaxLineLimitCheck() throws Exception {
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setMaxLineLen(50);
+
         String message = 
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
@@ -342,10 +345,8 @@ public class MimeEntityTest extends TestCase {
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
         LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12, config.getMaxLineLen()); 
         
-        MimeEntityConfig config = new MimeEntityConfig();
-        config.setMaxLineLen(50);
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
@@ -355,25 +356,23 @@ public class MimeEntityTest extends TestCase {
                 config);
         
         assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
-        entity.advance();
+        entity.advance(); // advances to T_START_HEADER
         assertEquals(EntityStates.T_START_HEADER, entity.getState());
-        entity.advance();
+        entity.advance(); // reads To: into field buffer, From: into line buffer
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        entity.advance();
+        entity.advance(); // reads Date: into line buffer
         assertEquals(EntityStates.T_FIELD, entity.getState());
-        entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
-        entity.advance();
+        entity.advance(); // reads Subject: into line buffer
         assertEquals(EntityStates.T_FIELD, entity.getState());
         try {
-            entity.advance();
+            entity.advance(); // reads DoS: into line buffer
             fail("MimeException caused by MaxLineLimitException should have been thrown");
         } catch (MimeException expected) {
             assertTrue(expected.getCause() instanceof MaxLineLimitException);
         }
     }
     
-    public void testMaxLineLimitCheckFoldedLines() throws Exception {
+    public void testMaxHeaderLimitCheckFoldedLines() throws Exception {
         String message = 
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
@@ -400,7 +399,8 @@ public class MimeEntityTest extends TestCase {
         BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
         
         MimeEntityConfig config = new MimeEntityConfig();
-        config.setMaxLineLen(50);
+        config.setMaxLineLen(100);
+        config.setMaxHeaderLen(200);
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
@@ -428,6 +428,47 @@ public class MimeEntityTest extends TestCase {
         }
     }
 
+    public void testMaxHeaderLengthMayExceedMaxLineLength() throws Exception {
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setMaxLineLen(50);
+        config.setMaxHeaderLen(130);
+
+        String message = 
+            "To: Road Runner <runner@example.org>\r\n" +
+            "From: Wile E. Cayote <wile@example.org>\r\n" +
+            "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
+            "Subject: Mail\r\n" +
+            "X-LongHeader: xxxxxxxxxxxxxxxxxxxxxxx\r\n" +
+            "    xxxxxxxxxxxxxxxxxxxxxxx\r\n" +
+            "    xxxxxxxxxxxxxxxxxxxxxxx\r\n" +
+            "    xxxxxxxxxxxxxxxxxxxxxxx\r\n" +
+            "Content-Type: text/plain\r\n" +
+            "\r\n" +
+            "a very important message";
+        byte[] raw = message.getBytes("US-ASCII");
+        ByteArrayInputStream instream = new ByteArrayInputStream(raw);
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12, config.getMaxLineLen()); 
+        
+        MimeEntity entity = new MimeEntity(
+                lineInput,
+                rawstream,
+                null,
+                EntityStates.T_START_MESSAGE,
+                EntityStates.T_END_MESSAGE,
+                config);
+        
+        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        for (int i = 0; i < 6; i++) {
+            entity.advance();
+            assertEquals(EntityStates.T_FIELD, entity.getState());
+        }
+        entity.advance();
+        assertEquals(EntityStates.T_END_HEADER, entity.getState());
+    }
+    
     public void testMaxHeaderCount() throws Exception {
         String message = 
             "To: Road Runner <runner@example.org>\r\n" +

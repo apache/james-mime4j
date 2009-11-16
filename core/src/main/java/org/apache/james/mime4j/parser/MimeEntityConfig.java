@@ -32,6 +32,7 @@ public final class MimeEntityConfig implements Cloneable {
     private boolean strictParsing;
     private int maxLineLen;
     private int maxHeaderCount;
+    private int maxHeaderLen;
     private long maxContentLen;
     private boolean countLineNumbers;
     private String defaultContentType;
@@ -41,6 +42,7 @@ public final class MimeEntityConfig implements Cloneable {
         this.strictParsing = false;
         this.maxLineLen = 1000;
         this.maxHeaderCount = 1000;
+        this.maxHeaderLen = 10000;
         this.maxContentLen = -1;
         this.countLineNumbers = false;
         this.defaultContentType = null;
@@ -147,6 +149,34 @@ public final class MimeEntityConfig implements Cloneable {
      */
     public void setMaxHeaderCount(int maxHeaderCount) {
         this.maxHeaderCount = maxHeaderCount;
+    }
+
+    /**
+     * Returns the maximum header length limit
+     * @see #setMaxHeaderLen(int)
+     * 
+     * @return value of the maximum header length limit
+     */
+    public int getMaxHeaderLen() {
+        return maxHeaderLen;
+    }
+
+    /**
+     * Sets the maximum header length limit. Parsing of a MIME entity will be terminated 
+     * with a {@link MimeException} if the total length of a header exceeds this limit.
+     * If this parameter is set to a non positive value the header length check will be
+     * disabled.
+     * <p>
+     * A message header may be folded across multiple lines. This configuration parameter
+     * is used to limit the total length of a header, i.e. the sum of the length of all
+     * lines the header spans across (including line terminators).
+     * <p>
+     * Default value: <code>10000</code>
+     * 
+     * @param maxHeaderLen maximum header length limit
+     */
+    public void setMaxHeaderLen(int maxHeaderLen) {
+        this.maxHeaderLen = maxHeaderLen;
     }
 
     /** 
