@@ -149,21 +149,13 @@ public abstract class AbstractField implements ParsedField {
 
     private static ParsedField parse(final ByteSequence raw, final String rawStr)
             throws MimeException {
-        /*
-         * Unfold the field.
-         */
-        final String unfolded = MimeUtil.unfold(rawStr);
-
-        /*
-         * Split into name and value.
-         */
-        final Matcher fieldMatcher = FIELD_NAME_PATTERN.matcher(unfolded);
+        final Matcher fieldMatcher = FIELD_NAME_PATTERN.matcher(rawStr);
         if (!fieldMatcher.find()) {
             throw new MimeException("Invalid field in string");
         }
         final String name = fieldMatcher.group(1);
 
-        String body = unfolded.substring(fieldMatcher.end());
+        String body = rawStr.substring(fieldMatcher.end());
         if (body.length() > 0 && body.charAt(0) == ' ') {
             body = body.substring(1);
         }
