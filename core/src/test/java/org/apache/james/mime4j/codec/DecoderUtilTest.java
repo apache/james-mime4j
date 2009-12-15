@@ -110,6 +110,11 @@ public class DecoderUtilTest extends TestCase {
             DecoderUtil.decodeEncodedWords("Test =?ISO-8859-1?Q?=FC_?= =?ISO-8859-1?Q?and_more?="));
     }
 
+    // see MIME4J-142
+    public void testEncodedTextMayContainDollarSign() {
+        assertEquals("variable ${target.nl}", DecoderUtil.decodeEncodedWords("=?utf-8?Q?variable=20${target.nl}?="));
+    }
+
     public void testNonWhiteSpaceBetweenEncodedWordsIsRetained() {
         assertEquals("a b c", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?= b =?ISO-8859-1?Q?c?="));
         assertEquals("a\rb\nc", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?=\rb\n=?ISO-8859-1?Q?c?="));
