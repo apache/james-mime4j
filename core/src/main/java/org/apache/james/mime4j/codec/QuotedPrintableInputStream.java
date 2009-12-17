@@ -29,16 +29,41 @@ import org.apache.commons.logging.LogFactory;
  * Performs Quoted-Printable decoding on an underlying stream.
  */
 public class QuotedPrintableInputStream extends InputStream {
+    
+    private static final int ENCODED_BUFFER_SIZE = 1024 * 2;
+    private static char CR = '\r';
+    private static char LF = '\n';
+    private static char EQ = '=';
+    
     private static Log log = LogFactory.getLog(QuotedPrintableInputStream.class);
     
-    private InputStream stream;
-    ByteQueue byteq = new ByteQueue();
-    ByteQueue pushbackq = new ByteQueue();
-    private byte state = 0;
-    private boolean closed = false;
+    private final InputStream in;
+    private boolean strict;
+    private final ByteQueue data; 
+    private final ByteQueue blanks; 
+    
+    private final byte[] encoded;
+    private int pos = 0; // current index into encoded buffer
+    private int limit = 0; // current size of encoded buffer
+    
+    private boolean closed;
 
-    public QuotedPrintableInputStream(InputStream stream) {
-        this.stream = stream;
+    protected QuotedPrintableInputStream(final int bufsize, final InputStream in, boolean strict) {
+        super();
+        this.in = in;
+        this.strict = strict;
+        this.encoded = new byte[bufsize];
+        this.data = new ByteQueue();
+        this.blanks = new ByteQueue();
+        this.closed = false;
+    }
+    
+    public QuotedPrintableInputStream(final InputStream in, boolean strict) {
+        this(ENCODED_BUFFER_SIZE, in, strict);
+    }
+    
+    public QuotedPrintableInputStream(final InputStream in) {
+        this(ENCODED_BUFFER_SIZE, in, false);
     }
     
     /**
@@ -49,181 +74,187 @@ public class QuotedPrintableInputStream extends InputStream {
      */
     @Override
     public void close() throws IOException {
-        this.closed = true;
+        closed = true;
     }
 
-    @Override
-    public int read() throws IOException {
-        if (closed) {
-            throw new IOException("QuotedPrintableInputStream has been closed");
+    private int bufferLength() {
+        return limit - pos;
+    }
+    
+    private int fillBuffer() throws IOException {
+        // Compact buffer if needed
+        if (pos < limit) {
+            System.arraycopy(encoded, pos, encoded, 0, limit - pos);
+            limit -= pos;
+            pos = 0;
+        } else {
+            limit = 0;
+            pos = 0;
         }
-        fillBuffer();
-        if (byteq.count() == 0)
+        
+        int capacity = encoded.length - limit;
+        if (capacity > 0) {
+            int bytesRead = in.read(encoded, limit, capacity);
+            if (bytesRead > 0) {
+                limit += bytesRead;
+            }
+            return bytesRead;
+        } else {
+            return 0;
+        }
+    }
+    
+    private byte advance() {
+        if (pos < limit) {
+            byte b =  encoded[pos];
+            pos++;
+            return b;
+        } else {
             return -1;
-        else {
-            byte val = byteq.dequeue();
-            if (val >= 0)
-                return val;
-            else
-                return val & 0xFF;
         }
     }
+    
+    private byte peek(int i) {
+        if (pos + i < limit) {
+            return encoded[pos + i];
+        } else {
+            return -1;
+        }
+    }
+    
+    private void enqueueData() {
+        for (int i = pos; i < limit; i++) {
+            byte b = encoded[i];
+            if (b == LF || b == EQ) {
+                break;
+            }
+            if (Character.isWhitespace(b)) {
+                blanks.enqueue(b);
+            } else {
+                enqueueBlanks();                
+                data.enqueue(b);
+            }
+            pos++;
+        }
+    }    
+    
+    private void enqueueBlanks() {
+        while (blanks.count() > 0) {
+            data.enqueue(blanks.dequeue());
+        }
+    }
+    
+    private void decode() throws IOException {
+        boolean endOfStream = false;
+        while (data.count() == 0) {
 
-    /**
-     * Pulls bytes out of the underlying stream and places them in the
-     * pushback queue.  This is necessary (vs. reading from the
-     * underlying stream directly) to detect and filter out "transport
-     * padding" whitespace, i.e., all whitespace that appears immediately
-     * before a CRLF.
-     *
-     * @throws IOException Underlying stream threw IOException.
-     */
-    private void populatePushbackQueue() throws IOException {
-        //Debug.verify(pushbackq.count() == 0, "PopulatePushbackQueue called when pushback queue was not empty!");
-
-        if (pushbackq.count() != 0)
-            return;
-
-        while (true) {
-            int i = stream.read();
-            switch (i) {
-                case -1:
-                    // stream is done
-                    pushbackq.clear();  // discard any whitespace preceding EOF
-                    return;
-                case ' ':
-                case '\t':
-                    pushbackq.enqueue((byte)i);
-                    break;
-                case '\r':
-                case '\n':
-                    pushbackq.clear();  // discard any whitespace preceding EOL
-                    pushbackq.enqueue((byte)i);
-                    return;
-                default:
-                    pushbackq.enqueue((byte)i);
-                    return;
+            if (bufferLength() < 3) {
+                int bytesRead = fillBuffer();
+                endOfStream = bytesRead == -1;
+            }
+            // end of stream?
+            if (bufferLength() == 0 && endOfStream) {
+                break;
+            }
+            
+            // copy plain bytes until a delimiter is encountered
+            enqueueData();            
+            
+            int len = bufferLength();
+            if (len > 0) {
+                // found a delimiter of some kind
+                if (len >= 3 || endOfStream) {
+                    decodeSpecialSequence();
+                }
             }
         }
     }
 
-    /**
-     * Causes the pushback queue to get populated if it is empty, then
-     * consumes and decodes bytes out of it until one or more bytes are
-     * in the byte queue.  This decoding step performs the actual QP
-     * decoding.
-     *
-     * @throws IOException Underlying stream threw IOException.
-     */
-    private void fillBuffer() throws IOException {
-        byte msdChar = 0;  // first digit of escaped num
-        while (byteq.count() == 0) {
-            if (pushbackq.count() == 0) {
-                populatePushbackQueue();
-                if (pushbackq.count() == 0)
-                    return;
+    private void decodeSpecialSequence() throws IOException {
+        byte b1 = advance();
+        if (b1 == LF) {
+            // at end of line
+            if (blanks.count() == 0) {
+                data.enqueue((byte) LF);
+            } else {
+                if (blanks.dequeue() != EQ) {
+                    // hard line break
+                    data.enqueue((byte) CR);
+                    data.enqueue((byte) LF);
+                }
             }
-
-            byte b = pushbackq.dequeue();
-
-            switch (state) {
-                case 0:  // start state, no bytes pending
-                    if (b != '=') {
-                        byteq.enqueue(b);
-                        break;  // state remains 0
+            blanks.clear();
+        } else if (b1 == EQ) {
+            // found special char '='
+            enqueueBlanks();
+            byte b2 = advance();
+            if (b2 == EQ) {
+                data.enqueue(b2);
+                // deal with '==\r\n' brokenness
+                byte bb1 = peek(0);
+                byte bb2 = peek(1);
+                if (bb1 == LF || (bb1 == CR && bb2 == LF)) {
+                    blanks.enqueue(b2);
+                }
+            } else if (Character.isWhitespace((char) b2)) {
+                // soft line break
+                if (b2 != LF) {
+                    blanks.enqueue(b1);
+                    blanks.enqueue(b2);
+                }
+            } else {
+                byte b3 = advance();
+                int upper = convert(b2);
+                int lower = convert(b3);
+                if (upper < 0 || lower < 0) {
+                    if (strict) {
+                        throw new IOException("Malformed encoded value encountered");
                     } else {
-                        state = 1;
-                        break;
+                        log.warn("Malformed encoded value encountered");
+                        data.enqueue((byte) EQ);
+                        if (b2 != -1) data.enqueue((byte) b2);
+                        if (b3 != -1) data.enqueue((byte) b3);
                     }
-                case 1:  // encountered "=" so far
-                    if (b == '\r') {
-                        state = 2;
-                        break;
-                    } else if ((b >= '0' && b <= '9') || (b >= 'A' && b <= 'F') || (b >= 'a' && b <= 'f')) {
-                        state = 3;
-                        msdChar = b;  // save until next digit encountered
-                        break;
-                    } else if (b == '=') {
-                        /*
-                         * Special case when == is encountered.
-                         * Emit one = and stay in this state.
-                         */
-                        if (log.isWarnEnabled()) {
-                            log.warn("Malformed MIME; got ==");
-                        }
-                        byteq.enqueue((byte)'=');
-                        break;
-                    } else {
-                        if (log.isWarnEnabled()) {
-                            log.warn("Malformed MIME; expected \\r or "
-                                    + "[0-9A-Z], got " + b);
-                        }
-                        state = 0;
-                        byteq.enqueue((byte)'=');
-                        byteq.enqueue(b);
-                        break;
-                    }
-                case 2:  // encountered "=\r" so far
-                    if (b == '\n') {
-                        state = 0;
-                        break;
-                    } else {
-                        if (log.isWarnEnabled()) {
-                            log.warn("Malformed MIME; expected " 
-                                    + (int)'\n' + ", got " + b);
-                        }
-                        state = 0;
-                        byteq.enqueue((byte)'=');
-                        byteq.enqueue((byte)'\r');
-                        byteq.enqueue(b);
-                        break;
-                    }
-                case 3:  // encountered =<digit> so far; expecting another <digit> to complete the octet
-                    if ((b >= '0' && b <= '9') || (b >= 'A' && b <= 'F') || (b >= 'a' && b <= 'f')) {
-                        byte msd = asciiCharToNumericValue(msdChar);
-                        byte low = asciiCharToNumericValue(b);
-                        state = 0;
-                        byteq.enqueue((byte)((msd << 4) | low));
-                        break;
-                    } else {
-                        if (log.isWarnEnabled()) {
-                            log.warn("Malformed MIME; expected "
-                                     + "[0-9A-Z], got " + b);
-                        }
-                        state = 0;
-                        byteq.enqueue((byte)'=');
-                        byteq.enqueue(msdChar);
-                        byteq.enqueue(b);
-                        break;
-                    }
-                default:  // should never happen
-                    log.error("Illegal state: " + state);
-                    state = 0;
-                    byteq.enqueue(b);
-                    break;
+                } else {
+                    data.enqueue((byte)((upper << 4) | lower));
+                }
             }
+        } else {
+            throw new IllegalStateException();
         }
     }
-
+    
     /**
      * Converts '0' => 0, 'A' => 10, etc.
      * @param c ASCII character value.
      * @return Numeric value of hexadecimal character.
      */
-    private byte asciiCharToNumericValue(byte c) {
+    private int convert(byte c) {
         if (c >= '0' && c <= '9') {
-            return (byte)(c - '0');
-        } else if (c >= 'A' && c <= 'Z') {
-            return (byte)(0xA + (c - 'A'));
-        } else if (c >= 'a' && c <= 'z') {
-            return (byte)(0xA + (c - 'a'));
+            return (c - '0');
+        } else if (c >= 'A' && c <= 'F') {
+            return (0xA + (c - 'A'));
+        } else if (c >= 'a' && c <= 'f') {
+            return (0xA + (c - 'a'));
         } else {
-            /*
-             * This should never happen since all calls to this method
-             * are preceded by a check that c is in [0-9A-Za-z]
-             */
-            throw new IllegalArgumentException((char) c 
-                    + " is not a hexadecimal digit");
+            return -1;
+        }
+    }
+
+    @Override
+    public int read() throws IOException {
+        if (closed) {
+            throw new IOException("Stream has been closed");
+        }
+        decode();
+        if (data.count() == 0)
+            return -1;
+        else {
+            byte val = data.dequeue();
+            if (val >= 0)
+                return val;
+            else
+                return val & 0xFF;
         }
     }
 

@@ -103,7 +103,7 @@ public class QuotedPrintableTextEncodeTest extends TestCase {
         for (byte b=0;b<Byte.MAX_VALUE;b++) {
             byte[] content = {b};
             // White space is only escaped when followed by CRLF
-            if (b != 32 && b != 9) { 
+            if (b != 13 && b != 32 && b != 9) { 
                 checkRoundtrip(content);
             }
         }
