@@ -30,10 +30,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class QuotedPrintableInputStream extends InputStream {
     
-    private static final int ENCODED_BUFFER_SIZE = 1024 * 2;
-    private static char CR = '\r';
-    private static char LF = '\n';
-    private static char EQ = '=';
+    private static final int DEFAULT_BUFFER_SIZE = 1024 * 2;
+    
+    private static final byte EQ = 0x3D;
+    private static final byte CR = 0x0D;
+    private static final byte LF = 0x0A;
     
     private static Log log = LogFactory.getLog(QuotedPrintableInputStream.class);
     
@@ -59,11 +60,11 @@ public class QuotedPrintableInputStream extends InputStream {
     }
     
     public QuotedPrintableInputStream(final InputStream in, boolean strict) {
-        this(ENCODED_BUFFER_SIZE, in, strict);
+        this(DEFAULT_BUFFER_SIZE, in, strict);
     }
     
     public QuotedPrintableInputStream(final InputStream in) {
-        this(ENCODED_BUFFER_SIZE, in, false);
+        this(DEFAULT_BUFFER_SIZE, in, false);
     }
     
     /**

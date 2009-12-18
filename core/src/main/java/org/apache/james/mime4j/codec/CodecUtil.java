@@ -53,9 +53,9 @@ public class CodecUtil {
      * @throws IOException
      */
     public static void encodeQuotedPrintableBinary(final InputStream in, final OutputStream out) throws IOException {
-        
-        QuotedPrintableEncoder encoder = new QuotedPrintableEncoder(DEFAULT_ENCODING_BUFFER_SIZE, true);
-        encoder.encode(in, out);
+        QuotedPrintableOutputStream qpOut = new QuotedPrintableOutputStream(out, true);
+        copy(in, qpOut);
+        qpOut.close();
     }
     
     /**
@@ -67,8 +67,9 @@ public class CodecUtil {
      * @throws IOException
      */
     public static void encodeQuotedPrintable(final InputStream in, final OutputStream out) throws IOException {
-        final QuotedPrintableEncoder encoder = new QuotedPrintableEncoder(DEFAULT_ENCODING_BUFFER_SIZE, false);
-        encoder.encode(in, out);
+        QuotedPrintableOutputStream qpOut = new QuotedPrintableOutputStream(out, false);
+        copy(in, qpOut);
+        qpOut.close();
     }
     
     /**
