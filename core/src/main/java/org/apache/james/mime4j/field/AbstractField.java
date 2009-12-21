@@ -25,7 +25,6 @@ import java.util.regex.Pattern;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
-import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * The base class of all field classes.
