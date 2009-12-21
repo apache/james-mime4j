@@ -52,7 +52,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
 
     private boolean closed = false;
 
-    private byte[] oneByte = new byte[1];
+    private byte[] singleByte = new byte[1];
     
     public QuotedPrintableOutputStream(int bufsize, OutputStream out, boolean binary) {
         super(out);
@@ -218,8 +218,8 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        oneByte[0] = (byte) b;
-        this.write(oneByte, 0, 1);
+        singleByte[0] = (byte) b;
+        this.write(singleByte, 0, 1);
     }
 
     @Override

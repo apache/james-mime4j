@@ -166,4 +166,66 @@ public class TestByteArrayBuffer extends TestCase {
         }
     }
     
+    public void testRemove() throws Exception {
+        ByteArrayBuffer b = new ByteArrayBuffer(16);
+        byte tmp[] = "--+++-".getBytes("US-ASCII");
+        b.append(tmp, 0, tmp.length);
+
+        b.remove(2, 3);
+        assertEquals(3, b.length());
+        assertEquals("---", new String(b.buffer(), 0, b.length(), "US-ASCII"));
+        b.remove(2, 1);
+        b.remove(1, 1);
+        b.remove(0, 1);
+        assertEquals(0, b.length());
+
+        tmp = "+++---".getBytes("US-ASCII");
+        b.append(tmp, 0, tmp.length);
+
+        b.remove(0, 3);
+        assertEquals(3, b.length());
+        assertEquals("---", new String(b.buffer(), 0, b.length(), "US-ASCII"));
+        b.remove(0, 3);
+        assertEquals(0, b.length());
+
+        tmp = "---+++".getBytes("US-ASCII");
+        b.append(tmp, 0, tmp.length);
+
+        b.remove(3, 3);
+        assertEquals(3, b.length());
+        assertEquals("---", new String(b.buffer(), 0, b.length(), "US-ASCII"));
+        b.remove(0, 3);
+        
+        assertEquals(0, b.length());
+    }
+
+    public void testInvalidRemove() throws Exception {
+        ByteArrayBuffer buffer = new ByteArrayBuffer(16);
+        buffer.setLength(8);
+        try {
+            buffer.remove(-1, 0);
+            fail("IndexOutOfBoundsException should have been thrown");
+        } catch (IndexOutOfBoundsException ex) {
+            // expected
+        }
+        try {
+            buffer.remove(0, -1);
+            fail("IndexOutOfBoundsException should have been thrown");
+        } catch (IndexOutOfBoundsException ex) {
+            // expected
+        }
+        try {
+            buffer.remove(0, 9);
+            fail("IndexOutOfBoundsException should have been thrown");
+        } catch (IndexOutOfBoundsException ex) {
+            // expected
+        }
+        try {
+            buffer.remove(10, 2);
+            fail("IndexOutOfBoundsException should have been thrown");
+        } catch (IndexOutOfBoundsException ex) {
+            // expected
+        }
+    }
+
 }

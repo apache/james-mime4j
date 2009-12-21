@@ -24,6 +24,7 @@ import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 /**
  * Performs Base-64 decoding on an underlying stream.
@@ -48,35 +49,38 @@ public class Base64InputStream extends InputStream {
 
     private final byte[] singleByte = new byte[1];
 
-    private boolean strict;
-
     private final InputStream in;
-    private boolean closed = false;
+    private final boolean strict;
+    private final byte[] encoded;
+    private final ByteArrayBuffer decodedBuf;
 
-    private final byte[] encoded = new byte[ENCODED_BUFFER_SIZE];
     private int position = 0; // current index into encoded buffer
     private int size = 0; // current size of encoded buffer
 
-    private final ByteQueue q = new ByteQueue();
-
+    private boolean closed = false;
     private boolean eof; // end of file or pad character reached
 
+    protected Base64InputStream(int bufsize, InputStream in, boolean strict) {
+        if (in == null)
+            throw new IllegalArgumentException();
+        this.encoded = new byte[bufsize];
+        this.decodedBuf = new ByteArrayBuffer(512);
+        this.in = in;
+        this.strict = strict;
+    }
+
     public Base64InputStream(InputStream in) {
-        this(in, false);
+        this(ENCODED_BUFFER_SIZE, in, false);
     }
 
     public Base64InputStream(InputStream in, boolean strict) {
-        if (in == null)
-            throw new IllegalArgumentException();
-
-        this.in = in;
-        this.strict = strict;
+        this(ENCODED_BUFFER_SIZE, in, strict);
     }
 
     @Override
     public int read() throws IOException {
         if (closed)
-            throw new IOException("Base64InputStream has been closed");
+            throw new IOException("Stream has been closed");
 
         while (true) {
             int bytes = read0(singleByte, 0, 1);
@@ -91,7 +95,7 @@ public class Base64InputStream extends InputStream {
     @Override
     public int read(byte[] buffer) throws IOException {
         if (closed)
-            throw new IOException("Base64InputStream has been closed");
+            throw new IOException("Stream has been closed");
 
         if (buffer == null)
             throw new NullPointerException();
@@ -105,7 +109,7 @@ public class Base64InputStream extends InputStream {
     @Override
     public int read(byte[] buffer, int offset, int length) throws IOException {
         if (closed)
-            throw new IOException("Base64InputStream has been closed");
+            throw new IOException("Stream has been closed");
 
         if (buffer == null)
             throw new NullPointerException();
@@ -131,11 +135,12 @@ public class Base64InputStream extends InputStream {
             throws IOException {
         int index = from; // index into given buffer
 
-        // check if a previous invocation left decoded bytes in the queue
-
-        int qCount = q.count();
-        while (qCount-- > 0 && index < to) {
-            buffer[index++] = q.dequeue();
+        // check if a previous invocation left decoded content
+        if (decodedBuf.length() > 0) {
+            int len = Math.min(decodedBuf.length(), to - from);
+            System.arraycopy(decodedBuf.buffer(), 0, buffer, index, len);
+            decodedBuf.remove(0, len);
+            index += len;
         }
 
         // eof or pad reached?
@@ -202,15 +207,15 @@ public class Base64InputStream extends InputStream {
                         if (index < to - 1) {
                             buffer[index++] = b1;
                             buffer[index++] = b2;
-                            q.enqueue(b3);
+                            decodedBuf.append(b3);
                         } else if (index < to) {
                             buffer[index++] = b1;
-                            q.enqueue(b2);
-                            q.enqueue(b3);
+                            decodedBuf.append(b2);
+                            decodedBuf.append(b3);
                         } else {
-                            q.enqueue(b1);
-                            q.enqueue(b2);
-                            q.enqueue(b3);
+                            decodedBuf.append(b1);
+                            decodedBuf.append(b2);
+                            decodedBuf.append(b3);
                         }
 
                         assert index == to;
@@ -236,7 +241,7 @@ public class Base64InputStream extends InputStream {
             if (index < end) {
                 buffer[index++] = b;
             } else {
-                q.enqueue(b);
+                decodedBuf.append(b);
             }
         } else if (sextets == 3) {
             // two bytes encoded as "XYZ="
@@ -249,10 +254,10 @@ public class Base64InputStream extends InputStream {
                 buffer[index++] = b2;
             } else if (index < end) {
                 buffer[index++] = b1;
-                q.enqueue(b2);
+                decodedBuf.append(b2);
             } else {
-                q.enqueue(b1);
-                q.enqueue(b2);
+                decodedBuf.append(b1);
+                decodedBuf.append(b2);
             }
         } else {
             // error in encoded data
@@ -264,17 +269,17 @@ public class Base64InputStream extends InputStream {
 
     private void handleUnexpectedEof(int sextets) throws IOException {
         if (strict)
-            throw new IOException("unexpected end of file");
+            throw new IOException("Unexpected end of BASE64 stream");
         else
-            log.warn("unexpected end of file; dropping " + sextets
+            log.warn("Unexpected end of BASE64 stream; dropping " + sextets
                     + " sextet(s)");
     }
 
     private void handleUnexpecedPad(int sextets) throws IOException {
         if (strict)
-            throw new IOException("unexpected padding character");
+            throw new IOException("Unexpected padding character");
         else
-            log.warn("unexpected padding character; dropping " + sextets
+            log.warn("Unexpected padding character; dropping " + sextets
                     + " sextet(s)");
     }
 }

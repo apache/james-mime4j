@@ -150,6 +150,21 @@ public final class ByteArrayBuffer implements ByteSequence {
         this.len = len;
     }
     
+    public void remove(int off, int len) {
+        if ((off < 0) || (off > this.len) || (len < 0) ||
+                ((off + len) < 0) || ((off + len) > this.len)) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (len == 0) {
+            return;
+        }
+        int remaining = this.len - off - len;
+        if (remaining > 0) {
+            System.arraycopy(this.buffer, off + len, this.buffer, off, remaining);
+        }
+        this.len -= len;
+    }
+    
     public boolean isEmpty() {
         return this.len == 0; 
     }

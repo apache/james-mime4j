@@ -24,6 +24,7 @@ import java.io.InputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 /**
  * Performs Quoted-Printable decoding on an underlying stream.
@@ -38,10 +39,12 @@ public class QuotedPrintableInputStream extends InputStream {
     
     private static Log log = LogFactory.getLog(QuotedPrintableInputStream.class);
     
+    private final byte[] singleByte = new byte[1];
+    
     private final InputStream in;
     private boolean strict;
-    private final ByteQueue data; 
-    private final ByteQueue blanks; 
+    private final ByteArrayBuffer decodedBuf; 
+    private final ByteArrayBuffer blanks; 
     
     private final byte[] encoded;
     private int pos = 0; // current index into encoded buffer
@@ -54,8 +57,8 @@ public class QuotedPrintableInputStream extends InputStream {
         this.in = in;
         this.strict = strict;
         this.encoded = new byte[bufsize];
-        this.data = new ByteQueue();
-        this.blanks = new ByteQueue();
+        this.decodedBuf = new ByteArrayBuffer(512);
+        this.blanks = new ByteArrayBuffer(512);
         this.closed = false;
     }
     
@@ -130,24 +133,21 @@ public class QuotedPrintableInputStream extends InputStream {
                 break;
             }
             if (Character.isWhitespace(b)) {
-                blanks.enqueue(b);
+                blanks.append(b);
             } else {
-                enqueueBlanks();                
-                data.enqueue(b);
+                if (blanks.length() > 0) {
+                    decodedBuf.append(blanks.buffer(), 0, blanks.length());
+                    blanks.clear();
+                }
+                decodedBuf.append(b);
             }
             pos++;
         }
     }    
     
-    private void enqueueBlanks() {
-        while (blanks.count() > 0) {
-            data.enqueue(blanks.dequeue());
-        }
-    }
-    
     private void decode() throws IOException {
         boolean endOfStream = false;
-        while (data.count() == 0) {
+        while (decodedBuf.length() == 0) {
 
             if (bufferLength() < 3) {
                 int bytesRead = fillBuffer();
@@ -175,33 +175,36 @@ public class QuotedPrintableInputStream extends InputStream {
         byte b1 = advance();
         if (b1 == LF) {
             // at end of line
-            if (blanks.count() == 0) {
-                data.enqueue((byte) LF);
+            if (blanks.length() == 0) {
+                decodedBuf.append((byte) LF);
             } else {
-                if (blanks.dequeue() != EQ) {
+                if (blanks.byteAt(0) != EQ) {
                     // hard line break
-                    data.enqueue((byte) CR);
-                    data.enqueue((byte) LF);
+                    decodedBuf.append((byte) CR);
+                    decodedBuf.append((byte) LF);
                 }
             }
             blanks.clear();
         } else if (b1 == EQ) {
             // found special char '='
-            enqueueBlanks();
+            if (blanks.length() > 0) {
+                decodedBuf.append(blanks.buffer(), 0, blanks.length());
+                blanks.clear();
+            }
             byte b2 = advance();
             if (b2 == EQ) {
-                data.enqueue(b2);
+                decodedBuf.append(b2);
                 // deal with '==\r\n' brokenness
                 byte bb1 = peek(0);
                 byte bb2 = peek(1);
                 if (bb1 == LF || (bb1 == CR && bb2 == LF)) {
-                    blanks.enqueue(b2);
+                    blanks.append(b2);
                 }
             } else if (Character.isWhitespace((char) b2)) {
                 // soft line break
                 if (b2 != LF) {
-                    blanks.enqueue(b1);
-                    blanks.enqueue(b2);
+                    blanks.append(b1);
+                    blanks.append(b2);
                 }
             } else {
                 byte b3 = advance();
@@ -212,12 +215,12 @@ public class QuotedPrintableInputStream extends InputStream {
                         throw new IOException("Malformed encoded value encountered");
                     } else {
                         log.warn("Malformed encoded value encountered");
-                        data.enqueue((byte) EQ);
-                        if (b2 != -1) data.enqueue((byte) b2);
-                        if (b3 != -1) data.enqueue((byte) b3);
+                        decodedBuf.append((byte) EQ);
+                        if (b2 != -1) decodedBuf.append((byte) b2);
+                        if (b3 != -1) decodedBuf.append((byte) b3);
                     }
                 } else {
-                    data.enqueue((byte)((upper << 4) | lower));
+                    decodedBuf.append((byte)((upper << 4) | lower));
                 }
             }
         } else {
@@ -247,15 +250,32 @@ public class QuotedPrintableInputStream extends InputStream {
         if (closed) {
             throw new IOException("Stream has been closed");
         }
+        for (;;) {
+            int bytes = read(singleByte, 0, 1);
+            if (bytes == -1) {
+                return -1;
+            }
+            if (bytes == 1) {
+                return singleByte[0] & 0xff;
+            }
+        }
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException {
+        if (closed) {
+            throw new IOException("Stream has been closed");
+        }
         decode();
-        if (data.count() == 0)
+        if (decodedBuf.length() == 0) {
             return -1;
-        else {
-            byte val = data.dequeue();
-            if (val >= 0)
-                return val;
-            else
-                return val & 0xFF;
+        } else {
+            int chunk = Math.min(decodedBuf.length(), len);
+            if (chunk > 0) {
+                System.arraycopy(decodedBuf.buffer(), 0, b, off, chunk);
+                decodedBuf.remove(0, chunk);
+            }
+            return chunk;
         }
     }
 

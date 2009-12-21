@@ -228,7 +228,7 @@ public class Base64InputStreamTest extends TestCase {
             fail();
         } catch (IOException expected) {
             assertTrue(expected.getMessage().toLowerCase().contains(
-                    "end of file"));
+                    "end of base64 stream"));
         }
     }
 
