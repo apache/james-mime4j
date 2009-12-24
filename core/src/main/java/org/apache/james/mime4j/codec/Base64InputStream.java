@@ -120,7 +120,7 @@ public class Base64InputStream extends InputStream {
         if (length == 0)
             return 0;
 
-        return read0(buffer, offset, offset + length);
+        return read0(buffer, offset, length);
     }
 
     @Override
@@ -131,16 +131,17 @@ public class Base64InputStream extends InputStream {
         closed = true;
     }
 
-    private int read0(final byte[] buffer, final int from, final int to)
-            throws IOException {
-        int index = from; // index into given buffer
+    private int read0(final byte[] buffer, final int off, final int len) throws IOException {
+        int from = off;
+        int to = off + len;
+        int index = off;
 
         // check if a previous invocation left decoded content
         if (decodedBuf.length() > 0) {
-            int len = Math.min(decodedBuf.length(), to - from);
-            System.arraycopy(decodedBuf.buffer(), 0, buffer, index, len);
-            decodedBuf.remove(0, len);
-            index += len;
+            int chunk = Math.min(decodedBuf.length(), len);
+            System.arraycopy(decodedBuf.buffer(), 0, buffer, index, chunk);
+            decodedBuf.remove(0, chunk);
+            index += chunk;
         }
 
         // eof or pad reached?

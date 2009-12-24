@@ -81,10 +81,6 @@ public class QuotedPrintableInputStream extends InputStream {
         closed = true;
     }
 
-    private int bufferLength() {
-        return limit - pos;
-    }
-    
     private int fillBuffer() throws IOException {
         // Compact buffer if needed
         if (pos < limit) {
@@ -108,132 +104,145 @@ public class QuotedPrintableInputStream extends InputStream {
         }
     }
     
-    private byte advance() {
+    private int getnext() {
         if (pos < limit) {
             byte b =  encoded[pos];
             pos++;
-            return b;
+            return b & 0xFF;
         } else {
             return -1;
         }
     }
     
-    private byte peek(int i) {
+    private int peek(int i) {
         if (pos + i < limit) {
-            return encoded[pos + i];
+            return encoded[pos + i] & 0xFF;
         } else {
             return -1;
         }
     }
     
-    private void enqueueData() {
-        for (int i = pos; i < limit; i++) {
-            byte b = encoded[i];
-            if (b == LF || b == EQ) {
-                break;
-            }
-            if (Character.isWhitespace(b)) {
-                blanks.append(b);
-            } else {
-                if (blanks.length() > 0) {
-                    decodedBuf.append(blanks.buffer(), 0, blanks.length());
-                    blanks.clear();
-                }
-                decodedBuf.append(b);
-            }
-            pos++;
-        }
-    }    
-    
-    private void decode() throws IOException {
-        boolean endOfStream = false;
-        while (decodedBuf.length() == 0) {
-
-            if (bufferLength() < 3) {
-                int bytesRead = fillBuffer();
-                endOfStream = bytesRead == -1;
-            }
-            // end of stream?
-            if (bufferLength() == 0 && endOfStream) {
-                break;
-            }
-            
-            // copy plain bytes until a delimiter is encountered
-            enqueueData();            
-            
-            int len = bufferLength();
-            if (len > 0) {
-                // found a delimiter of some kind
-                if (len >= 3 || endOfStream) {
-                    decodeSpecialSequence();
-                }
-            }
-        }
-    }
-
-    private void decodeSpecialSequence() throws IOException {
-        byte b1 = advance();
-        if (b1 == LF) {
-            // at end of line
-            if (blanks.length() == 0) {
-                decodedBuf.append((byte) LF);
-            } else {
-                if (blanks.byteAt(0) != EQ) {
-                    // hard line break
-                    decodedBuf.append((byte) CR);
-                    decodedBuf.append((byte) LF);
-                }
+    private int transfer(
+            final int b, final byte[] buffer, final int from, final int to, boolean keepblanks) {
+        int index = from;
+        if (keepblanks && blanks.length() > 0) {
+            int chunk = Math.min(blanks.length(), to - index);
+            System.arraycopy(blanks.buffer(), 0, buffer, index, chunk);
+            index += chunk;
+            int remaining = blanks.length() - chunk;
+            if (remaining > 0) {
+                decodedBuf.append(blanks.buffer(), chunk, remaining);
             }
             blanks.clear();
-        } else if (b1 == EQ) {
-            // found special char '='
-            if (blanks.length() > 0) {
-                decodedBuf.append(blanks.buffer(), 0, blanks.length());
-                blanks.clear();
-            }
-            byte b2 = advance();
-            if (b2 == EQ) {
-                decodedBuf.append(b2);
-                // deal with '==\r\n' brokenness
-                byte bb1 = peek(0);
-                byte bb2 = peek(1);
-                if (bb1 == LF || (bb1 == CR && bb2 == LF)) {
-                    blanks.append(b2);
-                }
-            } else if (Character.isWhitespace((char) b2)) {
-                // soft line break
-                if (b2 != LF) {
-                    blanks.append(b1);
-                    blanks.append(b2);
-                }
-            } else {
-                byte b3 = advance();
-                int upper = convert(b2);
-                int lower = convert(b3);
-                if (upper < 0 || lower < 0) {
-                    if (strict) {
-                        throw new IOException("Malformed encoded value encountered");
-                    } else {
-                        log.warn("Malformed encoded value encountered");
-                        decodedBuf.append((byte) EQ);
-                        if (b2 != -1) decodedBuf.append((byte) b2);
-                        if (b3 != -1) decodedBuf.append((byte) b3);
-                    }
-                } else {
-                    decodedBuf.append((byte)((upper << 4) | lower));
-                }
-            }
-        } else {
-            throw new IllegalStateException();
         }
+        if (b != -1) {
+            if (index < to) {
+                buffer[index++] = (byte) b;
+            } else {
+                decodedBuf.append(b);
+            }
+        }
+        return index;
     }
     
+    private int read0(final byte[] buffer, final int off, final int len) throws IOException {
+        boolean eof = false;
+        int from = off;
+        int to = off + len;
+        int index = off;
+
+        // check if a previous invocation left decoded content
+        if (decodedBuf.length() > 0) {
+            int chunk = Math.min(decodedBuf.length(), to - index);
+            System.arraycopy(decodedBuf.buffer(), 0, buffer, index, chunk);
+            decodedBuf.remove(0, chunk);
+            index += chunk;
+        }
+        
+        while (index < to) {
+
+            if (limit - pos < 3) {
+                int bytesRead = fillBuffer();
+                eof = bytesRead == -1;
+            }
+            
+            // end of stream?
+            if (limit - pos == 0 && eof) {
+                return index == from ? -1 : index - from;
+            }
+
+            while (pos < limit && index < to) {
+                int b = encoded[pos++] & 0xFF;
+
+                if (b == LF) {
+                    // at end of line
+                    if (blanks.length() == 0) {
+                        index = transfer(LF, buffer, index, to, false);
+                    } else {
+                        if (blanks.byteAt(0) != EQ) {
+                            // hard line break
+                            index = transfer(CR, buffer, index, to, false);
+                            index = transfer(LF, buffer, index, to, false);
+                        }
+                    }
+                    blanks.clear();
+                } else if (b == EQ) {
+                    if (limit - pos < 2 && !eof) {
+                        // not enough buffered data
+                        pos--;
+                        break;
+                    }
+
+                    // found special char '='
+                    int b2 = getnext();
+                    if (b2 == EQ) {
+                        index = transfer(b2, buffer, index, to, true);
+                        // deal with '==\r\n' brokenness
+                        int bb1 = peek(0);
+                        int bb2 = peek(1);
+                        if (bb1 == LF || (bb1 == CR && bb2 == LF)) {
+                            blanks.append(b2);
+                        }
+                    } else if (Character.isWhitespace((char) b2)) {
+                        // soft line break
+                        index = transfer(-1, buffer, index, to, true);
+                        if (b2 != LF) {
+                            blanks.append(b);
+                            blanks.append(b2);
+                        }
+                    } else {
+                        int b3 = getnext();
+                        int upper = convert(b2);
+                        int lower = convert(b3);
+                        if (upper < 0 || lower < 0) {
+                            if (strict) {
+                                throw new IOException("Malformed encoded value encountered");
+                            } else {
+                                log.warn("Malformed encoded value encountered");
+                                index = transfer(EQ, buffer, index, to, true);
+                                index = transfer(b2, buffer, index, to, false);
+                                index = transfer(b3, buffer, index, to, false);
+                            }
+                        } else {
+                            index = transfer((upper << 4) | lower, buffer, index, to, true);
+                        }
+                    }
+                } else if (Character.isWhitespace(b)) {
+                    blanks.append(b);
+                } else {
+                    index = transfer((int) b & 0xFF, buffer, index, to, true);
+                }
+            }
+        }
+        return to - from;
+    }
+
     /**
      * Converts '0' => 0, 'A' => 10, etc.
      * @param c ASCII character value.
      * @return Numeric value of hexadecimal character.
      */
-    private int convert(byte c) {
+    private int convert(int c) {
         if (c >= '0' && c <= '9') {
             return (c - '0');
         } else if (c >= 'A' && c <= 'F') {
@@ -266,17 +275,7 @@ public class QuotedPrintableInputStream extends InputStream {
         if (closed) {
             throw new IOException("Stream has been closed");
         }
-        decode();
-        if (decodedBuf.length() == 0) {
-            return -1;
-        } else {
-            int chunk = Math.min(decodedBuf.length(), len);
-            if (chunk > 0) {
-                System.arraycopy(decodedBuf.buffer(), 0, b, off, chunk);
-                decodedBuf.remove(0, chunk);
-            }
-            return chunk;
-        }
+        return read0(b, off, len);
     }
 
 }
