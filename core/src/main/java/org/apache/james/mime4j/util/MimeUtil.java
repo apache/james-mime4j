@@ -175,8 +175,6 @@ public final class MimeUtil {
     @SuppressWarnings("fallthrough")
     public static Map<String, String> getHeaderParams(String pValue) {
         pValue = pValue.trim();
-
-        pValue = unfold(pValue);
         
         Map<String, String> result = new HashMap<String, String>();
 

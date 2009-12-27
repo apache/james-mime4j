@@ -21,6 +21,7 @@ package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * The basic immutable MIME field.
@@ -70,7 +71,7 @@ class RawField implements Field {
     private String parseBody() {
         int offset = colonIdx + 1;
         int length = raw.length() - offset;
-        return ContentUtil.decode(raw, offset, length);
+        return MimeUtil.unfold(ContentUtil.decode(raw, offset, length));
     }
 
 }
