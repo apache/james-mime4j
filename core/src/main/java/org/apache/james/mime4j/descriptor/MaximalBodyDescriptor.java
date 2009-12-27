@@ -140,9 +140,15 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         if (value != null) {
             final StringReader stringReader = new StringReader(value);
             final StructuredFieldParser parser = new StructuredFieldParser(stringReader);
-            parser.setFoldingPreserved(false);
             try {
-                contentLocation = parser.parse();
+            	// From RFC2017 3.1
+            	/*
+            	 * Extraction of the URL string from the URL-parameter is even simpler:
+            	 * The enclosing quotes and any linear whitespace are removed and the
+            	 * remaining material is the URL string.
+            	 * Read more: http://www.faqs.org/rfcs/rfc2017.html#ixzz0aufO9nRL
+            	 */
+                contentLocation = parser.parse().replaceAll("\\s", "");
             } catch (MimeException e) { 
                 contentLocationParseException = e;
             }
