@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.MimeUtil;
 
 public class DelegatingFieldParser implements FieldParser {
     private static final FieldParser DEFAULT_PARSER = UnstructuredField.PARSER;
@@ -49,6 +48,6 @@ public class DelegatingFieldParser implements FieldParser {
     
     public ParsedField parse(final String name, final String body, final ByteSequence raw) {
         final FieldParser parser = getParser(name);
-        return parser.parse(name, MimeUtil.unfold(body), raw);
+        return parser.parse(name, body, raw);
     }
 }

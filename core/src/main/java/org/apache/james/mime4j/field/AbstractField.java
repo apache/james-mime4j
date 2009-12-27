@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * The base class of all field classes.
@@ -159,6 +160,7 @@ public abstract class AbstractField implements ParsedField {
             body = body.substring(1);
         }
 
+        body = MimeUtil.unfold(body);
         return PARSER.parse(name, body, raw);
     }
 
