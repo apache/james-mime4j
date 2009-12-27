@@ -19,20 +19,21 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.codec.CodecUtil;
-import org.apache.james.mime4j.parser.MimeEntityConfig;
-import org.apache.log4j.BasicConfigurator;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.parser.MimeEntityConfig;
+import org.apache.log4j.BasicConfigurator;
 
 /**
  * Creates a TestSuite running the test for each .msg file in the test resouce folder.
@@ -43,7 +44,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
     private File file;
 
 
-    public ExampleMessagesRoundtripTest(String testName) {
+    public ExampleMessagesRoundtripTest(String testName) throws URISyntaxException {
         this(testName, ExampleMessagesRountripTestSuite.getFile(testName));
     }
 
@@ -82,18 +83,18 @@ public class ExampleMessagesRoundtripTest extends TestCase {
         }
     }
 
-    public static Test suite() throws IOException {
+    public static Test suite() throws IOException, URISyntaxException {
         return new ExampleMessagesRountripTestSuite();
     }
 
     
     static class ExampleMessagesRountripTestSuite extends TestSuite {
 
-        private static final File TESTS_FOLDER = new File("src/test/resources/testmsgs");
+        private static final String TESTS_FOLDER = "/testmsgs";
 
-        public ExampleMessagesRountripTestSuite() throws IOException {
+        public ExampleMessagesRountripTestSuite() throws IOException, URISyntaxException {
             super();
-            File dir = TESTS_FOLDER;
+            File dir = new File(ExampleMessagesRountripTestSuite.class.getResource(TESTS_FOLDER).toURI());
             File[] files = dir.listFiles();
             
             for (File f : files) {
@@ -103,8 +104,8 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             }
         }
         
-        public static File getFile(String name) {
-            return new File(TESTS_FOLDER.getAbsolutePath()+File.separator+name+".msg");
+        public static File getFile(String name) throws URISyntaxException {
+            return new File(ExampleMessagesRountripTestSuite.class.getResource(TESTS_FOLDER+File.separator+name+".msg").toURI());
         }
 
     }

@@ -19,19 +19,19 @@
 
 package org.apache.james.mime4j.parser;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.log4j.BasicConfigurator;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.BasicConfigurator;
 
 /**
  * Creates a TestSuite running the test for each .msg file in the test resouce folder.
@@ -42,7 +42,7 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
     private File file;
 
 
-    public MimeStreamParserExampleMessagesTest(String testName) {
+    public MimeStreamParserExampleMessagesTest(String testName) throws URISyntaxException {
         this(testName, MimeStreamParserExampleMessagesTestSuite.getFile(testName));
     }
 
@@ -86,18 +86,18 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
         }
     }
 
-    public static Test suite() throws IOException {
+    public static Test suite() throws IOException, URISyntaxException {
         return new MimeStreamParserExampleMessagesTestSuite();
     }
 
     
     static class MimeStreamParserExampleMessagesTestSuite extends TestSuite {
 
-        private static final File TESTS_FOLDER = new File("src/test/resources/testmsgs");
+        private static final String TESTS_FOLDER = "/testmsgs";
 
-        public MimeStreamParserExampleMessagesTestSuite() throws IOException {
+        public MimeStreamParserExampleMessagesTestSuite() throws IOException, URISyntaxException {
             super();
-            File dir = TESTS_FOLDER;
+            File dir = new File(MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER).toURI());
             File[] files = dir.listFiles();
             
             for (File f : files) {
@@ -107,8 +107,8 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
             }
         }
         
-        public static File getFile(String name) {
-            return new File(TESTS_FOLDER.getAbsolutePath()+File.separator+name+".msg");
+        public static File getFile(String name) throws URISyntaxException {
+            return new File(MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER+File.separator+name+".msg").toURI());
         }
 
     }

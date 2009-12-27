@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import junit.framework.Test;
@@ -44,7 +45,7 @@ import junit.framework.TestSuite;
 public class MessageParserTest extends TestCase {
     private File file = null;
 
-    public MessageParserTest(String name) {
+    public MessageParserTest(String name) throws URISyntaxException {
         this(name, MessageParserTestSuite.getFile(name));
     }
 
@@ -59,16 +60,16 @@ public class MessageParserTest extends TestCase {
         BasicConfigurator.configure();
     }
         
-    public static Test suite() {
+    public static Test suite() throws URISyntaxException {
         return new MessageParserTestSuite();
     }
     
     static class MessageParserTestSuite extends TestSuite {
         
-        private static final File TESTS_FOLDER = new File("src/test/resources/testmsgs");
+        private static final String TESTS_FOLDER = "/testmsgs";
 
-        public MessageParserTestSuite() {
-            File dir = TESTS_FOLDER;
+        public MessageParserTestSuite() throws URISyntaxException {
+			File dir = new File(MessageParserTestSuite.class.getResource(TESTS_FOLDER).toURI());
             File[] files = dir.listFiles();
             
             for (int i = 0; i < files.length && i < 5000; i++) {
@@ -79,8 +80,8 @@ public class MessageParserTest extends TestCase {
             }
         }
         
-        public static File getFile(String name) {
-            return new File(TESTS_FOLDER.getAbsolutePath()+File.separator+name+".msg");
+        public static File getFile(String name) throws URISyntaxException {
+            return new File(MessageParserTestSuite.class.getResource(TESTS_FOLDER+File.separator+name+".msg").toURI());
         }
     }
     
