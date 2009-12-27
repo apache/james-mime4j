@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.field.AbstractField;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.Entity;
 
 import junit.framework.TestCase;
@@ -70,7 +70,7 @@ public class EntityTest extends TestCase {
         assertNull(entity.getDispositionType());
 
         Header header = new Header();
-        header.setField(AbstractField.parse("Content-Disposition: inline"));
+        header.setField(DefaultFieldParser.parse("Content-Disposition: inline"));
         entity.setHeader(header);
 
         assertEquals("inline", entity.getDispositionType());
@@ -100,7 +100,7 @@ public class EntityTest extends TestCase {
         assertNull(entity.getFilename());
 
         Header header = new Header();
-        header.setField(AbstractField.parse("Content-Disposition: attachment; "
+        header.setField(DefaultFieldParser.parse("Content-Disposition: attachment; "
                 + "filename=\"some file.dat\""));
         entity.setHeader(header);
 

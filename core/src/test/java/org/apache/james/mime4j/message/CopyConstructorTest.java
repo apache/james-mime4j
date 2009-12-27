@@ -22,7 +22,7 @@ package org.apache.james.mime4j.message;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.james.mime4j.field.AbstractField;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.parser.Field;
 
 import junit.framework.TestCase;
@@ -161,9 +161,9 @@ public class CopyConstructorTest extends TestCase {
     }
 
     public void testCopyHeader() throws Exception {
-        Field f1 = AbstractField.parse("name1: value1");
-        Field f2 = AbstractField.parse("name2: value");
-        Field f3 = AbstractField.parse("name1: value2");
+        Field f1 = DefaultFieldParser.parse("name1: value1");
+        Field f2 = DefaultFieldParser.parse("name2: value");
+        Field f3 = DefaultFieldParser.parse("name1: value2");
 
         Header original = new Header();
         original.addField(f1);

@@ -22,7 +22,7 @@ package org.apache.james.mime4j.field;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
-import org.apache.james.mime4j.field.AbstractField;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.UnstructuredField;
 import org.apache.james.mime4j.parser.Field;
 
@@ -33,14 +33,14 @@ public class FieldTest extends TestCase {
     public void testGetName() throws Exception {
         Field f = null;
         
-        f = AbstractField.parse("Subject: Yada yada yada");
+        f = DefaultFieldParser.parse("Subject: Yada yada yada");
         assertEquals("Testing simple field", "Subject", f.getName());
         
-        f = AbstractField.parse("X-yada-yada: Yada yada yada");
+        f = DefaultFieldParser.parse("X-yada-yada: Yada yada yada");
         assertEquals("Testing an X- field", "X-yada-yada", f.getName());
         
         try {
-            f = AbstractField.parse("Yada yada yada");
+            f = DefaultFieldParser.parse("Yada yada yada");
             fail("MimeException not thrown when using an invalid field");
         } catch (MimeException e) {
         }
@@ -49,13 +49,13 @@ public class FieldTest extends TestCase {
     public void testParse() throws Exception {
         Field f = null;
         
-        f = AbstractField.parse("Subject: Yada yada yada");
+        f = DefaultFieldParser.parse("Subject: Yada yada yada");
         assertTrue("Field should be UnstructuredField", 
                         f instanceof UnstructuredField);
-        f = AbstractField.parse("Content-Type: text/plain");
+        f = DefaultFieldParser.parse("Content-Type: text/plain");
         assertTrue("Field should be ContentTypeField", 
                         f instanceof ContentTypeField);
-        f = AbstractField.parse("Content-Transfer-Encoding: 7bit");
+        f = DefaultFieldParser.parse("Content-Transfer-Encoding: 7bit");
         assertTrue("Field should be ContentTransferEncodingField", 
                         f instanceof ContentTransferEncodingField);
     }

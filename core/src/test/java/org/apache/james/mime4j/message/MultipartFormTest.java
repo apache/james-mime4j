@@ -23,7 +23,7 @@ import java.io.ByteArrayOutputStream;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.field.AbstractField;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 
 public class MultipartFormTest extends TestCase {
 
@@ -33,24 +33,24 @@ public class MultipartFormTest extends TestCase {
         Message message = new Message();
         Header header = new Header();
         header.addField(
-                AbstractField.parse("Content-Type: multipart/form-data; boundary=foo"));
+                DefaultFieldParser.parse("Content-Type: multipart/form-data; boundary=foo"));
         message.setHeader(header);
         
         Multipart multipart = new Multipart("alternative");
         multipart.setParent(message);
         BodyPart p1 = new BodyPart();
         Header h1 = new Header();
-        h1.addField(AbstractField.parse("Content-Type: text/plain"));
+        h1.addField(DefaultFieldParser.parse("Content-Type: text/plain"));
         p1.setHeader(h1);
         p1.setBody(bodyFactory.textBody("this stuff"));
         BodyPart p2 = new BodyPart();
         Header h2 = new Header();
-        h2.addField(AbstractField.parse("Content-Type: text/plain"));
+        h2.addField(DefaultFieldParser.parse("Content-Type: text/plain"));
         p2.setHeader(h2);
         p2.setBody(bodyFactory.textBody("that stuff"));
         BodyPart p3 = new BodyPart();
         Header h3 = new Header();
-        h3.addField(AbstractField.parse("Content-Type: text/plain"));
+        h3.addField(DefaultFieldParser.parse("Content-Type: text/plain"));
         p3.setHeader(h3);
         p3.setBody(bodyFactory.textBody("all kind of stuff"));
 
