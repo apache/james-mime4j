@@ -71,8 +71,8 @@ public class MailboxListField extends AbstractField {
         parsed = true;
     }
 
-    static final FieldParser PARSER = new FieldParser() {
-        public ParsedField parse(final String name, final String body,
+    static final FieldParser<MailboxListField> PARSER = new FieldParser<MailboxListField>() {
+        public MailboxListField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new MailboxListField(name, body, raw);
         }

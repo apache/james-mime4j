@@ -80,8 +80,8 @@ public class DateTimeField extends AbstractField {
         parsed = true;
     }
 
-    static final FieldParser PARSER = new FieldParser() {
-        public ParsedField parse(final String name, final String body,
+    static final FieldParser<DateTimeField> PARSER = new FieldParser<DateTimeField>() {
+        public DateTimeField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new DateTimeField(name, body, raw);
         }

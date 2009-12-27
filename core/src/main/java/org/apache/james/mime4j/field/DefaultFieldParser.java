@@ -113,19 +113,19 @@ public class DefaultFieldParser extends DelegatingFieldParser {
         setFieldParser(FieldName.CONTENT_DISPOSITION,
                 ContentDispositionField.PARSER);
 
-        final FieldParser dateTimeParser = DateTimeField.PARSER;
+        final FieldParser<DateTimeField> dateTimeParser = DateTimeField.PARSER;
         setFieldParser(FieldName.DATE, dateTimeParser);
         setFieldParser(FieldName.RESENT_DATE, dateTimeParser);
 
-        final FieldParser mailboxListParser = MailboxListField.PARSER;
+        final FieldParser<MailboxListField> mailboxListParser = MailboxListField.PARSER;
         setFieldParser(FieldName.FROM, mailboxListParser);
         setFieldParser(FieldName.RESENT_FROM, mailboxListParser);
 
-        final FieldParser mailboxParser = MailboxField.PARSER;
+        final FieldParser<MailboxField> mailboxParser = MailboxField.PARSER;
         setFieldParser(FieldName.SENDER, mailboxParser);
         setFieldParser(FieldName.RESENT_SENDER, mailboxParser);
 
-        final FieldParser addressListParser = AddressListField.PARSER;
+        final FieldParser<AddressListField> addressListParser = AddressListField.PARSER;
         setFieldParser(FieldName.TO, addressListParser);
         setFieldParser(FieldName.RESENT_TO, addressListParser);
         setFieldParser(FieldName.CC, addressListParser);

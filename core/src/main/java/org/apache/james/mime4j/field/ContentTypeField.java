@@ -249,8 +249,8 @@ public class ContentTypeField extends AbstractField {
         parsed = true;
     }
 
-    static final FieldParser PARSER = new FieldParser() {
-        public ParsedField parse(final String name, final String body,
+    static final FieldParser<ContentTypeField> PARSER = new FieldParser<ContentTypeField>() {
+        public ContentTypeField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new ContentTypeField(name, body, raw);
         }

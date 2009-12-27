@@ -24,22 +24,22 @@ import java.util.Map;
 
 import org.apache.james.mime4j.util.ByteSequence;
 
-public class DelegatingFieldParser implements FieldParser {
-    private static final FieldParser DEFAULT_PARSER = UnstructuredField.PARSER;
+public class DelegatingFieldParser implements FieldParser<ParsedField> {
+    private static final FieldParser<UnstructuredField> DEFAULT_PARSER = UnstructuredField.PARSER;
 
-    private Map<String, FieldParser> parsers = new HashMap<String, FieldParser>();
+    private Map<String, FieldParser<? extends ParsedField>> parsers = new HashMap<String, FieldParser<? extends ParsedField>>();
 
     /**
      * Sets the parser used for the field named <code>name</code>.
      * @param name the name of the field
      * @param parser the parser for fields named <code>name</code>
      */
-    public void setFieldParser(final String name, final FieldParser parser) {
+    public void setFieldParser(final String name, final FieldParser<? extends ParsedField> parser) {
         parsers.put(name.toLowerCase(), parser);
     }
     
-    public FieldParser getParser(final String name) {
-        final FieldParser field = parsers.get(name.toLowerCase());
+    public FieldParser<? extends ParsedField> getParser(final String name) {
+        final FieldParser<? extends ParsedField> field = parsers.get(name.toLowerCase());
         if (field == null) {
             return DEFAULT_PARSER;
         }
@@ -47,7 +47,7 @@ public class DelegatingFieldParser implements FieldParser {
     }
     
     public ParsedField parse(final String name, final String body, final ByteSequence raw) {
-        final FieldParser parser = getParser(name);
+        final FieldParser<? extends ParsedField> parser = getParser(name);
         return parser.parse(name, body, raw);
     }
 }

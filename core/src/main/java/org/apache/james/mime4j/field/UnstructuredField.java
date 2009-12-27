@@ -49,8 +49,8 @@ public class UnstructuredField extends AbstractField {
         parsed = true;
     }
 
-    static final FieldParser PARSER = new FieldParser() {
-        public ParsedField parse(final String name, final String body,
+    static final FieldParser<UnstructuredField> PARSER = new FieldParser<UnstructuredField>() {
+        public UnstructuredField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new UnstructuredField(name, body, raw);
         }

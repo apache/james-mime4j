@@ -70,8 +70,8 @@ public class AddressListField extends AbstractField {
         parsed = true;
     }
 
-    static final FieldParser PARSER = new FieldParser() {
-        public ParsedField parse(final String name, final String body,
+    static final FieldParser<AddressListField> PARSER = new FieldParser<AddressListField>() {
+        public AddressListField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new AddressListField(name, body, raw);
         }

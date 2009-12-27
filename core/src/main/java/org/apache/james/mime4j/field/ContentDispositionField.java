@@ -317,8 +317,8 @@ public class ContentDispositionField extends AbstractField {
         parsed = true;
     }
 
-    static final FieldParser PARSER = new FieldParser() {
-        public ParsedField parse(final String name, final String body,
+    static final FieldParser<ContentDispositionField> PARSER = new FieldParser<ContentDispositionField>() {
+        public ContentDispositionField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new ContentDispositionField(name, body, raw);
         }

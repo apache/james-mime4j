@@ -56,8 +56,8 @@ public class ContentTransferEncodingField extends AbstractField {
         return MimeUtil.ENC_7BIT;
     }
 
-    static final FieldParser PARSER = new FieldParser() {
-        public ParsedField parse(final String name, final String body,
+    static final FieldParser<ContentTransferEncodingField> PARSER = new FieldParser<ContentTransferEncodingField>() {
+        public ContentTransferEncodingField parse(final String name, final String body,
                 final ByteSequence raw) {
             return new ContentTransferEncodingField(name, body, raw);
         }
