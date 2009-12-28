@@ -54,7 +54,6 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      * @param raw the bytes to parse.
      * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
-     * @see #isValidField()
      */
     public static ParsedField parse(final ByteSequence raw) throws MimeException {
         String rawStr = ContentUtil.decode(raw);
@@ -82,7 +81,6 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      * @param rawStr the string to parse.
      * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
-     * @see #isValidField()
      */
     public static ParsedField parse(final String rawStr) throws MimeException {
         ByteSequence raw = ContentUtil.encode(rawStr);
