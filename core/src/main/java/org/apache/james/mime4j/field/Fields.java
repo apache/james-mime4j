@@ -602,16 +602,11 @@ public class Fields {
         return EncoderUtil.isToken(dispositionType);
     }
 
-    private static <F extends Field> F parse(FieldParser parser,
+    private static <F extends ParsedField> F parse(FieldParser<F> parser,
             String fieldName, String fieldBody) {
         String rawStr = MimeUtil.fold(fieldName + ": " + fieldBody, 0);
         ByteSequence raw = ContentUtil.encode(rawStr);
-
-        Field field = parser.parse(fieldName, fieldBody, raw);
-
-        @SuppressWarnings("unchecked")
-        F f = (F) field;
-        return f;
+        return parser.parse(fieldName, fieldBody, raw);
     }
 
     private static String encodeAddresses(Iterable<? extends Address> addresses) {
