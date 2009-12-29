@@ -261,7 +261,7 @@ public class MimeEntity extends AbstractEntity {
             return message;
         } else {
             BufferedLineReaderInputStream stream = new BufferedLineReaderInputStream(
-                    mimeStream, 
+                    instream, 
                     4 * 1024,
                     config.getMaxLineLen());
             MimeEntity message = new MimeEntity(
@@ -277,16 +277,16 @@ public class MimeEntity extends AbstractEntity {
     }
     
     private EntityStateMachine nextMimeEntity() {
-    	return nextMimeEntity(EntityStates.T_START_BODYPART, EntityStates.T_END_BODYPART);
+    	return nextMimeEntity(EntityStates.T_START_BODYPART, EntityStates.T_END_BODYPART, mimeStream);
     }
     
-    private EntityStateMachine nextMimeEntity(int startState, int endState) {
+    private EntityStateMachine nextMimeEntity(int startState, int endState, InputStream instream) {
         if (recursionMode == RecursionMode.M_RAW) {
-            RawEntity message = new RawEntity(mimeStream);
+            RawEntity message = new RawEntity(instream);
             return message;
         } else {
             BufferedLineReaderInputStream stream = new BufferedLineReaderInputStream(
-                    mimeStream, 
+            		instream, 
                     4 * 1024,
                     config.getMaxLineLen());
             MimeEntity mimeentity = new MimeEntity(
