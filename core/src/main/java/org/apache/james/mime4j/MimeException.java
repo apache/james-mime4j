@@ -19,12 +19,10 @@
 
 package org.apache.james.mime4j;
 
-import org.apache.james.mime4j.parser.ContentHandler;
-
 /**
  * MIME processing exception.
  * <p>
- * A <code>MimeException</code> may be thrown by a {@link ContentHandler} to
+ * A <code>MimeException</code> may be thrown by a {@link org.apache.james.mime4j.parser.ContentHandler} to
  * indicate that it has failed to process a message event and that no further
  * events should be generated.
  * <p>
