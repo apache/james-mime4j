@@ -115,6 +115,85 @@ public class MimeEntityTest extends TestCase {
         }
     }
 
+    public void testObsoleteSyntaxEntity() throws Exception {
+        String message = 
+            "To 	: Road Runner <runner@example.org>\r\n" +
+            "From	: Wile E. Cayote <wile@example.org>\r\n" +
+            "Date  	:Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
+            "Subject	:Mail\r\n" +
+            "     \r\n" +
+            " with a folded subject \r\n" +
+            "Content-Type: text/plain\r\n" +
+            "\r\n" +
+            "a very important message";
+        byte[] raw = message.getBytes("US-ASCII");
+        ByteArrayInputStream instream = new ByteArrayInputStream(raw);
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
+        
+        MimeEntity entity = new MimeEntity(
+                lineInput,
+                rawstream,
+                null,
+                EntityStates.T_START_MESSAGE,
+                EntityStates.T_END_MESSAGE);
+        
+        
+        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals("To", entity.getField().getName());
+        assertEquals(" Road Runner <runner@example.org>", entity.getField().getBody());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals("From", entity.getField().getName());
+        assertEquals(" Wile E. Cayote <wile@example.org>", entity.getField().getBody());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals("Date", entity.getField().getName());
+        assertEquals("Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getField().getBody());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals("Subject", entity.getField().getName());
+        assertEquals("Mail      with a folded subject ", entity.getField().getBody());
+        entity.advance();
+        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals("Content-Type", entity.getField().getName());
+        assertEquals(" text/plain", entity.getField().getBody());
+        entity.advance();
+        assertEquals(EntityStates.T_END_HEADER, entity.getState());
+        try {
+            entity.getField().getName();
+            fail("IllegalStateException should have been thrown");
+        } catch (IllegalStateException expected) {
+        }
+        try {
+            entity.getField().getBody();
+            fail("IllegalStateException should have been thrown");
+        } catch (IllegalStateException expected) {
+        }
+        
+        entity.advance();
+        assertEquals(EntityStates.T_BODY, entity.getState());
+        assertEquals("a very important message", IOUtils.toString(entity.getContentStream()));
+        entity.advance();
+        assertEquals(EntityStates.T_END_MESSAGE, entity.getState());
+        try {
+            entity.getContentStream();
+            fail("IllegalStateException should have been thrown");
+        } catch (IllegalStateException expected) {
+        }
+        entity.advance();
+        assertEquals(EntityStates.T_END_OF_STREAM, entity.getState());
+        try {
+            entity.advance();
+            fail("IllegalStateException should have been thrown");
+        } catch (IllegalStateException expected) {
+        }
+    }
+
     public void testMultipartEntity() throws Exception {
         String message = 
             "To: Road Runner <runner@example.org>\r\n" +

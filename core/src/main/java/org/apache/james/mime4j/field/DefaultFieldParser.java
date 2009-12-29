@@ -30,7 +30,7 @@ import org.apache.james.mime4j.util.MimeUtil;
 public class DefaultFieldParser extends DelegatingFieldParser {
 
 	private static final Pattern FIELD_NAME_PATTERN = Pattern
-    .compile("^([\\x21-\\x39\\x3b-\\x7e]+):");
+    .compile("^([\\x21-\\x39\\x3b-\\x7e]+)[\\x20\\x09]*:");
 	
     private static final DefaultFieldParser PARSER = new DefaultFieldParser();
     

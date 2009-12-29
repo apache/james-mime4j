@@ -33,8 +33,11 @@ public final class Event {
         = new Event("Unexpected end of headers detected. " +
                 "Higher level boundary detected or EOF reached.");
     /** Indicates that unexpected end of headers detected.*/
-    public static final Event INALID_HEADER 
+    public static final Event INVALID_HEADER 
         = new Event("Invalid header encountered");
+    /** Indicates that an obsolete syntax header has been detected */
+    public static final Event OBSOLETE_HEADER 
+        = new Event("Obsolete header encountered");
     
     private final String code;
     

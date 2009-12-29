@@ -201,24 +201,33 @@ public abstract class AbstractEntity implements EntityStateMachine {
             fieldbuf.setLength(len);
             
             boolean valid = true;
+            boolean obsoleteSyntax = false;
             
             int pos = fieldbuf.indexOf((byte) ':');
             if (pos <= 0) {
-                monitor(Event.INALID_HEADER);
                 valid = false;
             } else {
                 for (int i = 0; i < pos; i++) {
                     if (!fieldChars.get(fieldbuf.byteAt(i) & 0xff)) {
-                        monitor(Event.INALID_HEADER);
-                        valid = false;
-                        break;
+                    	for (; i < pos; i++) {
+                    		int j = fieldbuf.byteAt(i) & 0xff;
+							if (j != 0x20 && j != 0x09) {
+		                        valid = false;
+		                        break;
+							} else {
+								obsoleteSyntax = true;
+							}
+                    	}
                     }
                 }
             }
             if (valid) {
+                if (obsoleteSyntax) warn(Event.OBSOLETE_HEADER);
                 field = new RawField(fieldbuf, pos);
-                body.addField(field);            
+                body.addField(field);
                 return true;
+            } else {
+                monitor(Event.INVALID_HEADER);
             }
         }
     }

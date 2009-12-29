@@ -65,7 +65,10 @@ public class RawField {
     }
 
     private String parseName() {
-        return ContentUtil.decode(raw, 0, colonIdx);
+    	// make sure we ignore ending WSP (obsolete rfc822 syntax)
+    	int endIdx = colonIdx;
+    	while (endIdx > 0 && raw.byteAt(endIdx - 1) == 0x20 || raw.byteAt(endIdx - 1) == 0x09) endIdx--;
+        return ContentUtil.decode(raw, 0, endIdx);
     }
 
     private String parseBody() {
