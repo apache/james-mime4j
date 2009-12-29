@@ -161,15 +161,10 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
                 stream, 
                 4 * 1024,
                 config.getMaxLineLen());
-        switch (recursionMode) {
-        case M_RAW:
+        if (recursionMode == M_RAW) {
             RawEntity rawentity = new RawEntity(inbuffer);
             currentStateMachine = rawentity;
-            break;
-        case M_NO_RECURSE:
-        case M_FLAT:
-            // expected to be called only at start of paring
-        case M_RECURSE:
+        } else {
             MimeEntity mimeentity = new MimeEntity(
                     lineSource,
                     inbuffer,
@@ -182,7 +177,6 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
                 mimeentity.skipHeader(contentType);
             }
             currentStateMachine = mimeentity;
-            break;
         }
         entities.add(currentStateMachine);
         state = currentStateMachine.getState();
