@@ -339,7 +339,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * @throws IllegalStateException {@link #getState()} returns another
      *   value than {@link #T_FIELD}.
      */
-    public Field getField() {
+    public RawField getField() {
         return currentStateMachine.getField();
     }
     

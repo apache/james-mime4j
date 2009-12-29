@@ -79,7 +79,7 @@ public abstract class AbstractContentHandler implements ContentHandler {
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#field(Field)
      */
-    public void field(Field field) throws MimeException {
+    public void field(RawField field) throws MimeException {
     }
     
     /**

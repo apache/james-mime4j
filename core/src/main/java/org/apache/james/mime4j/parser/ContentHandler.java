@@ -121,10 +121,10 @@ public interface ContentHandler {
     /**
      * Called for each field of a header.
      * 
-     * @param field the MIME field.
+     * @param rawField the MIME field.
      * @throws MimeException on processing errors
      */
-    void field(Field field) throws MimeException;
+    void field(RawField rawField) throws MimeException;
 
     /**
      * Called when there are no more header fields in a message or body part.

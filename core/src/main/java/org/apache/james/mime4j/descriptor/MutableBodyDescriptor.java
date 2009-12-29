@@ -20,7 +20,7 @@
 
 package org.apache.james.mime4j.descriptor;
 
-import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.parser.RawField;
 
 /**
  * Adds mutator.
@@ -31,6 +31,6 @@ public interface MutableBodyDescriptor extends BodyDescriptor {
      * Adds a field to the body descriptor.
      * @param field the MIME field.
      */
-    void addField(Field field);
+    void addField(RawField field);
 
 }

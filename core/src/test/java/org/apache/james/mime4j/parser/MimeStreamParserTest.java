@@ -141,7 +141,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(Field field) {
+            public void field(RawField field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -165,7 +165,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(Field field) {
+            public void field(RawField field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -189,7 +189,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(Field field) {
+            public void field(RawField field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -250,7 +250,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(Field field) {
+            public void field(RawField field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -299,7 +299,7 @@ public class MimeStreamParserTest extends TestCase {
             }
 
             @Override
-            public void field(Field field) {
+            public void field(RawField field) {
                 fail("field shouldn't be called for empty stream");
             }
 
@@ -342,7 +342,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(Field field) {
+            public void field(RawField field) {
                 fail("No fields should be reported");
             }
             @Override
@@ -373,7 +373,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(Field field) {
+            public void field(RawField field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
             @Override
@@ -401,7 +401,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(Field field) {
+            public void field(RawField field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -420,7 +420,7 @@ public class MimeStreamParserTest extends TestCase {
         parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(Field field) {
+            public void field(RawField field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });

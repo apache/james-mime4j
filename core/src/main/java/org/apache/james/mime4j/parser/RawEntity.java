@@ -71,7 +71,7 @@ public class RawEntity implements EntityStateMachine {
     /**
      * This method has no effect and always returns <code>null</code>.
      */
-    public Field getField() {
+    public RawField getField() {
         return null;
     }
 

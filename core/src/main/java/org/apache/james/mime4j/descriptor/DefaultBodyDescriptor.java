@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.parser.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -92,7 +92,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * 
      * @param field the MIME field.
      */
-    public void addField(Field field) {
+    public void addField(RawField field) {
         String name = field.getName();
         String value = field.getBody();
 

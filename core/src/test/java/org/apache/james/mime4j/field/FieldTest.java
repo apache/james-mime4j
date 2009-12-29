@@ -24,7 +24,6 @@ import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.UnstructuredField;
-import org.apache.james.mime4j.parser.Field;
 
 import junit.framework.TestCase;
 

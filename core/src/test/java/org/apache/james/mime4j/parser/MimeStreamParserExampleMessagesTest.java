@@ -25,6 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -97,13 +98,16 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
 
         public MimeStreamParserExampleMessagesTestSuite() throws IOException, URISyntaxException {
             super();
-            File dir = new File(MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER).toURI());
-            File[] files = dir.listFiles();
-            
-            for (File f : files) {
-                if (f.getName().toLowerCase().endsWith(".msg")) {
-                    addTest(new MimeStreamParserExampleMessagesTest(f.getName().substring(0, f.getName().length()-4), f));
-                }
+            URL resource = MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER);
+            if (resource != null) {
+				File dir = new File(resource.toURI());
+	            File[] files = dir.listFiles();
+	            
+	            for (File f : files) {
+	                if (f.getName().toLowerCase().endsWith(".msg")) {
+	                    addTest(new MimeStreamParserExampleMessagesTest(f.getName().substring(0, f.getName().length()-4), f));
+	                }
+	            }
             }
         }
         

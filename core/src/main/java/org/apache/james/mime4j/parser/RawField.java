@@ -26,7 +26,7 @@ import org.apache.james.mime4j.util.MimeUtil;
 /**
  * The basic immutable MIME field.
  */
-class RawField implements Field {
+public class RawField {
 
     private final ByteSequence raw;
     private int colonIdx;

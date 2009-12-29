@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.CharsetUtil;
@@ -36,6 +36,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.List;
 
 import junit.framework.Test;
@@ -69,15 +70,18 @@ public class MessageParserTest extends TestCase {
         private static final String TESTS_FOLDER = "/testmsgs";
 
         public MessageParserTestSuite() throws URISyntaxException {
-			File dir = new File(MessageParserTestSuite.class.getResource(TESTS_FOLDER).toURI());
-            File[] files = dir.listFiles();
-            
-            for (int i = 0; i < files.length && i < 5000; i++) {
-                File f = files[i];
-                if (f.getName().toLowerCase().endsWith(".msg")) {
-                    addTest(new MessageParserTest(f.getName().substring(0, f.getName().length()-4), f));
-                }
-            }
+			URL resource = MessageParserTestSuite.class.getResource(TESTS_FOLDER);
+			if (resource != null) {
+				File dir = new File(resource.toURI());
+	            File[] files = dir.listFiles();
+	            
+	            for (int i = 0; i < files.length && i < 5000; i++) {
+	                File f = files[i];
+	                if (f.getName().toLowerCase().endsWith(".msg")) {
+	                    addTest(new MessageParserTest(f.getName().substring(0, f.getName().length()-4), f));
+	                }
+	            }
+			}
         }
         
         public static File getFile(String name) throws URISyntaxException {

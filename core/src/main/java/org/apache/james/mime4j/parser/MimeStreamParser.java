@@ -26,7 +26,6 @@ import java.io.SequenceInputStream;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
-import org.apache.james.mime4j.field.FieldName;
 
 /**
  * <p>
@@ -95,7 +94,7 @@ public class MimeStreamParser {
         InputStream inputStream = is;
         if (headless) {
             ByteArrayInputStream headerInputStream = new ByteArrayInputStream(
-                    (FieldName.CONTENT_TYPE + ": " + mimeEntityConfig.getDefaultContentType()
+                    ("Content-Type: " + mimeEntityConfig.getDefaultContentType()
                             + "\r\n\r\n").getBytes("iso-8859-1"));
             inputStream = new SequenceInputStream(headerInputStream, is);
         }

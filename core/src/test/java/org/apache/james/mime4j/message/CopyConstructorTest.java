@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.field.Field;
 
 import junit.framework.TestCase;
 

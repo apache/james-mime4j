@@ -98,6 +98,6 @@ public interface EntityStateMachine {
      * @throws IllegalStateException if a header field cannot be
      *  obtained at the current stage of the parsing process. 
      */
-    Field getField() throws IllegalStateException;
+    RawField getField() throws IllegalStateException;
     
 }

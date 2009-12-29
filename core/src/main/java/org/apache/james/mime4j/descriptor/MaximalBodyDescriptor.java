@@ -31,7 +31,7 @@ import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
 import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
-import org.apache.james.mime4j.parser.Field;
+import org.apache.james.mime4j.parser.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -105,7 +105,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
     }
     
     @Override
-    public void addField(Field field) {
+    public void addField(RawField field) {
         String name = field.getName();
         String value = field.getBody();
         name = name.trim().toLowerCase();

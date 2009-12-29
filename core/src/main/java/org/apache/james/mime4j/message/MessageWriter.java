@@ -24,8 +24,8 @@ import java.io.OutputStream;
 
 import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.field.ContentTypeField;
+import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.FieldName;
-import org.apache.james.mime4j.parser.Field;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;

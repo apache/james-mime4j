@@ -54,7 +54,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
     private final ByteArrayBuffer linebuf;
 
     private int lineCount;
-    private Field field;
+    private RawField field;
     private boolean endOfHeader;
     private int headerCount;
 
@@ -253,7 +253,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * @throws IllegalStateException {@link #getState()} returns another
      *   value than {@link EntityStates#T_FIELD}.
      */
-    public Field getField() {
+    public RawField getField() {
         switch (getState()) {
         case EntityStates.T_FIELD:
             return field;
