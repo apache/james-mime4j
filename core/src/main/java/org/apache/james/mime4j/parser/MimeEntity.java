@@ -260,12 +260,13 @@ public class MimeEntity extends AbstractEntity {
             RawEntity message = new RawEntity(instream);
             return message;
         } else {
+            BufferedLineReaderInputStream stream = new BufferedLineReaderInputStream(
+                    mimeStream, 
+                    4 * 1024,
+                    config.getMaxLineLen());
             MimeEntity message = new MimeEntity(
                     lineSource, 
-                    new BufferedLineReaderInputStream(
-                            instream, 
-                            4 * 1024,
-                            config.getMaxLineLen()),
+                    stream,
                     body, 
                     EntityStates.T_START_MESSAGE, 
                     EntityStates.T_END_MESSAGE,
