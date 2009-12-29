@@ -277,6 +277,10 @@ public class MimeEntity extends AbstractEntity {
     }
     
     private EntityStateMachine nextMimeEntity() {
+    	return nextMimeEntity(EntityStates.T_START_BODYPART, EntityStates.T_END_BODYPART);
+    }
+    
+    private EntityStateMachine nextMimeEntity(int startState, int endState) {
         if (recursionMode == RecursionMode.M_RAW) {
             RawEntity message = new RawEntity(mimeStream);
             return message;
@@ -289,8 +293,8 @@ public class MimeEntity extends AbstractEntity {
                     lineSource, 
                     stream,
                     body, 
-                    EntityStates.T_START_BODYPART, 
-                    EntityStates.T_END_BODYPART,
+                    startState, 
+                    endState,
                     config);
             mimeentity.setRecursionMode(recursionMode);
             return mimeentity;
