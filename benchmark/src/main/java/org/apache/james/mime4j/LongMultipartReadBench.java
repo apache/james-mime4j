@@ -146,8 +146,10 @@ public class LongMultipartReadBench {
         public void run(byte[] content, int repetitions) throws Exception {
             ContentHandler contentHandler = new SimpleContentHandler() {
                 @Override
-                public void bodyDecoded(BodyDescriptor bd, InputStream is)
+                public void body(BodyDescriptor bd, InputStream is)
                         throws IOException {
+                	byte[] b = new byte[4096];
+					while (is.read(b) != -1);
                 }
 
                 @Override
@@ -157,6 +159,7 @@ public class LongMultipartReadBench {
 
             for (int i = 0; i < repetitions; i++) {
                 MimeStreamParser parser = new MimeStreamParser();
+                parser.setContentDecoding(true);
                 parser.setContentHandler(contentHandler);
                 parser.parse(new ByteArrayInputStream(content));
             }

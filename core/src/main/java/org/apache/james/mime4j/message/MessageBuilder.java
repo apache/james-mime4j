@@ -24,8 +24,6 @@ import java.io.InputStream;
 import java.util.Stack;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.codec.Base64InputStream;
-import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Field;
@@ -35,7 +33,6 @@ import org.apache.james.mime4j.parser.RawField;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * A <code>ContentHandler</code> for building an <code>Entity</code> to be
@@ -132,10 +129,15 @@ public class MessageBuilder implements ContentHandler {
     public void body(BodyDescriptor bd, final InputStream is) throws MimeException, IOException {
         expect(Entity.class);
         
-        final String enc = bd.getTransferEncoding();
+        // NO NEED TO MANUALLY RUN DECODING. 
+        // The parser has a "setContentDecoding" method. We should
+        // simply instantiate the MimeStreamParser with that method.
+        
+        // final String enc = bd.getTransferEncoding();
         
         final Body body;
         
+        /*
         final InputStream decodedStream;
         if (MimeUtil.ENC_BASE64.equals(enc)) {
             decodedStream = new Base64InputStream(is);
@@ -144,11 +146,12 @@ public class MessageBuilder implements ContentHandler {
         } else {
             decodedStream = is;
         }
+        */
         
         if (bd.getMimeType().startsWith("text/")) {
-            body = bodyFactory.textBody(decodedStream, bd.getCharset());
+            body = bodyFactory.textBody(is, bd.getCharset());
         } else {
-            body = bodyFactory.binaryBody(decodedStream);
+            body = bodyFactory.binaryBody(is);
         }
         
         Entity entity = ((Entity) stack.peek());

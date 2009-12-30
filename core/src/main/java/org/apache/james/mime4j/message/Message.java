@@ -137,6 +137,7 @@ public class Message extends Entity implements Body {
             MimeIOException {
         try {
             MimeStreamParser parser = new MimeStreamParser(config);
+            parser.setContentDecoding(true);
             parser.setContentHandler(new MessageBuilder(this, storageProvider));
             parser.parse(is);
         } catch (MimeException e) {

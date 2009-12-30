@@ -20,24 +20,17 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.codec.Base64InputStream;
-import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
-import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.RawField;
-import org.apache.james.mime4j.util.MimeUtil;
-
-import java.io.InputStream;
-import java.io.IOException;
 
 /**
  * Abstract implementation of ContentHandler that automates common
- * tasks. Currently performs header parsing and applies content-transfer
- * decoding to body parts.
+ * tasks. Currently performs header parsing.
  *
- * 
+ * Older versions of this class performed decoding of content streams.
+ * This can be now easily achieved by calling setContentDecoding(true) on the MimeStreamParser.
  */
 public abstract class SimpleContentHandler extends  AbstractContentHandler {
 
@@ -45,21 +38,6 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
      * Called after headers are parsed.
      */
     public abstract void headers(Header header);
-
-    /**
-     * Called when the body of a discrete (non-multipart) entity is encountered.
-
-     * @param bd encapsulates the values (either read from the
-     *        message stream or, if not present, determined implictly
-     *        as described in the
-     *        MIME rfc:s) of the <code>Content-Type</code> and
-     *        <code>Content-Transfer-Encoding</code> header fields.
-     * @param is the contents of the body. Base64 or quoted-printable
-     *        decoding will be applied transparently.
-     * @throws IOException should be thrown on I/O errors.
-     */
-    public abstract void bodyDecoded(BodyDescriptor bd, InputStream is) throws IOException;
-
 
     /* Implement introduced callbacks. */
 
@@ -92,19 +70,4 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
         headers(tmp);
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.AbstractContentHandler#body(org.apache.james.mime4j.descriptor.BodyDescriptor, java.io.InputStream)
-     */
-    @Override
-    public final void body(BodyDescriptor bd, InputStream is) throws IOException {
-        if (MimeUtil.isBase64Encoding(bd.getTransferEncoding())) {
-            bodyDecoded(bd, new Base64InputStream(is));
-        }
-        else if (MimeUtil.isQuotedPrintableEncoded(bd.getTransferEncoding())) {
-            bodyDecoded(bd, new QuotedPrintableInputStream(is));
-        }
-        else {
-            bodyDecoded(bd, is);
-        }
-    }
 }
