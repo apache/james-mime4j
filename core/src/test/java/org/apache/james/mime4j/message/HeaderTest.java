@@ -53,7 +53,9 @@ public class HeaderTest extends TestCase {
         
         Field field = header.getField("Hello");
         assertNotNull(field);
-        assertEquals(hello, field.getBody());
+        // field.getBody is already a 7 bit ASCII string, after MIME4J-151
+        // assertEquals(hello, field.getBody());
+        assertEquals("Gr?ezi_z?m?", field.getBody());
         
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         

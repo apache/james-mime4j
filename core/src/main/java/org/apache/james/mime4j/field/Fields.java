@@ -30,8 +30,7 @@ import java.util.regex.Pattern;
 import org.apache.james.mime4j.codec.EncoderUtil;
 import org.apache.james.mime4j.field.address.Address;
 import org.apache.james.mime4j.field.address.Mailbox;
-import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.ContentUtil;
+import org.apache.james.mime4j.parser.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -603,9 +602,8 @@ public class Fields {
 
     private static <F extends ParsedField> F parse(FieldParser<F> parser,
             String fieldName, String fieldBody) {
-        String rawStr = MimeUtil.fold(fieldName + ": " + fieldBody, 0);
-        ByteSequence raw = ContentUtil.encode(rawStr);
-        return parser.parse(fieldName, fieldBody, raw);
+    	RawField rawField = new RawField(fieldName, fieldBody);
+        return parser.parse(rawField.getName(), rawField.getBody(), rawField.getRaw());
     }
 
     private static String encodeAddresses(Iterable<? extends Address> addresses) {

@@ -21,9 +21,7 @@ package org.apache.james.mime4j.descriptor;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.parser.RawField;
-import org.apache.james.mime4j.util.ByteSequence;
 
 public abstract class BaseTestForBodyDescriptors extends TestCase {
 
@@ -214,26 +212,9 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
     
     private static final class TestField extends RawField {
 
-        private final String name;
-        private final String body;
-
-        public TestField(String name, String body){
-        	super(null, -1);
-            this.name = name;
-            this.body = body;
+    	public TestField(String name, String body){
+        	super(name, body);
         }
-        
-        public String getName() {
-            return name;
-        }
-
-        public String getBody() {
-            return body;
-        }
-
-        public ByteSequence getRaw() {
-            throw new UnsupportedOperationException();
-        }
-        
+    	
     }
 }

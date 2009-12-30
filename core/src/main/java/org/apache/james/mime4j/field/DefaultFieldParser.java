@@ -19,19 +19,13 @@
 
 package org.apache.james.mime4j.field;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.parser.RawField;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
-import org.apache.james.mime4j.util.MimeUtil;
 
 public class DefaultFieldParser extends DelegatingFieldParser {
 
-	private static final Pattern FIELD_NAME_PATTERN = Pattern
-    .compile("^([\\x21-\\x39\\x3b-\\x7e]+)[\\x20\\x09]*:");
-	
     private static final DefaultFieldParser PARSER = new DefaultFieldParser();
     
 
@@ -56,8 +50,8 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      * @throws MimeException if the raw string cannot be split into field name and body.
      */
     public static ParsedField parse(final ByteSequence raw) throws MimeException {
-        String rawStr = ContentUtil.decode(raw);
-        return parse(raw, rawStr);
+    	RawField rawField = new RawField(raw);
+        return PARSER.parse(rawField.getName(), rawField.getBody(), raw);
     }
 
 
@@ -84,23 +78,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      */
     public static ParsedField parse(final String rawStr) throws MimeException {
         ByteSequence raw = ContentUtil.encode(rawStr);
-        return parse(raw, rawStr);
-    }
-
-    private static ParsedField parse(final ByteSequence raw, final String rawStr)
-            throws MimeException {
-        final Matcher fieldMatcher = FIELD_NAME_PATTERN.matcher(rawStr);
-        if (!fieldMatcher.find()) {
-            throw new MimeException("Invalid field in string");
-        }
-        final String name = fieldMatcher.group(1);
-
-        String body = rawStr.substring(fieldMatcher.end());
-        if (body.length() > 0 && body.charAt(0) == ' ') {
-            body = body.substring(1);
-        }
-        body = MimeUtil.unfold(body);
-        return PARSER.parse(name, body, raw);
+        return parse(raw);
     }
 
 

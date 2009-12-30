@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.parser;
 
 import java.io.IOException;
-import java.util.BitSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,17 +56,6 @@ public abstract class AbstractEntity implements EntityStateMachine {
     private RawField field;
     private boolean endOfHeader;
     private int headerCount;
-
-    private static final BitSet fieldChars = new BitSet();
-
-    static {
-        for (int i = 0x21; i <= 0x39; i++) {
-            fieldChars.set(i);
-        }
-        for (int i = 0x3b; i <= 0x7e; i++) {
-            fieldChars.set(i);
-        }
-    }
 
     /**
      * Internal state, not exposed.
@@ -200,33 +188,14 @@ public abstract class AbstractEntity implements EntityStateMachine {
             }
             fieldbuf.setLength(len);
             
-            boolean valid = true;
-            boolean obsoleteSyntax = false;
-            
-            int pos = fieldbuf.indexOf((byte) ':');
-            if (pos <= 0) {
-                valid = false;
-            } else {
-                for (int i = 0; i < pos; i++) {
-                    if (!fieldChars.get(fieldbuf.byteAt(i) & 0xff)) {
-                    	for (; i < pos; i++) {
-                    		int j = fieldbuf.byteAt(i) & 0xff;
-							if (j != 0x20 && j != 0x09) {
-		                        valid = false;
-		                        break;
-							} else {
-								obsoleteSyntax = true;
-							}
-                    	}
-                    }
-                }
-            }
-            if (valid) {
-                if (obsoleteSyntax) warn(Event.OBSOLETE_HEADER);
-                field = new RawField(fieldbuf, pos);
+            try {
+            	field = new RawField(fieldbuf);
+            	if (field.isObsoleteSyntax()) {
+            		warn(Event.OBSOLETE_HEADER);
+            	}
                 body.addField(field);
                 return true;
-            } else {
+            } catch (MimeException e) {
                 monitor(Event.INVALID_HEADER);
             }
         }
