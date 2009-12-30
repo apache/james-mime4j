@@ -24,6 +24,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
@@ -54,10 +55,7 @@ public class MimeEntityTest extends TestCase {
         
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream,
-                null,
-                EntityStates.T_START_MESSAGE,
-                EntityStates.T_END_MESSAGE);
+                rawstream, new DefaultBodyDescriptor());
         
         
         assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
@@ -133,10 +131,7 @@ public class MimeEntityTest extends TestCase {
         
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream,
-                null,
-                EntityStates.T_START_MESSAGE,
-                EntityStates.T_END_MESSAGE);
+                rawstream, new DefaultBodyDescriptor());
         
         
         assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
@@ -220,10 +215,7 @@ public class MimeEntityTest extends TestCase {
         
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream,
-                null,
-                EntityStates.T_START_MESSAGE,
-                EntityStates.T_END_MESSAGE);
+                rawstream, new DefaultBodyDescriptor());
         
         assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
         entity.advance();
@@ -333,10 +325,7 @@ public class MimeEntityTest extends TestCase {
         
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream,
-                null,
-                EntityStates.T_START_MESSAGE,
-                EntityStates.T_END_MESSAGE);
+                rawstream, new DefaultBodyDescriptor());
         
         entity.setRecursionMode(RecursionMode.M_RAW);
         
@@ -430,7 +419,7 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                null,
+                new DefaultBodyDescriptor(),
                 EntityStates.T_START_MESSAGE,
                 EntityStates.T_END_MESSAGE,
                 config);
@@ -484,7 +473,7 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                null,
+                new DefaultBodyDescriptor(),
                 EntityStates.T_START_MESSAGE,
                 EntityStates.T_END_MESSAGE,
                 config);
@@ -532,7 +521,7 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                null,
+                new DefaultBodyDescriptor(),
                 EntityStates.T_START_MESSAGE,
                 EntityStates.T_END_MESSAGE,
                 config);
@@ -583,7 +572,7 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                null,
+                new DefaultBodyDescriptor(),
                 EntityStates.T_START_MESSAGE,
                 EntityStates.T_END_MESSAGE,
                 config);
@@ -631,7 +620,7 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                null,
+                new DefaultBodyDescriptor(),
                 EntityStates.T_START_MESSAGE,
                 EntityStates.T_END_MESSAGE,
                 config);

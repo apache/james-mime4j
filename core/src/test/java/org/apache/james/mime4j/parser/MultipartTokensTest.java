@@ -275,7 +275,8 @@ public class MultipartTokensTest extends TestCase {
     public void testMultipartMessageWithoutHeader() throws Exception {
         parser.parseHeadless(new ByteArrayInputStream(US_ASCII.encode(BODY).array()), 
                 "multipart/mixed;boundary=1729");
-        checkState(MimeTokenStream.T_END_HEADER);
+        // see https://issues.apache.org/jira/browse/MIME4J-153
+        // checkState(MimeTokenStream.T_END_HEADER);
         checkState(MimeTokenStream.T_START_MULTIPART);
         checkState(MimeTokenStream.T_PREAMBLE);
         checkState(MimeTokenStream.T_START_BODYPART);

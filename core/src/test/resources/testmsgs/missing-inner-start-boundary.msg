@@ -13,6 +13,5 @@ Content-Type: multipart/alternative; boundary="inner-boundary"
 AAA
 
 --inner-boundary--
-
 --outer-boundary--
 Outer epilouge

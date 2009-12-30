@@ -25,7 +25,7 @@ import java.io.InputStream;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
-import org.apache.james.mime4j.descriptor.BodyDescriptor;
+import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.LimitedInputStream;
 import org.apache.james.mime4j.io.LineNumberSource;
@@ -36,48 +36,38 @@ import org.apache.james.mime4j.util.MimeUtil;
 
 public class MimeEntity extends AbstractEntity {
 
-    /**
-     * Internal state, not exposed.
-     */
-    private static final int T_IN_BODYPART = -2;
-    /**
-     * Internal state, not exposed.
-     */
-    private static final int T_IN_MESSAGE = -3;
-
     private final LineNumberSource lineSource;
     private final BufferedLineReaderInputStream inbuffer;
     
     private int recursionMode;
-    private MimeBoundaryInputStream mimeStream;
+    private MimeBoundaryInputStream currentMimePartStream;
     private LineReaderInputStreamAdaptor dataStream;
-    private boolean skipHeader;
     
     private byte[] tmpbuf;
     
     public MimeEntity(
             LineNumberSource lineSource,
-            BufferedLineReaderInputStream inbuffer,
-            BodyDescriptor parent, 
+            InputStream instream,
+            MutableBodyDescriptor body, 
             int startState, 
             int endState,
             MimeEntityConfig config) {
-        super(parent, startState, endState, config);
+        super(body, startState, endState, config);
         this.lineSource = lineSource;
-        this.inbuffer = inbuffer;
+        this.inbuffer = new BufferedLineReaderInputStream(
+                instream,
+                4 * 1024,
+                config.getMaxLineLen());
         this.dataStream = new LineReaderInputStreamAdaptor(
                 inbuffer,
                 config.getMaxLineLen());
-        this.skipHeader = false;
     }
 
     public MimeEntity(
             LineNumberSource lineSource,
-            BufferedLineReaderInputStream inbuffer,
-            BodyDescriptor parent, 
-            int startState, 
-            int endState) {
-        this(lineSource, inbuffer, parent, startState, endState, 
+            InputStream instream,
+            MutableBodyDescriptor body) {
+        this(lineSource, instream, body, EntityStates.T_START_MESSAGE, EntityStates.T_END_MESSAGE, 
                 new MimeEntityConfig());
     }
 
@@ -89,14 +79,10 @@ public class MimeEntity extends AbstractEntity {
         this.recursionMode = recursionMode;
     }
 
-    public void skipHeader(String contentType) {
-        if (state != EntityStates.T_START_MESSAGE) {
-            throw new IllegalStateException("Invalid state: " + stateToString(state));
-        }
-        skipHeader = true;
-        body.addField(new RawField("Content-Type", contentType));
+    public void stop() {
+    	this.inbuffer.truncate();
     }
-
+    
     @Override
     protected int getLineNumber() {
         if (lineSource == null)
@@ -113,11 +99,7 @@ public class MimeEntity extends AbstractEntity {
     public EntityStateMachine advance() throws IOException, MimeException {
         switch (state) {
         case EntityStates.T_START_MESSAGE:
-            if (skipHeader) {
-                state = EntityStates.T_END_HEADER;
-            } else {
-                state = EntityStates.T_START_HEADER;
-            }
+            state = EntityStates.T_START_HEADER;
             break;
         case EntityStates.T_START_BODYPART:
             state = EntityStates.T_START_HEADER;
@@ -132,10 +114,10 @@ public class MimeEntity extends AbstractEntity {
                 state = EntityStates.T_BODY;
             } else if (MimeUtil.isMultipart(mimeType)) {
                 state = EntityStates.T_START_MULTIPART;
-                clearMimeStream();
+                clearMimePartStream();
             } else if (recursionMode != RecursionMode.M_NO_RECURSE 
                     && MimeUtil.isMessage(mimeType)) {
-                state = T_IN_MESSAGE;
+                state = EntityStates.T_BODY;
                 return nextMessage();
             } else {
                 state = EntityStates.T_BODY;
@@ -146,35 +128,25 @@ public class MimeEntity extends AbstractEntity {
                 advanceToBoundary();            
                 state = EntityStates.T_END_MULTIPART;
             } else {
-                createMimeStream();
+                createMimePartStream();
                 state = EntityStates.T_PREAMBLE;
             }
             break;
         case EntityStates.T_PREAMBLE:
-            advanceToBoundary();            
-            if (mimeStream.isLastPart()) {
-                clearMimeStream();
-                state = EntityStates.T_END_MULTIPART;
-            } else {
-                clearMimeStream();
-                createMimeStream();
-                state = T_IN_BODYPART;
-                return nextMimeEntity();
-            }
-            break;
-        case T_IN_BODYPART:
+        	// removed specific code. Fallback to T_IN_BODYPART that
+        	// better handle missing parts.
+        	// Removed the T_IN_BODYPART state (always use T_PREAMBLE)
             advanceToBoundary();
-            if (mimeStream.eof() && !mimeStream.isLastPart()) {
+            if (currentMimePartStream.eof() && !currentMimePartStream.isLastPart()) {
                 monitor(Event.MIME_BODY_PREMATURE_END);
             } else {
-                if (!mimeStream.isLastPart()) {
-                    clearMimeStream();
-                    createMimeStream();
-                    state = T_IN_BODYPART;
+                if (!currentMimePartStream.isLastPart()) {
+                    clearMimePartStream();
+                    createMimePartStream();
                     return nextMimeEntity();
                 }
             }
-            clearMimeStream();
+            clearMimePartStream();
             state = EntityStates.T_EPILOGUE;
             break;
         case EntityStates.T_EPILOGUE:
@@ -182,7 +154,6 @@ public class MimeEntity extends AbstractEntity {
             break;
         case EntityStates.T_BODY:
         case EntityStates.T_END_MULTIPART:
-        case T_IN_MESSAGE:
             state = endState;
             break;
         default:
@@ -195,35 +166,26 @@ public class MimeEntity extends AbstractEntity {
         return null;
     }
 
-    private void createMimeStream() throws MimeException, IOException {
+    private void createMimePartStream() throws MimeException, IOException {
         String boundary = body.getBoundary();
         int bufferSize = 2 * boundary.length();
         if (bufferSize < 4096) {
             bufferSize = 4096;
         }
         try {
-            if (mimeStream != null) {
-                mimeStream = new MimeBoundaryInputStream(
-                        new BufferedLineReaderInputStream(
-                                mimeStream, 
-                                bufferSize, 
-                                config.getMaxLineLen()), 
-                        boundary);
-            } else {
-                inbuffer.ensureCapacity(bufferSize);
-                mimeStream = new MimeBoundaryInputStream(inbuffer, boundary);
-            }
+            inbuffer.ensureCapacity(bufferSize);
+            currentMimePartStream = new MimeBoundaryInputStream(inbuffer, boundary);
         } catch (IllegalArgumentException e) {
             // thrown when boundary is too long
             throw new MimeException(e.getMessage(), e);
         }
         dataStream = new LineReaderInputStreamAdaptor(
-                mimeStream,
-                config.getMaxLineLen()); 
+                currentMimePartStream,
+                config.getMaxLineLen());
     }
     
-    private void clearMimeStream() {
-        mimeStream = null;
+    private void clearMimePartStream() {
+        currentMimePartStream = null;
         dataStream = new LineReaderInputStreamAdaptor(
                 inbuffer,
                 config.getMaxLineLen()); 
@@ -242,22 +204,22 @@ public class MimeEntity extends AbstractEntity {
     
     private EntityStateMachine nextMessage() {
         String transferEncoding = body.getTransferEncoding();
-        InputStream instream;
+        // optimize nesting of streams returning the "lower" stream instead of
+        // always return dataStream (that would add a LineReaderInputStreamAdaptor in the chain)
+        InputStream instream = currentMimePartStream != null ? currentMimePartStream : inbuffer;
         if (MimeUtil.isBase64Encoding(transferEncoding)) {
             log.debug("base64 encoded message/rfc822 detected");
-            instream = new Base64InputStream(dataStream);                    
+            instream = new Base64InputStream(instream);                    
         } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
             log.debug("quoted-printable encoded message/rfc822 detected");
-            instream = new QuotedPrintableInputStream(dataStream);                    
-        } else {
-            instream = dataStream;
+            instream = new QuotedPrintableInputStream(instream);
         }
 
         return nextMimeEntity(EntityStates.T_START_MESSAGE, EntityStates.T_END_MESSAGE, instream);
     }
     
     private EntityStateMachine nextMimeEntity() {
-    	return nextMimeEntity(EntityStates.T_START_BODYPART, EntityStates.T_END_BODYPART, mimeStream);
+    	return nextMimeEntity(EntityStates.T_START_BODYPART, EntityStates.T_END_BODYPART, currentMimePartStream);
     }
     
     private EntityStateMachine nextMimeEntity(int startState, int endState, InputStream instream) {
@@ -265,14 +227,10 @@ public class MimeEntity extends AbstractEntity {
             RawEntity message = new RawEntity(instream);
             return message;
         } else {
-            BufferedLineReaderInputStream stream = new BufferedLineReaderInputStream(
-            		instream, 
-                    4 * 1024,
-                    config.getMaxLineLen());
             MimeEntity mimeentity = new MimeEntity(
                     lineSource, 
-                    stream,
-                    body, 
+                    instream,
+                    body.newChild(), 
                     startState, 
                     endState,
                     config);

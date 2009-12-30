@@ -23,11 +23,6 @@ Content-Type: multipart/alternative; boundary="inner-boundary"</field>
 <preamble>
 AAA
 </preamble>
-<body-part>
-<header>
-</header>
-<text-body name="missing-inner-boundary_decoded_1_2_1.txt"/>
-</body-part>
 <epilogue>
 </epilogue>
 </multipart>

@@ -25,12 +25,6 @@ Content-Type: multipart/alternative; boundary="inner-boundary"</field>
 <preamble>
 AAA
 </preamble>
-<body-part>
-<header>
-</header>
-<body>
-</body>
-</body-part>
 <epilogue>
 </epilogue>
 </multipart>

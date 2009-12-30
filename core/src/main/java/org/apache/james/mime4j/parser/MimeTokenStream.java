@@ -32,7 +32,9 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
-import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
+import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
+import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
+import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
 import org.apache.james.mime4j.io.LineNumberInputStream;
 import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.util.CharsetUtil;
@@ -106,7 +108,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     private int state = T_END_OF_STREAM;
     private EntityStateMachine currentStateMachine;
     private int recursionMode = M_RECURSE;
-    private BufferedLineReaderInputStream inbuffer;
+	private MimeEntity rootentity;
     
     /**
      * Constructs a standard (lax) stream.
@@ -157,29 +159,39 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
             stream = lineInput;
         }
 
-        inbuffer = new BufferedLineReaderInputStream(
-                stream, 
-                4 * 1024,
-                config.getMaxLineLen());
-        if (recursionMode == M_RAW) {
-            RawEntity rawentity = new RawEntity(inbuffer);
-            currentStateMachine = rawentity;
-        } else {
-            MimeEntity mimeentity = new MimeEntity(
-                    lineSource,
-                    inbuffer,
-                    null, 
-                    T_START_MESSAGE, 
-                    T_END_MESSAGE,
-                    config);
-            mimeentity.setRecursionMode(recursionMode);
-            if (contentType != null) {
-                mimeentity.skipHeader(contentType);
-            }
-            currentStateMachine = mimeentity;
+        MutableBodyDescriptor newBodyDescriptor = newBodyDescriptor(null);
+        int start = T_START_MESSAGE;
+        if (contentType != null) {
+        	start = T_END_HEADER;
+        	newBodyDescriptor.addField(new RawField("Content-Type", contentType));
         }
+		rootentity = new MimeEntity(
+                lineSource,
+                stream,
+                newBodyDescriptor, 
+                start, 
+                T_END_MESSAGE,
+                config);
+        rootentity.setRecursionMode(recursionMode);
+        currentStateMachine = rootentity;
+
         entities.add(currentStateMachine);
         state = currentStateMachine.getState();
+    }
+
+    /**
+     * Creates a new instance of {@link BodyDescriptor}. Subclasses may override
+     * this in order to create body descriptors, that provide more specific
+     * information.
+     */
+    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor pParent) {
+        final MutableBodyDescriptor result;
+        if (config.isMaximalBodyDescriptor()) {
+            result = new MaximalBodyDescriptor(pParent);
+        } else {
+            result = new DefaultBodyDescriptor(pParent);
+        }
+        return result;
     }
 
     /**
@@ -235,7 +247,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * {@link ContentHandler#startMessage()}, etc.
      */
     public void stop() {
-        inbuffer.truncate();
+        rootentity.stop();
     }
 
     /**

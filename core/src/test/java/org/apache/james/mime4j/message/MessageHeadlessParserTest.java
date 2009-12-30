@@ -29,6 +29,46 @@ import org.apache.james.mime4j.parser.MimeEntityConfig;
 
 public class MessageHeadlessParserTest extends TestCase {
 
+
+	public void testMalformedHeaderShouldEndHeader() throws Exception {
+		String headlessContent = "Subject: my subject\r\n"
+			    + "Hi, how are you?\r\n"
+				+ "This is a simple message with no CRLFCELF between headers and body.\r\n"
+				+ "ThisIsNotAnHeader: because this should be already in the body\r\n"
+				+ "\r\n"
+				+ "Instead this should be better parsed as a text/plain body\r\n";
+
+		Message message = new Message(new ByteArrayInputStream(headlessContent
+				.getBytes("UTF-8")));
+		assertEquals("text/plain", message.getMimeType());
+		assertEquals(1, message.getHeader().getFields().size());
+		ContentTypeField contentTypeField = ((ContentTypeField) message
+				.getHeader().getField(FieldName.CONTENT_TYPE));
+		assertEquals("foo", contentTypeField.getBoundary());
+		Multipart multipart = (Multipart) message.getBody();
+		assertEquals(3, multipart.getCount());
+	}
+
+	public void testSimpleNonMimeTextHeadless() throws Exception {
+		String headlessContent = "Hi, how are you?\r\n"
+				+ "This is a simple message with no headers. While mime messages should start with\r\n"
+				+ "header: headervalue\r\n"
+				+ "\r\n"
+				+ "Instead this should be better parsed as a text/plain body\r\n";
+
+		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
+		mimeEntityConfig.setDefaultContentType("text/plain");
+		Message message = new Message(new ByteArrayInputStream(headlessContent
+				.getBytes("UTF-8")), mimeEntityConfig);
+		assertEquals("text/plain", message.getMimeType());
+		assertEquals(1, message.getHeader().getFields().size());
+		ContentTypeField contentTypeField = ((ContentTypeField) message
+				.getHeader().getField(FieldName.CONTENT_TYPE));
+		assertEquals("foo", contentTypeField.getBoundary());
+		Multipart multipart = (Multipart) message.getBody();
+		assertEquals(3, multipart.getCount());
+	}
+
 	public void testMultipartFormContent() throws Exception {
 		String contentType = "multipart/form-data; boundary=foo";
 		String headlessContent = "\r\n"

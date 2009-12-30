@@ -25,8 +25,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
-import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
-import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
 import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
 import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
@@ -42,7 +40,6 @@ public abstract class AbstractEntity implements EntityStateMachine {
 
     protected final Log log;
     
-    protected final BodyDescriptor parent;
     protected final int startState;
     protected final int endState;
     protected final MimeEntityConfig config;
@@ -67,17 +64,16 @@ public abstract class AbstractEntity implements EntityStateMachine {
     private static final int T_IN_MESSAGE = -3;
 
     AbstractEntity(
-            BodyDescriptor parent,
+            MutableBodyDescriptor body,
             int startState, 
             int endState,
             MimeEntityConfig config) {
         this.log = LogFactory.getLog(getClass());        
-        this.parent = parent;
         this.state = startState;
         this.startState = startState;
         this.endState = endState;
         this.config = config;
-        this.body = newBodyDescriptor(parent);
+        this.body = body;
         this.linebuf = new ByteArrayBuffer(64);
         this.lineCount = 0;
         this.endOfHeader = false;
@@ -86,21 +82,6 @@ public abstract class AbstractEntity implements EntityStateMachine {
 
     public int getState() {
         return state;
-    }
-    
-    /**
-     * Creates a new instance of {@link BodyDescriptor}. Subclasses may override
-     * this in order to create body descriptors, that provide more specific
-     * information.
-     */
-    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor pParent) {
-        final MutableBodyDescriptor result;
-        if (config.isMaximalBodyDescriptor()) {
-            result = new MaximalBodyDescriptor(pParent);
-        } else {
-            result = new DefaultBodyDescriptor(pParent);
-        }
-        return result;
     }
 
     /**
@@ -157,8 +138,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
                     }
                 }
             }
-        }
-        catch (MaxLineLimitException e) {
+        } catch (MaxLineLimitException e) {
             throw new MimeException(e);
         }
 
@@ -167,6 +147,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
 
     protected boolean parseField() throws MimeException, IOException {
         int maxHeaderCount = config.getMaxHeaderCount();
+        // the loop is here to transparently skip invalid headers
         for (;;) {
             if (endOfHeader) {
                 return false;
