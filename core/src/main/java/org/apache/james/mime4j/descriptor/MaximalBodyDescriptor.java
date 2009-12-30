@@ -103,7 +103,11 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         this.contentMD5Raw = null;
         this.isContentMD5Set = false;
     }
-    
+
+    public MutableBodyDescriptor newChild() {
+		return new MaximalBodyDescriptor(this);
+    }
+
     @Override
     public void addField(RawField field) {
         String name = field.getName();

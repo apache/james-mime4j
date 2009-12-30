@@ -86,6 +86,10 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
         }
     }
     
+    public MutableBodyDescriptor newChild() {
+		return new DefaultBodyDescriptor(this);
+    }
+    
     /**
      * Should be called for each <code>Content-</code> header field of 
      * a MIME message or part.
@@ -149,7 +153,6 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
         if (main != null 
                 && ((main.startsWith("multipart/") && b != null) 
                         || !main.startsWith("multipart/"))) {
-            
             mimeType = main;
             this.subType = subtype;
             this.mediaType = type;
