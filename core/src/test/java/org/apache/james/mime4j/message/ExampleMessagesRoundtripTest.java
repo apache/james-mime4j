@@ -63,6 +63,9 @@ public class ExampleMessagesRoundtripTest extends TestCase {
     @Override
     protected void runTest() throws Throwable {
         MimeEntityConfig config = new MimeEntityConfig();
+        if (getName().startsWith("malformedHeaderStartsBody")) {
+        	config.setMalformedHeaderStartsBody(true);
+        }
         config.setMaxLineLen(-1);
         Message inputMessage = new Message(new FileInputStream(file), config);
         ByteArrayOutputStream out = new ByteArrayOutputStream();

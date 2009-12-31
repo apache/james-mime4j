@@ -97,6 +97,9 @@ public class MessageParserTest extends TestCase {
         System.out.println("Parsing " + f.getName());
         
         MimeEntityConfig config = new MimeEntityConfig();
+        if (getName().startsWith("malformedHeaderStartsBody")) {
+        	config.setMalformedHeaderStartsBody(true);
+        }
         config.setMaxLineLen(-1);
         Message m = new Message(new FileInputStream(f), config);
         

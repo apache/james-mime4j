@@ -63,6 +63,9 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
         MimeStreamParser parser = null;
         TestHandler handler = null;
         MimeEntityConfig config = new MimeEntityConfig();
+        if (getName().startsWith("malformedHeaderStartsBody")) {
+        	config.setMalformedHeaderStartsBody(true);
+        }
         config.setMaxLineLen(-1);
         parser = new MimeStreamParser(config);
         handler = new TestHandler();
