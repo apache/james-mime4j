@@ -19,47 +19,13 @@
 
 package org.apache.james.mime4j.field;
 
-import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.MimeUtil;
-
-/**
- * Represents a <code>Content-Transfer-Encoding</code> field.
- */
-public class ContentTransferEncodingField extends AbstractField {
-    private String encoding;
-
-    ContentTransferEncodingField(String name, String body, ByteSequence raw) {
-        super(name, body, raw);
-        encoding = body.trim().toLowerCase();
-    }
+public interface ContentTransferEncodingField extends ParsedField {
 
     /**
      * Gets the encoding defined in this field.
      * 
      * @return the encoding or an empty string if not set.
      */
-    public String getEncoding() {
-        return encoding;
-    }
+    public abstract String getEncoding();
 
-    /**
-     * Gets the encoding of the given field if. Returns the default
-     * <code>7bit</code> if not set or if <code>f</code> is
-     * <code>null</code>.
-     * 
-     * @return the encoding.
-     */
-    public static String getEncoding(ContentTransferEncodingField f) {
-        if (f != null && f.getEncoding().length() != 0) {
-            return f.getEncoding();
-        }
-        return MimeUtil.ENC_7BIT;
-    }
-
-    static final FieldParser<ContentTransferEncodingField> PARSER = new FieldParser<ContentTransferEncodingField>() {
-        public ContentTransferEncodingField parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new ContentTransferEncodingField(name, body, raw);
-        }
-    };
 }

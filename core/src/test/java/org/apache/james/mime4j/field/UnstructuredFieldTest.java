@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
+import org.apache.james.mime4j.field.impl.DefaultFieldParser;
+
 import junit.framework.TestCase;
 
 public class UnstructuredFieldTest extends TestCase {

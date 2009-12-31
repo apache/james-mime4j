@@ -17,37 +17,46 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.field.impl;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.apache.james.mime4j.codec.DecoderUtil;
+import org.apache.james.mime4j.field.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
-public class DelegatingFieldParser implements FieldParser<ParsedField> {
-    private static final FieldParser<UnstructuredField> DEFAULT_PARSER = UnstructuredField.PARSER;
+/**
+ * Simple unstructured field such as <code>Subject</code>.
+ */
+public class UnstructuredFieldImpl extends AbstractField implements org.apache.james.mime4j.field.UnstructuredField {
+    private boolean parsed = false;
 
-    private Map<String, FieldParser<? extends ParsedField>> parsers = new HashMap<String, FieldParser<? extends ParsedField>>();
+    private String value;
+
+    UnstructuredFieldImpl(String name, String body, ByteSequence raw) {
+        super(name, body, raw);
+    }
 
     /**
-     * Sets the parser used for the field named <code>name</code>.
-     * @param name the name of the field
-     * @param parser the parser for fields named <code>name</code>
+     * @see org.apache.james.mime4j.field.UnstructuredField#getValue()
      */
-    public void setFieldParser(final String name, final FieldParser<? extends ParsedField> parser) {
-        parsers.put(name.toLowerCase(), parser);
+    public String getValue() {
+        if (!parsed)
+            parse();
+
+        return value;
     }
-    
-    public FieldParser<? extends ParsedField> getParser(final String name) {
-        final FieldParser<? extends ParsedField> field = parsers.get(name.toLowerCase());
-        if (field == null) {
-            return DEFAULT_PARSER;
+
+    private void parse() {
+        String body = getBody();
+
+        value = DecoderUtil.decodeEncodedWords(body);
+
+        parsed = true;
+    }
+
+    static final FieldParser<UnstructuredFieldImpl> PARSER = new FieldParser<UnstructuredFieldImpl>() {
+        public UnstructuredFieldImpl parse(final String name, final String body,
+                final ByteSequence raw) {
+            return new UnstructuredFieldImpl(name, body, raw);
         }
-        return field;
-    }
-    
-    public ParsedField parse(final String name, final String body, final ByteSequence raw) {
-        final FieldParser<? extends ParsedField> parser = getParser(name);
-        return parser.parse(name, body, raw);
-    }
+    };
 }

@@ -17,9 +17,20 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.field.impl;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.field.impl.AddressListFieldImpl;
+import org.apache.james.mime4j.field.impl.ContentDispositionFieldImpl;
+import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
+import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
+import org.apache.james.mime4j.field.impl.DateTimeFieldImpl;
+import org.apache.james.mime4j.field.FieldName;
+import org.apache.james.mime4j.field.FieldParser;
+import org.apache.james.mime4j.field.impl.MailboxFieldImpl;
+import org.apache.james.mime4j.field.impl.MailboxListFieldImpl;
+import org.apache.james.mime4j.field.ParsedField;
+import org.apache.james.mime4j.field.impl.UnstructuredFieldImpl;
 import org.apache.james.mime4j.parser.RawField;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -62,14 +73,14 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      * <p>
      * <table>
      *   <tr><th>Class returned</th><th>Field names</th></tr>
-     *   <tr><td>{@link ContentTypeField}</td><td>Content-Type</td></tr>
-     *   <tr><td>{@link ContentTransferEncodingField}</td><td>Content-Transfer-Encoding</td></tr>
-     *   <tr><td>{@link ContentDispositionField}</td><td>Content-Disposition</td></tr>
-     *   <tr><td>{@link DateTimeField}</td><td>Date, Resent-Date</td></tr>
-     *   <tr><td>{@link MailboxField}</td><td>Sender, Resent-Sender</td></tr>
-     *   <tr><td>{@link MailboxListField}</td><td>From, Resent-From</td></tr>
-     *   <tr><td>{@link AddressListField}</td><td>To, Cc, Bcc, Reply-To, Resent-To, Resent-Cc, Resent-Bcc</td></tr>
-     *   <tr><td>{@link UnstructuredField}</td><td>Subject and others</td></tr>
+     *   <tr><td>{@link ContentTypeFieldImpl}</td><td>Content-Type</td></tr>
+     *   <tr><td>{@link ContentTransferEncodingFieldImpl}</td><td>Content-Transfer-Encoding</td></tr>
+     *   <tr><td>{@link ContentDispositionFieldImpl}</td><td>Content-Disposition</td></tr>
+     *   <tr><td>{@link DateTimeFieldImpl}</td><td>Date, Resent-Date</td></tr>
+     *   <tr><td>{@link MailboxFieldImpl}</td><td>Sender, Resent-Sender</td></tr>
+     *   <tr><td>{@link MailboxListFieldImpl}</td><td>From, Resent-From</td></tr>
+     *   <tr><td>{@link AddressListFieldImpl}</td><td>To, Cc, Bcc, Reply-To, Resent-To, Resent-Cc, Resent-Bcc</td></tr>
+     *   <tr><td>{@link UnstructuredFieldImpl}</td><td>Subject and others</td></tr>
      * </table>
      * 
      * @param rawStr the string to parse.
@@ -84,24 +95,24 @@ public class DefaultFieldParser extends DelegatingFieldParser {
 
     public DefaultFieldParser() {
         setFieldParser(FieldName.CONTENT_TRANSFER_ENCODING,
-                ContentTransferEncodingField.PARSER);
-        setFieldParser(FieldName.CONTENT_TYPE, ContentTypeField.PARSER);
+                ContentTransferEncodingFieldImpl.PARSER);
+        setFieldParser(FieldName.CONTENT_TYPE, ContentTypeFieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_DISPOSITION,
-                ContentDispositionField.PARSER);
+                ContentDispositionFieldImpl.PARSER);
 
-        final FieldParser<DateTimeField> dateTimeParser = DateTimeField.PARSER;
+        final FieldParser<DateTimeFieldImpl> dateTimeParser = DateTimeFieldImpl.PARSER;
         setFieldParser(FieldName.DATE, dateTimeParser);
         setFieldParser(FieldName.RESENT_DATE, dateTimeParser);
 
-        final FieldParser<MailboxListField> mailboxListParser = MailboxListField.PARSER;
+        final FieldParser<MailboxListFieldImpl> mailboxListParser = MailboxListFieldImpl.PARSER;
         setFieldParser(FieldName.FROM, mailboxListParser);
         setFieldParser(FieldName.RESENT_FROM, mailboxListParser);
 
-        final FieldParser<MailboxField> mailboxParser = MailboxField.PARSER;
+        final FieldParser<MailboxFieldImpl> mailboxParser = MailboxFieldImpl.PARSER;
         setFieldParser(FieldName.SENDER, mailboxParser);
         setFieldParser(FieldName.RESENT_SENDER, mailboxParser);
 
-        final FieldParser<AddressListField> addressListParser = AddressListField.PARSER;
+        final FieldParser<AddressListFieldImpl> addressListParser = AddressListFieldImpl.PARSER;
         setFieldParser(FieldName.TO, addressListParser);
         setFieldParser(FieldName.RESENT_TO, addressListParser);
         setFieldParser(FieldName.CC, addressListParser);

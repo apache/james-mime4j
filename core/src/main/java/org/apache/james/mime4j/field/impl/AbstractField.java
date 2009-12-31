@@ -17,8 +17,10 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.field.impl;
 
+import org.apache.james.mime4j.field.ParseException;
+import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**

@@ -22,8 +22,8 @@ package org.apache.james.mime4j.message;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 import org.apache.james.mime4j.message.impl.BodyFactory;
 import org.apache.james.mime4j.message.impl.BodyPart;
 import org.apache.james.mime4j.message.impl.MessageImpl;

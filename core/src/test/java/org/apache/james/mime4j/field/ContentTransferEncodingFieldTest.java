@@ -20,7 +20,8 @@
 package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
-import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
+import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 
 import junit.framework.TestCase;
 
@@ -51,18 +52,18 @@ public class ContentTransferEncodingFieldTest extends TestCase {
         
         f = (ContentTransferEncodingField) 
                     DefaultFieldParser.parse("Content-Transfer-Encoding: 8bit");
-        assertEquals("8bit", ContentTransferEncodingField.getEncoding(f));
+        assertEquals("8bit", ContentTransferEncodingFieldImpl.getEncoding(f));
         
         f = null;
-        assertEquals("7bit", ContentTransferEncodingField.getEncoding(f));
+        assertEquals("7bit", ContentTransferEncodingFieldImpl.getEncoding(f));
         
         f = (ContentTransferEncodingField) 
                     DefaultFieldParser.parse("Content-Transfer-Encoding:       ");
-        assertEquals("7bit", ContentTransferEncodingField.getEncoding(f));
+        assertEquals("7bit", ContentTransferEncodingFieldImpl.getEncoding(f));
         
         f = (ContentTransferEncodingField) 
                     DefaultFieldParser.parse("Content-Transfer-Encoding:");
-        assertEquals("7bit", ContentTransferEncodingField.getEncoding(f));
+        assertEquals("7bit", ContentTransferEncodingFieldImpl.getEncoding(f));
     }
 
 }

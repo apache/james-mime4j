@@ -20,7 +20,8 @@
 package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.field.ContentTypeField;
-import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
+import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 import org.apache.log4j.BasicConfigurator;
 
 import junit.framework.TestCase;
@@ -63,29 +64,29 @@ public class ContentTypeFieldTest extends TestCase {
         
         child = (ContentTypeField) DefaultFieldParser.parse("Content-Type: child/type");
         parent = (ContentTypeField) DefaultFieldParser.parse("Content-Type: parent/type");
-        assertEquals("child/type", ContentTypeField.getMimeType(child, parent));
+        assertEquals("child/type", ContentTypeFieldImpl.getMimeType(child, parent));
         
         child = null;
         parent = (ContentTypeField) DefaultFieldParser.parse("Content-Type: parent/type");
-        assertEquals("text/plain", ContentTypeField.getMimeType(child, parent));
+        assertEquals("text/plain", ContentTypeFieldImpl.getMimeType(child, parent));
         parent = (ContentTypeField) DefaultFieldParser.parse("Content-Type: multipart/digest");
-        assertEquals("message/rfc822", ContentTypeField.getMimeType(child, parent));
+        assertEquals("message/rfc822", ContentTypeFieldImpl.getMimeType(child, parent));
         
         child = (ContentTypeField) DefaultFieldParser.parse("Content-Type:");
         parent = (ContentTypeField) DefaultFieldParser.parse("Content-Type: parent/type");
-        assertEquals("text/plain", ContentTypeField.getMimeType(child, parent));
+        assertEquals("text/plain", ContentTypeFieldImpl.getMimeType(child, parent));
         parent = (ContentTypeField) DefaultFieldParser.parse("Content-Type: multipart/digest");
-        assertEquals("message/rfc822", ContentTypeField.getMimeType(child, parent));
+        assertEquals("message/rfc822", ContentTypeFieldImpl.getMimeType(child, parent));
     }
     
     public void testGetCharsetStatic() throws Exception {
         ContentTypeField f = null;
         
         f = (ContentTypeField) DefaultFieldParser.parse("Content-Type: some/type; charset=iso8859-1");
-        assertEquals("iso8859-1", ContentTypeField.getCharset(f));
+        assertEquals("iso8859-1", f.getCharset());
         
         f = (ContentTypeField) DefaultFieldParser.parse("Content-Type: some/type;");
-        assertEquals("us-ascii", ContentTypeField.getCharset(f));
+        assertEquals("us-ascii", f.getCharset());
     }
     
     public void testGetParameter() throws Exception {

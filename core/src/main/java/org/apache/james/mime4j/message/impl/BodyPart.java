@@ -25,7 +25,7 @@ import java.util.Map;
 import org.apache.james.mime4j.field.ContentDispositionField;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
-import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.field.impl.Fields;
 import org.apache.james.mime4j.message.Body;
 import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Header;

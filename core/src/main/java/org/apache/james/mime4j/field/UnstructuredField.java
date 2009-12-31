@@ -19,40 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
-import org.apache.james.mime4j.codec.DecoderUtil;
-import org.apache.james.mime4j.util.ByteSequence;
+public interface UnstructuredField extends ParsedField {
 
-/**
- * Simple unstructured field such as <code>Subject</code>.
- */
-public class UnstructuredField extends AbstractField {
-    private boolean parsed = false;
+    public abstract String getValue();
 
-    private String value;
-
-    UnstructuredField(String name, String body, ByteSequence raw) {
-        super(name, body, raw);
-    }
-
-    public String getValue() {
-        if (!parsed)
-            parse();
-
-        return value;
-    }
-
-    private void parse() {
-        String body = getBody();
-
-        value = DecoderUtil.decodeEncodedWords(body);
-
-        parsed = true;
-    }
-
-    static final FieldParser<UnstructuredField> PARSER = new FieldParser<UnstructuredField>() {
-        public UnstructuredField parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new UnstructuredField(name, body, raw);
-        }
-    };
 }

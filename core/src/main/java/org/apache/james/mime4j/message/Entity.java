@@ -29,6 +29,8 @@ import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.FieldName;
+import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
+import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
 
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
@@ -257,13 +259,17 @@ public abstract class Entity implements Disposable {
      */
     public String getMimeType() {
         ContentTypeField child = 
-            (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE);
+            getContentTypeField();
         ContentTypeField parent = getParent() != null 
             ? (ContentTypeField) getParent().getHeader().
                                                 getField(FieldName.CONTENT_TYPE)
             : null;
         
-        return ContentTypeField.getMimeType(child, parent);
+        return ContentTypeFieldImpl.getMimeType(child, parent);
+    }
+
+    private ContentTypeField getContentTypeField() {
+        return (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE);
     }
     
     /**
@@ -272,7 +278,7 @@ public abstract class Entity implements Disposable {
      * @return the MIME character set encoding.
      */
     public String getCharset() {
-        return ContentTypeField.getCharset( 
+        return ContentTypeFieldImpl.getCharset( 
             (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE));
     }
     
@@ -285,7 +291,7 @@ public abstract class Entity implements Disposable {
         ContentTransferEncodingField f = (ContentTransferEncodingField) 
                         getHeader().getField(FieldName.CONTENT_TRANSFER_ENCODING);
         
-        return ContentTransferEncodingField.getEncoding(f);
+        return ContentTransferEncodingFieldImpl.getEncoding(f);
     }
 
     /**
@@ -469,8 +475,7 @@ public abstract class Entity implements Disposable {
      * @return <code>true</code> on match, <code>false</code> otherwise.
      */
     public boolean isMultipart() {
-        ContentTypeField f = (ContentTypeField) getHeader().getField(
-                FieldName.CONTENT_TYPE);
+        ContentTypeField f = getContentTypeField();
         return f != null
                 && f.getBoundary() != null
                 && getMimeType().startsWith(

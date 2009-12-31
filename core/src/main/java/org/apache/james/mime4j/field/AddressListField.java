@@ -19,61 +19,13 @@
 
 package org.apache.james.mime4j.field;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.parser.ParseException;
-import org.apache.james.mime4j.util.ByteSequence;
 
-/**
- * Address list field such as <code>To</code> or <code>Reply-To</code>.
- */
-public class AddressListField extends AbstractField {
-    private static Log log = LogFactory.getLog(AddressListField.class);
+public interface AddressListField extends ParsedField {
 
-    private boolean parsed = false;
+    public abstract AddressList getAddressList();
 
-    private AddressList addressList;
-    private ParseException parseException;
+    public abstract ParseException getParseException();
 
-    AddressListField(String name, String body, ByteSequence raw) {
-        super(name, body, raw);
-    }
-
-    public AddressList getAddressList() {
-        if (!parsed)
-            parse();
-
-        return addressList;
-    }
-
-    @Override
-    public ParseException getParseException() {
-        if (!parsed)
-            parse();
-
-        return parseException;
-    }
-
-    private void parse() {
-        String body = getBody();
-
-        try {
-            addressList = AddressList.parse(body);
-        } catch (ParseException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': " + e.getMessage());
-            }
-            parseException = e;
-        }
-
-        parsed = true;
-    }
-
-    static final FieldParser<AddressListField> PARSER = new FieldParser<AddressListField>() {
-        public AddressListField parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new AddressListField(name, body, raw);
-        }
-    };
 }
