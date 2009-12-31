@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.field.address.AddressList;
-import org.apache.james.mime4j.field.address.parser.ParseException;
+import org.apache.james.mime4j.field.ParseException;
 
 public interface AddressListField extends ParsedField {
 
