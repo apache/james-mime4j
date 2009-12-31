@@ -47,5 +47,12 @@ public abstract class LineReaderInputStream extends FilterInputStream {
      */
     public abstract int readLine(final ByteArrayBuffer dst)
             throws MaxLineLimitException, IOException;
+    
+    /**
+     * Tries to unread the last read line.
+     * 
+     * @return true if the unread has been succesfull.
+     */
+    public abstract boolean unread(ByteArrayBuffer buf);
 
 }

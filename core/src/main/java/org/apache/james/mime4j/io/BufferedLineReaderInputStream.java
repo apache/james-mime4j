@@ -32,8 +32,13 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
     private boolean truncated;
     
-    private byte[] buffer;
+    boolean tempBuffer = false;
     
+    private byte[] origBuffer;
+    private int origBufpos;
+    private int origBuflen;
+    
+    private byte[] buffer;
     private int bufpos;
     private int buflen;
     
@@ -65,7 +70,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
     private void expand(int newlen) {
         byte newbuffer[] = new byte[newlen];
-        int len = this.buflen - this.bufpos;
+        int len = bufferLen();
         if (len > 0) {
             System.arraycopy(this.buffer, this.bufpos, newbuffer, this.bufpos, len);
         }
@@ -79,9 +84,21 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     }
     
     public int fillBuffer() throws IOException {
+    	if (tempBuffer) {
+    		// we was on tempBuffer.
+    		// check that we completed the tempBuffer
+    		if (bufpos != buflen) throw new IllegalStateException("unread only works when a buffer is fully read before the next refill is asked!");
+    		// restore the original buffer
+    		buffer = origBuffer;
+    		buflen = origBuflen;
+    		bufpos = origBufpos;
+    		tempBuffer = false;
+    		// return that we just read bufferLen data.
+    		return bufferLen();
+    	}
         // compact the buffer if necessary
-        if (this.bufpos > 0) {
-            int len = this.buflen - this.bufpos;
+        if (this.bufpos > 0) { // could swtich to (this.buffer.length / 2) but needs a 4*boundary capacity, then (instead of 2).
+            int len = bufferLen();
             if (len > 0) {
                 System.arraycopy(this.buffer, this.bufpos, this.buffer, 0, len);
             }
@@ -100,8 +117,12 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
     }
 
+	private int bufferLen() {
+		return this.buflen - this.bufpos;
+	}
+
     public boolean hasBufferedData() {
-        return this.bufpos < this.buflen;
+        return bufferLen() > 0;
     }
 
     public void truncate() {
@@ -109,11 +130,13 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         this.truncated = true;
     }
     
+    protected boolean readAllowed() {
+    	return !this.truncated;
+    }
+    
     @Override
     public int read() throws IOException {
-        if (this.truncated) {
-            return -1;
-        }
+        if (!readAllowed()) return -1;
         int noRead = 0;
         while (!hasBufferedData()) {
             noRead = fillBuffer();
@@ -126,9 +149,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     
     @Override
     public int read(final byte[] b, int off, int len) throws IOException {
-        if (this.truncated) {
-            return -1;
-        }
+        if (!readAllowed()) return -1;
         if (b == null) {
             return 0;
         }
@@ -139,7 +160,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
                 return -1;
             }
         }
-        int chunk = this.buflen - this.bufpos;
+        int chunk = bufferLen();
         if (chunk > len) {
             chunk = len;
         }
@@ -150,9 +171,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     
     @Override
     public int read(final byte[] b) throws IOException {
-        if (this.truncated) {
-            return -1;
-        }
+        if (!readAllowed()) return -1;
         if (b == null) {
             return 0;
         }
@@ -170,9 +189,8 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         if (dst == null) {
             throw new IllegalArgumentException("Buffer may not be null");
         }
-        if (this.truncated) {
-            return -1;
-        }
+        if (!readAllowed()) return -1;
+
         int total = 0;
         boolean found = false;
         int bytesRead = 0;
@@ -207,7 +225,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
     }
 
-    /**
+	/**
      * Implements quick search algorithm as published by
      * <p> 
      * SUNDAY D.M., 1990, 
@@ -220,7 +238,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             throw new IllegalArgumentException("Pattern may not be null");
         }
         if (off < this.bufpos || len < 0 || off + len > this.buflen) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("looking for "+off+"("+len+")"+" in "+bufpos+"/"+buflen);
         }
         if (len < pattern.length) {
             return -1;
@@ -284,43 +302,43 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     }
     
     public int indexOf(byte b) {
-        return indexOf(b, this.bufpos, this.buflen - this.bufpos);
+        return indexOf(b, this.bufpos, bufferLen());
     }
     
     public byte charAt(int pos) {
         if (pos < this.bufpos || pos > this.buflen) {
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("looking for "+pos+" in "+bufpos+"/"+buflen);
         }
         return this.buffer[pos];
     }
     
-    public byte[] buf() {
+    protected byte[] buf() {
         return this.buffer;        
     }
     
-    public int pos() {
+    protected int pos() {
         return this.bufpos;
     }
     
-    public int limit() {
+    protected int limit() {
         return this.buflen;
     }
     
-    public int length() {
-        return this.buflen - this.bufpos;
+    protected int length() {
+        return bufferLen();
     }
     
     public int capacity() {
         return this.buffer.length;
     }
     
-    public int skip(int n) {
-        int chunk = Math.min(n, this.buflen - this.bufpos);
+    protected int skip(int n) {
+        int chunk = Math.min(n, bufferLen());
         this.bufpos += chunk; 
         return chunk;
     }
 
-    public void clear() {
+    private void clear() {
         this.bufpos = 0;
         this.buflen = 0;
     }
@@ -341,5 +359,17 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         buffer.append("]");
         return buffer.toString();
     }
+
+	@Override
+	public boolean unread(ByteArrayBuffer buf) {
+		origBuffer = buffer;
+		origBuflen = buflen;
+		origBufpos = bufpos;
+		bufpos = 0;
+		buflen = buf.length();
+		buffer = buf.buffer();
+		tempBuffer = true;
+		return true;
+	}
 
 }

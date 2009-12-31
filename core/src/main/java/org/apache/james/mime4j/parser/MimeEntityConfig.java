@@ -36,8 +36,9 @@ public final class MimeEntityConfig implements Cloneable {
     private long maxContentLen;
     private boolean countLineNumbers;
     private String defaultContentType;
+    private boolean malformedHeaderStartsBody;
     
-    public MimeEntityConfig() {
+	public MimeEntityConfig() {
         this.maximalBodyDescriptor = false;
         this.strictParsing = false;
         this.maxLineLen = 1000;
@@ -48,6 +49,30 @@ public final class MimeEntityConfig implements Cloneable {
         this.defaultContentType = null;
     }
     
+    /**
+     * @see #setMalformedHeaderStartsBody(boolean)
+     * 
+     * @return true if malformed header should "end" the headers and be 
+     * part of the body
+     */
+    public boolean isMalformedHeaderStartsBody() {
+		return malformedHeaderStartsBody;
+	}
+
+	/**
+	 * Define the behaviour for dealing with malformed headers while in lenient
+	 * mode
+	 * 
+	 * @param malformedHeaderStartsBody <code>true</code> to make the parser
+	 *            interpret a malformed header as end of the headers and
+	 *            as part of the body (as if the CRLF separator was missing).
+	 *            <code>false</code> to simply ignore malformed headers and
+	 *            continue parsing headers from the following line.
+	 */
+	public void setMalformedHeaderStartsBody(boolean malformedHeaderStartsBody) {
+		this.malformedHeaderStartsBody = malformedHeaderStartsBody;
+	}
+
     /**
      * Returns <code>true</code> if the maximum body descriptor should be
      * used, <code>false</code> for the default body descriptor.

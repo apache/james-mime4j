@@ -117,4 +117,13 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
     public String toString() {
         return "[LineReaderInputStreamAdaptor: " + bis + "]";
     }
+
+	@Override
+	public boolean unread(ByteArrayBuffer buf) {
+		if (bis != null) {
+			return bis.unread(buf);
+		} else {
+			return false;
+		}
+	}
 }

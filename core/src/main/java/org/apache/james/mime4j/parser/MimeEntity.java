@@ -168,6 +168,7 @@ public class MimeEntity extends AbstractEntity {
 
     private void createMimePartStream() throws MimeException, IOException {
         String boundary = body.getBoundary();
+    	// TODO move the following lines inside the MimeBoundaryInputStream constructor
         int bufferSize = 2 * boundary.length();
         if (bufferSize < 4096) {
             bufferSize = 4096;

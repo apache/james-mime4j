@@ -160,6 +160,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
             headerCount++;
 
             // Strip away line delimiter
+            int origLen = fieldbuf.length();
             int len = fieldbuf.length();
             if (len > 0 && fieldbuf.byteAt(len - 1) == '\n') {
                 len--;
@@ -178,6 +179,12 @@ public abstract class AbstractEntity implements EntityStateMachine {
                 return true;
             } catch (MimeException e) {
                 monitor(Event.INVALID_HEADER);
+                if (config.isMalformedHeaderStartsBody()) {
+	                fieldbuf.setLength(origLen);
+	                LineReaderInputStream instream = getDataStream();
+	                if (!instream.unread(fieldbuf)) throw new MimeParseEventException(Event.INVALID_HEADER);
+	                return false;
+                }
             }
         }
     }

@@ -51,7 +51,8 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     public MimeBoundaryInputStream(BufferedLineReaderInputStream inbuffer, String boundary) 
             throws IOException {
         super(inbuffer);
-        if (inbuffer.capacity() <= boundary.length()) {
+
+        if (inbuffer.capacity() < boundary.length() * 2) {
             throw new IllegalArgumentException("Boundary is too long");
         }
         this.buffer = inbuffer;
@@ -72,6 +73,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             }
             this.boundary[i + 2] = ch;
         }
+        
         fillBuffer();
     }
 
@@ -91,19 +93,25 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     public boolean markSupported() {
         return false;
     }
+    
+    public boolean readAllowed() throws IOException {
+        if (completed) {
+            return false;
+        }
+        // System.out.println("rA!");
+        if (endOfStream() && !hasData()) {
+            skipBoundary();            
+            return false;
+        }
+        return true;
+    }
 
     /**
      * @see java.io.InputStream#read()
      */
     @Override
     public int read() throws IOException {
-        if (completed) {
-            return -1;
-        }
-        if (endOfStream() && !hasData()) {
-            skipBoundary();            
-            return -1;
-        }
+        if (!readAllowed()) return -1;
         for (;;) {
             if (hasData()) {
                 return buffer.read();
@@ -117,13 +125,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        if (completed) {
-            return -1;
-        }
-        if (endOfStream() && !hasData()) {
-            skipBoundary();            
-            return -1;
-        }
+        if (!readAllowed()) return -1;
         fillBuffer();
         if (!hasData()) {
             return read(b, off, len);
@@ -137,21 +139,15 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         if (dst == null) {
             throw new IllegalArgumentException("Destination buffer may not be null");
         }
-        if (completed) {
-            return -1;
-        }
-        if (endOfStream() && !hasData()) {
-            skipBoundary();            
-            return -1;
-        }
-
+        if (!readAllowed()) return -1;
+        
         int total = 0;
         boolean found = false;
         int bytesRead = 0;
         while (!found) {
             if (!hasData()) {
                 bytesRead = fillBuffer();
-                if (!hasData() && endOfStream()) {
+                if (endOfStream() && !hasData()) {
                     skipBoundary();
                     bytesRead = -1;
                     break;
@@ -179,7 +175,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         }
     }
     
-    private boolean endOfStream() {
+	private boolean endOfStream() {
         return eof || atBoundary;
     }
     
@@ -194,16 +190,18 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         int bytesRead;
         if (!hasData()) {
             bytesRead = buffer.fillBuffer();
+            if (bytesRead == -1) {
+            	eof = true;
+            }
         } else {
             bytesRead = 0;
         }
-        eof = bytesRead == -1;
         
         
         int i = buffer.indexOf(boundary);
         // NOTE this currently check only for LF. It doesn't check for canonical CRLF
         // and neither for isolated CR. This will require updates according to MIME4J-60
-        while (i > 0 && buffer.charAt(i-1) != '\n') {
+        while (i > buffer.pos() && buffer.charAt(i-1) != '\n') {
             // skip the "fake" boundary (it does not contain LF or CR so we cannot have
             // another boundary starting before this is complete.
             i = i + boundary.length;
@@ -295,4 +293,9 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         }
         return buffer.toString();
     }
+
+	@Override
+	public boolean unread(ByteArrayBuffer buf) {
+		return false;
+	}
 }
