@@ -25,6 +25,8 @@ import java.util.Map;
 import org.apache.james.mime4j.field.ContentDispositionField;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
+import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
+import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
 import org.apache.james.mime4j.field.impl.Fields;
 import org.apache.james.mime4j.message.Body;
 import org.apache.james.mime4j.message.Entity;
@@ -97,6 +99,18 @@ public class BodyPart extends Entity {
     protected ContentTransferEncodingField newContentTransferEncoding(
             String contentTransferEncoding) {
         return Fields.contentTransferEncoding(contentTransferEncoding);
+    }
+
+    protected String calcTransferEncoding(ContentTransferEncodingField f) {
+        return ContentTransferEncodingFieldImpl.getEncoding(f);
+    }
+
+    protected String calcMimeType(ContentTypeField child, ContentTypeField parent) {
+        return ContentTypeFieldImpl.getMimeType(child, parent);
+    }
+
+    protected String calcCharset(ContentTypeField contentType) {
+        return ContentTypeFieldImpl.getCharset(contentType); 
     }
 
 }

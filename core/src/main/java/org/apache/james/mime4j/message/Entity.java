@@ -29,8 +29,6 @@ import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.FieldName;
-import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
-import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
 
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
@@ -265,7 +263,7 @@ public abstract class Entity implements Disposable {
                                                 getField(FieldName.CONTENT_TYPE)
             : null;
         
-        return ContentTypeFieldImpl.getMimeType(child, parent);
+        return calcMimeType(child, parent);
     }
 
     private ContentTypeField getContentTypeField() {
@@ -278,8 +276,7 @@ public abstract class Entity implements Disposable {
      * @return the MIME character set encoding.
      */
     public String getCharset() {
-        return ContentTypeFieldImpl.getCharset( 
-            (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE));
+        return calcCharset((ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE));
     }
     
     /**
@@ -291,7 +288,7 @@ public abstract class Entity implements Disposable {
         ContentTransferEncodingField f = (ContentTransferEncodingField) 
                         getHeader().getField(FieldName.CONTENT_TRANSFER_ENCODING);
         
-        return ContentTransferEncodingFieldImpl.getEncoding(f);
+        return calcTransferEncoding(f);
     }
 
     /**
@@ -545,4 +542,9 @@ public abstract class Entity implements Disposable {
     protected abstract ContentTransferEncodingField newContentTransferEncoding(
             String contentTransferEncoding);
 
+    protected abstract String calcMimeType(ContentTypeField child, ContentTypeField parent);
+
+    protected abstract String calcTransferEncoding(ContentTransferEncodingField f);
+
+    protected abstract String calcCharset(ContentTypeField contentType);
 }
