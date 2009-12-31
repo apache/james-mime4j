@@ -131,7 +131,7 @@ public class MessageWriter {
         writeBytes(multipart.getPreambleRaw(), out);
         out.write(CRLF);
 
-        for (BodyPart bodyPart : multipart.getBodyParts()) {
+        for (Entity bodyPart : multipart.getBodyParts()) {
             out.write(DASHES);
             writeBytes(boundary, out);
             out.write(CRLF);

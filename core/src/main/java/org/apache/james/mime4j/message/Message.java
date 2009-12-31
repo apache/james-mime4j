@@ -42,6 +42,7 @@ import org.apache.james.mime4j.field.address.Address;
 import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.MailboxList;
+import org.apache.james.mime4j.message.impl.BodyCopier;
 import org.apache.james.mime4j.message.impl.MessageBuilder;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
@@ -83,7 +84,14 @@ public class Message extends Entity implements Body {
      *             {@link SingleBody}.
      */
     public Message(Message other) {
-        super(other);
+        if (other.getHeader() != null) {
+            setHeader(new Header(other.getHeader()));
+        }
+
+        if (other.getBody() != null) {
+            Body bodyCopy = BodyCopier.copy(other.getBody());
+            setBody(bodyCopy);
+        }
     }
 
     /**

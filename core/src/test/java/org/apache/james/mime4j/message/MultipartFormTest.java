@@ -25,6 +25,8 @@ import junit.framework.TestCase;
 
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.impl.BodyFactory;
+import org.apache.james.mime4j.message.impl.BodyPart;
+import org.apache.james.mime4j.message.impl.MultipartImpl;
 
 public class MultipartFormTest extends TestCase {
 
@@ -37,7 +39,7 @@ public class MultipartFormTest extends TestCase {
                 DefaultFieldParser.parse("Content-Type: multipart/form-data; boundary=foo"));
         message.setHeader(header);
         
-        Multipart multipart = new Multipart("alternative");
+        Multipart multipart = new MultipartImpl("alternative");
         multipart.setParent(message);
         BodyPart p1 = new BodyPart();
         Header h1 = new Header();

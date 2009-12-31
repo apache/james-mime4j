@@ -162,14 +162,14 @@ public class MessageParserTest extends TestCase {
             sb.append("<multipart>\r\n");
             
             Multipart multipart =(Multipart) e.getBody(); 
-            List<BodyPart> parts = multipart.getBodyParts();
+            List<Entity> parts = multipart.getBodyParts();
 
             sb.append("<preamble>\r\n");
             sb.append(escape(multipart.getPreamble()));
             sb.append("</preamble>\r\n");
             
             int i = 1;
-            for (BodyPart bodyPart : parts) {
+            for (Entity bodyPart : parts) {
                 sb.append(getStructure(bodyPart, prefix, id + "_" + (i++)));
             }
 

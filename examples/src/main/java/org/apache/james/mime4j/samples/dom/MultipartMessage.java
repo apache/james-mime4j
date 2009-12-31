@@ -31,11 +31,12 @@ import javax.imageio.ImageIO;
 
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.message.BinaryBody;
-import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.message.impl.BodyFactory;
+import org.apache.james.mime4j.message.impl.BodyPart;
+import org.apache.james.mime4j.message.impl.MultipartImpl;
 import org.apache.james.mime4j.storage.Storage;
 import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
@@ -67,7 +68,7 @@ public class MultipartMessage {
 
         // 3) set a multipart body
 
-        Multipart multipart = new Multipart("mixed");
+        Multipart multipart = new MultipartImpl("mixed");
 
         // a multipart may have a preamble
         multipart.setPreamble("This is a multi-part message in MIME format.");

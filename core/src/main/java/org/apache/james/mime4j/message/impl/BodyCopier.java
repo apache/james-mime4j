@@ -17,7 +17,13 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.message.impl;
+
+import org.apache.james.mime4j.message.Body;
+import org.apache.james.mime4j.message.Disposable;
+import org.apache.james.mime4j.message.Message;
+import org.apache.james.mime4j.message.Multipart;
+import org.apache.james.mime4j.message.SingleBody;
 
 /**
  * Utility class for copying message bodies.
@@ -57,7 +63,7 @@ public class BodyCopier {
             return new Message((Message) body);
 
         if (body instanceof Multipart)
-            return new Multipart((Multipart) body);
+            return new MultipartImpl((Multipart) body);
 
         if (body instanceof SingleBody)
             return ((SingleBody) body).copy();

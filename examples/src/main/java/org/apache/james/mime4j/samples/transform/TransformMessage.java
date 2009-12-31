@@ -26,11 +26,13 @@ import java.util.Random;
 
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.message.Body;
-import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.message.impl.BodyFactory;
+import org.apache.james.mime4j.message.impl.BodyPart;
+import org.apache.james.mime4j.message.impl.MultipartImpl;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.storage.TempFileStorageProvider;
@@ -102,7 +104,7 @@ public class TransformMessage {
 
         // For no particular reason remove the second binary body part (now
         // at index four).
-        BodyPart removed = multipart.removeBodyPart(4);
+        Entity removed = multipart.removeBodyPart(4);
 
         // The removed body part no longer has a parent entity it belongs to so
         // it should be disposed of.
@@ -122,7 +124,7 @@ public class TransformMessage {
      * two binary).
      */
     private static Message createTemplate() throws IOException {
-        Multipart multipart = new Multipart("mixed");
+        Multipart multipart = new MultipartImpl("mixed");
 
         BodyPart part1 = createTextPart("This is the first part of the template..");
         multipart.addBodyPart(part1);

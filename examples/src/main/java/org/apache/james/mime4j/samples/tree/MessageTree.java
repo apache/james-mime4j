@@ -49,12 +49,12 @@ import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.MailboxList;
 import org.apache.james.mime4j.message.BinaryBody;
 import org.apache.james.mime4j.message.Body;
-import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
+import org.apache.james.mime4j.message.impl.BodyPart;
 
 /**
  * Displays a parsed Message in a window. The window will be divided into
@@ -167,7 +167,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
 
         node.add(new DefaultMutableTreeNode(
                        new ObjectWrapper("Preamble", multipart.getPreamble())));
-        for (BodyPart part : multipart.getBodyParts()) {
+        for (Entity part : multipart.getBodyParts()) {
             node.add(createNode(part));
         }
         node.add(new DefaultMutableTreeNode(

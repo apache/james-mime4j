@@ -25,6 +25,8 @@ import java.util.List;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.message.impl.BodyFactory;
+import org.apache.james.mime4j.message.impl.BodyPart;
+import org.apache.james.mime4j.message.impl.MultipartImpl;
 
 import junit.framework.TestCase;
 
@@ -97,9 +99,9 @@ public class CopyConstructorTest extends TestCase {
     }
 
     public void testCopyEmptyMultipart() throws Exception {
-        Multipart original = new Multipart("mixed");
+        Multipart original = new MultipartImpl("mixed");
 
-        Multipart copy = new Multipart(original);
+        Multipart copy = new MultipartImpl(original);
 
         assertSame(original.getPreamble(), copy.getPreamble());
         assertSame(original.getEpilogue(), copy.getEpilogue());
@@ -112,13 +114,13 @@ public class CopyConstructorTest extends TestCase {
         Message parent = new Message();
         BodyPart bodyPart = new BodyPart();
 
-        Multipart original = new Multipart("mixed");
+        Multipart original = new MultipartImpl("mixed");
         original.setPreamble("preamble");
         original.setEpilogue("epilogue");
         original.setParent(parent);
         original.addBodyPart(bodyPart);
 
-        Multipart copy = new Multipart(original);
+        Multipart copy = new MultipartImpl(original);
 
         assertSame(original.getPreamble(), copy.getPreamble());
         assertSame(original.getEpilogue(), copy.getEpilogue());
@@ -126,7 +128,7 @@ public class CopyConstructorTest extends TestCase {
         assertEquals(1, copy.getBodyParts().size());
         assertNull(copy.getParent());
 
-        BodyPart bodyPartCopy = copy.getBodyParts().iterator().next();
+        Entity bodyPartCopy = copy.getBodyParts().iterator().next();
         assertNotSame(bodyPart, bodyPartCopy);
 
         assertSame(parent, bodyPart.getParent());
@@ -137,7 +139,7 @@ public class CopyConstructorTest extends TestCase {
         BodyPart bodyPart1 = new BodyPart();
         BodyPart bodyPart2 = new BodyPart();
 
-        Multipart multipart = new Multipart("mixed");
+        Multipart multipart = new MultipartImpl("mixed");
         multipart.addBodyPart(bodyPart1);
         multipart.addBodyPart(bodyPart2);
 
@@ -148,9 +150,9 @@ public class CopyConstructorTest extends TestCase {
         Message copy = new Message(original);
 
         Multipart multipartCopy = (Multipart) copy.getBody();
-        List<BodyPart> bodyParts = multipartCopy.getBodyParts();
-        BodyPart bodyPartCopy1 = bodyParts.get(0);
-        BodyPart bodyPartCopy2 = bodyParts.get(1);
+        List<Entity> bodyParts = multipartCopy.getBodyParts();
+        Entity bodyPartCopy1 = bodyParts.get(0);
+        Entity bodyPartCopy2 = bodyParts.get(1);
 
         assertNotSame(bodyPart1, bodyPartCopy1);
         assertEquals(original, bodyPart1.getParent());

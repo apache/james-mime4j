@@ -28,7 +28,6 @@ import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.message.Body;
-import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.message.Message;
@@ -124,7 +123,7 @@ public class MessageBuilder implements ContentHandler {
         
         final Entity e = (Entity) stack.peek();
         final String subType = bd.getSubType();
-        final Multipart multiPart = new Multipart(subType);
+        final Multipart multiPart = new MultipartImpl(subType);
         e.setBody(multiPart);
         stack.push(multiPart);
     }
@@ -194,18 +193,18 @@ public class MessageBuilder implements ContentHandler {
      * @see org.apache.james.mime4j.parser.ContentHandler#epilogue(java.io.InputStream)
      */
     public void epilogue(InputStream is) throws MimeException, IOException {
-        expect(Multipart.class);
+        expect(MultipartImpl.class);
         ByteSequence bytes = loadStream(is);
-        ((Multipart) stack.peek()).setEpilogueRaw(bytes);
+        ((MultipartImpl) stack.peek()).setEpilogueRaw(bytes);
     }
     
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#preamble(java.io.InputStream)
      */
     public void preamble(InputStream is) throws MimeException, IOException {
-        expect(Multipart.class);
+        expect(MultipartImpl.class);
         ByteSequence bytes = loadStream(is);
-        ((Multipart) stack.peek()).setPreambleRaw(bytes);
+        ((MultipartImpl) stack.peek()).setPreambleRaw(bytes);
     }
     
     /**

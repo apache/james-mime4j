@@ -22,6 +22,7 @@ package org.apache.james.mime4j.message;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.impl.BodyFactory;
+import org.apache.james.mime4j.message.impl.BodyPart;
 
 import junit.framework.TestCase;
 

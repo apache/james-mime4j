@@ -17,7 +17,14 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.message.impl;
+
+import org.apache.james.mime4j.message.Body;
+import org.apache.james.mime4j.message.Entity;
+import org.apache.james.mime4j.message.Header;
+import org.apache.james.mime4j.message.Message;
+import org.apache.james.mime4j.message.Multipart;
+import org.apache.james.mime4j.message.SingleBody;
 
 /**
  * Represents a MIME body part  (see RFC 2045).
@@ -47,8 +54,15 @@ public class BodyPart extends Entity {
      *             is neither a {@link Message}, {@link Multipart} or
      *             {@link SingleBody}.
      */
-    public BodyPart(BodyPart other) {
-        super(other);
+    public BodyPart(Entity other) {
+        if (other.getHeader() != null) {
+            setHeader(new Header(other.getHeader()));
+        }
+
+        if (other.getBody() != null) {
+            Body bodyCopy = BodyCopier.copy(other.getBody());
+            setBody(bodyCopy);
+        }
     }
 
 }

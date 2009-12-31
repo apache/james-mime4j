@@ -36,6 +36,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.address.Group;
 import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.message.impl.BodyPart;
+import org.apache.james.mime4j.message.impl.MultipartImpl;
 
 public class MessageTest extends TestCase {
     private Header headerTextPlain = null;
@@ -448,7 +450,7 @@ public class MessageTest extends TestCase {
         part2.setHeader(headerEmpty);
         part2.setBody(body2);
 
-        Multipart mp = new Multipart("mixed");
+        Multipart mp = new MultipartImpl("mixed");
         mp.addBodyPart(part1);
         mp.addBodyPart(part2);
 
