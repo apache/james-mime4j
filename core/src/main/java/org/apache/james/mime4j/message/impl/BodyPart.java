@@ -19,6 +19,13 @@
 
 package org.apache.james.mime4j.message.impl;
 
+import java.util.Date;
+import java.util.Map;
+
+import org.apache.james.mime4j.field.ContentDispositionField;
+import org.apache.james.mime4j.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.field.ContentTypeField;
+import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.message.Body;
 import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Header;
@@ -70,5 +77,27 @@ public class BodyPart extends Entity {
 	protected String newUniqueBoundary() {
 		return MimeUtil.createUniqueBoundary();
 	}
+
+    protected ContentDispositionField newContentDisposition(
+            String dispositionType, String filename, long size,
+            Date creationDate, Date modificationDate, Date readDate) {
+        return Fields.contentDisposition(dispositionType, filename, size,
+                creationDate, modificationDate, readDate);
+    }
+
+    protected ContentDispositionField newContentDisposition(
+            String dispositionType, Map<String, String> parameters) {
+        return Fields.contentDisposition(dispositionType, parameters);
+    }
+
+    protected ContentTypeField newContentType(String mimeType,
+            Map<String, String> parameters) {
+        return Fields.contentType(mimeType, parameters);
+    }
+
+    protected ContentTransferEncodingField newContentTransferEncoding(
+            String contentTransferEncoding) {
+        return Fields.contentTransferEncoding(contentTransferEncoding);
+    }
 
 }

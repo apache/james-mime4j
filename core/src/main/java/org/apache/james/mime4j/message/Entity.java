@@ -29,7 +29,6 @@ import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.FieldName;
-import org.apache.james.mime4j.field.Fields;
 
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
@@ -528,26 +527,17 @@ public abstract class Entity implements Disposable {
 
     protected abstract String newUniqueBoundary();
 
-    protected ContentDispositionField newContentDisposition(
+    protected abstract ContentDispositionField newContentDisposition(
             String dispositionType, String filename, long size,
-            Date creationDate, Date modificationDate, Date readDate) {
-        return Fields.contentDisposition(dispositionType, filename, size,
-                creationDate, modificationDate, readDate);
-    }
+            Date creationDate, Date modificationDate, Date readDate);
 
-    protected ContentDispositionField newContentDisposition(
-            String dispositionType, Map<String, String> parameters) {
-        return Fields.contentDisposition(dispositionType, parameters);
-    }
+    protected abstract ContentDispositionField newContentDisposition(
+            String dispositionType, Map<String, String> parameters);
 
-    protected ContentTypeField newContentType(String mimeType,
-            Map<String, String> parameters) {
-        return Fields.contentType(mimeType, parameters);
-    }
+    protected abstract ContentTypeField newContentType(String mimeType,
+            Map<String, String> parameters);
 
-    protected ContentTransferEncodingField newContentTransferEncoding(
-            String contentTransferEncoding) {
-        return Fields.contentTransferEncoding(contentTransferEncoding);
-    }
+    protected abstract ContentTransferEncodingField newContentTransferEncoding(
+            String contentTransferEncoding);
 
 }

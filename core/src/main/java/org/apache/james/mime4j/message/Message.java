@@ -26,11 +26,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.AddressListField;
+import org.apache.james.mime4j.field.ContentDispositionField;
+import org.apache.james.mime4j.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.DateTimeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.FieldName;
@@ -639,8 +643,30 @@ public class Message extends Entity implements Body {
 		return Fields.addressList(fieldName, addresses);
 	}
 
-	private UnstructuredField newSubject(String subject) {
+	protected UnstructuredField newSubject(String subject) {
 		return Fields.subject(subject);
 	}
+
+    protected ContentDispositionField newContentDisposition(
+            String dispositionType, String filename, long size,
+            Date creationDate, Date modificationDate, Date readDate) {
+        return Fields.contentDisposition(dispositionType, filename, size,
+                creationDate, modificationDate, readDate);
+    }
+
+    protected ContentDispositionField newContentDisposition(
+            String dispositionType, Map<String, String> parameters) {
+        return Fields.contentDisposition(dispositionType, parameters);
+    }
+
+    protected ContentTypeField newContentType(String mimeType,
+            Map<String, String> parameters) {
+        return Fields.contentType(mimeType, parameters);
+    }
+
+    protected ContentTransferEncodingField newContentTransferEncoding(
+            String contentTransferEncoding) {
+        return Fields.contentTransferEncoding(contentTransferEncoding);
+    }
 
 }
