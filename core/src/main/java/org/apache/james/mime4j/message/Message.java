@@ -48,6 +48,7 @@ import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageProvider;
+import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * Represents a MIME message. The following code parses a stream into a
@@ -194,7 +195,7 @@ public class Message extends Entity implements Body {
     public void createMessageId(String hostname) {
         Header header = obtainHeader();
 
-        header.setField(Fields.messageId(hostname));
+        header.setField(newMessageId(hostname));
     }
 
     /**
@@ -227,7 +228,7 @@ public class Message extends Entity implements Body {
         if (subject == null) {
             header.removeFields(FieldName.SUBJECT);
         } else {
-            header.setField(Fields.subject(subject));
+            header.setField(newSubject(subject));
         }
     }
 
@@ -275,7 +276,7 @@ public class Message extends Entity implements Body {
         if (date == null) {
             header.removeFields(FieldName.DATE);
         } else {
-            header.setField(Fields.date(FieldName.DATE, date, zone));
+            header.setField(newDate(date, zone));
         }
     }
 
@@ -551,7 +552,7 @@ public class Message extends Entity implements Body {
         if (mailbox == null) {
             header.removeFields(fieldName);
         } else {
-            header.setField(Fields.mailbox(fieldName, mailbox));
+            header.setField(newMailbox(fieldName, mailbox));
         }
     }
 
@@ -579,7 +580,7 @@ public class Message extends Entity implements Body {
         if (mailboxes == null || mailboxes.isEmpty()) {
             header.removeFields(fieldName);
         } else {
-            header.setField(Fields.mailboxList(fieldName, mailboxes));
+            header.setField(newMailboxList(fieldName, mailboxes));
         }
     }
 
@@ -607,8 +608,39 @@ public class Message extends Entity implements Body {
         if (addresses == null || addresses.isEmpty()) {
             header.removeFields(fieldName);
         } else {
-            header.setField(Fields.addressList(fieldName, addresses));
+            header.setField(newAddressList(fieldName, addresses));
         }
     }
+
+	@Override
+	protected String newUniqueBoundary() {
+		return MimeUtil.createUniqueBoundary();
+	}
+
+	protected UnstructuredField newMessageId(String hostname) {
+		return Fields.messageId(hostname);
+	}
+
+	protected DateTimeField newDate(Date date, TimeZone zone) {
+		return Fields.date(FieldName.DATE, date, zone);
+	}
+
+	protected MailboxField newMailbox(String fieldName, Mailbox mailbox) {
+		return Fields.mailbox(fieldName, mailbox);
+	}
+
+	protected MailboxListField newMailboxList(String fieldName,
+			Collection<Mailbox> mailboxes) {
+		return Fields.mailboxList(fieldName, mailboxes);
+	}
+
+	private AddressListField newAddressList(String fieldName,
+			Collection<Address> addresses) {
+		return Fields.addressList(fieldName, addresses);
+	}
+
+	private UnstructuredField newSubject(String subject) {
+		return Fields.subject(subject);
+	}
 
 }

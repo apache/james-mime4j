@@ -30,7 +30,6 @@ import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.FieldName;
 import org.apache.james.mime4j.field.Fields;
-import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
@@ -150,7 +149,7 @@ public abstract class Entity implements Disposable {
     public void setMultipart(Multipart multipart) {
         String mimeType = "multipart/" + multipart.getSubType();
         Map<String, String> parameters = Collections.singletonMap("boundary",
-                MimeUtil.createUniqueBoundary());
+                newUniqueBoundary());
 
         setBody(multipart, mimeType, parameters);
     }
@@ -170,7 +169,7 @@ public abstract class Entity implements Disposable {
         String mimeType = "multipart/" + multipart.getSubType();
         if (!parameters.containsKey("boundary")) {
             parameters = new HashMap<String, String>(parameters);
-            parameters.put("boundary", MimeUtil.createUniqueBoundary());
+            parameters.put("boundary", newUniqueBoundary());
         }
 
         setBody(multipart, mimeType, parameters);
@@ -247,7 +246,7 @@ public abstract class Entity implements Disposable {
         setBody(body);
 
         Header header = obtainHeader();
-        header.setField(Fields.contentType(mimeType, parameters));
+        header.setField(newContentType(mimeType, parameters));
     }
 
     /**
@@ -299,7 +298,7 @@ public abstract class Entity implements Disposable {
      */
     public void setContentTransferEncoding(String contentTransferEncoding) {
         Header header = obtainHeader();
-        header.setField(Fields.contentTransferEncoding(contentTransferEncoding));
+        header.setField(newContentTransferEncoding(contentTransferEncoding));
     }
 
     /**
@@ -316,7 +315,7 @@ public abstract class Entity implements Disposable {
 
         return field.getDispositionType();
     }
-    
+
     /**
      * Sets the content disposition of this <code>Entity</code> to the
      * specified disposition type. No filename, size or date parameters
@@ -328,8 +327,8 @@ public abstract class Entity implements Disposable {
      */
     public void setContentDisposition(String dispositionType) {
         Header header = obtainHeader();
-        header.setField(Fields.contentDisposition(dispositionType, null, -1,
-                null, null, null));
+        header.setField(newContentDisposition(dispositionType, null, -1, null,
+                null, null));
     }
 
     /**
@@ -346,8 +345,8 @@ public abstract class Entity implements Disposable {
      */
     public void setContentDisposition(String dispositionType, String filename) {
         Header header = obtainHeader();
-        header.setField(Fields.contentDisposition(dispositionType, filename,
-                -1, null, null, null));
+        header.setField(newContentDisposition(dispositionType, filename, -1,
+                null, null, null));
     }
 
     /**
@@ -368,8 +367,8 @@ public abstract class Entity implements Disposable {
     public void setContentDisposition(String dispositionType, String filename,
             long size) {
         Header header = obtainHeader();
-        header.setField(Fields.contentDisposition(dispositionType, filename,
-                size, null, null, null));
+        header.setField(newContentDisposition(dispositionType, filename, size,
+                null, null, null));
     }
 
     /**
@@ -398,8 +397,8 @@ public abstract class Entity implements Disposable {
     public void setContentDisposition(String dispositionType, String filename,
             long size, Date creationDate, Date modificationDate, Date readDate) {
         Header header = obtainHeader();
-        header.setField(Fields.contentDisposition(dispositionType, filename,
-                size, creationDate, modificationDate, readDate));
+        header.setField(newContentDisposition(dispositionType, filename, size,
+                creationDate, modificationDate, readDate));
     }
 
     /**
@@ -433,7 +432,7 @@ public abstract class Entity implements Disposable {
                 .getField(FieldName.CONTENT_DISPOSITION);
         if (field == null) {
             if (filename != null) {
-                header.setField(Fields.contentDisposition(
+                header.setField(newContentDisposition(
                         ContentDispositionField.DISPOSITION_TYPE_ATTACHMENT,
                         filename, -1, null, null, null));
             }
@@ -447,8 +446,7 @@ public abstract class Entity implements Disposable {
                 parameters
                         .put(ContentDispositionField.PARAM_FILENAME, filename);
             }
-            header.setField(Fields.contentDisposition(dispositionType,
-                    parameters));
+            header.setField(newContentDisposition(dispositionType, parameters));
         }
     }
 
@@ -472,10 +470,12 @@ public abstract class Entity implements Disposable {
      * @return <code>true</code> on match, <code>false</code> otherwise.
      */
     public boolean isMultipart() {
-        ContentTypeField f = 
-            (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE);
-        return f != null && f.getBoundary() != null 
-            && getMimeType().startsWith(ContentTypeField.TYPE_MULTIPART_PREFIX);
+        ContentTypeField f = (ContentTypeField) getHeader().getField(
+                FieldName.CONTENT_TYPE);
+        return f != null
+                && f.getBoundary() != null
+                && getMimeType().startsWith(
+                        ContentTypeField.TYPE_MULTIPART_PREFIX);
     }
 
     /**
@@ -524,6 +524,30 @@ public abstract class Entity implements Disposable {
         @SuppressWarnings("unchecked")
         F field = (F) header.getField(fieldName);
         return field;
+    }
+
+    protected abstract String newUniqueBoundary();
+
+    protected ContentDispositionField newContentDisposition(
+            String dispositionType, String filename, long size,
+            Date creationDate, Date modificationDate, Date readDate) {
+        return Fields.contentDisposition(dispositionType, filename, size,
+                creationDate, modificationDate, readDate);
+    }
+
+    protected ContentDispositionField newContentDisposition(
+            String dispositionType, Map<String, String> parameters) {
+        return Fields.contentDisposition(dispositionType, parameters);
+    }
+
+    protected ContentTypeField newContentType(String mimeType,
+            Map<String, String> parameters) {
+        return Fields.contentType(mimeType, parameters);
+    }
+
+    protected ContentTransferEncodingField newContentTransferEncoding(
+            String contentTransferEncoding) {
+        return Fields.contentTransferEncoding(contentTransferEncoding);
     }
 
 }

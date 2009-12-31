@@ -25,6 +25,7 @@ import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.SingleBody;
+import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * Represents a MIME body part  (see RFC 2045).
@@ -64,5 +65,10 @@ public class BodyPart extends Entity {
             setBody(bodyCopy);
         }
     }
+
+	@Override
+	protected String newUniqueBoundary() {
+		return MimeUtil.createUniqueBoundary();
+	}
 
 }

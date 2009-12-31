@@ -295,7 +295,7 @@ public class Fields {
      *            <code>null</code> if no host name should be included.
      * @return the newly created <i>Message-ID</i> field.
      */
-    public static Field messageId(String hostname) {
+    public static UnstructuredField messageId(String hostname) {
         String fieldValue = MimeUtil.createUniqueMessageId(hostname);
         return parse(UnstructuredField.PARSER, FieldName.MESSAGE_ID, fieldValue);
     }
