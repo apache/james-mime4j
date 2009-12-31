@@ -83,10 +83,10 @@ public class ContentTypeFieldTest extends TestCase {
         ContentTypeField f = null;
         
         f = (ContentTypeField) DefaultFieldParser.parse("Content-Type: some/type; charset=iso8859-1");
-        assertEquals("iso8859-1", f.getCharset());
+        assertEquals("iso8859-1", ContentTypeFieldImpl.getCharset(f));
         
         f = (ContentTypeField) DefaultFieldParser.parse("Content-Type: some/type;");
-        assertEquals("us-ascii", f.getCharset());
+        assertEquals("us-ascii", ContentTypeFieldImpl.getCharset(f));
     }
     
     public void testGetParameter() throws Exception {
