@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import org.apache.james.mime4j.ExampleMail;
+import org.apache.james.mime4j.message.impl.MessageImpl;
 
 import junit.framework.TestCase;
 
@@ -39,7 +40,7 @@ public class MessageWriteToTest extends TestCase {
     }
     
     public void testSimpleMail() throws Exception {
-        Message message = createMessage(ExampleMail.RFC822_SIMPLE_BYTES);
+        MessageImpl message = createMessage(ExampleMail.RFC822_SIMPLE_BYTES);
         assertFalse("Not multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out);
@@ -56,16 +57,16 @@ public class MessageWriteToTest extends TestCase {
     }
     
     public void testBinaryAttachment() throws Exception {
-        Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
+        MessageImpl message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
         assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
     }
     
-    private Message createMessage(byte[] octets) throws Exception {
+    private MessageImpl createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
-        Message message = new Message(in);
+        MessageImpl message = new MessageImpl(in);
         return message;
     }
 }

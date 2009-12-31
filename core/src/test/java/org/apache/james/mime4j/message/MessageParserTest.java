@@ -21,6 +21,7 @@ package org.apache.james.mime4j.message;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.message.impl.MessageImpl;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.CharsetUtil;
@@ -101,7 +102,7 @@ public class MessageParserTest extends TestCase {
         	config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        Message m = new Message(new FileInputStream(f), config);
+        MessageImpl m = new MessageImpl(new FileInputStream(f), config);
         
         String prefix = f.getName().substring(0, f.getName().length() - 4);
         String xmlFileName = fileName.substring(0, fileName.length() - 4) 
@@ -144,7 +145,7 @@ public class MessageParserTest extends TestCase {
         
         StringBuilder sb = new StringBuilder();
         
-        if (e instanceof Message) {
+        if (e instanceof MessageImpl) {
             sb.append("<message>\r\n");
         } else {
             sb.append("<body-part>\r\n");
@@ -179,8 +180,8 @@ public class MessageParserTest extends TestCase {
             
             sb.append("</multipart>\r\n");
             
-        } else if (e.getBody() instanceof Message) {
-            sb.append(getStructure((Message) e.getBody(), prefix, id + "_1"));
+        } else if (e.getBody() instanceof MessageImpl) {
+            sb.append(getStructure((MessageImpl) e.getBody(), prefix, id + "_1"));
         } else {
             Body b = e.getBody();
             String name = prefix + "_decoded_" + id 
@@ -222,7 +223,7 @@ public class MessageParserTest extends TestCase {
         }
         
         
-        if (e instanceof Message) {
+        if (e instanceof MessageImpl) {
             sb.append("</message>\r\n");
         } else {
             sb.append("</body-part>\r\n");

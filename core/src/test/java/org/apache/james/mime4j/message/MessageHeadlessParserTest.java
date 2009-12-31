@@ -26,6 +26,7 @@ import junit.framework.TestCase;
 
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.FieldName;
+import org.apache.james.mime4j.message.impl.MessageImpl;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 
 public class MessageHeadlessParserTest extends TestCase {
@@ -41,7 +42,7 @@ public class MessageHeadlessParserTest extends TestCase {
 
 		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
 		mimeEntityConfig.setMalformedHeaderStartsBody(true);
-		Message message = new Message(new ByteArrayInputStream(headlessContent
+		MessageImpl message = new MessageImpl(new ByteArrayInputStream(headlessContent
 				.getBytes("UTF-8")), mimeEntityConfig);
 		assertEquals("text/plain", message.getMimeType());
 		assertEquals(1, message.getHeader().getFields().size());
@@ -59,7 +60,7 @@ public class MessageHeadlessParserTest extends TestCase {
 
 		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
 		mimeEntityConfig.setMalformedHeaderStartsBody(true);
-		Message message = new Message(new ByteArrayInputStream(headlessContent
+		MessageImpl message = new MessageImpl(new ByteArrayInputStream(headlessContent
 				.getBytes("UTF-8")), mimeEntityConfig);
 		assertEquals("text/plain", message.getMimeType());
 		assertEquals(0, message.getHeader().getFields().size());
@@ -86,7 +87,7 @@ public class MessageHeadlessParserTest extends TestCase {
 
 		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
 		mimeEntityConfig.setDefaultContentType(contentType);
-		Message message = new Message(new ByteArrayInputStream(headlessContent
+		MessageImpl message = new MessageImpl(new ByteArrayInputStream(headlessContent
 				.getBytes("UTF-8")), mimeEntityConfig);
 		assertEquals("multipart/form-data", message.getMimeType());
 		assertEquals(1, message.getHeader().getFields().size());

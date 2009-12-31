@@ -51,10 +51,10 @@ import org.apache.james.mime4j.message.BinaryBody;
 import org.apache.james.mime4j.message.Body;
 import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Header;
-import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.message.impl.BodyPart;
+import org.apache.james.mime4j.message.impl.MessageImpl;
 
 /**
  * Displays a parsed Message in a window. The window will be divided into
@@ -100,7 +100,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
      * 
      * @param message the message to display.
      */
-    public MessageTree(Message message) {
+    public MessageTree(MessageImpl message) {
         super(new GridLayout(1,0));
 
         DefaultMutableTreeNode root = createNode(message);
@@ -210,12 +210,12 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
              */
             
             node.add(createNode((Multipart) body));
-        } else if (body instanceof Message) {
+        } else if (body instanceof MessageImpl) {
             /*
              * The body is another Message.
              */
             
-            node.add(createNode((Message) body));
+            node.add(createNode((MessageImpl) body));
             
         } else {
             /*
@@ -339,7 +339,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
      * 
      * @param message the Message to display in the tree.
      */
-    private static void createAndShowGUI(Message message) {
+    private static void createAndShowGUI(MessageImpl message) {
         /*
          * Create and set up the window.
          */
@@ -363,7 +363,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
     public static void main(String[] args) {
         try {
             
-            final Message message = new Message(new FileInputStream(args[0]));
+            final MessageImpl message = new MessageImpl(new FileInputStream(args[0]));
             
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

@@ -52,7 +52,7 @@ public class BodyCopier {
      * @throws IllegalArgumentException
      *             if <code>body</code> is <code>null</code> or
      *             <code>body</code> is a <code>Body</code> that is neither
-     *             a {@link Message}, {@link Multipart} or {@link SingleBody}
+     *             a {@link MessageImpl}, {@link Multipart} or {@link SingleBody}
      *             (or contains such a <code>Body</code>).
      */
     public static Body copy(Body body) {
@@ -60,7 +60,7 @@ public class BodyCopier {
             throw new IllegalArgumentException("Body is null");
 
         if (body instanceof Message)
-            return new Message((Message) body);
+            return new MessageImpl((Message) body);
 
         if (body instanceof Multipart)
             return new MultipartImpl((Multipart) body);

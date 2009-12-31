@@ -27,11 +27,11 @@ import java.util.Random;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.message.Body;
 import org.apache.james.mime4j.message.Entity;
-import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.message.impl.BodyFactory;
 import org.apache.james.mime4j.message.impl.BodyPart;
+import org.apache.james.mime4j.message.impl.MessageImpl;
 import org.apache.james.mime4j.message.impl.MultipartImpl;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageProvider;
@@ -55,10 +55,10 @@ public class TransformMessage {
         // Create a template message. It would be possible to load a message
         // from an input stream but for this example a message object is created
         // from scratch for demonstration purposes.
-        Message template = createTemplate();
+        MessageImpl template = createTemplate();
 
         // Create a new message by transforming the template.
-        Message transformed = transform(template);
+        MessageImpl transformed = transform(template);
 
         // Print transformed message.
         System.out.println("\n\nTransformed message:\n--------------------\n");
@@ -84,10 +84,10 @@ public class TransformMessage {
     /**
      * Copies the given message and makes some arbitrary changes to the copy.
      */
-    private static Message transform(Message original) throws IOException {
+    private static MessageImpl transform(MessageImpl original) throws IOException {
         // Create a copy of the template. The copy can be modified without
         // affecting the original.
-        Message message = new Message(original);
+        MessageImpl message = new MessageImpl(original);
 
         // In this example we know we have a multipart message. Use
         // Message#isMultipart() if uncertain.
@@ -123,7 +123,7 @@ public class TransformMessage {
      * Creates a multipart/mixed message that consists of three parts (one text,
      * two binary).
      */
-    private static Message createTemplate() throws IOException {
+    private static MessageImpl createTemplate() throws IOException {
         Multipart multipart = new MultipartImpl("mixed");
 
         BodyPart part1 = createTextPart("This is the first part of the template..");
@@ -135,7 +135,7 @@ public class TransformMessage {
         BodyPart part3 = createRandomBinaryPart(300);
         multipart.addBodyPart(part3);
 
-        Message message = new Message();
+        MessageImpl message = new MessageImpl();
         message.setMultipart(multipart);
 
         message.setSubject("Template message");

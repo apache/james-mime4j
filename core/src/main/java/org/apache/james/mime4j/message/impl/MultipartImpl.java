@@ -64,7 +64,7 @@ public class MultipartImpl extends Multipart {
      *             operation.
      * @throws IllegalArgumentException
      *             if <code>other</code> contains a <code>Body</code> that
-     *             is neither a {@link Message}, {@link MultipartImpl} or
+     *             is neither a {@link Message}, {@link Multipart} or
      *             {@link SingleBody}.
      */
     public MultipartImpl(Multipart other) {

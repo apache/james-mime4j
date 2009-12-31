@@ -33,6 +33,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.message.impl.MessageImpl;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
 import org.apache.log4j.BasicConfigurator;
 
@@ -67,7 +68,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
         	config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        Message inputMessage = new Message(new FileInputStream(file), config);
+        Message inputMessage = new MessageImpl(new FileInputStream(file), config);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         inputMessage.writeTo(out);
         

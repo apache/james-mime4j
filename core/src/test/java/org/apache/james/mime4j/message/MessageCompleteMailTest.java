@@ -24,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import junit.framework.TestCase;
 
 import org.apache.james.mime4j.ExampleMail;
+import org.apache.james.mime4j.message.impl.MessageImpl;
 
 public class MessageCompleteMailTest extends TestCase {
 
@@ -38,22 +39,22 @@ public class MessageCompleteMailTest extends TestCase {
     }
     
     public void testMultipartAlternative() throws Exception {
-        Message message = createMessage(ExampleMail.MIME_MULTIPART_ALTERNATIVE_BYTES);
+        MessageImpl message = createMessage(ExampleMail.MIME_MULTIPART_ALTERNATIVE_BYTES);
         assertTrue("Should be a multipart/alternative mail", message.isMultipart());
         Multipart part = (Multipart)message.getBody();
         assertEquals("alternative", part.getSubType());
     }    
     
     public void testMultipartMixed() throws Exception {
-        Message message = createMessage(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTES);
+        MessageImpl message = createMessage(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTES);
         assertTrue("Should be a multipart/mixed mail", message.isMultipart());
         Multipart part = (Multipart)message.getBody();
         assertEquals("mixed", part.getSubType());
     }
 
-    private Message createMessage(byte[] octets) throws Exception {
+    private MessageImpl createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
-        Message message = new Message(in);
+        MessageImpl message = new MessageImpl(in);
         return message;
     }
 }

@@ -75,7 +75,7 @@ public class MessageBuilder implements ContentHandler {
             stack.push(this.entity);
         } else {
             expect(Entity.class);
-            Message m = new Message();
+            Message m = new MessageImpl();
             ((Entity) stack.peek()).setBody(m);
             stack.push(m);
         }

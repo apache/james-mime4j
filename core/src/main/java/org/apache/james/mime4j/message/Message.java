@@ -20,25 +20,17 @@
 package org.apache.james.mime4j.message;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Map;
 import java.util.TimeZone;
 
-import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.field.AddressListField;
-import org.apache.james.mime4j.field.ContentDispositionField;
-import org.apache.james.mime4j.field.ContentTransferEncodingField;
-import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.DateTimeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.FieldName;
-import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.MailboxField;
 import org.apache.james.mime4j.field.MailboxListField;
 import org.apache.james.mime4j.field.UnstructuredField;
@@ -46,118 +38,8 @@ import org.apache.james.mime4j.field.address.Address;
 import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.MailboxList;
-import org.apache.james.mime4j.message.impl.BodyCopier;
-import org.apache.james.mime4j.message.impl.MessageBuilder;
-import org.apache.james.mime4j.parser.MimeEntityConfig;
-import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.storage.DefaultStorageProvider;
-import org.apache.james.mime4j.storage.StorageProvider;
-import org.apache.james.mime4j.util.MimeUtil;
 
-/**
- * Represents a MIME message. The following code parses a stream into a
- * <code>Message</code> object.
- * 
- * <pre>
- * Message msg = new Message(new FileInputStream(&quot;mime.msg&quot;));
- * </pre>
- */
-public class Message extends Entity implements Body {
-
-    /**
-     * Creates a new empty <code>Message</code>.
-     */
-    public Message() {
-    }
-
-    /**
-     * Creates a new <code>Message</code> from the specified
-     * <code>Message</code>. The <code>Message</code> instance is
-     * initialized with copies of header and body of the specified
-     * <code>Message</code>. The parent entity of the new message is
-     * <code>null</code>.
-     * 
-     * @param other
-     *            message to copy.
-     * @throws UnsupportedOperationException
-     *             if <code>other</code> contains a {@link SingleBody} that
-     *             does not support the {@link SingleBody#copy() copy()}
-     *             operation.
-     * @throws IllegalArgumentException
-     *             if <code>other</code> contains a <code>Body</code> that
-     *             is neither a {@link Message}, {@link Multipart} or
-     *             {@link SingleBody}.
-     */
-    public Message(Message other) {
-        if (other.getHeader() != null) {
-            setHeader(new Header(other.getHeader()));
-        }
-
-        if (other.getBody() != null) {
-            Body bodyCopy = BodyCopier.copy(other.getBody());
-            setBody(bodyCopy);
-        }
-    }
-
-    /**
-     * Parses the specified MIME message stream into a <code>Message</code>
-     * instance.
-     * 
-     * @param is
-     *            the stream to parse.
-     * @throws IOException
-     *             on I/O errors.
-     * @throws MimeIOException
-     *             on MIME protocol violations.
-     */
-    public Message(InputStream is) throws IOException, MimeIOException {
-        this(is, null, DefaultStorageProvider.getInstance());
-    }
-
-    /**
-     * Parses the specified MIME message stream into a <code>Message</code>
-     * instance using given {@link MimeEntityConfig}.
-     * 
-     * @param is
-     *            the stream to parse.
-     * @throws IOException
-     *             on I/O errors.
-     * @throws MimeIOException
-     *             on MIME protocol violations.
-     */
-    public Message(InputStream is, MimeEntityConfig config) throws IOException,
-            MimeIOException {
-        this(is, config, DefaultStorageProvider.getInstance());
-    }
-
-    /**
-     * Parses the specified MIME message stream into a <code>Message</code>
-     * instance using given {@link MimeEntityConfig} and {@link StorageProvider}.
-     * 
-     * @param is
-     *            the stream to parse.
-     * @param config
-     *            {@link MimeEntityConfig} to use.
-     * @param storageProvider
-     *            {@link StorageProvider} to use for storing text and binary
-     *            message bodies.
-     * @throws IOException
-     *             on I/O errors.
-     * @throws MimeIOException
-     *             on MIME protocol violations.
-     */
-    public Message(InputStream is, MimeEntityConfig config,
-            StorageProvider storageProvider) throws IOException,
-            MimeIOException {
-        try {
-            MimeStreamParser parser = new MimeStreamParser(config);
-            parser.setContentDecoding(true);
-            parser.setContentHandler(new MessageBuilder(this, storageProvider));
-            parser.parse(is);
-        } catch (MimeException e) {
-            throw new MimeIOException(e);
-        }
-    }
+public abstract class Message extends Entity implements Body {
 
     /**
      * Write the content to the given output stream using the
@@ -169,9 +51,7 @@ public class Message extends Entity implements Body {
      *             in case of an I/O error
      * @see MessageWriter
      */
-    public void writeTo(OutputStream out) throws IOException {
-        MessageWriter.DEFAULT.writeEntity(this, out);
-    }
+    public abstract void writeTo(OutputStream out) throws IOException;
 
     /**
      * Returns the value of the <i>Message-ID</i> header field of this message
@@ -201,6 +81,8 @@ public class Message extends Entity implements Body {
 
         header.setField(newMessageId(hostname));
     }
+
+    protected abstract Field newMessageId(String hostname);
 
     /**
      * Returns the (decoded) value of the <i>Subject</i> header field of this
@@ -616,57 +498,15 @@ public class Message extends Entity implements Body {
         }
     }
 
-	@Override
-	protected String newUniqueBoundary() {
-		return MimeUtil.createUniqueBoundary();
-	}
+    protected abstract AddressListField newAddressList(String fieldName, Collection<Address> addresses);
 
-	protected UnstructuredField newMessageId(String hostname) {
-		return Fields.messageId(hostname);
-	}
+    protected abstract UnstructuredField newSubject(String subject);
 
-	protected DateTimeField newDate(Date date, TimeZone zone) {
-		return Fields.date(FieldName.DATE, date, zone);
-	}
+    protected abstract DateTimeField newDate(Date date, TimeZone zone);
 
-	protected MailboxField newMailbox(String fieldName, Mailbox mailbox) {
-		return Fields.mailbox(fieldName, mailbox);
-	}
+    protected abstract MailboxField newMailbox(String fieldName, Mailbox mailbox);
 
-	protected MailboxListField newMailboxList(String fieldName,
-			Collection<Mailbox> mailboxes) {
-		return Fields.mailboxList(fieldName, mailboxes);
-	}
+    protected abstract MailboxListField newMailboxList(String fieldName, Collection<Mailbox> mailboxes);
 
-	private AddressListField newAddressList(String fieldName,
-			Collection<Address> addresses) {
-		return Fields.addressList(fieldName, addresses);
-	}
-
-	protected UnstructuredField newSubject(String subject) {
-		return Fields.subject(subject);
-	}
-
-    protected ContentDispositionField newContentDisposition(
-            String dispositionType, String filename, long size,
-            Date creationDate, Date modificationDate, Date readDate) {
-        return Fields.contentDisposition(dispositionType, filename, size,
-                creationDate, modificationDate, readDate);
-    }
-
-    protected ContentDispositionField newContentDisposition(
-            String dispositionType, Map<String, String> parameters) {
-        return Fields.contentDisposition(dispositionType, parameters);
-    }
-
-    protected ContentTypeField newContentType(String mimeType,
-            Map<String, String> parameters) {
-        return Fields.contentType(mimeType, parameters);
-    }
-
-    protected ContentTransferEncodingField newContentTransferEncoding(
-            String contentTransferEncoding) {
-        return Fields.contentTransferEncoding(contentTransferEncoding);
-    }
-
+    
 }

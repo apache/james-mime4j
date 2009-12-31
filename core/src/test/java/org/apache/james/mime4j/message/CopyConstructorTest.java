@@ -26,6 +26,7 @@ import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.message.impl.BodyFactory;
 import org.apache.james.mime4j.message.impl.BodyPart;
+import org.apache.james.mime4j.message.impl.MessageImpl;
 import org.apache.james.mime4j.message.impl.MultipartImpl;
 
 import junit.framework.TestCase;
@@ -33,9 +34,9 @@ import junit.framework.TestCase;
 public class CopyConstructorTest extends TestCase {
 
     public void testCopyEmptyMessage() throws Exception {
-        Message original = new Message();
+        MessageImpl original = new MessageImpl();
 
-        Message copy = new Message(original);
+        MessageImpl copy = new MessageImpl(original);
 
         assertNull(copy.getHeader());
         assertNull(copy.getBody());
@@ -43,16 +44,16 @@ public class CopyConstructorTest extends TestCase {
     }
 
     public void testCopyMessage() throws Exception {
-        Message parent = new Message();
+        MessageImpl parent = new MessageImpl();
         Header header = new Header();
         Body body = new BodyFactory().textBody("test");
 
-        Message original = new Message();
+        MessageImpl original = new MessageImpl();
         original.setHeader(header);
         original.setBody(body);
         original.setParent(parent);
 
-        Message copy = new Message(original);
+        MessageImpl copy = new MessageImpl(original);
 
         assertNotNull(copy.getHeader());
         assertNotSame(header, copy.getHeader());
@@ -76,7 +77,7 @@ public class CopyConstructorTest extends TestCase {
     }
 
     public void testCopyBodyPart() throws Exception {
-        Message parent = new Message();
+        MessageImpl parent = new MessageImpl();
         Header header = new Header();
         Body body = new BodyFactory().textBody("test");
 
@@ -111,7 +112,7 @@ public class CopyConstructorTest extends TestCase {
     }
 
     public void testCopyMultipart() throws Exception {
-        Message parent = new Message();
+        MessageImpl parent = new MessageImpl();
         BodyPart bodyPart = new BodyPart();
 
         Multipart original = new MultipartImpl("mixed");
@@ -143,11 +144,11 @@ public class CopyConstructorTest extends TestCase {
         multipart.addBodyPart(bodyPart1);
         multipart.addBodyPart(bodyPart2);
 
-        Message original = new Message();
+        MessageImpl original = new MessageImpl();
         original.setHeader(new Header());
         original.setBody(multipart);
 
-        Message copy = new Message(original);
+        MessageImpl copy = new MessageImpl(original);
 
         Multipart multipartCopy = (Multipart) copy.getBody();
         List<Entity> bodyParts = multipartCopy.getBodyParts();

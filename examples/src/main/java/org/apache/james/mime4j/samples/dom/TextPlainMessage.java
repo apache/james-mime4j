@@ -23,9 +23,9 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.james.mime4j.field.address.Mailbox;
-import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.message.impl.BodyFactory;
+import org.apache.james.mime4j.message.impl.MessageImpl;
 
 /**
  * This example generates a message very similar to the one from RFC 5322
@@ -35,7 +35,7 @@ public class TextPlainMessage {
     public static void main(String[] args) throws IOException {
         // 1) start with an empty message
 
-        Message message = new Message();
+        MessageImpl message = new MessageImpl();
 
         // 2) set header fields
 

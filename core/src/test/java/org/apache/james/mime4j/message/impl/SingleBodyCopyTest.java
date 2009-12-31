@@ -24,7 +24,6 @@ import java.io.ByteArrayOutputStream;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.SingleBody;
 import org.apache.james.mime4j.message.impl.StorageBinaryBody;
 import org.apache.james.mime4j.message.impl.StorageTextBody;
@@ -79,7 +78,7 @@ public class SingleBodyCopyTest extends TestCase {
     }
 
     private void copyTest(SingleBody body) throws Exception {
-        Message parent = new Message();
+        MessageImpl parent = new MessageImpl();
         parent.setBody(body);
 
         SingleBody copy = body.copy();
