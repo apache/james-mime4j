@@ -26,11 +26,11 @@ import java.util.Random;
 
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.message.Body;
-import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
+import org.apache.james.mime4j.message.impl.BodyFactory;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.storage.TempFileStorageProvider;

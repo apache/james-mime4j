@@ -17,13 +17,17 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.message.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import junit.framework.TestCase;
 
+import org.apache.james.mime4j.message.Message;
+import org.apache.james.mime4j.message.SingleBody;
+import org.apache.james.mime4j.message.impl.StorageBinaryBody;
+import org.apache.james.mime4j.message.impl.StorageTextBody;
 import org.apache.james.mime4j.storage.MemoryStorageProvider;
 import org.apache.james.mime4j.storage.MultiReferenceStorage;
 import org.apache.james.mime4j.storage.Storage;

@@ -19,8 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -28,13 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.MimeIOException;
-import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.parser.AbstractContentHandler;
-import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.parser.RawField;
 
 /**
  * The header of an entity (see RFC 2045).
@@ -63,35 +55,6 @@ public class Header implements Iterable<Field> {
     public Header(Header other) {
         for (Field otherField : other.fields) {
             addField(otherField);
-        }
-    }
-
-    /**
-     * Creates a new <code>Header</code> from the specified stream.
-     * 
-     * @param is the stream to read the header from.
-     * 
-     * @throws IOException on I/O errors.
-     * @throws MimeIOException on MIME protocol violations.
-     */
-    public Header(InputStream is) 
-            throws IOException, MimeIOException {
-        final MimeStreamParser parser = new MimeStreamParser();
-        parser.setContentHandler(new AbstractContentHandler() {
-            @Override
-            public void endHeader() {
-                parser.stop();
-            }
-            @Override
-            public void field(RawField field) throws MimeException {
-                Field parsedField = DefaultFieldParser.parse(field.getRaw()); 
-                addField(parsedField);
-            }
-        });
-        try {
-            parser.parse(is);
-        } catch (MimeException ex) {
-            throw new MimeIOException(ex);
         }
     }
 

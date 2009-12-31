@@ -24,6 +24,7 @@ import java.io.ByteArrayOutputStream;
 import junit.framework.TestCase;
 
 import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.message.impl.BodyFactory;
 
 public class MultipartFormTest extends TestCase {
 

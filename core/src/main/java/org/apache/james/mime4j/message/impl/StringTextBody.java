@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.message.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -29,6 +29,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.nio.charset.Charset;
 
+import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**

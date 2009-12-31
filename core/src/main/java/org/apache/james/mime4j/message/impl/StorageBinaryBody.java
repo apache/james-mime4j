@@ -17,13 +17,14 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.message.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.message.BinaryBody;
 import org.apache.james.mime4j.storage.MultiReferenceStorage;
 
 /**

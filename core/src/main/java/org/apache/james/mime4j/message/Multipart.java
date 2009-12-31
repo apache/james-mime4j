@@ -243,7 +243,7 @@ public class Multipart implements Body {
         return preamble;
     }
 
-    void setPreambleRaw(ByteSequence preamble) {
+    public void setPreambleRaw(ByteSequence preamble) {
         this.preamble = preamble;
         this.preambleStrCache = null;
     }
@@ -276,7 +276,7 @@ public class Multipart implements Body {
         return epilogue;
     }
 
-    void setEpilogueRaw(ByteSequence epilogue) {
+    public void setEpilogueRaw(ByteSequence epilogue) {
         this.epilogue = epilogue;
         this.epilogueStrCache = null;
     }

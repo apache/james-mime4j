@@ -28,7 +28,7 @@ import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.message.Message;
-import org.apache.james.mime4j.message.SimpleContentHandler;
+import org.apache.james.mime4j.message.impl.SimpleContentHandler;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;

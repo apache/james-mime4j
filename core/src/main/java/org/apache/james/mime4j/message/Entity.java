@@ -211,7 +211,7 @@ public abstract class Entity implements Disposable {
      * 
      * @param textBody
      *            the <code>TextBody</code> to set as body.
-     * @see BodyFactory#textBody(String)
+     * @see org.apache.james.mime4j.message.impl.BodyFactory#textBody(String)
      */
     public void setText(TextBody textBody) {
         setText(textBody, "plain");
@@ -228,7 +228,7 @@ public abstract class Entity implements Disposable {
      * @param subtype
      *            the text subtype (e.g. &quot;plain&quot;, &quot;html&quot; or
      *            &quot;xml&quot;).
-     * @see BodyFactory#textBody(String)
+     * @see org.apache.james.mime4j.message.impl.BodyFactory#textBody(String)
      */
     public void setText(TextBody textBody, String subtype) {
         String mimeType = "text/" + subtype;

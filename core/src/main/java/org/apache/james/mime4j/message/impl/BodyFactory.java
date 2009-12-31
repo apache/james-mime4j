@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.message.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +25,10 @@ import java.nio.charset.Charset;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.message.BinaryBody;
+import org.apache.james.mime4j.message.Disposable;
+import org.apache.james.mime4j.message.SingleBody;
+import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.MultiReferenceStorage;
 import org.apache.james.mime4j.storage.Storage;
