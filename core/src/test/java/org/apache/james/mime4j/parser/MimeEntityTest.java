@@ -24,7 +24,6 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;

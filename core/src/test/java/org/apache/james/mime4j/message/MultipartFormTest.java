@@ -27,6 +27,7 @@ import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 import org.apache.james.mime4j.message.impl.BodyFactory;
 import org.apache.james.mime4j.message.impl.BodyPart;
 import org.apache.james.mime4j.message.impl.MessageImpl;
+import org.apache.james.mime4j.message.impl.MessageWriter;
 import org.apache.james.mime4j.message.impl.MultipartImpl;
 
 public class MultipartFormTest extends TestCase {

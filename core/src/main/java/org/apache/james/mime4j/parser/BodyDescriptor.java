@@ -17,22 +17,19 @@
  * under the License.                                           *
  ****************************************************************/
 
-
-package org.apache.james.mime4j.descriptor;
-
-import org.apache.james.mime4j.parser.RawField;
+package org.apache.james.mime4j.parser;
 
 /**
- * Adds mutator.
+ * Encapsulates the values of the MIME-specific header fields 
+ * (which starts with <code>Content-</code>). 
  */
-public interface MutableBodyDescriptor extends BodyDescriptor {
+public interface BodyDescriptor extends ContentDescriptor {
 
     /**
-     * Adds a field to the body descriptor.
-     * @param field the MIME field.
+     * Returns the body descriptors boundary.
+     * @return Boundary string, if known, or null. The latter may be the
+     *   case, in particular, if the body is no multipart entity.
      */
-    void addField(RawField field);
-    
-    MutableBodyDescriptor newChild();
+    String getBoundary();
 
 }

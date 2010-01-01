@@ -17,19 +17,20 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.descriptor;
+package org.apache.james.mime4j.parser;
 
-/**
- * Encapsulates the values of the MIME-specific header fields 
- * (which starts with <code>Content-</code>). 
- */
-public interface BodyDescriptor extends ContentDescriptor {
+import org.apache.james.mime4j.parser.BodyDescriptor;
+import org.apache.james.mime4j.parser.DefaultBodyDescriptor;
+import org.apache.james.mime4j.parser.MutableBodyDescriptor;
 
-    /**
-     * Returns the body descriptors boundary.
-     * @return Boundary string, if known, or null. The latter may be the
-     *   case, in particular, if the body is no multipart entity.
-     */
-    String getBoundary();
+public class DefaultBodyDescriptorTest extends BaseTestForBodyDescriptors {
+    @Override
+    protected MutableBodyDescriptor newBodyDescriptor() {
+        return new DefaultBodyDescriptor();
+    }
 
+    @Override
+    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
+        return new DefaultBodyDescriptor(parent);
+    }
 }

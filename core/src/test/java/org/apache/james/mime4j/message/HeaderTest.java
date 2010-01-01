@@ -24,6 +24,7 @@ import junit.framework.TestCase;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.impl.DefaultFieldParser;
+import org.apache.james.mime4j.message.impl.MessageWriter;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 public class HeaderTest extends TestCase {

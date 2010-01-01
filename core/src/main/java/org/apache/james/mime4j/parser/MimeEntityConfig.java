@@ -20,8 +20,6 @@
 package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
-import org.apache.james.mime4j.descriptor.MaximalBodyDescriptor;
 
 /**
  * MIME entity configuration

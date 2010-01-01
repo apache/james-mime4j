@@ -17,10 +17,12 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.descriptor;
+package org.apache.james.mime4j.parser;
 
 import junit.framework.TestCase;
 
+import org.apache.james.mime4j.parser.BodyDescriptor;
+import org.apache.james.mime4j.parser.MutableBodyDescriptor;
 import org.apache.james.mime4j.parser.RawField;
 
 public abstract class BaseTestForBodyDescriptors extends TestCase {

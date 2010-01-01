@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.util.Stack;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.descriptor.BodyDescriptor;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 import org.apache.james.mime4j.message.Body;
@@ -32,6 +31,7 @@ import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.message.Message;
 import org.apache.james.mime4j.message.Multipart;
+import org.apache.james.mime4j.parser.BodyDescriptor;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.parser.RawField;
@@ -116,7 +116,7 @@ public class MessageBuilder implements ContentHandler {
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#startMultipart(org.apache.james.mime4j.descriptor.BodyDescriptor)
+     * @see org.apache.james.mime4j.parser.ContentHandler#startMultipart(org.apache.james.mime4j.parser.BodyDescriptor)
      */
     public void startMultipart(final BodyDescriptor bd) throws MimeException {
         expect(Entity.class);
@@ -129,7 +129,7 @@ public class MessageBuilder implements ContentHandler {
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#body(org.apache.james.mime4j.descriptor.BodyDescriptor, java.io.InputStream)
+     * @see org.apache.james.mime4j.parser.ContentHandler#body(org.apache.james.mime4j.parser.BodyDescriptor, java.io.InputStream)
      */
     public void body(BodyDescriptor bd, final InputStream is) throws MimeException, IOException {
         expect(Entity.class);

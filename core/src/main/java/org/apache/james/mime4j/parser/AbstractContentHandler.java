@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.descriptor.BodyDescriptor;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,13 +39,13 @@ public abstract class AbstractContentHandler implements ContentHandler {
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#startMultipart(org.apache.james.mime4j.descriptor.BodyDescriptor)
+     * @see org.apache.james.mime4j.parser.ContentHandler#startMultipart(org.apache.james.mime4j.parser.BodyDescriptor)
      */
     public void startMultipart(BodyDescriptor bd) throws MimeException {
     }
     
     /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#body(org.apache.james.mime4j.descriptor.BodyDescriptor, java.io.InputStream)
+     * @see org.apache.james.mime4j.parser.ContentHandler#body(org.apache.james.mime4j.parser.BodyDescriptor, java.io.InputStream)
      */
     public void body(BodyDescriptor bd, InputStream is)
             throws MimeException, IOException {

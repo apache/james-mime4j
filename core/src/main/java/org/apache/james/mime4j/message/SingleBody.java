@@ -23,8 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.james.mime4j.codec.CodecUtil;
-
 /**
  * Abstract implementation of a single message body; that is, a body that does
  * not contain (directly or indirectly) any other child bodies. It also provides
@@ -78,7 +76,7 @@ public abstract class SingleBody implements Body {
             throw new IllegalArgumentException();
 
         InputStream in = getInputStream();
-        CodecUtil.copy(in, out);
+        SingleBody.copy(in, out);
         in.close();
     }
 
@@ -120,6 +118,22 @@ public abstract class SingleBody implements Body {
      * @see org.apache.james.mime4j.message.Disposable#dispose()
      */
     public void dispose() {
+    }
+
+    static final int DEFAULT_ENCODING_BUFFER_SIZE = 1024;
+    
+    /**
+     * Copies the contents of one stream to the other.
+     * @param in not null
+     * @param out not null
+     * @throws IOException
+     */
+    private static void copy(final InputStream in, final OutputStream out) throws IOException {
+        final byte[] buffer = new byte[DEFAULT_ENCODING_BUFFER_SIZE];
+        int inputLength;
+        while (-1 != (inputLength = in.read(buffer))) {
+            out.write(buffer, 0, inputLength);
+        }
     }
 
 }

@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.descriptor.BodyDescriptor;
 
 /**
  * <p>

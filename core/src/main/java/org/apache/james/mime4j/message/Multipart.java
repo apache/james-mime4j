@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.james.mime4j.util.ByteSequence;
-
 /**
  * Represents a MIME multipart body (see RFC 2045).A multipart body has a
  * ordered list of body parts. The multipart body also has a preamble and
@@ -202,9 +200,6 @@ public abstract class Multipart implements Body {
      */
     public abstract String getPreamble();
 
-    // package private for now; might become public someday
-    public abstract ByteSequence getPreambleRaw();
-
     /**
      * Sets the preamble.
      * 
@@ -219,9 +214,6 @@ public abstract class Multipart implements Body {
      * @return the epilogue.
      */
     public abstract String getEpilogue();
-
-    // package private for now; might become public someday
-    public abstract ByteSequence getEpilogueRaw();
 
     /**
      * Sets the epilogue.

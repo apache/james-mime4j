@@ -25,7 +25,6 @@ import java.io.InputStream;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
-import org.apache.james.mime4j.descriptor.MutableBodyDescriptor;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.LimitedInputStream;
 import org.apache.james.mime4j.io.LineNumberSource;

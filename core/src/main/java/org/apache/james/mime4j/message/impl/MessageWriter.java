@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.message.impl;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,6 +26,13 @@ import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.FieldName;
+import org.apache.james.mime4j.message.BinaryBody;
+import org.apache.james.mime4j.message.Body;
+import org.apache.james.mime4j.message.Entity;
+import org.apache.james.mime4j.message.Header;
+import org.apache.james.mime4j.message.Message;
+import org.apache.james.mime4j.message.Multipart;
+import org.apache.james.mime4j.message.SingleBody;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -128,7 +135,16 @@ public class MessageWriter {
 
         ByteSequence boundary = getBoundary(contentType);
 
-        writeBytes(multipart.getPreambleRaw(), out);
+        ByteSequence preamble;
+        ByteSequence epilogue;
+        if (multipart instanceof MultipartImpl) {
+            preamble = ((MultipartImpl) multipart).getPreambleRaw();
+            epilogue = ((MultipartImpl) multipart).getEpilogueRaw();
+        } else {
+            preamble = ContentUtil.encode(multipart.getPreamble());
+            epilogue = ContentUtil.encode(multipart.getEpilogue());
+        }
+        writeBytes(preamble, out);
         out.write(CRLF);
 
         for (Entity bodyPart : multipart.getBodyParts()) {
@@ -145,7 +161,7 @@ public class MessageWriter {
         out.write(DASHES);
         out.write(CRLF);
 
-        writeBytes(multipart.getEpilogueRaw(), out);
+        writeBytes(epilogue, out);
     }
 
     /**

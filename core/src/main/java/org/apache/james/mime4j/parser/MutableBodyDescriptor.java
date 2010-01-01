@@ -17,18 +17,21 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.descriptor;
 
-import org.apache.james.mime4j.descriptor.DefaultBodyDescriptor;
+package org.apache.james.mime4j.parser;
 
-public class DefaultBodyDescriptorTest extends BaseTestForBodyDescriptors {
-    @Override
-    protected MutableBodyDescriptor newBodyDescriptor() {
-        return new DefaultBodyDescriptor();
-    }
 
-    @Override
-    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
-        return new DefaultBodyDescriptor(parent);
-    }
+/**
+ * Adds mutator.
+ */
+public interface MutableBodyDescriptor extends BodyDescriptor {
+
+    /**
+     * Adds a field to the body descriptor.
+     * @param field the MIME field.
+     */
+    void addField(RawField field);
+    
+    MutableBodyDescriptor newChild();
+
 }
