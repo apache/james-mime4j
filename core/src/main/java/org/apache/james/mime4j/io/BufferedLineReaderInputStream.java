@@ -362,6 +362,9 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
 	@Override
 	public boolean unread(ByteArrayBuffer buf) {
+	    if (tempBuffer) {
+	        throw new IllegalStateException("A previous unreaded buffer has not yet been consumed.");
+	    }
 		origBuffer = buffer;
 		origBuflen = buflen;
 		origBufpos = bufpos;
