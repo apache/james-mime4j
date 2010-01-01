@@ -51,6 +51,12 @@ public abstract class LineReaderInputStream extends FilterInputStream {
     /**
      * Tries to unread the last read line.
      * 
+     * Implementation may refuse to unread a new buffer until the previous
+     * unread one has been competely consumed.
+     * 
+     * Implementations will directly use the byte array backed by buf, so
+     * make sure to not alter it anymore once this method has been called.
+     * 
      * @return true if the unread has been succesfull.
      */
     public abstract boolean unread(ByteArrayBuffer buf);
