@@ -21,7 +21,7 @@ package org.apache.james.mime4j.field;
 
 import java.util.Map;
 
-import org.apache.james.mime4j.field.contenttype.parser.ParseException;
+import org.apache.james.mime4j.field.ParseException;
 
 public interface ContentTypeField extends ParsedField {
 
