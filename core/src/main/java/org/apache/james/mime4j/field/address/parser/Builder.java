@@ -23,7 +23,6 @@ import org.apache.james.mime4j.codec.DecoderUtil;
 import org.apache.james.mime4j.field.address.Address;
 import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.DomainList;
-import org.apache.james.mime4j.field.address.Group;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.MailboxList;
 import org.apache.james.mime4j.field.address.parser.ASTaddr_spec;
@@ -78,11 +77,11 @@ class Builder {
             String name = buildString((ASTphrase) n, false);
             Node n2 = it.next();
             if (n2 instanceof ASTgroup_body) {
-                return new Group(name, buildGroupBody((ASTgroup_body) n2));
+                return new GroupImpl(name, buildGroupBody((ASTgroup_body) n2));
             } else if (n2 instanceof ASTangle_addr) {
                 name = DecoderUtil.decodeEncodedWords(name);
                 Mailbox mb = buildAngleAddr((ASTangle_addr) n2);
-                return new Mailbox(name, mb.getRoute(), mb.getLocalPart(),
+                return new MailboxImpl(name, mb.getRoute(), mb.getLocalPart(),
                         mb.getDomain());
             } else {
                 throw new IllegalStateException();
@@ -133,7 +132,7 @@ class Builder {
         if (n instanceof ASTangle_addr) {
             name = DecoderUtil.decodeEncodedWords(name);
             Mailbox mb = buildAngleAddr((ASTangle_addr) n);
-            return new Mailbox(name, mb.getRoute(), mb.getLocalPart(),
+            return new MailboxImpl(name, mb.getRoute(), mb.getLocalPart(),
                     mb.getDomain());
         } else {
             throw new IllegalStateException();
@@ -180,7 +179,7 @@ class Builder {
         ChildNodeIterator it = new ChildNodeIterator(node);
         String localPart = buildString((ASTlocal_part) it.next(), true);
         String domain = buildString((ASTdomain) it.next(), true);
-        return new Mailbox(route, localPart, domain);
+        return new MailboxImpl(route, localPart, domain);
     }
 
     private String buildString(SimpleNode node, boolean stripSpaces) {

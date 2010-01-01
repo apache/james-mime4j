@@ -36,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.field.address.Group;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
+import org.apache.james.mime4j.field.address.parser.GroupImpl;
 import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 import org.apache.james.mime4j.message.impl.BodyPart;
 import org.apache.james.mime4j.message.impl.MessageImpl;
@@ -306,7 +307,7 @@ public class MessageTest extends TestCase {
 
         Mailbox mailbox1 = AddressBuilder.parseMailbox("john.doe@example.net");
         Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.net");
-        Group group = new Group("Does", mailbox1, mailbox2);
+        Group group = new GroupImpl("Does", mailbox1, mailbox2);
         Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
 
         m.setTo(group);
@@ -344,7 +345,7 @@ public class MessageTest extends TestCase {
 
         Mailbox mailbox1 = AddressBuilder.parseMailbox("john.doe@example.net");
         Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.net");
-        Group group = new Group("Does", mailbox1, mailbox2);
+        Group group = new GroupImpl("Does", mailbox1, mailbox2);
         Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
 
         m.setCc(group);
@@ -382,7 +383,7 @@ public class MessageTest extends TestCase {
 
         Mailbox mailbox1 = AddressBuilder.parseMailbox("john.doe@example.net");
         Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.net");
-        Group group = new Group("Does", mailbox1, mailbox2);
+        Group group = new GroupImpl("Does", mailbox1, mailbox2);
         Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
 
         m.setBcc(group);
@@ -420,7 +421,7 @@ public class MessageTest extends TestCase {
 
         Mailbox mailbox1 = AddressBuilder.parseMailbox("john.doe@example.net");
         Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.net");
-        Group group = new Group("Does", mailbox1, mailbox2);
+        Group group = new GroupImpl("Does", mailbox1, mailbox2);
         Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
 
         m.setReplyTo(group);

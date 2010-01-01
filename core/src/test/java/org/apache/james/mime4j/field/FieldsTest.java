@@ -30,6 +30,7 @@ import junit.framework.TestCase;
 import org.apache.james.mime4j.field.address.Group;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
+import org.apache.james.mime4j.field.address.parser.GroupImpl;
 import org.apache.james.mime4j.field.impl.Fields;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -257,7 +258,7 @@ public class FieldsTest extends TestCase {
         Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
         Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
         Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
-        Group group = new Group("The Does", mailbox1, mailbox2);
+        Group group = new GroupImpl("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.to(group);
         assertEquals("To: The Does: JD <john.doe@acme.org>, "
@@ -278,7 +279,7 @@ public class FieldsTest extends TestCase {
         Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
         Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
         Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
-        Group group = new Group("The Does", mailbox1, mailbox2);
+        Group group = new GroupImpl("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.cc(group);
         assertEquals("Cc: The Does: JD <john.doe@acme.org>, "
@@ -299,7 +300,7 @@ public class FieldsTest extends TestCase {
         Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
         Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
         Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
-        Group group = new Group("The Does", mailbox1, mailbox2);
+        Group group = new GroupImpl("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.bcc(group);
         assertEquals("Bcc: The Does: JD <john.doe@acme.org>, "
@@ -320,7 +321,7 @@ public class FieldsTest extends TestCase {
         Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
         Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
         Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
-        Group group = new Group("The Does", mailbox1, mailbox2);
+        Group group = new GroupImpl("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.replyTo(group);
         assertEquals("Reply-To: The Does: JD <john.doe@acme.org>, "
@@ -358,7 +359,7 @@ public class FieldsTest extends TestCase {
         Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
         Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
         Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
-        Group group = new Group("The Does", mailbox1, mailbox2);
+        Group group = new GroupImpl("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.addressList("Resent-To", Arrays.asList(
                 group, mailbox3));

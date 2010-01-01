@@ -21,8 +21,6 @@ package org.apache.james.mime4j.field;
 
 import java.util.Map;
 
-import org.apache.james.mime4j.field.ParseException;
-
 public interface ContentTypeField extends ParsedField {
 
     /** The prefix of all <code>multipart</code> MIME types. */

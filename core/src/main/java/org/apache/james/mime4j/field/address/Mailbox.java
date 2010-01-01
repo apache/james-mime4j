@@ -23,12 +23,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.james.mime4j.codec.EncoderUtil;
-
 /**
  * Represents a single e-mail address.
  */
-public class Mailbox extends Address {
+public abstract class Mailbox extends Address {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,47 +37,6 @@ public class Mailbox extends Address {
     private final DomainList route;
     private final String localPart;
     private final String domain;
-
-    /**
-     * Creates an unnamed mailbox without a route. Routes are obsolete.
-     * 
-     * @param localPart
-     *            The part of the e-mail address to the left of the "@".
-     * @param domain
-     *            The part of the e-mail address to the right of the "@".
-     */
-    public Mailbox(String localPart, String domain) {
-        this(null, null, localPart, domain);
-    }
-
-    /**
-     * Creates an unnamed mailbox with a route. Routes are obsolete.
-     * 
-     * @param route
-     *            The zero or more domains that make up the route. May be
-     *            <code>null</code>.
-     * @param localPart
-     *            The part of the e-mail address to the left of the "@".
-     * @param domain
-     *            The part of the e-mail address to the right of the "@".
-     */
-    public Mailbox(DomainList route, String localPart, String domain) {
-        this(null, route, localPart, domain);
-    }
-
-    /**
-     * Creates a named mailbox without a route. Routes are obsolete.
-     * 
-     * @param name
-     *            the name of the e-mail address. May be <code>null</code>.
-     * @param localPart
-     *            The part of the e-mail address to the left of the "@".
-     * @param domain
-     *            The part of the e-mail address to the right of the "@".
-     */
-    public Mailbox(String name, String localPart, String domain) {
-        this(name, null, localPart, domain);
-    }
 
     /**
      * Creates a named mailbox with a route. Routes are obsolete.
@@ -186,32 +143,6 @@ public class Mailbox extends Address {
         }
 
         if (includeAngleBrackets) {
-            sb.append('>');
-        }
-
-        return sb.toString();
-    }
-
-    @Override
-    public String getEncodedString() {
-        StringBuilder sb = new StringBuilder();
-
-        if (name != null) {
-            sb.append(EncoderUtil.encodeAddressDisplayName(name));
-            sb.append(" <");
-        }
-
-        sb.append(EncoderUtil.encodeAddressLocalPart(localPart));
-
-        // domain = dot-atom / domain-literal
-        // domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
-        // dtext = %d33-90 / %d94-126
-        if (domain != null) {
-            sb.append('@');
-            sb.append(domain);
-        }
-
-        if (name != null) {
             sb.append('>');
         }
 
