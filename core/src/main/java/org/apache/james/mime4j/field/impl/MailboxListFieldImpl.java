@@ -22,8 +22,8 @@ package org.apache.james.mime4j.field.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.FieldParser;
-import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.MailboxList;
+import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -67,7 +67,7 @@ public class MailboxListFieldImpl extends AbstractField implements org.apache.ja
         String body = getBody();
 
         try {
-            mailboxList = AddressList.parse(body).flatten();
+            mailboxList = AddressBuilder.parseAddressList(body).flatten();
         } catch (ParseException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Parsing value '" + body + "': " + e.getMessage());

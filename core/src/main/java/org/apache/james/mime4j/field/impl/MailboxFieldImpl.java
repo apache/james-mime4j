@@ -22,9 +22,9 @@ package org.apache.james.mime4j.field.impl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.FieldParser;
-import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.MailboxList;
+import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -68,7 +68,7 @@ public class MailboxFieldImpl extends AbstractField implements org.apache.james.
         String body = getBody();
 
         try {
-            MailboxList mailboxList = AddressList.parse(body).flatten();
+            MailboxList mailboxList = AddressBuilder.parseAddressList(body).flatten();
             if (mailboxList.size() > 0) {
                 mailbox = mailboxList.get(0);
             }

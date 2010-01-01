@@ -73,23 +73,6 @@ public class Group extends Address {
     }
 
     /**
-     * Parses the specified raw string into a group address.
-     * 
-     * @param rawGroupString
-     *            string to parse.
-     * @return a <code>Group</code> object for the specified string.
-     * @throws IllegalArgumentException
-     *             if the raw string does not represent a single group address.
-     */
-    public static Group parse(String rawGroupString) {
-        Address address = Address.parse(rawGroupString);
-        if (!(address instanceof Group))
-            throw new IllegalArgumentException("Not a group address");
-
-        return (Group) address;
-    }
-
-    /**
      * Returns the group name.
      */
     public String getName() {

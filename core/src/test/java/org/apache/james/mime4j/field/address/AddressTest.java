@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.field.address;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 
 import java.io.BufferedReader;
@@ -43,7 +44,7 @@ public class AddressTest extends TestCase {
     }
 
     public void testParse1() throws ParseException {
-        AddressList addrList = AddressList.parse("John Doe <jdoe@machine(comment).  example>");
+        AddressList addrList = AddressBuilder.parseAddressList("John Doe <jdoe@machine(comment).  example>");
         assertEquals(1, addrList.size());
         Mailbox mailbox = (Mailbox)addrList.get(0);
         assertEquals("John Doe", mailbox.getName());
@@ -52,7 +53,7 @@ public class AddressTest extends TestCase {
     }
 
     public void testParse2() throws ParseException {
-        AddressList addrList = AddressList.parse("Mary Smith \t    \t\t  <mary@example.net>");
+        AddressList addrList = AddressBuilder.parseAddressList("Mary Smith \t    \t\t  <mary@example.net>");
         assertEquals(1, addrList.size());
         Mailbox mailbox = (Mailbox)addrList.get(0);
         assertEquals("Mary Smith", mailbox.getName());
@@ -61,7 +62,7 @@ public class AddressTest extends TestCase {
     }
 
     public void testEmptyGroup() throws ParseException {
-        AddressList addrList = AddressList.parse("undisclosed-recipients:;");
+        AddressList addrList = AddressBuilder.parseAddressList("undisclosed-recipients:;");
         assertEquals(1, addrList.size());
         Group group = (Group)addrList.get(0);
         assertEquals(0, group.getMailboxes().size());
@@ -69,7 +70,7 @@ public class AddressTest extends TestCase {
     }
 
     public void testMessyGroupAndMailbox() throws ParseException {
-        AddressList addrList = AddressList.parse("Marketing  folks :  Jane Smith < jane @ example . net >, \" Jack \\\"Jackie\\\" Jones \" < jjones@example.com > (comment(comment)); ,, (comment)  , <@example . net,@example(ignore\\)).com:(ignore)john@(ignore)example.net>");
+        AddressList addrList = AddressBuilder.parseAddressList("Marketing  folks :  Jane Smith < jane @ example . net >, \" Jack \\\"Jackie\\\" Jones \" < jjones@example.com > (comment(comment)); ,, (comment)  , <@example . net,@example(ignore\\)).com:(ignore)john@(ignore)example.net>");
         assertEquals(2, addrList.size());
 
         Group group = (Group)addrList.get(0);
@@ -96,12 +97,12 @@ public class AddressTest extends TestCase {
     }
 
     public void testEmptyAddressList() throws ParseException {
-        assertEquals(0, AddressList.parse("  \t   \t ").size());
-        assertEquals(0, AddressList.parse("  \t  ,  , , ,,, , \t ").size());
+        assertEquals(0, AddressBuilder.parseAddressList("  \t   \t ").size());
+        assertEquals(0, AddressBuilder.parseAddressList("  \t  ,  , , ,,, , \t ").size());
     }
 
     public void testSimpleForm() throws ParseException {
-        AddressList addrList = AddressList.parse("\"a b c d e f g\" (comment) @example.net");
+        AddressList addrList = AddressBuilder.parseAddressList("\"a b c d e f g\" (comment) @example.net");
         assertEquals(1, addrList.size());
         Mailbox mailbox = (Mailbox)addrList.get(0);
         assertEquals("a b c d e f g", mailbox.getLocalPart());
@@ -109,7 +110,7 @@ public class AddressTest extends TestCase {
     }
 
     public void testFlatten() throws ParseException {
-        AddressList addrList = AddressList.parse("dev : one@example.com, two@example.com; , ,,, marketing:three@example.com ,four@example.com;, five@example.com");
+        AddressList addrList = AddressBuilder.parseAddressList("dev : one@example.com, two@example.com; , ,,, marketing:three@example.com ,four@example.com;, five@example.com");
         assertEquals(3, addrList.size());
         assertEquals(5, addrList.flatten().size());
     }
@@ -126,15 +127,15 @@ public class AddressTest extends TestCase {
         // there shouldn't be any aspect of the RFC that is tested here
         // but not in the other unit tests.
 
-        AddressList.parse("Alfred Neuman <Neuman@BBN-TENEXA>");
-        AddressList.parse("Neuman@BBN-TENEXA");
-        AddressList.parse("\"George, Ted\" <Shared@Group.Arpanet>");
-        AddressList.parse("Wilt . (the Stilt) Chamberlain@NBA.US");
+        AddressBuilder.parseAddressList("Alfred Neuman <Neuman@BBN-TENEXA>");
+        AddressBuilder.parseAddressList("Neuman@BBN-TENEXA");
+        AddressBuilder.parseAddressList("\"George, Ted\" <Shared@Group.Arpanet>");
+        AddressBuilder.parseAddressList("Wilt . (the Stilt) Chamberlain@NBA.US");
 
         // NOTE: In RFC822 8.1.5, the following example did not have "Galloping Gourmet"
         // in double-quotes.  I can only assume this was a typo, since 6.2.4 specifically
         // disallows spaces in unquoted local-part.
-        AddressList.parse("     Gourmets:  Pompous Person <WhoZiWhatZit@Cordon-Bleu>," +
+        AddressBuilder.parseAddressList("     Gourmets:  Pompous Person <WhoZiWhatZit@Cordon-Bleu>," +
                 "                Childs@WGBH.Boston, \"Galloping Gourmet\"@" +
                 "                ANT.Down-Under (Australian National Television)," +
                 "                Cheapie@Discount-Liquors;," +
@@ -144,7 +145,7 @@ public class AddressTest extends TestCase {
         // NOTE: In RFC822 8.3.3, the following example ended with a lone ">" after
         // Tops-20-Host.  I can only assume this was a typo, since 6.1 clearly shows
         // ">" requires a matching "<".
-        AddressList.parse("Important folk:" +
+        AddressBuilder.parseAddressList("Important folk:" +
                 "                   Tom Softwood <Balsa@Tree.Root>," +
                 "                   \"Sam Irving\"@Other-Host;," +
                 "                 Standard Distribution:" +
@@ -153,16 +154,16 @@ public class AddressTest extends TestCase {
 
         // The following are from a Usenet post by Dan J. Bernstein:
         // http://groups.google.com/groups?selm=1996Aug1418.21.01.28081%40koobera.math.uic.edu
-        AddressList.parse("\":sysmail\"@  Some-Group.\t         Some-Org, Muhammed.(I am  the greatest) Ali @(the)Vegas.WBA");
-        AddressList.parse("me@home.com (comment (nested (deeply\\))))");
-        AddressList.parse("mailing list: me@home.com, route two <you@work.com>, them@play.com ;");
+        AddressBuilder.parseAddressList("\":sysmail\"@  Some-Group.\t         Some-Org, Muhammed.(I am  the greatest) Ali @(the)Vegas.WBA");
+        AddressBuilder.parseAddressList("me@home.com (comment (nested (deeply\\))))");
+        AddressBuilder.parseAddressList("mailing list: me@home.com, route two <you@work.com>, them@play.com ;");
 
     }
 
     public void testLexicalError() {
         // ensure that TokenMgrError doesn't get thrown
         try {
-            AddressList.parse(")");
+            AddressBuilder.parseAddressList(")");
             fail("Expected parsing error");
         }
         catch (ParseException e) {
@@ -189,7 +190,7 @@ public class AddressTest extends TestCase {
 
     
     public void testAddressList() throws ParseException {
-        AddressList addlist = AddressList.parse("foo@example.com, bar@example.com, third@example.com");
+        AddressList addlist = AddressBuilder.parseAddressList("foo@example.com, bar@example.com, third@example.com");
         List<Address> al = new ArrayList<Address>();
         al.add(addlist.get(0));
 
@@ -232,7 +233,7 @@ public class AddressTest extends TestCase {
                 @Override
                 public void run() {
                     try {
-                        AddressList.main(null);
+                        AddressBuilder.main(null);
                     } catch (Exception e) {
                         fail("Catched an exception in main: "+e);
                     }
@@ -367,7 +368,7 @@ public class AddressTest extends TestCase {
          * ParseException
          */
         try {
-            AddressList.parse("\"\"bar@bar.com");
+            AddressBuilder.parseAddressList("\"\"bar@bar.com");
             fail("ParseException expected");
         } catch (ParseException pe) {
         }
@@ -405,12 +406,12 @@ public class AddressTest extends TestCase {
     }
 
     public void testParseAddress() throws Exception {
-        Address address = Address.parse("Mary Smith <mary@example.net>");
+        Address address = AddressBuilder.parseAddress("Mary Smith <mary@example.net>");
         assertTrue(address instanceof Mailbox);
         assertEquals("Mary Smith", ((Mailbox) address).getName());
         assertEquals("mary@example.net", ((Mailbox) address).getAddress());
 
-        address = Address.parse("group: Mary Smith <mary@example.net>;");
+        address = AddressBuilder.parseAddress("group: Mary Smith <mary@example.net>;");
         assertTrue(address instanceof Group);
         assertEquals("group", ((Group) address).getName());
         assertEquals("Mary Smith", ((Group) address).getMailboxes().get(0)
@@ -419,15 +420,15 @@ public class AddressTest extends TestCase {
                 .get(0).getAddress());
 
         try {
-            Group.parse("john.doe@acme.org, jane.doe@acme.org");
+            AddressBuilder.parseGroup("john.doe@acme.org, jane.doe@acme.org");
             fail();
         } catch (IllegalArgumentException expected) {
         }
     }
     
     public void testParseGroup() throws Exception {
-        Group group = Group
-                .parse("group: john.doe@acme.org, Mary Smith <mary@example.net>;");
+        Group group = AddressBuilder
+                .parseGroup("group: john.doe@acme.org, Mary Smith <mary@example.net>;");
         assertEquals("group", group.getName());
 
         MailboxList mailboxes = group.getMailboxes();
@@ -442,41 +443,41 @@ public class AddressTest extends TestCase {
         assertEquals("mary@example.net", mailbox2.getAddress());
 
         try {
-            Group.parse("john.doe@acme.org");
+            AddressBuilder.parseGroup("john.doe@acme.org");
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            Group.parse("g1: john.doe@acme.org;, g2: mary@example.net;");
+            AddressBuilder.parseGroup("g1: john.doe@acme.org;, g2: mary@example.net;");
             fail();
         } catch (IllegalArgumentException expected) {
         }
     }
 
     public void testParseMailbox() throws Exception {
-        Mailbox mailbox1 = Mailbox.parse("john.doe@acme.org");
+        Mailbox mailbox1 = AddressBuilder.parseMailbox("john.doe@acme.org");
         assertNull(mailbox1.getName());
         assertEquals("john.doe@acme.org", mailbox1.getAddress());
 
-        Mailbox mailbox2 = Mailbox.parse("Mary Smith <mary@example.net>");
+        Mailbox mailbox2 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
         assertEquals("Mary Smith", mailbox2.getName());
         assertEquals("mary@example.net", mailbox2.getAddress());
 
         // non-ascii should be allowed in quoted strings
-        Mailbox mailbox3 = Mailbox
-                .parse("\"Hans M\374ller\" <hans.mueller@acme.org>");
+        Mailbox mailbox3 = AddressBuilder
+                .parseMailbox("\"Hans M\374ller\" <hans.mueller@acme.org>");
         assertEquals("Hans M\374ller", mailbox3.getName());
         assertEquals("hans.mueller@acme.org", mailbox3.getAddress());
 
         try {
-            Mailbox.parse("g: Mary Smith <mary@example.net>;");
+            AddressBuilder.parseMailbox("g: Mary Smith <mary@example.net>;");
             fail();
         } catch (IllegalArgumentException expected) {
         }
 
         try {
-            Mailbox.parse("Mary Smith <mary@example.net>, hans.mueller@acme.org");
+            AddressBuilder.parseMailbox("Mary Smith <mary@example.net>, hans.mueller@acme.org");
             fail();
         } catch (IllegalArgumentException expected) {
         }

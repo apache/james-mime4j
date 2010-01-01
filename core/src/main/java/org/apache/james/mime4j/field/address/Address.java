@@ -20,11 +20,7 @@
 package org.apache.james.mime4j.field.address;
 
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.List;
-
-import org.apache.james.mime4j.field.address.parser.AddressListParser;
-import org.apache.james.mime4j.field.address.parser.ParseException;
 
 /**
  * The abstract base for classes that represent RFC2822 addresses. This includes
@@ -94,25 +90,6 @@ public abstract class Address implements Serializable {
      *         purposes.
      */
     public abstract String getEncodedString();
-
-    /**
-     * Parses the specified raw string into an address.
-     * 
-     * @param rawAddressString
-     *            string to parse.
-     * @return an <code>Address</code> object for the specified string.
-     * @throws IllegalArgumentException
-     *             if the raw string does not represent a single address.
-     */
-    public static Address parse(String rawAddressString) {
-        AddressListParser parser = new AddressListParser(new StringReader(
-                rawAddressString));
-        try {
-            return Builder.getInstance().buildAddress(parser.parseAddress());
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
 
     @Override
     public String toString() {

@@ -23,6 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.field.FieldParser;
 import org.apache.james.mime4j.field.address.AddressList;
+import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -66,7 +67,7 @@ public class AddressListFieldImpl extends AbstractField implements org.apache.ja
         String body = getBody();
 
         try {
-            addressList = AddressList.parse(body);
+            addressList = AddressBuilder.parseAddressList(body);
         } catch (ParseException e) {
             if (log.isDebugEnabled()) {
                 log.debug("Parsing value '" + body + "': " + e.getMessage());

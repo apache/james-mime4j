@@ -22,7 +22,7 @@ package org.apache.james.mime4j.samples.dom;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.message.impl.BodyFactory;
 import org.apache.james.mime4j.message.impl.MessageImpl;
@@ -41,13 +41,13 @@ public class TextPlainMessage {
 
         // Date and From are required fields
         message.setDate(new Date());
-        message.setFrom(Mailbox.parse("John Doe <jdoe@machine.example>"));
+        message.setFrom(AddressBuilder.parseMailbox("John Doe <jdoe@machine.example>"));
 
         // Message-ID should be present
         message.createMessageId("machine.example");
 
         // set some optional fields
-        message.setTo(Mailbox.parse("Mary Smith <mary@example.net>"));
+        message.setTo(AddressBuilder.parseMailbox("Mary Smith <mary@example.net>"));
         message.setSubject("Saying Hello");
 
         // 3) set a text body

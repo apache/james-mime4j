@@ -29,7 +29,7 @@ import java.util.Date;
 
 import javax.imageio.ImageIO;
 
-import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.message.BinaryBody;
 import org.apache.james.mime4j.message.Multipart;
 import org.apache.james.mime4j.message.TextBody;
@@ -57,13 +57,13 @@ public class MultipartMessage {
 
         // Date and From are required fields
         message.setDate(new Date());
-        message.setFrom(Mailbox.parse("John Doe <jdoe@machine.example>"));
+        message.setFrom(AddressBuilder.parseMailbox("John Doe <jdoe@machine.example>"));
 
         // Message-ID should be present
         message.createMessageId("machine.example");
 
         // set some optional fields
-        message.setTo(Mailbox.parse("Mary Smith <mary@example.net>"));
+        message.setTo(AddressBuilder.parseMailbox("Mary Smith <mary@example.net>"));
         message.setSubject("An image for you");
 
         // 3) set a multipart body

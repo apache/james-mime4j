@@ -19,14 +19,11 @@
 
 package org.apache.james.mime4j.field.address;
 
-import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
-import org.apache.james.mime4j.field.address.parser.AddressListParser;
-import org.apache.james.mime4j.field.address.parser.ParseException;
 
 /**
  * Represents a single e-mail address.
@@ -115,26 +112,6 @@ public class Mailbox extends Address {
     Mailbox(String name, Mailbox baseMailbox) {
         this(name, baseMailbox.getRoute(), baseMailbox.getLocalPart(),
                 baseMailbox.getDomain());
-    }
-
-    /**
-     * Parses the specified raw string into a mailbox address.
-     * 
-     * @param rawMailboxString
-     *            string to parse.
-     * @return a <code>Mailbox</code> object for the specified string.
-     * @throws IllegalArgumentException
-     *             if the raw string does not represent a single mailbox
-     *             address.
-     */
-    public static Mailbox parse(String rawMailboxString) {
-        AddressListParser parser = new AddressListParser(new StringReader(
-                rawMailboxString));
-        try {
-            return Builder.getInstance().buildMailbox(parser.parseMailbox());
-        } catch (ParseException e) {
-            throw new IllegalArgumentException(e);
-        }
     }
 
     /**

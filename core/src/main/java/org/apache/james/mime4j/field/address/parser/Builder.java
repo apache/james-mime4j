@@ -17,9 +17,15 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field.address;
+package org.apache.james.mime4j.field.address.parser;
 
 import org.apache.james.mime4j.codec.DecoderUtil;
+import org.apache.james.mime4j.field.address.Address;
+import org.apache.james.mime4j.field.address.AddressList;
+import org.apache.james.mime4j.field.address.DomainList;
+import org.apache.james.mime4j.field.address.Group;
+import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.field.address.MailboxList;
 import org.apache.james.mime4j.field.address.parser.ASTaddr_spec;
 import org.apache.james.mime4j.field.address.parser.ASTaddress;
 import org.apache.james.mime4j.field.address.parser.ASTaddress_list;
@@ -75,7 +81,9 @@ class Builder {
                 return new Group(name, buildGroupBody((ASTgroup_body) n2));
             } else if (n2 instanceof ASTangle_addr) {
                 name = DecoderUtil.decodeEncodedWords(name);
-                return new Mailbox(name, buildAngleAddr((ASTangle_addr) n2));
+                Mailbox mb = buildAngleAddr((ASTangle_addr) n2);
+                return new Mailbox(name, mb.getRoute(), mb.getLocalPart(),
+                        mb.getDomain());
             } else {
                 throw new IllegalStateException();
             }
@@ -124,7 +132,9 @@ class Builder {
         n = it.next();
         if (n instanceof ASTangle_addr) {
             name = DecoderUtil.decodeEncodedWords(name);
-            return new Mailbox(name, buildAngleAddr((ASTangle_addr) n));
+            Mailbox mb = buildAngleAddr((ASTangle_addr) n);
+            return new Mailbox(name, mb.getRoute(), mb.getLocalPart(),
+                    mb.getDomain());
         } else {
             throw new IllegalStateException();
         }

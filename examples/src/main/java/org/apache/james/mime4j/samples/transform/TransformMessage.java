@@ -24,7 +24,7 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Random;
 
-import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.message.Body;
 import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Multipart;
@@ -114,7 +114,7 @@ public class TransformMessage {
         message.createMessageId(HOSTNAME);
         message.setSubject("Transformed message");
         message.setDate(new Date());
-        message.setFrom(Mailbox.parse("John Doe <jdoe@machine.example>"));
+        message.setFrom(AddressBuilder.parseMailbox("John Doe <jdoe@machine.example>"));
 
         return message;
     }

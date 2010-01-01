@@ -19,11 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
-import org.apache.james.mime4j.field.address.parser.AddressListParser;
-import org.apache.james.mime4j.field.address.parser.ParseException;
-
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -109,40 +105,4 @@ public class AddressList extends AbstractList<Address> implements Serializable {
         }
     }
 
-    /**
-     * Parse the address list string, such as the value of a From, To, Cc, Bcc,
-     * Sender, or Reply-To header.
-     * 
-     * The string MUST be unfolded already.
-     */
-    public static AddressList parse(String rawAddressList)
-            throws ParseException {
-        AddressListParser parser = new AddressListParser(new StringReader(
-                rawAddressList));
-        return Builder.getInstance().buildAddressList(parser.parseAddressList());
-    }
-
-    /**
-     * Test console.
-     */
-    public static void main(String[] args) throws Exception {
-        java.io.BufferedReader reader = new java.io.BufferedReader(
-                new java.io.InputStreamReader(System.in));
-        while (true) {
-            try {
-                System.out.print("> ");
-                String line = reader.readLine();
-                if (line.length() == 0 || line.toLowerCase().equals("exit")
-                        || line.toLowerCase().equals("quit")) {
-                    System.out.println("Goodbye.");
-                    return;
-                }
-                AddressList list = parse(line);
-                list.print();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Thread.sleep(300);
-            }
-        }
-    }
 }
