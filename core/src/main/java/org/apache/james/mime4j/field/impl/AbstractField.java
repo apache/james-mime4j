@@ -19,6 +19,9 @@
 
 package org.apache.james.mime4j.field.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
+
 import org.apache.james.mime4j.field.ParseException;
 import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -49,12 +52,10 @@ public abstract class AbstractField implements ParsedField {
     }
     
     /**
-     * Gets the original raw field string.
-     * 
-     * @return the original raw field string.
+     * @see org.apache.james.mime4j.field.Field#writeTo(java.io.OutputStream)
      */
-    public ByteSequence getRaw() {
-        return raw;
+    public void writeTo(OutputStream out) throws IOException {
+        out.write(raw.toByteArray());
     }
     
     /**

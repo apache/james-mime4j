@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,7 +34,7 @@ import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.GroupImpl;
 import org.apache.james.mime4j.field.impl.Fields;
-import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -47,7 +49,7 @@ public class FieldsTest extends TestCase {
         String expectedRaw = "Content-Type: multipart/mixed;\r\n "
                 + "boundary=\"-=Part.0.37877968dd4f6595.11eccf0271c"
                 + ".2dce5678cbc933d5=-\"";
-        assertEquals(expectedRaw, decode(field.getRaw()));
+        assertEquals(expectedRaw, decode(field));
     }
 
     public void testContentTypeStringParameters() throws Exception {
@@ -61,7 +63,7 @@ public class FieldsTest extends TestCase {
         String expectedRaw = "Content-Type: multipart/mixed;\r\n "
                 + "boundary=\"-=Part.0.37877968dd4f6595.11eccf0271c"
                 + ".2dce5678cbc933d5=-\"";
-        assertEquals(expectedRaw, decode(field.getRaw()));
+        assertEquals(expectedRaw, decode(field));
     }
 
     public void testContentTypeStringParametersWithSpaces() throws Exception {
@@ -73,7 +75,7 @@ public class FieldsTest extends TestCase {
 
         String expectedRaw = "Content-Type: multipart/mixed; "
                 + "param=\"value with space chars\"";
-        assertEquals(expectedRaw, decode(field.getRaw()));
+        assertEquals(expectedRaw, decode(field));
     }
 
     public void testContentTypeStringNullParameters() throws Exception {
@@ -81,7 +83,7 @@ public class FieldsTest extends TestCase {
         assertTrue(field.isValidField());
 
         String expectedRaw = "Content-Type: text/plain";
-        assertEquals(expectedRaw, decode(field.getRaw()));
+        assertEquals(expectedRaw, decode(field));
     }
 
     public void testInvalidContentType() throws Exception {
@@ -99,7 +101,7 @@ public class FieldsTest extends TestCase {
         assertTrue(field.isValidField());
 
         assertEquals("Content-Transfer-Encoding: base64",
-                decode(field.getRaw()));
+                decode(field));
     }
 
     public void testContentDispositionString() throws Exception {
@@ -111,7 +113,7 @@ public class FieldsTest extends TestCase {
         String expectedRaw = "Content-Disposition: inline; filename="
                 + "\"testing 1 2.dat\"; size=12345;\r\n creation-date="
                 + "\"Thu, 1 Jan 1970 00:00:00 +0000\"";
-        assertEquals(expectedRaw, decode(field.getRaw()));
+        assertEquals(expectedRaw, decode(field));
     }
 
     public void testContentDispositionStringParameters() throws Exception {
@@ -124,7 +126,7 @@ public class FieldsTest extends TestCase {
 
         String expectedRaw = "Content-Disposition: attachment; "
                 + "creation-date=\"Thu, 1 Jan 1970 00:00:00\r\n +0000\"";
-        assertEquals(expectedRaw, decode(field.getRaw()));
+        assertEquals(expectedRaw, decode(field));
 
         assertEquals(new Date(0), field.getCreationDate());
     }
@@ -135,7 +137,7 @@ public class FieldsTest extends TestCase {
         assertTrue(field.isValidField());
 
         String expectedRaw = "Content-Disposition: inline";
-        assertEquals(expectedRaw, decode(field.getRaw()));
+        assertEquals(expectedRaw, decode(field));
     }
 
     public void testContentDispositionFilename() throws Exception {
@@ -185,7 +187,7 @@ public class FieldsTest extends TestCase {
         assertTrue(field.isValidField());
 
         assertEquals("Date: Thu, 1 Jan 1970 00:00:00 +0000", decode(field
-                .getRaw()));
+                ));
         assertEquals(new Date(0), field.getDate());
 
         field = Fields.date("Resent-Date", new Date(0), TimeZone
@@ -193,7 +195,7 @@ public class FieldsTest extends TestCase {
         assertTrue(field.isValidField());
 
         assertEquals("Resent-Date: Thu, 1 Jan 1970 01:00:00 +0100",
-                decode(field.getRaw()));
+                decode(field));
         assertEquals(new Date(0), field.getDate());
     }
 
@@ -204,38 +206,38 @@ public class FieldsTest extends TestCase {
         assertTrue(field.isValidField());
 
         assertEquals("Date: Wed, 16 Jul 2008 17:12:33 +0200", decode(field
-                .getRaw()));
+                ));
         assertEquals(new Date(millis), field.getDate());
     }
 
     public void testMessageId() throws Exception {
         Field messageId = Fields.messageId("acme.org");
 
-        String raw = ContentUtil.decode(messageId.getRaw());
+        String raw = decode(messageId);
         assertTrue(raw.startsWith("Message-ID: <Mime4j."));
         assertTrue(raw.endsWith("@acme.org>"));
     }
 
     public void testSubject() throws Exception {
-        assertEquals("Subject: ", decode(Fields.subject("").getRaw()));
-        assertEquals("Subject: test", decode(Fields.subject("test").getRaw()));
+        assertEquals("Subject: ", decode(Fields.subject("")));
+        assertEquals("Subject: test", decode(Fields.subject("test")));
         assertEquals("Subject: =?ISO-8859-1?Q?Sm=F8rebr=F8d?=", decode(Fields
-                .subject("Sm\370rebr\370d").getRaw()));
+                .subject("Sm\370rebr\370d")));
 
         String seventyEight = "12345678901234567890123456789012345678901234567890123456789012345678";
         assertEquals("Subject:\r\n " + seventyEight, decode(Fields.subject(
-                seventyEight).getRaw()));
+                seventyEight)));
 
         String seventyNine = seventyEight + "9";
         String expected = "Subject: =?US-ASCII?Q?1234567890123456789012345678901234?="
                 + "\r\n =?US-ASCII?Q?56789012345678901234567890123456789?=";
-        assertEquals(expected, decode(Fields.subject(seventyNine).getRaw()));
+        assertEquals(expected, decode(Fields.subject(seventyNine)));
     }
 
     public void testSender() throws Exception {
         MailboxField field = Fields.sender(AddressBuilder
                 .parseMailbox("JD <john.doe@acme.org>"));
-        assertEquals("Sender: JD <john.doe@acme.org>", decode(field.getRaw()));
+        assertEquals("Sender: JD <john.doe@acme.org>", decode(field));
     }
 
     public void testFrom() throws Exception {
@@ -243,15 +245,15 @@ public class FieldsTest extends TestCase {
         Mailbox mailbox2 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
 
         MailboxListField field = Fields.from(mailbox1);
-        assertEquals("From: JD <john.doe@acme.org>", decode(field.getRaw()));
+        assertEquals("From: JD <john.doe@acme.org>", decode(field));
 
         field = Fields.from(mailbox1, mailbox2);
         assertEquals("From: JD <john.doe@acme.org>, "
-                + "Mary Smith <mary@example.net>", decode(field.getRaw()));
+                + "Mary Smith <mary@example.net>", decode(field));
 
         field = Fields.from(Arrays.asList(mailbox1, mailbox2));
         assertEquals("From: JD <john.doe@acme.org>, "
-                + "Mary Smith <mary@example.net>", decode(field.getRaw()));
+                + "Mary Smith <mary@example.net>", decode(field));
     }
 
     public void testTo() throws Exception {
@@ -262,17 +264,17 @@ public class FieldsTest extends TestCase {
 
         AddressListField field = Fields.to(group);
         assertEquals("To: The Does: JD <john.doe@acme.org>, "
-                + "jane.doe@example.org;", decode(field.getRaw()));
+                + "jane.doe@example.org;", decode(field));
 
         field = Fields.to(group, mailbox3);
         assertEquals("To: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
-                decode(field.getRaw()));
+                decode(field));
 
         field = Fields.to(Arrays.asList(group, mailbox3));
         assertEquals("To: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
-                decode(field.getRaw()));
+                decode(field));
     }
 
     public void testCc() throws Exception {
@@ -283,17 +285,17 @@ public class FieldsTest extends TestCase {
 
         AddressListField field = Fields.cc(group);
         assertEquals("Cc: The Does: JD <john.doe@acme.org>, "
-                + "jane.doe@example.org;", decode(field.getRaw()));
+                + "jane.doe@example.org;", decode(field));
 
         field = Fields.cc(group, mailbox3);
         assertEquals("Cc: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
-                decode(field.getRaw()));
+                decode(field));
 
         field = Fields.cc(Arrays.asList(group, mailbox3));
         assertEquals("Cc: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
-                decode(field.getRaw()));
+                decode(field));
     }
 
     public void testBcc() throws Exception {
@@ -304,17 +306,17 @@ public class FieldsTest extends TestCase {
 
         AddressListField field = Fields.bcc(group);
         assertEquals("Bcc: The Does: JD <john.doe@acme.org>, "
-                + "jane.doe@example.org;", decode(field.getRaw()));
+                + "jane.doe@example.org;", decode(field));
 
         field = Fields.bcc(group, mailbox3);
         assertEquals("Bcc: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
-                decode(field.getRaw()));
+                decode(field));
 
         field = Fields.bcc(Arrays.asList(group, mailbox3));
         assertEquals("Bcc: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary Smith\r\n <mary@example.net>",
-                decode(field.getRaw()));
+                decode(field));
     }
 
     public void testReplyTo() throws Exception {
@@ -325,24 +327,24 @@ public class FieldsTest extends TestCase {
 
         AddressListField field = Fields.replyTo(group);
         assertEquals("Reply-To: The Does: JD <john.doe@acme.org>, "
-                + "jane.doe@example.org;", decode(field.getRaw()));
+                + "jane.doe@example.org;", decode(field));
 
         field = Fields.replyTo(group, mailbox3);
         assertEquals("Reply-To: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary\r\n Smith <mary@example.net>",
-                decode(field.getRaw()));
+                decode(field));
 
         field = Fields.replyTo(Arrays.asList(group, mailbox3));
         assertEquals("Reply-To: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary\r\n Smith <mary@example.net>",
-                decode(field.getRaw()));
+                decode(field));
     }
 
     public void testMailbox() throws Exception {
         MailboxField field = Fields.mailbox("Resent-Sender", AddressBuilder
                 .parseMailbox("JD <john.doe@acme.org>"));
         assertEquals("Resent-Sender: JD <john.doe@acme.org>", decode(field
-                .getRaw()));
+                ));
     }
 
     public void testMailboxList() throws Exception {
@@ -352,7 +354,7 @@ public class FieldsTest extends TestCase {
         MailboxListField field = Fields.mailboxList("Resent-From", Arrays
                 .asList(mailbox1, mailbox2));
         assertEquals("Resent-From: JD <john.doe@acme.org>, "
-                + "Mary Smith <mary@example.net>", decode(field.getRaw()));
+                + "Mary Smith <mary@example.net>", decode(field));
     }
 
     public void testAddressList() throws Exception {
@@ -365,7 +367,7 @@ public class FieldsTest extends TestCase {
                 group, mailbox3));
         assertEquals("Resent-To: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary\r\n Smith <mary@example.net>",
-                decode(field.getRaw()));
+                decode(field));
     }
 
     public void testInvalidFieldName() throws Exception {
@@ -376,8 +378,15 @@ public class FieldsTest extends TestCase {
         }
     }
 
-    private String decode(ByteSequence byteSequence) {
-        return ContentUtil.decode(byteSequence);
+    public static String decode(Field f) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        try {
+            f.writeTo(bos);
+        } catch (IOException e) {
+            throw new RuntimeException("bytearrayoutputstream doens't throw this exception");
+        }
+        ByteArrayBuffer bab = new ByteArrayBuffer(bos.toByteArray(), true);
+        return ContentUtil.decode(bab);
     }
 
 }

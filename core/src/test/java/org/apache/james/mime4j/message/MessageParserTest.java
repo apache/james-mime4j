@@ -19,14 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.message.impl.MessageImpl;
-import org.apache.james.mime4j.parser.MimeEntityConfig;
-import org.apache.james.mime4j.util.ContentUtil;
-import org.apache.james.mime4j.util.CharsetUtil;
-import org.apache.log4j.BasicConfigurator;
-
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +35,14 @@ import java.util.List;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.field.FieldsTest;
+import org.apache.james.mime4j.message.impl.MessageImpl;
+import org.apache.james.mime4j.parser.MimeEntityConfig;
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.log4j.BasicConfigurator;
 
 public class MessageParserTest extends TestCase {
     private File file = null;
@@ -154,7 +154,7 @@ public class MessageParserTest extends TestCase {
         sb.append("<header>\r\n");
         for (Field field : e.getHeader().getFields()) {
             sb.append("<field>\r\n"
-                    + escape(ContentUtil.decode(field.getRaw()))
+                    + escape(FieldsTest.decode(field))
                     + "</field>\r\n");
         }
         sb.append("</header>\r\n");

@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.field.impl;
 
 import org.apache.james.mime4j.codec.DecoderUtil;
-import org.apache.james.mime4j.field.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**

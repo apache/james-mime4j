@@ -26,7 +26,6 @@ import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
 import org.apache.james.mime4j.field.impl.DateTimeFieldImpl;
 import org.apache.james.mime4j.field.FieldName;
-import org.apache.james.mime4j.field.FieldParser;
 import org.apache.james.mime4j.field.impl.MailboxFieldImpl;
 import org.apache.james.mime4j.field.impl.MailboxListFieldImpl;
 import org.apache.james.mime4j.field.ParsedField;

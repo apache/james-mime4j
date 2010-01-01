@@ -29,7 +29,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.james.mime4j.field.FieldParser;
 import org.apache.james.mime4j.field.contentdisposition.parser.ContentDispositionParser;
 import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
 import org.apache.james.mime4j.field.contentdisposition.parser.TokenMgrError;

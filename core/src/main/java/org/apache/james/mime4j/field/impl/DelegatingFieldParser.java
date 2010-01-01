@@ -22,7 +22,6 @@ package org.apache.james.mime4j.field.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.james.mime4j.field.FieldParser;
 import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.field.impl.UnstructuredFieldImpl;
 import org.apache.james.mime4j.util.ByteSequence;

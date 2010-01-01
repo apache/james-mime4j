@@ -177,7 +177,7 @@ public class MessageWriter {
      */
     public void writeHeader(Header header, OutputStream out) throws IOException {
         for (Field field : header) {
-            writeBytes(field.getRaw(), out);
+            field.writeTo(out);
             out.write(CRLF);
         }
 

@@ -19,7 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
-import org.apache.james.mime4j.util.ByteSequence;
+import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Abstract MIME field.
@@ -41,10 +42,10 @@ public interface Field {
     String getBody();
 
     /**
-     * Gets the original raw field bytes.
-     * 
-     * @return the original raw field bytes.
+     * Writes the original raw field bytes to an output stream.
+     * The output is folded, the last CRLF is not included.
+     * @throws IOException
      */
-    ByteSequence getRaw();
+    void writeTo(OutputStream out) throws IOException;
     
 }
