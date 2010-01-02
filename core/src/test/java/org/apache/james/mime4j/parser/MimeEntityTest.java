@@ -33,6 +33,7 @@ import org.apache.james.mime4j.parser.EntityStateMachine;
 import org.apache.james.mime4j.parser.EntityStates;
 import org.apache.james.mime4j.parser.MimeEntity;
 import org.apache.james.mime4j.parser.RecursionMode;
+import org.apache.james.mime4j.parser.impl.DefaultBodyDescriptor;
 
 import junit.framework.TestCase;
 

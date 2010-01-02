@@ -319,7 +319,7 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
     }
 
 
-    protected MimeEntityConfig getConfig() {
+    public MimeEntityConfig getConfig() {
         return config;
     }
 }

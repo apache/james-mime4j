@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.parser.impl;
 
 import java.io.StringReader;
 import java.util.Collections;
@@ -31,6 +31,9 @@ import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
 import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
+import org.apache.james.mime4j.parser.BodyDescriptor;
+import org.apache.james.mime4j.parser.MutableBodyDescriptor;
+import org.apache.james.mime4j.parser.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**

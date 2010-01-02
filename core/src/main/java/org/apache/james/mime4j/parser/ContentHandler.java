@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.parser.impl.MimeStreamParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,7 +30,7 @@ import java.io.InputStream;
  * Receives notifications of the content of a plain RFC822 or MIME message.
  * Implement this interface and register an instance of that implementation
  * with a <code>MimeStreamParser</code> instance using its 
- * {@link org.apache.james.mime4j.parser.MimeStreamParser#setContentHandler(ContentHandler)}
+ * {@link org.apache.james.mime4j.parser.impl.MimeStreamParser#setContentHandler(ContentHandler)}
  * method. The parser uses the <code>ContentHandler</code> instance to report
  * basic message-related events like the start and end of the body of a
  * part in a multipart MIME entity.

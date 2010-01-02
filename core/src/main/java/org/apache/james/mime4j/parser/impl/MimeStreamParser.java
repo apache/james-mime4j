@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.parser.impl;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,6 +25,9 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.parser.BodyDescriptor;
+import org.apache.james.mime4j.parser.ContentHandler;
+import org.apache.james.mime4j.parser.MimeEntityConfig;
 
 /**
  * <p>

@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.parser.AbstractContentHandler;
-import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.parser.impl.MimeStreamParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.log4j.BasicConfigurator;

@@ -17,16 +17,17 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.parser.impl;
 
 import java.io.ByteArrayInputStream;
 
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.field.datetime.DateTime;
+import org.apache.james.mime4j.parser.BaseTestForBodyDescriptors;
 import org.apache.james.mime4j.parser.BodyDescriptor;
-import org.apache.james.mime4j.parser.MaximalBodyDescriptor;
-import org.apache.james.mime4j.parser.MimeTokenStream;
 import org.apache.james.mime4j.parser.MutableBodyDescriptor;
+import org.apache.james.mime4j.parser.impl.MaximalBodyDescriptor;
+import org.apache.james.mime4j.parser.impl.MimeTokenStream;
 
 public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
 

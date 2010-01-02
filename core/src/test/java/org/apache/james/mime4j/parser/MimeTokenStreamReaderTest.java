@@ -27,7 +27,7 @@ import java.io.Reader;
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.MimeTokenStream;
+import org.apache.james.mime4j.parser.impl.MimeTokenStream;
 
 import junit.framework.TestCase;
 

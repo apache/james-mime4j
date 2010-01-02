@@ -17,11 +17,12 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.parser.impl;
 
+import org.apache.james.mime4j.parser.BaseTestForBodyDescriptors;
 import org.apache.james.mime4j.parser.BodyDescriptor;
-import org.apache.james.mime4j.parser.DefaultBodyDescriptor;
 import org.apache.james.mime4j.parser.MutableBodyDescriptor;
+import org.apache.james.mime4j.parser.impl.DefaultBodyDescriptor;
 
 public class DefaultBodyDescriptorTest extends BaseTestForBodyDescriptors {
     @Override

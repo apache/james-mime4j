@@ -17,9 +17,15 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.parser.impl;
 
 import java.io.InputStream;
+
+import org.apache.james.mime4j.parser.BasicMimeTokenStream;
+import org.apache.james.mime4j.parser.BodyDescriptor;
+import org.apache.james.mime4j.parser.MimeEntityConfig;
+import org.apache.james.mime4j.parser.MutableBodyDescriptor;
+import org.apache.james.mime4j.parser.RawField;
 
 /**
  * <p>

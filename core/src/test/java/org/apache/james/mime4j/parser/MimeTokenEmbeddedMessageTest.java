@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.parser.MimeTokenStream;
+import org.apache.james.mime4j.parser.impl.MimeTokenStream;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

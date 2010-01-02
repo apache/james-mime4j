@@ -21,8 +21,8 @@ package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.parser.EntityStates;
-import org.apache.james.mime4j.parser.MimeTokenStream;
 import org.apache.james.mime4j.parser.RecursionMode;
+import org.apache.james.mime4j.parser.impl.MimeTokenStream;
 
 import java.io.ByteArrayInputStream;
 

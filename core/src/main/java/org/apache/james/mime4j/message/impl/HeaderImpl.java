@@ -28,8 +28,8 @@ import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
-import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.parser.RawField;
+import org.apache.james.mime4j.parser.impl.MimeStreamParser;
 
 /**
  * The header of an entity (see RFC 2045).

@@ -32,6 +32,7 @@ import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.parser.impl.MimeStreamParser;
 import org.apache.log4j.BasicConfigurator;
 
 /**
