@@ -45,7 +45,7 @@ public class DecoderUtil {
      * @param s the string to decode.
      * @return the decoded bytes.
      */
-    public static byte[] decodeQuotedPrintable(String s) {
+    private static byte[] decodeQuotedPrintable(String s) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
         try {
@@ -73,7 +73,7 @@ public class DecoderUtil {
      * @param s the string to decode.
      * @return the decoded bytes.
      */
-    public static byte[] decodeBase64(String s) {
+    private static byte[] decodeBase64(String s) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         
         try {
@@ -105,7 +105,7 @@ public class DecoderUtil {
      * @throws UnsupportedEncodingException if the given Java charset isn't 
      *         supported.
      */
-    public static String decodeB(String encodedText, String charset) 
+    static String decodeB(String encodedText, String charset) 
             throws UnsupportedEncodingException {
         byte[] decodedBytes = decodeBase64(encodedText);
         return new String(decodedBytes, charset);
@@ -121,7 +121,7 @@ public class DecoderUtil {
      * @throws UnsupportedEncodingException if the given Java charset isn't 
      *         supported.
      */
-    public static String decodeQ(String encodedText, String charset)
+    static String decodeQ(String encodedText, String charset)
             throws UnsupportedEncodingException {
         encodedText = replaceUnderscores(encodedText);
         
