@@ -48,19 +48,23 @@ public class MimeStreamParser {
     
     private final MimeTokenStream mimeTokenStream;
 
-    public MimeStreamParser(final MimeEntityConfig config) {
+    public MimeStreamParser(MimeTokenStream tokenStream) {
         super();
-        if (config != null) {
-            mimeEntityConfig = config.clone();
-        } else {
-            mimeEntityConfig = new MimeEntityConfig();
-        }
-        this.mimeTokenStream = new MimeTokenStream(mimeEntityConfig);
+        this.mimeTokenStream = tokenStream;
+        this.mimeEntityConfig = tokenStream.getConfig();
         this.contentDecoding = false;
+    }
+
+    public MimeStreamParser(final MimeEntityConfig config, boolean clone) {
+        this(new MimeTokenStream(clone ? config.clone() : config));
+    }
+
+    public MimeStreamParser(final MimeEntityConfig config) {
+        this(config != null ? config : new MimeEntityConfig(), config != null);
     }
     
     public MimeStreamParser() {
-        this(null);
+        this(new MimeEntityConfig(), false);
     }
     
     /**
