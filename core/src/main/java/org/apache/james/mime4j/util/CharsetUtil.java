@@ -20,15 +20,10 @@
 package org.apache.james.mime4j.util;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * Utility class for working with character sets. It is somewhat similar to
@@ -788,7 +783,6 @@ import org.apache.commons.logging.LogFactory;
  * </table>
  */
 public class CharsetUtil {
-    private static Log log = LogFactory.getLog(CharsetUtil.class);
     
     private static class Charset implements Comparable<Charset> {
         private String canonical = null;
@@ -1044,13 +1038,6 @@ public class CharsetUtil {
                 }
             }
         }
-        
-        if (log.isDebugEnabled()) {
-            log.debug("Character sets which support decoding: " 
-                        + decodingSupported);
-            log.debug("Character sets which support encoding: " 
-                        + encodingSupported);
-        }
     }
 
     /** carriage return - line feed sequence */
@@ -1213,25 +1200,6 @@ public class CharsetUtil {
         return null;
     }
 
-    public static java.nio.charset.Charset getCharset(String charsetName) {
-        String defaultCharset = "ISO-8859-1";
-        
-        // Use the default chareset if given charset is null
-        if(charsetName == null) charsetName = defaultCharset;
-            
-        try {
-            return java.nio.charset.Charset.forName(charsetName);
-        } catch (IllegalCharsetNameException e) {
-            log.info("Illegal charset " + charsetName + ", fallback to " + defaultCharset + ": " + e);
-            // Use default charset on exception 
-            return java.nio.charset.Charset.forName(defaultCharset);
-        } catch (UnsupportedCharsetException ex) {
-            log.info("Unsupported charset " + charsetName + ", fallback to " + defaultCharset + ": " + ex);
-            // Use default charset on exception
-            return java.nio.charset.Charset.forName(defaultCharset);
-        }
-        
-    }
     /*
      * Uncomment the code below and run the main method to regenerate the
      * Javadoc table above when the known charsets change. 
