@@ -25,6 +25,4 @@ public interface MailboxListField extends ParsedField {
 
     public abstract MailboxList getMailboxList();
 
-    public abstract ParseException getParseException();
-
 }

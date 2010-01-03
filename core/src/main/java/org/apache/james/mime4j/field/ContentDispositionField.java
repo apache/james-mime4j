@@ -21,12 +21,6 @@ public interface ContentDispositionField extends ParsedField {
     public static final String PARAM_SIZE = "size";
 
     /**
-     * Gets the exception that was raised during parsing of the field value, if
-     * any; otherwise, null.
-     */
-    public abstract ParseException getParseException();
-
-    /**
      * Gets the disposition type defined in this Content-Disposition field.
      * 
      * @return the disposition type or an empty string if not set.

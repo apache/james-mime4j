@@ -25,6 +25,4 @@ public interface AddressListField extends ParsedField {
 
     public abstract AddressList getAddressList();
 
-    public abstract ParseException getParseException();
-
 }

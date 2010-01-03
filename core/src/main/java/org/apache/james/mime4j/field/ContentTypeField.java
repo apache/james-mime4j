@@ -37,12 +37,6 @@ public interface ContentTypeField extends ParsedField {
     public static final String PARAM_CHARSET = "charset";
 
     /**
-     * Gets the exception that was raised during parsing of the field value, if
-     * any; otherwise, null.
-     */
-    public abstract ParseException getParseException();
-
-    /**
      * Gets the MIME type defined in this Content-Type field.
      * 
      * @return the MIME type or an empty string if not set.
