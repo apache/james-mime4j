@@ -88,6 +88,16 @@ public interface EntityStateMachine {
      *  obtained at the current stage of the parsing process. 
      */
     InputStream getContentStream() throws IllegalStateException;
+    
+    /**
+     * Returns the decoded content stream of the entity body.
+     * 
+     * @return input stream
+     * 
+     * @throws IllegalStateException if the content stream cannot be
+     *  obtained at the current stage of the parsing process. 
+     */
+    InputStream getDecodedContentStream() throws IllegalStateException;
  
     /**
      * Returns current header field.

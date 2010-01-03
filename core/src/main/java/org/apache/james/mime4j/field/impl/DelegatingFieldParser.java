@@ -22,6 +22,7 @@ package org.apache.james.mime4j.field.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.field.impl.UnstructuredFieldImpl;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -48,8 +49,8 @@ public class DelegatingFieldParser implements FieldParser<ParsedField> {
         return field;
     }
     
-    public ParsedField parse(final String name, final String body, final ByteSequence raw) {
+    public ParsedField parse(final String name, final String body, final ByteSequence raw, DecodeMonitor monitor) {
         final FieldParser<? extends ParsedField> parser = getParser(name);
-        return parser.parse(name, body, raw);
+        return parser.parse(name, body, raw, monitor);
     }
 }

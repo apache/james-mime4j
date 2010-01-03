@@ -19,11 +19,12 @@
 
 package org.apache.james.mime4j.field.impl;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.util.ByteSequence;
 
 public interface FieldParser<T extends ParsedField> {
     
-    T parse(final String name, final String body, final ByteSequence raw);
+    T parse(final String name, final String body, final ByteSequence raw, DecodeMonitor monitor);
     
 }

@@ -22,8 +22,7 @@ package org.apache.james.mime4j.field.impl;
 import java.io.StringReader;
 import java.util.Date;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import org.apache.james.mime4j.field.datetime.parser.TokenMgrError;
@@ -33,15 +32,13 @@ import org.apache.james.mime4j.util.ByteSequence;
  * Date-time field such as <code>Date</code> or <code>Resent-Date</code>.
  */
 public class DateTimeFieldImpl extends AbstractField implements org.apache.james.mime4j.field.DateTimeField {
-    private static Log log = LogFactory.getLog(DateTimeFieldImpl.class);
-
     private boolean parsed = false;
 
     private Date date;
     private ParseException parseException;
 
-    DateTimeFieldImpl(String name, String body, ByteSequence raw) {
-        super(name, body, raw);
+    DateTimeFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
+        super(name, body, raw, monitor);
     }
 
     /**
@@ -72,14 +69,8 @@ public class DateTimeFieldImpl extends AbstractField implements org.apache.james
             date = new DateTimeParser(new StringReader(body)).parseAll()
                     .getDate();
         } catch (ParseException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': " + e.getMessage());
-            }
             parseException = e;
         } catch (TokenMgrError e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': " + e.getMessage());
-            }
             parseException = new ParseException(e.getMessage());
         }
 
@@ -88,8 +79,8 @@ public class DateTimeFieldImpl extends AbstractField implements org.apache.james
 
     static final FieldParser<DateTimeFieldImpl> PARSER = new FieldParser<DateTimeFieldImpl>() {
         public DateTimeFieldImpl parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new DateTimeFieldImpl(name, body, raw);
+                final ByteSequence raw, DecodeMonitor monitor) {
+            return new DateTimeFieldImpl(name, body, raw, monitor);
         }
     };
 }

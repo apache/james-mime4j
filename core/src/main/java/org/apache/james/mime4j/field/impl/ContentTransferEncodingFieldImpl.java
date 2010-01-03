@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.impl;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -29,8 +30,8 @@ import org.apache.james.mime4j.util.MimeUtil;
 public class ContentTransferEncodingFieldImpl extends AbstractField implements ContentTransferEncodingField {
     private String encoding;
 
-    ContentTransferEncodingFieldImpl(String name, String body, ByteSequence raw) {
-        super(name, body, raw);
+    ContentTransferEncodingFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
+        super(name, body, raw, monitor);
         encoding = body.trim().toLowerCase();
     }
 
@@ -57,8 +58,8 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
 
     static final FieldParser<ContentTransferEncodingFieldImpl> PARSER = new FieldParser<ContentTransferEncodingFieldImpl>() {
         public ContentTransferEncodingFieldImpl parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new ContentTransferEncodingFieldImpl(name, body, raw);
+                final ByteSequence raw, DecodeMonitor monitor) {
+            return new ContentTransferEncodingFieldImpl(name, body, raw, monitor);
         }
     };
 }

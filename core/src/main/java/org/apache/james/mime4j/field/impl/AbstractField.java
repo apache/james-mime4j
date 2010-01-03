@@ -22,6 +22,7 @@ package org.apache.james.mime4j.field.impl;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.ParseException;
 import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -34,11 +35,13 @@ public abstract class AbstractField implements ParsedField {
     private final String name;
     private final String body;
     private final ByteSequence raw;
+    protected DecodeMonitor monitor;
     
-    protected AbstractField(final String name, final String body, final ByteSequence raw) {
+    protected AbstractField(final String name, final String body, final ByteSequence raw, DecodeMonitor monitor) {
         this.name = name;
         this.body = body;
         this.raw = raw;
+        this.monitor = monitor;
     }
     
     /**

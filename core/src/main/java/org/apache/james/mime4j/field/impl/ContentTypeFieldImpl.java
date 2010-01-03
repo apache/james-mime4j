@@ -25,8 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.contenttype.parser.ContentTypeParser;
 import org.apache.james.mime4j.field.contenttype.parser.ParseException;
@@ -37,16 +36,14 @@ import org.apache.james.mime4j.util.ByteSequence;
  * Represents a <code>Content-Type</code> field.
  */
 public class ContentTypeFieldImpl extends AbstractField implements ContentTypeField {
-    private static Log log = LogFactory.getLog(ContentTypeFieldImpl.class);
-
     private boolean parsed = false;
 
     private String mimeType = "";
     private Map<String, String> parameters = new HashMap<String, String>();
     private ParseException parseException;
 
-    ContentTypeFieldImpl(String name, String body, ByteSequence raw) {
-        super(name, body, raw);
+    ContentTypeFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
+        super(name, body, raw, monitor);
     }
 
     /**
@@ -175,14 +172,8 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
         try {
             parser.parseAll();
         } catch (ParseException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': " + e.getMessage());
-            }
             parseException = e;
         } catch (TokenMgrError e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': " + e.getMessage());
-            }
             parseException = new ParseException(e.getMessage());
         }
 
@@ -210,8 +201,8 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
 
     static final FieldParser<ContentTypeFieldImpl> PARSER = new FieldParser<ContentTypeFieldImpl>() {
         public ContentTypeFieldImpl parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new ContentTypeFieldImpl(name, body, raw);
+                final ByteSequence raw, DecodeMonitor monitor) {
+            return new ContentTypeFieldImpl(name, body, raw, monitor);
         }
     };
 }

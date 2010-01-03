@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.impl;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.codec.DecoderUtil;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -30,8 +31,8 @@ public class UnstructuredFieldImpl extends AbstractField implements org.apache.j
 
     private String value;
 
-    UnstructuredFieldImpl(String name, String body, ByteSequence raw) {
-        super(name, body, raw);
+    UnstructuredFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
+        super(name, body, raw, monitor);
     }
 
     /**
@@ -47,15 +48,15 @@ public class UnstructuredFieldImpl extends AbstractField implements org.apache.j
     private void parse() {
         String body = getBody();
 
-        value = DecoderUtil.decodeEncodedWords(body);
+        value = DecoderUtil.decodeEncodedWords(body, monitor);
 
         parsed = true;
     }
 
     static final FieldParser<UnstructuredFieldImpl> PARSER = new FieldParser<UnstructuredFieldImpl>() {
         public UnstructuredFieldImpl parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new UnstructuredFieldImpl(name, body, raw);
+                final ByteSequence raw, DecodeMonitor monitor) {
+            return new UnstructuredFieldImpl(name, body, raw, monitor);
         }
     };
 }

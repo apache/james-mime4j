@@ -61,7 +61,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      */
     public static ParsedField parse(final ByteSequence raw) throws MimeException {
     	RawField rawField = new RawField(raw);
-        return PARSER.parse(rawField.getName(), rawField.getBody(), raw);
+        return PARSER.parse(rawField.getName(), rawField.getBody(), raw, LoggingMonitor.MONITOR);
     }
 
 

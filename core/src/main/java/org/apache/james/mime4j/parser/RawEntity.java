@@ -87,5 +87,12 @@ public class RawEntity implements EntityStateMachine {
     public String getFieldValue() {
         return null;
     }
+
+    /**
+     * @see org.apache.james.mime4j.parser.EntityStateMachine#getDecodedContentStream()
+     */
+    public InputStream getDecodedContentStream() throws IllegalStateException {
+        throw new IllegalStateException("Raw entity does not support stream decoding");
+    }
     
 }

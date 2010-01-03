@@ -21,9 +21,8 @@ package org.apache.james.mime4j.parser;
 
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
@@ -36,8 +35,6 @@ import org.apache.james.mime4j.util.CharsetUtil;
  */
 public abstract class AbstractEntity implements EntityStateMachine {
 
-    protected final Log log;
-    
     protected final int startState;
     protected final int endState;
     protected final MimeEntityConfig config;
@@ -51,6 +48,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
     private RawField field;
     private boolean endOfHeader;
     private int headerCount;
+    protected final DecodeMonitor monitor;
 
     /**
      * Internal state, not exposed.
@@ -65,8 +63,8 @@ public abstract class AbstractEntity implements EntityStateMachine {
             MutableBodyDescriptor body,
             int startState, 
             int endState,
-            MimeEntityConfig config) {
-        this.log = LogFactory.getLog(getClass());        
+            MimeEntityConfig config,
+            DecodeMonitor monitor) {
         this.state = startState;
         this.startState = startState;
         this.endState = endState;
@@ -76,6 +74,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
         this.lineCount = 0;
         this.endOfHeader = false;
         this.headerCount = 0;
+        this.monitor = monitor;
     }
 
     public int getState() {
@@ -171,7 +170,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
             try {
             	field = new RawField(fieldbuf);
             	if (field.isObsoleteSyntax()) {
-            		warn(Event.OBSOLETE_HEADER);
+            		monitor(Event.OBSOLETE_HEADER);
             	}
                 body.addField(field);
                 return true;
@@ -236,10 +235,11 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * @throws IOException subclasses may elect to throw this exception
      */
     protected void monitor(Event event) throws MimeException, IOException {
-        if (config.isStrictParsing()) {
-            throw new MimeParseEventException(event);
-        } else {
-            warn(event);
+        if (monitor.isListening()) {
+            String message = message(event);
+            if (monitor.warn(message, "ignoring")) {
+                throw new MimeParseEventException(event);
+            }
         }
     }
     
@@ -263,28 +263,6 @@ public abstract class AbstractEntity implements EntityStateMachine {
             return message;
         else
             return "Line " + lineNumber + ": " + message;
-    }
-    
-    /**
-     * Logs (at warn) an indicative message based on the given event 
-     * and the current state of the system.
-     * @param event <code>Event</code>, not null
-     */
-    protected void warn(Event event) {
-        if (log.isWarnEnabled()) {
-            log.warn(message(event));
-        }
-    }
-    
-    /**
-     * Logs (at debug) an indicative message based on the given event
-     * and the current state of the system.
-     * @param event <code>Event</code>, not null
-     */
-    protected void debug(Event event) {
-        if (log.isDebugEnabled()) {
-            log.debug(message(event));
-        }
     }
 
     @Override

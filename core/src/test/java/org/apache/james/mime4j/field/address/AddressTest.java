@@ -424,7 +424,7 @@ public class AddressTest extends TestCase {
         try {
             AddressBuilder.parseGroup("john.doe@acme.org, jane.doe@acme.org");
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (ParseException expected) {
         }
     }
     
@@ -447,13 +447,13 @@ public class AddressTest extends TestCase {
         try {
             AddressBuilder.parseGroup("john.doe@acme.org");
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (ParseException expected) {
         }
 
         try {
             AddressBuilder.parseGroup("g1: john.doe@acme.org;, g2: mary@example.net;");
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (ParseException expected) {
         }
     }
 
@@ -475,13 +475,13 @@ public class AddressTest extends TestCase {
         try {
             AddressBuilder.parseMailbox("g: Mary Smith <mary@example.net>;");
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (ParseException expected) {
         }
 
         try {
             AddressBuilder.parseMailbox("Mary Smith <mary@example.net>, hans.mueller@acme.org");
             fail();
-        } catch (IllegalArgumentException expected) {
+        } catch (ParseException expected) {
         }
     }
     

@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.contentdisposition.parser.ContentDispositionParser;
 import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
 import org.apache.james.mime4j.field.contentdisposition.parser.TokenMgrError;
@@ -39,7 +38,6 @@ import org.apache.james.mime4j.util.ByteSequence;
  * Represents a <code>Content-Disposition</code> field.
  */
 public class ContentDispositionFieldImpl extends AbstractField implements org.apache.james.mime4j.field.ContentDispositionField {
-    private static Log log = LogFactory.getLog(ContentDispositionFieldImpl.class);
 
     private boolean parsed = false;
 
@@ -56,8 +54,8 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     private boolean readDateParsed;
     private Date readDate;
 
-    ContentDispositionFieldImpl(String name, String body, ByteSequence raw) {
-        super(name, body, raw);
+    ContentDispositionFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
+        super(name, body, raw, monitor);
     }
 
     /**
@@ -194,9 +192,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     private Date parseDate(String paramName) {
         String value = getParameter(paramName);
         if (value == null) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing " + paramName + " null");
-            }
+            monitor.warn("Parsing " + paramName + " null", "returning null");
             return null;
         }
 
@@ -204,16 +200,12 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
             return new DateTimeParser(new StringReader(value)).parseAll()
                     .getDate();
         } catch (org.apache.james.mime4j.field.datetime.parser.ParseException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing " + paramName + " '" + value + "': "
-                        + e.getMessage());
-            }
+            monitor.warn("Parsing " + paramName + " '" + value + "': "
+                    + e.getMessage(), "returning null");
             return null;
         } catch (org.apache.james.mime4j.field.datetime.parser.TokenMgrError e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing " + paramName + " '" + value + "': "
-                        + e.getMessage());
-            }
+            monitor.warn("Parsing " + paramName + " '" + value + "': "
+                    + e.getMessage(), "returning null");
             return null;
         }
     }
@@ -226,14 +218,8 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
         try {
             parser.parseAll();
         } catch (ParseException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': " + e.getMessage());
-            }
             parseException = e;
         } catch (TokenMgrError e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': " + e.getMessage());
-            }
             parseException = new ParseException(e.getMessage());
         }
 
@@ -260,8 +246,8 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
 
     static final FieldParser<ContentDispositionFieldImpl> PARSER = new FieldParser<ContentDispositionFieldImpl>() {
         public ContentDispositionFieldImpl parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new ContentDispositionFieldImpl(name, body, raw);
+                final ByteSequence raw, DecodeMonitor monitor) {
+            return new ContentDispositionFieldImpl(name, body, raw, monitor);
         }
     };
 }

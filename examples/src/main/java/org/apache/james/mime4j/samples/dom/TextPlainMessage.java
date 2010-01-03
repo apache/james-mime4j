@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
+import org.apache.james.mime4j.field.address.parser.ParseException;
 import org.apache.james.mime4j.message.TextBody;
 import org.apache.james.mime4j.message.impl.BodyFactory;
 import org.apache.james.mime4j.message.impl.MessageImpl;
@@ -32,7 +33,7 @@ import org.apache.james.mime4j.message.impl.MessageImpl;
  * Appendix A.1.1.
  */
 public class TextPlainMessage {
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, ParseException {
         // 1) start with an empty message
 
         MessageImpl message = new MessageImpl();

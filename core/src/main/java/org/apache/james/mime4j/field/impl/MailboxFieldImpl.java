@@ -19,8 +19,7 @@
 
 package org.apache.james.mime4j.field.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.MailboxList;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
@@ -31,15 +30,13 @@ import org.apache.james.mime4j.util.ByteSequence;
  * Mailbox field such as <code>Sender</code> or <code>Resent-Sender</code>.
  */
 public class MailboxFieldImpl extends AbstractField implements org.apache.james.mime4j.field.MailboxField {
-    private static Log log = LogFactory.getLog(MailboxFieldImpl.class);
-
     private boolean parsed = false;
 
     private Mailbox mailbox;
     private ParseException parseException;
 
-    MailboxFieldImpl(final String name, final String body, final ByteSequence raw) {
-        super(name, body, raw);
+    MailboxFieldImpl(final String name, final String body, final ByteSequence raw, DecodeMonitor monitor) {
+        super(name, body, raw, monitor);
     }
 
     /**
@@ -67,14 +64,11 @@ public class MailboxFieldImpl extends AbstractField implements org.apache.james.
         String body = getBody();
 
         try {
-            MailboxList mailboxList = AddressBuilder.parseAddressList(body).flatten();
+            MailboxList mailboxList = AddressBuilder.parseAddressList(body, monitor).flatten();
             if (mailboxList.size() > 0) {
                 mailbox = mailboxList.get(0);
             }
         } catch (ParseException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': " + e.getMessage());
-            }
             parseException = e;
         }
 
@@ -83,8 +77,8 @@ public class MailboxFieldImpl extends AbstractField implements org.apache.james.
 
     static final FieldParser<MailboxFieldImpl> PARSER = new FieldParser<MailboxFieldImpl>() {
         public MailboxFieldImpl parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new MailboxFieldImpl(name, body, raw);
+                final ByteSequence raw, DecodeMonitor monitor) {
+            return new MailboxFieldImpl(name, body, raw, monitor);
         }
     };
 }

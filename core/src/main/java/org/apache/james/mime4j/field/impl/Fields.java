@@ -614,7 +614,7 @@ public class Fields {
     private static <F extends ParsedField> F parse(FieldParser<F> parser,
             String fieldName, String fieldBody) {
     	RawField rawField = new RawField(fieldName, fieldBody);
-        return parser.parse(rawField.getName(), rawField.getBody(), rawField.getRaw());
+        return parser.parse(rawField.getName(), rawField.getBody(), rawField.getRaw(), LoggingMonitor.MONITOR);
     }
 
     private static String encodeAddresses(Iterable<? extends Address> addresses) {

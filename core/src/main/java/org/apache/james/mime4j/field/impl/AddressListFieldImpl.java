@@ -19,8 +19,7 @@
 
 package org.apache.james.mime4j.field.impl;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.address.AddressList;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.ParseException;
@@ -30,15 +29,14 @@ import org.apache.james.mime4j.util.ByteSequence;
  * Address list field such as <code>To</code> or <code>Reply-To</code>.
  */
 public class AddressListFieldImpl extends AbstractField implements org.apache.james.mime4j.field.AddressListField {
-    private static Log log = LogFactory.getLog(AddressListFieldImpl.class);
 
     private boolean parsed = false;
 
     private AddressList addressList;
     private ParseException parseException;
 
-    AddressListFieldImpl(String name, String body, ByteSequence raw) {
-        super(name, body, raw);
+    AddressListFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
+        super(name, body, raw, monitor);
     }
 
     /**
@@ -66,11 +64,8 @@ public class AddressListFieldImpl extends AbstractField implements org.apache.ja
         String body = getBody();
 
         try {
-            addressList = AddressBuilder.parseAddressList(body);
+            addressList = AddressBuilder.parseAddressList(body, monitor);
         } catch (ParseException e) {
-            if (log.isDebugEnabled()) {
-                log.debug("Parsing value '" + body + "': " + e.getMessage());
-            }
             parseException = e;
         }
 
@@ -79,8 +74,8 @@ public class AddressListFieldImpl extends AbstractField implements org.apache.ja
 
     static final FieldParser<AddressListFieldImpl> PARSER = new FieldParser<AddressListFieldImpl>() {
         public AddressListFieldImpl parse(final String name, final String body,
-                final ByteSequence raw) {
-            return new AddressListFieldImpl(name, body, raw);
+                final ByteSequence raw, DecodeMonitor monitor) {
+            return new AddressListFieldImpl(name, body, raw, monitor);
         }
     };
 }

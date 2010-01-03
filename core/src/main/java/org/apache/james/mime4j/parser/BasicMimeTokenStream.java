@@ -29,12 +29,10 @@ import java.nio.charset.UnsupportedCharsetException;
 import java.util.LinkedList;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.codec.Base64InputStream;
-import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineNumberInputStream;
 import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.util.CharsetUtil;
-import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * <p>
@@ -101,6 +99,11 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
 
     public void doParse(InputStream stream,
             MutableBodyDescriptor newBodyDescriptor, int start) {
+        doParse(stream, newBodyDescriptor, start, config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
+    }
+    
+    public void doParse(InputStream stream,
+            MutableBodyDescriptor newBodyDescriptor, int start, DecodeMonitor monitor) {
         LineNumberSource lineSource = null;
         if (config.isCountLineNumbers()) {
             LineNumberInputStream lineInput = new LineNumberInputStream(stream);
@@ -114,7 +117,8 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
                 newBodyDescriptor, 
                 start, 
                 T_END_MESSAGE,
-                config);
+                config,
+                monitor);
 
 		rootentity.setRecursionMode(recursionMode);
         currentStateMachine = rootentity;
@@ -212,15 +216,7 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
      *   invalid value.
      */
     public InputStream getDecodedInputStream() {
-        BodyDescriptor bodyDescriptor = getBodyDescriptor();
-        String transferEncoding = bodyDescriptor.getTransferEncoding();
-        InputStream dataStream = currentStateMachine.getContentStream();
-        if (MimeUtil.isBase64Encoding(transferEncoding)) {
-            dataStream = new Base64InputStream(dataStream);
-        } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
-            dataStream = new QuotedPrintableInputStream(dataStream);
-        }
-        return dataStream;
+        return currentStateMachine.getDecodedContentStream();
     }
 
     /**

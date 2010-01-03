@@ -24,6 +24,7 @@ import java.io.InputStream;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.LimitedInputStream;
@@ -50,8 +51,9 @@ public class MimeEntity extends AbstractEntity {
             MutableBodyDescriptor body, 
             int startState, 
             int endState,
-            MimeEntityConfig config) {
-        super(body, startState, endState, config);
+            MimeEntityConfig config, 
+            DecodeMonitor monitor) {
+        super(body, startState, endState, config, monitor);
         this.lineSource = lineSource;
         this.inbuffer = new BufferedLineReaderInputStream(
                 instream,
@@ -65,9 +67,19 @@ public class MimeEntity extends AbstractEntity {
     public MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
+            MutableBodyDescriptor body, 
+            int startState, 
+            int endState,
+            MimeEntityConfig config) {
+        this(lineSource, instream, body, startState, endState, config, config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
+    }
+
+    public MimeEntity(
+            LineNumberSource lineSource,
+            InputStream instream,
             MutableBodyDescriptor body) {
         this(lineSource, instream, body, EntityStates.T_START_MESSAGE, EntityStates.T_END_MESSAGE, 
-                new MimeEntityConfig());
+                new MimeEntityConfig(), DecodeMonitor.SILENT);
     }
 
     public int getRecursionMode() {
@@ -203,19 +215,21 @@ public class MimeEntity extends AbstractEntity {
     }
     
     private EntityStateMachine nextMessage() {
-        String transferEncoding = body.getTransferEncoding();
         // optimize nesting of streams returning the "lower" stream instead of
         // always return dataStream (that would add a LineReaderInputStreamAdaptor in the chain)
         InputStream instream = currentMimePartStream != null ? currentMimePartStream : inbuffer;
+        instream = decodedStream(instream);
+        return nextMimeEntity(EntityStates.T_START_MESSAGE, EntityStates.T_END_MESSAGE, instream);
+    }
+
+    private InputStream decodedStream(InputStream instream) {
+        String transferEncoding = body.getTransferEncoding();
         if (MimeUtil.isBase64Encoding(transferEncoding)) {
-            log.debug("base64 encoded message/rfc822 detected");
             instream = new Base64InputStream(instream);                    
         } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
-            log.debug("quoted-printable encoded message/rfc822 detected");
             instream = new QuotedPrintableInputStream(instream);
         }
-
-        return nextMimeEntity(EntityStates.T_START_MESSAGE, EntityStates.T_END_MESSAGE, instream);
+        return instream;
     }
     
     private EntityStateMachine nextMimeEntity() {
@@ -233,7 +247,8 @@ public class MimeEntity extends AbstractEntity {
                     body.newChild(), 
                     startState, 
                     endState,
-                    config);
+                    config,
+                    monitor);
             mimeentity.setRecursionMode(recursionMode);
             return mimeentity;
         }
@@ -248,6 +263,9 @@ public class MimeEntity extends AbstractEntity {
         }
     }
     
+    /**
+     * @see org.apache.james.mime4j.parser.EntityStateMachine#getContentStream()
+     */
     public InputStream getContentStream() {
         switch (state) {
         case EntityStates.T_START_MULTIPART:
@@ -258,6 +276,13 @@ public class MimeEntity extends AbstractEntity {
         default:
             throw new IllegalStateException("Invalid state: " + stateToString(state));
         }
+    }
+
+    /**
+     * @see org.apache.james.mime4j.parser.EntityStateMachine#getDecodedContentStream()
+     */
+    public InputStream getDecodedContentStream() throws IllegalStateException {
+        return decodedStream(getContentStream());
     }
 
 }
