@@ -21,6 +21,7 @@ package org.apache.james.mime4j.parser.impl;
 
 import java.io.InputStream;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.parser.BasicMimeTokenStream;
 import org.apache.james.mime4j.parser.BodyDescriptor;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
@@ -99,10 +100,14 @@ public class MimeTokenStream extends BasicMimeTokenStream {
         this(new MimeEntityConfig());
     }
     
-    protected MimeTokenStream(final MimeEntityConfig config) {
-        super(config);
+    public MimeTokenStream(final MimeEntityConfig config) {
+        this(config, null);
     }
     
+    public MimeTokenStream(final MimeEntityConfig config, DecodeMonitor monitor) {
+        super(config, monitor);
+    }
+
     /** Instructs the {@code MimeTokenStream} to parse the given streams contents.
      * If the {@code MimeTokenStream} has already been in use, resets the streams
      * internal state.

@@ -81,6 +81,7 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
     private EntityStateMachine currentStateMachine;
     private int recursionMode = M_RECURSE;
 	private MimeEntity rootentity;
+    private final DecodeMonitor monitor;
     
     /**
      * Constructs a standard (lax) stream.
@@ -91,19 +92,19 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
     public BasicMimeTokenStream() {
         this(new MimeEntityConfig());
     }
-    
+
     public BasicMimeTokenStream(final MimeEntityConfig config) {
+        this(config, null);
+    }
+        
+    public BasicMimeTokenStream(final MimeEntityConfig config, DecodeMonitor monitor) {
         super();
         this.config = config;
+        this.monitor = monitor != null ? monitor : (config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
     }
 
     public void doParse(InputStream stream,
             MutableBodyDescriptor newBodyDescriptor, int start) {
-        doParse(stream, newBodyDescriptor, start, config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
-    }
-    
-    public void doParse(InputStream stream,
-            MutableBodyDescriptor newBodyDescriptor, int start, DecodeMonitor monitor) {
         LineNumberSource lineSource = null;
         if (config.isCountLineNumbers()) {
             LineNumberInputStream lineInput = new LineNumberInputStream(stream);

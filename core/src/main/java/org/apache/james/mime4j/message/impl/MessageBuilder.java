@@ -24,8 +24,10 @@ import java.io.InputStream;
 import java.util.Stack;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.impl.DefaultFieldParser;
+import org.apache.james.mime4j.field.impl.LoggingMonitor;
 import org.apache.james.mime4j.message.Body;
 import org.apache.james.mime4j.message.Entity;
 import org.apache.james.mime4j.message.Header;
@@ -48,15 +50,20 @@ public class MessageBuilder implements ContentHandler {
     private final Entity entity;
     private final BodyFactory bodyFactory;
     private Stack<Object> stack = new Stack<Object>();
+    private final DecodeMonitor monitor;
     
     public MessageBuilder(Entity entity) {
-        this.entity = entity;
-        this.bodyFactory = new BodyFactory();
+        this(entity, null);
     }
     
     public MessageBuilder(Entity entity, StorageProvider storageProvider) {
+        this(entity, storageProvider, LoggingMonitor.MONITOR);
+    }
+    
+    public MessageBuilder(Entity entity, StorageProvider storageProvider, DecodeMonitor monitor) {
         this.entity = entity;
         this.bodyFactory = new BodyFactory(storageProvider);
+        this.monitor = monitor != null ? monitor : LoggingMonitor.MONITOR;
     }
     
     private void expect(Class<?> c) {
@@ -101,7 +108,7 @@ public class MessageBuilder implements ContentHandler {
      */
     public void field(RawField field) throws MimeException {
         expect(Header.class);
-        Field parsedField = DefaultFieldParser.parse(field.getRaw()); 
+        Field parsedField = DefaultFieldParser.parse(field.getRaw(), monitor); 
         ((Header) stack.peek()).addField(parsedField);
     }
     

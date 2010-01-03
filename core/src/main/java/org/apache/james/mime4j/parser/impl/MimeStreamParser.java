@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.SequenceInputStream;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.parser.BodyDescriptor;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.parser.MimeEntityConfig;
@@ -58,14 +59,22 @@ public class MimeStreamParser {
         this.contentDecoding = false;
     }
 
+    public MimeStreamParser(final MimeEntityConfig config, DecodeMonitor monitor, boolean clone) {
+        this(new MimeTokenStream(clone ? config.clone() : config, monitor));
+    }
+
     public MimeStreamParser(final MimeEntityConfig config, boolean clone) {
-        this(new MimeTokenStream(clone ? config.clone() : config));
+        this(new MimeTokenStream(clone ? config.clone() : config, null));
+    }
+
+    public MimeStreamParser(final MimeEntityConfig config, DecodeMonitor monitor) {
+        this(config != null ? config : new MimeEntityConfig(), monitor, config != null);
     }
 
     public MimeStreamParser(final MimeEntityConfig config) {
-        this(config != null ? config : new MimeEntityConfig(), config != null);
+        this(config, null);
     }
-    
+
     public MimeStreamParser() {
         this(new MimeEntityConfig(), false);
     }

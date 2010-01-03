@@ -29,6 +29,7 @@ import java.util.TimeZone;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.AddressListField;
 import org.apache.james.mime4j.field.ContentDispositionField;
 import org.apache.james.mime4j.field.ContentTransferEncodingField;
@@ -43,6 +44,7 @@ import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
 import org.apache.james.mime4j.field.impl.Fields;
+import org.apache.james.mime4j.field.impl.LoggingMonitor;
 import org.apache.james.mime4j.message.Body;
 import org.apache.james.mime4j.message.Header;
 import org.apache.james.mime4j.message.Message;
@@ -63,6 +65,8 @@ import org.apache.james.mime4j.util.MimeUtil;
  * </pre>
  */
 public class MessageImpl extends Message {
+
+    private DecodeMonitor monitor;
 
     /**
      * Creates a new empty <code>Message</code>.
@@ -147,16 +151,22 @@ public class MessageImpl extends Message {
      *             on MIME protocol violations.
      */
     public MessageImpl(InputStream is, MimeEntityConfig config,
-            StorageProvider storageProvider) throws IOException,
+            StorageProvider storageProvider, DecodeMonitor monitor) throws IOException,
             MimeIOException {
         try {
-            MimeStreamParser parser = new MimeStreamParser(config);
+            MimeStreamParser parser = new MimeStreamParser(config, monitor);
             parser.setContentDecoding(true);
-            parser.setContentHandler(new MessageBuilder(this, storageProvider));
+            this.monitor = monitor != null ? monitor : LoggingMonitor.MONITOR;
+            parser.setContentHandler(new MessageBuilder(this, storageProvider, this.monitor));
             parser.parse(is);
         } catch (MimeException e) {
             throw new MimeIOException(e);
         }
+    }
+
+    public MessageImpl(InputStream is, MimeEntityConfig config,
+            StorageProvider storageProvider) throws IOException, MimeIOException {
+        this(is, config, storageProvider, LoggingMonitor.MONITOR);
     }
 
     /**

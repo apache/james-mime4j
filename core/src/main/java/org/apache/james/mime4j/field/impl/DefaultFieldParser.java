@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.field.impl;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.field.impl.AddressListFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentDispositionFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
@@ -56,14 +57,18 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      * their corresponding classes.
      * 
      * @param raw the bytes to parse.
+     * @param monitor a DecodeMonitor object used while parsing/decoding.
      * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
      */
-    public static ParsedField parse(final ByteSequence raw) throws MimeException {
+    public static ParsedField parse(final ByteSequence raw, DecodeMonitor monitor) throws MimeException {
     	RawField rawField = new RawField(raw);
-        return PARSER.parse(rawField.getName(), rawField.getBody(), raw, LoggingMonitor.MONITOR);
+        return PARSER.parse(rawField.getName(), rawField.getBody(), raw, monitor);
     }
 
+    public static ParsedField parse(final ByteSequence raw) throws MimeException {
+        return parse(raw, LoggingMonitor.MONITOR);
+    }
 
     /**
      * Parses the given string and returns an instance of the 
