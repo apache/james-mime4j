@@ -35,12 +35,12 @@ public class DecoderUtilTest extends TestCase {
 
     public void testDecodeB() throws UnsupportedEncodingException {
         String s = DecoderUtil.decodeB("VGhpcyBpcyB0aGUgcGxhaW4gd"
-                    + "GV4dCBtZXNzYWdlIQ==", "ISO8859-1");
+                    + "GV4dCBtZXNzYWdlIQ==", "ISO8859-1", DecodeMonitor.STRICT);
         assertEquals("This is the plain text message!", s);
     }
 
     public void testDecodeQ() throws UnsupportedEncodingException {
-        String s = DecoderUtil.decodeQ("=e1_=e2=09=E3_=E4_", "ISO8859-1");
+        String s = DecoderUtil.decodeQ("=e1_=e2=09=E3_=E4_", "ISO8859-1", DecodeMonitor.STRICT);
         assertEquals("\u00e1 \u00e2\t\u00e3 \u00e4 ", s);
     }
 

@@ -22,16 +22,12 @@ package org.apache.james.mime4j.codec;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 /**
  * Performs Base-64 decoding on an underlying stream.
  */
 public class Base64InputStream extends InputStream {
-    private static Log log = LogFactory.getLog(Base64InputStream.class);
-
     private static final int ENCODED_BUFFER_SIZE = 1536;
 
     private static final int[] BASE64_DECODE = new int[256];
@@ -50,7 +46,6 @@ public class Base64InputStream extends InputStream {
     private final byte[] singleByte = new byte[1];
 
     private final InputStream in;
-    private final boolean strict;
     private final byte[] encoded;
     private final ByteArrayBuffer decodedBuf;
 
@@ -60,21 +55,27 @@ public class Base64InputStream extends InputStream {
     private boolean closed = false;
     private boolean eof; // end of file or pad character reached
 
-    protected Base64InputStream(int bufsize, InputStream in, boolean strict) {
+    private final DecodeMonitor monitor;
+
+    public Base64InputStream(InputStream in, DecodeMonitor monitor) {
+        this(ENCODED_BUFFER_SIZE, in, monitor);
+    }
+
+    protected Base64InputStream(int bufsize, InputStream in, DecodeMonitor monitor) {
         if (in == null)
             throw new IllegalArgumentException();
         this.encoded = new byte[bufsize];
         this.decodedBuf = new ByteArrayBuffer(512);
         this.in = in;
-        this.strict = strict;
+        this.monitor = monitor;
     }
 
     public Base64InputStream(InputStream in) {
-        this(ENCODED_BUFFER_SIZE, in, false);
+        this(in, false);
     }
 
     public Base64InputStream(InputStream in, boolean strict) {
-        this(ENCODED_BUFFER_SIZE, in, strict);
+        this(ENCODED_BUFFER_SIZE, in, strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
     }
 
     @Override
@@ -187,8 +188,13 @@ public class Base64InputStream extends InputStream {
                 }
 
                 int decoded = BASE64_DECODE[value];
-                if (decoded < 0) // -1: not a base64 char
+                if (decoded < 0) { // -1: not a base64 char
+                    if (value != 0x0D && value != 0x0A && value != 0x20) {
+                        if (monitor.warn("Unexpected base64 byte: "+(byte) value, "ignoring."))
+                            throw new IOException("Unexpected base64 byte");
+                    }
                     continue;
+                }
 
                 data = (data << 6) | decoded;
                 sextets++;
@@ -269,18 +275,12 @@ public class Base64InputStream extends InputStream {
     }
 
     private void handleUnexpectedEof(int sextets) throws IOException {
-        if (strict)
+        if (monitor.warn("Unexpected end of BASE64 stream", "dropping " + sextets + " sextet(s)"))
             throw new IOException("Unexpected end of BASE64 stream");
-        else
-            log.warn("Unexpected end of BASE64 stream; dropping " + sextets
-                    + " sextet(s)");
     }
 
     private void handleUnexpecedPad(int sextets) throws IOException {
-        if (strict)
+        if (monitor.warn("Unexpected padding character", "dropping " + sextets + " sextet(s)"))
             throw new IOException("Unexpected padding character");
-        else
-            log.warn("Unexpected padding character; dropping " + sextets
-                    + " sextet(s)");
     }
 }

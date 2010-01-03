@@ -22,8 +22,6 @@ package org.apache.james.mime4j.codec;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 /**
@@ -37,12 +35,9 @@ public class QuotedPrintableInputStream extends InputStream {
     private static final byte CR = 0x0D;
     private static final byte LF = 0x0A;
     
-    private static Log log = LogFactory.getLog(QuotedPrintableInputStream.class);
-    
     private final byte[] singleByte = new byte[1];
     
     private final InputStream in;
-    private boolean strict;
     private final ByteArrayBuffer decodedBuf; 
     private final ByteArrayBuffer blanks; 
     
@@ -52,22 +47,32 @@ public class QuotedPrintableInputStream extends InputStream {
     
     private boolean closed;
 
-    protected QuotedPrintableInputStream(final int bufsize, final InputStream in, boolean strict) {
+    private final DecodeMonitor monitor;
+
+    public QuotedPrintableInputStream(final InputStream in, DecodeMonitor monitor) {
+        this(DEFAULT_BUFFER_SIZE, in, monitor);
+    }
+
+    protected QuotedPrintableInputStream(final int bufsize, final InputStream in, DecodeMonitor monitor) {
         super();
         this.in = in;
-        this.strict = strict;
         this.encoded = new byte[bufsize];
         this.decodedBuf = new ByteArrayBuffer(512);
         this.blanks = new ByteArrayBuffer(512);
         this.closed = false;
+        this.monitor = monitor;
     }
-    
+
+    protected QuotedPrintableInputStream(final int bufsize, final InputStream in, boolean strict) {
+        this(bufsize, in, strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
+    }
+
     public QuotedPrintableInputStream(final InputStream in, boolean strict) {
         this(DEFAULT_BUFFER_SIZE, in, strict);
     }
     
     public QuotedPrintableInputStream(final InputStream in) {
-        this(DEFAULT_BUFFER_SIZE, in, false);
+        this(in, false);
     }
     
     /**
@@ -123,7 +128,7 @@ public class QuotedPrintableInputStream extends InputStream {
     }
     
     private int transfer(
-            final int b, final byte[] buffer, final int from, final int to, boolean keepblanks) {
+            final int b, final byte[] buffer, final int from, final int to, boolean keepblanks) throws IOException {
         int index = from;
         if (keepblanks && blanks.length() > 0) {
             int chunk = Math.min(blanks.length(), to - index);
@@ -134,6 +139,11 @@ public class QuotedPrintableInputStream extends InputStream {
                 decodedBuf.append(blanks.buffer(), chunk, remaining);
             }
             blanks.clear();
+        } else if (blanks.length() > 0 && !keepblanks) {
+            StringBuilder sb = new StringBuilder(blanks.length() * 3);
+            for (int i = 0; i < blanks.length(); i++) sb.append(" "+blanks.byteAt(i));
+            if (monitor.warn("ignored blanks", sb.toString()))
+                throw new IOException("ignored blanks");
         }
         if (b != -1) {
             if (index < to) {
@@ -171,12 +181,30 @@ public class QuotedPrintableInputStream extends InputStream {
                 return index == from ? -1 : index - from;
             }
 
+            boolean lastWasCR = false;
             while (pos < limit && index < to) {
                 int b = encoded[pos++] & 0xFF;
 
+                if (lastWasCR && b != LF) {
+                    if (monitor.warn("Found CR without LF", "Leaving it as is"))
+                        throw new IOException("Found CR without LF");
+                    index = transfer(CR, buffer, index, to, false);
+                } else if (!lastWasCR && b == LF) {
+                    if (monitor.warn("Found LF without CR", "Translating to CRLF"))
+                        throw new IOException("Found LF without CR");
+                }
+                
+                if (b == CR) {
+                    lastWasCR = true;
+                    continue;
+                } else {
+                    lastWasCR = false;
+                }
+                
                 if (b == LF) {
                     // at end of line
                     if (blanks.length() == 0) {
+                        index = transfer(CR, buffer, index, to, false);
                         index = transfer(LF, buffer, index, to, false);
                     } else {
                         if (blanks.byteAt(0) != EQ) {
@@ -201,7 +229,10 @@ public class QuotedPrintableInputStream extends InputStream {
                         int bb1 = peek(0);
                         int bb2 = peek(1);
                         if (bb1 == LF || (bb1 == CR && bb2 == LF)) {
+                            monitor.warn("Unexpected ==EOL encountered", "== 0x"+bb1+" 0x"+bb2);
                             blanks.append(b2);
+                        } else {
+                            monitor.warn("Unexpected == encountered", "==");
                         }
                     } else if (Character.isWhitespace((char) b2)) {
                         // soft line break
@@ -215,14 +246,11 @@ public class QuotedPrintableInputStream extends InputStream {
                         int upper = convert(b2);
                         int lower = convert(b3);
                         if (upper < 0 || lower < 0) {
-                            if (strict) {
-                                throw new IOException("Malformed encoded value encountered");
-                            } else {
-                                log.warn("Malformed encoded value encountered");
-                                index = transfer(EQ, buffer, index, to, true);
-                                index = transfer(b2, buffer, index, to, false);
-                                index = transfer(b3, buffer, index, to, false);
-                            }
+                            monitor.warn("Malformed encoded value encountered", "leaving "+((char) EQ)+((char) b2)+((char) b3)+" as is");
+                            // TODO see MIME4J-160
+                            index = transfer(EQ, buffer, index, to, true);
+                            index = transfer(b2, buffer, index, to, false);
+                            index = transfer(b3, buffer, index, to, false);
                         } else {
                             index = transfer((upper << 4) | lower, buffer, index, to, true);
                         }

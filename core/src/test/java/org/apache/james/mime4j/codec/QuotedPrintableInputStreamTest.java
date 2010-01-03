@@ -68,6 +68,13 @@ public class QuotedPrintableInputStreamTest extends TestCase {
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
         assertEquals("Soft line   Hard line\r\n", new String(read(decoder), "ISO8859-1"));
     }
+
+    public void testInvalidCR() throws IOException, UnsupportedEncodingException {
+        ByteArrayInputStream bis = new ByteArrayInputStream("Invalid=\rCR\rHard line   \r\n".getBytes("US-ASCII"));
+        QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
+        // TODO is this what we really expect from decoding a stream including CR with no LF?
+        assertEquals("Invalid=\rCR\rHard line\r\n", new String(read(decoder), "ISO8859-1"));
+    }
     
     public void testSoftBreakLoneLFDecode() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = new ByteArrayInputStream("Soft line   =\nHard line   \r\n".getBytes("US-ASCII"));
@@ -91,6 +98,7 @@ public class QuotedPrintableInputStreamTest extends TestCase {
         ByteArrayInputStream bis = new ByteArrayInputStream("width==340 height=3d200\r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
         assertEquals("width=340 height=200\r\n", new String(read(decoder), "ISO8859-1"));
+        // TODO this could be even decoded as width=40 height=200.
     }
 
     public void testBrokenEscapedEQDecode() throws IOException, UnsupportedEncodingException {
@@ -102,6 +110,13 @@ public class QuotedPrintableInputStreamTest extends TestCase {
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
         assertEquals("width=340 height=200\r\n", new String(read(decoder), "ISO8859-1"));
     }
+
+    public void testSpacesBeforeEOL() throws IOException, UnsupportedEncodingException {
+        ByteArrayInputStream bis = new ByteArrayInputStream("some \r\n spaced\t\r\ncontent \t \r\n".getBytes("US-ASCII"));
+        QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
+        assertEquals("some\r\n spaced\r\ncontent\r\n", new String(read(decoder), "ISO8859-1"));
+    }
+
 
     public void testDecodeEndOfStream1() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = new ByteArrayInputStream("01234567".getBytes("US-ASCII"));
@@ -118,7 +133,7 @@ public class QuotedPrintableInputStreamTest extends TestCase {
     public void testDecodeEndOfStream3() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = new ByteArrayInputStream("012345\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(6, bis, false);
-        assertEquals("012345\n", new String(read(decoder), "ISO8859-1"));
+        assertEquals("012345\r\n", new String(read(decoder), "ISO8859-1"));
     }
 
     public void testDecodeEndOfStream4() throws IOException, UnsupportedEncodingException {
@@ -131,6 +146,12 @@ public class QuotedPrintableInputStreamTest extends TestCase {
         ByteArrayInputStream bis = new ByteArrayInputStream("01234=\r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(6, bis, false);
         assertEquals("01234", new String(read(decoder), "ISO8859-1"));
+    }
+
+    public void testDecodeEndOfStream6() throws IOException, UnsupportedEncodingException {
+        ByteArrayInputStream bis = new ByteArrayInputStream("01234\r\n".getBytes("US-ASCII"));
+        QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(6, bis, false);
+        assertEquals("01234\r\n", new String(read(decoder), "ISO8859-1"));
     }
 
     public void testDecodePrematureClose() throws IOException, UnsupportedEncodingException {
