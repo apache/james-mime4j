@@ -175,7 +175,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
 
     private void parseContentDisposition(final String value) {
         isContentDispositionSet = true;
-        contentDispositionParameters = MimeUtil.getHeaderParams(value);
+        contentDispositionParameters = DefaultBodyDescriptor.getHeaderParams(value);
         contentDispositionType = contentDispositionParameters.get("");
         
         final String contentDispositionModificationDate 
