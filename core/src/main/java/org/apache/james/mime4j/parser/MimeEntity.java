@@ -225,9 +225,9 @@ public class MimeEntity extends AbstractEntity {
     private InputStream decodedStream(InputStream instream) {
         String transferEncoding = body.getTransferEncoding();
         if (MimeUtil.isBase64Encoding(transferEncoding)) {
-            instream = new Base64InputStream(instream);                    
+            instream = new Base64InputStream(instream, monitor);                    
         } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
-            instream = new QuotedPrintableInputStream(instream);
+            instream = new QuotedPrintableInputStream(instream, monitor);
         }
         return instream;
     }
