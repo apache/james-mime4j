@@ -25,9 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.james.mime4j.codec.CodecUtil;
-import org.apache.james.mime4j.message.Header;
-import org.apache.james.mime4j.message.impl.MessageImpl;
-import org.apache.james.mime4j.message.impl.SimpleContentHandler;
+import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.SimpleContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.parser.MimeTokenStream;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;

@@ -40,6 +40,12 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.dom.Body;
+import org.apache.james.mime4j.dom.Entity;
+import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.field.AddressListField;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.DateTimeField;
@@ -47,14 +53,8 @@ import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.UnstructuredField;
 import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.field.address.MailboxList;
-import org.apache.james.mime4j.message.BinaryBody;
-import org.apache.james.mime4j.message.Body;
-import org.apache.james.mime4j.message.Entity;
-import org.apache.james.mime4j.message.Header;
-import org.apache.james.mime4j.message.Multipart;
-import org.apache.james.mime4j.message.TextBody;
-import org.apache.james.mime4j.message.impl.BodyPart;
-import org.apache.james.mime4j.message.impl.MessageImpl;
+import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.MessageImpl;
 
 /**
  * Displays a parsed Message in a window. The window will be divided into

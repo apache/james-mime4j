@@ -22,11 +22,11 @@ package org.apache.james.mime4j.samples.dom;
 import java.io.IOException;
 import java.util.Date;
 
+import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.ParseException;
-import org.apache.james.mime4j.message.TextBody;
-import org.apache.james.mime4j.message.impl.BodyFactory;
-import org.apache.james.mime4j.message.impl.MessageImpl;
+import org.apache.james.mime4j.message.BodyFactory;
+import org.apache.james.mime4j.message.MessageImpl;
 
 /**
  * This example generates a message very similar to the one from RFC 5322

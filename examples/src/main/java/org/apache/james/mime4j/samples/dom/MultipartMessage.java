@@ -29,14 +29,14 @@ import java.util.Date;
 
 import javax.imageio.ImageIO;
 
+import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
-import org.apache.james.mime4j.message.BinaryBody;
-import org.apache.james.mime4j.message.Multipart;
-import org.apache.james.mime4j.message.TextBody;
-import org.apache.james.mime4j.message.impl.BodyFactory;
-import org.apache.james.mime4j.message.impl.BodyPart;
-import org.apache.james.mime4j.message.impl.MessageImpl;
-import org.apache.james.mime4j.message.impl.MultipartImpl;
+import org.apache.james.mime4j.message.BodyFactory;
+import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.storage.Storage;
 import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;

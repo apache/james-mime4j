@@ -35,7 +35,7 @@ import java.util.NoSuchElementException;
  * maps values are strings (single value), lists, or arrays.
  * <p>
  * Note that this class is not directly used anywhere in Mime4j.
- * Instead a user might choose to use it instead of {@link org.apache.james.mime4j.message.Header}
+ * Instead a user might choose to use it instead of {@link org.apache.james.mime4j.dom.Header}
  * and {@link org.apache.james.mime4j.field.Field} in a custom {@link org.apache.james.mime4j.stream.ContentHandler} implementation.
  * See also MIME4j-24.
  */
