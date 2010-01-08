@@ -30,9 +30,9 @@ import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
-import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
-import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
-import org.apache.james.mime4j.field.impl.Fields;
+import org.apache.james.mime4j.field.ContentTransferEncodingFieldImpl;
+import org.apache.james.mime4j.field.ContentTypeFieldImpl;
+import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**

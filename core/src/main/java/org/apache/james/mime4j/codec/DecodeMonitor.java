@@ -28,7 +28,7 @@ package org.apache.james.mime4j.codec;
  * STRICT return "true" on any occourence.
  * SILENT ignores any problem.
  * 
- * @see org.apache.james.mime4j.field.impl.LoggingMonitor for an example
+ * @see org.apache.james.mime4j.field.LoggingMonitor for an example
  * about logging malformations via Commons-logging.
  */
 public class DecodeMonitor {

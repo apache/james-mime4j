@@ -19,24 +19,44 @@
 
 package org.apache.james.mime4j.field;
 
-import org.apache.james.mime4j.dom.field.UnstructuredField;
-import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.codec.DecoderUtil;
+import org.apache.james.mime4j.util.ByteSequence;
 
-import junit.framework.TestCase;
+/**
+ * Simple unstructured field such as <code>Subject</code>.
+ */
+public class UnstructuredFieldImpl extends AbstractField implements org.apache.james.mime4j.dom.field.UnstructuredField {
+    private boolean parsed = false;
 
-public class UnstructuredFieldTest extends TestCase {
+    private String value;
 
-    public void testGetBody() throws Exception {
-        UnstructuredField f = null;
-        
-        f = (UnstructuredField) DefaultFieldParser.parse("Subject: Yada\r\n yada yada\r\n");
-        assertEquals("Testing folding value 1", "Yada yada yada", f.getValue());
-        
-        f = (UnstructuredField) DefaultFieldParser.parse("Subject:  \r\n\tyada");
-        assertEquals("Testing folding value 2", " \tyada", f.getValue());
-        
-        f = (UnstructuredField) DefaultFieldParser.parse("Subject:yada");
-        assertEquals("Testing value without a leading ' '", "yada", f.getValue());
+    UnstructuredFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
+        super(name, body, raw, monitor);
     }
 
+    /**
+     * @see org.apache.james.mime4j.dom.field.UnstructuredField#getValue()
+     */
+    public String getValue() {
+        if (!parsed)
+            parse();
+
+        return value;
+    }
+
+    private void parse() {
+        String body = getBody();
+
+        value = DecoderUtil.decodeEncodedWords(body, monitor);
+
+        parsed = true;
+    }
+
+    static final FieldParser<UnstructuredFieldImpl> PARSER = new FieldParser<UnstructuredFieldImpl>() {
+        public UnstructuredFieldImpl parse(final String name, final String body,
+                final ByteSequence raw, DecodeMonitor monitor) {
+            return new UnstructuredFieldImpl(name, body, raw, monitor);
+        }
+    };
 }

@@ -22,7 +22,7 @@ package org.apache.james.mime4j.dom;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
-import org.apache.james.mime4j.field.impl.DefaultFieldParser;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 

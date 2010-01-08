@@ -22,7 +22,7 @@ package org.apache.james.mime4j.message;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.field.Field;
-import org.apache.james.mime4j.field.impl.DefaultFieldParser;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.stream.AbstractContentHandler;
 import org.apache.james.mime4j.stream.RawField;
 

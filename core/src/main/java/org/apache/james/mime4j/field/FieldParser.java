@@ -19,24 +19,12 @@
 
 package org.apache.james.mime4j.field;
 
-import org.apache.james.mime4j.dom.field.UnstructuredField;
-import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.field.ParsedField;
+import org.apache.james.mime4j.util.ByteSequence;
 
-import junit.framework.TestCase;
-
-public class UnstructuredFieldTest extends TestCase {
-
-    public void testGetBody() throws Exception {
-        UnstructuredField f = null;
-        
-        f = (UnstructuredField) DefaultFieldParser.parse("Subject: Yada\r\n yada yada\r\n");
-        assertEquals("Testing folding value 1", "Yada yada yada", f.getValue());
-        
-        f = (UnstructuredField) DefaultFieldParser.parse("Subject:  \r\n\tyada");
-        assertEquals("Testing folding value 2", " \tyada", f.getValue());
-        
-        f = (UnstructuredField) DefaultFieldParser.parse("Subject:yada");
-        assertEquals("Testing value without a leading ' '", "yada", f.getValue());
-    }
-
+public interface FieldParser<T extends ParsedField> {
+    
+    T parse(final String name, final String body, final ByteSequence raw, DecodeMonitor monitor);
+    
 }

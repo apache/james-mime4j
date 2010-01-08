@@ -20,8 +20,8 @@
 package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
-import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
-import org.apache.james.mime4j.field.impl.DefaultFieldParser;
+import org.apache.james.mime4j.field.ContentTransferEncodingFieldImpl;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 
 import junit.framework.TestCase;
 
