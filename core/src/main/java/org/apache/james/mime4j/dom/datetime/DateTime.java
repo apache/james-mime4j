@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field.datetime;
+package org.apache.james.mime4j.dom.datetime;
 
 import java.util.Calendar;
 import java.util.Date;

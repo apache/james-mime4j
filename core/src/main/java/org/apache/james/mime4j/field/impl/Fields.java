@@ -28,19 +28,19 @@ import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
+import org.apache.james.mime4j.dom.address.Address;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.field.Field;
+import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.impl.AddressListFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentDispositionFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
 import org.apache.james.mime4j.field.impl.DateTimeFieldImpl;
-import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.field.FieldName;
 import org.apache.james.mime4j.field.impl.MailboxFieldImpl;
 import org.apache.james.mime4j.field.impl.MailboxListFieldImpl;
-import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.field.impl.UnstructuredFieldImpl;
-import org.apache.james.mime4j.field.address.Address;
-import org.apache.james.mime4j.field.address.Mailbox;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 

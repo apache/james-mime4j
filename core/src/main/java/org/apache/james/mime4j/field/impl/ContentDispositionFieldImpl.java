@@ -37,7 +37,7 @@ import org.apache.james.mime4j.util.ByteSequence;
 /**
  * Represents a <code>Content-Disposition</code> field.
  */
-public class ContentDispositionFieldImpl extends AbstractField implements org.apache.james.mime4j.field.ContentDispositionField {
+public class ContentDispositionFieldImpl extends AbstractField implements org.apache.james.mime4j.dom.field.ContentDispositionField {
 
     private boolean parsed = false;
 
@@ -71,7 +71,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#getDispositionType()
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getDispositionType()
      */
     public String getDispositionType() {
         if (!parsed)
@@ -81,7 +81,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#getParameter(java.lang.String)
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getParameter(java.lang.String)
      */
     public String getParameter(String name) {
         if (!parsed)
@@ -91,7 +91,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#getParameters()
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getParameters()
      */
     public Map<String, String> getParameters() {
         if (!parsed)
@@ -101,7 +101,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#isDispositionType(java.lang.String)
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#isDispositionType(java.lang.String)
      */
     public boolean isDispositionType(String dispositionType) {
         if (!parsed)
@@ -111,7 +111,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#isInline()
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#isInline()
      */
     public boolean isInline() {
         if (!parsed)
@@ -121,7 +121,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#isAttachment()
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#isAttachment()
      */
     public boolean isAttachment() {
         if (!parsed)
@@ -131,14 +131,14 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#getFilename()
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getFilename()
      */
     public String getFilename() {
         return getParameter(PARAM_FILENAME);
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#getCreationDate()
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getCreationDate()
      */
     public Date getCreationDate() {
         if (!creationDateParsed) {
@@ -150,7 +150,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#getModificationDate()
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getModificationDate()
      */
     public Date getModificationDate() {
         if (!modificationDateParsed) {
@@ -162,7 +162,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#getReadDate()
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getReadDate()
      */
     public Date getReadDate() {
         if (!readDateParsed) {
@@ -174,7 +174,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentDispositionField#getSize()
+     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getSize()
      */
     public long getSize() {
         String value = getParameter(PARAM_SIZE);

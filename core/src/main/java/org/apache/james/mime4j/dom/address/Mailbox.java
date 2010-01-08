@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field.address;
+package org.apache.james.mime4j.dom.address;
 
 import java.util.Collections;
 import java.util.List;

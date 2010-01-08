@@ -29,8 +29,16 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.field.address.Group;
-import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.dom.address.Group;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.field.AddressListField;
+import org.apache.james.mime4j.dom.field.ContentDispositionField;
+import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.dom.field.ContentTypeField;
+import org.apache.james.mime4j.dom.field.DateTimeField;
+import org.apache.james.mime4j.dom.field.Field;
+import org.apache.james.mime4j.dom.field.MailboxField;
+import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.GroupImpl;
 import org.apache.james.mime4j.field.impl.Fields;

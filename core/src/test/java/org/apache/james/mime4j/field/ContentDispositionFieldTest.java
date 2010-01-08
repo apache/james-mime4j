@@ -23,6 +23,7 @@ import java.util.Date;
 
 import junit.framework.TestCase;
 
+import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 import org.apache.log4j.BasicConfigurator;
 

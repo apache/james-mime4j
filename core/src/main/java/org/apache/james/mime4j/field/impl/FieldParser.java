@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.field.impl;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.field.ParsedField;
+import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.util.ByteSequence;
 
 public interface FieldParser<T extends ParsedField> {

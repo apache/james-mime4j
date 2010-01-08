@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.field.ParseException;
-import org.apache.james.mime4j.field.ParsedField;
+import org.apache.james.mime4j.dom.field.ParseException;
+import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
@@ -55,7 +55,7 @@ public abstract class AbstractField implements ParsedField {
     }
     
     /**
-     * @see org.apache.james.mime4j.field.Field#writeTo(java.io.OutputStream)
+     * @see org.apache.james.mime4j.dom.field.Field#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
         out.write(raw.toByteArray());

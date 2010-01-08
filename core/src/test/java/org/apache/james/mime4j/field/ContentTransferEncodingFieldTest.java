@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.field;
 
-import org.apache.james.mime4j.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
 import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 

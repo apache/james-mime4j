@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.dom.field;
 
 import org.apache.james.mime4j.MimeException;
 

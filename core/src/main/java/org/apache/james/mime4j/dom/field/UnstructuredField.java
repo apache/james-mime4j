@@ -17,12 +17,10 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.dom.field;
 
-import org.apache.james.mime4j.field.address.AddressList;
+public interface UnstructuredField extends ParsedField {
 
-public interface AddressListField extends ParsedField {
-
-    public abstract AddressList getAddressList();
+    public abstract String getValue();
 
 }

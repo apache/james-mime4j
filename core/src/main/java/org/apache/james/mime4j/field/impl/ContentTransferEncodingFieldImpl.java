@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.field.impl;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -36,7 +36,7 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentTransferEncodingField#getEncoding()
+     * @see org.apache.james.mime4j.dom.field.ContentTransferEncodingField#getEncoding()
      */
     public String getEncoding() {
         return encoding;

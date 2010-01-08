@@ -26,7 +26,7 @@ import org.apache.james.mime4j.util.ByteSequence;
 /**
  * Simple unstructured field such as <code>Subject</code>.
  */
-public class UnstructuredFieldImpl extends AbstractField implements org.apache.james.mime4j.field.UnstructuredField {
+public class UnstructuredFieldImpl extends AbstractField implements org.apache.james.mime4j.dom.field.UnstructuredField {
     private boolean parsed = false;
 
     private String value;
@@ -36,7 +36,7 @@ public class UnstructuredFieldImpl extends AbstractField implements org.apache.j
     }
 
     /**
-     * @see org.apache.james.mime4j.field.UnstructuredField#getValue()
+     * @see org.apache.james.mime4j.dom.field.UnstructuredField#getValue()
      */
     public String getValue() {
         if (!parsed)

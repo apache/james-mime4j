@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.field.ContentTypeField;
+import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.field.contenttype.parser.ContentTypeParser;
 import org.apache.james.mime4j.field.contenttype.parser.ParseException;
 import org.apache.james.mime4j.field.contenttype.parser.TokenMgrError;
@@ -58,7 +58,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentTypeField#getMimeType()
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#getMimeType()
      */
     public String getMimeType() {
         if (!parsed)
@@ -68,7 +68,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentTypeField#getParameter(java.lang.String)
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#getParameter(java.lang.String)
      */
     public String getParameter(String name) {
         if (!parsed)
@@ -78,7 +78,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentTypeField#getParameters()
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#getParameters()
      */
     public Map<String, String> getParameters() {
         if (!parsed)
@@ -88,7 +88,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentTypeField#isMimeType(java.lang.String)
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#isMimeType(java.lang.String)
      */
     public boolean isMimeType(String mimeType) {
         if (!parsed)
@@ -98,7 +98,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentTypeField#isMultipart()
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#isMultipart()
      */
     public boolean isMultipart() {
         if (!parsed)
@@ -108,14 +108,14 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentTypeField#getBoundary()
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#getBoundary()
      */
     public String getBoundary() {
         return getParameter(PARAM_BOUNDARY);
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentTypeField#getCharset()
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#getCharset()
      */
     public String getCharset() {
         return getParameter(PARAM_CHARSET);

@@ -1,4 +1,4 @@
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.dom.field;
 
 import java.util.Date;
 

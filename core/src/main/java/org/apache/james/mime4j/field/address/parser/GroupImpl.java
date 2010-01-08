@@ -5,9 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
-import org.apache.james.mime4j.field.address.Group;
-import org.apache.james.mime4j.field.address.Mailbox;
-import org.apache.james.mime4j.field.address.MailboxList;
+import org.apache.james.mime4j.dom.address.Group;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.address.MailboxList;
 
 public class GroupImpl extends Group {
 

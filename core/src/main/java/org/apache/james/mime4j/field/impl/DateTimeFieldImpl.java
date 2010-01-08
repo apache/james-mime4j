@@ -31,7 +31,7 @@ import org.apache.james.mime4j.util.ByteSequence;
 /**
  * Date-time field such as <code>Date</code> or <code>Resent-Date</code>.
  */
-public class DateTimeFieldImpl extends AbstractField implements org.apache.james.mime4j.field.DateTimeField {
+public class DateTimeFieldImpl extends AbstractField implements org.apache.james.mime4j.dom.field.DateTimeField {
     private boolean parsed = false;
 
     private Date date;
@@ -42,7 +42,7 @@ public class DateTimeFieldImpl extends AbstractField implements org.apache.james
     }
 
     /**
-     * @see org.apache.james.mime4j.field.DateTimeField#getDate()
+     * @see org.apache.james.mime4j.dom.field.DateTimeField#getDate()
      */
     public Date getDate() {
         if (!parsed)
@@ -52,7 +52,7 @@ public class DateTimeFieldImpl extends AbstractField implements org.apache.james
     }
 
     /**
-     * @see org.apache.james.mime4j.field.DateTimeField#getParseException()
+     * @see org.apache.james.mime4j.dom.field.DateTimeField#getParseException()
      */
     @Override
     public ParseException getParseException() {

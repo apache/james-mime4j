@@ -1,8 +1,8 @@
 package org.apache.james.mime4j.field.address.parser;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
-import org.apache.james.mime4j.field.address.DomainList;
-import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.dom.address.DomainList;
+import org.apache.james.mime4j.dom.address.Mailbox;
 
 public class MailboxImpl extends Mailbox {
 

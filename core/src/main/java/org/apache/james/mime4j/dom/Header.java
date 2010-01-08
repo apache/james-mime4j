@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.james.mime4j.field.Field;
+import org.apache.james.mime4j.dom.field.Field;
 
 /**
  * The header of an entity (see RFC 2045).

@@ -20,6 +20,12 @@
 package org.apache.james.mime4j.field.address;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.dom.address.Address;
+import org.apache.james.mime4j.dom.address.AddressList;
+import org.apache.james.mime4j.dom.address.DomainList;
+import org.apache.james.mime4j.dom.address.Group;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.address.MailboxList;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.GroupImpl;
 import org.apache.james.mime4j.field.address.parser.MailboxImpl;

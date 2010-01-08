@@ -22,7 +22,7 @@ package org.apache.james.mime4j.parser;
 import java.io.ByteArrayInputStream;
 
 import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.field.datetime.DateTime;
+import org.apache.james.mime4j.dom.datetime.DateTime;
 import org.apache.james.mime4j.parser.MaximalBodyDescriptor;
 import org.apache.james.mime4j.parser.MimeTokenStream;
 import org.apache.james.mime4j.stream.BaseTestForBodyDescriptors;

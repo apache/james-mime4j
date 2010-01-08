@@ -25,15 +25,15 @@ import java.util.List;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.codec.DecoderUtil;
-import org.apache.james.mime4j.field.address.Address;
-import org.apache.james.mime4j.field.address.AddressList;
-import org.apache.james.mime4j.field.address.DomainList;
-import org.apache.james.mime4j.field.address.Mailbox;
-import org.apache.james.mime4j.field.address.MailboxList;
+import org.apache.james.mime4j.dom.address.Address;
+import org.apache.james.mime4j.dom.address.AddressList;
+import org.apache.james.mime4j.dom.address.DomainList;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.address.MailboxList;
 
 /**
  * Transforms the JJTree-generated abstract syntax tree into a graph of
- * org.apache.james.mime4j.field.address objects.
+ * org.apache.james.mime4j.dom.address objects.
  */
 class Builder {
 

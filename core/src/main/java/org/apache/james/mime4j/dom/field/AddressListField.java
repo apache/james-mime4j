@@ -17,35 +17,12 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.dom.field;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import org.apache.james.mime4j.dom.address.AddressList;
 
-/**
- * Abstract MIME field.
- */
-public interface Field {
-    
-    /**
-     * Gets the name of the field (<code>Subject</code>, <code>From</code>, etc).
-     * 
-     * @return the field name.
-     */
-    String getName();
+public interface AddressListField extends ParsedField {
 
-    /**
-     * Gets the unparsed and possibly encoded (see RFC 2047) field body string.
-     * 
-     * @return the unparsed field body string.
-     */
-    String getBody();
+    public abstract AddressList getAddressList();
 
-    /**
-     * Writes the original raw field bytes to an output stream.
-     * The output is folded, the last CRLF is not included.
-     * @throws IOException
-     */
-    void writeTo(OutputStream out) throws IOException;
-    
 }

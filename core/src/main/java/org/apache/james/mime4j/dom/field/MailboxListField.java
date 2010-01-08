@@ -17,12 +17,12 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.dom.field;
 
-import org.apache.james.mime4j.field.address.Mailbox;
+import org.apache.james.mime4j.dom.address.MailboxList;
 
-public interface MailboxField extends ParsedField {
+public interface MailboxListField extends ParsedField {
 
-    public abstract Mailbox getMailbox();
+    public abstract MailboxList getMailboxList();
 
 }

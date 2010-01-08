@@ -21,15 +21,15 @@ package org.apache.james.mime4j.field.impl;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.impl.AddressListFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentDispositionFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentTransferEncodingFieldImpl;
 import org.apache.james.mime4j.field.impl.ContentTypeFieldImpl;
 import org.apache.james.mime4j.field.impl.DateTimeFieldImpl;
-import org.apache.james.mime4j.field.FieldName;
 import org.apache.james.mime4j.field.impl.MailboxFieldImpl;
 import org.apache.james.mime4j.field.impl.MailboxListFieldImpl;
-import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.field.impl.UnstructuredFieldImpl;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteSequence;

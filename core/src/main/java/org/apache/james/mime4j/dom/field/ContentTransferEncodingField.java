@@ -17,12 +17,15 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.dom.field;
 
-import org.apache.james.mime4j.field.address.MailboxList;
+public interface ContentTransferEncodingField extends ParsedField {
 
-public interface MailboxListField extends ParsedField {
-
-    public abstract MailboxList getMailboxList();
+    /**
+     * Gets the encoding defined in this field.
+     * 
+     * @return the encoding or an empty string if not set.
+     */
+    public abstract String getEncoding();
 
 }

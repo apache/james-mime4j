@@ -17,29 +17,12 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.dom.field;
 
+import org.apache.james.mime4j.dom.address.Mailbox;
 
-public interface ParsedField extends Field {
+public interface MailboxField extends ParsedField {
 
-    /**
-     * Returns <code>true</code> if this field is valid, i.e. no errors were
-     * encountered while parsing the field value.
-     * 
-     * @return <code>true</code> if this field is valid, <code>false</code>
-     *         otherwise.
-     * @see #getParseException()
-     */
-    boolean isValidField();
-
-    /**
-     * Returns the exception that was thrown by the field parser while parsing
-     * the field value. The result is <code>null</code> if the field is valid
-     * and no errors were encountered.
-     * 
-     * @return the exception that was thrown by the field parser or
-     *         <code>null</code> if the field is valid.
-     */
-    ParseException getParseException();
+    public abstract Mailbox getMailbox();
 
 }

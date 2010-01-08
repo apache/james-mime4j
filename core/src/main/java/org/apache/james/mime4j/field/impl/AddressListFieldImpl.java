@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.field.impl;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.field.address.AddressList;
+import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -28,7 +28,7 @@ import org.apache.james.mime4j.util.ByteSequence;
 /**
  * Address list field such as <code>To</code> or <code>Reply-To</code>.
  */
-public class AddressListFieldImpl extends AbstractField implements org.apache.james.mime4j.field.AddressListField {
+public class AddressListFieldImpl extends AbstractField implements org.apache.james.mime4j.dom.field.AddressListField {
 
     private boolean parsed = false;
 
@@ -40,7 +40,7 @@ public class AddressListFieldImpl extends AbstractField implements org.apache.ja
     }
 
     /**
-     * @see org.apache.james.mime4j.field.AddressListField#getAddressList()
+     * @see org.apache.james.mime4j.dom.field.AddressListField#getAddressList()
      */
     public AddressList getAddressList() {
         if (!parsed)
@@ -50,7 +50,7 @@ public class AddressListFieldImpl extends AbstractField implements org.apache.ja
     }
 
     /**
-     * @see org.apache.james.mime4j.field.AddressListField#getParseException()
+     * @see org.apache.james.mime4j.dom.field.AddressListField#getParseException()
      */
     @Override
     public ParseException getParseException() {

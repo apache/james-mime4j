@@ -26,8 +26,8 @@ import junit.framework.TestCase;
 
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.field.ContentTypeField;
-import org.apache.james.mime4j.field.FieldName;
+import org.apache.james.mime4j.dom.field.ContentTypeField;
+import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 

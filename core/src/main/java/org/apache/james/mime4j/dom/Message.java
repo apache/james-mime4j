@@ -27,17 +27,17 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.apache.james.mime4j.field.AddressListField;
-import org.apache.james.mime4j.field.DateTimeField;
-import org.apache.james.mime4j.field.Field;
-import org.apache.james.mime4j.field.FieldName;
-import org.apache.james.mime4j.field.MailboxField;
-import org.apache.james.mime4j.field.MailboxListField;
-import org.apache.james.mime4j.field.UnstructuredField;
-import org.apache.james.mime4j.field.address.Address;
-import org.apache.james.mime4j.field.address.AddressList;
-import org.apache.james.mime4j.field.address.Mailbox;
-import org.apache.james.mime4j.field.address.MailboxList;
+import org.apache.james.mime4j.dom.address.Address;
+import org.apache.james.mime4j.dom.address.AddressList;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.address.MailboxList;
+import org.apache.james.mime4j.dom.field.AddressListField;
+import org.apache.james.mime4j.dom.field.DateTimeField;
+import org.apache.james.mime4j.dom.field.Field;
+import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.dom.field.MailboxField;
+import org.apache.james.mime4j.dom.field.MailboxListField;
+import org.apache.james.mime4j.dom.field.UnstructuredField;
 
 public abstract class Message extends Entity implements Body {
 

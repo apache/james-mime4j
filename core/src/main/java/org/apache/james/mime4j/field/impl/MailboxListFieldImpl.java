@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.field.impl;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.field.address.MailboxList;
+import org.apache.james.mime4j.dom.address.MailboxList;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -28,7 +28,7 @@ import org.apache.james.mime4j.util.ByteSequence;
 /**
  * Mailbox-list field such as <code>From</code> or <code>Resent-From</code>.
  */
-public class MailboxListFieldImpl extends AbstractField implements org.apache.james.mime4j.field.MailboxListField {
+public class MailboxListFieldImpl extends AbstractField implements org.apache.james.mime4j.dom.field.MailboxListField {
     private boolean parsed = false;
 
     private MailboxList mailboxList;
@@ -39,7 +39,7 @@ public class MailboxListFieldImpl extends AbstractField implements org.apache.ja
     }
 
     /**
-     * @see org.apache.james.mime4j.field.MailboxListField#getMailboxList()
+     * @see org.apache.james.mime4j.dom.field.MailboxListField#getMailboxList()
      */
     public MailboxList getMailboxList() {
         if (!parsed)
@@ -49,7 +49,7 @@ public class MailboxListFieldImpl extends AbstractField implements org.apache.ja
     }
 
     /**
-     * @see org.apache.james.mime4j.field.MailboxListField#getParseException()
+     * @see org.apache.james.mime4j.dom.field.MailboxListField#getParseException()
      */
     @Override
     public ParseException getParseException() {
