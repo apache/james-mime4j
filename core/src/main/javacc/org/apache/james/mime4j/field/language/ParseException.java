@@ -31,7 +31,7 @@ package org.apache.james.mime4j.field.language.parser;
  *   added constructor ParseException(Throwable)
  *   default detail message is "Cannot parse field"
  */
-public class ParseException extends org.apache.james.mime4j.field.ParseException {
+public class ParseException extends org.apache.james.mime4j.dom.field.ParseException {
 
   private static final long serialVersionUID = 1L;
 

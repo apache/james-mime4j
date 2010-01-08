@@ -55,7 +55,7 @@ PARSER_BEGIN(DateTimeParser)
  ****************************************************************/
 package org.apache.james.mime4j.field.datetime.parser;
 
-import org.apache.james.mime4j.field.datetime.DateTime;
+import org.apache.james.mime4j.dom.datetime.DateTime;
 
 public class DateTimeParser {
     private static final boolean ignoreMilitaryZoneOffset = true;
