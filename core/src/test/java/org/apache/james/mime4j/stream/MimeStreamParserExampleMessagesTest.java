@@ -17,9 +17,8 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.stream;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,8 +31,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-import org.apache.james.mime4j.codec.CodecUtil;
-import org.apache.james.mime4j.message.impl.MessageImpl;
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.log4j.BasicConfigurator;
 
@@ -41,16 +40,16 @@ import org.apache.log4j.BasicConfigurator;
  * Creates a TestSuite running the test for each .msg file in the test resouce folder.
  * Allow running of a single test from Unit testing GUIs
  */
-public class ExampleMessagesRoundtripTest extends TestCase {
+public class MimeStreamParserExampleMessagesTest extends TestCase {
 
     private File file;
 
 
-    public ExampleMessagesRoundtripTest(String testName) throws URISyntaxException {
-        this(testName, ExampleMessagesRountripTestSuite.getFile(testName));
+    public MimeStreamParserExampleMessagesTest(String testName) throws URISyntaxException {
+        this(testName, MimeStreamParserExampleMessagesTestSuite.getFile(testName));
     }
 
-    public ExampleMessagesRoundtripTest(String name, File testFile) {
+    public MimeStreamParserExampleMessagesTest(String name, File testFile) {
         super(name);
         this.file = testFile;
     }
@@ -63,57 +62,62 @@ public class ExampleMessagesRoundtripTest extends TestCase {
    
     @Override
     protected void runTest() throws Throwable {
+        MimeStreamParser parser = null;
+        TestHandler handler = null;
         MimeEntityConfig config = new MimeEntityConfig();
         if (getName().startsWith("malformedHeaderStartsBody")) {
         	config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        Message inputMessage = new MessageImpl(new FileInputStream(file), config);
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        inputMessage.writeTo(out);
+        parser = new MimeStreamParser(config);
+        handler = new TestHandler();
         
-        String msgoutFile = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".out";
-        String msgoutFileMime4j = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".mime4j.out";
+        System.out.println("Parsing " + file.getName());
+        parser.setContentHandler(handler);
+        parser.parse(new FileInputStream(file));
+        
+        String result = handler.sb.toString();
+        String xmlFile = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".xml";
+        String xmlFileMime4j = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".mime4j.xml";
         
         try {
-            ByteArrayOutputStream expectedstream = new ByteArrayOutputStream();
-            CodecUtil.copy(new FileInputStream(msgoutFile), expectedstream);
-            assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
+            String expected = IOUtils.toString(new FileInputStream(xmlFile), "ISO8859-1");
+            assertEquals("Error parsing " + file.getName(), expected, result);
         } catch (FileNotFoundException e) {
-            FileOutputStream fos = new FileOutputStream(msgoutFileMime4j);
-            fos.write(out.toByteArray());
+            FileOutputStream fos = new FileOutputStream(xmlFileMime4j);
+            fos.write(result.getBytes());
             fos.flush();
             fos.close();
-            fail("Expected file not found: generated a file with the expected result!");
+            fail("XML file not found: generated a file with the expected result!");
         }
     }
 
     public static Test suite() throws IOException, URISyntaxException {
-        return new ExampleMessagesRountripTestSuite();
+        return new MimeStreamParserExampleMessagesTestSuite();
     }
 
     
-    static class ExampleMessagesRountripTestSuite extends TestSuite {
+    static class MimeStreamParserExampleMessagesTestSuite extends TestSuite {
 
         private static final String TESTS_FOLDER = "/testmsgs";
 
-        public ExampleMessagesRountripTestSuite() throws IOException, URISyntaxException {
+        public MimeStreamParserExampleMessagesTestSuite() throws IOException, URISyntaxException {
             super();
-            URL resource = ExampleMessagesRountripTestSuite.class.getResource(TESTS_FOLDER);
+            URL resource = MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER);
             if (resource != null) {
 				File dir = new File(resource.toURI());
 	            File[] files = dir.listFiles();
 	            
 	            for (File f : files) {
 	                if (f.getName().toLowerCase().endsWith(".msg")) {
-	                    addTest(new ExampleMessagesRoundtripTest(f.getName().substring(0, f.getName().length()-4), f));
+	                    addTest(new MimeStreamParserExampleMessagesTest(f.getName().substring(0, f.getName().length()-4), f));
 	                }
 	            }
             }
         }
         
         public static File getFile(String name) throws URISyntaxException {
-            return new File(ExampleMessagesRountripTestSuite.class.getResource(TESTS_FOLDER+File.separator+name+".msg").toURI());
+            return new File(MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER+File.separator+name+".msg").toURI());
         }
 
     }

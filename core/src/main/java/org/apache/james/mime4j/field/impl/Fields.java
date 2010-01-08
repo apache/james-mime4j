@@ -41,7 +41,7 @@ import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.field.impl.UnstructuredFieldImpl;
 import org.apache.james.mime4j.field.address.Address;
 import org.apache.james.mime4j.field.address.Mailbox;
-import org.apache.james.mime4j.parser.RawField;
+import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**

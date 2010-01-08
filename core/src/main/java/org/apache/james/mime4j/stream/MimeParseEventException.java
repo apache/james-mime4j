@@ -17,49 +17,34 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j;
+package org.apache.james.mime4j.stream;
+
+import org.apache.james.mime4j.MimeException;
 
 /**
- * MIME processing exception.
- * <p>
- * A <code>MimeException</code> may be thrown by a {@link org.apache.james.mime4j.stream.ContentHandler} to
- * indicate that it has failed to process a message event and that no further
- * events should be generated.
- * <p>
- * <code>MimeException</code> also gets thrown by the parser to indicate MIME
- * protocol errors, e.g. if a message boundary is too long or a header field
- * cannot be parsed.
+ * Indicates that strict parsing has been enabled 
+ * and an optional invality has been found in the input.
+ * {@link #getEvent()} indicates the type of invalidity.
  */
-public class MimeException extends Exception {
-
-    private static final long serialVersionUID = 8352821278714188542L;
-
-    /**
-     * Constructs a new MIME exception with the specified detail message.
-     *
-     * @param message detail message
-     */
-    public MimeException(String message) {
-        super(message);
-    }
-
-    /**
-     * Constructs a MIME exception with the specified cause.
-     *
-     * @param cause cause of the exception
-     */
-    public MimeException(Throwable cause) {
-        super(cause);
-    }
+public class MimeParseEventException extends MimeException {
+    
+    private static final long serialVersionUID = 4632991604246852302L;
+    private final Event event;
     
     /**
-     * Constructs a MIME exception with the specified detail message and cause.
-     *
-     * @param message detail message
-     * @param cause cause of the exception
+     * Constructs an exception 
+     * @param event <code>MimeTokenStream.Event</code>, not null
      */
-    public MimeException(String message, Throwable cause) {
-        super(message, cause);
+    public MimeParseEventException(final Event event) {
+        super(event.toString());
+        this.event = event;
     }
 
+    /**
+     * Gets the causal parse event.
+     * @return <code>MimeTokenStream.Event</code>, not null
+     */
+    public Event getEvent() {
+        return event;
+    }
 }

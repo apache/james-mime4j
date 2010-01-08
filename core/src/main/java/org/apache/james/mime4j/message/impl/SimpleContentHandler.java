@@ -23,8 +23,8 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.Field;
 import org.apache.james.mime4j.field.impl.DefaultFieldParser;
 import org.apache.james.mime4j.message.Header;
-import org.apache.james.mime4j.parser.AbstractContentHandler;
-import org.apache.james.mime4j.parser.RawField;
+import org.apache.james.mime4j.stream.AbstractContentHandler;
+import org.apache.james.mime4j.stream.RawField;
 
 /**
  * Abstract implementation of ContentHandler that automates common
@@ -45,7 +45,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     private Header currHeader;
 
     /**
-     * @see org.apache.james.mime4j.parser.AbstractContentHandler#startHeader()
+     * @see org.apache.james.mime4j.stream.AbstractContentHandler#startHeader()
      */
     @Override
     public final void startHeader() {
@@ -53,7 +53,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     }
 
     /**
-     * @see org.apache.james.mime4j.parser.AbstractContentHandler#field(Field)
+     * @see org.apache.james.mime4j.stream.AbstractContentHandler#field(Field)
      */
     @Override
     public final void field(RawField field) throws MimeException {
@@ -62,7 +62,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     }
 
     /**
-     * @see org.apache.james.mime4j.parser.AbstractContentHandler#endHeader()
+     * @see org.apache.james.mime4j.stream.AbstractContentHandler#endHeader()
      */
     @Override
     public final void endHeader() {

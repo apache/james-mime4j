@@ -27,7 +27,7 @@ import junit.framework.TestCase;
 import org.apache.james.mime4j.field.ContentTypeField;
 import org.apache.james.mime4j.field.FieldName;
 import org.apache.james.mime4j.message.impl.MessageImpl;
-import org.apache.james.mime4j.parser.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MimeEntityConfig;
 
 public class MessageHeadlessParserTest extends TestCase {
 

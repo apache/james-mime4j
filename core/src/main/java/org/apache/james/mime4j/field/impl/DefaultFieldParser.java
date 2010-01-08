@@ -31,7 +31,7 @@ import org.apache.james.mime4j.field.impl.MailboxFieldImpl;
 import org.apache.james.mime4j.field.impl.MailboxListFieldImpl;
 import org.apache.james.mime4j.field.ParsedField;
 import org.apache.james.mime4j.field.impl.UnstructuredFieldImpl;
-import org.apache.james.mime4j.parser.RawField;
+import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 

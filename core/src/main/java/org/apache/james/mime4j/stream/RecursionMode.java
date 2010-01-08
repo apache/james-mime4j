@@ -17,49 +17,29 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j;
+package org.apache.james.mime4j.stream;
 
 /**
- * MIME processing exception.
- * <p>
- * A <code>MimeException</code> may be thrown by a {@link org.apache.james.mime4j.stream.ContentHandler} to
- * indicate that it has failed to process a message event and that no further
- * events should be generated.
- * <p>
- * <code>MimeException</code> also gets thrown by the parser to indicate MIME
- * protocol errors, e.g. if a message boundary is too long or a header field
- * cannot be parsed.
+ * Enumeration of parsing modes.
  */
-public class MimeException extends Exception {
+public interface RecursionMode {
 
-    private static final long serialVersionUID = 8352821278714188542L;
-
-    /**
-     * Constructs a new MIME exception with the specified detail message.
-     *
-     * @param message detail message
+    /** 
+     * Recursively parse every <code>message/rfc822</code> part 
      */
-    public MimeException(String message) {
-        super(message);
-    }
-
+    int M_RECURSE = 0;
     /**
-     * Constructs a MIME exception with the specified cause.
-     *
-     * @param cause cause of the exception
+     * Do not recurse <code>message/rfc822</code> parts 
      */
-    public MimeException(Throwable cause) {
-        super(cause);
-    }
+    int M_NO_RECURSE = 1;
+    /** 
+     * Parse into raw entities
+     */
+    int M_RAW = 2;
+    /**
+     * Do not recurse <code>message/rfc822</code> parts
+     * and treat multiparts as a single flat body. 
+     */
+    int M_FLAT = 3;
     
-    /**
-     * Constructs a MIME exception with the specified detail message and cause.
-     *
-     * @param message detail message
-     * @param cause cause of the exception
-     */
-    public MimeException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
 }

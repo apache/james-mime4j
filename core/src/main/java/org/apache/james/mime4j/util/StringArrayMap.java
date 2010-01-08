@@ -36,7 +36,7 @@ import java.util.NoSuchElementException;
  * <p>
  * Note that this class is not directly used anywhere in Mime4j.
  * Instead a user might choose to use it instead of {@link org.apache.james.mime4j.message.Header}
- * and {@link org.apache.james.mime4j.field.Field} in a custom {@link org.apache.james.mime4j.parser.ContentHandler} implementation.
+ * and {@link org.apache.james.mime4j.field.Field} in a custom {@link org.apache.james.mime4j.stream.ContentHandler} implementation.
  * See also MIME4j-24.
  */
 public class StringArrayMap implements Serializable {
