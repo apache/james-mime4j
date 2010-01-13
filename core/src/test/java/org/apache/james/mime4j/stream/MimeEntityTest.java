@@ -29,7 +29,6 @@ import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.io.LineNumberInputStream;
-import org.apache.james.mime4j.parser.DefaultBodyDescriptor;
 import org.apache.james.mime4j.stream.EntityStateMachine;
 import org.apache.james.mime4j.stream.EntityStates;
 import org.apache.james.mime4j.stream.MimeEntity;

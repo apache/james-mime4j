@@ -19,9 +19,9 @@
 
 package org.apache.james.mime4j.parser;
 
-import org.apache.james.mime4j.parser.DefaultBodyDescriptor;
 import org.apache.james.mime4j.stream.BaseTestForBodyDescriptors;
 import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.DefaultBodyDescriptor;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
 
 public class DefaultBodyDescriptorTest extends BaseTestForBodyDescriptors {

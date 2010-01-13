@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.DefaultBodyDescriptor;
 import org.apache.james.mime4j.parser.MaximalBodyDescriptor;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.parser.MimeTokenStream;

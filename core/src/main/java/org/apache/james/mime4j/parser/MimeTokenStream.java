@@ -24,9 +24,9 @@ import java.io.InputStream;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.stream.BasicMimeTokenStream;
 import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.DefaultBodyDescriptor;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
-import org.apache.james.mime4j.stream.RawField;
 
 /**
  * <p>
@@ -106,40 +106,6 @@ public class MimeTokenStream extends BasicMimeTokenStream {
     
     public MimeTokenStream(final MimeEntityConfig config, DecodeMonitor monitor) {
         super(config, monitor);
-    }
-
-    /** Instructs the {@code MimeTokenStream} to parse the given streams contents.
-     * If the {@code MimeTokenStream} has already been in use, resets the streams
-     * internal state.
-     */
-    public void parse(InputStream stream) {
-        doParse(stream, null);
-    }
-
-    /** Instructs the {@code MimeTokenStream} to parse the given content with 
-     * the content type. The message stream is assumed to have no message header
-     * and is expected to begin with a message body. This can be the case when 
-     * the message content is transmitted using a different transport protocol 
-     * such as HTTP.
-     * <p/>
-     * If the {@code MimeTokenStream} has already been in use, resets the streams
-     * internal state.
-     */    
-    public void parseHeadless(InputStream stream, String contentType) {
-        if (contentType == null) {
-            throw new IllegalArgumentException("Content type may not be null");
-        }
-        doParse(stream, contentType);
-    }
-
-    private void doParse(InputStream stream, String contentType) {
-        MutableBodyDescriptor newBodyDescriptor = newBodyDescriptor();
-        int start = T_START_MESSAGE;
-        if (contentType != null) {
-        	start = T_END_HEADER;
-        	newBodyDescriptor.addField(new RawField("Content-Type", contentType));
-        }
-        doParse(stream, newBodyDescriptor, start);
     }
 
     /**

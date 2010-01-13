@@ -103,7 +103,46 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
         this.monitor = monitor != null ? monitor : (config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
     }
 
-    public void doParse(InputStream stream,
+
+    /** Instructs the {@code MimeTokenStream} to parse the given streams contents.
+     * If the {@code MimeTokenStream} has already been in use, resets the streams
+     * internal state.
+     */
+    public void parse(InputStream stream) {
+        doParse(stream, null);
+    }
+
+    /** Instructs the {@code MimeTokenStream} to parse the given content with 
+     * the content type. The message stream is assumed to have no message header
+     * and is expected to begin with a message body. This can be the case when 
+     * the message content is transmitted using a different transport protocol 
+     * such as HTTP.
+     * <p/>
+     * If the {@code MimeTokenStream} has already been in use, resets the streams
+     * internal state.
+     */    
+    public void parseHeadless(InputStream stream, String contentType) {
+        if (contentType == null) {
+            throw new IllegalArgumentException("Content type may not be null");
+        }
+        doParse(stream, contentType);
+    }
+
+    protected void doParse(InputStream stream, String contentType) {
+        MutableBodyDescriptor newBodyDescriptor = newBodyDescriptor();
+        int start = T_START_MESSAGE;
+        if (contentType != null) {
+        	start = T_END_HEADER;
+        	newBodyDescriptor.addField(new RawField("Content-Type", contentType));
+        }
+        doParse(stream, newBodyDescriptor, start);
+    }
+
+    protected MutableBodyDescriptor newBodyDescriptor() {
+		return new DefaultBodyDescriptor(null);
+	}
+
+	public void doParse(InputStream stream,
             MutableBodyDescriptor newBodyDescriptor, int start) {
         LineNumberSource lineSource = null;
         if (config.isCountLineNumbers()) {
