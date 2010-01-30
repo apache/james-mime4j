@@ -1,3 +1,0 @@
-This is an invalid header
-
-Body text
