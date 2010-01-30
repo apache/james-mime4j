@@ -1,0 +1,15 @@
+<message>
+<header>
+<field>
+Subject :The obsolete syntax allow spaces before the colon
+       
+ and also empty lines in folding.</field>
+<field>
+Date    :     Malformed Date.</field>
+<field>
+HeaderWithWSP 	  	:		value.</field>
+</header>
+<body>
+body
+</body>
+</message>
