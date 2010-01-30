@@ -43,13 +43,13 @@ public abstract class Message extends Entity implements Body {
 
     /**
      * Write the content to the given output stream using the
-     * {@link MessageWriter#DEFAULT default} message writer.
+     * {@link org.apache.james.mime4j.message.MessageWriter#DEFAULT default} message writer.
      * 
      * @param out
      *            the output stream to write to.
      * @throws IOException
      *             in case of an I/O error
-     * @see MessageWriter
+     * @see org.apache.james.mime4j.message.MessageWriter
      */
     public abstract void writeTo(OutputStream out) throws IOException;
 

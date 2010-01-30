@@ -170,7 +170,7 @@ public class MessageImpl extends Message {
     }
 
     /**
-     * @see org.apache.james.mime4j.message.Message#writeTo(java.io.OutputStream)
+     * @see org.apache.james.mime4j.dom.Message#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
         MessageWriter.DEFAULT.writeEntity(this, out);

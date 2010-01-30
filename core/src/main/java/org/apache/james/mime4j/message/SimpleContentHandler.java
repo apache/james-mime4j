@@ -53,7 +53,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
     }
 
     /**
-     * @see org.apache.james.mime4j.stream.AbstractContentHandler#field(Field)
+     * @see org.apache.james.mime4j.stream.AbstractContentHandler#field(RawField)
      */
     @Override
     public final void field(RawField field) throws MimeException {

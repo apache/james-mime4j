@@ -86,7 +86,7 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
     /**
      * Constructs a standard (lax) stream.
      * Optional validation events will be logged only.
-     * Use {@link #createStrictValidationStream()} to create
+     * Use {@link MimeTokenStream#createStrictValidationStream()} to create
      * a stream that strictly validates the input.
      */
     public BasicMimeTokenStream() {

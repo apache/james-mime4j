@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.MimeStreamParser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -194,7 +193,7 @@ public interface ContentHandler {
      * @param is the raw contents of the entity.
      * @throws MimeException on processing errors
      * @throws IOException should be thrown on I/O errors.
-     * @see MimeStreamParser#setRaw(boolean)
+     * @see org.apache.james.mime4j.stream.MimeStreamParser#setRaw(boolean)
      */
     void raw(InputStream is) throws MimeException, IOException;
 

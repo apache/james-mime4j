@@ -33,7 +33,6 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.LoggingMonitor;
-import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.ContentHandler;
@@ -43,7 +42,7 @@ import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * A <code>ContentHandler</code> for building an <code>Entity</code> to be
- * used in conjunction with a {@link MimeStreamParser}.
+ * used in conjunction with a {@link org.apache.james.mime4j.parser.MimeStreamParser}.
  */
 public class MessageBuilder implements ContentHandler {
 
@@ -104,7 +103,7 @@ public class MessageBuilder implements ContentHandler {
     }
     
     /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#field(Field)
+     * @see org.apache.james.mime4j.stream.ContentHandler#field(RawField)
      */
     public void field(RawField field) throws MimeException {
         expect(Header.class);

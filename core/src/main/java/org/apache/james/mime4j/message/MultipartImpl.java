@@ -20,7 +20,9 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.dom.Entity;
+import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 

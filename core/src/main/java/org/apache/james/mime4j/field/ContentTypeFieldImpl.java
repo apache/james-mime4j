@@ -47,7 +47,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     /**
-     * @see org.apache.james.mime4j.field.ContentTypeField#getParseException()
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#getParseException()
      */
     @Override
     public ParseException getParseException() {
