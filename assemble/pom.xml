@@ -37,7 +37,7 @@
     <plugins>
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.2-beta-2</version>
+        <version>2.2-beta-5</version>
         <configuration>
           <descriptorSourceDirectory>${basedir}/src/assemble/</descriptorSourceDirectory>
           <tarLongFileMode>gnu</tarLongFileMode>

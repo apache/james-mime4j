@@ -57,6 +57,27 @@
   </scm>
   
   <build>
+    <pluginManagement>
+      <plugins>
+         <plugin>
+           <artifactId>maven-clean-plugin</artifactId>
+           <version>2.4</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-resources-plugin</artifactId>
+           <version>2.4.1</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-site-plugin</artifactId>
+           <version>2.1</version>
+         </plugin>
+         <plugin>
+           <artifactId>maven-surfire-plugin</artifactId>
+           <version>2.5</version>
+         </plugin>
+      </plugins>
+    </pluginManagement>
+  
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -75,7 +96,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
+        <version>2.1</version>
         <configuration>
           <source>${compileSource}</source>
           <target>${compileSource}</target>
@@ -84,7 +105,7 @@
       </plugin>      
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.2</version>
+        <version>2.3</version>
         <configuration>
           <archive>
           <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -103,14 +124,20 @@
       </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.5</version>
+        <version>2.6.1</version>
         <executions>
           <execution>
-            <id>create-javadocs</id> <!-- this is used for inheritance merges -->
-            <phase>package</phase> <!-- append to the packaging phase. -->
+            <id>aggregate</id>
             <goals>
-              <goal>javadoc</goal> <!-- goals == mojos -->
-              <goal>jar</goal> <!-- goals == mojos -->
+              <goal>aggregate</goal>
+            </goals>
+            <phase>site</phase>
+          </execution>
+          <execution>
+            <id>javadoc-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar</goal>
             </goals>
           </execution>
         </executions>
@@ -121,7 +148,7 @@
       <!-- Add NOTICE and LICENSE to generated JAR -->
       <plugin>
         <artifactId>maven-remote-resources-plugin</artifactId>
-        <version>1.0</version>
+        <version>1.1</version>
         <executions>
           <execution>
             <goals>
@@ -141,7 +168,7 @@
       <plugin>
          <groupId>org.apache.maven.plugins</groupId>
          <artifactId>maven-source-plugin</artifactId>
-         <version>2.0.4</version>
+         <version>2.1.1</version>
          <executions>
             <execution>
                <id>attach-sources</id>
@@ -152,16 +179,10 @@
          </executions>
       </plugin>
 
-      <!--
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-      </plugin>
-      -->
       <plugin>
          <groupId>org.apache.felix</groupId>
          <artifactId>maven-bundle-plugin</artifactId>
-         <version>1.4.3</version>
+         <version>2.0.1</version>
          <executions>
             <execution>
                <id>bundle-manifest</id>
@@ -179,43 +200,32 @@
             </instructions>
          </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-doap-plugin</artifactId>
+        <version>1.0</version>
+        <configuration>
+         <doapOptions>
+           <programmingLanguage>java</programmingLanguage>
+           <category>Java</category>
+         </doapOptions>
+         <asfExtOptions>
+           <included>true</included>
+           <charter>The mission of the Apache JAMES mime4j project is to create and maintain software libraries related to MIME handling</charter>
+         </asfExtOptions>
+        </configuration>
+        <executions>
+          <execution>
+            <id>package</id>
+            <phase>package</phase>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
-  
-  <repositories>
-    <repository>
-      <id>local-mime4j-stage-repository</id>
-      <name>Local mime4j stage repository</name>
-      <!-- Please note that due to http://jira.codehaus.org/browse/MNG-2896 -->
-      <!-- If you don't have james-project checked out in ../james-project -->
-      <!-- you will have to place your absolute path to the project instead -->
-      <!-- of ${basedir}, or, otherwise, manually install the parent poms -->
-      <!--
-           mvn -fignorepom.xml install:install-file 
-              -Dfile=stage\org.apache.james\poms\james-parent-1.1.pom 
-              -Dpackaging=pom 
-              -DgroupId=org.apache.james 
-              -DartifactId=james-parent 
-              -Dversion=1.1
-           mvn -fignorepom.xml install:install-file 
-              -Dfile=stage\org.apache.james\poms\james-project-1.2.pom 
-              -Dpackaging=pom 
-              -DgroupId=org.apache.james 
-              -DartifactId=james-project 
-              -Dversion=1.2
-       -->
-      <url>file://${basedir}/stage</url>
-      <layout>legacy</layout>
-      <snapshots>
-        <enabled>true</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-        <checksumPolicy>ignore</checksumPolicy>
-      </releases>
-    </repository>
-  </repositories>
   
   <dependencyManagement> 
     <dependencies>
@@ -233,7 +243,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>3.8.1</version>
+        <version>3.8.2</version>
         <type>jar</type>
         <!--  Removed as a workaround for an unidentified M2 bug -->
         <scope>test</scope>
@@ -242,7 +252,7 @@
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>1.2</version>
+        <version>1.4</version>
         <scope>test</scope>
         <optional>true</optional>
       </dependency>
@@ -261,14 +271,6 @@
             <!-- test resources created by JAMES committers / we can't include ALv2 headers there -->
             <exclude>core/src/test/resources/testmsgs/*</exclude>
             <exclude>core/benchmarks/resources/*.msg</exclude>
-            <!-- 3rd party descriptors distributed via maven repositories
-                 and included "as is" -->
-            <exclude>stage/commons-io/poms/commons-io-1.2.pom</exclude>
-            <exclude>stage/commons-logging/poms/commons-logging-1.1.pom</exclude>
-            <exclude>stage/org.apache.james/xmls/james-parent-1.1-site.xml</exclude>
-            <exclude>stage/org.apache.james/xmls/james-parent-1.1-site_en.xml</exclude>
-            <exclude>stage/org.apache.james/xmls/james-project-1.2-site.xml</exclude>
-            <exclude>stage/org.apache.james/xmls/james-project-1.2-site_en.xml</exclude>
             <exclude>release.properties</exclude>
             <exclude>**/.*/**/*</exclude>
           </excludes>
@@ -291,24 +293,35 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.4.3</version>
+        <version>2.5</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>
       </plugin>
       <plugin>
         <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.4.3</version>
+        <version>2.5</version>
         <configuration>
           <aggregate>true</aggregate>
         </configuration>
       </plugin> 
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.5</version>
-        <configuration>
-          <aggregate>true</aggregate>
-        </configuration>
+        <version>2.6.1</version>
+        <reportSets>
+          <reportSet>
+            <id>non-aggregate</id>
+            <reports>
+              <report>javadoc</report>
+            </reports>
+          </reportSet>
+          <reportSet>
+            <id>aggregate</id>
+            <reports>
+              <report>aggregate</report>
+            </reports>
+          </reportSet>
+        </reportSets>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -338,7 +351,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
-        <version>2.0-beta-7</version>
+        <version>2.1</version>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -351,7 +364,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javacc-maven-plugin</artifactId>
-        <version>2.4.1</version>
+        <version>2.6</version>
       </plugin>
     </plugins>
   </reporting>
@@ -371,23 +384,5 @@
     <compileSource>1.5</compileSource>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
-  <profiles>
-    <profile>
-      <id>hudson</id>
-      <repositories>
-        <repository>
-          <id>local-mime4j-stage-repository</id>
-          <name>Local mime4j stage repository</name>
-          <url>file://${basedir}/stage</url>
-          <snapshots>
-            <enabled>false</enabled>
-            <checksumPolicy>ignore</checksumPolicy>
-          </snapshots>
-        </repository>
-      </repositories>
-  
-    </profile>
-  </profiles>
   
 </project>
