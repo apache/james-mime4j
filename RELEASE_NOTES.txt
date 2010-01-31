@@ -5,11 +5,34 @@ Mime4J storage contains support for encrypted storage through the standard Java 
 API. When used in conjunction with a JRE with strong cryptography enabled, this library will
 use strong cryptography. See README.
 
-Notes
------
+Release 0.7
+-------------------
 
+Mime4J is a flexible MIME parsing library written in Java. SAX, DOM and pull parsing styles are 
+supported.
+
+The 0.7 release brings another round of API enhancements, bug fixes and performance optimizations. 
+A major effort has been put in code reorganization, separating parsing code from DOM manipulation
+code. Mime4J 0.7 introduces the "dom" package collecting base/abstract classes and interfaces for
+MIME-DOM manipulation aiming to provide the base for a full featured traversable DOM.
+Mime4J 0.7 improve support for headless messages, malformed separation between headers and body
+and adds support for "obsolete" rfc822 syntax (e.g: "Header<somespace>: " style).
+Parsing performance for quoted printable streams have been considerably improved.
+A "DecodeMonitor" object has been introduced in most code to define how to deal with malformed
+input (Lenient vs Strict behaviours).
+
+Upgrade Notes
+-------------
+
+ * The defualt field parsing logic has been moved from AbstractField to DefaultFieldParser. 
+ * many classes have been moved from org.apache.james.mime4j.parser to 
+   org.apache.james.mime4j.stream package (ContentHandler, DefaultBodyDescriptor, RawField..)
+ * "dom" classes/interfaces have been moved from the .message and .field package to the .dom
+   package tree.
  * The method decodeBaseQuotedPrintable() of class o.a.j.mime4j.codec.DecoderUtil has been renamed
-   in decodeQuotedPrintable(). Please adjust your code accordingly in case you use this method.
+   in decodeQuotedPrintable().
+
+Please also note that as of this release Mime4j requires a Java 1.5 compatible runtime.
 
 Release 0.6
 -------------------
