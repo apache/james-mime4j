@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
+package org.apache.james.mime4j.message;
 
 import java.io.StringReader;
 import java.util.Collections;
@@ -108,7 +108,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
     }
 
     public MutableBodyDescriptor newChild() {
-		return new MaximalBodyDescriptor(this);
+        return new MaximalBodyDescriptor(this);
     }
 
     @Override
@@ -148,13 +148,13 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
             final StringReader stringReader = new StringReader(value);
             final StructuredFieldParser parser = new StructuredFieldParser(stringReader);
             try {
-            	// From RFC2017 3.1
-            	/*
-            	 * Extraction of the URL string from the URL-parameter is even simpler:
-            	 * The enclosing quotes and any linear whitespace are removed and the
-            	 * remaining material is the URL string.
-            	 * Read more: http://www.faqs.org/rfcs/rfc2017.html#ixzz0aufO9nRL
-            	 */
+                // From RFC2017 3.1
+                /*
+                 * Extraction of the URL string from the URL-parameter is even simpler:
+                 * The enclosing quotes and any linear whitespace are removed and the
+                 * remaining material is the URL string.
+                 * Read more: http://www.faqs.org/rfcs/rfc2017.html#ixzz0aufO9nRL
+                 */
                 contentLocation = parser.parse().replaceAll("\\s", "");
             } catch (MimeException e) { 
                 contentLocationParseException = e;
