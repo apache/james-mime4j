@@ -23,10 +23,8 @@ import java.io.InputStream;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.stream.BasicMimeTokenStream;
-import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.DefaultBodyDescriptor;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
-import org.apache.james.mime4j.stream.MutableBodyDescriptor;
+import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
 /**
  * <p>
@@ -67,60 +65,26 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptor;
  * one instance per thread.</p>
  */
 public class MimeTokenStream extends BasicMimeTokenStream {
-    
-    /**
-     * Creates a stream that creates a more detailed body descriptor.
-     * @return <code>MimeTokenStream</code>, not null
-     */
-    public static final MimeTokenStream createMaximalDescriptorStream() {
-        MimeEntityConfig config = new MimeEntityConfig();
-        config.setMaximalBodyDescriptor(true);
-        return new MimeTokenStream(config);
-    }
-    
-    /**
-     * Creates a stream that strictly validates the input.
-     * @return <code>MimeTokenStream</code> which throws a 
-     * <code>MimeException</code> whenever possible issues 
-     * are dedicated in the input
-     */
-    public static final MimeTokenStream createStrictValidationStream() {
-        MimeEntityConfig config = new MimeEntityConfig();
-        config.setStrictParsing(true);
-        return new MimeTokenStream(config);
-    }
-    
-    /**
-     * Constructs a standard (lax) stream.
-     * Optional validation events will be logged only.
-     * Use {@link #createStrictValidationStream()} to create
-     * a stream that strictly validates the input.
-     */
+
     public MimeTokenStream() {
-        this(new MimeEntityConfig());
+        super(new MimeEntityConfig());
     }
-    
+
     public MimeTokenStream(final MimeEntityConfig config) {
-        this(config, null);
+        super(config, null, null);
+    }
+        
+    public MimeTokenStream(
+            final MimeEntityConfig config, 
+            final MutableBodyDescriptorFactory bodyDescFactory) {
+        super(config, null, bodyDescFactory);
+    }
+
+    public MimeTokenStream(
+            final MimeEntityConfig config, 
+            final DecodeMonitor monitor,
+            final MutableBodyDescriptorFactory bodyDescFactory) {
+        super(config, monitor, bodyDescFactory);
     }
     
-    public MimeTokenStream(final MimeEntityConfig config, DecodeMonitor monitor) {
-        super(config, monitor);
-    }
-
-    /**
-     * Creates a new instance of {@link BodyDescriptor}. Subclasses may override
-     * this in order to create body descriptors, that provide more specific
-     * information.
-     */
-    protected MutableBodyDescriptor newBodyDescriptor() {
-        final MutableBodyDescriptor result;
-        if (getConfig().isMaximalBodyDescriptor()) {
-            result = new MaximalBodyDescriptor(null);
-        } else {
-            result = new DefaultBodyDescriptor(null);
-        }
-        return result;
-    }
-
 }

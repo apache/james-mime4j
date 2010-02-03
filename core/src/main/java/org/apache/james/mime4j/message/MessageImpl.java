@@ -54,6 +54,7 @@ import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -145,16 +146,21 @@ public class MessageImpl extends Message {
      * @param storageProvider
      *            {@link StorageProvider} to use for storing text and binary
      *            message bodies.
+     * @param bodyDescFactory
+     *            {@link MutableBodyDescriptorFactory} to use for creating body descriptors.
      * @throws IOException
      *             on I/O errors.
      * @throws MimeIOException
      *             on MIME protocol violations.
      */
-    public MessageImpl(InputStream is, MimeEntityConfig config,
-            StorageProvider storageProvider, DecodeMonitor monitor) throws IOException,
-            MimeIOException {
+    public MessageImpl(
+            final InputStream is, 
+            final MimeEntityConfig config,
+            final StorageProvider storageProvider, 
+            final DecodeMonitor monitor,
+            final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
         try {
-            MimeStreamParser parser = new MimeStreamParser(config, monitor);
+            MimeStreamParser parser = new MimeStreamParser(config, monitor, bodyDescFactory);
             parser.setContentDecoding(true);
             this.monitor = monitor != null ? monitor : LoggingMonitor.MONITOR;
             parser.setContentHandler(new MessageBuilder(this, storageProvider, this.monitor));
@@ -164,9 +170,19 @@ public class MessageImpl extends Message {
         }
     }
 
-    public MessageImpl(InputStream is, MimeEntityConfig config,
-            StorageProvider storageProvider) throws IOException, MimeIOException {
-        this(is, config, storageProvider, LoggingMonitor.MONITOR);
+    public MessageImpl(
+            final InputStream is, 
+            final MimeEntityConfig config,
+            final StorageProvider storageProvider,
+            final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
+        this(is, config, storageProvider, LoggingMonitor.MONITOR, bodyDescFactory);
+    }
+
+    public MessageImpl(
+            final InputStream is, 
+            final MimeEntityConfig config,
+            final StorageProvider storageProvider) throws IOException, MimeIOException {
+        this(is, config, storageProvider, LoggingMonitor.MONITOR, null);
     }
 
     /**

@@ -27,6 +27,7 @@ import org.apache.james.mime4j.parser.MaximalBodyDescriptor;
 import org.apache.james.mime4j.parser.MimeTokenStream;
 import org.apache.james.mime4j.stream.BaseTestForBodyDescriptors;
 import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
 
 public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
@@ -36,7 +37,9 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        parser = MimeTokenStream.createMaximalDescriptorStream();
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setStrictParsing(true);
+        parser = new MimeTokenStream(config, new MaximalBodyDescriptorFactory());
     }
 
     @Override

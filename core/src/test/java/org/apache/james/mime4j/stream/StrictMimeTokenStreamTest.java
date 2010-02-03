@@ -34,8 +34,9 @@ public class StrictMimeTokenStreamTest extends TestCase {
     
     public void testUnexpectedEndOfHeaders() throws Exception {
         
-        MimeTokenStream parser = MimeTokenStream.createStrictValidationStream();
-        
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setStrictParsing(true);
+        MimeTokenStream parser = new MimeTokenStream(config);
         parser.parse(new ByteArrayInputStream(HEADER_ONLY.getBytes()));
         
         assertEquals("Headers start", MimeTokenStream.T_START_HEADER, parser.next());
@@ -50,7 +51,9 @@ public class StrictMimeTokenStreamTest extends TestCase {
     
     public void testCorrectEndOfHeaders() throws Exception {
         
-        MimeTokenStream parser = MimeTokenStream.createStrictValidationStream();
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setStrictParsing(true);
+        MimeTokenStream parser = new MimeTokenStream();
         
         parser.parse(new ByteArrayInputStream(CORRECT_HEADERS.getBytes()));
         

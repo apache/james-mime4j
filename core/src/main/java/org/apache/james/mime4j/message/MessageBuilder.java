@@ -48,7 +48,7 @@ public class MessageBuilder implements ContentHandler {
 
     private final Entity entity;
     private final BodyFactory bodyFactory;
-    private Stack<Object> stack = new Stack<Object>();
+    private final Stack<Object> stack;
     private final DecodeMonitor monitor;
     
     public MessageBuilder(Entity entity) {
@@ -62,6 +62,7 @@ public class MessageBuilder implements ContentHandler {
     public MessageBuilder(Entity entity, StorageProvider storageProvider, DecodeMonitor monitor) {
         this.entity = entity;
         this.bodyFactory = new BodyFactory(storageProvider);
+        this.stack = new Stack<Object>();
         this.monitor = monitor != null ? monitor : LoggingMonitor.MONITOR;
     }
     

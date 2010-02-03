@@ -75,13 +75,14 @@ import org.apache.james.mime4j.util.CharsetUtil;
 public class BasicMimeTokenStream implements EntityStates, RecursionMode {
     
     private final MimeEntityConfig config;
+    private final DecodeMonitor monitor;
+    private final MutableBodyDescriptorFactory bodyDescFactory;
     private final LinkedList<EntityStateMachine> entities = new LinkedList<EntityStateMachine>();
     
     private int state = T_END_OF_STREAM;
     private EntityStateMachine currentStateMachine;
     private int recursionMode = M_RECURSE;
 	private MimeEntity rootentity;
-    private final DecodeMonitor monitor;
     
     /**
      * Constructs a standard (lax) stream.
@@ -94,15 +95,25 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
     }
 
     public BasicMimeTokenStream(final MimeEntityConfig config) {
-        this(config, null);
+        this(config, null, null);
     }
         
-    public BasicMimeTokenStream(final MimeEntityConfig config, DecodeMonitor monitor) {
-        super();
-        this.config = config;
-        this.monitor = monitor != null ? monitor : (config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
+    public BasicMimeTokenStream(
+            final MimeEntityConfig config, 
+            final MutableBodyDescriptorFactory bodyDescFactory) {
+        this(config, null, bodyDescFactory);
     }
 
+    public BasicMimeTokenStream(
+            final MimeEntityConfig config, 
+            final DecodeMonitor monitor,
+            final MutableBodyDescriptorFactory bodyDescFactory) {
+        super();
+        this.config = config;
+        this.monitor = monitor != null ? monitor : 
+            (config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
+        this.bodyDescFactory = bodyDescFactory;
+    }
 
     /** Instructs the {@code MimeTokenStream} to parse the given streams contents.
      * If the {@code MimeTokenStream} has already been in use, resets the streams
@@ -138,9 +149,20 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
         doParse(stream, newBodyDescriptor, start);
     }
 
+    /**
+     * Creates a new instance of {@link BodyDescriptor}. Subclasses may override
+     * this in order to create body descriptors, that provide more specific
+     * information.
+     */
     protected MutableBodyDescriptor newBodyDescriptor() {
-		return new DefaultBodyDescriptor(null);
-	}
+        final MutableBodyDescriptor result;
+        if (bodyDescFactory != null) {
+            result = bodyDescFactory.newInstance();
+        } else {
+            result = new DefaultBodyDescriptor(null);
+        }
+        return result;
+    }
 
 	public void doParse(InputStream stream,
             MutableBodyDescriptor newBodyDescriptor, int start) {

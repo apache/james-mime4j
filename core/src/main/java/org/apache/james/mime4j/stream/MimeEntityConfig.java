@@ -20,16 +20,12 @@
 package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.MaximalBodyDescriptor;
-import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.parser.MimeTokenStream;
 
 /**
  * MIME entity configuration
  */
 public final class MimeEntityConfig implements Cloneable {
 
-    private boolean maximalBodyDescriptor;
     private boolean strictParsing;
     private int maxLineLen;
     private int maxHeaderCount;
@@ -40,7 +36,6 @@ public final class MimeEntityConfig implements Cloneable {
     private boolean malformedHeaderStartsBody;
     
 	public MimeEntityConfig() {
-        this.maximalBodyDescriptor = false;
         this.strictParsing = false;
         this.maxLineLen = 1000;
         this.maxHeaderCount = 1000;
@@ -74,36 +69,6 @@ public final class MimeEntityConfig implements Cloneable {
 		this.malformedHeaderStartsBody = malformedHeaderStartsBody;
 	}
 
-    /**
-     * Returns <code>true</code> if the maximum body descriptor should be
-     * used, <code>false</code> for the default body descriptor.
-     *
-     * @see #setMaximalBodyDescriptor(boolean)
-     *
-     * @return value of maximum body descriptor.
-     */
-    public boolean isMaximalBodyDescriptor() {
-        return this.maximalBodyDescriptor;
-    }
-
-    /**
-     * Specified whether the parser should use an instance of
-     * {@link MaximalBodyDescriptor} instead of {@link DefaultBodyDescriptor} to
-     * encapsulate the values of MIME-specific header fields.
-     * <p>
-     * The body descriptor can be retrieved by calling
-     * {@link MimeTokenStream#getBodyDescriptor()}.
-     * <p>
-     * Default value: <code>false</code>
-     *
-     * @param maximalBodyDescriptor <code>true</code> to use an instance of
-     *            {@link MaximalBodyDescriptor}, <code>false</code> for an
-     *            instance of {@link DefaultBodyDescriptor}.
-     */
-    public void setMaximalBodyDescriptor(boolean maximalBodyDescriptor) {
-        this.maximalBodyDescriptor = maximalBodyDescriptor;
-    }
-    
     /**
      * Returns the value of the strict parsing mode
      * @see #setStrictParsing(boolean)
@@ -290,8 +255,7 @@ public final class MimeEntityConfig implements Cloneable {
     
     @Override
     public String toString() {
-        return "[max body descriptor: " + maximalBodyDescriptor
-                + ", strict parsing: " + strictParsing + ", max line length: "
+        return "[strict parsing: " + strictParsing + ", max line length: "
                 + maxLineLen + ", max header count: " + maxHeaderCount
                 + ", max content length: " + maxContentLen
                 + ", count line numbers: " + countLineNumbers + "]";

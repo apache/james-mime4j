@@ -29,6 +29,7 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.ContentHandler;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
 /**
  * <p>
@@ -59,24 +60,32 @@ public class MimeStreamParser {
         this.contentDecoding = false;
     }
 
-    public MimeStreamParser(final MimeEntityConfig config, DecodeMonitor monitor, boolean clone) {
-        this(new MimeTokenStream(clone ? config.clone() : config, monitor));
+    public MimeStreamParser(
+            final MimeEntityConfig config, 
+            boolean clone,
+            final DecodeMonitor monitor, 
+            final MutableBodyDescriptorFactory bodyDescFactory) {
+        this(new MimeTokenStream(clone ? config.clone() : config, monitor, bodyDescFactory));
     }
 
     public MimeStreamParser(final MimeEntityConfig config, boolean clone) {
-        this(new MimeTokenStream(clone ? config.clone() : config, null));
+        this(new MimeTokenStream(clone ? config.clone() : config, null, null));
     }
 
-    public MimeStreamParser(final MimeEntityConfig config, DecodeMonitor monitor) {
-        this(config != null ? config : new MimeEntityConfig(), monitor, config != null);
+    public MimeStreamParser(
+            final MimeEntityConfig config, 
+            final DecodeMonitor monitor,
+            final MutableBodyDescriptorFactory bodyDescFactory) {
+        this(config != null ? config : new MimeEntityConfig(), config != null, 
+                monitor, bodyDescFactory);
     }
 
     public MimeStreamParser(final MimeEntityConfig config) {
-        this(config, null);
+        this(config, null, null);
     }
 
     public MimeStreamParser() {
-        this(new MimeEntityConfig(), false);
+        this(new MimeEntityConfig(), false, null, null);
     }
     
     /**
