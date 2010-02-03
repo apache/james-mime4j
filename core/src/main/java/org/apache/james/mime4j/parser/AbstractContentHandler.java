@@ -17,9 +17,11 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.RawField;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,82 +34,43 @@ import java.io.InputStream;
  */
 public abstract class AbstractContentHandler implements ContentHandler {
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#endMultipart()
-     */
     public void endMultipart() throws MimeException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#startMultipart(org.apache.james.mime4j.stream.BodyDescriptor)
-     */
     public void startMultipart(BodyDescriptor bd) throws MimeException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#body(org.apache.james.mime4j.stream.BodyDescriptor, java.io.InputStream)
-     */
     public void body(BodyDescriptor bd, InputStream is)
             throws MimeException, IOException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#endBodyPart()
-     */
     public void endBodyPart() throws MimeException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#endHeader()
-     */
     public void endHeader() throws MimeException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#endMessage()
-     */
     public void endMessage() throws MimeException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#epilogue(java.io.InputStream)
-     */
     public void epilogue(InputStream is) throws MimeException, IOException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#field(RawField)
-     */
     public void field(RawField field) throws MimeException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#preamble(java.io.InputStream)
-     */
     public void preamble(InputStream is) throws MimeException, IOException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#startBodyPart()
-     */
     public void startBodyPart() throws MimeException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#startHeader()
-     */
     public void startHeader() throws MimeException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#startMessage()
-     */
     public void startMessage() throws MimeException {
     }
     
-    /**
-     * @see org.apache.james.mime4j.stream.ContentHandler#raw(java.io.InputStream)
-     */
     public void raw(InputStream is) throws MimeException, IOException {
     }
 

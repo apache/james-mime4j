@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j.parser;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,6 +33,7 @@ import junit.framework.TestSuite;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.log4j.BasicConfigurator;
 
 /**
@@ -65,7 +66,7 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
         TestHandler handler = null;
         MimeEntityConfig config = new MimeEntityConfig();
         if (getName().startsWith("malformedHeaderStartsBody")) {
-        	config.setMalformedHeaderStartsBody(true);
+            config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
         parser = new MimeStreamParser(config);
@@ -104,14 +105,14 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
             super();
             URL resource = MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER);
             if (resource != null) {
-				File dir = new File(resource.toURI());
-	            File[] files = dir.listFiles();
-	            
-	            for (File f : files) {
-	                if (f.getName().toLowerCase().endsWith(".msg")) {
-	                    addTest(new MimeStreamParserExampleMessagesTest(f.getName().substring(0, f.getName().length()-4), f));
-	                }
-	            }
+                File dir = new File(resource.toURI());
+                File[] files = dir.listFiles();
+                
+                for (File f : files) {
+                    if (f.getName().toLowerCase().endsWith(".msg")) {
+                        addTest(new MimeStreamParserExampleMessagesTest(f.getName().substring(0, f.getName().length()-4), f));
+                    }
+                }
             }
         }
         

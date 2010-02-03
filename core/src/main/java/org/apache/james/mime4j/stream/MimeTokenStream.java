@@ -232,14 +232,8 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     /**
      * Finishes the parsing and stops reading lines.
      * NOTE: No more lines will be parsed but the parser
-     * will still call 
-     * {@link ContentHandler#endMultipart()},
-     * {@link ContentHandler#endBodyPart()},
-     * {@link ContentHandler#endMessage()}, etc to match previous calls
-     * to 
-     * {@link ContentHandler#startMultipart(BodyDescriptor)},
-     * {@link ContentHandler#startBodyPart()},
-     * {@link ContentHandler#startMessage()}, etc.
+     * will still trigger 'end' events to match previously 
+     * triggered 'start' events.
      */
     public void stop() {
         rootentity.stop();

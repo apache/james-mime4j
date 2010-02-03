@@ -28,12 +28,12 @@ import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.SimpleContentHandler;
+import org.apache.james.mime4j.parser.AbstractContentHandler;
+import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.MemoryStorageProvider;
-import org.apache.james.mime4j.stream.AbstractContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.ContentHandler;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 
 public class LongMultipartReadBench {

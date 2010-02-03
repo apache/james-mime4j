@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j.parser;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -26,7 +26,10 @@ import java.util.LinkedList;
 
 import junit.framework.TestCase;
 
+import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.log4j.BasicConfigurator;

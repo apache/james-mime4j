@@ -17,11 +17,14 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.james.mime4j.parser.ContentHandler;
+import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**

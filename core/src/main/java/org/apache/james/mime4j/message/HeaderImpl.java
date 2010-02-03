@@ -27,8 +27,8 @@ import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.stream.AbstractContentHandler;
 import org.apache.james.mime4j.stream.RawField;
 
 /**
