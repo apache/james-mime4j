@@ -22,20 +22,15 @@ package org.apache.james.mime4j.stream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
+import org.apache.james.mime4j.io.LineNumberInputStream;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
-import org.apache.james.mime4j.io.LineNumberInputStream;
-import org.apache.james.mime4j.stream.EntityStateMachine;
-import org.apache.james.mime4j.stream.EntityStates;
-import org.apache.james.mime4j.stream.MimeEntity;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
-import org.apache.james.mime4j.stream.RecursionMode;
-
-import junit.framework.TestCase;
 
 public class MimeEntityTest extends TestCase {
 

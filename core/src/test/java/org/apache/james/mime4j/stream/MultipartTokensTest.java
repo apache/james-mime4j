@@ -27,7 +27,6 @@ import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.MimeTokenStream;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 public class MultipartTokensTest extends TestCase {

@@ -19,20 +19,17 @@
 
 package org.apache.james.mime4j.stream;
 
-import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.stream.AbstractContentHandler;
-import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.RawField;
-import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.ContentUtil;
-import org.apache.log4j.BasicConfigurator;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 
 import junit.framework.TestCase;
+
+import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
+import org.apache.log4j.BasicConfigurator;
 
 public class MimeStreamParserTest extends TestCase {
 

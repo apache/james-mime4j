@@ -24,7 +24,6 @@ import java.io.InputStream;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.parser.MimeTokenStream;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 public class MimeTokenNoRecurseTest extends TestCase {

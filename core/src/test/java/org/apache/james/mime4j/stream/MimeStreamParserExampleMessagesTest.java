@@ -33,7 +33,6 @@ import junit.framework.TestSuite;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.log4j.BasicConfigurator;
 
 /**

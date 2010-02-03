@@ -19,10 +19,6 @@
 
 package org.apache.james.mime4j.stream;
 
-import org.apache.james.mime4j.parser.MimeTokenStream;
-import org.apache.james.mime4j.stream.Event;
-import org.apache.james.mime4j.stream.MimeParseEventException;
-
 import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;

@@ -66,13 +66,13 @@ import org.apache.james.mime4j.util.CharsetUtil;
  *          }
  *      }
  * </pre>
- * <p>Instances of {@link BasicMimeTokenStream} are reusable: Invoking the
+ * <p>Instances of {@link MimeTokenStream} are reusable: Invoking the
  * method {@link #parse(InputStream)} resets the token streams internal
  * state. However, they are definitely <em>not</em> thread safe. If you
  * have a multi threaded application, then the suggested use is to have
  * one instance per thread.</p>
  */
-public class BasicMimeTokenStream implements EntityStates, RecursionMode {
+public class MimeTokenStream implements EntityStates, RecursionMode {
     
     private final MimeEntityConfig config;
     private final DecodeMonitor monitor;
@@ -82,7 +82,7 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
     private int state = T_END_OF_STREAM;
     private EntityStateMachine currentStateMachine;
     private int recursionMode = M_RECURSE;
-	private MimeEntity rootentity;
+    private MimeEntity rootentity;
     
     /**
      * Constructs a standard (lax) stream.
@@ -90,21 +90,21 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
      * Use {@link MimeTokenStream#createStrictValidationStream()} to create
      * a stream that strictly validates the input.
      */
-    public BasicMimeTokenStream() {
+    public MimeTokenStream() {
         this(new MimeEntityConfig());
     }
 
-    public BasicMimeTokenStream(final MimeEntityConfig config) {
+    public MimeTokenStream(final MimeEntityConfig config) {
         this(config, null, null);
     }
         
-    public BasicMimeTokenStream(
+    public MimeTokenStream(
             final MimeEntityConfig config, 
             final MutableBodyDescriptorFactory bodyDescFactory) {
         this(config, null, bodyDescFactory);
     }
 
-    public BasicMimeTokenStream(
+    public MimeTokenStream(
             final MimeEntityConfig config, 
             final DecodeMonitor monitor,
             final MutableBodyDescriptorFactory bodyDescFactory) {
@@ -143,8 +143,8 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
         MutableBodyDescriptor newBodyDescriptor = newBodyDescriptor();
         int start = T_START_MESSAGE;
         if (contentType != null) {
-        	start = T_END_HEADER;
-        	newBodyDescriptor.addField(new RawField("Content-Type", contentType));
+            start = T_END_HEADER;
+            newBodyDescriptor.addField(new RawField("Content-Type", contentType));
         }
         doParse(stream, newBodyDescriptor, start);
     }
@@ -164,7 +164,7 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
         return result;
     }
 
-	public void doParse(InputStream stream,
+    public void doParse(InputStream stream,
             MutableBodyDescriptor newBodyDescriptor, int start) {
         LineNumberSource lineSource = null;
         if (config.isCountLineNumbers()) {
@@ -173,7 +173,7 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
             stream = lineInput;
         }
 
-		rootentity = new MimeEntity(
+        rootentity = new MimeEntity(
                 lineSource,
                 stream,
                 newBodyDescriptor, 
@@ -182,7 +182,7 @@ public class BasicMimeTokenStream implements EntityStates, RecursionMode {
                 config,
                 monitor);
 
-		rootentity.setRecursionMode(recursionMode);
+        rootentity.setRecursionMode(recursionMode);
         currentStateMachine = rootentity;
         entities.clear();
         entities.add(currentStateMachine);

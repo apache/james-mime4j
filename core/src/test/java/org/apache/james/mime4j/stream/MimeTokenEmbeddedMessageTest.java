@@ -19,13 +19,12 @@
 
 package org.apache.james.mime4j.stream;
 
-import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.parser.MimeTokenStream;
-
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import junit.framework.TestCase;
+
+import org.apache.james.mime4j.ExampleMail;
 
 public class MimeTokenEmbeddedMessageTest extends TestCase {
     

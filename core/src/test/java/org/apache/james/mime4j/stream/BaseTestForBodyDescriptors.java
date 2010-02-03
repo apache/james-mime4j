@@ -21,10 +21,6 @@ package org.apache.james.mime4j.stream;
 
 import junit.framework.TestCase;
 
-import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.MutableBodyDescriptor;
-import org.apache.james.mime4j.stream.RawField;
-
 public abstract class BaseTestForBodyDescriptors extends TestCase {
 
     protected abstract MutableBodyDescriptor newBodyDescriptor();

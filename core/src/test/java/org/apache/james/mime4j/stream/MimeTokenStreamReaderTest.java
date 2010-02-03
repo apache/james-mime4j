@@ -24,12 +24,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 
+import junit.framework.TestCase;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.parser.MimeTokenStream;
-
-import junit.framework.TestCase;
 
 public class MimeTokenStreamReaderTest extends TestCase {
     

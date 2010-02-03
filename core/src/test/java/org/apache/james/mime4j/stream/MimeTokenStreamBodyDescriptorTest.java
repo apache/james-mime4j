@@ -19,13 +19,11 @@
 
 package org.apache.james.mime4j.stream;
 
-import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.parser.MimeTokenStream;
-import org.apache.james.mime4j.stream.BodyDescriptor;
-
 import java.io.ByteArrayInputStream;
 
 import junit.framework.TestCase;
+
+import org.apache.james.mime4j.ExampleMail;
 
 public class MimeTokenStreamBodyDescriptorTest extends TestCase {
 
