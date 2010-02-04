@@ -19,11 +19,13 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
+
 /**
  * {@link MutableBodyDescriptor} factory.
  */
 public interface MutableBodyDescriptorFactory {
 
-    MutableBodyDescriptor newInstance();
+    MutableBodyDescriptor newInstance(DecodeMonitor monitor);
 
 }

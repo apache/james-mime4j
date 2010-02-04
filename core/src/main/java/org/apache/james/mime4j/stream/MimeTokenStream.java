@@ -120,7 +120,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * internal state.
      */
     public void parse(InputStream stream) {
-        doParse(stream, null);
+        doParse(stream, newBodyDescriptor(), T_START_MESSAGE);
     }
 
     /** Instructs the {@code MimeTokenStream} to parse the given content with 
@@ -136,17 +136,14 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
         if (contentType == null) {
             throw new IllegalArgumentException("Content type may not be null");
         }
-        doParse(stream, contentType);
-    }
-
-    protected void doParse(InputStream stream, String contentType) {
         MutableBodyDescriptor newBodyDescriptor = newBodyDescriptor();
-        int start = T_START_MESSAGE;
-        if (contentType != null) {
-            start = T_END_HEADER;
+        try {
             newBodyDescriptor.addField(new RawField("Content-Type", contentType));
+        } catch (MimeException ex) {
+            // should never happen
+            throw new IllegalArgumentException(ex.getMessage());
         }
-        doParse(stream, newBodyDescriptor, start);
+        doParse(stream, newBodyDescriptor, T_END_HEADER);
     }
 
     /**
@@ -157,9 +154,9 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     protected MutableBodyDescriptor newBodyDescriptor() {
         final MutableBodyDescriptor result;
         if (bodyDescFactory != null) {
-            result = bodyDescFactory.newInstance();
+            result = bodyDescFactory.newInstance(monitor);
         } else {
-            result = new DefaultBodyDescriptor(null);
+            result = new DefaultBodyDescriptor(null, monitor);
         }
         return result;
     }

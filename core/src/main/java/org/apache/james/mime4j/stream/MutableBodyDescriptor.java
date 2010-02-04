@@ -20,6 +20,7 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.MimeException;
 
 /**
  * Adds mutator.
@@ -30,7 +31,7 @@ public interface MutableBodyDescriptor extends BodyDescriptor {
      * Adds a field to the body descriptor.
      * @param field the MIME field.
      */
-    void addField(RawField field);
+    void addField(RawField field) throws MimeException;
     
     MutableBodyDescriptor newChild();
 

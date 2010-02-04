@@ -27,7 +27,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
 
     protected abstract MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent);
     
-    public void testGetParameters() {
+    public void testGetParameters() throws Exception {
         MutableBodyDescriptor bd = null;
         
         bd = newBodyDescriptor();
@@ -64,7 +64,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         assertEquals("\\n\\\"", bd.getContentTypeParameters().get("param"));
     }
     
-    public void testAddField() {
+    public void testAddField() throws Exception {
         MutableBodyDescriptor bd = null;
         
         /*
@@ -79,7 +79,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         assertEquals("iso-8859-1", bd.getCharset());
     }
     
-    public void testGetMimeType() {
+    public void testGetMimeType() throws Exception {
         MutableBodyDescriptor bd = null;
         
         bd = newBodyDescriptor();
@@ -135,7 +135,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         
     }
     
-    public void testParameters() {
+    public void testParameters() throws Exception {
         MutableBodyDescriptor bd = null;
 
         /*

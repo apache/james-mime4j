@@ -32,6 +32,6 @@ public class DefaultBodyDescriptorTest extends BaseTestForBodyDescriptors {
 
     @Override
     protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
-        return new DefaultBodyDescriptor(parent);
+        return new DefaultBodyDescriptor(parent, null);
     }
 }

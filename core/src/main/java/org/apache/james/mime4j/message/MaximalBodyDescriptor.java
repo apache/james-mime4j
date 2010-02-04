@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.datetime.DateTime;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
@@ -74,11 +75,11 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
     private boolean isContentMD5Set;
     
     protected MaximalBodyDescriptor() {
-        this(null);
+        this(null, null);
     }
 
-    public MaximalBodyDescriptor(BodyDescriptor parent) {
-        super(parent);
+    public MaximalBodyDescriptor(final BodyDescriptor parent, final DecodeMonitor monitor) {
+        super(parent, monitor);
         isMimeVersionSet = false;
         mimeMajorVersion = DEFAULT_MAJOR_VERSION;
         mimeMinorVersion = DEFAULT_MINOR_VERSION;
@@ -108,11 +109,11 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
     }
 
     public MutableBodyDescriptor newChild() {
-        return new MaximalBodyDescriptor(this);
+        return new MaximalBodyDescriptor(this, getDecodeMonitor());
     }
 
     @Override
-    public void addField(RawField field) {
+    public void addField(RawField field) throws MimeException {
         String name = field.getName();
         String value = field.getBody();
         name = name.trim().toLowerCase();
@@ -174,9 +175,9 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         }
     }
 
-    private void parseContentDisposition(final String value) {
+    private void parseContentDisposition(final String value) throws MimeException {
         isContentDispositionSet = true;
-        contentDispositionParameters = DefaultBodyDescriptor.getHeaderParams(value);
+        contentDispositionParameters = DefaultBodyDescriptor.getHeaderParams(value, getDecodeMonitor());
         contentDispositionType = contentDispositionParameters.get("");
         
         final String contentDispositionModificationDate 

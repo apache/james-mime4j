@@ -192,6 +192,6 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
 
     @Override
     protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
-        return new MaximalBodyDescriptor(parent);
+        return new MaximalBodyDescriptor(parent, null);
     }
 }

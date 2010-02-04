@@ -22,8 +22,8 @@ package org.apache.james.mime4j.stream;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -47,7 +47,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
 
     private static final String DEFAULT_MIME_TYPE = DEFAULT_MEDIA_TYPE + "/" + DEFAULT_SUB_TYPE;
 
-    private static Log log = LogFactory.getLog(DefaultBodyDescriptor.class);
+    private final DecodeMonitor monitor;
     
     private String mediaType = DEFAULT_MEDIA_TYPE;
     private String subType = DEFAULT_SUB_TYPE;
@@ -64,7 +64,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * Creates a new root <code>BodyDescriptor</code> instance.
      */
     public DefaultBodyDescriptor() {
-        this(null);
+        this(null, null);
     }
 
     /**
@@ -73,20 +73,25 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * @param parent the descriptor of the parent or <code>null</code> if this
      *        is the root descriptor.
      */
-    public DefaultBodyDescriptor(BodyDescriptor parent) {
+    public DefaultBodyDescriptor(final BodyDescriptor parent, final DecodeMonitor monitor) {
         if (parent != null && MimeUtil.isSameMimeType("multipart/digest", parent.getMimeType())) {
-            mimeType = EMAIL_MESSAGE_MIME_TYPE;
-            subType = SUB_TYPE_EMAIL;
-            mediaType = MEDIA_TYPE_MESSAGE;
+            this.mimeType = EMAIL_MESSAGE_MIME_TYPE;
+            this.subType = SUB_TYPE_EMAIL;
+            this.mediaType = MEDIA_TYPE_MESSAGE;
         } else {
-            mimeType = DEFAULT_MIME_TYPE;
-            subType = DEFAULT_SUB_TYPE;
-            mediaType = DEFAULT_MEDIA_TYPE;
+            this.mimeType = DEFAULT_MIME_TYPE;
+            this.subType = DEFAULT_SUB_TYPE;
+            this.mediaType = DEFAULT_MEDIA_TYPE;
         }
+        this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
+    }
+    
+    protected DecodeMonitor getDecodeMonitor() {
+        return monitor;
     }
     
     public MutableBodyDescriptor newChild() {
-		return new DefaultBodyDescriptor(this);
+		return new DefaultBodyDescriptor(this, getDecodeMonitor());
     }
     
     /**
@@ -95,7 +100,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * 
      * @param field the MIME field.
      */
-    public void addField(RawField field) {
+    public void addField(RawField field) throws MimeException {
         String name = field.getName();
         String value = field.getBody();
 
@@ -113,17 +118,20 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
             try {
                 contentLength = Long.parseLong(value.trim());
             } catch (NumberFormatException e) {
-                log.error("Invalid content-length: " + value);
+                if (monitor.warn("Invalid content length: " + value, 
+                        "ignoring Content-Length header")) {
+                    throw new MimeException("Invalid Content-Length header: " + value);
+                }
             }
         } else if (name.equals("content-type") && !contentTypeSet) {
             parseContentType(value);
         }
     }
 
-    private void parseContentType(String value) {
+    private void parseContentType(String value) throws MimeException {
         contentTypeSet = true;
         
-        Map<String, String> params = DefaultBodyDescriptor.getHeaderParams(value);
+        Map<String, String> params = DefaultBodyDescriptor.getHeaderParams(value, getDecodeMonitor());
         
         String main = params.get("");
         String type = null;
@@ -258,7 +266,8 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * @param pValue The field value to parse.
      * @return The result map; use the key "" to retrieve the first value.
      */
-    public static Map<String, String> getHeaderParams(String pValue) {
+    public static Map<String, String> getHeaderParams(
+            String pValue, DecodeMonitor monitor) throws MimeException {
         pValue = pValue.trim();
         
         Map<String, String> result = new HashMap<String, String>();
@@ -299,7 +308,9 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
     
                     case READY_FOR_NAME:
                         if (c == '=') {
-                            log.error("Expected header param name, got '='");
+                            if (monitor.warn("Expected header param name, got '='", "ignoring")) {
+                                throw new MimeException("Expected header param name, got '='");
+                            }
                             state = ERROR;
                             break;
                         }

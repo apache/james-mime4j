@@ -19,13 +19,14 @@
 
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
 public class MaximalBodyDescriptorFactory implements MutableBodyDescriptorFactory {
 
-    public MutableBodyDescriptor newInstance() {
-        return new MaximalBodyDescriptor(null);
+    public MutableBodyDescriptor newInstance(DecodeMonitor monitor) {
+        return new MaximalBodyDescriptor(null, monitor);
     }
     
 } 
