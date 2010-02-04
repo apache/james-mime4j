@@ -222,7 +222,7 @@ public final class MimeEntityConfig implements Cloneable {
      * 
      * @return default content type when parsing headless,
      * null otherwise
-     * @see MimeStreamParser#parse(java.io.InputStream)
+     * @see org.apache.james.mime4j.parser.MimeStreamParser#parse(java.io.InputStream)
      */
     public String getDefaultContentType() {
         return defaultContentType;
@@ -237,7 +237,7 @@ public final class MimeEntityConfig implements Cloneable {
      * @param defaultContentType
      *            value of the default content type when parsing headless,
      *            null otherwise
-     * @see MimeStreamParser#parse(java.io.InputStream)
+     * @see org.apache.james.mime4j.parser.MimeStreamParser#parse(java.io.InputStream)
      */
     public void setDefaultContentType(String defaultContentType) {
         this.defaultContentType = defaultContentType;

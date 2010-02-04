@@ -87,7 +87,9 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     /**
      * Constructs a standard (lax) stream.
      * Optional validation events will be logged only.
-     * Use {@link MimeTokenStream#createStrictValidationStream()} to create
+     * Use {@link MimeEntityConfig#setStrictParsing(boolean)} to turn on strict 
+     * parsing mode and pass the config object to 
+     * {@link MimeTokenStream#MimeTokenStream(MimeEntityConfig)} to create
      * a stream that strictly validates the input.
      */
     public MimeTokenStream() {
