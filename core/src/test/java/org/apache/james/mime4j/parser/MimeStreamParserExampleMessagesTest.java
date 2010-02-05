@@ -20,12 +20,13 @@
 package org.apache.james.mime4j.parser;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -41,16 +42,11 @@ import org.apache.james.mime4j.stream.MimeEntityConfig;
  */
 public class MimeStreamParserExampleMessagesTest extends TestCase {
 
-    private File file;
+    private URL url;
 
-
-    public MimeStreamParserExampleMessagesTest(String testName) throws URISyntaxException {
-        this(testName, MimeStreamParserExampleMessagesTestSuite.getFile(testName));
-    }
-
-    public MimeStreamParserExampleMessagesTest(String name, File testFile) {
+    public MimeStreamParserExampleMessagesTest(String name, URL url) {
         super(name);
-        this.file = testFile;
+        this.url = url;
     }
 
     @Override
@@ -65,52 +61,53 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
         parser = new MimeStreamParser(config);
         handler = new TestHandler();
         
-        System.out.println("Parsing " + file.getName());
         parser.setContentHandler(handler);
-        parser.parse(new FileInputStream(file));
+        parser.parse(url.openStream());
         
         String result = handler.sb.toString();
-        String xmlFile = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".xml";
-        String xmlFileMime4j = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".mime4j.xml";
         
-        try {
-            String expected = IOUtils.toString(new FileInputStream(xmlFile), "ISO8859-1");
-            assertEquals("Error parsing " + file.getName(), expected, result);
-        } catch (FileNotFoundException e) {
-            FileOutputStream fos = new FileOutputStream(xmlFileMime4j);
-            fos.write(result.getBytes());
-            fos.flush();
-            fos.close();
-            fail("XML file not found: generated a file with the expected result!");
-        }
+        String s = url.toString();
+        String prefix = s.substring(0, s.lastIndexOf('.'));
+        URL xmlFileUrl = new URL(prefix + ".xml");
+        String expected = IOUtils.toString(xmlFileUrl.openStream(), "ISO8859-1");
+        assertEquals(expected, result);
     }
 
     public static Test suite() throws IOException, URISyntaxException {
         return new MimeStreamParserExampleMessagesTestSuite();
     }
 
-    
     static class MimeStreamParserExampleMessagesTestSuite extends TestSuite {
 
         private static final String TESTS_FOLDER = "/testmsgs";
 
         public MimeStreamParserExampleMessagesTestSuite() throws IOException, URISyntaxException {
-            super();
             URL resource = MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER);
             if (resource != null) {
-                File dir = new File(resource.toURI());
-                File[] files = dir.listFiles();
-                
-                for (File f : files) {
-                    if (f.getName().toLowerCase().endsWith(".msg")) {
-                        addTest(new MimeStreamParserExampleMessagesTest(f.getName().substring(0, f.getName().length()-4), f));
+                if (resource.getProtocol().equalsIgnoreCase("file")) {
+                    File dir = new File(resource.toURI());
+                    File[] files = dir.listFiles();
+                    
+                    for (File f : files) {
+                        if (f.getName().endsWith(".msg")) {
+                            addTest(new MimeStreamParserExampleMessagesTest(f.getName(), 
+                                    f.toURL()));
+                        }
+                    }
+                } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
+                    JarURLConnection conn = (JarURLConnection) resource.openConnection();
+                    JarFile jar = conn.getJarFile();
+                    for (Enumeration<JarEntry> it = jar.entries(); it.hasMoreElements(); ) {
+                        JarEntry entry = it.nextElement();
+                        String s = "/" + entry.toString();
+                        File f = new File(s);
+                        if (s.startsWith(TESTS_FOLDER) && s.endsWith(".msg")) {
+                            addTest(new MimeStreamParserExampleMessagesTest(f.getName(), 
+                                    new URL("jar:file:" + jar.getName() + "!" + s)));
+                        }
                     }
                 }
             }
-        }
-        
-        public static File getFile(String name) throws URISyntaxException {
-            return new File(MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER+File.separator+name+".msg").toURI());
         }
 
     }

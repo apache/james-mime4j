@@ -21,12 +21,13 @@ package org.apache.james.mime4j.dom;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Enumeration;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -36,7 +37,6 @@ import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
-import org.apache.log4j.BasicConfigurator;
 
 /**
  * Creates a TestSuite running the test for each .msg file in the test resouce folder.
@@ -44,24 +44,13 @@ import org.apache.log4j.BasicConfigurator;
  */
 public class ExampleMessagesRoundtripTest extends TestCase {
 
-    private File file;
+    private URL url;
 
-
-    public ExampleMessagesRoundtripTest(String testName) throws URISyntaxException {
-        this(testName, ExampleMessagesRountripTestSuite.getFile(testName));
-    }
-
-    public ExampleMessagesRoundtripTest(String name, File testFile) {
+    public ExampleMessagesRoundtripTest(String name, URL url) {
         super(name);
-        this.file = testFile;
+        this.url = url;
     }
 
-    @Override
-    public void setUp() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
-   
     @Override
     protected void runTest() throws Throwable {
         MimeEntityConfig config = new MimeEntityConfig();
@@ -69,24 +58,16 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        Message inputMessage = new MessageImpl(new FileInputStream(file), config);
+        Message inputMessage = new MessageImpl(url.openStream(), config);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         inputMessage.writeTo(out);
         
-        String msgoutFile = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".out";
-        String msgoutFileMime4j = file.getAbsolutePath().substring(0, file.getAbsolutePath().lastIndexOf('.')) + ".mime4j.out";
+        String s = url.toString();
+        URL msgout = new URL(s.substring(0, s.lastIndexOf('.')) + ".out");
         
-        try {
-            ByteArrayOutputStream expectedstream = new ByteArrayOutputStream();
-            CodecUtil.copy(new FileInputStream(msgoutFile), expectedstream);
-            assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
-        } catch (FileNotFoundException e) {
-            FileOutputStream fos = new FileOutputStream(msgoutFileMime4j);
-            fos.write(out.toByteArray());
-            fos.flush();
-            fos.close();
-            fail("Expected file not found: generated a file with the expected result!");
-        }
+        ByteArrayOutputStream expectedstream = new ByteArrayOutputStream();
+        CodecUtil.copy(msgout.openStream(), expectedstream);
+        assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
     }
 
     public static Test suite() throws IOException, URISyntaxException {
@@ -107,18 +88,26 @@ public class ExampleMessagesRoundtripTest extends TestCase {
                     File[] files = dir.listFiles();
                     
                     for (File f : files) {
-                        if (f.getName().toLowerCase().endsWith(".msg")) {
-                            addTest(new ExampleMessagesRoundtripTest(f.getName().substring(0, f.getName().length()-4), f));
+                        if (f.getName().endsWith(".msg")) {
+                            addTest(new ExampleMessagesRoundtripTest(f.getName(), 
+                                    f.toURL()));
                         }
                     }
                 } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
+                    JarURLConnection conn = (JarURLConnection) resource.openConnection();
+                    JarFile jar = conn.getJarFile();
+                    for (Enumeration<JarEntry> it = jar.entries(); it.hasMoreElements(); ) {
+                        JarEntry entry = it.nextElement();
+                        String s = "/" + entry.toString();
+                        File f = new File(s);
+                        if (s.startsWith(TESTS_FOLDER) && s.endsWith(".msg")) {
+                            addTest(new ExampleMessagesRoundtripTest(f.getName(), 
+                                    new URL("jar:file:" + jar.getName() + "!" + s)));
+                        }
+                    }
                 }
             }
         }
         
-        public static File getFile(String name) throws URISyntaxException {
-            return new File(ExampleMessagesRountripTestSuite.class.getResource(TESTS_FOLDER+File.separator+name+".msg").toURI());
-        }
-
     }
 }
