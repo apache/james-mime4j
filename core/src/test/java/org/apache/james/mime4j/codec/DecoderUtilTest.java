@@ -23,15 +23,7 @@ import java.io.UnsupportedEncodingException;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.BasicConfigurator;
-
 public class DecoderUtilTest extends TestCase {
-
-    @Override
-    public void setUp() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
 
     public void testDecodeB() throws UnsupportedEncodingException {
         String s = DecoderUtil.decodeB("VGhpcyBpcyB0aGUgcGxhaW4gd"

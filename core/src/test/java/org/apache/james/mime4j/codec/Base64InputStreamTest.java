@@ -27,18 +27,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.Random;
 
 import org.apache.commons.io.output.NullOutputStream;
-import org.apache.log4j.BasicConfigurator;
 
 import junit.framework.TestCase;
 
 public class Base64InputStreamTest extends TestCase {
 
-    @Override
-    public void setUp() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
-    
     public void testDecode() throws IOException {
         ByteArrayInputStream bis = null;
         Base64InputStream decoder = null;

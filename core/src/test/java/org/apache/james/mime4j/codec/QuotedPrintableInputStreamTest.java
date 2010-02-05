@@ -27,16 +27,8 @@ import java.io.UnsupportedEncodingException;
 
 import junit.framework.TestCase;
 
-import org.apache.log4j.BasicConfigurator;
-
 public class QuotedPrintableInputStreamTest extends TestCase {
 
-    @Override
-    public void setUp() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
-    
     public void testBasicDecode() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = new ByteArrayInputStream("=e1=e2=E3=E4\r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
@@ -48,7 +40,7 @@ public class QuotedPrintableInputStreamTest extends TestCase {
                 "=e1=e2=E3=E4\r\n=e1=e2=E3=E4\r\n=e1=e2=E3=E4\r\n=e1=e2=E3=E4\r\n=e1=e2=E3=E4\r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
         assertEquals("\u00e1\u00e2\u00e3\u00e4\r\n\u00e1\u00e2\u00e3\u00e4\r\n\u00e1\u00e2\u00e3" +
-        		"\u00e4\r\n\u00e1\u00e2\u00e3\u00e4\r\n\u00e1\u00e2\u00e3\u00e4\r\n", new String(read(decoder), "ISO8859-1"));
+                "\u00e4\r\n\u00e1\u00e2\u00e3\u00e4\r\n\u00e1\u00e2\u00e3\u00e4\r\n", new String(read(decoder), "ISO8859-1"));
     }
 
     public void testInvalidValueDecode() throws IOException, UnsupportedEncodingException {

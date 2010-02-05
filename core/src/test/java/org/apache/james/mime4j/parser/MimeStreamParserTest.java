@@ -32,59 +32,9 @@ import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
-import org.apache.log4j.BasicConfigurator;
 
 public class MimeStreamParserTest extends TestCase {
 
-    @Override
-    public void setUp() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
-        /*
-    public void testRootAndBodyStreamsAreSynched() throws IOException {
-        File dir = new File("testmsgs");
-        File[] files = dir.listFiles();
-        
-        for (int i = 0; i < files.length; i++) {
-            File f = files[i];
-            
-            if (f.getName().toLowerCase().endsWith(".msg")) {
-                final RandomAccessFile file = new RandomAccessFile(f, "r");
-                final EOLTrackingInputStream rootStream = 
-                    new EOLTrackingInputStream(
-                       new RandomAccessFileInputStream(file, 0, file.length()));
-                
-                ContentHandler handler = new AbstractContentHandler() {
-                    public void body(BodyDescriptor bd, InputStream expected) throws IOException {
-                       int pos = rootStream.getMark();
-                       if (expected instanceof RootInputStream) {
-                           pos++;
-                       }
-                       InputStream actual = 
-                           new EOLConvertingInputStream(
-                                 new RandomAccessFileInputStream(file, pos, file.length()));
-                       
-                       StringBuilder sb1 = new StringBuilder();
-                       StringBuilder sb2 = new StringBuilder();
-                       int b = 0;
-                       while ((b = expected.read()) != -1) {
-                           sb1.append((char) (b & 0xff));
-                           sb2.append((char) (actual.read() & 0xff));
-                       }
-                       assertEquals(sb1.toString(), sb2.toString());
-                    }
-                };
-                
-                System.out.println("Testing synch of " + f.getName());
-                
-                MimeStreamParser parser = new MimeStreamParser();
-                parser.setContentHandler(handler);
-                parser.parse(rootStream);
-            }
-        }
-    }*/
-    
     public void testBoundaryInEpilogue() throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("From: foo@bar.com\r\n");
