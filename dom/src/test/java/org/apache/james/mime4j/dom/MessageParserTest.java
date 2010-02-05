@@ -76,18 +76,20 @@ public class MessageParserTest extends TestCase {
         private static final String TESTS_FOLDER = "/testmsgs";
 
         public MessageParserTestSuite() throws URISyntaxException {
-			URL resource = MessageParserTestSuite.class.getResource(TESTS_FOLDER);
-			if (resource != null) {
-				File dir = new File(resource.toURI());
-	            File[] files = dir.listFiles();
-	            
-	            for (int i = 0; i < files.length && i < 5000; i++) {
-	                File f = files[i];
-	                if (f.getName().toLowerCase().endsWith(".msg")) {
-	                    addTest(new MessageParserTest(f.getName().substring(0, f.getName().length()-4), f));
-	                }
-	            }
-			}
+            URL resource = MessageParserTestSuite.class.getResource(TESTS_FOLDER);
+            if (resource != null) {
+                if (resource.getProtocol().equalsIgnoreCase("file")) {
+                    File dir = new File(resource.toURI());
+                    File[] files = dir.listFiles();
+                    
+                    for (File f : files) {
+                        if (f.getName().toLowerCase().endsWith(".msg")) {
+                            addTest(new ExampleMessagesRoundtripTest(f.getName().substring(0, f.getName().length()-4), f));
+                        }
+                    }
+                } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
+                }
+            }
         }
         
         public static File getFile(String name) throws URISyntaxException {
@@ -104,7 +106,7 @@ public class MessageParserTest extends TestCase {
         
         MimeEntityConfig config = new MimeEntityConfig();
         if (getName().startsWith("malformedHeaderStartsBody")) {
-        	config.setMalformedHeaderStartsBody(true);
+            config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
         MessageImpl m = new MessageImpl(new FileInputStream(f), config);

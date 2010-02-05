@@ -66,7 +66,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
     protected void runTest() throws Throwable {
         MimeEntityConfig config = new MimeEntityConfig();
         if (getName().startsWith("malformedHeaderStartsBody")) {
-        	config.setMalformedHeaderStartsBody(true);
+            config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
         Message inputMessage = new MessageImpl(new FileInputStream(file), config);
@@ -102,14 +102,17 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             super();
             URL resource = ExampleMessagesRountripTestSuite.class.getResource(TESTS_FOLDER);
             if (resource != null) {
-				File dir = new File(resource.toURI());
-	            File[] files = dir.listFiles();
-	            
-	            for (File f : files) {
-	                if (f.getName().toLowerCase().endsWith(".msg")) {
-	                    addTest(new ExampleMessagesRoundtripTest(f.getName().substring(0, f.getName().length()-4), f));
-	                }
-	            }
+                if (resource.getProtocol().equalsIgnoreCase("file")) {
+                    File dir = new File(resource.toURI());
+                    File[] files = dir.listFiles();
+                    
+                    for (File f : files) {
+                        if (f.getName().toLowerCase().endsWith(".msg")) {
+                            addTest(new ExampleMessagesRoundtripTest(f.getName().substring(0, f.getName().length()-4), f));
+                        }
+                    }
+                } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
+                }
             }
         }
         

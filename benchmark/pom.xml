@@ -34,6 +34,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.apache.james</groupId>
+      <artifactId>apache-mime4j-dom</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
     </dependency>
@@ -42,11 +47,6 @@
       <artifactId>commons-io</artifactId>
       <optional>false</optional>
       <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.james</groupId>
-      <artifactId>apache-mime4j-core</artifactId>
-      <version>${project.version}</version>
     </dependency>
   </dependencies>
 </project>
