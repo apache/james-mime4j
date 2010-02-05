@@ -19,9 +19,6 @@
 
 package org.apache.james.mime4j.storage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Allows for a default {@link StorageProvider} instance to be configured on an
  * application level.
@@ -40,8 +37,6 @@ public class DefaultStorageProvider {
     /** Value is <code>org.apache.james.mime4j.defaultStorageProvider</code> */
     public static final String DEFAULT_STORAGE_PROVIDER_PROPERTY =
         "org.apache.james.mime4j.defaultStorageProvider";
-
-    private static Log log = LogFactory.getLog(DefaultStorageProvider.class);
 
     private static volatile StorageProvider instance = null;
 
@@ -82,10 +77,7 @@ public class DefaultStorageProvider {
                 instance = (StorageProvider) Class.forName(clazz).newInstance();
             }
         } catch (Exception e) {
-            log.warn("Unable to create or instantiate StorageProvider class '"
-                    + clazz + "'. Using default instead.", e);
         }
-
         if (instance == null) {
             StorageProvider backend = new TempFileStorageProvider();
             instance = new ThresholdStorageProvider(backend, 1024);

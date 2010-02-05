@@ -59,11 +59,14 @@ public class MessageBuilder implements ContentHandler {
         this(entity, storageProvider, LoggingMonitor.MONITOR);
     }
     
-    public MessageBuilder(Entity entity, StorageProvider storageProvider, DecodeMonitor monitor) {
+    public MessageBuilder(
+            final Entity entity, 
+            final StorageProvider storageProvider, 
+            final DecodeMonitor monitor) {
         this.entity = entity;
-        this.bodyFactory = new BodyFactory(storageProvider);
         this.stack = new Stack<Object>();
         this.monitor = monitor != null ? monitor : LoggingMonitor.MONITOR;
+        this.bodyFactory = new BodyFactory(storageProvider, this.monitor);
     }
     
     private void expect(Class<?> c) {

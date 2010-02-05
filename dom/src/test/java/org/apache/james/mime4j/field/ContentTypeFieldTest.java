@@ -22,18 +22,11 @@ package org.apache.james.mime4j.field;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.field.ContentTypeFieldImpl;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.log4j.BasicConfigurator;
 
 import junit.framework.TestCase;
 
 public class ContentTypeFieldTest extends TestCase {
 
-    @Override
-    public void setUp() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
-    
     public void testMimeTypeWithSemiColonNoParams() throws Exception  {
         ContentTypeField f = null;
         

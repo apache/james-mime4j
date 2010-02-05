@@ -25,15 +25,8 @@ import junit.framework.TestCase;
 
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.log4j.BasicConfigurator;
 
 public class ContentDispositionFieldTest extends TestCase {
-
-    @Override
-    public void setUp() {
-        BasicConfigurator.resetConfiguration();
-        BasicConfigurator.configure();
-    }
 
     public void testDispositionTypeWithSemiColonNoParams() throws Exception {
         ContentDispositionField f = null;

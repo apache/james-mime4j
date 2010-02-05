@@ -23,8 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Disposable;
 import org.apache.james.mime4j.dom.SingleBody;
@@ -40,18 +39,17 @@ import org.apache.james.mime4j.util.CharsetUtil;
  */
 public class BodyFactory {
 
-    private static Log log = LogFactory.getLog(BodyFactory.class);
-
     private static final Charset FALLBACK_CHARSET = CharsetUtil.DEFAULT_CHARSET;
 
-    private StorageProvider storageProvider;
+    private final StorageProvider storageProvider;
+    private final DecodeMonitor monitor;
 
     /**
      * Creates a new <code>BodyFactory</code> instance that uses the default
      * storage provider for creating message bodies from input streams.
      */
     public BodyFactory() {
-        this.storageProvider = DefaultStorageProvider.getInstance();
+        this(null, null);
     }
 
     /**
@@ -62,11 +60,13 @@ public class BodyFactory {
      *            a storage provider or <code>null</code> to use the default
      *            one.
      */
-    public BodyFactory(StorageProvider storageProvider) {
-        if (storageProvider == null)
-            storageProvider = DefaultStorageProvider.getInstance();
-
-        this.storageProvider = storageProvider;
+    public BodyFactory(
+            final StorageProvider storageProvider,
+            final DecodeMonitor monitor) {
+        this.storageProvider = 
+            storageProvider != null ? storageProvider : DefaultStorageProvider.getInstance();
+        this.monitor = 
+            monitor != null ? monitor : DecodeMonitor.SILENT;
     }
 
     /**
@@ -169,7 +169,7 @@ public class BodyFactory {
             throw new IllegalArgumentException();
 
         Storage storage = storageProvider.store(is);
-        Charset charset = toJavaCharset(mimeCharset, false);
+        Charset charset = toJavaCharset(mimeCharset, false, monitor);
         return new StorageTextBody(new MultiReferenceStorage(storage), charset);
     }
 
@@ -233,7 +233,7 @@ public class BodyFactory {
         if (mimeCharset == null)
             throw new IllegalArgumentException();
 
-        Charset charset = toJavaCharset(mimeCharset, false);
+        Charset charset = toJavaCharset(mimeCharset, false, monitor);
         return new StorageTextBody(new MultiReferenceStorage(storage), charset);
     }
 
@@ -278,33 +278,42 @@ public class BodyFactory {
         if (mimeCharset == null)
             throw new IllegalArgumentException();
 
-        Charset charset = toJavaCharset(mimeCharset, true);
+        Charset charset = toJavaCharset(mimeCharset, true, monitor);
         return new StringTextBody(text, charset);
     }
 
-    private static Charset toJavaCharset(String mimeCharset, boolean forEncoding) {
+    private static Charset toJavaCharset(
+            final String mimeCharset, 
+            boolean forEncoding,
+            final DecodeMonitor monitor) {
         String charset = CharsetUtil.toJavaCharset(mimeCharset);
         if (charset == null) {
-            if (log.isWarnEnabled())
-                log.warn("MIME charset '" + mimeCharset + "' has no "
-                        + "corresponding Java charset. Using "
+            if (monitor.isListening()) {
+                monitor.warn(
+                        "MIME charset '" + mimeCharset + "' has no "
+                        + "corresponding Java charset", "Using "
                         + FALLBACK_CHARSET + " instead.");
+            }
             return FALLBACK_CHARSET;
         }
 
         if (forEncoding && !CharsetUtil.isEncodingSupported(charset)) {
-            if (log.isWarnEnabled())
-                log.warn("MIME charset '" + mimeCharset
-                        + "' does not support encoding. Using "
+            if (monitor.isListening()) {
+                monitor.warn(
+                        "MIME charset '" + mimeCharset
+                        + "' does not support encoding", "Using "
                         + FALLBACK_CHARSET + " instead.");
+            }
             return FALLBACK_CHARSET;
         }
 
         if (!forEncoding && !CharsetUtil.isDecodingSupported(charset)) {
-            if (log.isWarnEnabled())
-                log.warn("MIME charset '" + mimeCharset
-                        + "' does not support decoding. Using "
+            if (monitor.isListening()) {
+                monitor.warn(
+                        "MIME charset '" + mimeCharset
+                        + "' does not support decoding", "Using "
                         + FALLBACK_CHARSET + " instead.");
+            }
             return FALLBACK_CHARSET;
         }
 
