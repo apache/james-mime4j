@@ -32,7 +32,6 @@ import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.james.mime4j.field.LoggingMonitor;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.BodyDescriptor;
@@ -52,11 +51,7 @@ public class MessageBuilder implements ContentHandler {
     private final DecodeMonitor monitor;
     
     public MessageBuilder(Entity entity) {
-        this(entity, null);
-    }
-    
-    public MessageBuilder(Entity entity, StorageProvider storageProvider) {
-        this(entity, storageProvider, LoggingMonitor.MONITOR);
+        this(entity, null, null);
     }
     
     public MessageBuilder(
@@ -65,7 +60,7 @@ public class MessageBuilder implements ContentHandler {
             final DecodeMonitor monitor) {
         this.entity = entity;
         this.stack = new Stack<Object>();
-        this.monitor = monitor != null ? monitor : LoggingMonitor.MONITOR;
+        this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
         this.bodyFactory = new BodyFactory(storageProvider, this.monitor);
     }
     

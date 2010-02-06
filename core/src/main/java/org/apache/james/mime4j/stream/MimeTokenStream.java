@@ -103,13 +103,13 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     public MimeTokenStream(
             final MimeEntityConfig config, 
             final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(config, null, bodyDescFactory);
+        this(config, bodyDescFactory, null);
     }
 
     public MimeTokenStream(
             final MimeEntityConfig config, 
-            final DecodeMonitor monitor,
-            final MutableBodyDescriptorFactory bodyDescFactory) {
+            final MutableBodyDescriptorFactory bodyDescFactory,
+            final DecodeMonitor monitor) {
         super();
         this.config = config;
         this.monitor = monitor != null ? monitor : 

@@ -38,5 +38,10 @@
       <artifactId>apache-mime4j-dom</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <scope>compile</scope>
+    </dependency>
    </dependencies>
 </project>

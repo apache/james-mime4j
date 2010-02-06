@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.codec.EncoderUtil;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.Mailbox;
@@ -613,8 +614,9 @@ public class Fields {
 
     private static <F extends ParsedField> F parse(FieldParser<F> parser,
             String fieldName, String fieldBody) {
-    	RawField rawField = new RawField(fieldName, fieldBody);
-        return parser.parse(rawField.getName(), rawField.getBody(), rawField.getRaw(), LoggingMonitor.MONITOR);
+        RawField rawField = new RawField(fieldName, fieldBody);
+        return parser.parse(rawField.getName(), rawField.getBody(), rawField.getRaw(), 
+                DecodeMonitor.SILENT);
     }
 
     private static String encodeAddresses(Iterable<? extends Address> addresses) {

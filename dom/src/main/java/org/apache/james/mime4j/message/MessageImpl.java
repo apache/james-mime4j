@@ -49,7 +49,6 @@ import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.ContentTransferEncodingFieldImpl;
 import org.apache.james.mime4j.field.ContentTypeFieldImpl;
 import org.apache.james.mime4j.field.Fields;
-import org.apache.james.mime4j.field.LoggingMonitor;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageProvider;
@@ -157,12 +156,12 @@ public class MessageImpl extends Message {
             final InputStream is, 
             final MimeEntityConfig config,
             final StorageProvider storageProvider, 
-            final DecodeMonitor monitor,
-            final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
+            final MutableBodyDescriptorFactory bodyDescFactory,
+            final DecodeMonitor monitor) throws IOException, MimeIOException {
         try {
-            MimeStreamParser parser = new MimeStreamParser(config, monitor, bodyDescFactory);
+            this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
+            MimeStreamParser parser = new MimeStreamParser(config, bodyDescFactory, this.monitor);
             parser.setContentDecoding(true);
-            this.monitor = monitor != null ? monitor : LoggingMonitor.MONITOR;
             parser.setContentHandler(new MessageBuilder(this, storageProvider, this.monitor));
             parser.parse(is);
         } catch (MimeException e) {
@@ -175,14 +174,14 @@ public class MessageImpl extends Message {
             final MimeEntityConfig config,
             final StorageProvider storageProvider,
             final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
-        this(is, config, storageProvider, LoggingMonitor.MONITOR, bodyDescFactory);
+        this(is, config, storageProvider, bodyDescFactory, null);
     }
 
     public MessageImpl(
             final InputStream is, 
             final MimeEntityConfig config,
             final StorageProvider storageProvider) throws IOException, MimeIOException {
-        this(is, config, storageProvider, LoggingMonitor.MONITOR, null);
+        this(is, config, storageProvider, null, null);
     }
 
     /**
@@ -192,36 +191,36 @@ public class MessageImpl extends Message {
         MessageWriter.DEFAULT.writeEntity(this, out);
     }
 
-	@Override
-	protected String newUniqueBoundary() {
-		return MimeUtil.createUniqueBoundary();
-	}
+    @Override
+    protected String newUniqueBoundary() {
+        return MimeUtil.createUniqueBoundary();
+    }
 
-	protected UnstructuredField newMessageId(String hostname) {
-		return Fields.messageId(hostname);
-	}
+    protected UnstructuredField newMessageId(String hostname) {
+        return Fields.messageId(hostname);
+    }
 
-	protected DateTimeField newDate(Date date, TimeZone zone) {
-		return Fields.date(FieldName.DATE, date, zone);
-	}
+    protected DateTimeField newDate(Date date, TimeZone zone) {
+        return Fields.date(FieldName.DATE, date, zone);
+    }
 
-	protected MailboxField newMailbox(String fieldName, Mailbox mailbox) {
-		return Fields.mailbox(fieldName, mailbox);
-	}
+    protected MailboxField newMailbox(String fieldName, Mailbox mailbox) {
+        return Fields.mailbox(fieldName, mailbox);
+    }
 
-	protected MailboxListField newMailboxList(String fieldName,
-			Collection<Mailbox> mailboxes) {
-		return Fields.mailboxList(fieldName, mailboxes);
-	}
+    protected MailboxListField newMailboxList(String fieldName,
+            Collection<Mailbox> mailboxes) {
+        return Fields.mailboxList(fieldName, mailboxes);
+    }
 
-	protected AddressListField newAddressList(String fieldName,
-			Collection<Address> addresses) {
-		return Fields.addressList(fieldName, addresses);
-	}
+    protected AddressListField newAddressList(String fieldName,
+            Collection<Address> addresses) {
+        return Fields.addressList(fieldName, addresses);
+    }
 
-	protected UnstructuredField newSubject(String subject) {
-		return Fields.subject(subject);
-	}
+    protected UnstructuredField newSubject(String subject) {
+        return Fields.subject(subject);
+    }
 
     protected ContentDispositionField newContentDisposition(
             String dispositionType, String filename, long size,

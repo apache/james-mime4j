@@ -61,13 +61,11 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
      */
-    public static ParsedField parse(final ByteSequence raw, DecodeMonitor monitor) throws MimeException {
-    	RawField rawField = new RawField(raw);
+    public static ParsedField parse(
+            final ByteSequence raw, 
+            final DecodeMonitor monitor) throws MimeException {
+        RawField rawField = new RawField(raw);
         return PARSER.parse(rawField.getName(), rawField.getBody(), raw, monitor);
-    }
-
-    public static ParsedField parse(final ByteSequence raw) throws MimeException {
-        return parse(raw, LoggingMonitor.MONITOR);
     }
 
     /**
@@ -91,11 +89,17 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
      */
-    public static ParsedField parse(final String rawStr) throws MimeException {
+    public static ParsedField parse(
+            final String rawStr,
+            final DecodeMonitor monitor) throws MimeException {
         ByteSequence raw = ContentUtil.encode(rawStr);
-        return parse(raw);
+        return parse(raw, monitor);
     }
 
+    public static ParsedField parse(final String rawStr) throws MimeException {
+        ByteSequence raw = ContentUtil.encode(rawStr);
+        return parse(raw, DecodeMonitor.SILENT);
+    }
 
     public DefaultFieldParser() {
         setFieldParser(FieldName.CONTENT_TRANSFER_ENCODING,

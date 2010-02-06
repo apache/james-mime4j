@@ -63,9 +63,9 @@ public class MimeStreamParser {
     public MimeStreamParser(
             final MimeEntityConfig config, 
             boolean clone,
-            final DecodeMonitor monitor, 
-            final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(new MimeTokenStream(clone ? config.clone() : config, monitor, bodyDescFactory));
+            final MutableBodyDescriptorFactory bodyDescFactory,
+            final DecodeMonitor monitor) {
+        this(new MimeTokenStream(clone ? config.clone() : config, bodyDescFactory, monitor));
     }
 
     public MimeStreamParser(final MimeEntityConfig config, boolean clone) {
@@ -74,10 +74,10 @@ public class MimeStreamParser {
 
     public MimeStreamParser(
             final MimeEntityConfig config, 
-            final DecodeMonitor monitor,
-            final MutableBodyDescriptorFactory bodyDescFactory) {
+            final MutableBodyDescriptorFactory bodyDescFactory,
+            final DecodeMonitor monitor) {
         this(config != null ? config : new MimeEntityConfig(), config != null, 
-                monitor, bodyDescFactory);
+                bodyDescFactory, monitor);
     }
 
     public MimeStreamParser(final MimeEntityConfig config) {

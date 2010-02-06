@@ -37,11 +37,15 @@ public abstract class AbstractField implements ParsedField {
     private final ByteSequence raw;
     protected DecodeMonitor monitor;
     
-    protected AbstractField(final String name, final String body, final ByteSequence raw, DecodeMonitor monitor) {
+    protected AbstractField(
+            final String name, 
+            final String body, 
+            final ByteSequence raw, 
+            final DecodeMonitor monitor) {
         this.name = name;
         this.body = body;
         this.raw = raw;
-        this.monitor = monitor;
+        this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
     }
     
     /**

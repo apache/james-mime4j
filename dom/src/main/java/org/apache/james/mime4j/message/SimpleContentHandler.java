@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
@@ -33,8 +34,19 @@ import org.apache.james.mime4j.stream.RawField;
  * Older versions of this class performed decoding of content streams.
  * This can be now easily achieved by calling setContentDecoding(true) on the MimeStreamParser.
  */
-public abstract class SimpleContentHandler extends  AbstractContentHandler {
+public abstract class SimpleContentHandler extends AbstractContentHandler {
 
+    private final DecodeMonitor monitor;
+    
+    public SimpleContentHandler(final DecodeMonitor monitor) {
+        super();
+        this.monitor = monitor;
+    }
+    
+    public SimpleContentHandler() {
+        this(null);
+    }
+    
     /**
      * Called after headers are parsed.
      */
@@ -57,7 +69,7 @@ public abstract class SimpleContentHandler extends  AbstractContentHandler {
      */
     @Override
     public final void field(RawField field) throws MimeException {
-        Field parsedField = DefaultFieldParser.parse(field.getRaw()); 
+        Field parsedField = DefaultFieldParser.parse(field.getRaw(), monitor); 
         currHeader.addField(parsedField);
     }
 

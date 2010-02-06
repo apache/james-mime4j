@@ -24,6 +24,7 @@ import java.io.InputStream;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
@@ -66,8 +67,9 @@ public class HeaderImpl extends Header {
      * @throws IOException on I/O errors.
      * @throws MimeIOException on MIME protocol violations.
      */
-    public HeaderImpl(InputStream is) 
-            throws IOException, MimeIOException {
+    public HeaderImpl(
+            final InputStream is,
+            final DecodeMonitor monitor) throws IOException, MimeIOException {
         final MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -76,7 +78,7 @@ public class HeaderImpl extends Header {
             }
             @Override
             public void field(RawField field) throws MimeException {
-                Field parsedField = DefaultFieldParser.parse(field.getRaw()); 
+                Field parsedField = DefaultFieldParser.parse(field.getRaw(), monitor); 
                 addField(parsedField);
             }
         });
