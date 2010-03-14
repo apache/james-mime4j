@@ -173,8 +173,8 @@ SKIP :
 
 <NESTED_COMMENT> SKIP:
 {
-	"(" { ++commentNest; System.out.println("+++ COMMENT NEST=" + commentNest);}
-|	")" { --commentNest; System.out.println("+++ COMMENT NEST=" + commentNest); if (commentNest == 0) SwitchTo(INCOMMENT); }
+	"(" { ++commentNest; }
+|	")" { --commentNest; if (commentNest == 0) SwitchTo(INCOMMENT); }
 }
 
 <NESTED_COMMENT> SKIP :
