@@ -993,13 +993,13 @@ public class CharsetUtil {
      * Contains the canonical names of character sets which can be used to 
      * decode bytes into Java chars.
      */
-    private static SortedSet<String> decodingSupported = null;
+    private static SortedSet<String> decodingSupported = new TreeSet<String>();
     
     /**
      * Contains the canonical names of character sets which can be used to 
      * encode Java chars into bytes.
      */
-    private static SortedSet<String> encodingSupported = null;
+    private static SortedSet<String> encodingSupported = new TreeSet<String>();
     
     /**
      * Maps character set names to Charset objects. All possible names of
@@ -1007,26 +1007,15 @@ public class CharsetUtil {
      */
     private static Map<String, Charset> charsetMap = null;
     
+    /**
+     * Map tracking which charset encoding/decodings have been
+     * tested during runtime.
+     */
+    private static Map<String,Boolean> charsetsTested = new HashMap<String,Boolean>();
+    
     static {
-        decodingSupported = new TreeSet<String>();
-        encodingSupported = new TreeSet<String>();
-        byte[] dummy = new byte[] {'d', 'u', 'm', 'm', 'y'};
-        for (Charset c : JAVA_CHARSETS) {
-            try {
-                new String(dummy, c.canonical);
-                decodingSupported.add(c.canonical.toLowerCase());
-            } catch (UnsupportedOperationException e) {
-            } catch (UnsupportedEncodingException e) {
-            }
-            try {
-                "dummy".getBytes(c.canonical);
-                encodingSupported.add(c.canonical.toLowerCase());
-            } catch (UnsupportedOperationException e) {
-            } catch (UnsupportedEncodingException e) {
-            }
-        }
-        
-        charsetMap = new HashMap<String, Charset>();
+
+    	charsetMap = new HashMap<String, Charset>();
         for (Charset c : JAVA_CHARSETS) {
             charsetMap.put(c.canonical.toLowerCase(), c);
             if (c.mime != null) {
@@ -1148,6 +1137,9 @@ public class CharsetUtil {
      *         otherwise.
      */
     public static boolean isEncodingSupported(String charsetName) {
+    	if (!charsetsTested.containsKey(charsetName.toLowerCase())) {
+    		testCharset(charsetName.toLowerCase());
+    	}
         return encodingSupported.contains(charsetName.toLowerCase());
     }
     
@@ -1163,8 +1155,45 @@ public class CharsetUtil {
      *         otherwise.
      */
     public static boolean isDecodingSupported(String charsetName) {
+    	if (!charsetsTested.containsKey(charsetName.toLowerCase())) {
+    		testCharset(charsetName.toLowerCase());
+    	}
         return decodingSupported.contains(charsetName.toLowerCase());
     }
+    
+    
+    /**
+     * Runs underlying encoding/decodings tests to determine appropriate
+     * responses for {@link #isDecodingSupported(String)} and {@link #isEncodingSupported(String)}
+     * 
+     * @param charsetName the characters set name.
+     */
+    private static void testCharset(String charsetName) {
+	    byte[] dummy = new byte[] {'d', 'u', 'm', 'm', 'y'};
+	    Charset c = charsetMap.get(charsetName.toLowerCase());
+	    if (null == c) {
+	    	charsetsTested.put(charsetName.toLowerCase(), null);
+	    	return;
+	    }
+
+    	try {
+            new String(dummy, c.canonical);
+            decodingSupported.add(c.canonical.toLowerCase());
+        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedEncodingException e) {
+        }
+        
+        try {
+            "dummy".getBytes(c.canonical);
+            encodingSupported.add(c.canonical.toLowerCase());
+        } catch (UnsupportedOperationException e) {
+        } catch (UnsupportedEncodingException e) {
+        }
+        
+        charsetsTested.put(charsetName.toLowerCase(), null);
+    }
+    
+    
     
     /**
      * Gets the preferred MIME character set name for the specified
