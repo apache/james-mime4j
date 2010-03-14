@@ -162,7 +162,7 @@ public class MessageImpl extends Message {
             this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
             MimeStreamParser parser = new MimeStreamParser(config, bodyDescFactory, this.monitor);
             parser.setContentDecoding(true);
-            parser.setContentHandler(new MessageBuilder(this, storageProvider, this.monitor));
+            parser.setContentHandler(new EntityBuilder(this, storageProvider, this.monitor));
             parser.parse(is);
         } catch (MimeException e) {
             throw new MimeIOException(e);
