@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 
 public abstract class MessageBuilder {
     
@@ -31,5 +32,8 @@ public abstract class MessageBuilder {
     public abstract Message newMessage(Message source);
 
     public abstract Message parse(InputStream source) throws MimeException, IOException;
+
+    public abstract void setDecodeMonitor(
+            DecodeMonitor decodeMonitor);
 
 }

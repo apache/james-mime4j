@@ -35,5 +35,7 @@ public abstract class MessageBuilderFactory {
     public static MessageBuilderFactory newInstance() throws MimeException {
         return ServiceLoader.load(MessageBuilderFactory.class);
     }
+
+    public abstract void setAttribute(String name, Object value) throws IllegalArgumentException;
     
 }

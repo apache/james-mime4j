@@ -21,12 +21,27 @@ package org.apache.james.mime4j.message;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageBuilderFactory;
+import org.apache.james.mime4j.storage.StorageProvider;
 
 public class MessageBuilderFactoryImpl extends MessageBuilderFactory {
 
+    private StorageProvider storageProvider = null;
+
     @Override
     public MessageBuilder newMessageBuilder() throws MimeException {
-        return new MessageBuilderImpl();
+        return new MessageBuilderImpl(storageProvider);
+    }
+
+    @Override
+    public void setAttribute(String name, Object value)
+            throws IllegalArgumentException {
+        if ("StorageProvider".equals(name) && value instanceof StorageProvider) {
+            this.storageProvider  = (StorageProvider) value;
+            return;
+        }
+            
+        throw new IllegalArgumentException("Unsupported attribute: "+name);
+        
     }
 
 }
