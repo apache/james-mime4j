@@ -42,6 +42,13 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     private BufferedLineReaderInputStream buffer;
 
     /**
+     * Store the first buffer length.
+     * Used to distinguish between an empty preamble and 
+     * no preamble. 
+     */
+    private int initialLength;
+
+    /**
      * Creates a new MimeBoundaryInputStream.
      * 
      * @param inbuffer The underlying stream.
@@ -61,6 +68,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         this.atBoundary = false;
         this.boundaryLen = 0;
         this.lastPart = false;
+        this.initialLength = -1;
         this.completed = false;
         
         this.boundary = new byte[boundary.length() + 2];
@@ -222,9 +230,14 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         return bytesRead;
     }
     
+    public boolean isEmptyStream() {
+        return initialLength == 0;
+    }
+    
     private void calculateBoundaryLen() throws IOException {
         boundaryLen = boundary.length;
         int len = limit - buffer.pos();
+        if (len >= 0 && initialLength == -1) initialLength = len;
         if (len > 0) {
             if (buffer.charAt(limit - 1) == '\n') {
                 boundaryLen++;

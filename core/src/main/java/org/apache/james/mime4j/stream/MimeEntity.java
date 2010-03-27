@@ -138,11 +138,14 @@ public class MimeEntity extends AbstractEntity {
             if (dataStream.isUsed()) {
                 advanceToBoundary();            
                 state = EntityStates.T_END_MULTIPART;
+                break;
             } else {
                 createMimePartStream();
                 state = EntityStates.T_PREAMBLE;
+                
+                if (!currentMimePartStream.isEmptyStream()) break;
+                // continue to next state
             }
-            break;
         case EntityStates.T_PREAMBLE:
         	// removed specific code. Fallback to T_IN_BODYPART that
         	// better handle missing parts.

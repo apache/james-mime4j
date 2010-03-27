@@ -153,13 +153,15 @@ public class MultipartTokensTest extends TestCase {
         checkState(MimeTokenStream.T_FIELD);
         checkState(MimeTokenStream.T_END_HEADER);
         checkState(MimeTokenStream.T_START_MULTIPART);
-        checkState(MimeTokenStream.T_PREAMBLE);
+        // an empty preamble should not rais a T_PREAMBLE event
+        // checkState(MimeTokenStream.T_PREAMBLE);
         checkState(MimeTokenStream.T_START_BODYPART);
         checkState(MimeTokenStream.T_START_HEADER);
         checkState(MimeTokenStream.T_FIELD);
         checkState(MimeTokenStream.T_END_HEADER);
         checkState(MimeTokenStream.T_START_MULTIPART);
-        checkState(MimeTokenStream.T_PREAMBLE);
+        // an empty preamble should not rais a T_PREAMBLE event
+        // checkState(MimeTokenStream.T_PREAMBLE);
         checkState(MimeTokenStream.T_START_BODYPART);
         checkState(MimeTokenStream.T_START_HEADER);
         checkState(MimeTokenStream.T_FIELD);

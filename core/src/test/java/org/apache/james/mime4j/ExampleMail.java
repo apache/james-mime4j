@@ -165,8 +165,8 @@ public class ExampleMail {
         "<html><head><title>Rhubarb</title></head><body>Rhubarb!</body></html>\r\n" +
         "\r\n--1729--\r\n" +
         "This is the epilogue\r\n";
-    
-    public static final String MULTIPART_WITH_BINARY_ATTACHMENTS = 
+
+    public static final String MULTIPART_WITH_BINARY_ATTACHMENTS_HEADER = 
         "Return-Path: <robertburrelldonkin@blueyonder.co.uk>\r\n" +
         "Received: (qmail 18554 invoked from network); 25 May 2008 14:38:53 -0000\r\n" +
         "Received: from unknown (HELO p3presmtp01-16.prod.phx3.secureserver.net)\r\n" +
@@ -216,9 +216,9 @@ public class ExampleMail {
         "X-Nonspam: None\r\n" +
         "X-fetched-from: mail.xmlmapt.org\r\n" +
         "X-Evolution-Source: imap://rob@thebes/\r\n" +
-        "\r\n" +
-        "\r\n" +
-        "--=-tIdGYVstQJghyEDATnJ+\r\n" +
+        "\r\n";
+    
+    public static final String MULTIPART_WITH_BINARY_ATTACHMENTS_BODY = "--=-tIdGYVstQJghyEDATnJ+\r\n" +
         "Content-Type: text/plain\r\n" +
         "Content-Transfer-Encoding: 7bit\r\n" +
         "\r\n" +
@@ -316,7 +316,19 @@ public class ExampleMail {
         "Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb Rhubarb\r\n" +
         "\r\n" +
         "--=-tIdGYVstQJghyEDATnJ+--\r\n";
-    
+
+    public static final String MULTIPART_WITH_BINARY_ATTACHMENTS = MULTIPART_WITH_BINARY_ATTACHMENTS_HEADER +
+        "\r\n" + MULTIPART_WITH_BINARY_ATTACHMENTS_BODY;
+
+    public static final String MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE = MULTIPART_WITH_BINARY_ATTACHMENTS_HEADER +
+        MULTIPART_WITH_BINARY_ATTACHMENTS_BODY;
+
+    public static final String MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE = MULTIPART_WITH_BINARY_ATTACHMENTS_HEADER +
+        "This is a preamble\r\n" +
+        "With 2 lines\r\n" + MULTIPART_WITH_BINARY_ATTACHMENTS_BODY +
+        "This is an epilogue\r\n" +
+        "With 2 lines\r\n";
+
     public static final String ONE_PART_MIME_ASCII_BODY = "A single part MIME mail.\r\n";
 
     public static final String RFC822_SIMPLE_BODY = "This is a very simple email.\r\n";
@@ -633,6 +645,8 @@ public class ExampleMail {
     public static final byte[] ONE_PART_MIME_ASCII_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII).array();
     public static final byte[] ONE_PART_MIME_8859_BYTES = LATIN1.encode(ONE_PART_MIME_8859).array();
     public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES = US_ASCII.encode(MULTIPART_WITH_BINARY_ATTACHMENTS).array();
+    public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES = US_ASCII.encode(MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE).array();
+    public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES = US_ASCII.encode(MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE).array();
     public static final byte[] ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION).array();
     public static final byte[] ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES).array();
     public static final byte[] MAIL_WITH_RFC822_PART_BYTES = ascii(MAIL_WITH_RFC822_PART);
