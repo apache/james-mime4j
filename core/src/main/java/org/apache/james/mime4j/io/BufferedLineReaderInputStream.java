@@ -357,6 +357,19 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             buffer.append((char) this.buffer[i]);
         }
         buffer.append("]");
+        if (tempBuffer) {
+            buffer.append("-ORIG[pos: ");
+            buffer.append(this.origBufpos);
+            buffer.append("]");
+            buffer.append("[limit: ");
+            buffer.append(this.origBuflen);
+            buffer.append("]");
+            buffer.append("[");
+            for (int i = this.origBufpos; i < this.origBuflen; i++) {
+                buffer.append((char) this.origBuffer[i]);
+            }
+            buffer.append("]");
+        }
         return buffer.toString();
     }
 
