@@ -43,6 +43,7 @@ public final class MimeEntityConfig implements Cloneable {
         this.maxContentLen = -1;
         this.countLineNumbers = false;
         this.defaultContentType = null;
+        this.malformedHeaderStartsBody = false;
     }
     
     /**
