@@ -31,6 +31,12 @@ Upgrade Notes
    package tree.
  * The method decodeBaseQuotedPrintable() of class o.a.j.mime4j.codec.DecoderUtil has been renamed
    in decodeQuotedPrintable().
+ * Preamble and Epilogue are now correctly handled as optionals and the parser invoke their
+   tokens/events only when they are present in the message. So if your code rely on that events
+   being always called make sure to fix it.
+ * preamble and epilogue Strings in Multipart DOM object are now nullable: an empty preamble is 
+   different from no preamble, so we had to update the dom contract to support this difference.
+   Make sure to add null checks if code using multipart.getPreamble and multipart.getEpilogue.
 
 Please also note that as of this release Mime4j requires a Java 1.5 compatible runtime.
 
