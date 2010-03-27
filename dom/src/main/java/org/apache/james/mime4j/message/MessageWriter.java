@@ -141,11 +141,13 @@ public class MessageWriter {
             preamble = ((MultipartImpl) multipart).getPreambleRaw();
             epilogue = ((MultipartImpl) multipart).getEpilogueRaw();
         } else {
-            preamble = ContentUtil.encode(multipart.getPreamble());
-            epilogue = ContentUtil.encode(multipart.getEpilogue());
+            preamble = multipart.getPreamble() != null ? ContentUtil.encode(multipart.getPreamble()) : null;
+            epilogue = multipart.getEpilogue() != null ? ContentUtil.encode(multipart.getEpilogue()) : null;
         }
-        writeBytes(preamble, out);
-        out.write(CRLF);
+        if (preamble != null) {
+            writeBytes(preamble, out);
+            out.write(CRLF);
+        }
 
         for (Entity bodyPart : multipart.getBodyParts()) {
             out.write(DASHES);
@@ -159,9 +161,10 @@ public class MessageWriter {
         out.write(DASHES);
         writeBytes(boundary, out);
         out.write(DASHES);
-        out.write(CRLF);
-
-        writeBytes(epilogue, out);
+        if (epilogue != null) {
+            out.write(CRLF);
+            writeBytes(epilogue, out);
+        }
     }
 
     /**

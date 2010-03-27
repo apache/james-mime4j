@@ -143,18 +143,22 @@ public class MessageParserTest extends TestCase {
             Multipart multipart =(Multipart) e.getBody(); 
             List<Entity> parts = multipart.getBodyParts();
 
-            sb.append("<preamble>\r\n");
-            sb.append(escape(multipart.getPreamble()));
-            sb.append("</preamble>\r\n");
+            if (multipart.getPreamble() != null) {
+                sb.append("<preamble>\r\n");
+                sb.append(escape(multipart.getPreamble()));
+                sb.append("</preamble>\r\n");
+            }
             
             int i = 1;
             for (Entity bodyPart : parts) {
                 sb.append(getStructure(bodyPart, prefix, id + "_" + (i++)));
             }
 
-            sb.append("<epilogue>\r\n");
-            sb.append(escape(multipart.getEpilogue()));
-            sb.append("</epilogue>\r\n");
+            if (multipart.getEpilogue() != null) {
+                sb.append("<epilogue>\r\n");
+                sb.append(escape(multipart.getEpilogue()));
+                sb.append("</epilogue>\r\n");
+            }
             
             sb.append("</multipart>\r\n");
             

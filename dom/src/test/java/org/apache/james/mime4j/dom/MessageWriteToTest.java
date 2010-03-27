@@ -49,6 +49,7 @@ public class MessageWriteToTest extends TestCase {
     
     private void assertEquals(byte[] expected, byte[] actual) {
         StringBuilder buffer = new StringBuilder(expected.length);
+        assertEquals(new String(expected), new String(actual));
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
             buffer.append((char)actual[i]);
@@ -62,6 +63,22 @@ public class MessageWriteToTest extends TestCase {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
+    }
+    
+    public void testBinaryAttachmentNoPreamble() throws Exception {
+        MessageImpl message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES);
+        assertTrue("Is multipart", message.isMultipart());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        message.writeTo(out);
+        assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES, out.toByteArray());
+    }
+    
+    public void testBinaryAttachmentPreambleEpilogue() throws Exception {
+        MessageImpl message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES);
+        assertTrue("Is multipart", message.isMultipart());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        message.writeTo(out);
+        assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES, out.toByteArray());
     }
     
     private MessageImpl createMessage(byte[] octets) throws Exception {

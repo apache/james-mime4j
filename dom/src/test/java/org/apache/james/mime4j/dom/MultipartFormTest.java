@@ -69,8 +69,7 @@ public class MultipartFormTest extends TestCase {
         MessageWriter.DEFAULT.writeMultipart(multipart, out);
         out.close();
         
-        String expected = "\r\n" + 
-            "--foo\r\n" +
+        String expected = "--foo\r\n" +
             "Content-Type: text/plain\r\n" +
             "\r\n" +
             "this stuff\r\n" +
@@ -82,7 +81,7 @@ public class MultipartFormTest extends TestCase {
             "Content-Type: text/plain\r\n" +
             "\r\n" +
             "all kind of stuff\r\n" +
-            "--foo--\r\n";
+            "--foo--";
         String s = out.toString("US-ASCII");
         assertEquals(expected, s);
     }

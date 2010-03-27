@@ -194,14 +194,14 @@ public abstract class Multipart implements Body {
     }
 
     /**
-     * Gets the preamble.
+     * Gets the preamble or null if the message has no preamble.
      * 
      * @return the preamble.
      */
     public abstract String getPreamble();
 
     /**
-     * Sets the preamble.
+     * Sets the preamble with a value or null to remove the preamble.
      * 
      * @param preamble
      *            the preamble.
@@ -209,14 +209,14 @@ public abstract class Multipart implements Body {
     public abstract void setPreamble(String preamble);
 
     /**
-     * Gets the epilogue.
+     * Gets the epilogue or null if the message has no epilogue
      * 
      * @return the epilogue.
      */
     public abstract String getEpilogue();
 
     /**
-     * Sets the epilogue.
+     * Sets the epilogue value, or remove it if the value passed is null.
      * 
      * @param epilogue
      *            the epilogue.

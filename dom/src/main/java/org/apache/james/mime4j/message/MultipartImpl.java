@@ -37,18 +37,22 @@ public class MultipartImpl extends Multipart {
 
     private ByteSequence preamble;
     private transient String preambleStrCache;
+    private transient boolean preambleComputed = false;
     private ByteSequence epilogue;
     private transient String epilogueStrCache;
+    private transient boolean epilogueComputed = false;
 
     /**
      * Creates a new empty <code>Multipart</code> instance.
      */
     public MultipartImpl(String subType) {
         super(subType);
-        preamble = ByteSequence.EMPTY;
-        preambleStrCache = "";
-        epilogue = ByteSequence.EMPTY;
-        epilogueStrCache = "";
+        preamble = null;
+        preambleStrCache = null;
+        preambleComputed = true;
+        epilogue = null;
+        epilogueStrCache = null;
+        epilogueComputed = true;
     }
 
     /**
@@ -80,8 +84,10 @@ public class MultipartImpl extends Multipart {
     	if (other instanceof MultipartImpl) {
 	        preamble = ((MultipartImpl) other).preamble;
 	        epilogue = ((MultipartImpl) other).epilogue;
-	        preambleStrCache = ((MultipartImpl) other).preambleStrCache;
-	        epilogueStrCache = ((MultipartImpl) other).epilogueStrCache;
+            preambleStrCache = ((MultipartImpl) other).preambleStrCache;
+            epilogueStrCache = ((MultipartImpl) other).epilogueStrCache;
+            preambleComputed = ((MultipartImpl) other).preambleComputed;
+            epilogueComputed = ((MultipartImpl) other).epilogueComputed;
     	} else {
     		setPreamble(other.getPreamble());
     		setEpilogue(other.getEpilogue());
@@ -96,6 +102,7 @@ public class MultipartImpl extends Multipart {
     public void setPreambleRaw(ByteSequence preamble) {
         this.preamble = preamble;
         this.preambleStrCache = null;
+        this.preambleComputed = false;
     }
 
     /**
@@ -104,8 +111,9 @@ public class MultipartImpl extends Multipart {
      * @return the preamble.
      */
     public String getPreamble() {
-        if (preambleStrCache == null) {
-            preambleStrCache = ContentUtil.decode(preamble);
+        if (!preambleComputed) {
+            preambleStrCache = preamble != null ? ContentUtil.decode(preamble) : null;
+            preambleComputed = true;
         }
         return preambleStrCache;
     }
@@ -117,8 +125,9 @@ public class MultipartImpl extends Multipart {
      *            the preamble.
      */
     public void setPreamble(String preamble) {
-        this.preamble = ContentUtil.encode(preamble);
+        this.preamble = preamble != null ? ContentUtil.encode(preamble) : null;
         this.preambleStrCache = preamble;
+        this.preambleComputed = true;
     }
 
     // package private for now; might become public someday
@@ -129,6 +138,7 @@ public class MultipartImpl extends Multipart {
     public void setEpilogueRaw(ByteSequence epilogue) {
         this.epilogue = epilogue;
         this.epilogueStrCache = null;
+        this.epilogueComputed = false;
     }
 
     /**
@@ -137,8 +147,9 @@ public class MultipartImpl extends Multipart {
      * @return the epilogue.
      */
     public String getEpilogue() {
-        if (epilogueStrCache == null) {
-            epilogueStrCache = ContentUtil.decode(epilogue);
+        if (!epilogueComputed) {
+            epilogueStrCache = epilogue != null ? ContentUtil.decode(epilogue) : null;
+            epilogueComputed = true;
         }
         return epilogueStrCache;
     }
@@ -150,8 +161,9 @@ public class MultipartImpl extends Multipart {
      *            the epilogue.
      */
     public void setEpilogue(String epilogue) {
-        this.epilogue = ContentUtil.encode(epilogue);
+        this.epilogue = epilogue != null ? ContentUtil.encode(epilogue) : null;
         this.epilogueStrCache = epilogue;
+        this.epilogueComputed = true;
     }
 
 }
