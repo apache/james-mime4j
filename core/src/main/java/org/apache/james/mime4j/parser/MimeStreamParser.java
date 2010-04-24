@@ -206,6 +206,18 @@ public class MimeStreamParser {
     }
     
     /**
+     * Enables or disables flat mode. In flat mode rfc822 parts are not
+     * recursively parsed and multipart content is handled as a single
+     * "simple" stream.
+     * 
+     * @param raw <code>true</code> enables raw mode, <code>false</code>
+     *        disables it.
+     */
+    public void setFlat(boolean flat) {
+        mimeTokenStream.setRecursionMode(MimeTokenStream.M_FLAT);
+    }
+    
+    /**
      * Finishes the parsing and stops reading lines.
      * NOTE: No more lines will be parsed but the parser
      * will still call 
