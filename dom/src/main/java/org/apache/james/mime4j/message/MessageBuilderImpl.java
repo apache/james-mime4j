@@ -8,14 +8,21 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.storage.StorageProvider;
+import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
+/**
+ * Default MessageBuilder implementation delegating Message parsing to the "legacy"
+ * MessageImpl object.
+ */
 public class MessageBuilderImpl extends MessageBuilder {
 
-    private StorageProvider storageProvider;
+    private StorageProvider storageProvider = null;
     private DecodeMonitor decodeMonitor = null;
+    private MimeEntityConfig mimeEntityConfig = null;
+    private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
 
-    public MessageBuilderImpl(StorageProvider storageProvider) {
-        this.storageProvider = storageProvider;
+    public MessageBuilderImpl() {
     }
 
     @Override
@@ -30,12 +37,25 @@ public class MessageBuilderImpl extends MessageBuilder {
 
     @Override
     public Message parse(InputStream source) throws MimeException, IOException {
-        return new MessageImpl(source, null, storageProvider, null, decodeMonitor);
+        return new MessageImpl(source, mimeEntityConfig, storageProvider, mutableBodyDescriptorFactory, decodeMonitor);
     }
 
     @Override
     public void setDecodeMonitor(DecodeMonitor decodeMonitor) {
         this.decodeMonitor = decodeMonitor;
+    }
+
+    public void setStorageProvider(StorageProvider storageProvider) {
+        this.storageProvider = storageProvider;
+    }
+
+    public void setMimeEntityConfig(MimeEntityConfig mimeEntityConfig) {
+        this.mimeEntityConfig = mimeEntityConfig;
+    }
+
+    public void setMutableBodyDescriptorFactory(
+            MutableBodyDescriptorFactory mutableBodyDescriptorFactory) {
+        this.mutableBodyDescriptorFactory  = mutableBodyDescriptorFactory;
     }
 
 }
