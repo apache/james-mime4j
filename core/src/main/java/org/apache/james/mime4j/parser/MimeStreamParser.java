@@ -19,10 +19,8 @@
 
 package org.apache.james.mime4j.parser;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.SequenceInputStream;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -30,6 +28,7 @@ import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
+import org.apache.james.mime4j.stream.RawField;
 
 /**
  * <p>
@@ -113,16 +112,16 @@ public class MimeStreamParser {
      * @throws MimeException if the message can not be processed
      * @throws IOException on I/O errors.
      */
-    public void parse(InputStream is) throws MimeException, IOException {
+    public void parse(InputStream inputStream) throws MimeException, IOException {
         boolean headless = mimeEntityConfig.getDefaultContentType() != null;
-        InputStream inputStream = is;
         if (headless) {
-            ByteArrayInputStream headerInputStream = new ByteArrayInputStream(
-                    ("Content-Type: " + mimeEntityConfig.getDefaultContentType()
-                            + "\r\n\r\n").getBytes("iso-8859-1"));
-            inputStream = new SequenceInputStream(headerInputStream, is);
+            mimeTokenStream.parseHeadless(inputStream, mimeEntityConfig.getDefaultContentType());
+            handler.startMessage();
+            handler.startHeader();
+            handler.field(new RawField("Content-Type", mimeEntityConfig.getDefaultContentType()));
+        } else {
+            mimeTokenStream.parse(inputStream);
         }
-        mimeTokenStream.parse(inputStream);
         OUTER: for (;;) {
             int state = mimeTokenStream.getState();
             switch (state) {
