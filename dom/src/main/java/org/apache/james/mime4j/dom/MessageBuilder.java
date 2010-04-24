@@ -25,6 +25,9 @@ import java.io.InputStream;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 
+/**
+ * Defines the API to obtain Message instances from a mime stream.
+ */
 public abstract class MessageBuilder {
     
     public abstract Message newMessage();
