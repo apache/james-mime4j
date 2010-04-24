@@ -37,6 +37,8 @@ Upgrade Notes
  * preamble and epilogue Strings in Multipart DOM object are now nullable: an empty preamble is 
    different from no preamble, so we had to update the dom contract to support this difference.
    Make sure to add null checks if code using multipart.getPreamble and multipart.getEpilogue.
+ * the first event for headless parsing in MimeTokenStream is not the first BODY event.
+   You should not expect T_START_HEADER/T_END_HEADER any more.   
 
 Please also note that as of this release Mime4j requires a Java 1.5 compatible runtime.
 
