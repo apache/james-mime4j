@@ -279,7 +279,12 @@ public class MultipartTokensTest extends TestCase {
                 "multipart/mixed;boundary=1729");
         // see https://issues.apache.org/jira/browse/MIME4J-153
         // checkState(MimeTokenStream.T_END_HEADER);
-        checkState(MimeTokenStream.T_START_MULTIPART);
+        
+        // see https://issues.apache.org/jira/browse/MIME4J-153
+        // checkState(MimeTokenStream.T_START_MULTIPART);
+        
+        // actually T_START_MULTIPART is the first state, but the 
+        // checkState method calls next() before checking.
         checkState(MimeTokenStream.T_PREAMBLE);
         checkState(MimeTokenStream.T_START_BODYPART);
         checkState(MimeTokenStream.T_START_HEADER);

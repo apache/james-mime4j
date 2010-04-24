@@ -119,6 +119,7 @@ public class MimeStreamParser {
             handler.startMessage();
             handler.startHeader();
             handler.field(new RawField("Content-Type", mimeEntityConfig.getDefaultContentType()));
+            handler.endHeader();
         } else {
             mimeTokenStream.parse(inputStream);
         }

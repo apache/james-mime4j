@@ -146,6 +146,15 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
             throw new IllegalArgumentException(ex.getMessage());
         }
         doParse(stream, newBodyDescriptor, T_END_HEADER);
+        try {
+            next();
+        } catch (IOException e) {
+            // Should never happend: the first next after END_HEADER does not produce IO
+            throw new IllegalStateException(e);
+        } catch (MimeException e) {
+            // This should never happen
+            throw new IllegalStateException(e);
+        }
     }
 
     /**
