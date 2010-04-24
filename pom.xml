@@ -208,7 +208,7 @@
         <configuration>
          <doapOptions>
            <programmingLanguage>java</programmingLanguage>
-           <category>Java</category>
+           <category>mail</category>
          </doapOptions>
          <asfExtOptions>
            <included>true</included>
