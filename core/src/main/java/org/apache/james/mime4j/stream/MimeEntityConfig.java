@@ -32,18 +32,18 @@ public final class MimeEntityConfig implements Cloneable {
     private int maxHeaderLen;
     private long maxContentLen;
     private boolean countLineNumbers;
-    private String defaultContentType;
+    private String headlessParsing;
     private boolean malformedHeaderStartsBody;
     
 	public MimeEntityConfig() {
         this.strictParsing = false;
+        this.countLineNumbers = false;
+        this.malformedHeaderStartsBody = false;
         this.maxLineLen = 1000;
         this.maxHeaderCount = 1000;
         this.maxHeaderLen = 10000;
         this.maxContentLen = -1;
-        this.countLineNumbers = false;
-        this.defaultContentType = null;
-        this.malformedHeaderStartsBody = false;
+        this.headlessParsing = null;
     }
     
     /**
@@ -225,8 +225,8 @@ public final class MimeEntityConfig implements Cloneable {
      * null otherwise
      * @see org.apache.james.mime4j.parser.MimeStreamParser#parse(java.io.InputStream)
      */
-    public String getDefaultContentType() {
-        return defaultContentType;
+    public String getHeadlessParsing() {
+        return headlessParsing;
     }
 
     /**
@@ -235,13 +235,13 @@ public final class MimeEntityConfig implements Cloneable {
      * <p>
      * Default value: <code>null</code>
      * 
-     * @param defaultContentType
+     * @param contentType
      *            value of the default content type when parsing headless,
      *            null otherwise
      * @see org.apache.james.mime4j.parser.MimeStreamParser#parse(java.io.InputStream)
      */
-    public void setDefaultContentType(String defaultContentType) {
-        this.defaultContentType = defaultContentType;
+    public void setHeadlessParsing(String contentType) {
+        this.headlessParsing = contentType;
     }
 
     @Override

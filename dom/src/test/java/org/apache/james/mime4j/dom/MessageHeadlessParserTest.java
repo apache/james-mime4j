@@ -88,7 +88,7 @@ public class MessageHeadlessParserTest extends TestCase {
 				+ "all kind of stuff\r\n" + "--foo--\r\n";
 
 		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
-		mimeEntityConfig.setDefaultContentType(contentType);
+		mimeEntityConfig.setHeadlessParsing(contentType);
 		MessageImpl message = new MessageImpl(new ByteArrayInputStream(headlessContent
 				.getBytes("UTF-8")), mimeEntityConfig);
 		assertEquals("multipart/form-data", message.getMimeType());

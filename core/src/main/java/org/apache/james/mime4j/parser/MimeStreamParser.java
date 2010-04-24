@@ -113,12 +113,11 @@ public class MimeStreamParser {
      * @throws IOException on I/O errors.
      */
     public void parse(InputStream inputStream) throws MimeException, IOException {
-        boolean headless = mimeEntityConfig.getDefaultContentType() != null;
-        if (headless) {
-            mimeTokenStream.parseHeadless(inputStream, mimeEntityConfig.getDefaultContentType());
+        if (mimeEntityConfig.getHeadlessParsing() != null) {
+            mimeTokenStream.parseHeadless(inputStream, mimeEntityConfig.getHeadlessParsing());
             handler.startMessage();
             handler.startHeader();
-            handler.field(new RawField("Content-Type", mimeEntityConfig.getDefaultContentType()));
+            handler.field(new RawField("Content-Type", mimeEntityConfig.getHeadlessParsing()));
             handler.endHeader();
         } else {
             mimeTokenStream.parse(inputStream);
