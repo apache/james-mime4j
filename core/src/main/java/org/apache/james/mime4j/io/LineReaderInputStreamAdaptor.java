@@ -126,4 +126,23 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
 			return false;
 		}
 	}
+
+	@Override
+	public long skip(long count) throws IOException {
+		if (count <= 0) {
+			return 0; // So specified by InputStream.skip(long).
+		}
+		final int bufferSize = count > 8192 ? 8192 : (int) count;
+		final byte[] buffer = new byte[bufferSize];
+		long result = 0;
+		while (count > 0) {
+			int res = read(buffer);
+			if (res == -1) {
+				break;
+			}
+			result += res;
+			count -= res;
+		}
+		return result;
+	}
 }
