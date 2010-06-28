@@ -21,6 +21,8 @@ public class MessageBuilderImpl extends MessageBuilder {
     private DecodeMonitor decodeMonitor = null;
     private MimeEntityConfig mimeEntityConfig = null;
     private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
+    private boolean flatMode = false;
+    private boolean contentDecoding = true;
 
     public MessageBuilderImpl() {
     }
@@ -37,7 +39,7 @@ public class MessageBuilderImpl extends MessageBuilder {
 
     @Override
     public Message parse(InputStream source) throws MimeException, IOException {
-        return new MessageImpl(source, mimeEntityConfig, storageProvider, mutableBodyDescriptorFactory, decodeMonitor);
+        return new MessageImpl(source, mimeEntityConfig, storageProvider, mutableBodyDescriptorFactory, decodeMonitor, contentDecoding, flatMode);
     }
 
     @Override
@@ -56,6 +58,16 @@ public class MessageBuilderImpl extends MessageBuilder {
     public void setMutableBodyDescriptorFactory(
             MutableBodyDescriptorFactory mutableBodyDescriptorFactory) {
         this.mutableBodyDescriptorFactory  = mutableBodyDescriptorFactory;
+    }
+
+    @Override
+    public void setContentDecoding(boolean contentDecoding) {
+        this.contentDecoding  = contentDecoding;
+    }
+
+    @Override
+    public void setFlatMode() {
+        this.flatMode = true;
     }
 
 }

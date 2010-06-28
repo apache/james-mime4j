@@ -66,8 +66,6 @@ import org.apache.james.mime4j.util.MimeUtil;
  */
 public class MessageImpl extends Message {
 
-    private DecodeMonitor monitor;
-
     /**
      * Creates a new empty <code>Message</code>.
      */
@@ -158,17 +156,47 @@ public class MessageImpl extends Message {
             final StorageProvider storageProvider, 
             final MutableBodyDescriptorFactory bodyDescFactory,
             final DecodeMonitor monitor) throws IOException, MimeIOException {
+        this(is, config, storageProvider, bodyDescFactory, monitor, true, false);
+    }
+    
+    /**
+     * Parses the specified MIME message stream into a <code>Message</code>
+     * instance using given {@link MimeEntityConfig} and {@link StorageProvider}.
+     * 
+     * @param is
+     *            the stream to parse.
+     * @param config
+     *            {@link MimeEntityConfig} to use.
+     * @param storageProvider
+     *            {@link StorageProvider} to use for storing text and binary
+     *            message bodies.
+     * @param bodyDescFactory
+     *            {@link MutableBodyDescriptorFactory} to use for creating body descriptors.
+     * @throws IOException
+     *             on I/O errors.
+     * @throws MimeIOException
+     *             on MIME protocol violations.
+     */
+    public MessageImpl(
+            final InputStream is, 
+            final MimeEntityConfig config,
+            final StorageProvider storageProvider, 
+            final MutableBodyDescriptorFactory bodyDescFactory,
+            final DecodeMonitor monitor,
+            boolean contentDecoding,
+            boolean flatMode) throws IOException, MimeIOException {
         try {
-            this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
-            MimeStreamParser parser = new MimeStreamParser(config, bodyDescFactory, this.monitor);
-            parser.setContentDecoding(true);
-            parser.setContentHandler(new EntityBuilder(this, storageProvider, this.monitor));
+            DecodeMonitor mon = monitor != null ? monitor : DecodeMonitor.SILENT;
+            MimeStreamParser parser = new MimeStreamParser(config, bodyDescFactory, mon);
+            parser.setContentHandler(new EntityBuilder(this, storageProvider, mon));
+            parser.setContentDecoding(contentDecoding);
+            if (flatMode) parser.setFlat(true);
             parser.parse(is);
         } catch (MimeException e) {
             throw new MimeIOException(e);
         }
     }
-
+    
     public MessageImpl(
             final InputStream is, 
             final MimeEntityConfig config,

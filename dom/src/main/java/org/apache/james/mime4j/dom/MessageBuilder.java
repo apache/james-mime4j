@@ -39,4 +39,8 @@ public abstract class MessageBuilder {
     public abstract void setDecodeMonitor(
             DecodeMonitor decodeMonitor);
 
+    public abstract void setContentDecoding(boolean contentDecoding);
+    
+    public abstract void setFlatMode();
+
 }
