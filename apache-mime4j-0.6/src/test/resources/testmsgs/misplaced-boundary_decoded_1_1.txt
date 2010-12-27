@@ -1,2 +1,0 @@
-This should be a text including the --boundary
-string and should not be parsed as multiple bodies
