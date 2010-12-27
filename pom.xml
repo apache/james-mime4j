@@ -37,7 +37,7 @@
   <distributionManagement>
     <site>
       <id>mime4j-website</id>
-      <url>scp://minotaur.apache.org/www/james.apache.org/mime4j/</url>
+      <url>http://people.apache.org/www/james.apache.org/mime4j/</url>
     </site>
   </distributionManagement>
   <scm>
