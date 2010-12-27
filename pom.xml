@@ -21,16 +21,13 @@
   <parent>
     <artifactId>james-project</artifactId>
     <groupId>org.apache.james</groupId>
-    <version>1.2</version>
-    <!-- Either this really points to the james-project/pom.xml or you
-         will have to tune the local repository, later, in this file -->
-    <relativePath>../james-project/project/pom.xml</relativePath>
+    <version>1.5</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
   <artifactId>apache-mime4j</artifactId>
   <name>Apache JAMES Mime4j</name>
-  <version>0.6</version>
+  <version>0.6.1</version>
   <description>Java stream based MIME message parser</description>
   <url>http://james.apache.org/mime4j</url>
   <issueManagement>
@@ -40,16 +37,17 @@
   <distributionManagement>
     <site>
       <id>mime4j-website</id>
-      <url>scp://minotaur.apache.org/www/james.apache.org/mime4j/</url>
+      <url>http://people.apache.org/www/james.apache.org/mime4j/</url>
     </site>
   </distributionManagement>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-0.6</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-0.6</developerConnection>
-    <url>http://svn.apache.org/viewvc/james/mime4j/tags/apache-mime4j-0.6</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-0.6.1</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-0.6.1</developerConnection>
+    <url>http://svn.apache.org/viewvc/james/mime4j/tags/apache-mime4j-0.6.1</url>
   </scm>
   <build>
     <plugins>
+      <!-- 
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>rat-maven-plugin</artifactId>
@@ -63,6 +61,7 @@
           </execution>
         </executions>
       </plugin>
+      -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>javacc-maven-plugin</artifactId>
