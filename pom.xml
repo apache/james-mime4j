@@ -41,9 +41,9 @@
     </site>
   </distributionManagement>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-0.6</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-0.6</developerConnection>
-    <url>http://svn.apache.org/viewvc/james/mime4j/tags/apache-mime4j-0.6</url>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/branches/apache-mime4j-0.6</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/branches/apache-mime4j-0.6</developerConnection>
+    <url>http://svn.apache.org/viewvc/james/mime4j/branches/apache-mime4j-0.6</url>
   </scm>
   <build>
     <plugins>
