@@ -1,0 +1,358 @@
+/****************************************************************
+ * Licensed to the Apache Software Foundation (ASF) under one   *
+ * or more contributor license agreements.  See the NOTICE file *
+ * distributed with this work for additional information        *
+ * regarding copyright ownership.  The ASF licenses this file   *
+ * to you under the Apache License, Version 2.0 (the            *
+ * "License"); you may not use this file except in compliance   *
+ * with the License.  You may obtain a copy of the License at   *
+ *                                                              *
+ *   http://www.apache.org/licenses/LICENSE-2.0                 *
+ *                                                              *
+ * Unless required by applicable law or agreed to in writing,   *
+ * software distributed under the License is distributed on an  *
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY       *
+ * KIND, either express or implied.  See the License for the    *
+ * specific language governing permissions and limitations      *
+ * under the License.                                           *
+ ****************************************************************/
+
+
+/**
+ * RFC2822 address list parser.
+ *
+ * Created 9/17/2004
+ * by Joe Cheng <code@joecheng.com>
+ */
+
+options {
+	STATIC=false;
+	LOOKAHEAD=1;
+	JDK_VERSION = "1.5";
+	VISITOR=true;
+	MULTI=true;
+	NODE_SCOPE_HOOK=true;
+	NODE_EXTENDS="org.apache.james.mime4j.field.address.parser.BaseNode"; 
+	//DEBUG_PARSER=true;
+	//DEBUG_TOKEN_MANAGER=true;
+}
+
+PARSER_BEGIN(AddressListParser)
+/****************************************************************
+ * Licensed to the Apache Software Foundation (ASF) under one   *
+ * or more contributor license agreements.  See the NOTICE file *
+ * distributed with this work for additional information        *
+ * regarding copyright ownership.  The ASF licenses this file   *
+ * to you under the Apache License, Version 2.0 (the            *
+ * "License"); you may not use this file except in compliance   *
+ * with the License.  You may obtain a copy of the License at   *
+ *                                                              *
+ *   http://www.apache.org/licenses/LICENSE-2.0                 *
+ *                                                              *
+ * Unless required by applicable law or agreed to in writing,   *
+ * software distributed under the License is distributed on an  *
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY       *
+ * KIND, either express or implied.  See the License for the    *
+ * specific language governing permissions and limitations      *
+ * under the License.                                           *
+ ****************************************************************/
+package org.apache.james.mime4j.field.address.parser;
+
+public class AddressListParser {
+    public static void main(String args[]) throws ParseException {
+        while (true) {
+            try {
+                AddressListParser parser = new AddressListParser(System.in);
+                parser.parseLine();
+                ((SimpleNode) parser.jjtree.rootNode()).dump("> ");
+            } catch (Exception x) {
+                x.printStackTrace();
+                return;
+            }
+        }
+    }
+
+    public ASTaddress_list parseAddressList() throws ParseException {
+        try {
+            parseAddressList0();
+            return (ASTaddress_list) jjtree.rootNode();
+        } catch (TokenMgrError tme) {
+            throw new ParseException(tme.getMessage());
+        }
+    }
+
+    public ASTaddress parseAddress() throws ParseException {
+        try {
+            parseAddress0();
+            return (ASTaddress) jjtree.rootNode();
+        } catch (TokenMgrError tme) {
+            throw new ParseException(tme.getMessage());
+        }
+    }
+
+    public ASTmailbox parseMailbox() throws ParseException {
+        try {
+            parseMailbox0();
+            return (ASTmailbox) jjtree.rootNode();
+        } catch (TokenMgrError tme) {
+            throw new ParseException(tme.getMessage());
+        }
+    }
+
+    void jjtreeOpenNodeScope(Node n) {
+        ((SimpleNode) n).firstToken = getToken(1);
+    }
+
+    void jjtreeCloseNodeScope(Node n) {
+        ((SimpleNode) n).lastToken = getToken(0);
+    }
+}
+
+PARSER_END(AddressListParser)
+
+void parseLine() #void :
+{}
+{
+	address_list() ["\r"] "\n"
+}
+
+void parseAddressList0() #void :
+{}
+{
+	address_list() <EOF>
+}
+
+void parseAddress0() #void :
+{}
+{
+	address() <EOF>
+}
+
+void parseMailbox0() #void :
+{}
+{
+	mailbox() <EOF>
+}
+
+void address_list() :
+{}
+{
+	[ address() ]
+	(
+		","
+		[ address() ]
+	)*
+}
+
+void address() :
+{}
+{
+	LOOKAHEAD(2147483647)
+	addr_spec()
+|	angle_addr()
+|	( phrase() (group_body() | angle_addr()) )
+}
+
+void mailbox() :
+{}
+{
+	LOOKAHEAD(2147483647)
+	addr_spec()
+|	angle_addr()
+|	name_addr()
+}
+
+void name_addr() :
+{}
+{
+	phrase() angle_addr()
+}
+
+void group_body() :
+{}
+{
+	":"
+	[ mailbox() ]
+	(
+		","
+		[ mailbox() ]
+	)*
+	";"
+}
+
+void angle_addr() :
+{}
+{
+	"<" [ route() ] addr_spec() ">"
+}
+
+void route() :
+{}
+{
+	"@" domain() ( (",")* "@" domain() )* ":"
+}
+
+void phrase() :
+{}
+{
+(	<DOTATOM>
+|	<QUOTEDSTRING>
+)+
+}
+
+void addr_spec() :
+{}
+{
+	( local_part() "@" domain() )
+}
+
+void local_part() :
+{ Token t; }
+{
+	( t=<DOTATOM> | t=<QUOTEDSTRING> )
+	(	[t="."]
+		{
+			if ( t.kind == AddressListParserConstants.QUOTEDSTRING || t.image.charAt(t.image.length() - 1) != '.')
+				throw new ParseException("Words in local part must be separated by '.'");
+		}
+		(	t=<DOTATOM> | t=<QUOTEDSTRING> )
+	)*
+}
+
+void domain() :
+{ Token t; }
+{
+	(	t=<DOTATOM>
+		(	[t="."]
+			{
+				if (t.image.charAt(t.image.length() - 1) != '.')
+					throw new ParseException("Atoms in domain names must be separated by '.'");
+			}
+			t=<DOTATOM>
+		)*
+	)
+|	<DOMAINLITERAL>
+}
+
+SPECIAL_TOKEN :
+{
+ 	< WS: ( [" ", "\t"] )+ >
+}
+
+TOKEN :
+{
+	< #ALPHA: ["a" - "z", "A" - "Z"] >
+|	< #DIGIT: ["0" - "9"] >
+|	< #ATEXT: ( <ALPHA> | <DIGIT>
+			  | "!" | "#" | "$" | "%"
+			  | "&" | "'" | "*" | "+"
+			  | "-" | "/" | "=" | "?"
+			  | "^" | "_" | "`" | "{"
+			  | "|" | "}" | "~"
+			  )>
+|	< DOTATOM: <ATEXT> ( <ATEXT> | "." )* >
+}
+
+TOKEN_MGR_DECLS :
+{
+	// Keeps track of how many levels of comment nesting
+	// we've encountered.  This is only used when the 2nd
+	// level is reached, for example ((this)), not (this).
+	// This is because the outermost level must be treated
+	// specially anyway, because the outermost ")" has a 
+	// different token type than inner ")" instances.
+	static int commentNest;
+}
+
+MORE :
+{
+	// domain literal
+	"[" : INDOMAINLITERAL
+}
+
+<INDOMAINLITERAL>
+MORE :
+{
+	< <QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
+|	< ~["[", "]", "\\"] >
+}
+
+<INDOMAINLITERAL>
+TOKEN :
+{
+	< DOMAINLITERAL: "]" > { matchedToken.image = image.toString(); }: DEFAULT
+}
+
+MORE :
+{
+	// starts a comment
+	"(" : INCOMMENT
+}
+
+<INCOMMENT>
+SKIP :
+{
+	// ends a comment
+	< COMMENT: ")" > : DEFAULT
+	// if this is ever changed to not be a SKIP, need
+	// to make sure matchedToken.token = token.toString()
+	// is called.
+}
+
+<INCOMMENT>
+MORE :
+{
+	< <QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
+|	"(" { commentNest = 1; } : NESTED_COMMENT
+|	< <ANY>>
+}
+
+<NESTED_COMMENT>
+MORE :
+{
+	< <QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
+|	"(" { ++commentNest; }
+|	")" { --commentNest; if (commentNest == 0) SwitchTo(INCOMMENT); }
+|	< <ANY>>
+}
+
+
+// QUOTED STRINGS
+
+MORE :
+{
+	"\"" { image.deleteCharAt(image.length() - 1); } : INQUOTEDSTRING
+}
+
+<INQUOTEDSTRING>
+MORE :
+{
+	< <QUOTEDPAIR>> { image.deleteCharAt(image.length() - 2); }
+|	< (~["\"", "\\"])+ >
+}
+
+<INQUOTEDSTRING>
+TOKEN :
+{
+	< QUOTEDSTRING: "\"" > { matchedToken.image = image.substring(0, image.length() - 1); } : DEFAULT
+}
+
+// GLOBALS
+
+<*>
+TOKEN :
+{
+	< #QUOTEDPAIR: "\\" <ANY> >
+|	< #ANY: ~[] >
+}
+
+// ERROR!
+/*
+
+<*>
+TOKEN :
+{
+	< UNEXPECTED_CHAR: <ANY> >
+}
+
+*/

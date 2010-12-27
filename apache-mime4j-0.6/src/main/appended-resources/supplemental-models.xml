@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<supplementalDataModels>
+  <!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+  
+  http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed  under the  License is distributed on an "AS IS" BASIS,
+  WITHOUT  WARRANTIES OR CONDITIONS  OF ANY KIND, either  express  or
+  implied.
+  
+  See the License for the specific language governing permissions and
+  limitations under the License.
+  -->
+  <supplement>
+    <project>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <name>Apache Commons Logging</name>
+      <url>http://jakarta.apache.org/commons/logging/</url>
+      <organization>
+        <name>The Apache Software Foundation</name>
+        <url>http://www.apache.org/</url>
+      </organization>
+      <licenses>
+        <license>
+          <name>Apache License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+  <supplement>
+    <project>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <name>Apache Commons IO</name>
+      <url>http://jakarta.apache.org/commons/io/</url>
+      <organization>
+        <name>The Apache Software Foundation</name>
+        <url>http://www.apache.org/</url>
+      </organization>
+      <licenses>
+        <license>
+          <name>Apache License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+  <supplement>
+    <project>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <name>Apache Log4j</name>
+      <url>http://logging.apache.org/log4j/</url>
+      <organization>
+        <name>The Apache Software Foundation</name>
+        <url>http://www.apache.org/</url>
+      </organization>
+      <licenses>
+        <license>
+          <name>Apache License, Version 2.0</name>
+          <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+          <distribution>repo</distribution>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+  <supplement>
+    <project>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <name>JUnit</name>
+      <url>http://www.junit.org/</url>
+      <organization>
+      	<name>Kent Beck, Erich Gamma, and David Saff</name>
+      </organization>
+      <licenses>
+        <license>
+          <name>Common Public License Version 1.0</name>
+          <url>http://www.opensource.org/licenses/cpl.php</url>
+        </license>
+      </licenses>
+    </project>
+  </supplement>
+</supplementalDataModels>
