@@ -23,6 +23,6 @@ import org.apache.james.mime4j.dom.address.AddressList;
 
 public interface AddressListField extends ParsedField {
 
-    public abstract AddressList getAddressList();
+    AddressList getAddressList();
 
 }

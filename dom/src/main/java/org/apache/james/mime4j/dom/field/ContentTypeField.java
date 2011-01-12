@@ -41,7 +41,7 @@ public interface ContentTypeField extends ParsedField {
      * 
      * @return the MIME type or an empty string if not set.
      */
-    public abstract String getMimeType();
+    String getMimeType();
 
     /**
      * Gets the value of a parameter. Parameter names are case-insensitive.
@@ -50,14 +50,14 @@ public interface ContentTypeField extends ParsedField {
      *            the name of the parameter to get.
      * @return the parameter value or <code>null</code> if not set.
      */
-    public abstract String getParameter(String name);
+    String getParameter(String name);
 
     /**
      * Gets all parameters.
      * 
      * @return the parameters.
      */
-    public abstract Map<String, String> getParameters();
+    Map<String, String> getParameters();
 
     /**
      * Determines if the MIME type of this field matches the given one.
@@ -67,7 +67,7 @@ public interface ContentTypeField extends ParsedField {
      * @return <code>true</code> if the MIME type of this field matches,
      *         <code>false</code> otherwise.
      */
-    public abstract boolean isMimeType(String mimeType);
+    boolean isMimeType(String mimeType);
 
     /**
      * Determines if the MIME type of this field is <code>multipart/*</code>.
@@ -76,7 +76,7 @@ public interface ContentTypeField extends ParsedField {
      *         <code>multipart/*</code> MIME type, <code>false</code>
      *         otherwise.
      */
-    public abstract boolean isMultipart();
+    boolean isMultipart();
 
     /**
      * Gets the value of the <code>boundary</code> parameter if set.
@@ -84,7 +84,7 @@ public interface ContentTypeField extends ParsedField {
      * @return the <code>boundary</code> parameter value or <code>null</code>
      *         if not set.
      */
-    public abstract String getBoundary();
+    String getBoundary();
 
     /**
      * Gets the value of the <code>charset</code> parameter if set.
@@ -92,6 +92,6 @@ public interface ContentTypeField extends ParsedField {
      * @return the <code>charset</code> parameter value or <code>null</code>
      *         if not set.
      */
-    public abstract String getCharset();
+    String getCharset();
 
 }

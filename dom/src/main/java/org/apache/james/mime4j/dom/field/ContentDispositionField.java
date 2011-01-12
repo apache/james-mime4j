@@ -25,7 +25,7 @@ public interface ContentDispositionField extends ParsedField {
      * 
      * @return the disposition type or an empty string if not set.
      */
-    public abstract String getDispositionType();
+    String getDispositionType();
 
     /**
      * Gets the value of a parameter. Parameter names are case-insensitive.
@@ -34,14 +34,14 @@ public interface ContentDispositionField extends ParsedField {
      *            the name of the parameter to get.
      * @return the parameter value or <code>null</code> if not set.
      */
-    public abstract String getParameter(String name);
+    String getParameter(String name);
 
     /**
      * Gets all parameters.
      * 
      * @return the parameters.
      */
-    public abstract Map<String, String> getParameters();
+    Map<String, String> getParameters();
 
     /**
      * Determines if the disposition type of this field matches the given one.
@@ -51,7 +51,7 @@ public interface ContentDispositionField extends ParsedField {
      * @return <code>true</code> if the disposition type of this field
      *         matches, <code>false</code> otherwise.
      */
-    public abstract boolean isDispositionType(String dispositionType);
+    boolean isDispositionType(String dispositionType);
 
     /**
      * Return <code>true</code> if the disposition type of this field is
@@ -60,7 +60,7 @@ public interface ContentDispositionField extends ParsedField {
      * @return <code>true</code> if the disposition type of this field is
      *         <i>inline</i>, <code>false</code> otherwise.
      */
-    public abstract boolean isInline();
+    boolean isInline();
 
     /**
      * Return <code>true</code> if the disposition type of this field is
@@ -77,7 +77,7 @@ public interface ContentDispositionField extends ParsedField {
      * @return the <code>filename</code> parameter value or <code>null</code>
      *         if not set.
      */
-    public abstract String getFilename();
+    String getFilename();
 
     /**
      * Gets the value of the <code>creation-date</code> parameter if set and
@@ -86,7 +86,7 @@ public interface ContentDispositionField extends ParsedField {
      * @return the <code>creation-date</code> parameter value or
      *         <code>null</code> if not set or invalid.
      */
-    public abstract Date getCreationDate();
+    Date getCreationDate();
 
     /**
      * Gets the value of the <code>modification-date</code> parameter if set
@@ -95,7 +95,7 @@ public interface ContentDispositionField extends ParsedField {
      * @return the <code>modification-date</code> parameter value or
      *         <code>null</code> if not set or invalid.
      */
-    public abstract Date getModificationDate();
+    Date getModificationDate();
 
     /**
      * Gets the value of the <code>read-date</code> parameter if set and
@@ -104,7 +104,7 @@ public interface ContentDispositionField extends ParsedField {
      * @return the <code>read-date</code> parameter value or <code>null</code>
      *         if not set or invalid.
      */
-    public abstract Date getReadDate();
+    Date getReadDate();
 
     /**
      * Gets the value of the <code>size</code> parameter if set and valid.
@@ -112,6 +112,6 @@ public interface ContentDispositionField extends ParsedField {
      * @return the <code>size</code> parameter value or <code>-1</code> if
      *         not set or invalid.
      */
-    public abstract long getSize();
+    long getSize();
 
 }

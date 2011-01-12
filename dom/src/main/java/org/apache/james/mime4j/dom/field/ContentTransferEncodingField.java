@@ -26,6 +26,6 @@ public interface ContentTransferEncodingField extends ParsedField {
      * 
      * @return the encoding or an empty string if not set.
      */
-    public abstract String getEncoding();
+    String getEncoding();
 
 }

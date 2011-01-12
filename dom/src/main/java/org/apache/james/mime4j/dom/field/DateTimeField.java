@@ -4,6 +4,6 @@ import java.util.Date;
 
 public interface DateTimeField extends ParsedField {
 
-    public abstract Date getDate();
+    Date getDate();
 
 }

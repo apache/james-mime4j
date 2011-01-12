@@ -23,6 +23,6 @@ import org.apache.james.mime4j.dom.address.Mailbox;
 
 public interface MailboxField extends ParsedField {
 
-    public abstract Mailbox getMailbox();
+    Mailbox getMailbox();
 
 }

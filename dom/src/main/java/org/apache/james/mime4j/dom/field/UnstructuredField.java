@@ -21,6 +21,6 @@ package org.apache.james.mime4j.dom.field;
 
 public interface UnstructuredField extends ParsedField {
 
-    public abstract String getValue();
+    String getValue();
 
 }
