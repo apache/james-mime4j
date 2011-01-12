@@ -26,7 +26,7 @@ import java.util.Locale;
 /**
  * Represents a single e-mail address.
  */
-public abstract class Mailbox extends Address {
+public class Mailbox extends Address {
 
     private static final long serialVersionUID = 1L;
 
@@ -69,6 +69,47 @@ public abstract class Mailbox extends Address {
     Mailbox(String name, Mailbox baseMailbox) {
         this(name, baseMailbox.getRoute(), baseMailbox.getLocalPart(),
                 baseMailbox.getDomain());
+    }
+
+    /**
+     * Creates an unnamed mailbox without a route. Routes are obsolete.
+     * 
+     * @param localPart
+     *            The part of the e-mail address to the left of the "@".
+     * @param domain
+     *            The part of the e-mail address to the right of the "@".
+     */
+    public Mailbox(String localPart, String domain) {
+        this(null, null, localPart, domain);
+    }
+
+    /**
+     * Creates an unnamed mailbox with a route. Routes are obsolete.
+     * 
+     * @param route
+     *            The zero or more domains that make up the route. May be
+     *            <code>null</code>.
+     * @param localPart
+     *            The part of the e-mail address to the left of the "@".
+     * @param domain
+     *            The part of the e-mail address to the right of the "@".
+     */
+    public Mailbox(DomainList route, String localPart, String domain) {
+        this(null, route, localPart, domain);
+    }
+
+    /**
+     * Creates a named mailbox without a route. Routes are obsolete.
+     * 
+     * @param name
+     *            the name of the e-mail address. May be <code>null</code>.
+     * @param localPart
+     *            The part of the e-mail address to the left of the "@".
+     * @param domain
+     *            The part of the e-mail address to the right of the "@".
+     */
+    public Mailbox(String name, String localPart, String domain) {
+        this(name, null, localPart, domain);
     }
 
     /**
@@ -115,41 +156,6 @@ public abstract class Mailbox extends Address {
     }
 
     @Override
-    public String getDisplayString(boolean includeRoute) {
-        includeRoute &= route != null;
-        boolean includeAngleBrackets = name != null || includeRoute;
-
-        StringBuilder sb = new StringBuilder();
-
-        if (name != null) {
-            sb.append(name);
-            sb.append(' ');
-        }
-
-        if (includeAngleBrackets) {
-            sb.append('<');
-        }
-
-        if (includeRoute) {
-            sb.append(route.toRouteString());
-            sb.append(':');
-        }
-
-        sb.append(localPart);
-
-        if (domain != null) {
-            sb.append('@');
-            sb.append(domain);
-        }
-
-        if (includeAngleBrackets) {
-            sb.append('>');
-        }
-
-        return sb.toString();
-    }
-
-    @Override
     public int hashCode() {
         return getCanonicalizedAddress().hashCode();
     }
@@ -185,12 +191,17 @@ public abstract class Mailbox extends Address {
         results.add(this);
     }
 
-    private Object getCanonicalizedAddress() {
+    private String getCanonicalizedAddress() {
         if (domain == null) {
             return localPart;
         } else {
             return localPart + '@' + domain.toLowerCase(Locale.US);
         }
+    }
+
+    @Override
+    public String toString() {
+        return getCanonicalizedAddress();
     }
 
 }

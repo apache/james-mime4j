@@ -26,9 +26,8 @@ import org.apache.james.mime4j.dom.address.DomainList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
+import org.apache.james.mime4j.field.address.formatter.AddressFormatter;
 import org.apache.james.mime4j.field.address.parser.AddressBuilder;
-import org.apache.james.mime4j.field.address.parser.GroupImpl;
-import org.apache.james.mime4j.field.address.parser.MailboxImpl;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 
 import java.util.ArrayList;
@@ -268,33 +267,32 @@ public class AddressTest extends TestCase {
 
     public void testMailboxList() {
         List<Mailbox> al = new ArrayList<Mailbox>();
-        al.add(new MailboxImpl("local","example.com"));
+        al.add(new Mailbox("local","example.com"));
 
         // shared arraylist
         MailboxList ml = new MailboxList(al, true);
         assertEquals(1, ml.size());
-        al.add(new MailboxImpl("local2", "foo.example.com"));
+        al.add(new Mailbox("local2", "foo.example.com"));
         assertEquals(2, ml.size());
         
         // cloned arraylist
         MailboxList mlcopy = new MailboxList(al, false);
         assertEquals(2, mlcopy.size());
-        al.add(new MailboxImpl("local3", "bar.example.com"));
+        al.add(new Mailbox("local3", "bar.example.com"));
         assertEquals(2, mlcopy.size());
-        
-        mlcopy.print();
     }
     
     public void testGroupSerialization() {
         List<Mailbox> al = new ArrayList<Mailbox>();
-        al.add(new MailboxImpl("test", "example.com"));
-        al.add(new MailboxImpl("Foo!", "foo", "example.com"));
+        al.add(new Mailbox("test", "example.com"));
+        al.add(new Mailbox("Foo!", "foo", "example.com"));
         DomainList dl = new DomainList(new ArrayList<String>(Arrays.asList(new String[] {"foo.example.com"})), true);
-        Mailbox mailbox = new MailboxImpl("Foo Bar", dl, "foo2", "example.com");
+        Mailbox mailbox = new Mailbox("Foo Bar", dl, "foo2", "example.com");
         assertSame(dl, mailbox.getRoute());
         al.add(mailbox);
-        Group g = new GroupImpl("group", new MailboxList(al, false));
-        assertEquals("group: test@example.com, Foo! <foo@example.com>, Foo Bar <foo2@example.com>;", g.getDisplayString());
+        Group g = new Group("group", new MailboxList(al, false));
+        String s = AddressFormatter.format(g, false);
+        assertEquals("group: test@example.com, Foo! <foo@example.com>, Foo Bar <foo2@example.com>;", s);
     }
     
     public void testEmptyQuotedStringBeforeDotAtomInLocalPart() throws Exception {
@@ -310,34 +308,34 @@ public class AddressTest extends TestCase {
     }
     
     public void testMailboxGetEncodedString() throws Exception {
-        assertEquals("john.doe@acme.org", new MailboxImpl("john.doe", "acme.org")
-                .getEncodedString());
-        assertEquals("\"john doe\"@acme.org", new MailboxImpl("john doe",
-                "acme.org").getEncodedString());
-        assertEquals("John Doe <john.doe@acme.org>", new MailboxImpl("John Doe",
-                "john.doe", "acme.org").getEncodedString());
-        assertEquals("\"John Doe @Home\" <john.doe@acme.org>", new MailboxImpl(
-                "John Doe @Home", "john.doe", "acme.org").getEncodedString());
+        Mailbox m1 = new Mailbox("john.doe", "acme.org");
+        assertEquals("john.doe@acme.org", AddressFormatter.encode(m1));
+        Mailbox m2 = new Mailbox("john doe", "acme.org");
+        assertEquals("\"john doe\"@acme.org", AddressFormatter.encode(m2));
+        Mailbox m3 = new Mailbox("John Doe", "john.doe", "acme.org");
+        assertEquals("John Doe <john.doe@acme.org>", AddressFormatter.encode(m3));
+        Mailbox m4 = new Mailbox("John Doe @Home", "john.doe", "acme.org");
+        assertEquals("\"John Doe @Home\" <john.doe@acme.org>", AddressFormatter.encode(m4));
+        Mailbox m5 = new Mailbox("Hans M\374ller", "hans.mueller", "acme.org");
         assertEquals("=?ISO-8859-1?Q?Hans_M=FCller?= <hans.mueller@acme.org>",
-                new MailboxImpl("Hans M\374ller", "hans.mueller", "acme.org")
-                        .getEncodedString());
+                AddressFormatter.encode(m5));
     }
 
     public void testGroupGetEncodedString() throws Exception {
         List<Mailbox> al = new ArrayList<Mailbox>();
-        al.add(new MailboxImpl("test", "example.com"));
-        al.add(new MailboxImpl("Foo!", "foo", "example.com"));
-        al.add(new MailboxImpl("Hans M\374ller", "hans.mueller", "acme.org"));
-        Group g = new GroupImpl("group @work", new MailboxList(al, false));
+        al.add(new Mailbox("test", "example.com"));
+        al.add(new Mailbox("Foo!", "foo", "example.com"));
+        al.add(new Mailbox("Hans M\374ller", "hans.mueller", "acme.org"));
+        Group g = new Group("group @work", new MailboxList(al, false));
         assertEquals("\"group @work\": test@example.com, "
                 + "Foo! <foo@example.com>, =?ISO-8859-1?Q?Hans_M=FCller?="
-                + " <hans.mueller@acme.org>;", g.getEncodedString());
+                + " <hans.mueller@acme.org>;", AddressFormatter.encode(g));
     }
 
     public void testEmptyGroupGetEncodedString() throws Exception {
         MailboxList emptyMailboxes = new MailboxList(null, true);
-        Group g = new GroupImpl("Undisclosed recipients", emptyMailboxes);
-        assertEquals("Undisclosed recipients:;", g.getEncodedString());
+        Group g = new Group("Undisclosed recipients", emptyMailboxes);
+        assertEquals("Undisclosed recipients:;", AddressFormatter.encode(g));
     }
 
     public void testParseAddress() throws Exception {

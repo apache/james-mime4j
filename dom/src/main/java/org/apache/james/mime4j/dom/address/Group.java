@@ -19,12 +19,15 @@
 
 package org.apache.james.mime4j.dom.address;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
  * A named group of zero or more mailboxes.
  */
-public abstract class Group extends Address {
+public class Group extends Address {
 
     private static final long serialVersionUID = 1L;
 
@@ -48,6 +51,26 @@ public abstract class Group extends Address {
     }
 
     /**
+     * @param name
+     *            The group name.
+     * @param mailboxes
+     *            The mailboxes in this group.
+     */
+    public Group(String name, Mailbox... mailboxes) {
+        this(name, new MailboxList(Arrays.asList(mailboxes), true));
+    }
+
+    /**
+     * @param name
+     *            The group name.
+     * @param mailboxes
+     *            The mailboxes in this group.
+     */
+    public Group(String name, Collection<Mailbox> mailboxes) {
+        this(name, new MailboxList(new ArrayList<Mailbox>(mailboxes), true));
+    }
+
+    /**
      * Returns the group name.
      */
     public String getName() {
@@ -62,12 +85,17 @@ public abstract class Group extends Address {
     }
 
     @Override
-    public String getDisplayString(boolean includeRoute) {
-        StringBuilder sb = new StringBuilder();
+    protected void doAddMailboxesTo(List<Mailbox> results) {
+        for (Mailbox mailbox : mailboxList) {
+            results.add(mailbox);
+        }
+    }
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
         sb.append(name);
         sb.append(':');
-
         boolean first = true;
         for (Mailbox mailbox : mailboxList) {
             if (first) {
@@ -75,21 +103,11 @@ public abstract class Group extends Address {
             } else {
                 sb.append(',');
             }
-
             sb.append(' ');
-            sb.append(mailbox.getDisplayString(includeRoute));
+            sb.append(mailbox);
         }
-
         sb.append(";");
-
         return sb.toString();
     }
-
-    @Override
-    protected void doAddMailboxesTo(List<Mailbox> results) {
-        for (Mailbox mailbox : mailboxList) {
-            results.add(mailbox);
-        }
-    }
-
+    
 }

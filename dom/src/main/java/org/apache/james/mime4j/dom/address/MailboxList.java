@@ -65,15 +65,4 @@ public class MailboxList extends AbstractList<Mailbox> implements Serializable {
         return mailboxes.get(index);
     }
 
-    /**
-     * Dumps a representation of this mailbox list to stdout, for debugging
-     * purposes.
-     */
-    public void print() {
-        for (int i = 0; i < size(); i++) {
-            Mailbox mailbox = get(i);
-            System.out.println(mailbox.toString());
-        }
-    }
-
 }
