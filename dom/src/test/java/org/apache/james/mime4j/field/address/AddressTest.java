@@ -31,13 +31,6 @@ import org.apache.james.mime4j.field.address.parser.GroupImpl;
 import org.apache.james.mime4j.field.address.parser.MailboxImpl;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -216,72 +209,6 @@ public class AddressTest extends TestCase {
         
         // check route string
         assertEquals(2, dlcopy.flatten().size());
-    }
-
-    public void testInteractiveMain() throws Exception {
-        PrintStream out_orig = System.out;
-        InputStream in_orig = System.in;
-        PrintStream err_orig = System.err;
-        try {
-            PipedOutputStream piped = new PipedOutputStream();
-            PipedInputStream newInput = new PipedInputStream(piped);
-            
-            PipedInputStream inOut = new PipedInputStream();
-            PrintStream outPs = new PrintStream(new PipedOutputStream(inOut));
-            BufferedReader outReader = new BufferedReader(new InputStreamReader(inOut));
-            PipedInputStream inErr = new PipedInputStream();
-            PrintStream errPs = new PrintStream(new PipedOutputStream(inErr));
-            BufferedReader errReader = new BufferedReader(new InputStreamReader(inErr));
-            
-            
-            System.setIn(newInput);
-            System.setOut(outPs);
-            System.setErr(errPs);
-            Thread t = new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        AddressBuilder.main(null);
-                    } catch (Exception e) {
-                        fail("Catched an exception in main: "+e);
-                    }
-                }
-            };
-            t.start();
-            
-            PrintWriter input = new PrintWriter(piped);
-            
-            input.write("Test <test@example.com>\r\n");
-            input.flush();
-
-            String out = outReader.readLine();
-            assertEquals("> Test <test@example.com>", out);
-
-            input.write("A <foo@example.com>\r\n");
-            input.flush();
-            
-            String out2 = outReader.readLine();
-            assertEquals("> A <foo@example.com>", out2);
-
-            input.write("\"Foo Bar\" <foo>\r\n");
-            input.flush();
-            
-            String out3 = errReader.readLine();
-            assertNotNull(out3);
-
-            input.write("quit\r\n");
-            input.flush();
-            
-            // we read 2 angular brackets because one was from the previous exception error.
-            String out4 = outReader.readLine();
-            assertEquals("> > Goodbye.", out4);
-
-            t.join();
-        } finally {
-            System.setIn(in_orig);
-            System.setOut(out_orig);
-            System.setErr(err_orig);
-        }
     }
 
     public void testEmptyDomainList() {

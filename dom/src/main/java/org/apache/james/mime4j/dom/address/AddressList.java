@@ -95,14 +95,4 @@ public class AddressList extends AbstractList<Address> implements Serializable {
         return new MailboxList(results, false);
     }
 
-    /**
-     * Dumps a representation of this address list to stdout, for debugging
-     * purposes.
-     */
-    public void print() {
-        for (Address addr : addresses) {
-            System.out.println(addr.toString());
-        }
-    }
-
 }

@@ -71,30 +71,6 @@ public class AddressBuilder {
     }
 
     /**
-     * Test console for AddressList
-     */
-    public static void main(String[] args) throws Exception {
-        java.io.BufferedReader reader = new java.io.BufferedReader(
-                new java.io.InputStreamReader(System.in));
-        while (true) {
-            try {
-                System.out.print("> ");
-                String line = reader.readLine();
-                if (line.length() == 0 || line.toLowerCase().equals("exit")
-                        || line.toLowerCase().equals("quit")) {
-                    System.out.println("Goodbye.");
-                    return;
-                }
-                AddressList list = AddressBuilder.parseAddressList(line, DecodeMonitor.STRICT);
-                list.print();
-            } catch (Exception e) {
-                e.printStackTrace();
-                Thread.sleep(300);
-            }
-        }
-    }
-
-    /**
      * Parses the specified raw string into a mailbox address.
      * 
      * @param rawMailboxString
