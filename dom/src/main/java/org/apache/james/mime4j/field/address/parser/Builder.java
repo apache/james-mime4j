@@ -28,6 +28,7 @@ import org.apache.james.mime4j.codec.DecoderUtil;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.DomainList;
+import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
 
@@ -64,7 +65,7 @@ class Builder {
             String name = buildString((ASTphrase) n, false);
             Node n2 = it.next();
             if (n2 instanceof ASTgroup_body) {
-                return new GroupImpl(name, buildGroupBody((ASTgroup_body) n2, monitor));
+                return new Group(name, buildGroupBody((ASTgroup_body) n2, monitor));
             } else if (n2 instanceof ASTangle_addr) {
                 try {
                     name = DecoderUtil.decodeEncodedWords(name, monitor);
@@ -72,7 +73,7 @@ class Builder {
                     throw new ParseException(e.getMessage());
                 }
                 Mailbox mb = buildAngleAddr((ASTangle_addr) n2);
-                return new MailboxImpl(name, mb.getRoute(), mb.getLocalPart(),
+                return new Mailbox(name, mb.getRoute(), mb.getLocalPart(),
                         mb.getDomain());
             } else {
                 throw new ParseException();
@@ -127,7 +128,7 @@ class Builder {
                 throw new ParseException(e.getMessage());
             }
             Mailbox mb = buildAngleAddr((ASTangle_addr) n);
-            return new MailboxImpl(name, mb.getRoute(), mb.getLocalPart(),
+            return new Mailbox(name, mb.getRoute(), mb.getLocalPart(),
                     mb.getDomain());
         } else {
             throw new ParseException();
@@ -174,7 +175,7 @@ class Builder {
         ChildNodeIterator it = new ChildNodeIterator(node);
         String localPart = buildString((ASTlocal_part) it.next(), true);
         String domain = buildString((ASTdomain) it.next(), true);
-        return new MailboxImpl(route, localPart, domain);
+        return new Mailbox(route, localPart, domain);
     }
 
     private String buildString(SimpleNode node, boolean stripSpaces) {

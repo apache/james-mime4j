@@ -50,6 +50,7 @@ import org.apache.james.mime4j.field.DateTimeFieldImpl;
 import org.apache.james.mime4j.field.MailboxFieldImpl;
 import org.apache.james.mime4j.field.MailboxListFieldImpl;
 import org.apache.james.mime4j.field.UnstructuredFieldImpl;
+import org.apache.james.mime4j.field.address.formatter.AddressFormatter;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -634,9 +635,8 @@ public class Fields {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            sb.append(address.getEncodedString());
+            AddressFormatter.encode(sb, address);
         }
-
         return sb.toString();
     }
 

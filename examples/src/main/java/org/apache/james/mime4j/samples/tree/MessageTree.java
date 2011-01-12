@@ -53,6 +53,7 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
+import org.apache.james.mime4j.field.address.formatter.AddressFormatter;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
 
@@ -312,7 +313,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < list.size(); i++) {
                     Mailbox mb = list.get(i);
-                    sb.append(mb.getDisplayString() + "\n");
+                    sb.append(AddressFormatter.format(mb, false) + "\n");
                 }
                 textView.setText(sb.toString());
                 
