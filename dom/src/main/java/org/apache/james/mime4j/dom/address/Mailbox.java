@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.james.mime4j.util.LangUtils;
+
 /**
  * Represents a single e-mail address.
  */
@@ -156,8 +158,17 @@ public class Mailbox extends Address {
     }
 
     @Override
+    protected final void doAddMailboxesTo(List<Mailbox> results) {
+        results.add(this);
+    }
+
+    @Override
     public int hashCode() {
-        return getCanonicalizedAddress().hashCode();
+        int hash = LangUtils.HASH_SEED;
+        hash = LangUtils.hashCode(hash, this.localPart);
+        hash = LangUtils.hashCode(hash, this.domain != null ? 
+                this.domain.toLowerCase(Locale.US) : null);
+        return hash;
     }
 
     /**
@@ -180,28 +191,14 @@ public class Mailbox extends Address {
             return true;
         if (!(obj instanceof Mailbox))
             return false;
-
-        Mailbox other = (Mailbox) obj;
-        return getCanonicalizedAddress()
-                .equals(other.getCanonicalizedAddress());
-    }
-
-    @Override
-    protected final void doAddMailboxesTo(List<Mailbox> results) {
-        results.add(this);
-    }
-
-    private String getCanonicalizedAddress() {
-        if (domain == null) {
-            return localPart;
-        } else {
-            return localPart + '@' + domain.toLowerCase(Locale.US);
-        }
+        Mailbox that = (Mailbox) obj;
+        return LangUtils.equals(this.localPart, that.localPart) && 
+            LangUtils.equalsIgnoreCase(this.domain, that.domain);
     }
 
     @Override
     public String toString() {
-        return getCanonicalizedAddress();
+        return getAddress();
     }
 
 }

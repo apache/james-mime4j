@@ -415,5 +415,28 @@ public class AddressTest extends TestCase {
         } catch (ParseException expected) {
         }
     }
+
+    public void testMailboxEquals() throws Exception {
+        Mailbox m1 = new Mailbox("john.doe", "acme.org");
+        Mailbox m2 = new Mailbox("john doe", "acme.org");
+        Mailbox m3 = new Mailbox("john.doe", "Acme.Org");
+        Mailbox m4 = new Mailbox("john.doe", null);
+        assertTrue(m1.equals(m1));
+        assertFalse(m1.equals(m2));
+        assertTrue(m1.equals(m3));
+        assertFalse(m1.equals(m4));
+        assertFalse(m1.equals(null));
+    }
     
+    public void testMailboxHashCode() throws Exception {
+        Mailbox m1 = new Mailbox("john.doe", "acme.org");
+        Mailbox m2 = new Mailbox("john doe", "acme.org");
+        Mailbox m3 = new Mailbox("john.doe", "Acme.Org");
+        Mailbox m4 = new Mailbox("john.doe", null);
+        assertTrue(m1.hashCode() == m1.hashCode());
+        assertFalse(m1.hashCode() == m2.hashCode());
+        assertTrue(m1.hashCode() == m3.hashCode());
+        assertFalse(m1.hashCode() == m4.hashCode());
+    }
+
 }
