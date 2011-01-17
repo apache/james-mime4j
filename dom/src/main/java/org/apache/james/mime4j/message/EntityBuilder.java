@@ -98,7 +98,7 @@ public class EntityBuilder implements ContentHandler {
      * @see org.apache.james.mime4j.parser.ContentHandler#startHeader()
      */
     public void startHeader() throws MimeException {
-        stack.push(new Header());
+        stack.push(new HeaderImpl());
     }
     
     /**

@@ -61,7 +61,7 @@ public abstract class SimpleContentHandler extends AbstractContentHandler {
      */
     @Override
     public final void startHeader() {
-        currHeader = new Header();
+        currHeader = new HeaderImpl();
     }
 
     /**

@@ -59,11 +59,7 @@ public class AddressBuilder {
             throws ParseException {
         AddressListParser parser = new AddressListParser(new StringReader(
                 rawAddressList));
-        try {
-            return Builder.getInstance().buildAddressList(parser.parseAddressList(), monitor);
-        } catch (RuntimeException e) {
-            throw new ParseException(e.getMessage());
-        }
+        return Builder.getInstance().buildAddressList(parser.parseAddressList(), monitor);
     }
 
     public static AddressList parseAddressList(String rawAddressList) throws ParseException {

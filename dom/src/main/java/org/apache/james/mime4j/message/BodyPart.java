@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
-import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
@@ -39,7 +38,7 @@ import org.apache.james.mime4j.util.MimeUtil;
 /**
  * Represents a MIME body part  (see RFC 2045).
  */
-public class BodyPart extends Entity {
+public class BodyPart extends EntityBase {
 
     /**
      * Creates a new empty <code>BodyPart</code>.
@@ -66,7 +65,7 @@ public class BodyPart extends Entity {
      */
     public BodyPart(Entity other) {
         if (other.getHeader() != null) {
-            setHeader(new Header(other.getHeader()));
+            setHeader(new HeaderImpl(other.getHeader()));
         }
 
         if (other.getBody() != null) {

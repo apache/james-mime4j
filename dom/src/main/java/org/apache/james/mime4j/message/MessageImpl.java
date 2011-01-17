@@ -31,7 +31,6 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Body;
-import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
@@ -64,7 +63,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * Message msg = new Message(new FileInputStream(&quot;mime.msg&quot;));
  * </pre>
  */
-public class MessageImpl extends Message {
+public class MessageImpl extends MessageBase {
 
     /**
      * Creates a new empty <code>Message</code>.
@@ -92,7 +91,7 @@ public class MessageImpl extends Message {
      */
     public MessageImpl(Message other) {
         if (other.getHeader() != null) {
-            setHeader(new Header(other.getHeader()));
+            setHeader(new HeaderImpl(other.getHeader()));
         }
 
         if (other.getBody() != null) {

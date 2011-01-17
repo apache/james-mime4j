@@ -35,7 +35,7 @@ import org.apache.james.mime4j.stream.RawField;
 /**
  * The header of an entity (see RFC 2045).
  */
-public class HeaderImpl extends Header {
+public class HeaderImpl extends HeaderBase {
 
     /**
      * Creates a new empty <code>Header</code>.

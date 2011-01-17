@@ -28,6 +28,7 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MessageWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
@@ -38,7 +39,7 @@ public class MultipartFormTest extends TestCase {
         BodyFactory bodyFactory = new BodyFactory();
         
         MessageImpl message = new MessageImpl();
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.addField(
                 DefaultFieldParser.parse("Content-Type: multipart/form-data; boundary=foo"));
         message.setHeader(header);
@@ -46,17 +47,17 @@ public class MultipartFormTest extends TestCase {
         Multipart multipart = new MultipartImpl("alternative");
         multipart.setParent(message);
         BodyPart p1 = new BodyPart();
-        Header h1 = new Header();
+        Header h1 = new HeaderImpl();
         h1.addField(DefaultFieldParser.parse("Content-Type: text/plain"));
         p1.setHeader(h1);
         p1.setBody(bodyFactory.textBody("this stuff"));
         BodyPart p2 = new BodyPart();
-        Header h2 = new Header();
+        Header h2 = new HeaderImpl();
         h2.addField(DefaultFieldParser.parse("Content-Type: text/plain"));
         p2.setHeader(h2);
         p2.setBody(bodyFactory.textBody("that stuff"));
         BodyPart p3 = new BodyPart();
-        Header h3 = new Header();
+        Header h3 = new HeaderImpl();
         h3.addField(DefaultFieldParser.parse("Content-Type: text/plain"));
         p3.setHeader(h3);
         p3.setBody(bodyFactory.textBody("all kind of stuff"));

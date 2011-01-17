@@ -33,7 +33,7 @@ import org.apache.james.mime4j.util.ContentUtil;
  * first body part while the epilogue consists of whatever characters come after
  * the last body part.
  */
-public class MultipartImpl extends Multipart {
+public class MultipartImpl extends MultipartBase {
 
     private ByteSequence preamble;
     private transient String preambleStrCache;

@@ -138,7 +138,7 @@ public class TransformMessage {
         BodyPart part3 = createRandomBinaryPart(300);
         multipart.addBodyPart(part3);
 
-        Message message = new MessageImpl();
+        MessageImpl message = new MessageImpl();
         message.setMultipart(multipart);
 
         message.setSubject("Template message");
