@@ -34,6 +34,7 @@ import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MimeBuilder;
 import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageProvider;
@@ -90,7 +91,7 @@ public class TransformMessage {
     private static Message transform(Message original) throws IOException, ParseException {
         // Create a copy of the template. The copy can be modified without
         // affecting the original.
-        MessageImpl message = new MessageImpl(original);
+        Message message = MimeBuilder.copy(original);
 
         // In this example we know we have a multipart message. Use
         // Message#isMultipart() if uncertain.

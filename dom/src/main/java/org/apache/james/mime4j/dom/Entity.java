@@ -79,6 +79,16 @@ public interface Entity extends Disposable {
     Body removeBody();
     
     /**
+     * Determines if the MIME type of this <code>Entity</code> is
+     * <code>multipart/*</code>. Since multipart-entities must have
+     * a boundary parameter in the <code>Content-Type</code> field this
+     * method returns <code>false</code> if no boundary exists.
+     * 
+     * @return <code>true</code> on match, <code>false</code> otherwise.
+     */
+    boolean isMultipart();
+    
+    /**
      * Determines the MIME type of this <code>Entity</code>. The MIME type
      * is derived by looking at the parent's Content-Type field if no
      * Content-Type field is set for this <code>Entity</code>.

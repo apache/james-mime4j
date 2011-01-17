@@ -43,7 +43,7 @@ import org.apache.james.mime4j.util.ByteSequence;
  * A <code>ContentHandler</code> for building an <code>Entity</code> to be
  * used in conjunction with a {@link org.apache.james.mime4j.parser.MimeStreamParser}.
  */
-public class EntityBuilder implements ContentHandler {
+class EntityBuilder implements ContentHandler {
 
     private final Entity entity;
     private final BodyFactory bodyFactory;

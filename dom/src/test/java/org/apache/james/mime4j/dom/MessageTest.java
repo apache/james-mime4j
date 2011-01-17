@@ -44,6 +44,7 @@ import org.apache.james.mime4j.field.address.parser.AddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MimeBuilder;
 import org.apache.james.mime4j.message.MultipartImpl;
 
 public class MessageTest extends TestCase {
@@ -132,7 +133,7 @@ public class MessageTest extends TestCase {
     public void testWriteTo() throws Exception {
         byte[] inputByte = getRawMessageAsByteArray();
 
-        Message m = new MessageImpl(new ByteArrayInputStream(inputByte));
+        Message m = MimeBuilder.parse(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         m.writeTo(out);
@@ -154,7 +155,7 @@ public class MessageTest extends TestCase {
 
         byte[] inputByte = getRawMessageAsByteArray();
 
-        MessageImpl m = new MessageImpl(new ByteArrayInputStream(inputByte));
+        Message m = MimeBuilder.parse(new ByteArrayInputStream(inputByte));
         m.getHeader().addField(DefaultFieldParser.parse(testheader));
 
         assertEquals("header added", m.getHeader().getField(headerName)

@@ -23,7 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MimeBuilder;
 
 import junit.framework.TestCase;
 
@@ -40,7 +40,7 @@ public class MessageWriteToTest extends TestCase {
     }
     
     public void testSimpleMail() throws Exception {
-        MessageImpl message = createMessage(ExampleMail.RFC822_SIMPLE_BYTES);
+        Message message = createMessage(ExampleMail.RFC822_SIMPLE_BYTES);
         assertFalse("Not multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out);
@@ -58,7 +58,7 @@ public class MessageWriteToTest extends TestCase {
     }
     
     public void testBinaryAttachment() throws Exception {
-        MessageImpl message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
+        Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
         assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out);
@@ -66,7 +66,7 @@ public class MessageWriteToTest extends TestCase {
     }
     
     public void testBinaryAttachmentNoPreamble() throws Exception {
-        MessageImpl message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES);
+        Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES);
         assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out);
@@ -74,16 +74,16 @@ public class MessageWriteToTest extends TestCase {
     }
     
     public void testBinaryAttachmentPreambleEpilogue() throws Exception {
-        MessageImpl message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES);
+        Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES);
         assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         message.writeTo(out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES, out.toByteArray());
     }
     
-    private MessageImpl createMessage(byte[] octets) throws Exception {
+    private Message createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
-        MessageImpl message = new MessageImpl(in);
+        Message message = MimeBuilder.parse(in);
         return message;
     }
 }

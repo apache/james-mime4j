@@ -19,10 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.dom.Entity;
-import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
@@ -53,45 +49,6 @@ public class MultipartImpl extends MultipartBase {
         epilogue = null;
         epilogueStrCache = null;
         epilogueComputed = true;
-    }
-
-    /**
-     * Creates a new <code>Multipart</code> from the specified
-     * <code>Multipart</code>. The <code>Multipart</code> instance is
-     * initialized with copies of preamble, epilogue, sub type and the list of
-     * body parts of the specified <code>Multipart</code>. The parent entity
-     * of the new multipart is <code>null</code>.
-     * 
-     * @param other
-     *            multipart to copy.
-     * @throws UnsupportedOperationException
-     *             if <code>other</code> contains a {@link SingleBody} that
-     *             does not support the {@link SingleBody#copy() copy()}
-     *             operation.
-     * @throws IllegalArgumentException
-     *             if <code>other</code> contains a <code>Body</code> that
-     *             is neither a {@link Message}, {@link Multipart} or
-     *             {@link SingleBody}.
-     */
-    public MultipartImpl(Multipart other) {
-    	super(other.getSubType());
-
-    	for (Entity otherBodyPart : other.getBodyParts()) {
-    		Entity bodyPartCopy = new BodyPart(otherBodyPart);
-            addBodyPart(bodyPartCopy);
-        }
-
-    	if (other instanceof MultipartImpl) {
-	        preamble = ((MultipartImpl) other).preamble;
-	        epilogue = ((MultipartImpl) other).epilogue;
-            preambleStrCache = ((MultipartImpl) other).preambleStrCache;
-            epilogueStrCache = ((MultipartImpl) other).epilogueStrCache;
-            preambleComputed = ((MultipartImpl) other).preambleComputed;
-            epilogueComputed = ((MultipartImpl) other).epilogueComputed;
-    	} else {
-    		setPreamble(other.getPreamble());
-    		setEpilogue(other.getEpilogue());
-    	}
     }
 
     // package private for now; might become public someday
