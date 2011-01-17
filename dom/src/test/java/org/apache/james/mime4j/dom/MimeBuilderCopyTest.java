@@ -37,7 +37,7 @@ import org.apache.james.mime4j.message.MultipartImpl;
 
 import junit.framework.TestCase;
 
-public class CopyConstructorTest extends TestCase {
+public class MimeBuilderCopyTest extends TestCase {
 
     public void testCopyEmptyMessage() throws Exception {
         MessageImpl original = new MessageImpl();
