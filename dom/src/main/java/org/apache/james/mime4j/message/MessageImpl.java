@@ -223,32 +223,39 @@ public class MessageImpl extends MessageBase {
         return MimeUtil.createUniqueBoundary();
     }
 
+    @Override
     protected UnstructuredField newMessageId(String hostname) {
         return Fields.messageId(hostname);
     }
 
+    @Override
     protected DateTimeField newDate(Date date, TimeZone zone) {
         return Fields.date(FieldName.DATE, date, zone);
     }
 
+    @Override
     protected MailboxField newMailbox(String fieldName, Mailbox mailbox) {
         return Fields.mailbox(fieldName, mailbox);
     }
 
+    @Override
     protected MailboxListField newMailboxList(String fieldName,
             Collection<Mailbox> mailboxes) {
         return Fields.mailboxList(fieldName, mailboxes);
     }
 
+    @Override
     protected AddressListField newAddressList(String fieldName,
             Collection<Address> addresses) {
         return Fields.addressList(fieldName, addresses);
     }
 
+    @Override
     protected UnstructuredField newSubject(String subject) {
         return Fields.subject(subject);
     }
 
+    @Override
     protected ContentDispositionField newContentDisposition(
             String dispositionType, String filename, long size,
             Date creationDate, Date modificationDate, Date readDate) {
@@ -256,29 +263,35 @@ public class MessageImpl extends MessageBase {
                 creationDate, modificationDate, readDate);
     }
 
+    @Override
     protected ContentDispositionField newContentDisposition(
             String dispositionType, Map<String, String> parameters) {
         return Fields.contentDisposition(dispositionType, parameters);
     }
 
+    @Override
     protected ContentTypeField newContentType(String mimeType,
             Map<String, String> parameters) {
         return Fields.contentType(mimeType, parameters);
     }
 
+    @Override
     protected ContentTransferEncodingField newContentTransferEncoding(
             String contentTransferEncoding) {
         return Fields.contentTransferEncoding(contentTransferEncoding);
     }
 
+    @Override
     protected String calcTransferEncoding(ContentTransferEncodingField f) {
         return ContentTransferEncodingFieldImpl.getEncoding(f);
     }
 
+    @Override
     protected String calcMimeType(ContentTypeField child, ContentTypeField parent) {
         return ContentTypeFieldImpl.getMimeType(child, parent);
     }
 
+    @Override
     protected String calcCharset(ContentTypeField contentType) {
         return ContentTypeFieldImpl.getCharset(contentType); 
     }

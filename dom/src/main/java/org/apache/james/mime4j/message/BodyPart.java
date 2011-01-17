@@ -79,6 +79,7 @@ public class BodyPart extends EntityBase {
 		return MimeUtil.createUniqueBoundary();
 	}
 
+    @Override
     protected ContentDispositionField newContentDisposition(
             String dispositionType, String filename, long size,
             Date creationDate, Date modificationDate, Date readDate) {
@@ -86,29 +87,35 @@ public class BodyPart extends EntityBase {
                 creationDate, modificationDate, readDate);
     }
 
+    @Override
     protected ContentDispositionField newContentDisposition(
             String dispositionType, Map<String, String> parameters) {
         return Fields.contentDisposition(dispositionType, parameters);
     }
 
+    @Override
     protected ContentTypeField newContentType(String mimeType,
             Map<String, String> parameters) {
         return Fields.contentType(mimeType, parameters);
     }
 
+    @Override
     protected ContentTransferEncodingField newContentTransferEncoding(
             String contentTransferEncoding) {
         return Fields.contentTransferEncoding(contentTransferEncoding);
     }
 
+    @Override
     protected String calcTransferEncoding(ContentTransferEncodingField f) {
         return ContentTransferEncodingFieldImpl.getEncoding(f);
     }
 
+    @Override
     protected String calcMimeType(ContentTypeField child, ContentTypeField parent) {
         return ContentTypeFieldImpl.getMimeType(child, parent);
     }
 
+    @Override
     protected String calcCharset(ContentTypeField contentType) {
         return ContentTypeFieldImpl.getCharset(contentType); 
     }

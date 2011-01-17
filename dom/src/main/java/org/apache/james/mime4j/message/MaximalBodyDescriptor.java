@@ -108,6 +108,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         this.isContentMD5Set = false;
     }
 
+    @Override
     public MutableBodyDescriptor newChild() {
         return new MaximalBodyDescriptor(this, getDecodeMonitor());
     }
