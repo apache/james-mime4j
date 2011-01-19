@@ -22,7 +22,7 @@ package org.apache.james.mime4j.message;
 /**
  * The header of an entity (see RFC 2045).
  */
-public class HeaderImpl extends HeaderBase {
+public class HeaderImpl extends AbstractHeader {
 
     /**
      * Creates a new empty <code>Header</code>.

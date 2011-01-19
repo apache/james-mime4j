@@ -33,7 +33,7 @@ import org.apache.james.mime4j.dom.Multipart;
  * first body part while the epilogue consists of whatever characters come after
  * the last body part.
  */
-public abstract class MultipartBase implements Multipart {
+public abstract class AbstractMultipart implements Multipart {
 
     protected List<Entity> bodyParts = new LinkedList<Entity>();
     private Entity parent = null;
@@ -43,7 +43,7 @@ public abstract class MultipartBase implements Multipart {
     /**
      * Creates a new empty <code>Multipart</code> instance.
      */
-    public MultipartBase(String subType) {
+    public AbstractMultipart(String subType) {
         this.subType = subType;
     }
 

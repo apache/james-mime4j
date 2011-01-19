@@ -33,7 +33,7 @@ import org.apache.james.mime4j.util.MimeUtil;
 /**
  * Represents a MIME body part  (see RFC 2045).
  */
-public class BodyPart extends EntityBase {
+public class BodyPart extends AbstractEntity {
 
     /**
      * Creates a new empty <code>BodyPart</code>.

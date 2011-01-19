@@ -45,7 +45,7 @@ import org.apache.james.mime4j.util.MimeUtil;
 /**
  * Represents a MIME message. 
  */
-public class MessageImpl extends MessageBase {
+public class MessageImpl extends AbstractMessage {
 
     /**
      * Creates a new empty <code>Message</code>.

@@ -40,7 +40,7 @@ import org.apache.james.mime4j.dom.field.FieldName;
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
  */
-public abstract class EntityBase implements Entity {
+public abstract class AbstractEntity implements Entity {
     private Header header = null;
     private Body body = null;
     private Entity parent = null;
@@ -49,7 +49,7 @@ public abstract class EntityBase implements Entity {
      * Creates a new <code>Entity</code>. Typically invoked implicitly by a
      * subclass constructor.
      */
-    protected EntityBase() {
+    protected AbstractEntity() {
     }
 
     /**

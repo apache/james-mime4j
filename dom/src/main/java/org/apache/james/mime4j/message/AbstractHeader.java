@@ -32,7 +32,7 @@ import org.apache.james.mime4j.dom.field.Field;
 /**
  * The header of an entity (see RFC 2045).
  */
-public abstract class HeaderBase implements Header {
+public abstract class AbstractHeader implements Header {
 
     private List<Field> fields = new LinkedList<Field>();
     private Map<String, List<Field>> fieldMap = new HashMap<String, List<Field>>();
@@ -40,7 +40,7 @@ public abstract class HeaderBase implements Header {
     /**
      * Creates a new empty <code>Header</code>.
      */
-    public HeaderBase() {
+    public AbstractHeader() {
     }
 
     /**
@@ -53,7 +53,7 @@ public abstract class HeaderBase implements Header {
      * @param other
      *            header to copy.
      */
-    public HeaderBase(Header other) {
+    public AbstractHeader(Header other) {
         for (Field otherField : other.getFields()) {
             addField(otherField);
         }

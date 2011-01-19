@@ -39,7 +39,7 @@ import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
 
-public abstract class MessageBase extends EntityBase implements Message {
+public abstract class AbstractMessage extends AbstractEntity implements Message {
 
     /**
      * Returns the value of the <i>Message-ID</i> header field of this message
