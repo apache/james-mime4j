@@ -19,8 +19,8 @@
 
 package org.apache.james.mime4j.field.address;
 
-import org.apache.james.mime4j.field.address.parser.Node;
-import org.apache.james.mime4j.field.address.parser.Token;
+import org.apache.james.mime4j.field.address.Node;
+import org.apache.james.mime4j.field.address.Token;
 
 
 public abstract class BaseNode implements Node {
