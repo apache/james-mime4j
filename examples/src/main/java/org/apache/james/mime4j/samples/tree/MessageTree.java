@@ -54,7 +54,7 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
-import org.apache.james.mime4j.field.address.formatter.AddressFormatter;
+import org.apache.james.mime4j.field.address.AddressFormatter;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MimeBuilder;

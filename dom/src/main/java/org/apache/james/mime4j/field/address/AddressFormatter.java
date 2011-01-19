@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field.address.formatter;
+package org.apache.james.mime4j.field.address;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
 import org.apache.james.mime4j.dom.address.Address;

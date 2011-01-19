@@ -22,7 +22,7 @@ package org.apache.james.mime4j.field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
-import org.apache.james.mime4j.field.address.parser.AddressBuilder;
+import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.field.address.parser.ParseException;
 import org.apache.james.mime4j.util.ByteSequence;
 

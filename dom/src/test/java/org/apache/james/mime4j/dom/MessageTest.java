@@ -40,7 +40,7 @@ import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.james.mime4j.field.address.parser.AddressBuilder;
+import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;

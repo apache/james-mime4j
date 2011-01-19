@@ -32,7 +32,7 @@ import javax.imageio.ImageIO;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.field.address.parser.AddressBuilder;
+import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
