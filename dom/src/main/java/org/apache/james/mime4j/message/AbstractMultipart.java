@@ -17,9 +17,14 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.dom;
+package org.apache.james.mime4j.message;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.james.mime4j.dom.Entity;
+import org.apache.james.mime4j.dom.Multipart;
 
 /**
  * Represents a MIME multipart body (see RFC 2045).A multipart body has a
@@ -28,7 +33,19 @@ import java.util.List;
  * first body part while the epilogue consists of whatever characters come after
  * the last body part.
  */
-public interface Multipart extends Body {
+public abstract class AbstractMultipart implements Multipart {
+
+    protected List<Entity> bodyParts = new LinkedList<Entity>();
+    private Entity parent = null;
+
+    private String subType;
+
+    /**
+     * Creates a new empty <code>Multipart</code> instance.
+     */
+    public AbstractMultipart(String subType) {
+        this.subType = subType;
+    }
 
     /**
      * Gets the multipart sub-type. E.g. <code>alternative</code> (the
@@ -37,21 +54,56 @@ public interface Multipart extends Body {
      * 
      * @return the multipart sub-type.
      */
-    String getSubType();
-    
+    public String getSubType() {
+        return subType;
+    }
+
+    /**
+     * Sets the multipart sub-type. E.g. <code>alternative</code> or
+     * <code>parallel</code>. See RFC 2045 for common sub-types and their
+     * meaning.
+     * 
+     * @param subType
+     *            the sub-type.
+     */
+    public void setSubType(String subType) {
+        this.subType = subType;
+    }
+
+    /**
+     * @see org.apache.james.mime4j.dom.Body#getParent()
+     */
+    public Entity getParent() {
+        return parent;
+    }
+
+    /**
+     * @see org.apache.james.mime4j.dom.Body#setParent(org.apache.james.mime4j.dom.Entity)
+     */
+    public void setParent(Entity parent) {
+        this.parent = parent;
+        for (Entity bodyPart : bodyParts) {
+            bodyPart.setParent(parent);
+        }
+    }
+
     /**
      * Returns the number of body parts.
      * 
      * @return number of <code>Entity</code> objects.
      */
-    int getCount();
+    public int getCount() {
+        return bodyParts.size();
+    }
 
     /**
      * Gets the list of body parts. The list is immutable.
      * 
      * @return the list of <code>Entity</code> objects.
      */
-    public List<Entity> getBodyParts();
+    public List<Entity> getBodyParts() {
+        return Collections.unmodifiableList(bodyParts);
+    }
 
     /**
      * Sets the list of body parts.
@@ -59,7 +111,12 @@ public interface Multipart extends Body {
      * @param bodyParts
      *            the new list of <code>Entity</code> objects.
      */
-    void setBodyParts(List<Entity> bodyParts);
+    public void setBodyParts(List<Entity> bodyParts) {
+        this.bodyParts = bodyParts;
+        for (Entity bodyPart : bodyParts) {
+            bodyPart.setParent(parent);
+        }
+    }
 
     /**
      * Adds a body part to the end of the list of body parts.
@@ -67,7 +124,13 @@ public interface Multipart extends Body {
      * @param bodyPart
      *            the body part.
      */
-    void addBodyPart(Entity bodyPart);
+    public void addBodyPart(Entity bodyPart) {
+        if (bodyPart == null)
+            throw new IllegalArgumentException();
+
+        bodyParts.add(bodyPart);
+        bodyPart.setParent(parent);
+    }
 
     /**
      * Inserts a body part at the specified position in the list of body parts.
@@ -80,7 +143,13 @@ public interface Multipart extends Body {
      *             if the index is out of range (index &lt; 0 || index &gt;
      *             getCount()).
      */
-    void addBodyPart(Entity bodyPart, int index);
+    public void addBodyPart(Entity bodyPart, int index) {
+        if (bodyPart == null)
+            throw new IllegalArgumentException();
+
+        bodyParts.add(index, bodyPart);
+        bodyPart.setParent(parent);
+    }
 
     /**
      * Removes the body part at the specified position in the list of body
@@ -93,7 +162,11 @@ public interface Multipart extends Body {
      *             if the index is out of range (index &lt; 0 || index &gt;=
      *             getCount()).
      */
-    Entity removeBodyPart(int index);
+    public Entity removeBodyPart(int index) {
+        Entity bodyPart = bodyParts.remove(index);
+        bodyPart.setParent(null);
+        return bodyPart;
+    }
 
     /**
      * Replaces the body part at the specified position in the list of body
@@ -108,14 +181,27 @@ public interface Multipart extends Body {
      *             if the index is out of range (index &lt; 0 || index &gt;=
      *             getCount()).
      */
-    Entity replaceBodyPart(Entity bodyPart, int index);
+    public Entity replaceBodyPart(Entity bodyPart, int index) {
+        if (bodyPart == null)
+            throw new IllegalArgumentException();
+
+        Entity replacedEntity = bodyParts.set(index, bodyPart);
+        if (bodyPart == replacedEntity)
+            throw new IllegalArgumentException(
+                    "Cannot replace body part with itself");
+
+        bodyPart.setParent(parent);
+        replacedEntity.setParent(null);
+
+        return replacedEntity;
+    }
 
     /**
      * Gets the preamble or null if the message has no preamble.
      * 
      * @return the preamble.
      */
-    String getPreamble();
+    public abstract String getPreamble();
 
     /**
      * Sets the preamble with a value or null to remove the preamble.
@@ -123,14 +209,14 @@ public interface Multipart extends Body {
      * @param preamble
      *            the preamble.
      */
-    void setPreamble(String preamble);
-    
+    public abstract void setPreamble(String preamble);
+
     /**
      * Gets the epilogue or null if the message has no epilogue
      * 
      * @return the epilogue.
      */
-    String getEpilogue();
+    public abstract String getEpilogue();
 
     /**
      * Sets the epilogue value, or remove it if the value passed is null.
@@ -138,6 +224,18 @@ public interface Multipart extends Body {
      * @param epilogue
      *            the epilogue.
      */
-    void setEpilogue(String epilogue);
-    
+    public abstract void setEpilogue(String epilogue);
+
+    /**
+     * Disposes of the BodyParts of this Multipart. Note that the dispose call
+     * does not get forwarded to the parent entity of this Multipart.
+     * 
+     * @see org.apache.james.mime4j.dom.Disposable#dispose()
+     */
+    public void dispose() {
+        for (Entity bodyPart : bodyParts) {
+            bodyPart.dispose();
+        }
+    }
+
 }

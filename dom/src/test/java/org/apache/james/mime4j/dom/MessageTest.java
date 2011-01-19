@@ -40,9 +40,11 @@ import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.james.mime4j.field.address.parser.AddressBuilder;
+import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MimeBuilder;
 import org.apache.james.mime4j.message.MultipartImpl;
 
 public class MessageTest extends TestCase {
@@ -54,11 +56,11 @@ public class MessageTest extends TestCase {
 
     @Override
     public void setUp() throws Exception {
-        headerTextPlain = new Header();
-        headerMessageRFC822 = new Header();
-        headerEmpty = new Header();
-        headerMultipartMixed = new Header();
-        headerMultipartDigest = new Header();
+        headerTextPlain = new HeaderImpl();
+        headerMessageRFC822 = new HeaderImpl();
+        headerEmpty = new HeaderImpl();
+        headerMultipartMixed = new HeaderImpl();
+        headerMultipartDigest = new HeaderImpl();
         
         headerTextPlain.addField(
                 DefaultFieldParser.parse("Content-Type: text/plain"));
@@ -131,7 +133,7 @@ public class MessageTest extends TestCase {
     public void testWriteTo() throws Exception {
         byte[] inputByte = getRawMessageAsByteArray();
 
-        Message m = new MessageImpl(new ByteArrayInputStream(inputByte));
+        Message m = MimeBuilder.parse(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         m.writeTo(out);
@@ -153,7 +155,7 @@ public class MessageTest extends TestCase {
 
         byte[] inputByte = getRawMessageAsByteArray();
 
-        MessageImpl m = new MessageImpl(new ByteArrayInputStream(inputByte));
+        Message m = MimeBuilder.parse(new ByteArrayInputStream(inputByte));
         m.getHeader().addField(DefaultFieldParser.parse(testheader));
 
         assertEquals("header added", m.getHeader().getField(headerName)
@@ -173,7 +175,7 @@ public class MessageTest extends TestCase {
         assertNull(m.getMessageId());
 
         String id = "<msg17@localhost>";
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Message-ID: " + id));
         m.setHeader(header);
         assertEquals(id, m.getMessageId());
@@ -194,7 +196,7 @@ public class MessageTest extends TestCase {
         assertNull(m.getSubject());
 
         String subject = "testing 1 2";
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Subject: " + subject));
         m.setHeader(header);
         assertEquals(subject, m.getSubject());
@@ -219,7 +221,7 @@ public class MessageTest extends TestCase {
         MessageImpl m = new MessageImpl();
         assertNull(m.getDate());
 
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Date: Thu, 1 Jan 1970 05:30:00 +0530"));
         m.setHeader(header);
 
@@ -242,7 +244,7 @@ public class MessageTest extends TestCase {
         MessageImpl m = new MessageImpl();
         assertNull(m.getSender());
 
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Sender: john.doe@example.net"));
         m.setHeader(header);
 
@@ -264,7 +266,7 @@ public class MessageTest extends TestCase {
         MessageImpl m = new MessageImpl();
         assertNull(m.getFrom());
 
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("From: john.doe@example.net"));
         m.setHeader(header);
 
@@ -297,7 +299,7 @@ public class MessageTest extends TestCase {
         MessageImpl m = new MessageImpl();
         assertNull(m.getTo());
 
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("To: john.doe@example.net"));
         m.setHeader(header);
 
@@ -335,7 +337,7 @@ public class MessageTest extends TestCase {
         MessageImpl m = new MessageImpl();
         assertNull(m.getCc());
 
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Cc: john.doe@example.net"));
         m.setHeader(header);
 
@@ -373,7 +375,7 @@ public class MessageTest extends TestCase {
         MessageImpl m = new MessageImpl();
         assertNull(m.getBcc());
 
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Bcc: john.doe@example.net"));
         m.setHeader(header);
 
@@ -411,7 +413,7 @@ public class MessageTest extends TestCase {
         MessageImpl m = new MessageImpl();
         assertNull(m.getReplyTo());
 
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Reply-To: john.doe@example.net"));
         m.setHeader(header);
 

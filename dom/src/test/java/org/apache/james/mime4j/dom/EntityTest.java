@@ -25,6 +25,7 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.HeaderImpl;
 
 import junit.framework.TestCase;
 
@@ -69,11 +70,11 @@ public class EntityTest extends TestCase {
     }
 
     public void testGetDispositionType() throws Exception {
-        Entity entity = new BodyPart();
+        BodyPart entity = new BodyPart();
 
         assertNull(entity.getDispositionType());
 
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Content-Disposition: inline"));
         entity.setHeader(header);
 
@@ -81,7 +82,7 @@ public class EntityTest extends TestCase {
     }
 
     public void testSetContentDispositionType() throws Exception {
-        Entity entity = new BodyPart();
+        BodyPart entity = new BodyPart();
 
         entity.setContentDisposition("attachment");
 
@@ -90,7 +91,7 @@ public class EntityTest extends TestCase {
     }
 
     public void testSetContentDispositionTypeFilename() throws Exception {
-        Entity entity = new BodyPart();
+        BodyPart entity = new BodyPart();
 
         entity.setContentDisposition("attachment", "some file.dat");
 
@@ -99,11 +100,11 @@ public class EntityTest extends TestCase {
     }
 
     public void testGetFilename() throws Exception {
-        Entity entity = new BodyPart();
+        BodyPart entity = new BodyPart();
 
         assertNull(entity.getFilename());
 
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Content-Disposition: attachment; "
                 + "filename=\"some file.dat\""));
         entity.setHeader(header);
@@ -112,7 +113,7 @@ public class EntityTest extends TestCase {
     }
 
     public void testSetFilename() throws Exception {
-        Entity entity = new BodyPart();
+        BodyPart entity = new BodyPart();
 
         entity.setFilename("file name.ext");
 

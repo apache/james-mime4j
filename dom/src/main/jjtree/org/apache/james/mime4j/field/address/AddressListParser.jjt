@@ -32,7 +32,7 @@ options {
 	VISITOR=true;
 	MULTI=true;
 	NODE_SCOPE_HOOK=true;
-	NODE_EXTENDS="org.apache.james.mime4j.field.address.parser.BaseNode"; 
+	NODE_EXTENDS="org.apache.james.mime4j.field.address.BaseNode"; 
 	//DEBUG_PARSER=true;
 	//DEBUG_TOKEN_MANAGER=true;
 }
@@ -56,7 +56,7 @@ PARSER_BEGIN(AddressListParser)
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
-package org.apache.james.mime4j.field.address.parser;
+package org.apache.james.mime4j.field.address;
 
 public class AddressListParser {
     public static void main(String args[]) throws ParseException {

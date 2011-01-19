@@ -19,10 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.dom.Entity;
-import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
@@ -33,7 +29,7 @@ import org.apache.james.mime4j.util.ContentUtil;
  * first body part while the epilogue consists of whatever characters come after
  * the last body part.
  */
-public class MultipartImpl extends Multipart {
+public class MultipartImpl extends AbstractMultipart {
 
     private ByteSequence preamble;
     private transient String preambleStrCache;
@@ -55,45 +51,6 @@ public class MultipartImpl extends Multipart {
         epilogueComputed = true;
     }
 
-    /**
-     * Creates a new <code>Multipart</code> from the specified
-     * <code>Multipart</code>. The <code>Multipart</code> instance is
-     * initialized with copies of preamble, epilogue, sub type and the list of
-     * body parts of the specified <code>Multipart</code>. The parent entity
-     * of the new multipart is <code>null</code>.
-     * 
-     * @param other
-     *            multipart to copy.
-     * @throws UnsupportedOperationException
-     *             if <code>other</code> contains a {@link SingleBody} that
-     *             does not support the {@link SingleBody#copy() copy()}
-     *             operation.
-     * @throws IllegalArgumentException
-     *             if <code>other</code> contains a <code>Body</code> that
-     *             is neither a {@link Message}, {@link Multipart} or
-     *             {@link SingleBody}.
-     */
-    public MultipartImpl(Multipart other) {
-    	super(other.getSubType());
-
-    	for (Entity otherBodyPart : other.getBodyParts()) {
-    		Entity bodyPartCopy = new BodyPart(otherBodyPart);
-            addBodyPart(bodyPartCopy);
-        }
-
-    	if (other instanceof MultipartImpl) {
-	        preamble = ((MultipartImpl) other).preamble;
-	        epilogue = ((MultipartImpl) other).epilogue;
-            preambleStrCache = ((MultipartImpl) other).preambleStrCache;
-            epilogueStrCache = ((MultipartImpl) other).epilogueStrCache;
-            preambleComputed = ((MultipartImpl) other).preambleComputed;
-            epilogueComputed = ((MultipartImpl) other).epilogueComputed;
-    	} else {
-    		setPreamble(other.getPreamble());
-    		setEpilogue(other.getEpilogue());
-    	}
-    }
-
     // package private for now; might become public someday
     public ByteSequence getPreambleRaw() {
         return preamble;
@@ -110,6 +67,7 @@ public class MultipartImpl extends Multipart {
      * 
      * @return the preamble.
      */
+    @Override
     public String getPreamble() {
         if (!preambleComputed) {
             preambleStrCache = preamble != null ? ContentUtil.decode(preamble) : null;
@@ -124,6 +82,7 @@ public class MultipartImpl extends Multipart {
      * @param preamble
      *            the preamble.
      */
+    @Override
     public void setPreamble(String preamble) {
         this.preamble = preamble != null ? ContentUtil.encode(preamble) : null;
         this.preambleStrCache = preamble;
@@ -146,6 +105,7 @@ public class MultipartImpl extends Multipart {
      * 
      * @return the epilogue.
      */
+    @Override
     public String getEpilogue() {
         if (!epilogueComputed) {
             epilogueStrCache = epilogue != null ? ContentUtil.decode(epilogue) : null;
@@ -160,6 +120,7 @@ public class MultipartImpl extends Multipart {
      * @param epilogue
      *            the epilogue.
      */
+    @Override
     public void setEpilogue(String epilogue) {
         this.epilogue = epilogue != null ? ContentUtil.encode(epilogue) : null;
         this.epilogueStrCache = epilogue;

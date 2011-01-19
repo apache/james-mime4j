@@ -26,9 +26,7 @@ import org.apache.james.mime4j.dom.address.DomainList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
-import org.apache.james.mime4j.field.address.formatter.AddressFormatter;
-import org.apache.james.mime4j.field.address.parser.AddressBuilder;
-import org.apache.james.mime4j.field.address.parser.ParseException;
+import org.apache.james.mime4j.field.address.ParseException;
 
 import java.util.ArrayList;
 import java.util.Arrays;

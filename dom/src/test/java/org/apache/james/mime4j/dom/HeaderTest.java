@@ -25,6 +25,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageWriter;
 import org.apache.james.mime4j.util.CharsetUtil;
 
@@ -35,7 +36,7 @@ public class HeaderTest extends TestCase {
     public static final String TO = "To: anyuser <any@user>";
 
     public void testHeader() throws Exception {
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse(SUBJECT));
         header.addField(DefaultFieldParser.parse(TO));
 
@@ -50,7 +51,7 @@ public class HeaderTest extends TestCase {
 
     public void testWriteSpecialCharacters() throws Exception {
         String hello = SWISS_GERMAN_HELLO;
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("Hello: " + hello));
         
         Field field = header.getField("Hello");
@@ -68,7 +69,7 @@ public class HeaderTest extends TestCase {
     }
 
     public void testRemoveFields() throws Exception {
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("Received: from foo by bar for james"));
         header.addField(DefaultFieldParser.parse("Content-type: text/plain; charset=US-ASCII"));
         header.addField(DefaultFieldParser.parse("ReCeIvEd: from bar by foo for james"));
@@ -87,7 +88,7 @@ public class HeaderTest extends TestCase {
     }
 
     public void testRemoveNonExistantField() throws Exception {
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("Received: from foo by bar for james"));
         header.addField(DefaultFieldParser.parse("Content-type: text/plain; charset=US-ASCII"));
         header.addField(DefaultFieldParser.parse("ReCeIvEd: from bar by foo for james"));
@@ -100,7 +101,7 @@ public class HeaderTest extends TestCase {
     }
 
     public void testSetField() throws Exception {
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("From: mime4j@james.apache.org"));
         header.addField(DefaultFieldParser.parse("Received: from foo by bar for james"));
         header.addField(DefaultFieldParser.parse("Content-type: text/plain; charset=US-ASCII"));
@@ -117,7 +118,7 @@ public class HeaderTest extends TestCase {
     }
 
     public void testSetNonExistantField() throws Exception {
-        Header header = new Header();
+        Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("Received: from foo by bar for james"));
         header.addField(DefaultFieldParser.parse("Content-type: text/plain; charset=US-ASCII"));
         header.addField(DefaultFieldParser.parse("ReCeIvEd: from bar by foo for james"));

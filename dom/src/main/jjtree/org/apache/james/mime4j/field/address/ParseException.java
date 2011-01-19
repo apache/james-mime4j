@@ -17,7 +17,7 @@
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
-package org.apache.james.mime4j.field.address.parser;
+package org.apache.james.mime4j.field.address;
 
 /**
  * This exception is thrown when parse errors are encountered.

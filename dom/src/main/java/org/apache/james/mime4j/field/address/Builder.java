@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field.address.parser;
+package org.apache.james.mime4j.field.address;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -31,6 +31,21 @@ import org.apache.james.mime4j.dom.address.DomainList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
+import org.apache.james.mime4j.field.address.ASTaddr_spec;
+import org.apache.james.mime4j.field.address.ASTaddress;
+import org.apache.james.mime4j.field.address.ASTaddress_list;
+import org.apache.james.mime4j.field.address.ASTangle_addr;
+import org.apache.james.mime4j.field.address.ASTdomain;
+import org.apache.james.mime4j.field.address.ASTgroup_body;
+import org.apache.james.mime4j.field.address.ASTlocal_part;
+import org.apache.james.mime4j.field.address.ASTmailbox;
+import org.apache.james.mime4j.field.address.ASTname_addr;
+import org.apache.james.mime4j.field.address.ASTphrase;
+import org.apache.james.mime4j.field.address.ASTroute;
+import org.apache.james.mime4j.field.address.Node;
+import org.apache.james.mime4j.field.address.ParseException;
+import org.apache.james.mime4j.field.address.SimpleNode;
+import org.apache.james.mime4j.field.address.Token;
 
 /**
  * Transforms the JJTree-generated abstract syntax tree into a graph of

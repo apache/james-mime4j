@@ -23,8 +23,8 @@ import java.io.IOException;
 import java.util.Date;
 
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.field.address.parser.AddressBuilder;
-import org.apache.james.mime4j.field.address.parser.ParseException;
+import org.apache.james.mime4j.field.address.AddressBuilder;
+import org.apache.james.mime4j.field.address.ParseException;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.MessageImpl;
 

@@ -26,7 +26,7 @@ import java.io.InputStream;
 
 import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.Header;
-import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MimeBuilder;
 import org.apache.james.mime4j.message.SimpleContentHandler;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.ContentHandler;
@@ -60,7 +60,7 @@ public class LongMultipartReadBench {
         System.out.println("No of repetitions: " + repetitions);
         System.out.println("Content length: " + content.length);
         System.out.println("Test: " + test.getClass().getSimpleName());
-        
+
         System.out.print("Warmup... ");
         long t0 = System.currentTimeMillis();
         while (System.currentTimeMillis() - t0 < 1500) {
@@ -171,7 +171,7 @@ public class LongMultipartReadBench {
             DefaultStorageProvider.setInstance(new MemoryStorageProvider());
 
             for (int i = 0; i < repetitions; i++) {
-                new MessageImpl(new ByteArrayInputStream(content));
+                MimeBuilder.parse(new ByteArrayInputStream(content));
             }
         }
     }

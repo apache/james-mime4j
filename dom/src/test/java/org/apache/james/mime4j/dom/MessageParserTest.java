@@ -43,6 +43,7 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.FieldsTest;
 import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MimeBuilder;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.util.CharsetUtil;
 
@@ -101,7 +102,7 @@ public class MessageParserTest extends TestCase {
             config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        MessageImpl m = new MessageImpl(url.openStream(), config);
+        Message m = MimeBuilder.parse(url.openStream(), config);
         
         String s = url.toString();
         String prefix = s.substring(0, s.lastIndexOf('.'));

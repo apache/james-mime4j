@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field.address.parser;
+package org.apache.james.mime4j.field.address;
 
 import java.io.StringReader;
 
@@ -26,6 +26,8 @@ import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.field.address.AddressListParser;
+import org.apache.james.mime4j.field.address.ParseException;
 
 public class AddressBuilder {
 
@@ -59,11 +61,7 @@ public class AddressBuilder {
             throws ParseException {
         AddressListParser parser = new AddressListParser(new StringReader(
                 rawAddressList));
-        try {
-            return Builder.getInstance().buildAddressList(parser.parseAddressList(), monitor);
-        } catch (RuntimeException e) {
-            throw new ParseException(e.getMessage());
-        }
+        return Builder.getInstance().buildAddressList(parser.parseAddressList(), monitor);
     }
 
     public static AddressList parseAddressList(String rawAddressList) throws ParseException {

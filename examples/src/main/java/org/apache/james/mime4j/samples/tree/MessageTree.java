@@ -44,6 +44,7 @@ import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.Mailbox;
@@ -53,13 +54,14 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
-import org.apache.james.mime4j.field.address.formatter.AddressFormatter;
+import org.apache.james.mime4j.field.address.AddressFormatter;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MimeBuilder;
 
 /**
  * Displays a parsed Message in a window. The window will be divided into
- * two panels. The left panel displays the Message tree. Clicking on a 
+ * two panels. The left panel displays the Message tree. Clicking on a
  * node in the tree shows information on that node in the right panel.
  *
  * Some of this code have been copied from the Java tutorial's JTree section.
@@ -72,36 +74,36 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
     private JTree tree;
 
     /**
-     * Wraps an Object and associates it with a text. All message parts 
+     * Wraps an Object and associates it with a text. All message parts
      * (headers, bodies, multiparts, body parts) will be wrapped in
      * ObjectWrapper instances before they are added to the JTree instance.
      */
     public static class ObjectWrapper {
         private String text = "";
         private Object object = null;
-        
+
         public ObjectWrapper(String text, Object object) {
             this.text = text;
             this.object = object;
         }
-        
+
         @Override
         public String toString() {
             return text;
         }
-        
+
         public Object getObject() {
             return object;
         }
     }
-    
+
     /**
-     * Creates a new <code>MessageTree</code> instance displaying the 
+     * Creates a new <code>MessageTree</code> instance displaying the
      * specified <code>Message</code>.
-     * 
+     *
      * @param message the message to display.
      */
-    public MessageTree(MessageImpl message) {
+    public MessageTree(Message message) {
         super(new GridLayout(1,0));
 
         DefaultMutableTreeNode root = createNode(message);
@@ -128,17 +130,17 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
         splitPane.setPreferredSize(new Dimension(750, 500));
 
         add(splitPane);
-        
+
         textView = new JTextArea();
         textView.setEditable(false);
         textView.setLineWrap(true);
         contentPane.add(textView);
     }
-    
+
     /**
      * Create a node given a Multipart body.
      * Add the Preamble, all Body parts and the Epilogue to the node.
-     * 
+     *
      * @param multipart the Multipart.
      * @return the root node of the tree.
      */
@@ -148,17 +150,17 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
 
         for (Field field : header.getFields()) {
             String name = field.getName();
-            
+
             node.add(new DefaultMutableTreeNode(new ObjectWrapper(name, field)));
-        }        
+        }
 
         return node;
     }
-    
+
     /**
      * Create a node given a Multipart body.
      * Add the Preamble, all Body parts and the Epilogue to the node.
-     * 
+     *
      * @param multipart the Multipart.
      * @return the root node of the tree.
      */
@@ -176,17 +178,17 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
 
         return node;
     }
-    
+
     /**
-     * Creates the tree nodes given a MIME entity (either a Message or 
+     * Creates the tree nodes given a MIME entity (either a Message or
      * a BodyPart).
-     * 
+     *
      * @param entity the entity.
-     * @return the root node of the tree displaying the specified entity and 
+     * @return the root node of the tree displaying the specified entity and
      *         its children.
      */
     private DefaultMutableTreeNode createNode(Entity entity) {
-        
+
         /*
          * Create the root node for the entity. It's either a
          * Message or a Body part.
@@ -202,22 +204,22 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
          * Add the node encapsulating the entity Header.
          */
         node.add(createNode(entity.getHeader()));
-        
+
         Body body = entity.getBody();
-        
+
         if (body instanceof Multipart) {
             /*
              * The body of the entity is a Multipart.
              */
-            
+
             node.add(createNode((Multipart) body));
         } else if (body instanceof MessageImpl) {
             /*
              * The body is another Message.
              */
-            
+
             node.add(createNode((MessageImpl) body));
-            
+
         } else {
             /*
              * Discrete Body (either of type TextBody or BinaryBody).
@@ -226,19 +228,19 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
             if (body instanceof BinaryBody) {
                 type = "Binary body";
             }
-            
+
             type += " (" + entity.getMimeType() + ")";
             node.add(new DefaultMutableTreeNode(new ObjectWrapper(type, body)));
-            
+
         }
-        
+
         return node;
     }
-    
+
     /**
      * Called whenever the selection changes in the JTree instance showing
      * the Message nodes.
-     * 
+     *
      * @param e the event.
      */
     public void valueChanged(TreeSelectionEvent e) {
@@ -246,15 +248,15 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                 tree.getLastSelectedPathComponent();
 
         textView.setText("");
-        
+
         if (node == null) {
             return;
         }
-        
+
         Object o = ((ObjectWrapper) node.getUserObject()).getObject();
 
         if (node.isLeaf()) {
-            
+
             if (o instanceof TextBody){
                 /*
                  * A text body. Display its contents.
@@ -271,7 +273,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                     ex.printStackTrace();
                 }
                 textView.setText(sb.toString());
-                
+
             } else if (o instanceof BinaryBody){
                 /*
                  * A binary body. Display its MIME type and length in bytes.
@@ -287,10 +289,10 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                     ex.printStackTrace();
                 }
                 textView.setText("Binary body\n"
-                               + "MIME type: " 
-                                   + body.getParent().getMimeType() + "\n" 
+                               + "MIME type: "
+                                   + body.getParent().getMimeType() + "\n"
                                + "Size of decoded data: " + size + " bytes");
-                
+
             } else if (o instanceof ContentTypeField) {
                 /*
                  * Content-Type field.
@@ -303,7 +305,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                     sb.append(name + " = " + params.get(name) + "\n");
                 }
                 textView.setText(sb.toString());
-                
+
             } else if (o instanceof AddressListField) {
                 /*
                  * An address field (From, To, Cc, etc)
@@ -316,31 +318,31 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                     sb.append(AddressFormatter.format(mb, false) + "\n");
                 }
                 textView.setText(sb.toString());
-                
+
             } else if (o instanceof DateTimeField) {
                 Date date = ((DateTimeField) o).getDate();
-                textView.setText(date.toString());                
+                textView.setText(date.toString());
             } else if (o instanceof UnstructuredField){
-                textView.setText(((UnstructuredField) o).getValue());                
+                textView.setText(((UnstructuredField) o).getValue());
             } else if (o instanceof Field){
-                textView.setText(((Field) o).getBody());                
+                textView.setText(((Field) o).getBody());
             } else {
                 /*
-                 * The Object should be a Header or a String containing a 
+                 * The Object should be a Header or a String containing a
                  * Preamble or Epilogue.
                  */
-                textView.setText(o.toString());                
+                textView.setText(o.toString());
             }
-            
+
         }
     }
-    
+
     /**
      * Creates and displays the gui.
-     * 
+     *
      * @param message the Message to display in the tree.
      */
-    private static void createAndShowGUI(MessageImpl message) {
+    private static void createAndShowGUI(Message message) {
         /*
          * Create and set up the window.
          */
@@ -360,18 +362,18 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
         frame.pack();
         frame.setVisible(true);
     }
-    
+
     public static void main(String[] args) {
         try {
-            
-            final MessageImpl message = new MessageImpl(new FileInputStream(args[0]));
-            
+
+            final Message message = MimeBuilder.parse(new FileInputStream(args[0]));
+
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     createAndShowGUI(message);
                 }
             });
-        
+
         } catch (ArrayIndexOutOfBoundsException e) {
             System.err.println("Wrong number of arguments.");
             System.err.println("Usage: org.mime4j.samples.tree.MessageTree"
