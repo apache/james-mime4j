@@ -27,6 +27,7 @@ import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.field.address.ParseException;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MimeWriter;
 
 /**
  * This example generates a message very similar to the one from RFC 5322
@@ -62,7 +63,7 @@ public class TextPlainMessage {
 
         // 4) print message to standard output
 
-        message.writeTo(System.out);
+        MimeWriter.DEFAULT.writeMessage(message, System.out);
 
         // 5) message is no longer needed and should be disposed of
 

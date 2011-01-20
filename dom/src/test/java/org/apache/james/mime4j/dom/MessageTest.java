@@ -45,6 +45,7 @@ import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MimeBuilder;
+import org.apache.james.mime4j.message.MimeWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
 
 public class MessageTest extends TestCase {
@@ -136,7 +137,7 @@ public class MessageTest extends TestCase {
         Message m = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        m.writeTo(out);
+        MimeWriter.DEFAULT.writeMessage(m, out);
 
         InputStream output = new ByteArrayInputStream(out.toByteArray());
 
@@ -162,7 +163,7 @@ public class MessageTest extends TestCase {
                 .getBody(), headerValue);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        m.writeTo(out);
+        MimeWriter.DEFAULT.writeMessage(m, out);
         List<?> lines = IOUtils.readLines((new BufferedReader(
                 new InputStreamReader(new ByteArrayInputStream(out
                         .toByteArray())))));

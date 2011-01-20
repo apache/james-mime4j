@@ -19,8 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -51,13 +49,6 @@ public class MessageImpl extends AbstractMessage {
      * Creates a new empty <code>Message</code>.
      */
     public MessageImpl() {
-    }
-
-    /**
-     * @see org.apache.james.mime4j.dom.Message#writeTo(java.io.OutputStream)
-     */
-    public void writeTo(OutputStream out) throws IOException {
-        MimeWriter.DEFAULT.writeEntity(this, out);
     }
 
     @Override

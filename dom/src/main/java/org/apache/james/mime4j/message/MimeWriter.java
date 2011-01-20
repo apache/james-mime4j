@@ -119,6 +119,21 @@ public class MimeWriter {
     }
 
     /**
+     * Write the specified <code>Message</code> to the specified
+     * <code>OutputStream</code>.
+     * 
+     * @param entity
+     *            the <code>Message</code> to write.
+     * @param out
+     *            the OutputStream to write to.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
+    public void writeMessage(Message message, OutputStream out) throws IOException {
+        writeEntity(message, out);
+    }
+    
+    /**
      * Write the specified <code>Multipart</code> to the specified
      * <code>OutputStream</code>.
      * 
