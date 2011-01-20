@@ -42,7 +42,7 @@ public class MimeBuilderCopyTest extends TestCase {
     public void testCopyEmptyMessage() throws Exception {
         MessageImpl original = new MessageImpl();
 
-        Message copy = MimeBuilder.copy(original);
+        Message copy = MimeBuilder.DEFAULT.copy(original);
 
         assertNull(copy.getHeader());
         assertNull(copy.getBody());
@@ -59,7 +59,7 @@ public class MimeBuilderCopyTest extends TestCase {
         original.setBody(body);
         original.setParent(parent);
 
-        Message copy = MimeBuilder.copy(original);
+        Message copy = MimeBuilder.DEFAULT.copy(original);
 
         assertNotNull(copy.getHeader());
         assertNotSame(header, copy.getHeader());
@@ -75,7 +75,7 @@ public class MimeBuilderCopyTest extends TestCase {
     public void testCopyEmptyBodyPart() throws Exception {
         BodyPart original = new BodyPart();
 
-        BodyPart copy = MimeBuilder.copy(original);
+        BodyPart copy = MimeBuilder.DEFAULT.copy(original);
 
         assertNull(copy.getHeader());
         assertNull(copy.getBody());
@@ -92,7 +92,7 @@ public class MimeBuilderCopyTest extends TestCase {
         original.setBody(body);
         original.setParent(parent);
 
-        BodyPart copy = MimeBuilder.copy(original);
+        BodyPart copy = MimeBuilder.DEFAULT.copy(original);
 
         assertNotNull(copy.getHeader());
         assertNotSame(header, copy.getHeader());
@@ -108,7 +108,7 @@ public class MimeBuilderCopyTest extends TestCase {
     public void testCopyEmptyMultipart() throws Exception {
         Multipart original = new MultipartImpl("mixed");
 
-        Multipart copy = MimeBuilder.copy(original);
+        Multipart copy = MimeBuilder.DEFAULT.copy(original);
 
         assertSame(original.getPreamble(), copy.getPreamble());
         assertSame(original.getEpilogue(), copy.getEpilogue());
@@ -127,7 +127,7 @@ public class MimeBuilderCopyTest extends TestCase {
         original.setParent(parent);
         original.addBodyPart(bodyPart);
 
-        Multipart copy = MimeBuilder.copy(original);
+        Multipart copy = MimeBuilder.DEFAULT.copy(original);
 
         assertSame(original.getPreamble(), copy.getPreamble());
         assertSame(original.getEpilogue(), copy.getEpilogue());
@@ -154,7 +154,7 @@ public class MimeBuilderCopyTest extends TestCase {
         original.setHeader(new HeaderImpl());
         original.setBody(multipart);
 
-        Message copy = MimeBuilder.copy(original);
+        Message copy = MimeBuilder.DEFAULT.copy(original);
 
         Multipart multipartCopy = (Multipart) copy.getBody();
         List<Entity> bodyParts = multipartCopy.getBodyParts();
@@ -180,7 +180,7 @@ public class MimeBuilderCopyTest extends TestCase {
         original.addField(f2);
         original.addField(f3);
 
-        Header copy = MimeBuilder.copy(original);
+        Header copy = MimeBuilder.DEFAULT.copy(original);
 
         // copy must have same fields as original
         assertEquals(Arrays.asList(f1, f2, f3), copy.getFields());

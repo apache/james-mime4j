@@ -366,7 +366,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
     public static void main(String[] args) {
         try {
 
-            final Message message = MimeBuilder.parse(new FileInputStream(args[0]));
+            final Message message = MimeBuilder.DEFAULT.parse(new FileInputStream(args[0]));
 
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

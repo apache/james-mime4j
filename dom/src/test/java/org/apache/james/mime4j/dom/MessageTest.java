@@ -133,7 +133,7 @@ public class MessageTest extends TestCase {
     public void testWriteTo() throws Exception {
         byte[] inputByte = getRawMessageAsByteArray();
 
-        Message m = MimeBuilder.parse(new ByteArrayInputStream(inputByte));
+        Message m = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         m.writeTo(out);
@@ -155,7 +155,7 @@ public class MessageTest extends TestCase {
 
         byte[] inputByte = getRawMessageAsByteArray();
 
-        Message m = MimeBuilder.parse(new ByteArrayInputStream(inputByte));
+        Message m = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(inputByte));
         m.getHeader().addField(DefaultFieldParser.parse(testheader));
 
         assertEquals("header added", m.getHeader().getField(headerName)

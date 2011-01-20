@@ -58,7 +58,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        Message inputMessage = MimeBuilder.parse(url.openStream(), config);
+        Message inputMessage = MimeBuilder.DEFAULT.parse(url.openStream(), config);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         inputMessage.writeTo(out);
         

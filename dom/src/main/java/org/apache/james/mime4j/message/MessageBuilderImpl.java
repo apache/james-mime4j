@@ -34,12 +34,12 @@ public class MessageBuilderImpl extends MessageBuilder {
 
     @Override
     public Message newMessage(Message source) {
-        return MimeBuilder.copy(source);
+        return MimeBuilder.DEFAULT.copy(source);
     }
 
     @Override
     public Message parse(InputStream source) throws MimeException, IOException {
-        return MimeBuilder.parse(source, 
+        return MimeBuilder.DEFAULT.parse(source, 
                 mimeEntityConfig, 
                 storageProvider, 
                 mutableBodyDescriptorFactory, 

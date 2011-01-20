@@ -83,7 +83,7 @@ public class MessageWriteToTest extends TestCase {
     
     private Message createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
-        Message message = MimeBuilder.parse(in);
+        Message message = MimeBuilder.DEFAULT.parse(in);
         return message;
     }
 }

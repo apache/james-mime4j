@@ -102,7 +102,7 @@ public class MessageParserTest extends TestCase {
             config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        Message m = MimeBuilder.parse(url.openStream(), config);
+        Message m = MimeBuilder.DEFAULT.parse(url.openStream(), config);
         
         String s = url.toString();
         String prefix = s.substring(0, s.lastIndexOf('.'));

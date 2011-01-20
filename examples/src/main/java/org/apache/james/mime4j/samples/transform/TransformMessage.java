@@ -91,7 +91,7 @@ public class TransformMessage {
     private static Message transform(Message original) throws IOException, ParseException {
         // Create a copy of the template. The copy can be modified without
         // affecting the original.
-        Message message = MimeBuilder.copy(original);
+        Message message = MimeBuilder.DEFAULT.copy(original);
 
         // In this example we know we have a multipart message. Use
         // Message#isMultipart() if uncertain.
