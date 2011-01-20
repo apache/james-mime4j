@@ -118,7 +118,7 @@ public class TransformMessage {
         message.createMessageId(HOSTNAME);
         message.setSubject("Transformed message");
         message.setDate(new Date());
-        message.setFrom(AddressBuilder.parseMailbox("John Doe <jdoe@machine.example>"));
+        message.setFrom(AddressBuilder.DEFAULT.parseMailbox("John Doe <jdoe@machine.example>"));
 
         return message;
     }

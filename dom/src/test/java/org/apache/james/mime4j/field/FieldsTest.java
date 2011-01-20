@@ -242,14 +242,14 @@ public class FieldsTest extends TestCase {
     }
 
     public void testSender() throws Exception {
-        MailboxField field = Fields.sender(AddressBuilder
+        MailboxField field = Fields.sender(AddressBuilder.DEFAULT
                 .parseMailbox("JD <john.doe@acme.org>"));
         assertEquals("Sender: JD <john.doe@acme.org>", decode(field));
     }
 
     public void testFrom() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
 
         MailboxListField field = Fields.from(mailbox1);
         assertEquals("From: JD <john.doe@acme.org>", decode(field));
@@ -264,9 +264,9 @@ public class FieldsTest extends TestCase {
     }
 
     public void testTo() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.to(group);
@@ -285,9 +285,9 @@ public class FieldsTest extends TestCase {
     }
 
     public void testCc() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.cc(group);
@@ -306,9 +306,9 @@ public class FieldsTest extends TestCase {
     }
 
     public void testBcc() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.bcc(group);
@@ -327,9 +327,9 @@ public class FieldsTest extends TestCase {
     }
 
     public void testReplyTo() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.replyTo(group);
@@ -348,15 +348,14 @@ public class FieldsTest extends TestCase {
     }
 
     public void testMailbox() throws Exception {
-        MailboxField field = Fields.mailbox("Resent-Sender", AddressBuilder
+        MailboxField field = Fields.mailbox("Resent-Sender", AddressBuilder.DEFAULT
                 .parseMailbox("JD <john.doe@acme.org>"));
-        assertEquals("Resent-Sender: JD <john.doe@acme.org>", decode(field
-                ));
+        assertEquals("Resent-Sender: JD <john.doe@acme.org>", decode(field));
     }
 
     public void testMailboxList() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
 
         MailboxListField field = Fields.mailboxList("Resent-From", Arrays
                 .asList(mailbox1, mailbox2));
@@ -365,9 +364,9 @@ public class FieldsTest extends TestCase {
     }
 
     public void testAddressList() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.addressList("Resent-To", Arrays.asList(

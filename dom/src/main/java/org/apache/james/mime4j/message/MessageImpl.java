@@ -57,7 +57,7 @@ public class MessageImpl extends AbstractMessage {
      * @see org.apache.james.mime4j.dom.Message#writeTo(java.io.OutputStream)
      */
     public void writeTo(OutputStream out) throws IOException {
-        MessageWriter.DEFAULT.writeEntity(this, out);
+        MimeWriter.DEFAULT.writeEntity(this, out);
     }
 
     @Override

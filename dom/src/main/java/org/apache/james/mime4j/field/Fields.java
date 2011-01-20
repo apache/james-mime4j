@@ -635,7 +635,7 @@ public class Fields {
             if (sb.length() > 0) {
                 sb.append(", ");
             }
-            AddressFormatter.encode(sb, address);
+            AddressFormatter.DEFAULT.encode(sb, address);
         }
         return sb.toString();
     }

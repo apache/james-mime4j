@@ -30,7 +30,7 @@ import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.MessageWriter;
+import org.apache.james.mime4j.message.MimeWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
 
 public class MultipartFormTest extends TestCase {
@@ -67,7 +67,7 @@ public class MultipartFormTest extends TestCase {
         multipart.addBodyPart(p3);
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        MessageWriter.DEFAULT.writeMultipart(multipart, out);
+        MimeWriter.DEFAULT.writeMultipart(multipart, out);
         out.close();
         
         String expected = "--foo\r\n" +

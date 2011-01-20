@@ -64,7 +64,7 @@ public class AddressListFieldImpl extends AbstractField implements org.apache.ja
         String body = getBody();
 
         try {
-            addressList = AddressBuilder.parseAddressList(body, monitor);
+            addressList = AddressBuilder.DEFAULT.parseAddressList(body, monitor);
         } catch (ParseException e) {
             parseException = e;
         }

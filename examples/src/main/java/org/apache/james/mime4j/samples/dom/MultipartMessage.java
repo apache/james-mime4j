@@ -57,13 +57,13 @@ public class MultipartMessage {
 
         // Date and From are required fields
         message.setDate(new Date());
-        message.setFrom(AddressBuilder.parseMailbox("John Doe <jdoe@machine.example>"));
+        message.setFrom(AddressBuilder.DEFAULT.parseMailbox("John Doe <jdoe@machine.example>"));
 
         // Message-ID should be present
         message.createMessageId("machine.example");
 
         // set some optional fields
-        message.setTo(AddressBuilder.parseMailbox("Mary Smith <mary@example.net>"));
+        message.setTo(AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>"));
         message.setSubject("An image for you");
 
         // 3) set a multipart body
