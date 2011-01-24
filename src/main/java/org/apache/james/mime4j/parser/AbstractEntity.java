@@ -193,6 +193,9 @@ public abstract class AbstractEntity implements EntityStateMachine {
                 len--;
             }
             fieldbuf.setLength(len);
+
+            // we are at the end of the header, the next loop will recognize it.
+            if (len == 0) continue;
             
             boolean valid = true;
             
