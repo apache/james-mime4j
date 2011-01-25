@@ -30,12 +30,14 @@ import org.apache.james.mime4j.MimeException;
  */
 public abstract class MessageBuilderFactory {
 
-    public abstract MessageBuilder newMessageBuilder() throws MimeException;
-    
     public static MessageBuilderFactory newInstance() throws MimeException {
         return ServiceLoader.load(MessageBuilderFactory.class);
     }
 
-    public abstract void setAttribute(String name, Object value) throws IllegalArgumentException;
+    public abstract MessageBuilder newMessageBuilder();
     
+    public abstract MessageFormatter newMessageFormatter();
+    
+    public abstract void setAttribute(String name, Object value) throws IllegalArgumentException;
+        
 }

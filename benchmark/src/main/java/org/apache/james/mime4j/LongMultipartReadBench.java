@@ -171,7 +171,7 @@ public class LongMultipartReadBench {
             DefaultStorageProvider.setInstance(new MemoryStorageProvider());
 
             for (int i = 0; i < repetitions; i++) {
-                MimeBuilder.parse(new ByteArrayInputStream(content));
+                MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(content));
             }
         }
     }

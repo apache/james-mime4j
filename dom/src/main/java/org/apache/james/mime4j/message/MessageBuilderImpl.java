@@ -1,13 +1,32 @@
+/****************************************************************
+ * Licensed to the Apache Software Foundation (ASF) under one   *
+ * or more contributor license agreements.  See the NOTICE file *
+ * distributed with this work for additional information        *
+ * regarding copyright ownership.  The ASF licenses this file   *
+ * to you under the Apache License, Version 2.0 (the            *
+ * "License"); you may not use this file except in compliance   *
+ * with the License.  You may obtain a copy of the License at   *
+ *                                                              *
+ *   http://www.apache.org/licenses/LICENSE-2.0                 *
+ *                                                              *
+ * Unless required by applicable law or agreed to in writing,   *
+ * software distributed under the License is distributed on an  *
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY       *
+ * KIND, either express or implied.  See the License for the    *
+ * specific language governing permissions and limitations      *
+ * under the License.                                           *
+ ****************************************************************/
+
 package org.apache.james.mime4j.message;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
+import org.apache.james.mime4j.dom.ParseParams;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
@@ -16,21 +35,16 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
  * Default MessageBuilder implementation delegating Message parsing to the "legacy"
  * MessageImpl object.
  */
-public class MessageBuilderImpl extends MessageBuilder {
+public class MessageBuilderImpl implements MessageBuilder {
 
-    private MimeWriter mimeWriter;
-    private MimeBuilder mimeBuilder;
+    private MimeBuilder mimeBuilder = null;
     private StorageProvider storageProvider = null;
-    private DecodeMonitor decodeMonitor = null;
     private MimeEntityConfig mimeEntityConfig = null;
     private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
-    private boolean flatMode = false;
-    private boolean contentDecoding = true;
 
     public MessageBuilderImpl() {
     }
 
-    @Override
     public Message newMessage() {
         return new MessageImpl();
     }
@@ -44,41 +58,30 @@ public class MessageBuilderImpl extends MessageBuilder {
         
     }
     
-    private MimeWriter getMimeWriter() {
-        if (this.mimeWriter != null) {
-            return this.mimeWriter;
-        } else {
-            return MimeWriter.DEFAULT;
-        }
-        
-    }
-    
-    @Override
     public Message newMessage(Message source) {
         return getMimeBuilder().copy(source);
     }
 
-    @Override
     public Message parse(InputStream source) throws MimeException, IOException {
         return getMimeBuilder().parse(source, 
                 mimeEntityConfig, 
                 storageProvider, 
                 mutableBodyDescriptorFactory, 
-                decodeMonitor, 
-                contentDecoding, 
-                flatMode);
+                null,
+                null);
     }
-
-    @Override
-    public void writeTo(Message message, OutputStream out) throws IOException {
-        getMimeWriter().writeMessage(message, out);
+    
+    public Message parse(
+            InputStream source, 
+            ParseParams params, DecodeMonitor decodeMonitor) throws MimeException, IOException {
+        return getMimeBuilder().parse(source, 
+                mimeEntityConfig, 
+                storageProvider, 
+                mutableBodyDescriptorFactory, 
+                params,
+                decodeMonitor);
     }
-
-    @Override
-    public void setDecodeMonitor(DecodeMonitor decodeMonitor) {
-        this.decodeMonitor = decodeMonitor;
-    }
-
+    
     public void setStorageProvider(StorageProvider storageProvider) {
         this.storageProvider = storageProvider;
     }
@@ -90,20 +93,6 @@ public class MessageBuilderImpl extends MessageBuilder {
     public void setMutableBodyDescriptorFactory(
             MutableBodyDescriptorFactory mutableBodyDescriptorFactory) {
         this.mutableBodyDescriptorFactory  = mutableBodyDescriptorFactory;
-    }
-
-    @Override
-    public void setContentDecoding(boolean contentDecoding) {
-        this.contentDecoding  = contentDecoding;
-    }
-
-    @Override
-    public void setFlatMode() {
-        this.flatMode = true;
-    }
-
-    public void setMimeWriter(MimeWriter mimeWriter) {
-        this.mimeWriter = mimeWriter;
     }
 
     public void setMimeBuilder(MimeBuilder mimeBuilder) {

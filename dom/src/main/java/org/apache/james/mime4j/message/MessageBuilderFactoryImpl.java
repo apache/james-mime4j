@@ -18,9 +18,9 @@
  ****************************************************************/
 package org.apache.james.mime4j.message;
 
-import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageBuilderFactory;
+import org.apache.james.mime4j.dom.MessageFormatter;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
@@ -38,7 +38,7 @@ public class MessageBuilderFactoryImpl extends MessageBuilderFactory {
     private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
 
     @Override
-    public MessageBuilder newMessageBuilder() throws MimeException {
+    public MessageBuilder newMessageBuilder() {
         MessageBuilderImpl m = new MessageBuilderImpl();
         if (storageProvider != null) m.setStorageProvider(storageProvider);
         if (mimeEntityConfig != null) m.setMimeEntityConfig(mimeEntityConfig);
@@ -46,6 +46,12 @@ public class MessageBuilderFactoryImpl extends MessageBuilderFactory {
         return m;
     }
 
+    @Override
+    public MessageFormatter newMessageFormatter() {
+        MessageFormatterImpl m = new MessageFormatterImpl();
+        return m;
+    }
+    
     @Override
     public void setAttribute(String name, Object value)
             throws IllegalArgumentException {

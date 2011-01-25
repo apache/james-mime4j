@@ -31,6 +31,7 @@ import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.ParseParams;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
@@ -250,16 +251,24 @@ public class MimeBuilder {
             final MimeEntityConfig config,
             final StorageProvider storageProvider, 
             final MutableBodyDescriptorFactory bodyDescFactory,
-            final DecodeMonitor monitor,
-            boolean contentDecoding,
-            boolean flatMode) throws IOException, MimeIOException {
+            final ParseParams params,
+            final DecodeMonitor monitor) throws IOException, MimeIOException {
         try {
             MessageImpl message = new MessageImpl();
             DecodeMonitor mon = monitor != null ? monitor : DecodeMonitor.SILENT;
             MimeStreamParser parser = new MimeStreamParser(config, bodyDescFactory, mon);
             parser.setContentHandler(new EntityBuilder(message, storageProvider, mon));
-            parser.setContentDecoding(contentDecoding);
-            if (flatMode) parser.setFlat(true);
+            if (params != null) {
+                parser.setContentDecoding(params.isContentDecoding());
+                if (params.isFlatMode()) {
+                    parser.setFlat();
+                } else {
+                    parser.setRecurse();
+                }
+            } else {
+                parser.setContentDecoding(true);
+                parser.setRecurse();
+            }
             parser.parse(is);
             return message;
         } catch (MimeException e) {
@@ -291,7 +300,7 @@ public class MimeBuilder {
             final StorageProvider storageProvider, 
             final MutableBodyDescriptorFactory bodyDescFactory,
             final DecodeMonitor monitor) throws IOException, MimeIOException {
-        return parse(is, config, storageProvider, bodyDescFactory, monitor, true, false);
+        return parse(is, config, storageProvider, bodyDescFactory, null, monitor);
     }
     
     public Message parse(
