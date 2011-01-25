@@ -22,16 +22,16 @@ import org.apache.james.mime4j.MimeException;
 
 import junit.framework.TestCase;
 
-public class MessageBuilderFactoryTest extends TestCase {
+public class MessageServiceFactoryTest extends TestCase {
 
     public void testNewInstance() throws MimeException {
-        MessageBuilderFactory factory = MessageBuilderFactory.newInstance();
+        MessageServiceFactory factory = MessageServiceFactory.newInstance();
         assertNotNull(factory);
     }
 
 
     public void testNewMessageBuilder() throws MimeException {
-        MessageBuilderFactory factory = MessageBuilderFactory.newInstance();
+        MessageServiceFactory factory = MessageServiceFactory.newInstance();
         assertNotNull(factory);
         MessageBuilder builder = factory.newMessageBuilder();
         Message message = builder.newMessage();

@@ -19,7 +19,7 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.dom.MessageBuilder;
-import org.apache.james.mime4j.dom.MessageBuilderFactory;
+import org.apache.james.mime4j.dom.MessageServiceFactory;
 import org.apache.james.mime4j.dom.MessageFormatter;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
@@ -31,7 +31,7 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
  * Supports the "StorageProvider", "MimeEntityConfig" and "MutableBodyDescriptorFactory"
  * attributes.
  */
-public class MessageBuilderFactoryImpl extends MessageBuilderFactory {
+public class MessageServiceFactoryImpl extends MessageServiceFactory {
 
     private StorageProvider storageProvider = null;
     private MimeEntityConfig mimeEntityConfig = null;
