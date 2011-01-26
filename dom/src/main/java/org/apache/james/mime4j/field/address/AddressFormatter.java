@@ -26,6 +26,12 @@ import org.apache.james.mime4j.dom.address.Mailbox;
 
 public class AddressFormatter {
 
+    public static final AddressFormatter DEFAULT = new AddressFormatter();
+    
+    protected AddressFormatter() {
+        super();
+    }
+    
     /**
      * Formats the address as a human readable string, not including the route.
      * The resulting string is intended for display purposes only and cannot be
@@ -47,7 +53,7 @@ public class AddressFormatter {
      *            exists, <code>false</code> otherwise.
      * @return a string representation of this address intended to be displayed.
      */
-    public static void format(final StringBuilder sb, final Address address, boolean includeRoute) {
+    public void format(final StringBuilder sb, final Address address, boolean includeRoute) {
         if (address == null) {
             return;
         }
@@ -69,7 +75,7 @@ public class AddressFormatter {
      * @return a string representation of this address intended for transport
      *         purposes.
      */
-    public static void encode(final StringBuilder sb, final Address address) {
+    public void encode(final StringBuilder sb, final Address address) {
         if (address == null) {
             return;
         }
@@ -82,7 +88,7 @@ public class AddressFormatter {
         }
     }
     
-    public static void format(final StringBuilder sb, final Mailbox mailbox, boolean includeRoute) {
+    public void format(final StringBuilder sb, final Mailbox mailbox, boolean includeRoute) {
         if (sb == null) {
             throw new IllegalArgumentException("StringBuilder may not be null");
         }
@@ -112,13 +118,13 @@ public class AddressFormatter {
         }
     }
     
-    public static String format(final Mailbox mailbox, boolean includeRoute) {
+    public String format(final Mailbox mailbox, boolean includeRoute) {
         StringBuilder sb = new StringBuilder();
         format(sb, mailbox, includeRoute);
         return sb.toString();
     }
     
-    public static void encode(final StringBuilder sb, final Mailbox mailbox) {
+    public void encode(final StringBuilder sb, final Mailbox mailbox) {
         if (sb == null) {
             throw new IllegalArgumentException("StringBuilder may not be null");
         }
@@ -142,13 +148,13 @@ public class AddressFormatter {
         }
     }
     
-    public static String encode(final Mailbox mailbox) {
+    public String encode(final Mailbox mailbox) {
         StringBuilder sb = new StringBuilder();
         encode(sb, mailbox);
         return sb.toString();
     }
 
-    public static void format(final StringBuilder sb, final Group group, boolean includeRoute) {
+    public void format(final StringBuilder sb, final Group group, boolean includeRoute) {
         if (sb == null) {
             throw new IllegalArgumentException("StringBuilder may not be null");
         }
@@ -171,13 +177,13 @@ public class AddressFormatter {
         sb.append(";");
     }
     
-    public static String format(final Group group, boolean includeRoute) {
+    public String format(final Group group, boolean includeRoute) {
         StringBuilder sb = new StringBuilder();
         format(sb, group, includeRoute);
         return sb.toString();
     }
     
-    public static void encode(final StringBuilder sb, final Group group) {
+    public void encode(final StringBuilder sb, final Group group) {
         if (sb == null) {
             throw new IllegalArgumentException("StringBuilder may not be null");
         }
@@ -200,7 +206,7 @@ public class AddressFormatter {
         sb.append(';');
     }
 
-    public static String encode(final Group group) {
+    public String encode(final Group group) {
         StringBuilder sb = new StringBuilder();
         encode(sb, group);
         return sb.toString();

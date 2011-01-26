@@ -44,7 +44,7 @@ public class MessageHeadlessParserTest extends TestCase {
 
 		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
 		mimeEntityConfig.setMalformedHeaderStartsBody(true);
-		Message message = MimeBuilder.parse(new ByteArrayInputStream(headlessContent
+		Message message = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(headlessContent
 				.getBytes("UTF-8")), mimeEntityConfig);
 		assertEquals("text/plain", message.getMimeType());
 		assertEquals(1, message.getHeader().getFields().size());
@@ -62,7 +62,7 @@ public class MessageHeadlessParserTest extends TestCase {
 
 		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
 		mimeEntityConfig.setMalformedHeaderStartsBody(true);
-		Message message = MimeBuilder.parse(new ByteArrayInputStream(headlessContent
+		Message message = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(headlessContent
 				.getBytes("UTF-8")), mimeEntityConfig);
 		assertEquals("text/plain", message.getMimeType());
 		assertEquals(0, message.getHeader().getFields().size());
@@ -89,7 +89,7 @@ public class MessageHeadlessParserTest extends TestCase {
 
 		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
 		mimeEntityConfig.setHeadlessParsing(contentType);
-		Message message = MimeBuilder.parse(new ByteArrayInputStream(headlessContent
+		Message message = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(headlessContent
 				.getBytes("UTF-8")), mimeEntityConfig);
 		assertEquals("multipart/form-data", message.getMimeType());
 		assertEquals(1, message.getHeader().getFields().size());

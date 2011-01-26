@@ -47,7 +47,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * This class may be subclassed to implement custom strategies for writing
  * messages.
  */
-public class MessageWriter {
+public class MimeWriter {
 
     private static final byte[] CRLF = { '\r', '\n' };
     private static final byte[] DASHES = { '-', '-' };
@@ -55,12 +55,12 @@ public class MessageWriter {
     /**
      * The default message writer.
      */
-    public static final MessageWriter DEFAULT = new MessageWriter();
+    public static final MimeWriter DEFAULT = new MimeWriter();
 
     /**
      * Protected constructor prevents direct instantiation.
      */
-    protected MessageWriter() {
+    protected MimeWriter() {
     }
 
     /**
@@ -118,6 +118,21 @@ public class MessageWriter {
             encOut.close();
     }
 
+    /**
+     * Write the specified <code>Message</code> to the specified
+     * <code>OutputStream</code>.
+     * 
+     * @param entity
+     *            the <code>Message</code> to write.
+     * @param out
+     *            the OutputStream to write to.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
+    public void writeMessage(Message message, OutputStream out) throws IOException {
+        writeEntity(message, out);
+    }
+    
     /**
      * Write the specified <code>Multipart</code> to the specified
      * <code>OutputStream</code>.

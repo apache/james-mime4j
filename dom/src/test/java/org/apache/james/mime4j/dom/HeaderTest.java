@@ -26,7 +26,7 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.HeaderImpl;
-import org.apache.james.mime4j.message.MessageWriter;
+import org.apache.james.mime4j.message.MimeWriter;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 public class HeaderTest extends TestCase {
@@ -62,7 +62,7 @@ public class HeaderTest extends TestCase {
         
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         
-        MessageWriter.DEFAULT.writeHeader(header, buffer);
+        MimeWriter.DEFAULT.writeHeader(header, buffer);
         String s = buffer.toString(CharsetUtil.US_ASCII.name());
         
         assertEquals("Hello: Gr?ezi_z?m?\r\n\r\n", s);

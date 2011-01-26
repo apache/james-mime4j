@@ -19,8 +19,6 @@
 
 package org.apache.james.mime4j.dom;
 
-import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Collection;
 import java.util.Date;
 import java.util.TimeZone;
@@ -31,16 +29,6 @@ import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
 
 public interface Message extends Entity, Body {
-
-    /**
-     * Write the content to the given output stream.
-     * 
-     * @param out
-     *            the output stream to write to.
-     * @throws IOException
-     *             in case of an I/O error
-     */
-    void writeTo(OutputStream out) throws IOException;
 
     /**
      * Returns the value of the <i>Message-ID</i> header field of this message

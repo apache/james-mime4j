@@ -28,19 +28,15 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 /**
  * Defines the API to obtain Message instances from a mime stream.
  */
-public abstract class MessageBuilder {
+public interface MessageBuilder {
     
-    public abstract Message newMessage();
-
-    public abstract Message newMessage(Message source);
-
-    public abstract Message parse(InputStream source) throws MimeException, IOException;
-
-    public abstract void setDecodeMonitor(
-            DecodeMonitor decodeMonitor);
-
-    public abstract void setContentDecoding(boolean contentDecoding);
-    
-    public abstract void setFlatMode();
+    Message newMessage();
+          
+    Message newMessage(Message source);
+          
+    Message parse(InputStream source) throws MimeException, IOException;
+          
+    Message parse(InputStream source, 
+            ParseParams params, DecodeMonitor decodeMonitor) throws MimeException, IOException;
 
 }

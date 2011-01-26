@@ -192,31 +192,32 @@ public class MimeStreamParser {
     }
     
     /**
-     * Enables or disables raw mode. In raw mode all future entities 
-     * (messages or body parts) in the stream will be reported to the
+     * Enables raw mode. In raw mode all future entities (messages 
+     * or body parts) in the stream will be reported to the
      * {@link ContentHandler#raw(InputStream)} handler method only.
      * The stream will contain the entire unparsed entity contents 
      * including header fields and whatever is in the body.
-     * 
-     * @param raw <code>true</code> enables raw mode, <code>false</code>
-     *        disables it.
      */
-    public void setRaw(boolean raw) {
+    public void setRaw() {
         mimeTokenStream.setRecursionMode(MimeTokenStream.M_RAW);
     }
     
     /**
-     * Enables or disables flat mode. In flat mode rfc822 parts are not
-     * recursively parsed and multipart content is handled as a single
-     * "simple" stream.
-     * 
-     * @param raw <code>true</code> enables raw mode, <code>false</code>
-     *        disables it.
+     * Enables flat mode. In flat mode rfc822 parts are not recursively 
+     * parsed and multipart content is handled as a single "simple" stream.
      */
-    public void setFlat(boolean flat) {
+    public void setFlat() {
         mimeTokenStream.setRecursionMode(MimeTokenStream.M_FLAT);
     }
     
+    /**
+     * Enables recursive mode. In tihs mode rfc822 parts are recursively 
+     * parsed.
+     */
+    public void setRecurse() {
+        mimeTokenStream.setRecursionMode(MimeTokenStream.M_RECURSE);
+    }
+
     /**
      * Finishes the parsing and stops reading lines.
      * NOTE: No more lines will be parsed but the parser

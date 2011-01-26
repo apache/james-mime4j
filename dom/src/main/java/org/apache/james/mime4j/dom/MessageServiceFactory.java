@@ -28,14 +28,16 @@ import org.apache.james.mime4j.MimeException;
  * of MessageBuilderFactory.
  * Then the method newMessageBuilder is used to create a new EntityBuilder object.
  */
-public abstract class MessageBuilderFactory {
+public abstract class MessageServiceFactory {
 
-    public abstract MessageBuilder newMessageBuilder() throws MimeException;
-    
-    public static MessageBuilderFactory newInstance() throws MimeException {
-        return ServiceLoader.load(MessageBuilderFactory.class);
+    public static MessageServiceFactory newInstance() throws MimeException {
+        return ServiceLoader.load(MessageServiceFactory.class);
     }
 
-    public abstract void setAttribute(String name, Object value) throws IllegalArgumentException;
+    public abstract MessageBuilder newMessageBuilder();
     
+    public abstract MessageFormatter newMessageFormatter();
+    
+    public abstract void setAttribute(String name, Object value) throws IllegalArgumentException;
+        
 }

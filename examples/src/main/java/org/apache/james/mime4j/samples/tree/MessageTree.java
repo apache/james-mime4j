@@ -315,7 +315,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < list.size(); i++) {
                     Mailbox mb = list.get(i);
-                    sb.append(AddressFormatter.format(mb, false) + "\n");
+                    sb.append(AddressFormatter.DEFAULT.format(mb, false) + "\n");
                 }
                 textView.setText(sb.toString());
 
@@ -366,7 +366,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
     public static void main(String[] args) {
         try {
 
-            final Message message = MimeBuilder.parse(new FileInputStream(args[0]));
+            final Message message = MimeBuilder.DEFAULT.parse(new FileInputStream(args[0]));
 
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {

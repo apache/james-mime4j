@@ -35,6 +35,7 @@ import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MimeBuilder;
+import org.apache.james.mime4j.message.MimeWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageProvider;
@@ -65,7 +66,7 @@ public class TransformMessage {
 
         // Print transformed message.
         System.out.println("\n\nTransformed message:\n--------------------\n");
-        transformed.writeTo(System.out);
+        MimeWriter.DEFAULT.writeMessage(transformed, System.out);
 
         // Messages should be disposed of when they are no longer needed.
         // Disposing of a message also disposes of all child elements (e.g. body
@@ -75,7 +76,7 @@ public class TransformMessage {
         // Print original message to illustrate that it was not affected by the
         // transformation.
         System.out.println("\n\nOriginal template:\n------------------\n");
-        template.writeTo(System.out);
+        MimeWriter.DEFAULT.writeMessage(template, System.out);
 
         // Original message is no longer needed.
         template.dispose();
@@ -91,7 +92,7 @@ public class TransformMessage {
     private static Message transform(Message original) throws IOException, ParseException {
         // Create a copy of the template. The copy can be modified without
         // affecting the original.
-        Message message = MimeBuilder.copy(original);
+        Message message = MimeBuilder.DEFAULT.copy(original);
 
         // In this example we know we have a multipart message. Use
         // Message#isMultipart() if uncertain.
@@ -118,7 +119,7 @@ public class TransformMessage {
         message.createMessageId(HOSTNAME);
         message.setSubject("Transformed message");
         message.setDate(new Date());
-        message.setFrom(AddressBuilder.parseMailbox("John Doe <jdoe@machine.example>"));
+        message.setFrom(AddressBuilder.DEFAULT.parseMailbox("John Doe <jdoe@machine.example>"));
 
         return message;
     }

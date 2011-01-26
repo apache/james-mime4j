@@ -31,6 +31,7 @@ import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.ParseParams;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
@@ -45,9 +46,12 @@ import org.apache.james.mime4j.stream.RawField;
 /**
  * Utility class for copying message and parsing message elements.
  */
-public final class MimeBuilder {
+public class MimeBuilder {
 
-    private MimeBuilder() {
+    public static final MimeBuilder DEFAULT = new MimeBuilder();
+    
+    protected MimeBuilder() {
+        super();
     }
 
     /**
@@ -60,7 +64,7 @@ public final class MimeBuilder {
      * @param other
      *            header to copy.
      */
-    public static Header copy(Header other) {
+    public Header copy(Header other) {
         HeaderImpl copy = new HeaderImpl();
         for (Field otherField : other.getFields()) {
             copy.addField(otherField);
@@ -85,7 +89,7 @@ public final class MimeBuilder {
      *             is neither a {@link Message}, {@link Multipart} or
      *             {@link SingleBody}.
      */
-    public static BodyPart copy(Entity other) {
+    public BodyPart copy(Entity other) {
         BodyPart copy = new BodyPart(); 
         if (other.getHeader() != null) {
             copy.setHeader(copy(other.getHeader()));
@@ -114,7 +118,7 @@ public final class MimeBuilder {
      *             is neither a {@link Message}, {@link Multipart} or
      *             {@link SingleBody}.
      */
-    public static Multipart copy(Multipart other) {
+    public Multipart copy(Multipart other) {
         MultipartImpl copy = new MultipartImpl(other.getSubType());
         for (Entity otherBodyPart : other.getBodyParts()) {
             copy.addBodyPart(copy(otherBodyPart));
@@ -147,7 +151,7 @@ public final class MimeBuilder {
      *             a {@link MessageImpl}, {@link Multipart} or {@link SingleBody}
      *             (or contains such a <code>Body</code>).
      */
-    public static Body copy(Body body) {
+    public Body copy(Body body) {
         if (body == null)
             throw new IllegalArgumentException("Body is null");
 
@@ -181,7 +185,7 @@ public final class MimeBuilder {
      *             is neither a {@link MessageImpl}, {@link Multipart} or
      *             {@link SingleBody}.
      */
-    public static Message copy(Message other) {
+    public Message copy(Message other) {
         MessageImpl copy = new MessageImpl();
         if (other.getHeader() != null) {
             copy.setHeader(copy(other.getHeader()));
@@ -200,7 +204,7 @@ public final class MimeBuilder {
      * @throws IOException on I/O errors.
      * @throws MimeIOException on MIME protocol violations.
      */
-    public static Header parse(
+    public Header parse(
             final InputStream is,
             final DecodeMonitor monitor) throws IOException, MimeIOException {
         final HeaderImpl header = new HeaderImpl();
@@ -242,21 +246,29 @@ public final class MimeBuilder {
      * @throws MimeIOException
      *             on MIME protocol violations.
      */
-    public static Message parse(
+    public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
             final StorageProvider storageProvider, 
             final MutableBodyDescriptorFactory bodyDescFactory,
-            final DecodeMonitor monitor,
-            boolean contentDecoding,
-            boolean flatMode) throws IOException, MimeIOException {
+            final ParseParams params,
+            final DecodeMonitor monitor) throws IOException, MimeIOException {
         try {
             MessageImpl message = new MessageImpl();
             DecodeMonitor mon = monitor != null ? monitor : DecodeMonitor.SILENT;
             MimeStreamParser parser = new MimeStreamParser(config, bodyDescFactory, mon);
             parser.setContentHandler(new EntityBuilder(message, storageProvider, mon));
-            parser.setContentDecoding(contentDecoding);
-            if (flatMode) parser.setFlat(true);
+            if (params != null) {
+                parser.setContentDecoding(params.isContentDecoding());
+                if (params.isFlatMode()) {
+                    parser.setFlat();
+                } else {
+                    parser.setRecurse();
+                }
+            } else {
+                parser.setContentDecoding(true);
+                parser.setRecurse();
+            }
             parser.parse(is);
             return message;
         } catch (MimeException e) {
@@ -282,16 +294,16 @@ public final class MimeBuilder {
      * @throws MimeIOException
      *             on MIME protocol violations.
      */
-    public static Message parse(
+    public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
             final StorageProvider storageProvider, 
             final MutableBodyDescriptorFactory bodyDescFactory,
             final DecodeMonitor monitor) throws IOException, MimeIOException {
-        return parse(is, config, storageProvider, bodyDescFactory, monitor, true, false);
+        return parse(is, config, storageProvider, bodyDescFactory, null, monitor);
     }
     
-    public static Message parse(
+    public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
             final StorageProvider storageProvider,
@@ -299,7 +311,7 @@ public final class MimeBuilder {
         return parse(is, config, storageProvider, bodyDescFactory, null);
     }
 
-    public static Message parse(
+    public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
             final StorageProvider storageProvider) throws IOException, MimeIOException {
@@ -317,7 +329,7 @@ public final class MimeBuilder {
      * @throws MimeIOException
      *             on MIME protocol violations.
      */
-    public static Message parse(InputStream is) throws IOException, MimeIOException {
+    public Message parse(InputStream is) throws IOException, MimeIOException {
         return parse(is, null, DefaultStorageProvider.getInstance());
     }
 
@@ -332,7 +344,7 @@ public final class MimeBuilder {
      * @throws MimeIOException
      *             on MIME protocol violations.
      */
-    public static Message parse(InputStream is, MimeEntityConfig config) throws IOException,
+    public Message parse(InputStream is, MimeEntityConfig config) throws IOException,
             MimeIOException {
         return parse(is, config, DefaultStorageProvider.getInstance());
     }

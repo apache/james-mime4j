@@ -36,6 +36,7 @@ import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MimeWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.storage.Storage;
 import org.apache.james.mime4j.storage.StorageOutputStream;
@@ -57,13 +58,13 @@ public class MultipartMessage {
 
         // Date and From are required fields
         message.setDate(new Date());
-        message.setFrom(AddressBuilder.parseMailbox("John Doe <jdoe@machine.example>"));
+        message.setFrom(AddressBuilder.DEFAULT.parseMailbox("John Doe <jdoe@machine.example>"));
 
         // Message-ID should be present
         message.createMessageId("machine.example");
 
         // set some optional fields
-        message.setTo(AddressBuilder.parseMailbox("Mary Smith <mary@example.net>"));
+        message.setTo(AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>"));
         message.setSubject("An image for you");
 
         // 3) set a multipart body
@@ -88,7 +89,7 @@ public class MultipartMessage {
 
         // 4) print message to standard output
 
-        message.writeTo(System.out);
+        MimeWriter.DEFAULT.writeMessage(message, System.out);
 
         // 5) message is no longer needed and should be disposed of
 

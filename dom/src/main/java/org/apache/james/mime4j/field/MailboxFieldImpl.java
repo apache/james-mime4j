@@ -64,7 +64,7 @@ public class MailboxFieldImpl extends AbstractField implements org.apache.james.
         String body = getBody();
 
         try {
-            MailboxList mailboxList = AddressBuilder.parseAddressList(body, monitor).flatten();
+            MailboxList mailboxList = AddressBuilder.DEFAULT.parseAddressList(body, monitor).flatten();
             if (mailboxList.size() > 0) {
                 mailbox = mailboxList.get(0);
             }

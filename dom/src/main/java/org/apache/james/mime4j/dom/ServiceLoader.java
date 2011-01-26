@@ -20,6 +20,7 @@ package org.apache.james.mime4j.dom;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.Enumeration;
@@ -40,56 +41,50 @@ class ServiceLoader {
     static <T> T load(Class<T> spiClass) {
         String spiResURI = "META-INF/services/" + spiClass.getName();
         ClassLoader classLoader = spiClass.getClassLoader();
-        Enumeration<URL> resources;
         try {
-            resources = classLoader.getResources(spiResURI);
-        } catch (IOException e) {
-            return null;
-        }
-
-        while (resources.hasMoreElements()) {
-            URL resource = resources.nextElement();
-            BufferedReader reader = null;
-            try {
-                reader = new BufferedReader(new InputStreamReader(resource
-                        .openStream()));
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    line = line.trim();
-                    int cmtIdx = line.indexOf('#');
-                    if (cmtIdx != -1) {
-                        line = line.substring(0, cmtIdx);
+             Enumeration<URL> resources = classLoader.getResources(spiResURI);
+             while (resources.hasMoreElements()) {
+                 URL resource = resources.nextElement();
+                 InputStream instream = resource.openStream();
+                 try {
+                     BufferedReader reader = new BufferedReader(new InputStreamReader(instream));
+                     String line;
+                     while ((line = reader.readLine()) != null) {
                         line = line.trim();
-                    }
+                         int cmtIdx = line.indexOf('#');
+                         if (cmtIdx != -1) {
+                             line = line.substring(0, cmtIdx);
+                             line = line.trim();
+                         }
 
-                    if (line.length() == 0) {
-                        continue;
-                    }
+                         if (line.length() == 0) {
+                             continue;
+                         }
 
-                    Class<?> implClass;
-                    try {
-                        implClass = classLoader.loadClass(line);
-                        
+                         Class<?> implClass = classLoader.loadClass(line);
                         if (spiClass.isAssignableFrom(implClass)) {
                             Object impl = implClass.newInstance();
                             return spiClass.cast(impl);
                         }
-                    } catch (Exception e) {
-                        e.printStackTrace();
                     }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                if (reader != null) {
-                    try {
-                        reader.close();
-                    } catch (IOException e) {
-                    }
+                     reader.close();
+                 } finally {
+                     instream.close();
                 }
             }
+             return null;
+         } catch (IOException ex) {
+             throw new ServiceLoaderException(ex);
+         } catch (ClassNotFoundException ex) {
+             throw new ServiceLoaderException("Unknown SPI class '" 
+                     + spiClass.getName() + "'", ex);
+         } catch (IllegalAccessException ex) {
+             // Not visible
+             return null;
+         } catch (InstantiationException ex) {
+             throw new ServiceLoaderException("SPI class '" 
+                     + spiClass.getName() + "' cannot be instantiated", ex);
         }
-
-        return null;
     }
+
 }
