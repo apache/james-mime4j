@@ -27,10 +27,26 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
-  <artifactId>apache-mime4j-benchmark</artifactId>
-  <name>Apache JAMES Mime4j (Benchmarks)</name>
+  <artifactId>apache-mime4j-storage</artifactId>
+  <name>Apache JAMES Mime4j (Storage)</name>
   <version>0.7-SNAPSHOT</version>
-  <description>Benchmarks for MIME4J stream based MIME message parser</description>
+  <description>Java MIME Document Object Model Storage</description>
+
+  <build>
+    <plugins>
+     <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-jar-plugin</artifactId>
+       <executions>
+         <execution>
+           <goals>
+             <goal>test-jar</goal>
+           </goals>
+         </execution>
+       </executions>
+     </plugin>
+    </plugins>
+  </build>
 
   <dependencies>
     <dependency>
@@ -39,19 +55,12 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.james</groupId>
-      <artifactId>apache-mime4j-storage</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <optional>false</optional>
-      <scope>compile</scope>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <type>jar</type>
+      <!--  Removed as a workaround for an unidentified M2 bug -->
+      <scope>test</scope>
+      <optional>true</optional>
     </dependency>
   </dependencies>
 </project>

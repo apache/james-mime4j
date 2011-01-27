@@ -8,15 +8,15 @@
     to you under the Apache License, Version 2.0 (the
     "License"); you may not use this file except in compliance
     with the License.  You may obtain a copy of the License at
-  
+
       http://www.apache.org/licenses/LICENSE-2.0
-  
+
     Unless required by applicable law or agreed to in writing,
     software distributed under the License is distributed on an
     "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
     KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
-    under the License.    
+    under the License.
   -->
   <parent>
     <artifactId>james-project</artifactId>
@@ -29,22 +29,23 @@
   <name>Apache JAMES Mime4j Project</name>
   <version>0.7-SNAPSHOT</version>
   <description>Java stream based MIME message parser</description>
-  
+
   <url>http://james.apache.org/mime4j</url>
   <issueManagement>
     <url>http://issues.apache.org/jira/browse/MIME4J</url>
   </issueManagement>
   <inceptionYear>2004</inceptionYear>
   <packaging>pom</packaging>
-  
+
   <modules>
     <module>core</module>
     <module>dom</module>
+    <module>storage</module>
     <module>benchmark</module>
     <module>examples</module>
     <module>assemble</module>
   </modules>
-    
+
   <distributionManagement>
     <site>
       <id>mime4j-website</id>
@@ -56,7 +57,7 @@
     <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/trunk</developerConnection>
     <url>http://svn.apache.org/viewvc/james/mime4j/trunk/</url>
   </scm>
-  
+
   <build>
     <pluginManagement>
       <plugins>
@@ -78,7 +79,7 @@
          </plugin>
       </plugins>
     </pluginManagement>
-  
+
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -103,7 +104,7 @@
           <target>${compileSource}</target>
           <encoding>iso8859-1</encoding>
         </configuration>
-      </plugin>      
+      </plugin>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.3</version>
@@ -227,8 +228,8 @@
       </plugin>
     </plugins>
   </build>
-  
-  <dependencyManagement> 
+
+  <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>commons-logging</groupId>
@@ -258,8 +259,8 @@
         <optional>true</optional>
       </dependency>
     </dependencies>
-  </dependencyManagement> 
-    
+  </dependencyManagement>
+
   <reporting>
     <plugins>
       <plugin>
@@ -306,7 +307,7 @@
         <configuration>
           <aggregate>true</aggregate>
         </configuration>
-      </plugin> 
+      </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.6.1</version>
@@ -370,8 +371,8 @@
       </plugin>
     </plugins>
   </reporting>
-  
-  
+
+
   <mailingLists>
     <mailingList>
             <name>Apache Mime4j Lists</name>
@@ -381,10 +382,10 @@
             <archive>http://mail-archives.apache.org/mod_mbox/james-mime4j-dev/</archive>
     </mailingList>
   </mailingLists>
-  
+
   <properties>
     <compileSource>1.5</compileSource>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
 </project>
