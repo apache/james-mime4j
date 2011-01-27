@@ -19,58 +19,29 @@
 
 package org.apache.james.mime4j.message;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
-import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.BinaryBody;
-import org.apache.james.mime4j.storage.MultiReferenceStorage;
 
-/**
- * Binary body backed by a
- * {@link org.apache.james.mime4j.storage.Storage}
- */
-class StorageBinaryBody extends BinaryBody {
+class BasicBinaryBody extends BinaryBody {
 
-    private MultiReferenceStorage storage;
-
-    public StorageBinaryBody(final MultiReferenceStorage storage) {
-        this.storage = storage;
+    private final byte[] content;
+    
+    BasicBinaryBody(final byte[] content) {
+        super();
+        this.content = content;
     }
-
+    
     @Override
     public InputStream getInputStream() throws IOException {
-        return storage.getInputStream();
+        return new ByteArrayInputStream(this.content);
     }
-
+    
     @Override
-    public void writeTo(OutputStream out) throws IOException {
-        if (out == null)
-            throw new IllegalArgumentException();
-
-        InputStream in = storage.getInputStream();
-        CodecUtil.copy(in, out);
-        in.close();
+    public BasicBinaryBody copy() {
+        return new BasicBinaryBody(this.content);
     }
-
-    @Override
-    public StorageBinaryBody copy() {
-        storage.addReference();
-        return new StorageBinaryBody(storage);
-    }
-
-    /**
-     * Deletes the Storage that holds the content of this binary body.
-     *
-     * @see org.apache.james.mime4j.dom.Disposable#dispose()
-     */
-    @Override
-    public void dispose() {
-        if (storage != null) {
-            storage.delete();
-            storage = null;
-        }
-    }
-
+    
 }

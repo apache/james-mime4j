@@ -33,12 +33,12 @@ import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.field.address.AddressBuilder;
-import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MimeWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.storage.Storage;
+import org.apache.james.mime4j.storage.StorageBodyFactory;
 import org.apache.james.mime4j.storage.StorageOutputStream;
 import org.apache.james.mime4j.storage.StorageProvider;
 
@@ -75,7 +75,7 @@ public class MultipartMessage {
         multipart.setPreamble("This is a multi-part message in MIME format.");
 
         // first part is text/plain
-        BodyFactory bodyFactory = new BodyFactory();
+        StorageBodyFactory bodyFactory = new StorageBodyFactory();
         BodyPart textPart = createTextPart(bodyFactory, "Why so serious?");
         multipart.addBodyPart(textPart);
 
@@ -99,7 +99,7 @@ public class MultipartMessage {
     /**
      * Creates a text part from the specified string.
      */
-    private static BodyPart createTextPart(BodyFactory bodyFactory, String text) {
+    private static BodyPart createTextPart(StorageBodyFactory bodyFactory, String text) {
         // Use UTF-8 to encode the specified text
         TextBody body = bodyFactory.textBody(text, "UTF-8");
 
@@ -114,7 +114,7 @@ public class MultipartMessage {
     /**
      * Creates a binary part from the specified image.
      */
-    private static BodyPart createImagePart(BodyFactory bodyFactory,
+    private static BodyPart createImagePart(StorageBodyFactory bodyFactory,
             BufferedImage image) throws IOException {
         // Create a binary message body from the image
         StorageProvider storageProvider = bodyFactory.getStorageProvider();

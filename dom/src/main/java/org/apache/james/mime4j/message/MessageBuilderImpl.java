@@ -27,7 +27,6 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.ParseParams;
-import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
@@ -38,7 +37,7 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 public class MessageBuilderImpl implements MessageBuilder {
 
     private MimeBuilder mimeBuilder = null;
-    private StorageProvider storageProvider = null;
+    private BodyFactory bodyFactory = null;
     private MimeEntityConfig mimeEntityConfig = null;
     private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
 
@@ -65,7 +64,7 @@ public class MessageBuilderImpl implements MessageBuilder {
     public Message parse(InputStream source) throws MimeException, IOException {
         return getMimeBuilder().parse(source, 
                 mimeEntityConfig, 
-                storageProvider, 
+                bodyFactory, 
                 mutableBodyDescriptorFactory, 
                 null,
                 null);
@@ -76,14 +75,14 @@ public class MessageBuilderImpl implements MessageBuilder {
             ParseParams params, DecodeMonitor decodeMonitor) throws MimeException, IOException {
         return getMimeBuilder().parse(source, 
                 mimeEntityConfig, 
-                storageProvider, 
+                bodyFactory, 
                 mutableBodyDescriptorFactory, 
                 params,
                 decodeMonitor);
     }
     
-    public void setStorageProvider(StorageProvider storageProvider) {
-        this.storageProvider = storageProvider;
+    public void setBodyFactory(BodyFactory bodyFactory) {
+        this.bodyFactory = bodyFactory;
     }
 
     public void setMimeEntityConfig(MimeEntityConfig mimeEntityConfig) {

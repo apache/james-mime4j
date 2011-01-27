@@ -17,39 +17,26 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.storage;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.nio.charset.Charset;
+import java.io.OutputStream;
 
-import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.storage.MultiReferenceStorage;
-import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
- * Text body backed by a {@link org.apache.james.mime4j.storage.Storage}.
+ * Binary body backed by a
+ * {@link org.apache.james.mime4j.storage.Storage}
  */
-class StorageTextBody extends TextBody {
+class StorageBinaryBody extends BinaryBody {
 
     private MultiReferenceStorage storage;
-    private Charset charset;
 
-    public StorageTextBody(MultiReferenceStorage storage, Charset charset) {
+    public StorageBinaryBody(final MultiReferenceStorage storage) {
         this.storage = storage;
-        this.charset = charset;
-    }
-
-    @Override
-    public String getMimeCharset() {
-        return CharsetUtil.toMimeCharset(charset.name());
-    }
-
-    @Override
-    public Reader getReader() throws IOException {
-        return new InputStreamReader(storage.getInputStream(), charset);
     }
 
     @Override
@@ -58,13 +45,23 @@ class StorageTextBody extends TextBody {
     }
 
     @Override
-    public StorageTextBody copy() {
+    public void writeTo(OutputStream out) throws IOException {
+        if (out == null)
+            throw new IllegalArgumentException();
+
+        InputStream in = storage.getInputStream();
+        CodecUtil.copy(in, out);
+        in.close();
+    }
+
+    @Override
+    public StorageBinaryBody copy() {
         storage.addReference();
-        return new StorageTextBody(storage, charset);
+        return new StorageBinaryBody(storage);
     }
 
     /**
-     * Deletes the Storage that holds the content of this text body.
+     * Deletes the Storage that holds the content of this binary body.
      *
      * @see org.apache.james.mime4j.dom.Disposable#dispose()
      */

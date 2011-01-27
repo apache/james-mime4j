@@ -23,7 +23,7 @@ import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.james.mime4j.message.BodyFactory;
+import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.HeaderImpl;
 
@@ -35,7 +35,7 @@ public class EntityTest extends TestCase {
         Entity entity = new BodyPart();
         assertNull(entity.getBody());
 
-        Body body = new BodyFactory().textBody("test");
+        Body body = new BasicBodyFactory().textBody("test");
         assertNull(body.getParent());
 
         entity.setBody(body);
@@ -46,8 +46,8 @@ public class EntityTest extends TestCase {
     public void testSetBodyTwice() throws Exception {
         Entity entity = new BodyPart();
 
-        Body b1 = new BodyFactory().textBody("foo");
-        Body b2 = new BodyFactory().textBody("bar");
+        Body b1 = new BasicBodyFactory().textBody("foo");
+        Body b2 = new BasicBodyFactory().textBody("bar");
 
         entity.setBody(b1);
         try {
@@ -59,7 +59,7 @@ public class EntityTest extends TestCase {
 
     public void testRemoveBody() throws Exception {
         Entity entity = new BodyPart();
-        Body body = new BodyFactory().textBody("test");
+        Body body = new BasicBodyFactory().textBody("test");
         entity.setBody(body);
 
         Body removed = entity.removeBody();

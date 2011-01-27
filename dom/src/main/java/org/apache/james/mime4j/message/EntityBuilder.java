@@ -33,7 +33,6 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.parser.ContentHandler;
-import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
@@ -56,12 +55,12 @@ class EntityBuilder implements ContentHandler {
     
     public EntityBuilder(
             final Entity entity, 
-            final StorageProvider storageProvider, 
+            final BodyFactory bodyFactory, 
             final DecodeMonitor monitor) {
         this.entity = entity;
         this.stack = new Stack<Object>();
         this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
-        this.bodyFactory = new BodyFactory(storageProvider, this.monitor);
+        this.bodyFactory = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
     }
     
     private void expect(Class<?> c) {

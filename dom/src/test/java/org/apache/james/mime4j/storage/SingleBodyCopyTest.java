@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.storage;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -26,12 +26,6 @@ import junit.framework.TestCase;
 
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.StorageBinaryBody;
-import org.apache.james.mime4j.message.StorageTextBody;
-import org.apache.james.mime4j.message.StringTextBody;
-import org.apache.james.mime4j.storage.MemoryStorageProvider;
-import org.apache.james.mime4j.storage.MultiReferenceStorage;
-import org.apache.james.mime4j.storage.Storage;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 public class SingleBodyCopyTest extends TestCase {

@@ -31,13 +31,13 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ParseException;
 import org.apache.james.mime4j.field.address.AddressBuilder;
-import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MimeBuilder;
 import org.apache.james.mime4j.message.MimeWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
+import org.apache.james.mime4j.storage.StorageBodyFactory;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.storage.TempFileStorageProvider;
 
@@ -152,7 +152,7 @@ public class TransformMessage {
      * Creates a text part from the specified string.
      */
     private static BodyPart createTextPart(String text) {
-        TextBody body = new BodyFactory().textBody(text, "UTF-8");
+        TextBody body = new StorageBodyFactory().textBody(text, "UTF-8");
 
         BodyPart bodyPart = new BodyPart();
         bodyPart.setText(body);
@@ -169,7 +169,7 @@ public class TransformMessage {
         byte[] data = new byte[numberOfBytes];
         new Random().nextBytes(data);
 
-        Body body = new BodyFactory()
+        Body body = new StorageBodyFactory()
                 .binaryBody(new ByteArrayInputStream(data));
 
         BodyPart bodyPart = new BodyPart();

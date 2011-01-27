@@ -25,9 +25,9 @@ import java.util.Date;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.field.address.ParseException;
-import org.apache.james.mime4j.message.BodyFactory;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MimeWriter;
+import org.apache.james.mime4j.storage.StorageBodyFactory;
 
 /**
  * This example generates a message very similar to the one from RFC 5322
@@ -54,7 +54,7 @@ public class TextPlainMessage {
 
         // 3) set a text body
 
-        BodyFactory bodyFactory = new BodyFactory();
+        StorageBodyFactory bodyFactory = new StorageBodyFactory();
         TextBody body = bodyFactory.textBody("This is a message just to "
                 + "say hello.\r\nSo, \"Hello\".");
 

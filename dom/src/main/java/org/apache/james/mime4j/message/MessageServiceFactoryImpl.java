@@ -21,7 +21,6 @@ package org.apache.james.mime4j.message;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageServiceFactory;
 import org.apache.james.mime4j.dom.MessageFormatter;
-import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
@@ -33,14 +32,14 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
  */
 public class MessageServiceFactoryImpl extends MessageServiceFactory {
 
-    private StorageProvider storageProvider = null;
+    private BodyFactory bodyFactory = null;
     private MimeEntityConfig mimeEntityConfig = null;
     private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
 
     @Override
     public MessageBuilder newMessageBuilder() {
         MessageBuilderImpl m = new MessageBuilderImpl();
-        if (storageProvider != null) m.setStorageProvider(storageProvider);
+        if (bodyFactory != null) m.setBodyFactory(bodyFactory);
         if (mimeEntityConfig != null) m.setMimeEntityConfig(mimeEntityConfig);
         if (mutableBodyDescriptorFactory != null) m.setMutableBodyDescriptorFactory(mutableBodyDescriptorFactory);
         return m;
@@ -55,11 +54,11 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
     @Override
     public void setAttribute(String name, Object value)
             throws IllegalArgumentException {
-        if ("StorageProvider".equals(name)) {
-            if (value instanceof StorageProvider) {
-                this.storageProvider  = (StorageProvider) value;
+        if ("BodyFactory".equals(name)) {
+            if (value instanceof BodyFactory) {
+                this.bodyFactory  = (BodyFactory) value;
                 return;
-            } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a StorageProvider");
+            } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a BodyFactory");
         } else if ("MimeEntityConfig".equals(name)) {
             if (value instanceof MimeEntityConfig) {
                 this.mimeEntityConfig = (MimeEntityConfig) value;

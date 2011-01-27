@@ -28,7 +28,7 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.james.mime4j.message.BodyFactory;
+import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
@@ -52,7 +52,7 @@ public class MimeBuilderCopyTest extends TestCase {
     public void testCopyMessage() throws Exception {
         MessageImpl parent = new MessageImpl();
         Header header = new HeaderImpl();
-        Body body = new BodyFactory().textBody("test");
+        Body body = new BasicBodyFactory().textBody("test");
 
         MessageImpl original = new MessageImpl();
         original.setHeader(header);
@@ -85,7 +85,7 @@ public class MimeBuilderCopyTest extends TestCase {
     public void testCopyBodyPart() throws Exception {
         MessageImpl parent = new MessageImpl();
         Header header = new HeaderImpl();
-        Body body = new BodyFactory().textBody("test");
+        Body body = new BasicBodyFactory().textBody("test");
 
         BodyPart original = new BodyPart();
         original.setHeader(header);

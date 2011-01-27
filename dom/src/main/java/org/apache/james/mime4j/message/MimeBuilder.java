@@ -37,8 +37,6 @@ import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.storage.DefaultStorageProvider;
-import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 import org.apache.james.mime4j.stream.RawField;
@@ -236,8 +234,8 @@ public class MimeBuilder {
      *            the stream to parse.
      * @param config
      *            {@link MimeEntityConfig} to use.
-     * @param storageProvider
-     *            {@link StorageProvider} to use for storing text and binary
+     * @param bodyFactory
+     *            {@link BodyFactory} to use for storing text and binary
      *            message bodies.
      * @param bodyDescFactory
      *            {@link MutableBodyDescriptorFactory} to use for creating body descriptors.
@@ -249,7 +247,7 @@ public class MimeBuilder {
     public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
-            final StorageProvider storageProvider, 
+            final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory,
             final ParseParams params,
             final DecodeMonitor monitor) throws IOException, MimeIOException {
@@ -257,7 +255,7 @@ public class MimeBuilder {
             MessageImpl message = new MessageImpl();
             DecodeMonitor mon = monitor != null ? monitor : DecodeMonitor.SILENT;
             MimeStreamParser parser = new MimeStreamParser(config, bodyDescFactory, mon);
-            parser.setContentHandler(new EntityBuilder(message, storageProvider, mon));
+            parser.setContentHandler(new EntityBuilder(message, bodyFactory, mon));
             if (params != null) {
                 parser.setContentDecoding(params.isContentDecoding());
                 if (params.isFlatMode()) {
@@ -297,25 +295,25 @@ public class MimeBuilder {
     public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
-            final StorageProvider storageProvider, 
+            final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory,
             final DecodeMonitor monitor) throws IOException, MimeIOException {
-        return parse(is, config, storageProvider, bodyDescFactory, null, monitor);
+        return parse(is, config, bodyFactory, bodyDescFactory, null, monitor);
     }
     
     public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
-            final StorageProvider storageProvider,
+            final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
-        return parse(is, config, storageProvider, bodyDescFactory, null);
+        return parse(is, config, bodyFactory, bodyDescFactory, null);
     }
 
     public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
-            final StorageProvider storageProvider) throws IOException, MimeIOException {
-        return parse(is, config, storageProvider, null, null);
+            final BodyFactory bodyFactory) throws IOException, MimeIOException {
+        return parse(is, config, bodyFactory, null, null);
     }
 
     /**
@@ -330,7 +328,7 @@ public class MimeBuilder {
      *             on MIME protocol violations.
      */
     public Message parse(InputStream is) throws IOException, MimeIOException {
-        return parse(is, null, DefaultStorageProvider.getInstance());
+        return parse(is, null, null);
     }
 
     /**
@@ -346,7 +344,7 @@ public class MimeBuilder {
      */
     public Message parse(InputStream is, MimeEntityConfig config) throws IOException,
             MimeIOException {
-        return parse(is, config, DefaultStorageProvider.getInstance());
+        return parse(is, config, null);
     }
     
 }

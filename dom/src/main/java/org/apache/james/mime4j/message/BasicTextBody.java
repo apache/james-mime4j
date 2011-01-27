@@ -19,47 +19,44 @@
 
 package org.apache.james.mime4j.message;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
-import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
 
-/**
- * Factory for creating message bodies.
- */
-public interface BodyFactory {
+class BasicTextBody extends TextBody {
 
-    /**
-     * Creates a {@link BinaryBody} that holds the content of the given input
-     * stream.
-     * 
-     * @param is
-     *            input stream to create a message body from.
-     * @return a binary body.
-     * @throws IOException
-     *             if an I/O error occurs.
-     */
-    BinaryBody binaryBody(InputStream is) throws IOException;
+    private final byte[] content;
+    private final String charset;
+    
+    BasicTextBody(final byte[] content, final String charset) {
+        super();
+        this.content = content;
+        this.charset = charset;
+    }
+    
+    @Override
+    public String getMimeCharset() {
+        return this.charset;
+    }
 
-    /**
-     * Creates a {@link TextBody} that holds the content of the given input
-     * stream.
-     * <p>
-     * The charset corresponding to the given MIME charset name is used to
-     * decode the byte content of the input stream into a character stream when
-     * calling {@link TextBody#getReader() getReader()} on the returned object.
-     * If the MIME charset has no corresponding Java charset or the Java charset
-     * cannot be used for decoding then &quot;us-ascii&quot; is used instead.
-     * 
-     * @param is
-     *            input stream to create a message body from.
-     * @param mimeCharset
-     *            name of a MIME charset.
-     * @return a text body.
-     * @throws IOException
-     *             if an I/O error occurs.
-     */
-    TextBody textBody(InputStream is, String mimeCharset) throws IOException;
+    @Override
+    public Reader getReader() throws IOException {
+        return new InputStreamReader(getInputStream(), this.charset);
+    }
 
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return new ByteArrayInputStream(this.content);
+    }
+
+    @Override
+    public SingleBody copy() {
+        return new BasicTextBody(this.content, this.charset);
+    }
+    
 }
