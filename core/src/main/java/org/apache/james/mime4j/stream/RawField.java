@@ -76,7 +76,7 @@ public class RawField {
             			colonIdx = i;
             			break;
             		} else if (j != 0x20 && j != 0x09) {
-            			throw new MimeException("Invalid header");
+            			throw new MimeException("Invalid header. Unexpected char after colon: "+j);
             		} else {
 						obsolete = true;
 					}

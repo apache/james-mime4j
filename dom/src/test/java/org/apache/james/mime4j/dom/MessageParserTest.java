@@ -20,6 +20,8 @@
 package org.apache.james.mime4j.dom;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
@@ -109,8 +111,13 @@ public class MessageParserTest extends TestCase {
         URL xmlFileUrl = new URL(prefix + "_decoded.xml");
         
         String result = getStructure(m, prefix, "1");
-        String expected = IOUtils.toString(xmlFileUrl.openStream(), "ISO8859-1");
-        assertEquals(expected, result);
+        try {
+	        String expected = IOUtils.toString(xmlFileUrl.openStream(), "ISO8859-1");
+	        assertEquals(expected, result);
+        } catch (FileNotFoundException ex) {
+        	IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"));
+        	fail("Expected file created.");
+        }
     }
 
     private String escape(String s) {
@@ -180,15 +187,24 @@ public class MessageParserTest extends TestCase {
                     charset = "ISO8859-1";
                 }
 
-                String s1 = IOUtils.toString(expectedUrl.openStream(), charset);
                 String s2 = IOUtils.toString(((TextBody) b).getReader());
-                assertEquals(f.getName(), s1, s2);
+                try {
+	                String s1 = IOUtils.toString(expectedUrl.openStream(), charset);
+	                assertEquals(f.getName(), s1, s2);
+                } catch (FileNotFoundException ex) {
+                	IOUtils.write(s2, new FileOutputStream(expectedUrl.getPath()+".expected"));
+                	fail("Expected file created.");
+                }
             } else {
-                assertEqualsBinary(f.getName(), expectedUrl.openStream(),
+            	try {
+            		assertEqualsBinary(f.getName(), expectedUrl.openStream(),
                         ((BinaryBody) b).getInputStream());
+            	} catch (FileNotFoundException ex) {
+                	IOUtils.copy(((BinaryBody) b).getInputStream(), new FileOutputStream(expectedUrl.getPath()+".expected"));
+                	fail("Expected file created.");
+            	}
             }
         }
-        
         
         if (e instanceof MessageImpl) {
             sb.append("</message>\r\n");

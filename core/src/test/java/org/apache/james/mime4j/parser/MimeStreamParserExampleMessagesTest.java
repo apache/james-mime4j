@@ -20,7 +20,10 @@
 package org.apache.james.mime4j.parser;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.JarURLConnection;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -69,8 +72,14 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
         String s = url.toString();
         String prefix = s.substring(0, s.lastIndexOf('.'));
         URL xmlFileUrl = new URL(prefix + ".xml");
-        String expected = IOUtils.toString(xmlFileUrl.openStream(), "ISO8859-1");
-        assertEquals(expected, result);
+        try {
+	        InputStream openStream = xmlFileUrl.openStream();
+			String expected = IOUtils.toString(openStream, "ISO8859-1");
+	        assertEquals(expected, result);
+        } catch (FileNotFoundException e) {
+        	IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"));
+        	fail("Expected file created.");
+        }
     }
 
     public static Test suite() throws IOException, URISyntaxException {
