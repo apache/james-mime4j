@@ -111,4 +111,22 @@ public interface Entity extends Disposable {
      */
     String getContentTransferEncoding();
 
+    /**
+     * Return the disposition type of the content disposition of this
+     * <code>Entity</code>.
+     * 
+     * @return the disposition type or <code>null</code> if no disposition
+     *         type has been set.
+     */
+    String getDispositionType();
+
+    /**
+     * Returns the filename parameter of the content disposition of this
+     * <code>Entity</code>.
+     * 
+     * @return the filename parameter of the content disposition or
+     *         <code>null</code> if the filename has not been set.
+     */
+    String getFilename();
+    
 }
