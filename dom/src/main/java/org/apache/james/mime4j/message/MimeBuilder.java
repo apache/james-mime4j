@@ -31,7 +31,6 @@ import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.ParseParams;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
@@ -249,22 +248,18 @@ public class MimeBuilder {
             final MimeEntityConfig config,
             final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory,
-            final ParseParams params,
+            final boolean contentDecoding,
+            final boolean flatMode,
             final DecodeMonitor monitor) throws IOException, MimeIOException {
         try {
             MessageImpl message = new MessageImpl();
             DecodeMonitor mon = monitor != null ? monitor : DecodeMonitor.SILENT;
             MimeStreamParser parser = new MimeStreamParser(config, bodyDescFactory, mon);
             parser.setContentHandler(new EntityBuilder(message, bodyFactory, mon));
-            if (params != null) {
-                parser.setContentDecoding(params.isContentDecoding());
-                if (params.isFlatMode()) {
-                    parser.setFlat();
-                } else {
-                    parser.setRecurse();
-                }
+            parser.setContentDecoding(contentDecoding);
+            if (flatMode) {
+                parser.setFlat();
             } else {
-                parser.setContentDecoding(true);
                 parser.setRecurse();
             }
             parser.parse(is);
@@ -298,7 +293,7 @@ public class MimeBuilder {
             final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory,
             final DecodeMonitor monitor) throws IOException, MimeIOException {
-        return parse(is, config, bodyFactory, bodyDescFactory, null, monitor);
+        return parse(is, config, bodyFactory, bodyDescFactory, true, false, monitor);
     }
     
     public Message parse(

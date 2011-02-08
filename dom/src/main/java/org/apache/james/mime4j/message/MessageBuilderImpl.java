@@ -26,7 +26,6 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
-import org.apache.james.mime4j.dom.ParseParams;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
@@ -40,6 +39,9 @@ public class MessageBuilderImpl implements MessageBuilder {
     private BodyFactory bodyFactory = null;
     private MimeEntityConfig mimeEntityConfig = null;
     private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
+    private boolean contentDecoding = true;
+    private boolean flatMode = false;
+    private DecodeMonitor decodeMonitor = null;
 
     public MessageBuilderImpl() {
     }
@@ -66,18 +68,8 @@ public class MessageBuilderImpl implements MessageBuilder {
                 mimeEntityConfig, 
                 bodyFactory, 
                 mutableBodyDescriptorFactory, 
-                null,
-                null);
-    }
-    
-    public Message parse(
-            InputStream source, 
-            ParseParams params, DecodeMonitor decodeMonitor) throws MimeException, IOException {
-        return getMimeBuilder().parse(source, 
-                mimeEntityConfig, 
-                bodyFactory, 
-                mutableBodyDescriptorFactory, 
-                params,
+                contentDecoding,
+                flatMode,
                 decodeMonitor);
     }
     
@@ -98,4 +90,16 @@ public class MessageBuilderImpl implements MessageBuilder {
         this.mimeBuilder = mimeBuilder;
     }
 
+    public void setDecodeMonitor(DecodeMonitor decodeMonitor) {
+        this.decodeMonitor = decodeMonitor;
+    }
+
+    public void setContentDecoding(boolean contentDecoding) {
+        this.contentDecoding = contentDecoding;
+    }
+
+    public void setFlatMode(boolean flatMode) {
+        this.flatMode = flatMode;
+    }
+    
 }

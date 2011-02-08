@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.codec.DecodeMonitor;
 
 /**
  * Defines the API to obtain Message instances from a mime stream.
@@ -36,7 +35,4 @@ public interface MessageBuilder {
           
     Message parse(InputStream source) throws MimeException, IOException;
           
-    Message parse(InputStream source, 
-            ParseParams params, DecodeMonitor decodeMonitor) throws MimeException, IOException;
-
 }
