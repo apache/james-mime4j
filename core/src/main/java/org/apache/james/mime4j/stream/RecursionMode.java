@@ -22,24 +22,24 @@ package org.apache.james.mime4j.stream;
 /**
  * Enumeration of parsing modes.
  */
-public interface RecursionMode {
+public enum RecursionMode {
 
     /** 
      * Recursively parse every <code>message/rfc822</code> part 
      */
-    int M_RECURSE = 0;
+    M_RECURSE,
     /**
      * Do not recurse <code>message/rfc822</code> parts 
      */
-    int M_NO_RECURSE = 1;
+    M_NO_RECURSE,
     /** 
      * Parse into raw entities
      */
-    int M_RAW = 2;
+    M_RAW,
     /**
      * Do not recurse <code>message/rfc822</code> parts
      * and treat multiparts as a single flat body. 
      */
-    int M_FLAT = 3;
+    M_FLAT
     
 }

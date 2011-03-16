@@ -82,67 +82,67 @@ public class MultipartStreamTest extends TestCase {
     
     public void testShouldSupplyInputStreamForSimpleBody() throws Exception {
         parser.parse(new ByteArrayInputStream(US_ASCII.encode(MESSAGE).array()));
-        checkState(MimeTokenStream.T_START_HEADER);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_END_HEADER);
-        checkState(MimeTokenStream.T_START_MULTIPART);
+        checkState(EntityState.T_START_HEADER);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_END_HEADER);
+        checkState(EntityState.T_START_MULTIPART);
         InputStream out = parser.getInputStream();
         assertEquals(BODY, IOUtils.toString(out, "us-ascii"));
-        checkState(MimeTokenStream.T_END_MULTIPART);
+        checkState(EntityState.T_END_MULTIPART);
     }
     
     public void testInputStreamShouldReadOnlyMessage() throws Exception {
         parser.parse(new ByteArrayInputStream(US_ASCII.encode(COMPLEX_MESSAGE).array()));
-        checkState(MimeTokenStream.T_START_HEADER);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_END_HEADER);
-        checkState(MimeTokenStream.T_START_MULTIPART);
-        checkState(MimeTokenStream.T_PREAMBLE);
-        checkState(MimeTokenStream.T_START_BODYPART);
-        checkState(MimeTokenStream.T_START_HEADER);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_END_HEADER);
-        checkState(MimeTokenStream.T_BODY);
-        checkState(MimeTokenStream.T_END_BODYPART);
-        checkState(MimeTokenStream.T_START_BODYPART);
-        checkState(MimeTokenStream.T_START_HEADER);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_END_HEADER);
-        checkState(MimeTokenStream.T_START_MESSAGE);
-        checkState(MimeTokenStream.T_START_HEADER);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_END_HEADER);
-        checkState(MimeTokenStream.T_START_MULTIPART);
+        checkState(EntityState.T_START_HEADER);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_END_HEADER);
+        checkState(EntityState.T_START_MULTIPART);
+        checkState(EntityState.T_PREAMBLE);
+        checkState(EntityState.T_START_BODYPART);
+        checkState(EntityState.T_START_HEADER);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_END_HEADER);
+        checkState(EntityState.T_BODY);
+        checkState(EntityState.T_END_BODYPART);
+        checkState(EntityState.T_START_BODYPART);
+        checkState(EntityState.T_START_HEADER);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_END_HEADER);
+        checkState(EntityState.T_START_MESSAGE);
+        checkState(EntityState.T_START_HEADER);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_END_HEADER);
+        checkState(EntityState.T_START_MULTIPART);
         InputStream out = parser.getInputStream();
         assertEquals(BODY, IOUtils.toString(out, "us-ascii"));
-        checkState(MimeTokenStream.T_END_MULTIPART);
-        checkState(MimeTokenStream.T_END_MESSAGE);
-        checkState(MimeTokenStream.T_END_BODYPART);
-        checkState(MimeTokenStream.T_START_BODYPART);
-        checkState(MimeTokenStream.T_START_HEADER);
-        checkState(MimeTokenStream.T_FIELD);
-        checkState(MimeTokenStream.T_END_HEADER);
-        checkState(MimeTokenStream.T_BODY);
-        checkState(MimeTokenStream.T_END_BODYPART);
-        checkState(MimeTokenStream.T_EPILOGUE);
-        checkState(MimeTokenStream.T_END_MULTIPART);
-        checkState(MimeTokenStream.T_END_MESSAGE);
-        checkState(MimeTokenStream.T_END_OF_STREAM);
+        checkState(EntityState.T_END_MULTIPART);
+        checkState(EntityState.T_END_MESSAGE);
+        checkState(EntityState.T_END_BODYPART);
+        checkState(EntityState.T_START_BODYPART);
+        checkState(EntityState.T_START_HEADER);
+        checkState(EntityState.T_FIELD);
+        checkState(EntityState.T_END_HEADER);
+        checkState(EntityState.T_BODY);
+        checkState(EntityState.T_END_BODYPART);
+        checkState(EntityState.T_EPILOGUE);
+        checkState(EntityState.T_END_MULTIPART);
+        checkState(EntityState.T_END_MESSAGE);
+        checkState(EntityState.T_END_OF_STREAM);
     }
 
-    private void checkState(final int state) throws IOException, MimeException {
+    private void checkState(final EntityState state) throws IOException, MimeException {
         assertEquals(MimeTokenStream.stateToString(state), MimeTokenStream.stateToString(parser.next()));
     }
 }

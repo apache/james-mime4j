@@ -25,10 +25,12 @@ import java.io.InputStream;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.RecursionMode;
 
 /**
  * <p>
@@ -123,9 +125,9 @@ public class MimeStreamParser {
             mimeTokenStream.parse(inputStream);
         }
         OUTER: for (;;) {
-            int state = mimeTokenStream.getState();
+            EntityState state = mimeTokenStream.getState();
             switch (state) {
-                case MimeTokenStream.T_BODY:
+                case T_BODY:
                     BodyDescriptor desc = mimeTokenStream.getBodyDescriptor();
                     InputStream bodyContent;
                     if (contentDecoding) {
@@ -135,42 +137,42 @@ public class MimeStreamParser {
                     }
                     handler.body(desc, bodyContent);
                     break;
-                case MimeTokenStream.T_END_BODYPART:
+                case T_END_BODYPART:
                     handler.endBodyPart();
                     break;
-                case MimeTokenStream.T_END_HEADER:
+                case T_END_HEADER:
                     handler.endHeader();
                     break;
-                case MimeTokenStream.T_END_MESSAGE:
+                case T_END_MESSAGE:
                     handler.endMessage();
                     break;
-                case MimeTokenStream.T_END_MULTIPART:
+                case T_END_MULTIPART:
                     handler.endMultipart();
                     break;
-                case MimeTokenStream.T_END_OF_STREAM:
+                case T_END_OF_STREAM:
                     break OUTER;
-                case MimeTokenStream.T_EPILOGUE:
+                case T_EPILOGUE:
                     handler.epilogue(mimeTokenStream.getInputStream());
                     break;
-                case MimeTokenStream.T_FIELD:
+                case T_FIELD:
                     handler.field(mimeTokenStream.getField());
                     break;
-                case MimeTokenStream.T_PREAMBLE:
+                case T_PREAMBLE:
                     handler.preamble(mimeTokenStream.getInputStream());
                     break;
-                case MimeTokenStream.T_RAW_ENTITY:
+                case T_RAW_ENTITY:
                     handler.raw(mimeTokenStream.getInputStream());
                     break;
-                case MimeTokenStream.T_START_BODYPART:
+                case T_START_BODYPART:
                     handler.startBodyPart();
                     break;
-                case MimeTokenStream.T_START_HEADER:
+                case T_START_HEADER:
                     handler.startHeader();
                     break;
-                case MimeTokenStream.T_START_MESSAGE:
+                case T_START_MESSAGE:
                     handler.startMessage();
                     break;
-                case MimeTokenStream.T_START_MULTIPART:
+                case T_START_MULTIPART:
                     handler.startMultipart(mimeTokenStream.getBodyDescriptor());
                     break;
                 default:
@@ -199,7 +201,7 @@ public class MimeStreamParser {
      * including header fields and whatever is in the body.
      */
     public void setRaw() {
-        mimeTokenStream.setRecursionMode(MimeTokenStream.M_RAW);
+        mimeTokenStream.setRecursionMode(RecursionMode.M_RAW);
     }
     
     /**
@@ -207,7 +209,7 @@ public class MimeStreamParser {
      * parsed and multipart content is handled as a single "simple" stream.
      */
     public void setFlat() {
-        mimeTokenStream.setRecursionMode(MimeTokenStream.M_FLAT);
+        mimeTokenStream.setRecursionMode(RecursionMode.M_FLAT);
     }
     
     /**
@@ -215,7 +217,7 @@ public class MimeStreamParser {
      * parsed.
      */
     public void setRecurse() {
-        mimeTokenStream.setRecursionMode(MimeTokenStream.M_RECURSE);
+        mimeTokenStream.setRecursionMode(RecursionMode.M_RECURSE);
     }
 
     /**

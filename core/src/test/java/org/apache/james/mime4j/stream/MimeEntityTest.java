@@ -53,31 +53,31 @@ public class MimeEntityTest extends TestCase {
                 rawstream, new DefaultBodyDescriptor());
         
         
-        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("To", entity.getField().getName());
         assertEquals("Road Runner <runner@example.org>", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("From", entity.getField().getName());
         assertEquals("Wile E. Cayote <wile@example.org>", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Date", entity.getField().getName());
         assertEquals("Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Subject", entity.getField().getName());
         assertEquals("Mail", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Content-Type", entity.getField().getName());
         assertEquals("text/plain", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_END_HEADER, entity.getState());
+        assertEquals(EntityState.T_END_HEADER, entity.getState());
         try {
             entity.getField().getName();
             fail("IllegalStateException should have been thrown");
@@ -90,17 +90,17 @@ public class MimeEntityTest extends TestCase {
         }
         
         entity.advance();
-        assertEquals(EntityStates.T_BODY, entity.getState());
+        assertEquals(EntityState.T_BODY, entity.getState());
         assertEquals("a very important message", IOUtils.toString(entity.getContentStream()));
         entity.advance();
-        assertEquals(EntityStates.T_END_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_END_MESSAGE, entity.getState());
         try {
             entity.getContentStream();
             fail("IllegalStateException should have been thrown");
         } catch (IllegalStateException expected) {
         }
         entity.advance();
-        assertEquals(EntityStates.T_END_OF_STREAM, entity.getState());
+        assertEquals(EntityState.T_END_OF_STREAM, entity.getState());
         try {
             entity.advance();
             fail("IllegalStateException should have been thrown");
@@ -129,31 +129,31 @@ public class MimeEntityTest extends TestCase {
                 rawstream, new DefaultBodyDescriptor());
         
         
-        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("To", entity.getField().getName());
         assertEquals("Road Runner <runner@example.org>", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("From", entity.getField().getName());
         assertEquals("Wile E. Cayote <wile@example.org>", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Date", entity.getField().getName());
         assertEquals("Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Subject", entity.getField().getName());
         assertEquals("Mail      with a folded subject ", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Content-Type", entity.getField().getName());
         assertEquals("text/plain", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_END_HEADER, entity.getState());
+        assertEquals(EntityState.T_END_HEADER, entity.getState());
         try {
             entity.getField().getName();
             fail("IllegalStateException should have been thrown");
@@ -166,17 +166,17 @@ public class MimeEntityTest extends TestCase {
         }
         
         entity.advance();
-        assertEquals(EntityStates.T_BODY, entity.getState());
+        assertEquals(EntityState.T_BODY, entity.getState());
         assertEquals("a very important message", IOUtils.toString(entity.getContentStream()));
         entity.advance();
-        assertEquals(EntityStates.T_END_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_END_MESSAGE, entity.getState());
         try {
             entity.getContentStream();
             fail("IllegalStateException should have been thrown");
         } catch (IllegalStateException expected) {
         }
         entity.advance();
-        assertEquals(EntityStates.T_END_OF_STREAM, entity.getState());
+        assertEquals(EntityState.T_END_OF_STREAM, entity.getState());
         try {
             entity.advance();
             fail("IllegalStateException should have been thrown");
@@ -212,86 +212,86 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream, new DefaultBodyDescriptor());
         
-        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("To", entity.getField().getName());
         assertEquals("Road Runner <runner@example.org>", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("From", entity.getField().getName());
         assertEquals("Wile E. Cayote <wile@example.org>", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Date", entity.getField().getName());
         assertEquals("Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Subject", entity.getField().getName());
         assertEquals("Mail", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Content-Type", entity.getField().getName());
         assertEquals("multipart/mixed;boundary=1729", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_END_HEADER, entity.getState());
+        assertEquals(EntityState.T_END_HEADER, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_MULTIPART, entity.getState());
+        assertEquals(EntityState.T_START_MULTIPART, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_PREAMBLE, entity.getState());
+        assertEquals(EntityState.T_PREAMBLE, entity.getState());
         assertEquals("Hello!", IOUtils.toString(entity.getContentStream()));
         
         EntityStateMachine p1 = entity.advance();
         assertNotNull(p1);
         
-        assertEquals(EntityStates.T_START_BODYPART, p1.getState());
+        assertEquals(EntityState.T_START_BODYPART, p1.getState());
         p1.advance();
-        assertEquals(EntityStates.T_START_HEADER, p1.getState());
+        assertEquals(EntityState.T_START_HEADER, p1.getState());
         p1.advance();
-        assertEquals(EntityStates.T_FIELD, p1.getState());
+        assertEquals(EntityState.T_FIELD, p1.getState());
         assertEquals("Content-Type", p1.getField().getName());
         assertEquals("text/plain; charset=US-ASCII", p1.getField().getBody());
         p1.advance();
-        assertEquals(EntityStates.T_END_HEADER, p1.getState());
+        assertEquals(EntityState.T_END_HEADER, p1.getState());
         p1.advance();
-        assertEquals(EntityStates.T_BODY, p1.getState());
+        assertEquals(EntityState.T_BODY, p1.getState());
         assertEquals("blah blah blah", IOUtils.toString(p1.getContentStream()));
         p1.advance();
-        assertEquals(EntityStates.T_END_BODYPART, p1.getState());
+        assertEquals(EntityState.T_END_BODYPART, p1.getState());
         p1.advance();
-        assertEquals(EntityStates.T_END_OF_STREAM, p1.getState());
+        assertEquals(EntityState.T_END_OF_STREAM, p1.getState());
 
         EntityStateMachine p2 = entity.advance();
         assertNotNull(p2);
         
-        assertEquals(EntityStates.T_START_BODYPART, p2.getState());
+        assertEquals(EntityState.T_START_BODYPART, p2.getState());
         p2.advance();
-        assertEquals(EntityStates.T_START_HEADER, p2.getState());
+        assertEquals(EntityState.T_START_HEADER, p2.getState());
         p2.advance();
-        assertEquals(EntityStates.T_FIELD, p2.getState());
+        assertEquals(EntityState.T_FIELD, p2.getState());
         assertEquals("Content-Type", p2.getField().getName());
         assertEquals("text/plain; charset=US-ASCII", p2.getField().getBody());
         p2.advance();
-        assertEquals(EntityStates.T_END_HEADER, p2.getState());
+        assertEquals(EntityState.T_END_HEADER, p2.getState());
         p2.advance();
-        assertEquals(EntityStates.T_BODY, p2.getState());
+        assertEquals(EntityState.T_BODY, p2.getState());
         assertEquals("yada yada yada", IOUtils.toString(p2.getContentStream()));
         p2.advance();
-        assertEquals(EntityStates.T_END_BODYPART, p2.getState());
+        assertEquals(EntityState.T_END_BODYPART, p2.getState());
         p2.advance();
-        assertEquals(EntityStates.T_END_OF_STREAM, p2.getState());
+        assertEquals(EntityState.T_END_OF_STREAM, p2.getState());
 
         entity.advance();
-        assertEquals(EntityStates.T_EPILOGUE, entity.getState());
+        assertEquals(EntityState.T_EPILOGUE, entity.getState());
         assertEquals("Goodbye!", IOUtils.toString(entity.getContentStream()));
         entity.advance();
-        assertEquals(EntityStates.T_END_MULTIPART, entity.getState());
+        assertEquals(EntityState.T_END_MULTIPART, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_END_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_END_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_END_OF_STREAM, entity.getState());
+        assertEquals(EntityState.T_END_OF_STREAM, entity.getState());
     }
     
     public void testRawEntity() throws Exception {
@@ -324,42 +324,42 @@ public class MimeEntityTest extends TestCase {
         
         entity.setRecursionMode(RecursionMode.M_RAW);
         
-        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("To", entity.getField().getName());
         assertEquals("Road Runner <runner@example.org>", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("From", entity.getField().getName());
         assertEquals("Wile E. Cayote <wile@example.org>", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Date", entity.getField().getName());
         assertEquals("Tue, 12 Feb 2008 17:34:09 +0000 (GMT)", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Subject", entity.getField().getName());
         assertEquals("Mail", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         assertEquals("Content-Type", entity.getField().getName());
         assertEquals("multipart/mixed;boundary=1729", entity.getField().getBody());
         entity.advance();
-        assertEquals(EntityStates.T_END_HEADER, entity.getState());
+        assertEquals(EntityState.T_END_HEADER, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_MULTIPART, entity.getState());
+        assertEquals(EntityState.T_START_MULTIPART, entity.getState());
         
         entity.advance();
-        assertEquals(EntityStates.T_PREAMBLE, entity.getState());
+        assertEquals(EntityState.T_PREAMBLE, entity.getState());
         assertEquals("Hello!", IOUtils.toString(entity.getContentStream()));
         
         EntityStateMachine p1 = entity.advance();
         assertNotNull(p1);
         
-        assertEquals(EntityStates.T_RAW_ENTITY, p1.getState());
+        assertEquals(EntityState.T_RAW_ENTITY, p1.getState());
         assertNull(p1.getBodyDescriptor());
         assertNull(p1.getField());
         assertEquals(
@@ -367,12 +367,12 @@ public class MimeEntityTest extends TestCase {
                 "\r\n" +
                 "blah blah blah", IOUtils.toString(p1.getContentStream()));
         p1.advance();
-        assertEquals(EntityStates.T_END_OF_STREAM, p1.getState());
+        assertEquals(EntityState.T_END_OF_STREAM, p1.getState());
 
         EntityStateMachine p2 = entity.advance();
         assertNotNull(p2);
         
-        assertEquals(EntityStates.T_RAW_ENTITY, p2.getState());
+        assertEquals(EntityState.T_RAW_ENTITY, p2.getState());
         assertNull(p2.getBodyDescriptor());
         assertNull(p2.getField());
         assertEquals(
@@ -380,17 +380,17 @@ public class MimeEntityTest extends TestCase {
                 "\r\n" +
                 "yada yada yada", IOUtils.toString(p2.getContentStream()));
         p2.advance();
-        assertEquals(EntityStates.T_END_OF_STREAM, p2.getState());
+        assertEquals(EntityState.T_END_OF_STREAM, p2.getState());
 
         entity.advance();
-        assertEquals(EntityStates.T_EPILOGUE, entity.getState());
+        assertEquals(EntityState.T_EPILOGUE, entity.getState());
         assertEquals("Goodbye!", IOUtils.toString(entity.getContentStream()));
         entity.advance();
-        assertEquals(EntityStates.T_END_MULTIPART, entity.getState());
+        assertEquals(EntityState.T_END_MULTIPART, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_END_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_END_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_END_OF_STREAM, entity.getState());
+        assertEquals(EntityState.T_END_OF_STREAM, entity.getState());
     }
 
     public void testMaxLineLimitCheck() throws Exception {
@@ -415,19 +415,19 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 new DefaultBodyDescriptor(),
-                EntityStates.T_START_MESSAGE,
-                EntityStates.T_END_MESSAGE,
+                EntityState.T_START_MESSAGE,
+                EntityState.T_END_MESSAGE,
                 config);
         
-        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance(); // advances to T_START_HEADER
-        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
         entity.advance(); // reads To: into field buffer, From: into line buffer
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance(); // reads Date: into line buffer
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance(); // reads Subject: into line buffer
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         try {
             entity.advance(); // reads DoS: into line buffer
             fail("MimeException caused by MaxLineLimitException should have been thrown");
@@ -469,21 +469,21 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 new DefaultBodyDescriptor(),
-                EntityStates.T_START_MESSAGE,
-                EntityStates.T_END_MESSAGE,
+                EntityState.T_START_MESSAGE,
+                EntityState.T_END_MESSAGE,
                 config);
         
-        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         try {
             entity.advance();
             fail("MimeException caused by MaxLineLimitException should have been thrown");
@@ -517,19 +517,19 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 new DefaultBodyDescriptor(),
-                EntityStates.T_START_MESSAGE,
-                EntityStates.T_END_MESSAGE,
+                EntityState.T_START_MESSAGE,
+                EntityState.T_END_MESSAGE,
                 config);
         
-        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
         for (int i = 0; i < 6; i++) {
             entity.advance();
-            assertEquals(EntityStates.T_FIELD, entity.getState());
+            assertEquals(EntityState.T_FIELD, entity.getState());
         }
         entity.advance();
-        assertEquals(EntityStates.T_END_HEADER, entity.getState());
+        assertEquals(EntityState.T_END_HEADER, entity.getState());
     }
     
     public void testMaxHeaderCount() throws Exception {
@@ -568,17 +568,17 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 new DefaultBodyDescriptor(),
-                EntityStates.T_START_MESSAGE,
-                EntityStates.T_END_MESSAGE,
+                EntityState.T_START_MESSAGE,
+                EntityState.T_END_MESSAGE,
                 config);
         
-        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
         
         for (int i = 0; i < 20; i++) {
             entity.advance();
-            assertEquals(EntityStates.T_FIELD, entity.getState());
+            assertEquals(EntityState.T_FIELD, entity.getState());
         }
         try {
             entity.advance();
@@ -616,27 +616,27 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 new DefaultBodyDescriptor(),
-                EntityStates.T_START_MESSAGE,
-                EntityStates.T_END_MESSAGE,
+                EntityState.T_START_MESSAGE,
+                EntityState.T_END_MESSAGE,
                 config);
         
-        assertEquals(EntityStates.T_START_MESSAGE, entity.getState());
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_START_HEADER, entity.getState());
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_FIELD, entity.getState());
+        assertEquals(EntityState.T_FIELD, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_END_HEADER, entity.getState());
+        assertEquals(EntityState.T_END_HEADER, entity.getState());
         entity.advance();
-        assertEquals(EntityStates.T_BODY, entity.getState());
+        assertEquals(EntityState.T_BODY, entity.getState());
         try {
             IOUtils.toByteArray(entity.getContentStream());
             fail("IOException should have been thrown");

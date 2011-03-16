@@ -33,11 +33,11 @@ public interface EntityStateMachine {
     /**
      * Return the current state of the entity.
      * 
-     * @see EntityStates
+     * @see EntityState
      * 
      * @return current state
      */
-    int getState();
+    EntityState getState();
     
     /**
      * Sets the current recursion mode.
@@ -51,7 +51,7 @@ public interface EntityStateMachine {
      * 
      * @param recursionMode
      */
-    void setRecursionMode(int recursionMode);
+    void setRecursionMode(RecursionMode recursionMode);
     
     /**
      * Advances the state machine to the next state in the 

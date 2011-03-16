@@ -72,16 +72,16 @@ import org.apache.james.mime4j.util.CharsetUtil;
  * have a multi threaded application, then the suggested use is to have
  * one instance per thread.</p>
  */
-public class MimeTokenStream implements EntityStates, RecursionMode {
+public class MimeTokenStream {
     
     private final MimeEntityConfig config;
     private final DecodeMonitor monitor;
     private final MutableBodyDescriptorFactory bodyDescFactory;
     private final LinkedList<EntityStateMachine> entities = new LinkedList<EntityStateMachine>();
     
-    private int state = T_END_OF_STREAM;
+    private EntityState state = EntityState.T_END_OF_STREAM;
     private EntityStateMachine currentStateMachine;
-    private int recursionMode = M_RECURSE;
+    private RecursionMode recursionMode = RecursionMode.M_RECURSE;
     private MimeEntity rootentity;
     
     /**
@@ -122,7 +122,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * internal state.
      */
     public void parse(InputStream stream) {
-        doParse(stream, newBodyDescriptor(), T_START_MESSAGE);
+        doParse(stream, newBodyDescriptor(), EntityState.T_START_MESSAGE);
     }
 
     /** Instructs the {@code MimeTokenStream} to parse the given content with 
@@ -145,7 +145,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
             // should never happen
             throw new IllegalArgumentException(ex.getMessage());
         }
-        doParse(stream, newBodyDescriptor, T_END_HEADER);
+        doParse(stream, newBodyDescriptor, EntityState.T_END_HEADER);
         try {
             next();
         } catch (IOException e) {
@@ -173,7 +173,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     }
 
     public void doParse(InputStream stream,
-            MutableBodyDescriptor newBodyDescriptor, int start) {
+            MutableBodyDescriptor newBodyDescriptor, EntityState start) {
         LineNumberSource lineSource = null;
         if (config.isCountLineNumbers()) {
             LineNumberInputStream lineInput = new LineNumberInputStream(stream);
@@ -186,7 +186,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
                 stream,
                 newBodyDescriptor, 
                 start, 
-                T_END_MESSAGE,
+                EntityState.T_END_MESSAGE,
                 config,
                 monitor);
 
@@ -205,7 +205,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * @see #setRecursionMode(int)
      */
     public boolean isRaw() {
-        return recursionMode == M_RAW;
+        return recursionMode == RecursionMode.M_RAW;
     }
     
     /**
@@ -217,7 +217,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * {@link #M_NO_RECURSE} does not.
      * @return {@link #M_RECURSE}, {@link #M_RAW} or {@link #M_NO_RECURSE}
      */
-    public int getRecursionMode() {
+    public RecursionMode getRecursionMode() {
         return recursionMode;
     }
     
@@ -230,7 +230,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * {@link #M_NO_RECURSE} does not.
      * @param mode {@link #M_RECURSE}, {@link #M_RAW} or {@link #M_NO_RECURSE}
      */
-    public void setRecursionMode(int mode) {
+    public void setRecursionMode(RecursionMode mode) {
         recursionMode = mode;
         if (currentStateMachine != null) {
             currentStateMachine.setRecursionMode(mode);
@@ -250,7 +250,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
     /**
      * Returns the current state.
      */
-    public int getState() {
+    public EntityState getState() {
         return state;
     }
 
@@ -343,8 +343,8 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * @throws IllegalStateException The method has been called, although
      *   {@link #getState()} was already {@link #T_END_OF_STREAM}.
      */
-    public int next() throws IOException, MimeException {
-        if (state == T_END_OF_STREAM  ||  currentStateMachine == null) {
+    public EntityState next() throws IOException, MimeException {
+        if (state == EntityState.T_END_OF_STREAM  ||  currentStateMachine == null) {
             throw new IllegalStateException("No more tokens are available.");
         }
         while (currentStateMachine != null) {
@@ -354,7 +354,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
                 currentStateMachine = next;
             }
             state = currentStateMachine.getState();
-            if (state != T_END_OF_STREAM) {
+            if (state != EntityState.T_END_OF_STREAM) {
                 return state;
             }
             entities.removeLast();
@@ -365,7 +365,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
                 currentStateMachine.setRecursionMode(recursionMode);
             }
         }
-        state = T_END_OF_STREAM;
+        state = EntityState.T_END_OF_STREAM;
         return state;
     }
 
@@ -374,7 +374,7 @@ public class MimeTokenStream implements EntityStates, RecursionMode {
      * @param state 
      * @return rendered as string, not null
      */
-    public static final String stateToString(int state) {
+    public static final String stateToString(EntityState state) {
         return AbstractEntity.stateToString(state);
     }
 

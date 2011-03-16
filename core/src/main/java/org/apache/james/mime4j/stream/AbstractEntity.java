@@ -35,12 +35,12 @@ import org.apache.james.mime4j.util.CharsetUtil;
  */
 public abstract class AbstractEntity implements EntityStateMachine {
 
-    protected final int startState;
-    protected final int endState;
+    protected final EntityState startState;
+    protected final EntityState endState;
     protected final MimeEntityConfig config;
     protected final MutableBodyDescriptor body;
     
-    protected int state;
+    protected EntityState state;
 
     private final ByteArrayBuffer linebuf;
 
@@ -50,19 +50,10 @@ public abstract class AbstractEntity implements EntityStateMachine {
     private int headerCount;
     protected final DecodeMonitor monitor;
 
-    /**
-     * Internal state, not exposed.
-     */
-    private static final int T_IN_BODYPART = -2;
-    /**
-     * Internal state, not exposed.
-     */
-    private static final int T_IN_MESSAGE = -3;
-
     AbstractEntity(
             MutableBodyDescriptor body,
-            int startState, 
-            int endState,
+            EntityState startState, 
+            EntityState endState,
             MimeEntityConfig config,
             DecodeMonitor monitor) {
         this.state = startState;
@@ -77,7 +68,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
         this.monitor = monitor;
     }
 
-    public int getState() {
+    public EntityState getState() {
         return state;
     }
 
@@ -190,20 +181,20 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * <p>Gets a descriptor for the current entity.
      * This method is valid if {@link #getState()} returns:</p>
      * <ul>
-     * <li>{@link EntityStates#T_BODY}</li>
-     * <li>{@link EntityStates#T_START_MULTIPART}</li>
-     * <li>{@link EntityStates#T_EPILOGUE}</li>
-     * <li>{@link EntityStates#T_PREAMBLE}</li>
+     * <li>{@link EntityState#T_BODY}</li>
+     * <li>{@link EntityState#T_START_MULTIPART}</li>
+     * <li>{@link EntityState#T_EPILOGUE}</li>
+     * <li>{@link EntityState#T_PREAMBLE}</li>
      * </ul>
      * @return <code>BodyDescriptor</code>, not nulls
      */
     public BodyDescriptor getBodyDescriptor() {
         switch (getState()) {
-        case EntityStates.T_BODY:
-        case EntityStates.T_START_MULTIPART:
-        case EntityStates.T_PREAMBLE:
-        case EntityStates.T_EPILOGUE:
-        case EntityStates.T_END_OF_STREAM:
+        case T_BODY:
+        case T_START_MULTIPART:
+        case T_PREAMBLE:
+        case T_EPILOGUE:
+        case T_END_OF_STREAM:
             return body;
         default:
             throw new IllegalStateException("Invalid state :" + stateToString(state));
@@ -211,14 +202,14 @@ public abstract class AbstractEntity implements EntityStateMachine {
     }
 
     /**
-     * This method is valid, if {@link #getState()} returns {@link EntityStates#T_FIELD}.
+     * This method is valid, if {@link #getState()} returns {@link EntityState#T_FIELD}.
      * @return String with the fields raw contents.
      * @throws IllegalStateException {@link #getState()} returns another
-     *   value than {@link EntityStates#T_FIELD}.
+     *   value than {@link EntityState#T_FIELD}.
      */
     public RawField getField() {
         switch (getState()) {
-        case EntityStates.T_FIELD:
+        case T_FIELD:
             return field;
         default:
             throw new IllegalStateException("Invalid state :" + stateToString(state));
@@ -276,56 +267,50 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * @param state 
      * @return rendered as string, not null
      */
-    public static final String stateToString(int state) {
+    public static final String stateToString(EntityState state) {
         final String result;
         switch (state) {
-            case EntityStates.T_END_OF_STREAM:
+            case T_END_OF_STREAM:
                 result = "End of stream";
                 break;
-            case EntityStates.T_START_MESSAGE:
+            case T_START_MESSAGE:
                 result = "Start message";
                 break;
-            case EntityStates.T_END_MESSAGE:
+            case T_END_MESSAGE:
                 result = "End message";
                 break;
-            case EntityStates.T_RAW_ENTITY:
+            case T_RAW_ENTITY:
                 result = "Raw entity";
                 break;
-            case EntityStates.T_START_HEADER:
+            case T_START_HEADER:
                 result = "Start header";
                 break;
-            case EntityStates.T_FIELD:
+            case T_FIELD:
                 result = "Field";
                 break;
-            case EntityStates.T_END_HEADER:
+            case T_END_HEADER:
                 result = "End header";
                 break;
-            case EntityStates.T_START_MULTIPART:
+            case T_START_MULTIPART:
                 result = "Start multipart";
                 break;
-            case EntityStates.T_END_MULTIPART:
+            case T_END_MULTIPART:
                 result = "End multipart";
                 break;
-            case EntityStates.T_PREAMBLE:
+            case T_PREAMBLE:
                 result = "Preamble";
                 break;
-            case EntityStates.T_EPILOGUE:
+            case T_EPILOGUE:
                 result = "Epilogue";
                 break;
-            case EntityStates.T_START_BODYPART:
+            case T_START_BODYPART:
                 result = "Start bodypart";
                 break;
-            case EntityStates.T_END_BODYPART:
+            case T_END_BODYPART:
                 result = "End bodypart";
                 break;
-            case EntityStates.T_BODY:
+            case T_BODY:
                 result = "Body";
-                break;
-            case T_IN_BODYPART:
-                result = "Bodypart";
-                break;
-            case T_IN_MESSAGE:
-                result = "In message";
                 break;
             default:
                 result = "Unknown";

@@ -35,8 +35,8 @@ public class StrictMimeTokenStreamTest extends TestCase {
         MimeTokenStream parser = new MimeTokenStream(config);
         parser.parse(new ByteArrayInputStream(HEADER_ONLY.getBytes()));
         
-        assertEquals("Headers start", MimeTokenStream.T_START_HEADER, parser.next());
-        assertEquals("Field", MimeTokenStream.T_FIELD, parser.next());
+        assertEquals("Headers start", EntityState.T_START_HEADER, parser.next());
+        assertEquals("Field", EntityState.T_FIELD, parser.next());
         try {
             parser.next();
             fail("Expected exception to be thrown");
@@ -53,9 +53,9 @@ public class StrictMimeTokenStreamTest extends TestCase {
         
         parser.parse(new ByteArrayInputStream(CORRECT_HEADERS.getBytes()));
         
-        assertEquals("Headers start", MimeTokenStream.T_START_HEADER, parser.next());
-        assertEquals("From header", MimeTokenStream.T_FIELD, parser.next());
-        assertEquals("Subject header", MimeTokenStream.T_FIELD, parser.next());
-        assertEquals("End message", MimeTokenStream.T_END_HEADER, parser.next());
+        assertEquals("Headers start", EntityState.T_START_HEADER, parser.next());
+        assertEquals("From header", EntityState.T_FIELD, parser.next());
+        assertEquals("Subject header", EntityState.T_FIELD, parser.next());
+        assertEquals("End message", EntityState.T_END_HEADER, parser.next());
      }
 }

@@ -27,6 +27,7 @@ import org.apache.james.mime4j.message.MaximalBodyDescriptor;
 import org.apache.james.mime4j.message.MaximalBodyDescriptorFactory;
 import org.apache.james.mime4j.stream.BaseTestForBodyDescriptors;
 import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
@@ -156,14 +157,14 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
     private MaximalBodyDescriptor describe(byte[] mail, int zeroBasedPart) throws Exception {
         ByteArrayInputStream bias = new ByteArrayInputStream(mail);
         parser.parse(bias);
-        int state = parser.next();
-        while (state != MimeTokenStream.T_END_OF_STREAM && zeroBasedPart>=0) {
+        EntityState state = parser.next();
+        while (state != EntityState.T_END_OF_STREAM && zeroBasedPart>=0) {
             state = parser.next();
-            if (state == MimeTokenStream.T_BODY) {
+            if (state == EntityState.T_BODY) {
                 --zeroBasedPart;
             }
         }
-        assertEquals(MimeTokenStream.T_BODY, state);
+        assertEquals(EntityState.T_BODY, state);
         BodyDescriptor descriptor = parser.getBodyDescriptor();
         assertNotNull(descriptor);
         assertTrue("Parser is maximal so body descriptor should be maximal", descriptor instanceof MaximalBodyDescriptor);
@@ -173,12 +174,12 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
     private MaximalBodyDescriptor describe(byte[] mail) throws Exception {
         ByteArrayInputStream bias = new ByteArrayInputStream(mail);
         parser.parse(bias);
-        int state = parser.next();
-        while (state != MimeTokenStream.T_BODY && state != MimeTokenStream.T_END_OF_STREAM) 
+        EntityState state = parser.next();
+        while (state != EntityState.T_BODY && state != EntityState.T_END_OF_STREAM) 
         {
             state = parser.next();
         }
-        assertEquals(MimeTokenStream.T_BODY, state);
+        assertEquals(EntityState.T_BODY, state);
         BodyDescriptor descriptor = parser.getBodyDescriptor();
         assertNotNull(descriptor);
         assertTrue("Parser is maximal so body descriptor should be maximal", descriptor instanceof MaximalBodyDescriptor);

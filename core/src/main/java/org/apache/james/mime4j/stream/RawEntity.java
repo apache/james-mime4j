@@ -31,25 +31,25 @@ public class RawEntity implements EntityStateMachine {
 
     private final InputStream stream;
 
-    private int state;
+    private EntityState state;
     
     RawEntity(InputStream stream) {
         this.stream = stream;
-        this.state = EntityStates.T_RAW_ENTITY;
+        this.state = EntityState.T_RAW_ENTITY;
     }
     
-    public int getState() {
+    public EntityState getState() {
         return state;
     }
 
     /**
      * This method has no effect.
      */
-    public void setRecursionMode(int recursionMode) {
+    public void setRecursionMode(RecursionMode recursionMode) {
     }
 
     public EntityStateMachine advance() {
-        state = EntityStates.T_END_OF_STREAM;
+        state = EntityState.T_END_OF_STREAM;
         return null;
     }
     

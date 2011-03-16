@@ -84,37 +84,37 @@ public class MimeTokenStreamReaderTest extends TestCase {
     public void testShouldReadPartBodies() throws IOException, MimeException {
         InputStream in = new ByteArrayInputStream(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTES);
         parser.parse(in);
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
         for (int i=0;i<5;i++) {
-            assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_FIELD),MimeTokenStream.stateToString(parser.next()));
+            assertEquals(MimeTokenStream.stateToString(EntityState.T_FIELD),MimeTokenStream.stateToString(parser.next()));
         }
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_START_MULTIPART),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_PREAMBLE),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_START_BODYPART),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_FIELD),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_FIELD),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_BODY),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_START_MULTIPART),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_PREAMBLE),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_START_BODYPART),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_FIELD),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_FIELD),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_BODY),MimeTokenStream.stateToString(parser.next()));
         checkBody(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_7BIT);
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_END_BODYPART),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_START_BODYPART),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_FIELD),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_FIELD),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_BODY),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_END_BODYPART),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_START_BODYPART),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_FIELD),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_FIELD),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_BODY),MimeTokenStream.stateToString(parser.next()));
         checkBody(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_QUOTED_PRINTABLE);
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_END_BODYPART),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_START_BODYPART),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_FIELD),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_FIELD),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_BODY),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_END_BODYPART),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_START_BODYPART),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_FIELD),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_FIELD),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_BODY),MimeTokenStream.stateToString(parser.next()));
         checkBody(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BASE64);
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_END_BODYPART),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_END_BODYPART),MimeTokenStream.stateToString(parser.next()));
 
         
     }
@@ -122,12 +122,12 @@ public class MimeTokenStreamReaderTest extends TestCase {
     private void checkSimpleMail(byte[] bytes, String body, int fields) throws IOException, MimeException {
         InputStream in = new ByteArrayInputStream(bytes);
         parser.parse(in);
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_START_HEADER),MimeTokenStream.stateToString(parser.next()));
         for (int i=0;i<fields;i++) {
-            assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_FIELD),MimeTokenStream.stateToString(parser.next()));
+            assertEquals(MimeTokenStream.stateToString(EntityState.T_FIELD),MimeTokenStream.stateToString(parser.next()));
         }
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
-        assertEquals(MimeTokenStream.stateToString(MimeTokenStream.T_BODY),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_END_HEADER),MimeTokenStream.stateToString(parser.next()));
+        assertEquals(MimeTokenStream.stateToString(EntityState.T_BODY),MimeTokenStream.stateToString(parser.next()));
         checkBody(body);
     }
 

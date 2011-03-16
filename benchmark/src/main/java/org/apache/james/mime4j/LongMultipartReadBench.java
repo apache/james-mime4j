@@ -34,6 +34,7 @@ import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.MemoryStorageProvider;
 import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 
 public class LongMultipartReadBench {
@@ -122,7 +123,7 @@ public class LongMultipartReadBench {
             MimeTokenStream stream = new MimeTokenStream();
             for (int i = 0; i < repetitions; i++) {
                 stream.parse(new ByteArrayInputStream(content));
-                for (int state = stream.getState(); state != MimeTokenStream.T_END_OF_STREAM; state = stream
+                for (EntityState state = stream.getState(); state != EntityState.T_END_OF_STREAM; state = stream
                         .next()) {
                 }
             }

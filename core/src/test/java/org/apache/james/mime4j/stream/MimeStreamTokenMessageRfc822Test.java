@@ -42,58 +42,58 @@ public class MimeStreamTokenMessageRfc822Test extends TestCase {
     }
     
     public void testShouldParseMessageRFC822CorrectWithDefaultConfiguration() throws Exception {
-        nextIs(MimeTokenStream.T_START_HEADER);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_END_HEADER);
-        nextIs(MimeTokenStream.T_START_MESSAGE);
-        nextIs(MimeTokenStream.T_START_HEADER);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_END_HEADER);
-        nextIs(MimeTokenStream.T_BODY);
-        nextIs(MimeTokenStream.T_END_MESSAGE);
-        nextIs(MimeTokenStream.T_END_MESSAGE);
-        nextIs(MimeTokenStream.T_END_OF_STREAM);
+        nextIs(EntityState.T_START_HEADER);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_END_HEADER);
+        nextIs(EntityState.T_START_MESSAGE);
+        nextIs(EntityState.T_START_HEADER);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_END_HEADER);
+        nextIs(EntityState.T_BODY);
+        nextIs(EntityState.T_END_MESSAGE);
+        nextIs(EntityState.T_END_MESSAGE);
+        nextIs(EntityState.T_END_OF_STREAM);
     }
     
     public void testShouldParseMessageRFC822CorrectWithNoRecurse() throws Exception {
         stream.setRecursionMode(RecursionMode.M_NO_RECURSE);
-        nextIs(MimeTokenStream.T_START_HEADER);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_END_HEADER);
-        nextIs(MimeTokenStream.T_BODY);
-        nextIs(MimeTokenStream.T_END_MESSAGE);
-        nextIs(MimeTokenStream.T_END_OF_STREAM);
+        nextIs(EntityState.T_START_HEADER);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_END_HEADER);
+        nextIs(EntityState.T_BODY);
+        nextIs(EntityState.T_END_MESSAGE);
+        nextIs(EntityState.T_END_OF_STREAM);
     }
     
     public void testShouldParseMessageRFC822CorrectWithFlat() throws Exception {
         stream.setRecursionMode(RecursionMode.M_FLAT);
-        nextIs(MimeTokenStream.T_START_HEADER);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_FIELD);
-        nextIs(MimeTokenStream.T_END_HEADER);
-        nextIs(MimeTokenStream.T_BODY);
-        nextIs(MimeTokenStream.T_END_MESSAGE);
-        nextIs(MimeTokenStream.T_END_OF_STREAM);
+        nextIs(EntityState.T_START_HEADER);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_FIELD);
+        nextIs(EntityState.T_END_HEADER);
+        nextIs(EntityState.T_BODY);
+        nextIs(EntityState.T_END_MESSAGE);
+        nextIs(EntityState.T_END_OF_STREAM);
     }
     
-    private void nextIs(int state) throws Exception {
+    private void nextIs(EntityState state) throws Exception {
         assertEquals(MimeTokenStream.stateToString(state), MimeTokenStream.stateToString(stream.next()));
     }
 }

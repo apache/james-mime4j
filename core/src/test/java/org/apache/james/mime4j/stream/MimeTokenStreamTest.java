@@ -37,46 +37,46 @@ public class MimeTokenStreamTest extends TestCase {
     public void testSetRecursionModeBeforeParse() throws Exception {
         stream.setRecursionMode(RecursionMode.M_NO_RECURSE);
         stream.parse(new ByteArrayInputStream(ExampleMail.MAIL_WITH_RFC822_PART_BYTES));
-        checkNextIs(EntityStates.T_START_HEADER);
-        checkNextIs(EntityStates.T_FIELD);
-        checkNextIs(EntityStates.T_FIELD);
-        checkNextIs(EntityStates.T_FIELD);
-        checkNextIs(EntityStates.T_FIELD);
-        checkNextIs(EntityStates.T_FIELD);
-        checkNextIs(EntityStates.T_FIELD);
-        checkNextIs(EntityStates.T_END_HEADER);
-        checkNextIs(EntityStates.T_START_MULTIPART);
-        checkNextIs(EntityStates.T_PREAMBLE);
-        checkNextIs(EntityStates.T_START_BODYPART);
-        checkNextIs(EntityStates.T_START_HEADER);
-        checkNextIs(EntityStates.T_END_HEADER);
-        checkNextIs(EntityStates.T_BODY);
-        checkNextIs(EntityStates.T_END_BODYPART);
-        checkNextIs(EntityStates.T_START_BODYPART);
-        checkNextIs(EntityStates.T_START_HEADER);
-        checkNextIs(EntityStates.T_FIELD);
-        checkNextIs(EntityStates.T_END_HEADER);
-        checkNextIs(EntityStates.T_BODY);
-        checkNextIs(EntityStates.T_END_BODYPART);
-        checkNextIs(EntityStates.T_START_BODYPART);
-        checkNextIs(EntityStates.T_START_HEADER);
-        checkNextIs(EntityStates.T_FIELD);
-        checkNextIs(EntityStates.T_END_HEADER);
-        checkNextIs(EntityStates.T_BODY);
-        checkNextIs(EntityStates.T_END_BODYPART);
-        checkNextIs(EntityStates.T_START_BODYPART);
-        checkNextIs(EntityStates.T_START_HEADER);
-        checkNextIs(EntityStates.T_FIELD);
-        checkNextIs(EntityStates.T_END_HEADER);
-        checkNextIs(EntityStates.T_BODY);
-        checkNextIs(EntityStates.T_END_BODYPART);
-        checkNextIs(EntityStates.T_EPILOGUE);
-        checkNextIs(EntityStates.T_END_MULTIPART);
-        checkNextIs(EntityStates.T_END_MESSAGE);
-        checkNextIs(EntityStates.T_END_OF_STREAM);
+        checkNextIs(EntityState.T_START_HEADER);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_END_HEADER);
+        checkNextIs(EntityState.T_START_MULTIPART);
+        checkNextIs(EntityState.T_PREAMBLE);
+        checkNextIs(EntityState.T_START_BODYPART);
+        checkNextIs(EntityState.T_START_HEADER);
+        checkNextIs(EntityState.T_END_HEADER);
+        checkNextIs(EntityState.T_BODY);
+        checkNextIs(EntityState.T_END_BODYPART);
+        checkNextIs(EntityState.T_START_BODYPART);
+        checkNextIs(EntityState.T_START_HEADER);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_END_HEADER);
+        checkNextIs(EntityState.T_BODY);
+        checkNextIs(EntityState.T_END_BODYPART);
+        checkNextIs(EntityState.T_START_BODYPART);
+        checkNextIs(EntityState.T_START_HEADER);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_END_HEADER);
+        checkNextIs(EntityState.T_BODY);
+        checkNextIs(EntityState.T_END_BODYPART);
+        checkNextIs(EntityState.T_START_BODYPART);
+        checkNextIs(EntityState.T_START_HEADER);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_END_HEADER);
+        checkNextIs(EntityState.T_BODY);
+        checkNextIs(EntityState.T_END_BODYPART);
+        checkNextIs(EntityState.T_EPILOGUE);
+        checkNextIs(EntityState.T_END_MULTIPART);
+        checkNextIs(EntityState.T_END_MESSAGE);
+        checkNextIs(EntityState.T_END_OF_STREAM);
     }
     
-    private void checkNextIs(int expected) throws Exception {
+    private void checkNextIs(EntityState expected) throws Exception {
         assertEquals(MimeTokenStream.stateToString(expected), MimeTokenStream.stateToString(stream.next()));        
     }
 }

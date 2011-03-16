@@ -39,7 +39,7 @@ public class MimeEntity extends AbstractEntity {
     private final LineNumberSource lineSource;
     private final BufferedLineReaderInputStream inbuffer;
     
-    private int recursionMode;
+    private RecursionMode recursionMode;
     private MimeBoundaryInputStream currentMimePartStream;
     private LineReaderInputStreamAdaptor dataStream;
     
@@ -49,8 +49,8 @@ public class MimeEntity extends AbstractEntity {
             LineNumberSource lineSource,
             InputStream instream,
             MutableBodyDescriptor body, 
-            int startState, 
-            int endState,
+            EntityState startState, 
+            EntityState endState,
             MimeEntityConfig config, 
             DecodeMonitor monitor) {
         super(body, startState, endState, config, monitor);
@@ -68,8 +68,8 @@ public class MimeEntity extends AbstractEntity {
             LineNumberSource lineSource,
             InputStream instream,
             MutableBodyDescriptor body, 
-            int startState, 
-            int endState,
+            EntityState startState, 
+            EntityState endState,
             MimeEntityConfig config) {
         this(lineSource, instream, body, startState, endState, config, config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
     }
@@ -78,15 +78,15 @@ public class MimeEntity extends AbstractEntity {
             LineNumberSource lineSource,
             InputStream instream,
             MutableBodyDescriptor body) {
-        this(lineSource, instream, body, EntityStates.T_START_MESSAGE, EntityStates.T_END_MESSAGE, 
+        this(lineSource, instream, body, EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE, 
                 new MimeEntityConfig(), DecodeMonitor.SILENT);
     }
 
-    public int getRecursionMode() {
+    public RecursionMode getRecursionMode() {
         return recursionMode;
     }
 
-    public void setRecursionMode(int recursionMode) {
+    public void setRecursionMode(RecursionMode recursionMode) {
         this.recursionMode = recursionMode;
     }
 
@@ -109,44 +109,44 @@ public class MimeEntity extends AbstractEntity {
     
     public EntityStateMachine advance() throws IOException, MimeException {
         switch (state) {
-        case EntityStates.T_START_MESSAGE:
-            state = EntityStates.T_START_HEADER;
+        case T_START_MESSAGE:
+            state = EntityState.T_START_HEADER;
             break;
-        case EntityStates.T_START_BODYPART:
-            state = EntityStates.T_START_HEADER;
+        case T_START_BODYPART:
+            state = EntityState.T_START_HEADER;
             break;
-        case EntityStates.T_START_HEADER:
-        case EntityStates.T_FIELD:
-            state = parseField() ? EntityStates.T_FIELD : EntityStates.T_END_HEADER;
+        case T_START_HEADER:
+        case T_FIELD:
+            state = parseField() ? EntityState.T_FIELD : EntityState.T_END_HEADER;
             break;
-        case EntityStates.T_END_HEADER:
+        case T_END_HEADER:
             String mimeType = body.getMimeType();
             if (recursionMode == RecursionMode.M_FLAT) {
-                state = EntityStates.T_BODY;
+                state = EntityState.T_BODY;
             } else if (MimeUtil.isMultipart(mimeType)) {
-                state = EntityStates.T_START_MULTIPART;
+                state = EntityState.T_START_MULTIPART;
                 clearMimePartStream();
             } else if (recursionMode != RecursionMode.M_NO_RECURSE 
                     && MimeUtil.isMessage(mimeType)) {
-                state = EntityStates.T_BODY;
+                state = EntityState.T_BODY;
                 return nextMessage();
             } else {
-                state = EntityStates.T_BODY;
+                state = EntityState.T_BODY;
             }
             break;
-        case EntityStates.T_START_MULTIPART:
+        case T_START_MULTIPART:
             if (dataStream.isUsed()) {
                 advanceToBoundary();            
-                state = EntityStates.T_END_MULTIPART;
+                state = EntityState.T_END_MULTIPART;
                 break;
             } else {
                 createMimePartStream();
-                state = EntityStates.T_PREAMBLE;
+                state = EntityState.T_PREAMBLE;
                 
                 if (!currentMimePartStream.isEmptyStream()) break;
                 // continue to next state
             }
-        case EntityStates.T_PREAMBLE:
+        case T_PREAMBLE:
         	// removed specific code. Fallback to T_IN_BODYPART that
         	// better handle missing parts.
         	// Removed the T_IN_BODYPART state (always use T_PREAMBLE)
@@ -161,18 +161,18 @@ public class MimeEntity extends AbstractEntity {
                 }
             }
             clearMimePartStream();
-            state = EntityStates.T_EPILOGUE;
+            state = EntityState.T_EPILOGUE;
             break;
-        case EntityStates.T_EPILOGUE:
-            state = EntityStates.T_END_MULTIPART;
+        case T_EPILOGUE:
+            state = EntityState.T_END_MULTIPART;
             break;
-        case EntityStates.T_BODY:
-        case EntityStates.T_END_MULTIPART:
+        case T_BODY:
+        case T_END_MULTIPART:
             state = endState;
             break;
         default:
             if (state == endState) {
-                state = EntityStates.T_END_OF_STREAM;
+                state = EntityState.T_END_OF_STREAM;
                 break;
             }
             throw new IllegalStateException("Invalid state: " + stateToString(state));
@@ -222,7 +222,7 @@ public class MimeEntity extends AbstractEntity {
         // always return dataStream (that would add a LineReaderInputStreamAdaptor in the chain)
         InputStream instream = currentMimePartStream != null ? currentMimePartStream : inbuffer;
         instream = decodedStream(instream);
-        return nextMimeEntity(EntityStates.T_START_MESSAGE, EntityStates.T_END_MESSAGE, instream);
+        return nextMimeEntity(EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE, instream);
     }
 
     private InputStream decodedStream(InputStream instream) {
@@ -236,10 +236,10 @@ public class MimeEntity extends AbstractEntity {
     }
     
     private EntityStateMachine nextMimeEntity() {
-    	return nextMimeEntity(EntityStates.T_START_BODYPART, EntityStates.T_END_BODYPART, currentMimePartStream);
+    	return nextMimeEntity(EntityState.T_START_BODYPART, EntityState.T_END_BODYPART, currentMimePartStream);
     }
     
-    private EntityStateMachine nextMimeEntity(int startState, int endState, InputStream instream) {
+    private EntityStateMachine nextMimeEntity(EntityState startState, EntityState endState, InputStream instream) {
         if (recursionMode == RecursionMode.M_RAW) {
             RawEntity message = new RawEntity(instream);
             return message;
@@ -271,10 +271,10 @@ public class MimeEntity extends AbstractEntity {
      */
     public InputStream getContentStream() {
         switch (state) {
-        case EntityStates.T_START_MULTIPART:
-        case EntityStates.T_PREAMBLE:
-        case EntityStates.T_EPILOGUE:
-        case EntityStates.T_BODY:
+        case T_START_MULTIPART:
+        case T_PREAMBLE:
+        case T_EPILOGUE:
+        case T_BODY:
             return getLimitedContentStream();
         default:
             throw new IllegalStateException("Invalid state: " + stateToString(state));
