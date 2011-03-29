@@ -38,18 +38,18 @@ class MimeEntity extends AbstractEntity {
 
     private final LineNumberSource lineSource;
     private final BufferedLineReaderInputStream inbuffer;
-    
+
     private RecursionMode recursionMode;
     private MimeBoundaryInputStream currentMimePartStream;
     private LineReaderInputStreamAdaptor dataStream;
-    
+
     private byte[] tmpbuf;
-    
+
     MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
             MimeEntityConfig config,
-            EntityState startState, 
+            EntityState startState,
             EntityState endState,
             DecodeMonitor monitor,
             FieldBuilder fieldBuilder,
@@ -69,7 +69,7 @@ class MimeEntity extends AbstractEntity {
             LineNumberSource lineSource,
             InputStream instream,
             MimeEntityConfig config,
-            EntityState startState, 
+            EntityState startState,
             EntityState endState,
             MutableBodyDescriptor body) {
         this(lineSource, instream, config, startState, endState,
@@ -82,8 +82,8 @@ class MimeEntity extends AbstractEntity {
             InputStream instream,
             MimeEntityConfig config,
             MutableBodyDescriptor body) {
-        this(lineSource, instream, config, 
-                EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE, 
+        this(lineSource, instream, config,
+                EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
                 new DefaultFieldBuilder(config.getMaxHeaderLen()), body);
     }
@@ -91,8 +91,19 @@ class MimeEntity extends AbstractEntity {
     MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
+            FieldBuilder fieldBuilder,
             MutableBodyDescriptor body) {
-        this(lineSource, instream, new MimeEntityConfig(), 
+        this(lineSource, instream, new MimeEntityConfig(),
+                EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
+                DecodeMonitor.SILENT,
+                fieldBuilder, body);
+    }
+
+    MimeEntity(
+            LineNumberSource lineSource,
+            InputStream instream,
+            MutableBodyDescriptor body) {
+        this(lineSource, instream, new MimeEntityConfig(),
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
                 new DefaultFieldBuilder(-1), body);
@@ -107,9 +118,9 @@ class MimeEntity extends AbstractEntity {
     }
 
     public void stop() {
-    	this.inbuffer.truncate();
+        this.inbuffer.truncate();
     }
-    
+
     @Override
     protected int getLineNumber() {
         if (lineSource == null)
@@ -117,12 +128,12 @@ class MimeEntity extends AbstractEntity {
         else
             return lineSource.getLineNumber();
     }
-    
+
     @Override
     protected LineReaderInputStream getDataStream() {
         return dataStream;
     }
-    
+
     public EntityStateMachine advance() throws IOException, MimeException {
         switch (state) {
         case T_START_MESSAGE:
@@ -142,7 +153,7 @@ class MimeEntity extends AbstractEntity {
             } else if (MimeUtil.isMultipart(mimeType)) {
                 state = EntityState.T_START_MULTIPART;
                 clearMimePartStream();
-            } else if (recursionMode != RecursionMode.M_NO_RECURSE 
+            } else if (recursionMode != RecursionMode.M_NO_RECURSE
                     && MimeUtil.isMessage(mimeType)) {
                 state = EntityState.T_BODY;
                 return nextMessage();
@@ -152,20 +163,20 @@ class MimeEntity extends AbstractEntity {
             break;
         case T_START_MULTIPART:
             if (dataStream.isUsed()) {
-                advanceToBoundary();            
+                advanceToBoundary();
                 state = EntityState.T_END_MULTIPART;
                 break;
             } else {
                 createMimePartStream();
                 state = EntityState.T_PREAMBLE;
-                
+
                 if (!currentMimePartStream.isEmptyStream()) break;
                 // continue to next state
             }
         case T_PREAMBLE:
-        	// removed specific code. Fallback to T_IN_BODYPART that
-        	// better handle missing parts.
-        	// Removed the T_IN_BODYPART state (always use T_PREAMBLE)
+            // removed specific code. Fallback to T_IN_BODYPART that
+            // better handle missing parts.
+            // Removed the T_IN_BODYPART state (always use T_PREAMBLE)
             advanceToBoundary();
             if (currentMimePartStream.eof() && !currentMimePartStream.isLastPart()) {
                 monitor(Event.MIME_BODY_PREMATURE_END);
@@ -198,7 +209,7 @@ class MimeEntity extends AbstractEntity {
 
     private void createMimePartStream() throws MimeException, IOException {
         String boundary = body.getBoundary();
-    	// TODO move the following lines inside the MimeBoundaryInputStream constructor
+        // TODO move the following lines inside the MimeBoundaryInputStream constructor
         int bufferSize = 2 * boundary.length();
         if (bufferSize < 4096) {
             bufferSize = 4096;
@@ -214,14 +225,14 @@ class MimeEntity extends AbstractEntity {
                 currentMimePartStream,
                 config.getMaxLineLen());
     }
-    
+
     private void clearMimePartStream() {
         currentMimePartStream = null;
         dataStream = new LineReaderInputStreamAdaptor(
                 inbuffer,
-                config.getMaxLineLen()); 
+                config.getMaxLineLen());
     }
-    
+
     private void advanceToBoundary() throws IOException {
         if (!dataStream.eof()) {
             if (tmpbuf == null) {
@@ -232,7 +243,7 @@ class MimeEntity extends AbstractEntity {
             }
         }
     }
-    
+
     private EntityStateMachine nextMessage() {
         // optimize nesting of streams returning the "lower" stream instead of
         // always return dataStream (that would add a LineReaderInputStreamAdaptor in the chain)
@@ -244,27 +255,27 @@ class MimeEntity extends AbstractEntity {
     private InputStream decodedStream(InputStream instream) {
         String transferEncoding = body.getTransferEncoding();
         if (MimeUtil.isBase64Encoding(transferEncoding)) {
-            instream = new Base64InputStream(instream, monitor);                    
+            instream = new Base64InputStream(instream, monitor);
         } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
             instream = new QuotedPrintableInputStream(instream, monitor);
         }
         return instream;
     }
-    
+
     private EntityStateMachine nextMimeEntity() {
-    	return nextMimeEntity(EntityState.T_START_BODYPART, EntityState.T_END_BODYPART, currentMimePartStream);
+        return nextMimeEntity(EntityState.T_START_BODYPART, EntityState.T_END_BODYPART, currentMimePartStream);
     }
-    
+
     private EntityStateMachine nextMimeEntity(EntityState startState, EntityState endState, InputStream instream) {
         if (recursionMode == RecursionMode.M_RAW) {
             RawEntity message = new RawEntity(instream);
             return message;
         } else {
             MimeEntity mimeentity = new MimeEntity(
-                    lineSource, 
+                    lineSource,
                     instream,
                     config,
-                    startState, 
+                    startState,
                     endState,
                     monitor,
                     fieldBuilder,
@@ -273,7 +284,7 @@ class MimeEntity extends AbstractEntity {
             return mimeentity;
         }
     }
-    
+
     private InputStream getLimitedContentStream() {
         long maxContentLimit = config.getMaxContentLen();
         if (maxContentLimit >= 0) {
@@ -282,7 +293,7 @@ class MimeEntity extends AbstractEntity {
             return dataStream;
         }
     }
-    
+
     /**
      * @see org.apache.james.mime4j.stream.EntityStateMachine#getContentStream()
      */

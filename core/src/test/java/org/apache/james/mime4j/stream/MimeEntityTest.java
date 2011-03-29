@@ -21,6 +21,7 @@ package org.apache.james.mime4j.stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 import junit.framework.TestCase;
 
@@ -35,7 +36,7 @@ import org.apache.james.mime4j.io.MaxLineLimitException;
 public class MimeEntityTest extends TestCase {
 
     public void testSimpleEntity() throws Exception {
-        String message = 
+        String message =
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
             "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -45,14 +46,14 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
-        
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
+
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream, new DefaultBodyDescriptor());
-        
-        
+
+
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
         assertEquals(EntityState.T_START_HEADER, entity.getState());
@@ -88,7 +89,7 @@ public class MimeEntityTest extends TestCase {
             fail("IllegalStateException should have been thrown");
         } catch (IllegalStateException expected) {
         }
-        
+
         entity.advance();
         assertEquals(EntityState.T_BODY, entity.getState());
         assertEquals("a very important message", IOUtils.toString(entity.getContentStream()));
@@ -109,7 +110,7 @@ public class MimeEntityTest extends TestCase {
     }
 
     public void testObsoleteSyntaxEntity() throws Exception {
-        String message = 
+        String message =
             "To 	: Road Runner <runner@example.org>\r\n" +
             "From	: Wile E. Cayote <wile@example.org>\r\n" +
             "Date  	:Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -121,14 +122,14 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
-        
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
+
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream, new DefaultBodyDescriptor());
-        
-        
+
+
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
         assertEquals(EntityState.T_START_HEADER, entity.getState());
@@ -164,7 +165,7 @@ public class MimeEntityTest extends TestCase {
             fail("IllegalStateException should have been thrown");
         } catch (IllegalStateException expected) {
         }
-        
+
         entity.advance();
         assertEquals(EntityState.T_BODY, entity.getState());
         assertEquals("a very important message", IOUtils.toString(entity.getContentStream()));
@@ -185,7 +186,7 @@ public class MimeEntityTest extends TestCase {
     }
 
     public void testMultipartEntity() throws Exception {
-        String message = 
+        String message =
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
             "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -205,13 +206,13 @@ public class MimeEntityTest extends TestCase {
             "Goodbye!";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 24); 
-        
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 24);
+
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream, new DefaultBodyDescriptor());
-        
+
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
         assertEquals(EntityState.T_START_HEADER, entity.getState());
@@ -242,10 +243,10 @@ public class MimeEntityTest extends TestCase {
         entity.advance();
         assertEquals(EntityState.T_PREAMBLE, entity.getState());
         assertEquals("Hello!", IOUtils.toString(entity.getContentStream()));
-        
+
         EntityStateMachine p1 = entity.advance();
         assertNotNull(p1);
-        
+
         assertEquals(EntityState.T_START_BODYPART, p1.getState());
         p1.advance();
         assertEquals(EntityState.T_START_HEADER, p1.getState());
@@ -265,7 +266,7 @@ public class MimeEntityTest extends TestCase {
 
         EntityStateMachine p2 = entity.advance();
         assertNotNull(p2);
-        
+
         assertEquals(EntityState.T_START_BODYPART, p2.getState());
         p2.advance();
         assertEquals(EntityState.T_START_HEADER, p2.getState());
@@ -293,9 +294,9 @@ public class MimeEntityTest extends TestCase {
         entity.advance();
         assertEquals(EntityState.T_END_OF_STREAM, entity.getState());
     }
-    
+
     public void testRawEntity() throws Exception {
-        String message = 
+        String message =
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
             "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -315,15 +316,15 @@ public class MimeEntityTest extends TestCase {
             "Goodbye!";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 24); 
-        
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 24);
+
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream, new DefaultBodyDescriptor());
-        
+
         entity.setRecursionMode(RecursionMode.M_RAW);
-        
+
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
         assertEquals(EntityState.T_START_HEADER, entity.getState());
@@ -351,14 +352,14 @@ public class MimeEntityTest extends TestCase {
         assertEquals(EntityState.T_END_HEADER, entity.getState());
         entity.advance();
         assertEquals(EntityState.T_START_MULTIPART, entity.getState());
-        
+
         entity.advance();
         assertEquals(EntityState.T_PREAMBLE, entity.getState());
         assertEquals("Hello!", IOUtils.toString(entity.getContentStream()));
-        
+
         EntityStateMachine p1 = entity.advance();
         assertNotNull(p1);
-        
+
         assertEquals(EntityState.T_RAW_ENTITY, p1.getState());
         assertNull(p1.getBodyDescriptor());
         assertNull(p1.getField());
@@ -371,7 +372,7 @@ public class MimeEntityTest extends TestCase {
 
         EntityStateMachine p2 = entity.advance();
         assertNotNull(p2);
-        
+
         assertEquals(EntityState.T_RAW_ENTITY, p2.getState());
         assertNull(p2.getBodyDescriptor());
         assertNull(p2.getField());
@@ -397,7 +398,7 @@ public class MimeEntityTest extends TestCase {
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMaxLineLen(50);
 
-        String message = 
+        String message =
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
             "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -408,15 +409,15 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12, config.getMaxLineLen()); 
-        
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12, config.getMaxLineLen());
+
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
                 config,
                 new DefaultBodyDescriptor());
-        
+
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance(); // advances to T_START_HEADER
         assertEquals(EntityState.T_START_HEADER, entity.getState());
@@ -433,9 +434,9 @@ public class MimeEntityTest extends TestCase {
             assertTrue(expected.getCause() instanceof MaxLineLimitException);
         }
     }
-    
+
     public void testMaxHeaderLimitCheckFoldedLines() throws Exception {
-        String message = 
+        String message =
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
             "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -457,9 +458,9 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
-        
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
+
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMaxLineLen(100);
         config.setMaxHeaderLen(200);
@@ -468,7 +469,7 @@ public class MimeEntityTest extends TestCase {
                 rawstream,
                 config,
                 new DefaultBodyDescriptor());
-        
+
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
         assertEquals(EntityState.T_START_HEADER, entity.getState());
@@ -492,7 +493,7 @@ public class MimeEntityTest extends TestCase {
         config.setMaxLineLen(50);
         config.setMaxHeaderLen(130);
 
-        String message = 
+        String message =
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
             "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -506,15 +507,15 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12, config.getMaxLineLen()); 
-        
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12, config.getMaxLineLen());
+
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
                 config,
                 new DefaultBodyDescriptor());
-        
+
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
         assertEquals(EntityState.T_START_HEADER, entity.getState());
@@ -525,9 +526,9 @@ public class MimeEntityTest extends TestCase {
         entity.advance();
         assertEquals(EntityState.T_END_HEADER, entity.getState());
     }
-    
+
     public void testMaxHeaderCount() throws Exception {
-        String message = 
+        String message =
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
             "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -553,9 +554,9 @@ public class MimeEntityTest extends TestCase {
             "a very important message";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
-        
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
+
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMaxHeaderCount(20);
         MimeEntity entity = new MimeEntity(
@@ -563,11 +564,11 @@ public class MimeEntityTest extends TestCase {
                 rawstream,
                 config,
                 new DefaultBodyDescriptor());
-        
+
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
         assertEquals(EntityState.T_START_HEADER, entity.getState());
-        
+
         for (int i = 0; i < 20; i++) {
             entity.advance();
             assertEquals(EntityState.T_FIELD, entity.getState());
@@ -580,7 +581,7 @@ public class MimeEntityTest extends TestCase {
     }
 
     public void testMaxContentLimitCheck() throws Exception {
-        String message = 
+        String message =
             "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
             "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -599,9 +600,9 @@ public class MimeEntityTest extends TestCase {
             "DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS DoS\r\n";
         byte[] raw = message.getBytes("US-ASCII");
         ByteArrayInputStream instream = new ByteArrayInputStream(raw);
-        LineNumberInputStream lineInput = new LineNumberInputStream(instream); 
-        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12); 
-        
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
+
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMaxContentLen(100);
         MimeEntity entity = new MimeEntity(
@@ -609,7 +610,7 @@ public class MimeEntityTest extends TestCase {
                 rawstream,
                 config,
                 new DefaultBodyDescriptor());
-        
+
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
         assertEquals(EntityState.T_START_HEADER, entity.getState());
@@ -633,5 +634,59 @@ public class MimeEntityTest extends TestCase {
         } catch (IOException expected) {
         }
     }
-    
+
+    public void testSkipFields() throws Exception {
+        String message =
+            "To: Road Runner <runner@example.org>\r\n" +
+            "From: Wile E. Cayote <wile@example.org>\r\n" +
+            "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
+            "Subject: Mail\r\n" +
+            "Content-Type: text/plain\r\n" +
+            "\r\n" +
+            "a very important message";
+        byte[] raw = message.getBytes("US-ASCII");
+        ByteArrayInputStream instream = new ByteArrayInputStream(raw);
+        LineNumberInputStream lineInput = new LineNumberInputStream(instream);
+        BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
+
+        DefaultFieldBuilder fieldBuilder = new DefaultFieldBuilder(-1) {
+
+            @Override
+            public RawField build() throws MimeException {
+                RawField raw = super.build();
+                String name = raw.getName().toLowerCase(Locale.US);
+                if (name.equals("content-type") || name.equals("subject")) {
+                    return raw;
+                } else {
+                    return null;
+                }
+            }
+
+        };
+
+        MimeEntity entity = new MimeEntity(
+                lineInput,
+                rawstream, fieldBuilder, new DefaultBodyDescriptor());
+
+
+        assertEquals(EntityState.T_START_MESSAGE, entity.getState());
+        entity.advance();
+        assertEquals(EntityState.T_START_HEADER, entity.getState());
+        entity.advance();
+        assertEquals(EntityState.T_FIELD, entity.getState());
+        assertEquals("Subject", entity.getField().getName());
+        assertEquals("Mail", entity.getField().getBody());
+        entity.advance();
+        assertEquals(EntityState.T_FIELD, entity.getState());
+        assertEquals("Content-Type", entity.getField().getName());
+        assertEquals("text/plain", entity.getField().getBody());
+        entity.advance();
+        assertEquals(EntityState.T_END_HEADER, entity.getState());
+        entity.advance();
+        assertEquals(EntityState.T_BODY, entity.getState());
+        assertEquals("a very important message", IOUtils.toString(entity.getContentStream()));
+        entity.advance();
+        assertEquals(EntityState.T_END_MESSAGE, entity.getState());
+    }
+
 }
