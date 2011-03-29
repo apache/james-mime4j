@@ -414,10 +414,8 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                new DefaultBodyDescriptor(),
-                EntityState.T_START_MESSAGE,
-                EntityState.T_END_MESSAGE,
-                config);
+                config,
+                new DefaultBodyDescriptor());
         
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance(); // advances to T_START_HEADER
@@ -468,10 +466,8 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                new DefaultBodyDescriptor(),
-                EntityState.T_START_MESSAGE,
-                EntityState.T_END_MESSAGE,
-                config);
+                config,
+                new DefaultBodyDescriptor());
         
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
@@ -516,10 +512,8 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                new DefaultBodyDescriptor(),
-                EntityState.T_START_MESSAGE,
-                EntityState.T_END_MESSAGE,
-                config);
+                config,
+                new DefaultBodyDescriptor());
         
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
@@ -567,10 +561,8 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                new DefaultBodyDescriptor(),
-                EntityState.T_START_MESSAGE,
-                EntityState.T_END_MESSAGE,
-                config);
+                config,
+                new DefaultBodyDescriptor());
         
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
@@ -615,10 +607,8 @@ public class MimeEntityTest extends TestCase {
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
-                new DefaultBodyDescriptor(),
-                EntityState.T_START_MESSAGE,
-                EntityState.T_END_MESSAGE,
-                config);
+                config,
+                new DefaultBodyDescriptor());
         
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();

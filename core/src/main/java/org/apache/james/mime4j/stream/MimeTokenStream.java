@@ -76,6 +76,7 @@ public class MimeTokenStream {
     
     private final MimeEntityConfig config;
     private final DecodeMonitor monitor;
+    private final FieldBuilder fieldBuilder;
     private final MutableBodyDescriptorFactory bodyDescFactory;
     private final LinkedList<EntityStateMachine> entities = new LinkedList<EntityStateMachine>();
     
@@ -97,21 +98,31 @@ public class MimeTokenStream {
     }
 
     public MimeTokenStream(final MimeEntityConfig config) {
-        this(config, null, null);
+        this(config, null, null, null);
     }
         
     public MimeTokenStream(
             final MimeEntityConfig config, 
             final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(config, bodyDescFactory, null);
+        this(config, null, null, bodyDescFactory);
     }
 
     public MimeTokenStream(
             final MimeEntityConfig config, 
-            final MutableBodyDescriptorFactory bodyDescFactory,
-            final DecodeMonitor monitor) {
+            final DecodeMonitor monitor,
+            final MutableBodyDescriptorFactory bodyDescFactory) {
+        this(config, monitor, null, bodyDescFactory);
+    }
+
+    public MimeTokenStream(
+            final MimeEntityConfig config, 
+            final DecodeMonitor monitor,
+            final FieldBuilder fieldBuilder,
+            final MutableBodyDescriptorFactory bodyDescFactory) {
         super();
         this.config = config;
+        this.fieldBuilder = fieldBuilder != null ? fieldBuilder : 
+            new DefaultFieldBuilder(config.getMaxHeaderLen());
         this.monitor = monitor != null ? monitor : 
             (config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
         this.bodyDescFactory = bodyDescFactory;
@@ -184,11 +195,12 @@ public class MimeTokenStream {
         rootentity = new MimeEntity(
                 lineSource,
                 stream,
-                newBodyDescriptor, 
+                config,
                 start, 
                 EntityState.T_END_MESSAGE,
-                config,
-                monitor);
+                monitor,
+                fieldBuilder,
+                newBodyDescriptor);
 
         rootentity.setRecursionMode(recursionMode);
         currentStateMachine = rootentity;

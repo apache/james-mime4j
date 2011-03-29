@@ -24,7 +24,6 @@ import java.io.IOException;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineReaderInputStream;
-import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
@@ -33,39 +32,42 @@ import org.apache.james.mime4j.util.CharsetUtil;
 /**
  * Abstract MIME entity.
  */
-public abstract class AbstractEntity implements EntityStateMachine {
+abstract class AbstractEntity implements EntityStateMachine {
 
     protected final EntityState startState;
     protected final EntityState endState;
     protected final MimeEntityConfig config;
+    protected final DecodeMonitor monitor;
+    protected final FieldBuilder fieldBuilder;
     protected final MutableBodyDescriptor body;
-    
-    protected EntityState state;
 
     private final ByteArrayBuffer linebuf;
 
+    protected EntityState state;
     private int lineCount;
-    private RawField field;
     private boolean endOfHeader;
     private int headerCount;
-    protected final DecodeMonitor monitor;
+    private RawField field;
 
     AbstractEntity(
-            MutableBodyDescriptor body,
-            EntityState startState, 
-            EntityState endState,
             MimeEntityConfig config,
-            DecodeMonitor monitor) {
+            EntityState startState,
+            EntityState endState,
+            DecodeMonitor monitor,
+            FieldBuilder fieldBuilder,
+            MutableBodyDescriptor body) {
+        this.config = config;
         this.state = startState;
         this.startState = startState;
         this.endState = endState;
-        this.config = config;
+        this.monitor = monitor;
+        this.fieldBuilder = fieldBuilder;
         this.body = body;
+
         this.linebuf = new ByteArrayBuffer(64);
         this.lineCount = 0;
         this.endOfHeader = false;
         this.headerCount = 0;
-        this.monitor = monitor;
     }
 
     public EntityState getState() {
@@ -77,27 +79,20 @@ public abstract class AbstractEntity implements EntityStateMachine {
      * information is not available.
      */
     protected abstract int getLineNumber();
-    
+
     protected abstract LineReaderInputStream getDataStream();
-    
-    private ByteArrayBuffer fillFieldBuffer() throws IOException, MimeException {
-        if (endOfHeader) 
+
+    private void readRawField() throws IOException, MimeException {
+        if (endOfHeader)
             throw new IllegalStateException();
-
-        int maxHeaderLen = config.getMaxHeaderLen();
         LineReaderInputStream instream = getDataStream();
-        ByteArrayBuffer fieldbuf = new ByteArrayBuffer(64);
-
         try {
             for (;;) {
                 // If there's still data stuck in the line buffer
                 // copy it to the field buffer
                 int len = linebuf.length();
-                if (maxHeaderLen > 0 && fieldbuf.length() + len >= maxHeaderLen) {
-                    throw new MaxHeaderLengthLimitException("Maximum header length limit exceeded");
-                }
                 if (len > 0) {
-                    fieldbuf.append(linebuf.buffer(), 0, len);
+                    fieldBuilder.append(linebuf);
                 }
                 linebuf.clear();
                 if (instream.readLine(linebuf) == -1) {
@@ -113,7 +108,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
                     len--;
                 }
                 if (len == 0) {
-                    // empty line detected 
+                    // empty line detected
                     endOfHeader = true;
                     break;
                 }
@@ -129,11 +124,9 @@ public abstract class AbstractEntity implements EntityStateMachine {
         } catch (MaxLineLimitException e) {
             throw new MimeException(e);
         }
-
-        return fieldbuf;
     }
 
-    protected boolean parseField() throws MimeException, IOException {
+    protected boolean nextField() throws MimeException, IOException {
         int maxHeaderCount = config.getMaxHeaderCount();
         // the loop is here to transparently skip invalid headers
         for (;;) {
@@ -143,35 +136,27 @@ public abstract class AbstractEntity implements EntityStateMachine {
             if (maxHeaderCount > 0 && headerCount >= maxHeaderCount) {
                 throw new MaxHeaderLimitException("Maximum header limit exceeded");
             }
-
-            ByteArrayBuffer fieldbuf = fillFieldBuffer();
             headerCount++;
-
-            // Strip away line delimiter
-            int origLen = fieldbuf.length();
-            int len = fieldbuf.length();
-            if (len > 0 && fieldbuf.byteAt(len - 1) == '\n') {
-                len--;
-            }
-            if (len > 0 && fieldbuf.byteAt(len - 1) == '\r') {
-                len--;
-            }
-            fieldbuf.setLength(len);
-            
+            fieldBuilder.reset();
+            readRawField();
             try {
-            	field = new RawField(fieldbuf);
-            	if (field.isObsoleteSyntax()) {
-            		monitor(Event.OBSOLETE_HEADER);
-            	}
+                field = fieldBuilder.build();
+                if (field == null) {
+                    continue;
+                }
+                if (field.isObsoleteSyntax()) {
+                    monitor(Event.OBSOLETE_HEADER);
+                }
                 body.addField(field);
                 return true;
             } catch (MimeException e) {
                 monitor(Event.INVALID_HEADER);
                 if (config.isMalformedHeaderStartsBody()) {
-	                fieldbuf.setLength(origLen);
-	                LineReaderInputStream instream = getDataStream();
-	                if (!instream.unread(fieldbuf)) throw new MimeParseEventException(Event.INVALID_HEADER);
-	                return false;
+                    LineReaderInputStream instream = getDataStream();
+                    if (!instream.unread(fieldBuilder.getRaw())) {
+                        throw new MimeParseEventException(Event.INVALID_HEADER);
+                    }
+                    return false;
                 }
             }
         }
@@ -233,7 +218,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
             }
         }
     }
-    
+
     /**
      * Creates an indicative message suitable for display
      * based on the given event and the current state of the system.
@@ -264,7 +249,7 @@ public abstract class AbstractEntity implements EntityStateMachine {
 
     /**
      * Renders a state as a string suitable for logging.
-     * @param state 
+     * @param state
      * @return rendered as string, not null
      */
     public static final String stateToString(EntityState state) {
@@ -318,5 +303,5 @@ public abstract class AbstractEntity implements EntityStateMachine {
         }
         return result;
     }
-    
+
 }

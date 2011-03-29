@@ -246,15 +246,15 @@ public class MimeBuilder {
     public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
+            final DecodeMonitor monitor,
             final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory,
             final boolean contentDecoding,
-            final boolean flatMode,
-            final DecodeMonitor monitor) throws IOException, MimeIOException {
+            final boolean flatMode) throws IOException, MimeIOException {
         try {
             MessageImpl message = new MessageImpl();
             DecodeMonitor mon = monitor != null ? monitor : DecodeMonitor.SILENT;
-            MimeStreamParser parser = new MimeStreamParser(config, bodyDescFactory, mon);
+            MimeStreamParser parser = new MimeStreamParser(config, mon, bodyDescFactory);
             parser.setContentHandler(new EntityBuilder(message, bodyFactory, mon));
             parser.setContentDecoding(contentDecoding);
             if (flatMode) {
@@ -290,10 +290,10 @@ public class MimeBuilder {
     public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
+            final DecodeMonitor monitor,
             final BodyFactory bodyFactory, 
-            final MutableBodyDescriptorFactory bodyDescFactory,
-            final DecodeMonitor monitor) throws IOException, MimeIOException {
-        return parse(is, config, bodyFactory, bodyDescFactory, true, false, monitor);
+            final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
+        return parse(is, config, monitor, bodyFactory, bodyDescFactory, true, false);
     }
     
     public Message parse(
@@ -301,14 +301,14 @@ public class MimeBuilder {
             final MimeEntityConfig config,
             final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
-        return parse(is, config, bodyFactory, bodyDescFactory, null);
+        return parse(is, config, null, bodyFactory, bodyDescFactory);
     }
 
     public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
             final BodyFactory bodyFactory) throws IOException, MimeIOException {
-        return parse(is, config, bodyFactory, null, null);
+        return parse(is, config, null, bodyFactory, null);
     }
 
     /**

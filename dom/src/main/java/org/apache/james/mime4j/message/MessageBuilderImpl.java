@@ -65,12 +65,12 @@ public class MessageBuilderImpl implements MessageBuilder {
 
     public Message parse(InputStream source) throws MimeException, IOException {
         return getMimeBuilder().parse(source, 
-                mimeEntityConfig, 
+                mimeEntityConfig,
+                decodeMonitor,
                 bodyFactory, 
                 mutableBodyDescriptorFactory, 
                 contentDecoding,
-                flatMode,
-                decodeMonitor);
+                flatMode);
     }
     
     public void setBodyFactory(BodyFactory bodyFactory) {

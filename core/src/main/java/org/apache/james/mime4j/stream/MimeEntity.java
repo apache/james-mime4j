@@ -34,7 +34,7 @@ import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
 import org.apache.james.mime4j.util.MimeUtil;
 
-public class MimeEntity extends AbstractEntity {
+class MimeEntity extends AbstractEntity {
 
     private final LineNumberSource lineSource;
     private final BufferedLineReaderInputStream inbuffer;
@@ -45,15 +45,16 @@ public class MimeEntity extends AbstractEntity {
     
     private byte[] tmpbuf;
     
-    public MimeEntity(
+    MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
-            MutableBodyDescriptor body, 
+            MimeEntityConfig config,
             EntityState startState, 
             EntityState endState,
-            MimeEntityConfig config, 
-            DecodeMonitor monitor) {
-        super(body, startState, endState, config, monitor);
+            DecodeMonitor monitor,
+            FieldBuilder fieldBuilder,
+            MutableBodyDescriptor body) {
+        super(config, startState, endState, monitor, fieldBuilder, body);
         this.lineSource = lineSource;
         this.inbuffer = new BufferedLineReaderInputStream(
                 instream,
@@ -64,22 +65,37 @@ public class MimeEntity extends AbstractEntity {
                 config.getMaxLineLen());
     }
 
-    public MimeEntity(
+    MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
-            MutableBodyDescriptor body, 
+            MimeEntityConfig config,
             EntityState startState, 
             EntityState endState,
-            MimeEntityConfig config) {
-        this(lineSource, instream, body, startState, endState, config, config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
+            MutableBodyDescriptor body) {
+        this(lineSource, instream, config, startState, endState,
+                config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
+                new DefaultFieldBuilder(config.getMaxHeaderLen()), body);
     }
 
-    public MimeEntity(
+    MimeEntity(
+            LineNumberSource lineSource,
+            InputStream instream,
+            MimeEntityConfig config,
+            MutableBodyDescriptor body) {
+        this(lineSource, instream, config, 
+                EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE, 
+                config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
+                new DefaultFieldBuilder(config.getMaxHeaderLen()), body);
+    }
+
+    MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
             MutableBodyDescriptor body) {
-        this(lineSource, instream, body, EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE, 
-                new MimeEntityConfig(), DecodeMonitor.SILENT);
+        this(lineSource, instream, new MimeEntityConfig(), 
+                EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
+                DecodeMonitor.SILENT,
+                new DefaultFieldBuilder(-1), body);
     }
 
     public RecursionMode getRecursionMode() {
@@ -117,7 +133,7 @@ public class MimeEntity extends AbstractEntity {
             break;
         case T_START_HEADER:
         case T_FIELD:
-            state = parseField() ? EntityState.T_FIELD : EntityState.T_END_HEADER;
+            state = nextField() ? EntityState.T_FIELD : EntityState.T_END_HEADER;
             break;
         case T_END_HEADER:
             String mimeType = body.getMimeType();
@@ -247,11 +263,12 @@ public class MimeEntity extends AbstractEntity {
             MimeEntity mimeentity = new MimeEntity(
                     lineSource, 
                     instream,
-                    body.newChild(), 
+                    config,
                     startState, 
                     endState,
-                    config,
-                    monitor);
+                    monitor,
+                    fieldBuilder,
+                    body.newChild());
             mimeentity.setRecursionMode(recursionMode);
             return mimeentity;
         }
