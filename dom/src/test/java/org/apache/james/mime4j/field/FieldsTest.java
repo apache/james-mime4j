@@ -19,7 +19,6 @@
 
 package org.apache.james.mime4j.field;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Date;
@@ -37,11 +36,12 @@ import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.Field;
+import org.apache.james.mime4j.dom.field.FieldRawData;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.address.AddressBuilder;
-import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -384,15 +384,25 @@ public class FieldsTest extends TestCase {
         }
     }
 
-    public static String decode(Field f) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        try {
-            f.writeTo(bos);
-        } catch (IOException e) {
-            throw new RuntimeException("bytearrayoutputstream doens't throw this exception");
+    public static String decode(Field f) throws IOException {
+        String s = null;
+        if (f instanceof FieldRawData) {
+            ByteSequence raw = ((FieldRawData) f).getRaw();
+            if (raw != null) {
+                s = ContentUtil.decode(raw);
+            }
         }
-        ByteArrayBuffer bab = new ByteArrayBuffer(bos.toByteArray(), true);
-        return ContentUtil.decode(bab);
+        if (s == null) {
+            StringBuilder buf = new StringBuilder();
+            buf.append(f.getName());
+            buf.append(": ");
+            String body = f.getBody();
+            if (body != null) {
+                buf.append(body);
+            }
+            s = MimeUtil.fold(buf.toString(), 0);
+        }
+        return s;
     }
 
 }

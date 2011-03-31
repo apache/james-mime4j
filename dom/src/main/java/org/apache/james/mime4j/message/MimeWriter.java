@@ -33,6 +33,7 @@ import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.dom.field.FieldRawData;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -195,7 +196,21 @@ public class MimeWriter {
      */
     public void writeHeader(Header header, OutputStream out) throws IOException {
         for (Field field : header) {
-            field.writeTo(out);
+            ByteSequence raw = null;
+            if (field instanceof FieldRawData) {
+                raw = ((FieldRawData) field).getRaw();
+            }
+            if (raw == null) {
+                StringBuilder buf = new StringBuilder();
+                buf.append(field.getName());
+                buf.append(": ");
+                String body = field.getBody();
+                if (body != null) {
+                    buf.append(body);
+                }
+                raw = ContentUtil.encode(MimeUtil.fold(buf.toString(), 0));
+            }
+            writeBytes(raw, out);
             out.write(CRLF);
         }
 

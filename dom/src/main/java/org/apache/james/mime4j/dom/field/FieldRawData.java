@@ -19,23 +19,17 @@
 
 package org.apache.james.mime4j.dom.field;
 
+import org.apache.james.mime4j.util.ByteSequence;
+
 /**
  * Abstract MIME field.
  */
-public interface Field {
+public interface FieldRawData extends Field {
     
     /**
-     * Gets the name of the field (<code>Subject</code>, <code>From</code>, etc).
-     * 
-     * @return the field name.
+     * Gets original (raw) representation of the field, if available, 
+     * <code>null</code> otherwise.
      */
-    String getName();
-
-    /**
-     * Gets the unparsed and possibly encoded (see RFC 2047) field body string.
-     * 
-     * @return the unparsed field body string.
-     */
-    String getBody();
+    ByteSequence getRaw();
 
 }

@@ -19,10 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
-import java.io.IOException;
-import java.io.OutputStream;
-
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.field.FieldRawData;
 import org.apache.james.mime4j.dom.field.ParseException;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -30,7 +28,7 @@ import org.apache.james.mime4j.util.ByteSequence;
 /**
  * The base class of all field classes.
  */
-public abstract class AbstractField implements ParsedField {
+public abstract class AbstractField implements ParsedField, FieldRawData {
 
     private final String name;
     private final String body;
@@ -59,13 +57,6 @@ public abstract class AbstractField implements ParsedField {
     }
     
     /**
-     * @see org.apache.james.mime4j.dom.field.Field#writeTo(java.io.OutputStream)
-     */
-    public void writeTo(OutputStream out) throws IOException {
-        out.write(raw.toByteArray());
-    }
-    
-    /**
      * Gets the unfolded, unparsed and possibly encoded (see RFC 2047) field 
      * body string.
      * 
@@ -73,6 +64,14 @@ public abstract class AbstractField implements ParsedField {
      */
     public String getBody() {
         return body;
+    }
+
+    /**
+     * Gets original (raw) representation of the field, if available, 
+     * <code>null</code> otherwise.
+     */
+    public ByteSequence getRaw() {
+        return raw;
     }
 
     /**
