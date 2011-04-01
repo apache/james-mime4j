@@ -105,7 +105,7 @@ class EntityBuilder implements ContentHandler {
      */
     public void field(RawField field) throws MimeException {
         expect(Header.class);
-        Field parsedField = DefaultFieldParser.parse(field.getRaw(), monitor); 
+        Field parsedField = DefaultFieldParser.parse(field, monitor); 
         ((Header) stack.peek()).addField(parsedField);
     }
     

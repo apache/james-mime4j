@@ -32,6 +32,7 @@ import org.apache.james.mime4j.field.MailboxFieldImpl;
 import org.apache.james.mime4j.field.MailboxListFieldImpl;
 import org.apache.james.mime4j.field.UnstructuredFieldImpl;
 import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
@@ -64,8 +65,25 @@ public class DefaultFieldParser extends DelegatingFieldParser {
     public static ParsedField parse(
             final ByteSequence raw, 
             final DecodeMonitor monitor) throws MimeException {
-        RawField rawField = new RawField(raw);
+        RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return PARSER.parse(rawField.getName(), rawField.getBody(), raw, monitor);
+    }
+
+    /**
+     * Parses the given <code>RawField</code> and returns an instance of the
+     * <code>Field</code> class. The type of the class returned depends on the
+     * field name; see {@link #parse(String)} for a table of field names and
+     * their corresponding classes.
+     * 
+     * @param rawField the raw field to parse.
+     * @param monitor a DecodeMonitor object used while parsing/decoding.
+     * @return a <code>ParsedField</code> instance.
+     * @throws MimeException if the raw string cannot be split into field name and body.
+     */
+    public static ParsedField parse(
+            final RawField rawField, 
+            final DecodeMonitor monitor) throws MimeException {
+        return PARSER.parse(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
     }
 
     /**
@@ -93,12 +111,14 @@ public class DefaultFieldParser extends DelegatingFieldParser {
             final String rawStr,
             final DecodeMonitor monitor) throws MimeException {
         ByteSequence raw = ContentUtil.encode(rawStr);
-        return parse(raw, monitor);
+        RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
+        // Do not retain the original raw representation as the field
+        // may require folding
+        return PARSER.parse(rawField.getName(), rawField.getBody(), null, monitor);
     }
 
     public static ParsedField parse(final String rawStr) throws MimeException {
-        ByteSequence raw = ContentUtil.encode(rawStr);
-        return parse(raw, DecodeMonitor.SILENT);
+        return parse(rawStr, DecodeMonitor.SILENT);
     }
 
     public DefaultFieldParser() {

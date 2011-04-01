@@ -59,7 +59,7 @@ public class DefaultFieldBuilder implements FieldBuilder {
             }
         }
         ByteArrayBuffer copy = new ByteArrayBuffer(this.buf.buffer(), len, false);
-        return new RawField(copy);
+        return RawFieldParser.DEFAULT.parseField(copy);
     }
     
     public ByteArrayBuffer getRaw() {

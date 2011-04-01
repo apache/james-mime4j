@@ -144,7 +144,7 @@ abstract class AbstractEntity implements EntityStateMachine {
                 if (field == null) {
                     continue;
                 }
-                if (field.isObsoleteSyntax()) {
+                if (field.isUsedObsoleteSyntax()) {
                     monitor(Event.OBSOLETE_HEADER);
                 }
                 body.addField(field);
@@ -153,7 +153,9 @@ abstract class AbstractEntity implements EntityStateMachine {
                 monitor(Event.INVALID_HEADER);
                 if (config.isMalformedHeaderStartsBody()) {
                     LineReaderInputStream instream = getDataStream();
-                    if (!instream.unread(fieldBuilder.getRaw())) {
+                    ByteArrayBuffer buf = fieldBuilder.getRaw();
+                    // Complain, if raw data is not available or cannot be 'unread'
+                    if (buf == null || !instream.unread(buf)) {
                         throw new MimeParseEventException(Event.INVALID_HEADER);
                     }
                     return false;

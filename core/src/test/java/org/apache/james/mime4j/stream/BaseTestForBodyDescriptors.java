@@ -31,7 +31,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         MutableBodyDescriptor bd = null;
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type ", "text/plain; charset=ISO-8859-1; "
+        bd.addField(new RawField("Content-Type ", "text/plain; charset=ISO-8859-1; "
                 + "boundary=foo; param1=value1; param2=value2; param3=value3"));
         assertEquals(3, bd.getContentTypeParameters().size());
         assertEquals("value1", bd.getContentTypeParameters().get("param1"));
@@ -39,7 +39,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         assertEquals("value3", bd.getContentTypeParameters().get("param3"));
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type ", "text/plain; param1=value1; param2=value2;"
+        bd.addField(new RawField("Content-Type ", "text/plain; param1=value1; param2=value2;"
                      + " param3=value3"));
         assertEquals(3, bd.getContentTypeParameters().size());
         assertEquals("value1", bd.getContentTypeParameters().get("param1"));
@@ -47,7 +47,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         assertEquals("value3", bd.getContentTypeParameters().get("param3"));
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type ", "text/plain; "
+        bd.addField(new RawField("Content-Type ", "text/plain; "
                 + "param1= \" value with\tspaces \" ; "
                 + "param2=\"\\\"value4 with escaped \\\" \\\"\";"));
         assertEquals(2, bd.getContentTypeParameters().size());
@@ -59,7 +59,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
          * The parameter value should be \n\"
          */
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type ", "text/plain; param=\"\\n\\\\\\\"\""));
+        bd.addField(new RawField("Content-Type ", "text/plain; param=\"\\n\\\\\\\"\""));
         assertEquals(1, bd.getContentTypeParameters().size());
         assertEquals("\\n\\\"", bd.getContentTypeParameters().get("param"));
     }
@@ -71,10 +71,10 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
          * Make sure that only the first Content-Type header added is used.
          */
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type ", "text/plain; charset=ISO-8859-1"));
+        bd.addField(new RawField("Content-Type ", "text/plain; charset=ISO-8859-1"));
         assertEquals("text/plain", bd.getMimeType());
         assertEquals("iso-8859-1", bd.getCharset());
-        bd.addField(new TestField("Content-Type ", "text/html; charset=us-ascii"));
+        bd.addField(new RawField("Content-Type ", "text/html; charset=us-ascii"));
         assertEquals("text/plain", bd.getMimeType());
         assertEquals("iso-8859-1", bd.getCharset());
     }
@@ -83,32 +83,32 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         MutableBodyDescriptor bd = null;
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type ", "text/PLAIN"));
+        bd.addField(new RawField("Content-Type ", "text/PLAIN"));
         assertEquals("text/plain", bd.getMimeType());
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type ", "text/PLAIN;"));
+        bd.addField(new RawField("Content-Type ", "text/PLAIN;"));
         assertEquals("text/plain", bd.getMimeType());
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("content-type", "   TeXt / html   "));
+        bd.addField(new RawField("content-type", "   TeXt / html   "));
         assertEquals("text/html", bd.getMimeType());
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("CONTENT-TYPE", "   x-app/yada ;  param = yada"));
+        bd.addField(new RawField("CONTENT-TYPE", "   x-app/yada ;  param = yada"));
         assertEquals("x-app/yada", bd.getMimeType());
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("CONTENT-TYPE", "   yada"));
+        bd.addField(new RawField("CONTENT-TYPE", "   yada"));
         assertEquals("text/plain", bd.getMimeType());
         
         /*
          * Make sure that only the first Content-Type header added is used.
          */
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type ", "text/plain"));
+        bd.addField(new RawField("Content-Type ", "text/plain"));
         assertEquals("text/plain", bd.getMimeType());
-        bd.addField(new TestField("Content-Type ", "text/html"));
+        bd.addField(new RawField("Content-Type ", "text/html"));
         assertEquals("text/plain", bd.getMimeType());
         
         /*
@@ -118,19 +118,19 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         MutableBodyDescriptor parent = null;
         
         parent = newBodyDescriptor();
-        parent.addField(new TestField("Content-Type", "mutlipart/alternative; boundary=foo"));
+        parent.addField(new RawField("Content-Type", "mutlipart/alternative; boundary=foo"));
         
         child = newBodyDescriptor(parent);
         assertEquals("text/plain", child.getMimeType());
-        child.addField(new TestField("Content-Type", " child/type"));
+        child.addField(new RawField("Content-Type", " child/type"));
         assertEquals("child/type", child.getMimeType());
         
         parent = newBodyDescriptor();
-        parent.addField(new TestField("Content-Type", "multipart/digest; boundary=foo"));
+        parent.addField(new RawField("Content-Type", "multipart/digest; boundary=foo"));
         
         child = newBodyDescriptor(parent);
         assertEquals("message/rfc822", child.getMimeType());
-        child.addField(new TestField("Content-Type", " child/type"));
+        child.addField(new RawField("Content-Type", " child/type"));
         assertEquals("child/type", child.getMimeType());
         
     }
@@ -143,39 +143,39 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
          */
         bd = newBodyDescriptor();
         assertEquals("us-ascii", bd.getCharset());
-        bd.addField(new TestField("Content-Type ", "text/type; charset=ISO-8859-1"));
+        bd.addField(new RawField("Content-Type ", "text/type; charset=ISO-8859-1"));
         assertEquals("iso-8859-1", bd.getCharset());
         
         bd = newBodyDescriptor();
         assertEquals("us-ascii", bd.getCharset());
-        bd.addField(new TestField("Content-Type ", "text/type"));
+        bd.addField(new RawField("Content-Type ", "text/type"));
         assertEquals("us-ascii", bd.getCharset());
         
         /*
          * Test boundary.
          */
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type", "text/html; boundary=yada yada"));
+        bd.addField(new RawField("Content-Type", "text/html; boundary=yada yada"));
         assertNull(bd.getBoundary());
 
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type", "multipart/yada; boundary=yada"));
+        bd.addField(new RawField("Content-Type", "multipart/yada; boundary=yada"));
         assertEquals("yada", bd.getBoundary());
 
         /*
          * Test some weird parameters.
          */
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type", "multipart/yada; boundary=yada yada"));
+        bd.addField(new RawField("Content-Type", "multipart/yada; boundary=yada yada"));
         assertEquals("yada", bd.getBoundary());
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type", "multipart/yada; boUNdarY= ya:*da; \tcharset\t =  big5"));
+        bd.addField(new RawField("Content-Type", "multipart/yada; boUNdarY= ya:*da; \tcharset\t =  big5"));
         assertEquals("ya:*da", bd.getBoundary());
         assertEquals("big5", bd.getCharset());
         
         bd = newBodyDescriptor();
-        bd.addField(new TestField("Content-Type", "multipart/yada; boUNdarY= \"ya \\\"\\\"\tda \\\"\"; "
+        bd.addField(new RawField("Content-Type", "multipart/yada; boUNdarY= \"ya \\\"\\\"\tda \\\"\"; "
                             + "\tcharset\t =  \"\\\"hepp\\\"  =us\t-ascii\""));
         assertEquals("ya \"\"\tda \"", bd.getBoundary());
         assertEquals("\"hepp\"  =us\t-ascii", bd.getCharset());
@@ -188,31 +188,24 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         bd = newBodyDescriptor();
         assertEquals(-1, bd.getContentLength());
 
-        bd.addField(new TestField("Content-Length", "9901"));
+        bd.addField(new RawField("Content-Length", "9901"));
         assertEquals(9901, bd.getContentLength());
 
         // only the first content-length counts
-        bd.addField(new TestField("Content-Length", "1239901"));
+        bd.addField(new RawField("Content-Length", "1239901"));
         assertEquals(9901, bd.getContentLength());
     }
     
     public void testDoDefaultToUsAsciiWhenUntyped() throws Exception {
         MutableBodyDescriptor descriptor = newBodyDescriptor();
-        descriptor.addField(new TestField("To", "me@example.org"));
+        descriptor.addField(new RawField("To", "me@example.org"));
         assertEquals("us-ascii", descriptor.getCharset());
     }
 
     public void testDoNotDefaultToUsAsciiForNonTextTypes() throws Exception {
         MutableBodyDescriptor descriptor = newBodyDescriptor();
-        descriptor.addField(new TestField("Content-Type", "image/png; name=blob.png"));
+        descriptor.addField(new RawField("Content-Type", "image/png; name=blob.png"));
         assertNull(descriptor.getCharset());
     }
     
-    private static final class TestField extends RawField {
-
-    	public TestField(String name, String body){
-        	super(name, body);
-        }
-    	
-    }
 }
