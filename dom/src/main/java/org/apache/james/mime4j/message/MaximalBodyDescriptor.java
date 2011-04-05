@@ -21,7 +21,9 @@ package org.apache.james.mime4j.message;
 
 import java.io.StringReader;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
@@ -34,8 +36,11 @@ import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.DefaultBodyDescriptor;
+import org.apache.james.mime4j.stream.RawBody;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
+import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -115,37 +120,37 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
 
     @Override
     public void addField(RawField field) throws MimeException {
-        String name = field.getName();
-        String value = field.getBody();
-        name = name.trim().toLowerCase();
+        String name = field.getName().toLowerCase(Locale.US);;
         if (MimeUtil.MIME_HEADER_MIME_VERSION.equals(name) && !isMimeVersionSet) {
-            parseMimeVersion(value);
+            parseMimeVersion(field);
         } else if (MimeUtil.MIME_HEADER_CONTENT_ID.equals(name) && !isContentIdSet) {
-            parseContentId(value);
+            parseContentId(field);
         } else if (MimeUtil.MIME_HEADER_CONTENT_DESCRIPTION.equals(name) && !isContentDescriptionSet) {
-            parseContentDescription(value);
+            parseContentDescription(field);
         } else if (MimeUtil.MIME_HEADER_CONTENT_DISPOSITION.equals(name) && !isContentDispositionSet) {
-            parseContentDisposition(value);
+            parseContentDisposition(field);
         } else if (MimeUtil.MIME_HEADER_LANGAUGE.equals(name) && !isContentLanguageSet) {
-            parseLanguage(value);
+            parseLanguage(field);
         } else if (MimeUtil.MIME_HEADER_LOCATION.equals(name) && !isContentLocationSet) {
-            parseLocation(value);
+            parseLocation(field);
         } else if (MimeUtil.MIME_HEADER_MD5.equals(name) && !isContentMD5Set) {
-            parseMD5(value);
+            parseMD5(field);
         } else {
             super.addField(field);
         }
     }
     
-    private void parseMD5(String value) {
+    private void parseMD5(final RawField field) {
+        String value = field.getBody();
         isContentMD5Set = true;
         if (value != null) {
             contentMD5Raw = value.trim();
         }
     }
 
-    private void parseLocation(final String value) {
+    private void parseLocation(final RawField field) {
         isContentLocationSet = true;
+        String value = field.getBody();
         if (value != null) {
             final StringReader stringReader = new StringReader(value);
             final StructuredFieldParser parser = new StructuredFieldParser(stringReader);
@@ -164,8 +169,9 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         }
     }
     
-    private void parseLanguage(final String value) {
+    private void parseLanguage(final RawField field) {
         isContentLanguageSet = true;
+        String value = field.getBody();
         if (value != null) {
             try {
                 final ContentLanguageParser parser = new ContentLanguageParser(new StringReader(value));
@@ -176,10 +182,17 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         }
     }
 
-    private void parseContentDisposition(final String value) throws MimeException {
+    private void parseContentDisposition(final RawField field) throws MimeException {
         isContentDispositionSet = true;
-        contentDispositionParameters = DefaultBodyDescriptor.getHeaderParams(value, getDecodeMonitor());
-        contentDispositionType = contentDispositionParameters.get("");
+        RawBody body = RawFieldParser.DEFAULT.parseRawBody(field);
+        Map<String, String> params = new HashMap<String, String>();
+        for (NameValuePair nmp: body.getParams()) {
+            String name = nmp.getName().toLowerCase(Locale.US);
+            params.put(name, nmp.getValue());
+        }
+        
+        contentDispositionType = body.getValue();
+        contentDispositionParameters = params;
         
         final String contentDispositionModificationDate 
             = contentDispositionParameters.get(MimeUtil.PARAM_MODIFICATION_DATE);
@@ -229,7 +242,8 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         return result;
     }
     
-    private void parseContentDescription(String value) {
+    private void parseContentDescription(final RawField field) {
+        String value = field.getBody();
         if (value == null) {
             contentDescription = "";
         } else {
@@ -238,7 +252,8 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         isContentDescriptionSet = true;
     }
 
-    private void parseContentId(final String value) {
+    private void parseContentId(final RawField field) {
+        String value = field.getBody();
         if (value == null) {
             contentId = "";
         } else {
@@ -247,8 +262,8 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         isContentIdSet = true;
     }
 
-    private void parseMimeVersion(String value) {
-        final StringReader reader = new StringReader(value);
+    private void parseMimeVersion(RawField field) {
+        final StringReader reader = new StringReader(field.getBody());
         final MimeVersionParser parser = new MimeVersionParser(reader);
         try {
             parser.parse();

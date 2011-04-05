@@ -167,7 +167,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
          */
         bd = newBodyDescriptor();
         bd.addField(new RawField("Content-Type", "multipart/yada; boundary=yada yada"));
-        assertEquals("yada", bd.getBoundary());
+        assertEquals("yada yada", bd.getBoundary());
         
         bd = newBodyDescriptor();
         bd.addField(new RawField("Content-Type", "multipart/yada; boUNdarY= ya:*da; \tcharset\t =  big5"));

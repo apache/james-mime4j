@@ -70,6 +70,10 @@ public final class RawField {
         return null;
     }
 
+    int getDelimiterIdx() {
+        return delimiterIdx;
+    }
+
     boolean isUsedObsoleteSyntax() {
         return obsolete;
     }
