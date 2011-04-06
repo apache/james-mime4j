@@ -40,7 +40,14 @@ public class ContentUtil {
      * @return encoded string as an immutable sequence of bytes.
      */
     public static ByteSequence encode(String string) {
-        return encode(CharsetUtil.US_ASCII, string);
+        if (string == null) {
+            return null;
+        }
+        ByteArrayBuffer buf = new ByteArrayBuffer(string.length());
+        for (int i = 0; i < string.length(); i++) {
+            buf.append((byte) string.charAt(i));
+        }
+        return buf;
     }
 
     /**
@@ -54,10 +61,16 @@ public class ContentUtil {
      * @return encoded string as an immutable sequence of bytes.
      */
     public static ByteSequence encode(Charset charset, String string) {
+        if (string == null) {
+            return null;
+        }
+        if (charset == null) {
+            charset = Charset.defaultCharset();
+        }
         ByteBuffer encoded = charset.encode(CharBuffer.wrap(string));
-        ByteArrayBuffer bab = new ByteArrayBuffer(encoded.remaining());
-        bab.append(encoded.array(), encoded.position(), encoded.remaining());
-        return bab;
+        ByteArrayBuffer buf = new ByteArrayBuffer(encoded.remaining());
+        buf.append(encoded.array(), encoded.position(), encoded.remaining());
+        return buf;
     }
 
     /**
@@ -69,8 +82,10 @@ public class ContentUtil {
      * @return decoded string.
      */
     public static String decode(ByteSequence byteSequence) {
-        return decode(CharsetUtil.US_ASCII, byteSequence, 0, byteSequence
-                .length());
+        if (byteSequence == null) {
+            return null;
+        }
+        return decode(byteSequence, 0, byteSequence.length());
     }
 
     /**
@@ -99,9 +114,15 @@ public class ContentUtil {
      *            number of bytes.
      * @return decoded string.
      */
-    public static String decode(ByteSequence byteSequence, int offset,
-            int length) {
-        return decode(CharsetUtil.US_ASCII, byteSequence, offset, length);
+    public static String decode(ByteSequence byteSequence, int offset, int length) {
+        if (byteSequence == null) {
+            return null;
+        }
+        StringBuilder buf = new StringBuilder(length);
+        for (int i = offset; i < offset + length; i++) {
+            buf.append((char) (byteSequence.byteAt(i) & 0xff));
+        }
+        return buf.toString();
     }
 
     /**
@@ -120,6 +141,12 @@ public class ContentUtil {
      */
     public static String decode(Charset charset, ByteSequence byteSequence,
             int offset, int length) {
+        if (byteSequence == null) {
+            return null;
+        }
+        if (charset == null) {
+            charset = Charset.defaultCharset();
+        }
         if (byteSequence instanceof ByteArrayBuffer) {
             ByteArrayBuffer bab = (ByteArrayBuffer) byteSequence;
             return decode(charset, bab.buffer(), offset, length);

@@ -27,7 +27,8 @@ import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MimeWriter;
-import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.ContentUtil;
 
 public class HeaderTest extends TestCase {
 
@@ -58,14 +59,17 @@ public class HeaderTest extends TestCase {
         assertNotNull(field);
         // field.getBody is already a 7 bit ASCII string, after MIME4J-151
         // assertEquals(hello, field.getBody());
-        assertEquals("Gr?ezi_z?m?", field.getBody());
+        assertEquals(SWISS_GERMAN_HELLO, field.getBody());
         
-        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        ByteArrayOutputStream outstream = new ByteArrayOutputStream();
         
-        MimeWriter.DEFAULT.writeHeader(header, buffer);
-        String s = buffer.toString(CharsetUtil.US_ASCII.name());
+        MimeWriter.DEFAULT.writeHeader(header, outstream);
+        byte[] b = outstream.toByteArray();
+        ByteArrayBuffer buf = new ByteArrayBuffer(b.length);
+        buf.append(b, 0, b.length);
+        String s = ContentUtil.decode(buf);
         
-        assertEquals("Hello: Gr?ezi_z?m?\r\n\r\n", s);
+        assertEquals("Hello: " + SWISS_GERMAN_HELLO + "\r\n\r\n", s);
     }
 
     public void testRemoveFields() throws Exception {

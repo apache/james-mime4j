@@ -24,7 +24,6 @@ import java.util.BitSet;
 import java.util.List;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
@@ -252,7 +251,11 @@ public class RawFieldParser {
     }
     
     private static String copy(final ByteSequence buf, int beginIndex, int endIndex) {
-        return ContentUtil.decode(buf, beginIndex, endIndex - beginIndex);
+        StringBuilder strbuf = new StringBuilder(endIndex - beginIndex);
+        for (int i = beginIndex; i < endIndex; i++) {
+            strbuf.append((char) (buf.byteAt(i) & 0xff));
+        }
+        return strbuf.toString();
     }
 
     private static String copyTrimmed(final ByteSequence buf, int beginIndex, int endIndex) {
@@ -262,29 +265,29 @@ public class RawFieldParser {
         while (endIndex > beginIndex && isWhitespace(buf.byteAt(endIndex - 1))) {
             endIndex--;
         }
-        return ContentUtil.decode(buf, beginIndex, endIndex - beginIndex);
+        return copy(buf, beginIndex, endIndex);
     }
 
     private static String copyEscaped(final ByteSequence buf, int beginIndex, int endIndex) {
-        ByteArrayBuffer copy = new ByteArrayBuffer(buf.length());
+        StringBuilder strbuf  = new StringBuilder(endIndex - beginIndex);
         boolean escaped = false;
         for (int i = beginIndex; i < endIndex; i++) {
-            int b = buf.byteAt(i);
+            char ch = (char) (buf.byteAt(i) & 0xff);
             if (escaped) {
-                if (b != '\"' && b != '\\') {
-                    copy.append('\\');
+                if (ch != '\"' && ch != '\\') {
+                    strbuf.append('\\');
                 }
-                copy.append(b);
+                strbuf.append(ch);
                 escaped = false;
             } else {
-                if (b == '\\') {
+                if (ch == '\\') {
                     escaped = true;
                 } else {
-                    copy.append(b);
+                    strbuf.append(ch);
                 }
             }
         }
-        return ContentUtil.decode(copy, 0, copy.length());
+        return strbuf.toString();
     }
 
 }
