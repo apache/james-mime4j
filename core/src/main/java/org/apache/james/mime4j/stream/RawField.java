@@ -30,23 +30,21 @@ public final class RawField {
 
     private final ByteSequence raw;
     private final int delimiterIdx;
-    private final boolean obsolete;
     private final String name;
     private final String body;
 
-    RawField(ByteSequence raw, int delimiterIdx, boolean obsolete, String name, String body) {
+    RawField(ByteSequence raw, int delimiterIdx, String name, String body) {
         if (name == null) {
             throw new IllegalArgumentException("Field may not be null");
         }
     	this.raw = raw;
     	this.delimiterIdx = delimiterIdx;
-        this.obsolete = obsolete;
         this.name = name.trim();
         this.body = body;
     }
 
     public RawField(String name, String body) {
-        this(null, -1, false, name, body);
+        this(null, -1, name, body);
     }
 
     public ByteSequence getRaw() {
@@ -72,10 +70,6 @@ public final class RawField {
 
     int getDelimiterIdx() {
         return delimiterIdx;
-    }
-
-    boolean isUsedObsoleteSyntax() {
-        return obsolete;
     }
 
     @Override

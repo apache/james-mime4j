@@ -144,7 +144,7 @@ abstract class AbstractEntity implements EntityStateMachine {
                 if (field == null) {
                     continue;
                 }
-                if (field.isUsedObsoleteSyntax()) {
+                if (field.getDelimiterIdx() != field.getName().length()) {
                     monitor(Event.OBSOLETE_HEADER);
                 }
                 body.addField(field);

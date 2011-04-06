@@ -30,7 +30,7 @@ public class RawFieldTest extends TestCase {
     public void testPrivateConstructor() throws Exception {
         String s = "raw: stuff;\r\n  more stuff";
         ByteSequence raw = ContentUtil.encode(s);
-        RawField field = new RawField(raw, 3, false, "raw", null);
+        RawField field = new RawField(raw, 3, "raw", null);
         Assert.assertSame(raw, field.getRaw());
         Assert.assertEquals("raw", field.getName());
         Assert.assertEquals("stuff;  more stuff", field.getBody());

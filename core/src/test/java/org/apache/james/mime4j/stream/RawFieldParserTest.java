@@ -40,7 +40,6 @@ public class RawFieldParserTest extends TestCase {
         Assert.assertSame(raw, field.getRaw());
         Assert.assertEquals("raw", field.getName());
         Assert.assertEquals("stuff;  more stuff", field.getBody());
-        Assert.assertFalse(field.isUsedObsoleteSyntax());
         Assert.assertEquals(s, field.toString());
     }
 
@@ -54,7 +53,6 @@ public class RawFieldParserTest extends TestCase {
         Assert.assertSame(raw, field.getRaw());
         Assert.assertEquals("raw", field.getName());
         Assert.assertEquals("stuff;  more stuff", field.getBody());
-        Assert.assertTrue(field.isUsedObsoleteSyntax());
         Assert.assertEquals(s, field.toString());
     }
 

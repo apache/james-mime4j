@@ -19,29 +19,17 @@
 
 package org.apache.james.mime4j.stream;
 
-import java.util.BitSet;
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
-public class DefaultFieldBuilder implements FieldBuilder {
-
-    private static final BitSet FIELD_CHARS = new BitSet();
-    
-    static {
-        for (int i = 0x21; i <= 0x39; i++) {
-            FIELD_CHARS.set(i);
-        }
-        for (int i = 0x3b; i <= 0x7e; i++) {
-            FIELD_CHARS.set(i);
-        }
-    }
+public class LenientFieldBuilder implements FieldBuilder {
 
     private final ByteArrayBuffer buf;
     private final int maxlen;
+    
 
-    public DefaultFieldBuilder(int maxlen) {
+    public LenientFieldBuilder(int maxlen) {
         this.buf = new ByteArrayBuffer(1024);
         this.maxlen = maxlen;
     }
@@ -56,36 +44,41 @@ public class DefaultFieldBuilder implements FieldBuilder {
         }
         int len = line.length();
         if (this.maxlen > 0 && this.buf.length() + len >= this.maxlen) {
-            throw new MaxHeaderLengthLimitException("Maximum header length limit exceeded");
-        }        
-        this.buf.append(line.buffer(), 0, line.length());
+            // buffer is over the max limit: quietly ignore all further input
+            return;
+        }
+        if (this.buf == null) {
+        }
+        int beginIndex = 0;
+        int endIndex = len;
+        while (beginIndex < endIndex && RawFieldParser.isWhitespace(line.byteAt(beginIndex))) {
+            beginIndex++;
+        }
+        while (endIndex > beginIndex && RawFieldParser.isWhitespace(line.byteAt(endIndex - 1))) {
+            endIndex--;
+        }
+        if (this.buf.length() > 0) {
+            this.buf.append(' ');
+        }
+        this.buf.append(line.buffer(), beginIndex, endIndex - beginIndex);
     }
     
     public RawField build() throws MimeException {
-        int len = this.buf.length();
-        if (len > 0) {
-            if (this.buf.byteAt(len - 1) == '\n') {
-                len --;
-            }
-            if (this.buf.byteAt(len - 1) == '\r') {
-                len --;
-            }
+        if (this.buf == null) {
+            return null;
         }
-        ByteArrayBuffer copy = new ByteArrayBuffer(this.buf.buffer(), len, false);
-        RawField field = RawFieldParser.DEFAULT.parseField(copy);
-        String name = field.getName();
-        for (int i = 0; i < name.length(); i++) {
-            char ch = name.charAt(i);
-            if (!FIELD_CHARS.get(ch)) {
-                throw new MimeException("MIME field name contains illegal characters: " 
-                        + field.getName());
-            }
+        int idx = RawFieldParser.indexOf(this.buf, RawFieldParser.COLON);
+        if (idx == -1) {
+            throw new MimeException("Invalid MIME field: no name/value separator found: " +
+                    this.buf.toString());
         }
-        return field;
+        String name = RawFieldParser.copyTrimmed(this.buf, 0, idx);
+        String value = RawFieldParser.copyTrimmed(this.buf, idx + 1, this.buf.length());
+        return new RawField(name, value);
     }
     
     public ByteArrayBuffer getRaw() {
-        return this.buf;
+        return null;
     }
     
 }

@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.stream;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
 import org.apache.james.mime4j.MimeException;
@@ -38,47 +37,19 @@ public class RawFieldParser {
     static final int CR      = 0x0d;
     static final int LF      = 0x0a;
     
-    private static final BitSet FIELD_CHARS = new BitSet();
-    
     public static final RawFieldParser DEFAULT = new RawFieldParser(); 
 
-    static {
-        for (int i = 0x21; i <= 0x39; i++) {
-            FIELD_CHARS.set(i);
-        }
-        for (int i = 0x3b; i <= 0x7e; i++) {
-            FIELD_CHARS.set(i);
-        }
-    }
-
     public RawField parseField(final ByteSequence raw) throws MimeException {
-        int len = raw.length();
-        int colonIdx = -1;
-        int headerNameEndIdx = -1;
-        boolean obsolete = false;
-        for (int i = 0; i < len; i++) {
-            if (!FIELD_CHARS.get(raw.byteAt(i) & 0xff)) {
-                headerNameEndIdx = i;
-                for (; i < len; i++) {
-                    int j = raw.byteAt(i) & 0xff;
-                    if (j == COLON) {
-                        colonIdx = i;
-                        break;
-                    } else if (j != SPACE && j != TAB) {
-                        throw new MimeException("Invalid header: unexpected char " + j + " after colon");
-                    } else {
-                        obsolete = true;
-                    }
-                }
-                break;
-            }
+        if (raw == null) {
+            return null;
         }
-        if (colonIdx == -1) {
-            throw new MimeException("Invalid header: no colon found");
+        int idx = indexOf(raw, COLON);
+        if (idx == -1) {
+            throw new MimeException("Invalid MIME field: no name/value separator found: " +
+            		raw.toString());
         }
-        // make sure we ignore ending WSP (obsolete rfc822 syntax)
-        String name = ContentUtil.decode(raw, 0, headerNameEndIdx);
-        return new RawField(raw, colonIdx, obsolete, name, null);
+        String name = copyTrimmed(raw, 0, idx);
+        return new RawField(raw, idx, name, null);
     }
 
     public RawBody parseRawBody(final RawField field) {
@@ -235,7 +206,16 @@ public class RawFieldParser {
         return new NameValuePair(name, value, quoted);
     }
     
-    private static boolean isOneOf(final int ch, final int[] chs) {
+    static int indexOf(final ByteSequence buf, int b) {
+        for (int i = 0; i < buf.length(); i++) {
+            if (buf.byteAt(i) == b) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    static boolean isOneOf(final int ch, final int[] chs) {
         if (chs != null) {
             for (int i = 0; i < chs.length; i++) {
                 if (ch == chs[i]) {
@@ -246,11 +226,11 @@ public class RawFieldParser {
         return false;
     }
     
-    private static boolean isWhitespace(int i) {
+    static boolean isWhitespace(int i) {
         return i == SPACE || i == TAB || i == CR || i == LF;
     }
     
-    private static String copy(final ByteSequence buf, int beginIndex, int endIndex) {
+    static String copy(final ByteSequence buf, int beginIndex, int endIndex) {
         StringBuilder strbuf = new StringBuilder(endIndex - beginIndex);
         for (int i = beginIndex; i < endIndex; i++) {
             strbuf.append((char) (buf.byteAt(i) & 0xff));
@@ -258,7 +238,7 @@ public class RawFieldParser {
         return strbuf.toString();
     }
 
-    private static String copyTrimmed(final ByteSequence buf, int beginIndex, int endIndex) {
+    static String copyTrimmed(final ByteSequence buf, int beginIndex, int endIndex) {
         while (beginIndex < endIndex && isWhitespace(buf.byteAt(beginIndex))) {
             beginIndex++;
         }
@@ -268,7 +248,7 @@ public class RawFieldParser {
         return copy(buf, beginIndex, endIndex);
     }
 
-    private static String copyEscaped(final ByteSequence buf, int beginIndex, int endIndex) {
+    static String copyEscaped(final ByteSequence buf, int beginIndex, int endIndex) {
         StringBuilder strbuf  = new StringBuilder(endIndex - beginIndex);
         boolean escaped = false;
         for (int i = beginIndex; i < endIndex; i++) {
