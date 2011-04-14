@@ -22,8 +22,6 @@
     <artifactId>apache-mime4j-project</artifactId>
     <groupId>org.apache.james</groupId>
     <version>0.7-SNAPSHOT</version>
-    <!-- Inherit from project -->
-    <relativePath>../pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
