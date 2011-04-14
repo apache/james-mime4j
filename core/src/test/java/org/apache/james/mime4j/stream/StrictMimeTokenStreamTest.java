@@ -20,6 +20,10 @@
 package org.apache.james.mime4j.stream;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
 
 import junit.framework.TestCase;
 
@@ -28,15 +32,26 @@ public class StrictMimeTokenStreamTest extends TestCase {
     private static final String HEADER_ONLY = "From: foo@abr.com\r\nSubject: A subject\r\n";
     private static final String CORRECT_HEADERS = HEADER_ONLY + "\r\n";
     
-    public void testUnexpectedEndOfHeaders() throws Exception {
-        
+    MimeTokenStream parser;
+    
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
         MimeEntityConfig config = new MimeEntityConfig();
         config.setStrictParsing(true);
-        MimeTokenStream parser = new MimeTokenStream(config);
-        parser.parse(new ByteArrayInputStream(HEADER_ONLY.getBytes()));
+        parser = new MimeTokenStream(config);
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+    }
+    
+    public void testUnexpectedEndOfHeaders() throws Exception {
+        parser.parse(new ByteArrayInputStream(HEADER_ONLY.getBytes("US-ASCII")));
         
-        assertEquals("Headers start", EntityState.T_START_HEADER, parser.next());
-        assertEquals("Field", EntityState.T_FIELD, parser.next());
+        checkNextIs(EntityState.T_START_HEADER);
+        checkNextIs(EntityState.T_FIELD);
         try {
             parser.next();
             fail("Expected exception to be thrown");
@@ -46,16 +61,41 @@ public class StrictMimeTokenStreamTest extends TestCase {
      }
     
     public void testCorrectEndOfHeaders() throws Exception {
+        parser.parse(new ByteArrayInputStream(CORRECT_HEADERS.getBytes("US-ASCII")));
         
-        MimeEntityConfig config = new MimeEntityConfig();
-        config.setStrictParsing(true);
-        MimeTokenStream parser = new MimeTokenStream();
-        
-        parser.parse(new ByteArrayInputStream(CORRECT_HEADERS.getBytes()));
-        
-        assertEquals("Headers start", EntityState.T_START_HEADER, parser.next());
-        assertEquals("From header", EntityState.T_FIELD, parser.next());
-        assertEquals("Subject header", EntityState.T_FIELD, parser.next());
-        assertEquals("End message", EntityState.T_END_HEADER, parser.next());
+        checkNextIs(EntityState.T_START_HEADER);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_END_HEADER);
      }
+    
+    public void testMissingBoundary() throws Exception {
+        String message = 
+            "Content-Type: multipart/mixed;boundary=aaaa\r\n\r\n" +
+            "--aaaa\r\n" +
+            "Content-Type:text/plain; charset=US-ASCII\r\n\r\n" +
+            "Oh my god! Boundary is missing!\r\n";
+        parser.parse(new ByteArrayInputStream(message.getBytes("US-ASCII")));
+        checkNextIs(EntityState.T_START_HEADER);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_END_HEADER);
+        checkNextIs(EntityState.T_START_MULTIPART);
+        checkNextIs(EntityState.T_START_BODYPART);
+        checkNextIs(EntityState.T_START_HEADER);
+        checkNextIs(EntityState.T_FIELD);
+        checkNextIs(EntityState.T_END_HEADER);
+        checkNextIs(EntityState.T_BODY);
+        InputStream out = parser.getInputStream();
+        assertEquals("Oh my god! Boundary is missing!\r\n", IOUtils.toString(out, "US-ASCII"));
+        checkNextIs(EntityState.T_END_BODYPART);
+        try {
+            parser.next();
+            fail("MimeParseEventException should have been thrown");
+        } catch (MimeParseEventException expected) {
+        }
+     }
+    
+    private void checkNextIs(EntityState expected) throws Exception {
+        assertEquals(MimeTokenStream.stateToString(expected), MimeTokenStream.stateToString(parser.next()));        
+    }
 }
