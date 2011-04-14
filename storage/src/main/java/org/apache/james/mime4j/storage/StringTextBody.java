@@ -30,7 +30,6 @@ import java.io.Writer;
 import java.nio.charset.Charset;
 
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * Text body backed by a <code>String</code>.
@@ -47,7 +46,7 @@ class StringTextBody extends TextBody {
 
     @Override
     public String getMimeCharset() {
-        return CharsetUtil.toMimeCharset(charset.name());
+        return charset.name();
     }
 
     @Override

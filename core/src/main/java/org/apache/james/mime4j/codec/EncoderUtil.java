@@ -310,22 +310,16 @@ public class EncoderUtil {
         if (charset == null)
             charset = determineCharset(text);
 
-        String mimeCharset = CharsetUtil.toMimeCharset(charset.name());
-        if (mimeCharset == null) {
-            // cannot happen if charset was originally null
-            throw new IllegalArgumentException("Unsupported charset");
-        }
-
         byte[] bytes = encode(text, charset);
 
         if (encoding == null)
             encoding = determineEncoding(bytes, usage);
 
         if (encoding == Encoding.B) {
-            String prefix = ENC_WORD_PREFIX + mimeCharset + "?B?";
+            String prefix = ENC_WORD_PREFIX + charset.name() + "?B?";
             return encodeB(prefix, text, usedCharacters, charset, bytes);
         } else {
-            String prefix = ENC_WORD_PREFIX + mimeCharset + "?Q?";
+            String prefix = ENC_WORD_PREFIX + charset.name() + "?Q?";
             return encodeQ(prefix, text, usage, usedCharacters, charset, bytes);
         }
     }

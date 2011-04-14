@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -177,16 +178,11 @@ public class DecoderUtil {
 
     // return null on error
     private static String tryDecodeEncodedWord(final String mimeCharset,
-            final String encoding, final String encodedText, DecodeMonitor monitor) throws IllegalArgumentException {
-        String charset = CharsetUtil.toJavaCharset(mimeCharset);
+            final String encoding, final String encodedText, final DecodeMonitor monitor) {
+        Charset charset = CharsetUtil.lookup(mimeCharset);
         if (charset == null) {
             monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded", 
                     "Mime charser '", mimeCharset, "' doesn't have a corresponding Java charset");
-            return null;
-        } else if (!CharsetUtil.isDecodingSupported(charset)) {
-            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded", 
-                    "Current JDK doesn't support decoding of charset '", charset, 
-                    "' - MIME charset '", mimeCharset, "' in encoded word");
             return null;
         }
 
@@ -198,9 +194,9 @@ public class DecoderUtil {
 
         try {
             if (encoding.equalsIgnoreCase("Q")) {
-                return DecoderUtil.decodeQ(encodedText, charset, monitor);
+                return DecoderUtil.decodeQ(encodedText, charset.name(), monitor);
             } else if (encoding.equalsIgnoreCase("B")) {
-                return DecoderUtil.decodeB(encodedText, charset, monitor);
+                return DecoderUtil.decodeB(encodedText, charset.name(), monitor);
             } else {
                 monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded", 
                         "Warning: Unknown encoding in encoded word");

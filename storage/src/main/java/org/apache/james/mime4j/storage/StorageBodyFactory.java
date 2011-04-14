@@ -287,7 +287,7 @@ public class StorageBodyFactory implements BodyFactory {
             final String mimeCharset, 
             boolean forEncoding,
             final DecodeMonitor monitor) {
-        String charset = CharsetUtil.toJavaCharset(mimeCharset);
+        Charset charset = CharsetUtil.lookup(mimeCharset);
         if (charset == null) {
             if (monitor.isListening()) {
                 monitor.warn(
@@ -297,28 +297,7 @@ public class StorageBodyFactory implements BodyFactory {
             }
             return FALLBACK_CHARSET;
         }
-
-        if (forEncoding && !CharsetUtil.isEncodingSupported(charset)) {
-            if (monitor.isListening()) {
-                monitor.warn(
-                        "MIME charset '" + mimeCharset
-                        + "' does not support encoding", "Using "
-                        + FALLBACK_CHARSET + " instead.");
-            }
-            return FALLBACK_CHARSET;
-        }
-
-        if (!forEncoding && !CharsetUtil.isDecodingSupported(charset)) {
-            if (monitor.isListening()) {
-                monitor.warn(
-                        "MIME charset '" + mimeCharset
-                        + "' does not support decoding", "Using "
-                        + FALLBACK_CHARSET + " instead.");
-            }
-            return FALLBACK_CHARSET;
-        }
-
-        return Charset.forName(charset);
+        return charset;
     }
 
 }

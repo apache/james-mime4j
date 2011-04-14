@@ -27,7 +27,6 @@ import java.nio.charset.Charset;
 
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.storage.MultiReferenceStorage;
-import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * Text body backed by a {@link org.apache.james.mime4j.storage.Storage}.
@@ -44,7 +43,7 @@ class StorageTextBody extends TextBody {
 
     @Override
     public String getMimeCharset() {
-        return CharsetUtil.toMimeCharset(charset.name());
+        return charset.name();
     }
 
     @Override

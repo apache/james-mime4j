@@ -47,7 +47,6 @@ import org.apache.james.mime4j.field.FieldsTest;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MimeBuilder;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
-import org.apache.james.mime4j.util.CharsetUtil;
 
 public class MessageParserTest extends TestCase {
     
@@ -182,7 +181,7 @@ public class MessageParserTest extends TestCase {
             URL expectedUrl = new URL(s);
                 
             if (b instanceof TextBody) {
-                String charset = CharsetUtil.toJavaCharset(e.getCharset());
+                String charset = e.getCharset();
                 if (charset == null) {
                     charset = "ISO8859-1";
                 }
