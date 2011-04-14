@@ -106,7 +106,6 @@ public class MimeTokenEmbeddedMessageTest extends TestCase {
         nextIs(EntityState.T_BODY);
         checkInputStream("CUSTARDCUSTARDCUSTARD\r\n");
         nextIs(EntityState.T_END_BODYPART);
-        nextIs(EntityState.T_EPILOGUE);
         nextIs(EntityState.T_END_MULTIPART);   
         nextIs(EntityState.T_END_MESSAGE);
         nextIs(EntityState.T_END_BODYPART);

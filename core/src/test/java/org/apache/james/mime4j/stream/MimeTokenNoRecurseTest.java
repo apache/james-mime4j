@@ -108,11 +108,8 @@ public class MimeTokenNoRecurseTest extends TestCase {
         nextIs(EntityState.T_FIELD);
         nextIs(EntityState.T_END_HEADER);
         nextIs(EntityState.T_START_MULTIPART);
-        // an empty preamble should not raise a T_PREAMBLE event
-        // nextIs(EntityStates.T_PREAMBLE);
         nextShouldBeStandardPart(true);
         nextShouldBeStandardPart(true);
-        nextIs(EntityState.T_EPILOGUE);
         nextIs(EntityState.T_END_MULTIPART);
         nextIs(EntityState.T_END_MESSAGE);
         nextIs(EntityState.T_END_BODYPART);

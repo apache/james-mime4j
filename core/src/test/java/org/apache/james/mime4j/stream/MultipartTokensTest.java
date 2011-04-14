@@ -39,7 +39,8 @@ public class MultipartTokensTest extends TestCase {
                 "--1729\r\n" +
                 "Content-Type: text/plain; charset=US-ASCII\r\n\r\n" +
                 "Some more text\r\n" +
-                "--1729--\r\n";
+                "--1729--\r\n" +
+                "An Epilogue\r\n";
     public static final String MESSAGE = "To: Road Runner <runner@example.org>\r\n" +
             "From: Wile E. Cayote <wile@example.org>\r\n" +
             "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -64,7 +65,8 @@ public class MultipartTokensTest extends TestCase {
     "\r\n" +
     "Custard!" +
     "\r\n" +
-    "--42--\r\n";
+    "--42--\r\n" +
+    "A little epilogue\r\n";
     
     public static final String COMPLEX_QP_MESSAGE = 
         "Content-Transfer-Encoding: quoted-printable\r\n" +
@@ -153,15 +155,11 @@ public class MultipartTokensTest extends TestCase {
         checkState(EntityState.T_FIELD);
         checkState(EntityState.T_END_HEADER);
         checkState(EntityState.T_START_MULTIPART);
-        // an empty preamble should not rais a T_PREAMBLE event
-        // checkState(EntityStates.T_PREAMBLE);
         checkState(EntityState.T_START_BODYPART);
         checkState(EntityState.T_START_HEADER);
         checkState(EntityState.T_FIELD);
         checkState(EntityState.T_END_HEADER);
         checkState(EntityState.T_START_MULTIPART);
-        // an empty preamble should not rais a T_PREAMBLE event
-        // checkState(EntityStates.T_PREAMBLE);
         checkState(EntityState.T_START_BODYPART);
         checkState(EntityState.T_START_HEADER);
         checkState(EntityState.T_FIELD);
@@ -171,7 +169,6 @@ public class MultipartTokensTest extends TestCase {
         checkState(EntityState.T_EPILOGUE);
         checkState(EntityState.T_END_MULTIPART);
         checkState(EntityState.T_END_BODYPART);
-        checkState(EntityState.T_EPILOGUE);
         checkState(EntityState.T_END_MULTIPART);
         checkState(EntityState.T_END_MESSAGE);
         checkState(EntityState.T_END_OF_STREAM);

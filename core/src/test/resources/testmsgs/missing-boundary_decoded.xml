@@ -8,7 +8,5 @@ Content-Type: multipart/alternative; boundary="inner-boundary"</field>
 AAA
 
 </preamble>
-<epilogue>
-</epilogue>
 </multipart>
 </message>

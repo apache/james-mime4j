@@ -234,6 +234,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         return initialLength == 0;
     }
     
+    public boolean isFullyConsumed() {
+        return completed && !buffer.hasBufferedData();
+    }
+    
     private void calculateBoundaryLen() throws IOException {
         boundaryLen = boundary.length;
         int len = limit - buffer.pos();

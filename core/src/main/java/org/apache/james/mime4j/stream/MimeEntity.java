@@ -170,7 +170,8 @@ class MimeEntity extends AbstractEntity {
                 createMimePartStream();
                 state = EntityState.T_PREAMBLE;
 
-                if (!currentMimePartStream.isEmptyStream()) break;
+                boolean empty = currentMimePartStream.isEmptyStream();
+                if (!empty) break;
                 // continue to next state
             }
         case T_PREAMBLE:
@@ -187,9 +188,11 @@ class MimeEntity extends AbstractEntity {
                     return nextMimeEntity();
                 }
             }
+            boolean empty = currentMimePartStream.isFullyConsumed();
             clearMimePartStream();
             state = EntityState.T_EPILOGUE;
-            break;
+            if (!empty) break;
+            // continue to next state
         case T_EPILOGUE:
             state = EntityState.T_END_MULTIPART;
             break;

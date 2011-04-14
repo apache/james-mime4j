@@ -82,7 +82,7 @@ public class MultipartFormTest extends TestCase {
             "Content-Type: text/plain\r\n" +
             "\r\n" +
             "all kind of stuff\r\n" +
-            "--foo--";
+            "--foo--\r\n";
         String s = out.toString("US-ASCII");
         assertEquals(expected, s);
     }

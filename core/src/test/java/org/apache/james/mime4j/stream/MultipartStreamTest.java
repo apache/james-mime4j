@@ -136,7 +136,6 @@ public class MultipartStreamTest extends TestCase {
         checkState(EntityState.T_END_HEADER);
         checkState(EntityState.T_BODY);
         checkState(EntityState.T_END_BODYPART);
-        checkState(EntityState.T_EPILOGUE);
         checkState(EntityState.T_END_MULTIPART);
         checkState(EntityState.T_END_MESSAGE);
         checkState(EntityState.T_END_OF_STREAM);

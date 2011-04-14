@@ -177,8 +177,8 @@ public class MimeWriter {
         out.write(DASHES);
         writeBytes(boundary, out);
         out.write(DASHES);
+        out.write(CRLF);
         if (epilogue != null) {
-            out.write(CRLF);
             writeBytes(epilogue, out);
         }
     }

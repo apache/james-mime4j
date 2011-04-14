@@ -131,7 +131,5 @@ Content-Transfer-Encoding: quoted-printable</field>
 </header>
 <text-body name="example_decoded_1_4.txt"/>
 </body-part>
-<epilogue>
-</epilogue>
 </multipart>
 </message>
