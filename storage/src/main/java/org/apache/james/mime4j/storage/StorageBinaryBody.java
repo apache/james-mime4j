@@ -25,7 +25,6 @@ import java.io.OutputStream;
 
 import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.BinaryBody;
-import org.apache.james.mime4j.storage.MultiReferenceStorage;
 
 /**
  * Binary body backed by a

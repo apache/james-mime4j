@@ -26,8 +26,6 @@ import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
-import org.apache.james.mime4j.field.address.AddressListParser;
-import org.apache.james.mime4j.field.address.ParseException;
 
 public class AddressBuilder {
 

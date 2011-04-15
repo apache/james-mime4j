@@ -29,10 +29,6 @@ import org.apache.james.mime4j.dom.Disposable;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.message.BodyFactory;
-import org.apache.james.mime4j.storage.DefaultStorageProvider;
-import org.apache.james.mime4j.storage.MultiReferenceStorage;
-import org.apache.james.mime4j.storage.Storage;
-import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**

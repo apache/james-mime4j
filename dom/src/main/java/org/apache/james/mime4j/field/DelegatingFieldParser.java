@@ -24,7 +24,6 @@ import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ParsedField;
-import org.apache.james.mime4j.field.UnstructuredFieldImpl;
 import org.apache.james.mime4j.util.ByteSequence;
 
 public class DelegatingFieldParser implements FieldParser<ParsedField> {

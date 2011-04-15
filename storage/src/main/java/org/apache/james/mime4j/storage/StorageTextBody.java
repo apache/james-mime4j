@@ -26,7 +26,6 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.storage.MultiReferenceStorage;
 
 /**
  * Text body backed by a {@link org.apache.james.mime4j.storage.Storage}.
