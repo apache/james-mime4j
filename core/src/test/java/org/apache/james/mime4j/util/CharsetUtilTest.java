@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.util;
 
+import java.nio.charset.Charset;
+
 import junit.framework.TestCase;
 
 public class CharsetUtilTest extends TestCase {
@@ -34,6 +36,23 @@ public class CharsetUtilTest extends TestCase {
     public void testNonASCII() {
         assertFalse(CharsetUtil.isASCII(SWISS_GERMAN_HELLO));
         assertFalse(CharsetUtil.isASCII(RUSSIAN_HELLO));
+    }
+
+    public void testCharsetLookup() {
+        Charset c1 = CharsetUtil.lookup("us-ascii");
+        Charset c2 = CharsetUtil.lookup("ascii");
+        assertEquals(CharsetUtil.US_ASCII, c1);
+        assertEquals(CharsetUtil.US_ASCII, c2);
+    }
+
+    public void testCharsetLookupNullInput() {
+        Charset c1 = CharsetUtil.lookup(null);
+        assertNull(c1);
+    }
+
+    public void testCharsetLookupFailure() {
+        Charset c1 = CharsetUtil.lookup("whatever");
+        assertNull(c1);
     }
 
 }

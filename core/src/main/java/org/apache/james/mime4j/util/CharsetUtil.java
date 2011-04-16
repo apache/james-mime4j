@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.util;
 
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 
 /**
@@ -119,13 +120,24 @@ public class CharsetUtil {
         }
         return true;
     }
-    
+
+    /**
+     * Returns a {@link Charset} instance if character set with the given name 
+     * is recognized and supported by Java runtime. Returns <code>null</code> 
+     * otherwise.
+     * <p/>
+     * This method is a wrapper around {@link Charset#forName(String)} method 
+     * that catches {@link IllegalCharsetNameException} and 
+     *  {@link UnsupportedCharsetException} and returns <code>null</code>.
+     */
     public static Charset lookup(final String name) {
         if (name == null) {
             return null;
         }
         try {
             return Charset.forName(name);
+        } catch (IllegalCharsetNameException ex) {
+            return null;
         } catch (UnsupportedCharsetException ex) {
             return null;
         }
