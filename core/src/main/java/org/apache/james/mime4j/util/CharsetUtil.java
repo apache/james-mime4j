@@ -121,6 +121,9 @@ public class CharsetUtil {
     }
     
     public static Charset lookup(final String name) {
+        if (name == null) {
+            return null;
+        }
         try {
             return Charset.forName(name);
         } catch (UnsupportedCharsetException ex) {
