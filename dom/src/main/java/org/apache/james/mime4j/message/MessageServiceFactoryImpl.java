@@ -35,6 +35,8 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
     private BodyFactory bodyFactory = null;
     private MimeEntityConfig mimeEntityConfig = null;
     private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
+    private Boolean flatMode = null;
+    private Boolean contentDecoding = null;
 
     @Override
     public MessageBuilder newMessageBuilder() {
@@ -42,6 +44,8 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
         if (bodyFactory != null) m.setBodyFactory(bodyFactory);
         if (mimeEntityConfig != null) m.setMimeEntityConfig(mimeEntityConfig);
         if (mutableBodyDescriptorFactory != null) m.setMutableBodyDescriptorFactory(mutableBodyDescriptorFactory);
+        if (flatMode != null) m.setFlatMode(flatMode.booleanValue());
+        if (contentDecoding != null) m.setContentDecoding(contentDecoding.booleanValue());
         return m;
     }
 
@@ -69,6 +73,16 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
                 this.mutableBodyDescriptorFactory  = (MutableBodyDescriptorFactory) value;
                 return;
             } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a MutableBodyDescriptorFactory");
+        } else if ("FlatMode".equals(name)) {
+            if (value instanceof Boolean) {
+                this.flatMode  = (Boolean) value;
+                return;
+            } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a Boolean");
+        } else if ("ContentDecoding".equals(name)) {
+            if (value instanceof Boolean) {
+                this.contentDecoding = (Boolean) value;
+                return;
+            } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a Boolean");
         }
             
         throw new IllegalArgumentException("Unsupported attribute: "+name);
