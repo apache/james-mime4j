@@ -184,6 +184,36 @@ public class MimeWriter {
     }
 
     /**
+     * Write the specified <code>Field</code> to the specified
+     * <code>OutputStream</code>.
+     * 
+     * @param field
+     *            the <code>Field</code> to write.
+     * @param out
+     *            the OutputStream to write to.
+     * @throws IOException
+     *             if an I/O error occurs.
+     */
+    public void writeField(Field field, OutputStream out) throws IOException {
+        ByteSequence raw = null;
+        if (field instanceof FieldRawData) {
+            raw = ((FieldRawData) field).getRaw();
+        }
+        if (raw == null) {
+            StringBuilder buf = new StringBuilder();
+            buf.append(field.getName());
+            buf.append(": ");
+            String body = field.getBody();
+            if (body != null) {
+                buf.append(body);
+            }
+            raw = ContentUtil.encode(MimeUtil.fold(buf.toString(), 0));
+        }
+        writeBytes(raw, out);
+        out.write(CRLF);
+    }
+
+    /**
      * Write the specified <code>Header</code> to the specified
      * <code>OutputStream</code>.
      * 
@@ -196,22 +226,7 @@ public class MimeWriter {
      */
     public void writeHeader(Header header, OutputStream out) throws IOException {
         for (Field field : header) {
-            ByteSequence raw = null;
-            if (field instanceof FieldRawData) {
-                raw = ((FieldRawData) field).getRaw();
-            }
-            if (raw == null) {
-                StringBuilder buf = new StringBuilder();
-                buf.append(field.getName());
-                buf.append(": ");
-                String body = field.getBody();
-                if (body != null) {
-                    buf.append(body);
-                }
-                raw = ContentUtil.encode(MimeUtil.fold(buf.toString(), 0));
-            }
-            writeBytes(raw, out);
-            out.write(CRLF);
+            writeField(field, out);
         }
 
         out.write(CRLF);
