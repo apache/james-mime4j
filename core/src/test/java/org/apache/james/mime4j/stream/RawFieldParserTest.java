@@ -248,4 +248,20 @@ public class RawFieldParserTest extends TestCase {
         assertEquals("value3", params.get(4).getValue());
     }
 
+    public void testRawBodyParseEmptyParam() {
+        ByteSequence buf = ContentUtil.encode(
+                "multipart/alternative;; boundary=\"boundary\"");
+        RawFieldParser parser = new RawFieldParser();
+        ParserCursor cursor = new ParserCursor(0, buf.length());
+        RawBody body = parser.parseRawBody(buf, cursor);
+        assertNotNull(body);
+        assertEquals("multipart/alternative", body.getValue());
+        List<NameValuePair> params = body.getParams();
+        assertEquals(2, params.size());
+        assertEquals("", params.get(0).getName());
+        assertEquals(null, params.get(0).getValue());
+        assertEquals("boundary", params.get(1).getName());
+        assertEquals("boundary", params.get(1).getValue());
+    }
+
 }
