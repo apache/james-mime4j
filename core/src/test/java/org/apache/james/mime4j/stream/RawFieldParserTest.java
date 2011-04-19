@@ -264,4 +264,23 @@ public class RawFieldParserTest extends TestCase {
         assertEquals("boundary", params.get(1).getValue());
     }
 
+    /**
+     * Proof for MIME4J-189.
+     * Either RawFieldParser implements unfolding or callers of RawFieldParser 
+     * have to make sure the content is unfolded before being parsed.
+     */
+    public void testFoldedContentType() {
+        ByteSequence buf = ContentUtil.encode(
+                "multipart/alternative; boundary=\"simple\r\n boundary\"");
+        RawFieldParser parser = new RawFieldParser();
+        ParserCursor cursor = new ParserCursor(0, buf.length());
+        RawBody body = parser.parseRawBody(buf, cursor);
+        assertNotNull(body);
+        assertEquals("multipart/alternative", body.getValue());
+        List<NameValuePair> params = body.getParams();
+        assertEquals(1, params.size());
+        assertEquals("boundary", params.get(0).getName());
+        assertEquals("simple boundary", params.get(0).getValue());
+    }
+
 }
