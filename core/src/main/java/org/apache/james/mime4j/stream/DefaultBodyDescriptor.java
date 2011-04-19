@@ -133,7 +133,9 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
 
     private void parseContentType(RawField field) throws MimeException {
         contentTypeSet = true;
-        RawBody body = RawFieldParser.DEFAULT.parseRawBody(field);
+        // TODO this is a temporary fix while MIME4J-189 is fixed for real.
+        RawField rf = new RawField(field.getName(), field.getBody());
+        RawBody body = RawFieldParser.DEFAULT.parseRawBody(rf);
         String main = body.getValue();
         Map<String, String> params = new HashMap<String, String>();
         for (NameValuePair nmp: body.getParams()) {
