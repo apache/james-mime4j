@@ -1,0 +1,98 @@
+<message>
+<header>
+<field>
+Return-Path: &lt;support@webmail.uwohali.com&gt;</field>
+<field>
+Received: from virtual.mrf.mail.rcn.net ([207.172.4.103])
+          by mta02.mrf.mail.rcn.net
+          (InterMail vM.4.01.02.27 201-229-119-110) with ESMTP
+          id &lt;20000425112650.ZPUD516.mta02.mrf.mail.rcn.net@virtual.mrf.mail.rcn.net&gt;
+          for &lt;eryq@mta.mrf.mail.rcn.net&gt;; Tue, 25 Apr 2000 07:26:50 -0400</field>
+<field>
+Received: from [205.139.141.226] (helo=webmail.uwohali.com ident=root)
+	by virtual.mrf.mail.rcn.net with esmtp (Exim 2.12 #3)
+	id 12k3VX-00012G-00
+	for eryq@zeegee.com; Tue, 25 Apr 2000 07:27:59 -0400</field>
+<field>
+Received: from webmail.uwohali.com (nobody@localhost [127.0.0.1])
+	by webmail.uwohali.com (8.8.7/8.8.7) with SMTP id GAA10264
+	for &lt;eryq@zeegee.com&gt;; Tue, 25 Apr 2000 06:34:43 -0500</field>
+<field>
+Date: Tue, 25 Apr 2000 06:34:43 -0500</field>
+<field>
+Message-Id: &lt;200004251134.GAA10264@webmail.uwohali.com&gt;</field>
+<field>
+From: "ADJE Webmail Tech Support" &lt;support@webmail.uwohali.com&gt;</field>
+<field>
+To: eryq@zeegee.com</field>
+<field>
+Subject: mime::parser</field>
+<field>
+Content-type: multipart/mixed; boundary="---------------------------7d033e3733c"</field>
+<field>
+Mime-Version: 1.0</field>
+<field>
+X-Mozilla-Status: 8001</field>
+</header>
+<multipart>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain</field>
+</header>
+<text-body name="uu-junk-target_decoded_1_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-type: multipart/mixed; boundary="----------=_960622044-2175-0"</field>
+</header>
+<multipart>
+<preamble>
+The following is a multipart MIME message which was extracted
+from a uuencoded message.
+</preamble>
+<body-part>
+<header>
+</header>
+<text-body name="uu-junk-target_decoded_1_2_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: image/gif; name="up.gif"; x-unix-mode="0644"</field>
+<field>
+Content-Disposition: inline; filename="up.gif"</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+<field>
+Mime-Version: 1.0</field>
+<field>
+X-Mailer: MIME-tools 5.208 (Entity 5.204)</field>
+</header>
+<binary-body name="uu-junk-target_decoded_1_2_2.bin"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: image/gif; name="zeegee.gif"; x-unix-mode="0644"</field>
+<field>
+Content-Disposition: inline; filename="zeegee.gif"</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+<field>
+Mime-Version: 1.0</field>
+<field>
+X-Mailer: MIME-tools 5.208 (Entity 5.204)</field>
+</header>
+<binary-body name="uu-junk-target_decoded_1_2_3.bin"/>
+</body-part>
+</multipart>
+</body-part>
+<epilogue>
+
+
+
+</epilogue>
+</multipart>
+</message>

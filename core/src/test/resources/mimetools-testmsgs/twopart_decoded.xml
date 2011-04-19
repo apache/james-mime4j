@@ -1,0 +1,54 @@
+<message>
+<header>
+<field>
+Return-Path: &lt;0647842285@uk.wowlg.com&gt;</field>
+<field>
+Delivered-To: wowlgcard@cpostale.com</field>
+<field>
+Received: from WOWLG POSTCARD (unknown [57.67.194.147])
+	by lbn-int.qualimucho.com (Postfix) with SMTP id B33BE3F06
+	for &lt;wowlgcard@cpostale.com&gt;; Wed, 12 Jan 2005 08:08:12 +0100 (CET)</field>
+<field>
+MIME-Version: 1.0 </field>
+<field>
+From: 0647842285@uk.wowlg.com</field>
+<field>
+To: wowlgcard@cpostale.com</field>
+<field>
+Message-Id:102.10200000000105</field>
+<field>
+Content-Type: multipart/mixed; boundary="=_wowlgpostcardsender102.10200000000105_=" </field>
+<field>
+Date: Wed, 12 Jan 2005 08:08:12 +0100 (CET)</field>
+</header>
+<multipart>
+<preamble>
+This is a multi-part message in MIME format... 
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset="ISO-8859-1"</field>
+<field>
+Content-Disposition: inline</field>
+<field>
+Content-Transfer-Encoding: 8bit </field>
+</header>
+<text-body name="twopart_decoded_1_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type:image/jpeg; name="/home1/eucyon/data/img_event/postcard/uk7200_110_6.jpg" </field>
+<field>
+Content-Disposition: attachment;filename="/home1/eucyon/data/img_event/postcard/uk7200_110_6.jpg" </field>
+<field>
+Content-transfer-encoding: base64 </field>
+</header>
+<binary-body name="twopart_decoded_1_2.bin"/>
+</body-part>
+<epilogue>
+
+</epilogue>
+</multipart>
+</message>

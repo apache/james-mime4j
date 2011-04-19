@@ -1,0 +1,15 @@
+<BASE HREF="file:///E|/ChckFree/Html/Pull3.html">
+
+<HTML>
+<HEAD>
+<TITLE>Client Pull Rolling Page Demo></TITLE>
+
+<META HTTP-EQUIV="REFRESH" CONTENT="10; URL=Pull1.html">
+
+</HEAD>
+
+<BODY>
+This is Page 3 of my rolling web page demo.
+</BODY>
+
+</HTML>

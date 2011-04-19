@@ -1,0 +1,41 @@
+<message>
+<header>
+<field>
+MIME-Version: 1.0</field>
+<field>
+Content-Type: multipart/mixed;
+ boundary="------------050706070100080203090004"</field>
+</header>
+<multipart>
+<preamble>
+This is a multi-part message in MIME format.</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset=UTF-8</field>
+<field>
+Content-Transfer-Encoding: 7bit</field>
+</header>
+<body>
+Attachment Test
+</body>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain;
+ name="=?UTF-8?B?YXR0YWNobWVudC7DpMO2w7w=?="</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+<field>
+Content-Disposition: attachment;
+ filename*=UTF-8''%61%74%74%61%63%68%6D%65%6E%74%2E%C3%A4%C3%B6%C3%BC</field>
+</header>
+<body>
+VGVzdAo=</body>
+</body-part>
+<epilogue>
+
+</epilogue>
+</multipart>
+</message>

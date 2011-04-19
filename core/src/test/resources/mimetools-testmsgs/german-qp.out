@@ -1,0 +1,28 @@
+Content-Type: text/plain; charset="iso-8859-15"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-Mailer: JaM - Just A Mailer
+Subject: Testnachricht
+Return-Path: <joern@zyn.de>
+Date: Wed, 21 Dec 2005 22:02:44 +0100
+To: joern@zyn.de
+From: =?ISO-8859-15?Q?J=F6rn?= Reder <joern@zyn.de>
+
+
+Hallo,
+
+das ist eine Testnachricht mit 8 Bit S=F6nderz=E4ichen, und obendr=
+ein noch 
+quoted-printable kodiert.
+
+Gr=FC=DFe,
+
+J=F6rn
+
+-- 
+ .''`.  J=F6rn Reder <joern@zyn.de>
+: :' :  http://www.exit1.org/ http=
+://www.zyn.de/
+`. `'
+  `-    Debian GNU/Linux -- The power of freedom

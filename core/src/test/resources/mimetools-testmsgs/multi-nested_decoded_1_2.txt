@@ -1,0 +1,4 @@
+Part 2 of the outer message.
+This could have been part of the previous part,
+but illustrates explicit versus implicit
+typing of body parts.

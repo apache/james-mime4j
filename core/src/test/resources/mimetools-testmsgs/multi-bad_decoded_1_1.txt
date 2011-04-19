@@ -1,0 +1,41 @@
+[[ERROR]] Error 600: Internal logic.
+
+Dying gasp:
+Bad mode: SEARCH/ (600).
+
+Recommended action to correct the situation:
+YIKES! IMS/www failed one of its internal consistency checks! Please SAVE THIS
+FILE, and contact IMS/www's developers immediately so they can fix the problem!
+If the parentheses at the end of this sentence are not blank, you can contact
+them here (imswww@rhine.gsfc.nasa.gov).
+
+    ------------------------------------------------------------------------
+
+
+Location of error
+
+Dying gasp:
+Package "main", file "/usr/app/people/imswww/v.b/lib/perl/imssearch.pl", line
+753.
+
+Traceback:
+
+  1.  Iw::Die: from "main", "/usr/app/people/imswww/v.b/lib/perl/imssearch.pl
+     line 753
+  2.  main::Main: from "main", "/usr/app/people/imswww/public_cgi/v.b/imssearch
+     line 85
+
+    ------------------------------------------------------------------------
+
+
+Basic state information
+
+Include path
+
+/usr/app/people/imswww/v.b/lib/perl
+/usr/app/people/imswww/v.b/lib/perl/Eg
+/usr/local/lib/perl5/sun4-sunos
+/usr/local/lib/perl5
+
+
+

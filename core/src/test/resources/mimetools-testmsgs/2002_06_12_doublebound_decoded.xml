@@ -1,0 +1,58 @@
+<message>
+<header>
+<field>
+From: Lars Hecking &lt;lhecking@nmrc.ie&gt;</field>
+<field>
+To: mutt-dev@mutt.org</field>
+<field>
+Subject: MIME handling bug demo</field>
+<field>
+Mime-Version: 1.0</field>
+<field>
+Content-Type: multipart/mixed; boundary="ReaqsoxgOBHFXBhH"</field>
+<field>
+Content-Disposition: inline</field>
+<field>
+Content-Transfer-Encoding: 8bit</field>
+<field>
+X-Mutt-Fcc: </field>
+<field>
+Status: RO</field>
+<field>
+Content-Length: 11138</field>
+<field>
+Lines: 226</field>
+</header>
+<multipart>
+<preamble>
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset=us-ascii</field>
+<field>
+Content-Disposition: inline</field>
+</header>
+<text-body name="2002_06_12_doublebound_decoded_1_1.txt"/>
+</body-part>
+<body-part>
+<header>
+</header>
+<text-body name="2002_06_12_doublebound_decoded_1_2.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: text/html; charset=iso-8859-15</field>
+<field>
+Content-Disposition: attachment; filename="The Mutt E-Mail Client.html"</field>
+<field>
+Content-Transfer-Encoding: 8bit</field>
+</header>
+<text-body name="2002_06_12_doublebound_decoded_1_3.txt"/>
+</body-part>
+<epilogue>
+
+</epilogue>
+</multipart>
+</message>

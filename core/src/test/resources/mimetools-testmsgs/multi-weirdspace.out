@@ -1,0 +1,58 @@
+Return-Path: eryq@rhine.gsfc.nasa.gov
+Sender: john-bigboote
+Date: Thu, 11 Apr 1996 01:10:30 -0500
+From: Eryq <eryq@rhine.gsfc.nasa.gov>
+Organization: Yoyodyne Propulsion Systems
+X-Mailer: Mozilla 2.0 (X11; I; Linux 1.1.18 i486)
+MIME-Version: 1.0
+To: john-bigboote@eryq.pr.mcs.net
+Subject: Two images for you...
+Content-Type: multipart/mixed; boundary="------------299A70B339B65A93542D2AE"
+
+--------------299A70B339B65A93542D2AE
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+
+When unpacked, this message should produce two GIF files:
+
+	* The 1st should be called "3d-compress.gif"
+	* The 2nd should be called "3d-eye.gif"
+
+There is an empty preamble, and linear space after the bounds.
+
+-- 
+   ____           __
+  / __/__________/_/  Eryq (eryq@rhine.gsfc.nasa.gov)
+ / __/ _/ / / , /     Hughes STX Corporation, NASA/Goddard
+/___/_/ \  /\  /___ 
+        /_/ /_____/   http://selsvr.stx.com/~eryq/
+
+--------------299A70B339B65A93542D2AE
+Content-Type: image/gif
+Content-Transfer-Encoding: base64
+Content-Disposition: inline; filename="3d-compress.gif"
+
+R0lGODdhKAAoAOMAAAAAAAAAgB6Q/y9PT25ubnCAkKBSLb6+vufn5/Xes/+lAP/6zQAAAAAAAAAA
+AAAAACwAAAAAKAAoAAAE/hDJSau9eJLMOyYbcoxkaZ5oCkoH6L5wLMfiWqd4btZhmxbAoFCY47EI
+qMJgyWw2ATjj7aRkAq5YwDMl9VGtKO0SiuoiTVlscsxt9c4HgXxUIA0EAVOVfDKT8Hl1B3kDAYYl
+e202XnGGgoMHhYckiWVuR3+OTgCGeZRslotwgJ2lnYigfZdTjQULr7ALBZN0qTurjHgLKAu0B5Wq
+opm7J72etQN8t8Ijury+wMtvw8/Hv7Ylfs0BxCbGqMmK0yOOQ0GTCgrR2bhwJGlXJQYG6mMKoeNo
+WSbzCWIACe5JwxQm3AkDAbUAQCiQhDZEBeBl6afgCsOBrD45edIvQceGWSMevpOYhl6CkydBHhBZ
+QmGKjihVshypjB9ClAHZMTugzOU7mzhBPiSZ5uDNnA7b/aTZ0mhMnfl0pDBFa6bUElSPWb0qtYuH
+rxlwcR17YsWMs2jTql3LFkQEADs=
+
+--------------299A70B339B65A93542D2AE
+Content-Type: image/gif; name="3d-eye.gif"
+Content-Transfer-Encoding: base64
+
+R0lGODdhKAAoAPMAAAAAAAAAzN3u/76+voiIiG5ubszd7v///+fn5wAAAAAAAAAAAAAAAAAAAAAA
+AAAAACwAAAAAKAAoAAAE/hDJSau9eJbMOy4bMoxkaZ5oCkoD6L5wLMfiWns41oZt7lM7VujnC96I
+RVsPWQE4nxPjkvmsQmu8oc/KBUSVWk7XepGGLeNrxoxJO1MjILjthg/kWXQ6wO/7+3dCeRRjfAKH
+iImJAV+DCF0BiW5VAo1CElaRh5NjlkeYmpyTgpcTAKGiaaSfpwKpVQaxVatLrU8GaQdOBAQAB7+y
+XliXTrgAxsW4vFabv8BOtBsBt7cGvwCIT9nOyNEIxuC4zrqKzc9XbODJvs7Y5ewH3d7Fxe3jB4rj
+8t6PuNa6r2bhKQXN17FYCBMqTGiBzSNhx5g0nEMhlsSJjiRYvDjwE0cdGxQ/gswosoKUkmuU2FnJ
+csSKGTBjypxJsyaICAA7
+
+--------------299A70B339B65A93542D2AE--
+
+

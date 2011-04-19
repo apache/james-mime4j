@@ -1,0 +1,11 @@
+<message>
+<header>
+<field>
+From: me</field>
+<field>
+To: you</field>
+<field>
+Subject: uudecoding</field>
+</header>
+<text-body name="uu-zeegee_decoded_1.txt"/>
+</message>

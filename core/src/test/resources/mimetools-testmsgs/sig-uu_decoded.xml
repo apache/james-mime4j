@@ -1,0 +1,9 @@
+<message>
+<header>
+<field>
+Content-type: text/plain</field>
+<field>
+Subject: Here's my UU'ed sig!</field>
+</header>
+<text-body name="sig-uu_decoded_1.txt"/>
+</message>

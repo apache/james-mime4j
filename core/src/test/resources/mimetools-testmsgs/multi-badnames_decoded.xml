@@ -1,0 +1,46 @@
+<message>
+<header>
+<field>
+From: Nathaniel Borenstein &lt;nsb@bellcore.com&gt;</field>
+<field>
+To:  Ned Freed &lt;ned@innosoft.com&gt;</field>
+<field>
+Subject: Sample message</field>
+<field>
+MIME-Version: 1.0</field>
+<field>
+Content-type: multipart/mixed; boundary="simple
+ boundary"</field>
+</header>
+<multipart>
+<preamble>
+This is the preamble.  It is to be ignored, though it
+is a handy place for mail composers to include an
+explanatory note to non-MIME conformant readers.</preamble>
+<body-part>
+<header>
+<field>
+Content-type: text/plain; charset=us-ascii; name="/foo/bar"</field>
+</header>
+<text-body name="multi-badnames_decoded_1_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-type: text/plain; charset=us-ascii; name="foo bar"</field>
+</header>
+<text-body name="multi-badnames_decoded_1_2.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-type: text/plain; charset=us-ascii; name="foobar"</field>
+</header>
+<text-body name="multi-badnames_decoded_1_3.txt"/>
+</body-part>
+<epilogue>
+This is the epilogue.  It is also to be ignored.
+
+</epilogue>
+</multipart>
+</message>

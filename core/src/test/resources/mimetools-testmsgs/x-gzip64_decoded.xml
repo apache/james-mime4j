@@ -1,0 +1,19 @@
+<message>
+<header>
+<field>
+Content-Type: text/plain; name=".signature"</field>
+<field>
+Content-Disposition: inline; filename=".signature"</field>
+<field>
+Content-Transfer-Encoding: x-gzip64</field>
+<field>
+Mime-Version: 1.0</field>
+<field>
+X-Mailer: MIME-tools 3.204  (ME 3.204 )</field>
+<field>
+Subject: Testing!</field>
+<field>
+Content-Length: 281</field>
+</header>
+<text-body name="x-gzip64_decoded_1.txt"/>
+</message>

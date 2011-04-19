@@ -1,0 +1,49 @@
+<message>
+<header>
+<field>
+Content-Type: multipart/mixed; boundary="t0UkRYy7tHLRMCai"</field>
+<field>
+Content-Disposition: inline</field>
+</header>
+<multipart>
+<preamble>
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset=us-ascii</field>
+<field>
+Content-Disposition: inline</field>
+<field>
+Content-Transfer-Encoding: quoted-printable</field>
+</header>
+<body>
+Das ist ein Test.
+--=20
+sub i($){print$_[0]}*j=3D*ENV;sub w($){sleep$_[0]}sub _($){i"$p:$c&gt; ",w+01
+,$_=3D$_[0],tr;i-za-h,;a-hi-z ;,i$_,w+01,i"\n"}$|=3D1;$f=3D'HO';($c=3D$j{PW=
+D})=3D~
+s+$j{$f."ME"}+~+;$p.=3D"$j{USER}\@".`hostname`;chop$p;_"kl",$c=3D'~',_"zu,".
+"-zn,*",_"#,epg,lw,gwc,mfmkcbm,cvsvwev,uiqt,kwvbmvb?",i"$p:$c&gt; ";w+1&lt;&lt;07
+</body>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: image/png</field>
+<field>
+Content-Disposition: attachment; filename="dot.png"</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+</header>
+<body>
+iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAACXBIWXMAAAsTAAALEwEAmpwY
+AAAAB3RJTUUH1AUbFQQ0Vbb7XQAAAB10RVh0Q29tbWVudABDcmVhdGVkIHdpdGggVGhlIEdJ
+TVDvZCVuAAAAFklEQVR42mP8//8/AwMDEwMDAwMDAwAkBgMB/umWrAAAAABJRU5ErkJggg==
+</body>
+</body-part>
+<epilogue>
+
+</epilogue>
+</multipart>
+</message>

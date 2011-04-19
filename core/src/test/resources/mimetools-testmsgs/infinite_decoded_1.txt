@@ -1,0 +1,99 @@
+Return-Path: <owner-cacomp-l@linf.unb.br>
+Received: from eiffel.base.com.br by mailbr1.mailbr.com.br ; Thu, 05 Nov 1998 22:58:23 +000
+Received: from marconi.base.com.br ([200.240.10.55]) by eiffel.base.com.br
+          (Netscape Mail Server v2.0) with ESMTP id ADH491
+          for <acecilia@mailbr.com.br>; Thu, 5 Nov 1998 21:55:24 -0200
+Received: from kepler.base.com.br ([200.240.10.104]) by marconi.base.com.br
+          (Netscape Mail Server v2.0) with ESMTP id AAE686;
+          Wed, 4 Nov 1998 14:00:10 -0200
+Received: from cyrius.linf.unb.br ([164.41.12.4]) by kepler.base.com.br
+          (Post.Office MTA v3.5 release 215 ID# 0-0U10L2S100) with SMTP
+          id br; Wed, 4 Nov 1998 13:53:47 -0200
+Received: from sendmail by cyrius.linf.unb.br with esmtp
+	id 0zb5I9-0003oM-00; Wed, 4 Nov 1998 13:56:17 -0200
+Received: from localhost (majordom@localhost)
+	by cyrius.linf.unb.br (8.8.7/8.8.7) with SMTP id NAA14639;
+	Wed, 4 Nov 1998 13:54:54 -0200 (EDT)
+Received: by linf.unb.br (bulk_mailer v1.6); Wed, 4 Nov 1998 13:54:54 -0200
+Received: (from majordom@localhost)
+	by cyrius.linf.unb.br (8.8.7/8.8.7) id NAA14630
+	for cacomp-l-outter; Wed, 4 Nov 1998 13:54:53 -0200 (EDT)
+Received: (from sendmail@localhost)
+	by cyrius.linf.unb.br (8.8.7/8.8.7) id NAA14623
+	for cacomp-l@linf.unb.br; Wed, 4 Nov 1998 13:54:50 -0200 (EDT)
+Received: from brasilia.mpdft.gov.br [200.252.85.2] 
+	by cyrius.linf.unb.br with esmtp
+	id 0zb5Fz-0003lF-00; Wed, 4 Nov 1998 13:54:28 -0200
+Received: from localhost (lbecker@localhost)
+	by brasilia.mpdft.gov.br (8.8.5/8.8.8) with ESMTP id NAA02571
+	for <cacomp-l@linf.unb.br>; Wed, 4 Nov 1998 13:36:14 -0200 (EDT)
+	(envelope-from lbecker@brasilia.mpdft.gov.br)
+Date: Wed, 4 Nov 1998 13:36:14 -0200 (EDT)
+From: Lula Becker <lbecker@brasilia.mpdft.gov.br>
+To: cacomp-l@linf.unb.br
+Subject: [cacomp-l] =??Q?Re=3A_=5Bcacomp-l=5D_E_n=3A_Bras=EDlia_cobre?=
+In-Reply-To: <Pine.SUN.3.91.981103235943.2241E-100000@antares.linf.unb.br>
+Message-ID: <Pine.BSF.3.96.981104133547.2532B-100000@brasilia.mpdft.gov.br>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=
+X-MIME-Autoconverted: from 8bit to quoted-printable by brasilia.mpdft.gov.br id NAA02571
+Content-Transfer-Encoding: 8bit
+X-MIME-Autoconverted: from quoted-printable to 8bit by cyrius.linf.unb.br id NAB14623
+Sender: owner-cacomp-l@linf.unb.br
+Reply-To: cacomp-l@linf.unb.br
+Precedence: bulk
+X-Rcpt-To: <acecilia@mailbr.com.br
+X-DPOP: DPOP Version 2.3d
+X-UIDL: 910386816.004
+Status: RO
+
+
+
+	Como assim, dah um exemplo. Deixando a conta aberta, neh, Fred...
+
+	
+
+On Wed, 4 Nov 1998, Frederico Nardotto wrote:
+
+> Porque eu sou eh foda.... 
+> Prego eh o caralho, Vc nao me conhece para ficar falando assim... Nao 
+> sabe de onde eu vim, quem sou, ou seja, PORRA NENHUMA...
+> 
+> VAI TOMAR NO CU E ME DEIXA EM PAZ!!!!!!!
+> 
+> On Tue, 3 Nov 1998, Guilherme Olivieri Caixeta Borges wrote:
+> 
+> > Sócrates,
+> > 
+> >     porque você faz tanta questão de se indispor com TODO MUNDO!!! Já não bastasse
+> > meia computação te achar um prego, você resolve ampliar este universo para outras
+> > pessoas... Mané!
+> > 
+> > Socrates Arantes Teixeira Filho (97/18443) wrote:
+> > 
+> > >      Você tem que ver que paciência tem limite. Eu agüentei o máximo
+> > > possível ele ficar escrevendo essas burrices na nossa sala de discursão.
+> > > Com gente ignorante como ele, que um rorizista cego, nós só conseguimos
+> > 
+> >     Em se falando de ignorância: é bem verdade que os mails da cacomp estão atingindo
+> > proporções dantescas, mas o certo é DISCUSSÃO.
+> > 
+> > Sem mais,
+> > 
+> > --
+> > Guilherme Olivieri Caixeta Borges
+> > **************************
+> > Web Design - Via Internet
+> > (061) 315-9657 / 964-9199
+> > guiborges@brasilia.com.br
+> > guiborges@via-net.com.br
+> > **************************
+> > 
+> > 
+> > 
+> > 
+> > 
+> 
+> 
+
+

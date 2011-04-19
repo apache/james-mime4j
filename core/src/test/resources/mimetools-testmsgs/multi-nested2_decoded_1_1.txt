@@ -1,0 +1,5 @@
+Part 1 of the outer message.
+[Note that the preceding blank line means
+no header fields were given and this is text,
+with charset US ASCII.  It could have been
+done with explicit typing as in the next part.]

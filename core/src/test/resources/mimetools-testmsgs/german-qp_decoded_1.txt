@@ -1,0 +1,15 @@
+
+Hallo,
+
+das ist eine Testnachricht mit 8 Bit Sönderzäichen, und obendrein noch 
+quoted-printable kodiert.
+
+Grüße,
+
+Jörn
+
+-- 
+ .''`.  Jörn Reder <joern@zyn.de>
+: :' :  http://www.exit1.org/ http://www.zyn.de/
+`. `'
+  `-    Debian GNU/Linux -- The power of freedom

@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -88,10 +89,14 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
 
     static class MimeStreamParserExampleMessagesTestSuite extends TestSuite {
 
-        private static final String TESTS_FOLDER = "/testmsgs";
-
         public MimeStreamParserExampleMessagesTestSuite() throws IOException, URISyntaxException {
-            URL resource = MimeStreamParserExampleMessagesTestSuite.class.getResource(TESTS_FOLDER);
+            addTests("/testmsgs");
+            addTests("/mimetools-testmsgs");
+        }
+
+		private void addTests(String testsFolder) throws URISyntaxException,
+				MalformedURLException, IOException {
+			URL resource = MimeStreamParserExampleMessagesTestSuite.class.getResource(testsFolder);
             if (resource != null) {
                 if (resource.getProtocol().equalsIgnoreCase("file")) {
                     File dir = new File(resource.toURI());
@@ -100,7 +105,7 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
                     for (File f : files) {
                         if (f.getName().endsWith(".msg")) {
                             addTest(new MimeStreamParserExampleMessagesTest(f.getName(), 
-                                    f.toURL()));
+                                    f.toURI().toURL()));
                         }
                     }
                 } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
@@ -110,14 +115,14 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
                         JarEntry entry = it.nextElement();
                         String s = "/" + entry.toString();
                         File f = new File(s);
-                        if (s.startsWith(TESTS_FOLDER) && s.endsWith(".msg")) {
+                        if (s.startsWith(testsFolder) && s.endsWith(".msg")) {
                             addTest(new MimeStreamParserExampleMessagesTest(f.getName(), 
                                     new URL("jar:file:" + jar.getName() + "!" + s)));
                         }
                     }
                 }
             }
-        }
+		}
 
     }
 }

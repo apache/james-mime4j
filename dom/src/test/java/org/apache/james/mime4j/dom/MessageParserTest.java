@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -63,10 +64,14 @@ public class MessageParserTest extends TestCase {
     
     static class MessageParserTestSuite extends TestSuite {
         
-        private static final String TESTS_FOLDER = "/testmsgs";
-
         public MessageParserTestSuite() throws IOException, URISyntaxException {
-            URL resource = MessageParserTestSuite.class.getResource(TESTS_FOLDER);
+            addTests("/testmsgs");
+            addTests("/mimetools-testmsgs");
+        }
+
+		private void addTests(String testsFolder) throws URISyntaxException,
+				MalformedURLException, IOException {
+			URL resource = MessageParserTestSuite.class.getResource(testsFolder);
             if (resource != null) {
                 if (resource.getProtocol().equalsIgnoreCase("file")) {
                     File dir = new File(resource.toURI());
@@ -75,7 +80,7 @@ public class MessageParserTest extends TestCase {
                     for (File f : files) {
                         if (f.getName().endsWith(".msg")) {
                             addTest(new MessageParserTest(f.getName(), 
-                                    f.toURL()));
+                                    f.toURI().toURL()));
                         }
                     }
                 } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
@@ -85,14 +90,14 @@ public class MessageParserTest extends TestCase {
                         JarEntry entry = it.nextElement();
                         String s = "/" + entry.toString();
                         File f = new File(s);
-                        if (s.startsWith(TESTS_FOLDER) && s.endsWith(".msg")) {
+                        if (s.startsWith(testsFolder) && s.endsWith(".msg")) {
                             addTest(new MessageParserTest(f.getName(), 
                                     new URL("jar:file:" + jar.getName() + "!" + s)));
                         }
                     }
                 }
             }
-        }
+		}
         
     }
     
@@ -114,7 +119,7 @@ public class MessageParserTest extends TestCase {
 	        String expected = IOUtils.toString(xmlFileUrl.openStream(), "ISO8859-1");
 	        assertEquals(expected, result);
         } catch (FileNotFoundException ex) {
-        	IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"));
+        	IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"), "ISO8859-1");
         	fail("Expected file created.");
         }
     }

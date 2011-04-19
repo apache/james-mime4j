@@ -21,8 +21,11 @@ package org.apache.james.mime4j.dom;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Enumeration;
@@ -65,10 +68,16 @@ public class ExampleMessagesRoundtripTest extends TestCase {
         
         String s = url.toString();
         URL msgout = new URL(s.substring(0, s.lastIndexOf('.')) + ".out");
-        
-        ByteArrayOutputStream expectedstream = new ByteArrayOutputStream();
-        CodecUtil.copy(msgout.openStream(), expectedstream);
-        assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
+        try {
+	        ByteArrayOutputStream expectedstream = new ByteArrayOutputStream();
+	        CodecUtil.copy(msgout.openStream(), expectedstream);
+	        assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
+        } catch (FileNotFoundException e) {
+        	FileOutputStream fos = new FileOutputStream(msgout.getPath()+".expected");
+	        MimeWriter.DEFAULT.writeMessage(inputMessage, fos);
+        	fos.close();
+        	fail("Expected file created");
+        }
     }
 
     public static Test suite() throws IOException, URISyntaxException {
@@ -78,11 +87,15 @@ public class ExampleMessagesRoundtripTest extends TestCase {
     
     static class ExampleMessagesRountripTestSuite extends TestSuite {
 
-        private static final String TESTS_FOLDER = "/testmsgs";
-
         public ExampleMessagesRountripTestSuite() throws IOException, URISyntaxException {
             super();
-            URL resource = ExampleMessagesRountripTestSuite.class.getResource(TESTS_FOLDER);
+            addTests("/testmsgs");
+            addTests("/mimetools-testmsgs");
+        }
+
+		private void addTests(String testsFolder) throws URISyntaxException,
+				MalformedURLException, IOException {
+			URL resource = ExampleMessagesRountripTestSuite.class.getResource(testsFolder);
             if (resource != null) {
                 if (resource.getProtocol().equalsIgnoreCase("file")) {
                     File dir = new File(resource.toURI());
@@ -91,7 +104,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
                     for (File f : files) {
                         if (f.getName().endsWith(".msg")) {
                             addTest(new ExampleMessagesRoundtripTest(f.getName(), 
-                                    f.toURL()));
+                                    f.toURI().toURL()));
                         }
                     }
                 } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
@@ -101,14 +114,14 @@ public class ExampleMessagesRoundtripTest extends TestCase {
                         JarEntry entry = it.nextElement();
                         String s = "/" + entry.toString();
                         File f = new File(s);
-                        if (s.startsWith(TESTS_FOLDER) && s.endsWith(".msg")) {
+                        if (s.startsWith(testsFolder) && s.endsWith(".msg")) {
                             addTest(new ExampleMessagesRoundtripTest(f.getName(), 
                                     new URL("jar:file:" + jar.getName() + "!" + s)));
                         }
                     }
                 }
             }
-        }
+		}
         
     }
 }

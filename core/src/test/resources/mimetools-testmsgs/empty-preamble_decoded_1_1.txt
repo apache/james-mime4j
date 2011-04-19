@@ -1,0 +1,6 @@
+Das ist ein Test.
+-- 
+sub i($){print$_[0]}*j=*ENV;sub w($){sleep$_[0]}sub _($){i"$p:$c> ",w+01
+,$_=$_[0],tr;i-za-h,;a-hi-z ;,i$_,w+01,i"\n"}$|=1;$f='HO';($c=$j{PWD})=~
+s+$j{$f."ME"}+~+;$p.="$j{USER}\@".`hostname`;chop$p;_"kl",$c='~',_"zu,".
+"-zn,*",_"#,epg,lw,gwc,mfmkcbm,cvsvwev,uiqt,kwvbmvb?",i"$p:$c> ";w+1<<07

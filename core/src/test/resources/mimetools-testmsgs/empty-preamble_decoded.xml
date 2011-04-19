@@ -1,0 +1,37 @@
+<message>
+<header>
+<field>
+Content-Type: multipart/mixed; boundary="t0UkRYy7tHLRMCai"</field>
+<field>
+Content-Disposition: inline</field>
+</header>
+<multipart>
+<preamble>
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset=us-ascii</field>
+<field>
+Content-Disposition: inline</field>
+<field>
+Content-Transfer-Encoding: quoted-printable</field>
+</header>
+<text-body name="empty-preamble_decoded_1_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: image/png</field>
+<field>
+Content-Disposition: attachment; filename="dot.png"</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+</header>
+<binary-body name="empty-preamble_decoded_1_2.bin"/>
+</body-part>
+<epilogue>
+
+</epilogue>
+</multipart>
+</message>

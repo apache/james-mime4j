@@ -1,0 +1,19 @@
+<message>
+<header>
+<field>
+From: Michelle Holm &lt;holm@sitka.colorado.edu&gt;</field>
+<field>
+To: imswww@rhine.gsfc.nasa.gov</field>
+<field>
+Mime-Version: 1.0</field>
+<field>
+Subject: note the bogus filename</field>
+<field>
+Content-Type: text/plain;  charset=iso-8859-1; name="/tmp/whoa"</field>
+<field>
+Content-Transfer-Encoding: 8bit</field>
+</header>
+<body>
+This had better not end up in /tmp!
+</body>
+</message>

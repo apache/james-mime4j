@@ -1,0 +1,25 @@
+<message>
+<header>
+<field>
+Content-Type: text/plain; charset="iso-8859-15"</field>
+<field>
+Content-Disposition: inline</field>
+<field>
+Content-Transfer-Encoding: quoted-printable</field>
+<field>
+MIME-Version: 1.0</field>
+<field>
+X-Mailer: JaM - Just A Mailer</field>
+<field>
+Subject: Testnachricht</field>
+<field>
+Return-Path: &lt;joern@zyn.de&gt;</field>
+<field>
+Date: Wed, 21 Dec 2005 22:02:44 +0100</field>
+<field>
+To: joern@zyn.de</field>
+<field>
+From: =?ISO-8859-15?Q?J=F6rn?= Reder &lt;joern@zyn.de&gt;</field>
+</header>
+<text-body name="german-qp_decoded_1.txt"/>
+</message>
