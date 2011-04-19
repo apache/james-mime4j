@@ -32,7 +32,6 @@ import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
-import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 class MimeEntity extends AbstractEntity {
@@ -213,14 +212,12 @@ class MimeEntity extends AbstractEntity {
 
     private void createMimePartStream() throws MimeException, IOException {
         String boundary = body.getBoundary();
-        for (int i = 0; i < boundary.length(); i++) {
-            char ch = boundary.charAt(i);
-            if (CharsetUtil.isWhitespace(ch)) {
-                monitor(Event.WHITESPACE_IN_BOUNDARY);
-                break;
-            }
+        try {
+            currentMimePartStream = new MimeBoundaryInputStream(inbuffer, boundary);
+        } catch (IllegalArgumentException e) {
+            // thrown when boundary is too long
+            throw new MimeException(e.getMessage(), e);
         }
-        currentMimePartStream = new MimeBoundaryInputStream(inbuffer, boundary);
         dataStream = new LineReaderInputStreamAdaptor(
                 currentMimePartStream,
                 config.getMaxLineLen());
