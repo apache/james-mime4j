@@ -30,6 +30,98 @@ import junit.framework.TestCase;
 
 public class RawFieldParserTest extends TestCase {
 
+    public void testBasicTokenParsing() throws Exception {
+        String s = "   raw: \" some stuff \"";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        RawFieldParser.skipWhiteSpace(raw, cursor);
+
+        Assert.assertFalse(cursor.atEnd());
+        Assert.assertEquals(3, cursor.getPos());
+
+        StringBuilder strbuf1 = new StringBuilder();
+        RawFieldParser.copyContent(raw, cursor, new int[] { ':' }, strbuf1);
+
+        Assert.assertFalse(cursor.atEnd());
+        Assert.assertEquals(6, cursor.getPos());
+        Assert.assertEquals("raw", strbuf1.toString());
+        Assert.assertEquals(':', raw.byteAt(cursor.getPos()));
+        cursor.updatePos(cursor.getPos() + 1);
+
+        RawFieldParser.skipWhiteSpace(raw, cursor);
+
+        Assert.assertFalse(cursor.atEnd());
+        Assert.assertEquals(8, cursor.getPos());
+
+        StringBuilder strbuf2 = new StringBuilder();
+        RawFieldParser.copyQuotedContent(raw, cursor, strbuf2);
+
+        Assert.assertTrue(cursor.atEnd());
+        Assert.assertEquals(" some stuff ", strbuf2.toString());
+
+        RawFieldParser.copyQuotedContent(raw, cursor, strbuf2);
+        Assert.assertTrue(cursor.atEnd());
+
+        RawFieldParser.skipWhiteSpace(raw, cursor);
+        Assert.assertTrue(cursor.atEnd());
+    }
+
+    public void testTokenParsingWithQuotedPairs() throws Exception {
+        String s = "raw: \"\\\"some\\stuff\\\\\"";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        RawFieldParser.skipWhiteSpace(raw, cursor);
+
+        Assert.assertFalse(cursor.atEnd());
+        Assert.assertEquals(0, cursor.getPos());
+
+        StringBuilder strbuf1 = new StringBuilder();
+        RawFieldParser.copyContent(raw, cursor, new int[] { ':' }, strbuf1);
+
+        Assert.assertFalse(cursor.atEnd());
+        Assert.assertEquals("raw", strbuf1.toString());
+        Assert.assertEquals(':', raw.byteAt(cursor.getPos()));
+        cursor.updatePos(cursor.getPos() + 1);
+
+        RawFieldParser.skipWhiteSpace(raw, cursor);
+
+        Assert.assertFalse(cursor.atEnd());
+
+        StringBuilder strbuf2 = new StringBuilder();
+        RawFieldParser.copyQuotedContent(raw, cursor, strbuf2);
+
+        Assert.assertTrue(cursor.atEnd());
+        Assert.assertEquals("\"some\\stuff\\", strbuf2.toString());
+    }
+
+    public void testTokenParsingIncompleteQuote() throws Exception {
+        String s = "\"stuff and more stuff  ";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+        StringBuilder strbuf1 = new StringBuilder();
+        RawFieldParser.copyQuotedContent(raw, cursor, strbuf1);
+        Assert.assertEquals("stuff and more stuff  ", strbuf1.toString());
+    }
+
+
+    public void testTokenParsingTokensWithUnquotedBlanks() throws Exception {
+        String s = "  stuff and   \tsome\tmore  stuff  ;";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+        String result = RawFieldParser.parseToken(raw, cursor, new int[] { ';' });
+        Assert.assertEquals("stuff and some more stuff", result);
+    }
+
+    public void testTokenParsingMixedValuesAndQuotedValues() throws Exception {
+        String s = "  stuff and    \" some more \"   \"stuff  ;";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+        String result = RawFieldParser.parseValue(raw, cursor, new int[] { ';' });
+        Assert.assertEquals("stuff and  some more  stuff  ;", result);
+    }
+
     public void testBasicParsing() throws Exception {
         String s = "raw: stuff;\r\n  more stuff";
         ByteSequence raw = ContentUtil.encode(s);
@@ -40,6 +132,19 @@ public class RawFieldParserTest extends TestCase {
         Assert.assertSame(raw, field.getRaw());
         Assert.assertEquals("raw", field.getName());
         Assert.assertEquals("stuff;  more stuff", field.getBody());
+        Assert.assertEquals(s, field.toString());
+    }
+
+    public void testParsingNoBlankAfterColon() throws Exception {
+        String s = "raw:stuff";
+        ByteSequence raw = ContentUtil.encode(s);
+
+        RawFieldParser parser = new RawFieldParser();
+
+        RawField field = parser.parseField(raw);
+        Assert.assertSame(raw, field.getRaw());
+        Assert.assertEquals("raw", field.getName());
+        Assert.assertEquals("stuff", field.getBody());
         Assert.assertEquals(s, field.toString());
     }
 
@@ -150,7 +255,7 @@ public class RawFieldParserTest extends TestCase {
         assertEquals("test", param.getName());
         assertEquals("  stuff\"", param.getValue());
 
-        s = "test  = \"  stuff\\\\\"\"";
+        s = "test  = \"  stuff\\\\\\\"\"";
         buf = ContentUtil.encode(s);
         cursor = new ParserCursor(0, s.length());
 
@@ -197,7 +302,7 @@ public class RawFieldParserTest extends TestCase {
         assertEquals("test2", params.get(2).getName());
         assertEquals("stuff; stuff", params.get(2).getValue());
         assertEquals("test3", params.get(3).getName());
-        assertEquals("\"stuff", params.get(3).getValue());
+        assertEquals("stuff", params.get(3).getValue());
         assertEquals(buf.length(), cursor.getPos());
         assertTrue(cursor.atEnd());
     }
@@ -266,7 +371,7 @@ public class RawFieldParserTest extends TestCase {
 
     /**
      * Proof for MIME4J-189.
-     * Either RawFieldParser implements unfolding or callers of RawFieldParser 
+     * Either RawFieldParser implements unfolding or callers of RawFieldParser
      * have to make sure the content is unfolded before being parsed.
      */
     /** TODO fix the main code.

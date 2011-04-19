@@ -45,7 +45,7 @@ public class LenientFieldBuilderTest extends TestCase {
         RawField field = builder.build();
         assertNotNull(field);
         assertEquals("raw", field.getName());
-        assertEquals("stuff; more stuff; a lot more stuff", field.getBody());
+        assertEquals("  stuff; more stuff; a lot more stuff", field.getBody());
         ByteSequence raw = field.getRaw();
         assertNull(raw);
     }

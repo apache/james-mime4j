@@ -22,6 +22,7 @@ package org.apache.james.mime4j.stream;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 public class LenientFieldBuilder implements FieldBuilder {
 
@@ -51,10 +52,12 @@ public class LenientFieldBuilder implements FieldBuilder {
         }
         int beginIndex = 0;
         int endIndex = len;
-        while (beginIndex < endIndex && RawFieldParser.isWhitespace(line.byteAt(beginIndex))) {
+        while (beginIndex < endIndex 
+                && CharsetUtil.isWhitespace((char)(line.byteAt(beginIndex) & 0xff))) {
             beginIndex++;
         }
-        while (endIndex > beginIndex && RawFieldParser.isWhitespace(line.byteAt(endIndex - 1))) {
+        while (endIndex > beginIndex 
+                && CharsetUtil.isWhitespace((char)(line.byteAt(endIndex - 1) & 0xff))) {
             endIndex--;
         }
         if (this.buf.length() > 0) {
@@ -67,14 +70,9 @@ public class LenientFieldBuilder implements FieldBuilder {
         if (this.buf == null) {
             return null;
         }
-        int idx = RawFieldParser.indexOf(this.buf, RawFieldParser.COLON);
-        if (idx == -1) {
-            throw new MimeException("Invalid MIME field: no name/value separator found: " +
-                    this.buf.toString());
-        }
-        String name = RawFieldParser.copyTrimmed(this.buf, 0, idx);
-        String value = RawFieldParser.copyTrimmed(this.buf, idx + 1, this.buf.length());
-        return new RawField(name, value);
+        RawField field = RawFieldParser.DEFAULT.parseField(this.buf);
+        // Discard modified raw data
+        return new RawField(field.getName(), field.getBody());
     }
     
     public ByteArrayBuffer getRaw() {

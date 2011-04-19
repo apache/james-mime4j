@@ -25,16 +25,14 @@ public final class NameValuePair {
 
     private final String name;
     private final String value;
-    private final boolean quoted;
 
-    public NameValuePair(final String name, final String value, boolean quoted) {
+    public NameValuePair(final String name, final String value) {
         super();
         if (name == null) {
             throw new IllegalArgumentException("Name may not be null");
         }
         this.name = name;
         this.value = value;
-        this.quoted = quoted;
     }
 
     public String getName() {
@@ -45,10 +43,6 @@ public final class NameValuePair {
         return this.value;
     }
 
-    public boolean isQuoted() {
-        return this.quoted;
-    }
-
     public String toString() {
         if (this.value == null) {
             return name;
@@ -56,13 +50,9 @@ public final class NameValuePair {
             StringBuilder buffer = new StringBuilder();
             buffer.append(this.name);
             buffer.append("=");
-            if (this.quoted) {
-                buffer.append("\"");
-            }
+            buffer.append("\"");
             buffer.append(this.value);
-            if (this.quoted) {
-                buffer.append("\"");
-            }
+            buffer.append("\"");
             return buffer.toString();
         }
     }

@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
@@ -31,30 +32,28 @@ import org.apache.james.mime4j.util.ContentUtil;
  */
 public class RawFieldParser {
 
-    static final int COLON   = ':';
-    static final int SPACE   = 0x20;
-    static final int TAB     = 0x09;
-    static final int CR      = 0x0d;
-    static final int LF      = 0x0a;
-    
-    public static final RawFieldParser DEFAULT = new RawFieldParser(); 
+    static final int[] COLON                   = { ':' };
+    static final int[] EQUAL_OR_SEMICOLON      = { '=', ';' };
+    static final int[] SEMICOLON               = { ';' };
+
+    public static final RawFieldParser DEFAULT = new RawFieldParser();
 
     public RawField parseField(final ByteSequence raw) throws MimeException {
         if (raw == null) {
             return null;
         }
-        int idx = indexOf(raw, COLON);
-        if (idx == -1) {
+        ParserCursor cursor = new ParserCursor(0, raw.length());
+        String name = parseToken(raw, cursor, COLON);
+        if (cursor.atEnd()) {
             throw new MimeException("Invalid MIME field: no name/value separator found: " +
-            		raw.toString());
+                    raw.toString());
         }
-        String name = copyTrimmed(raw, 0, idx);
-        return new RawField(raw, idx, name, null);
+        return new RawField(raw, cursor.getPos(), name, null);
     }
 
     public RawBody parseRawBody(final RawField field) {
         ByteSequence buf = field.getRaw();
-        int pos = field.getDelimiterIdx() + 1; 
+        int pos = field.getDelimiterIdx() + 1;
         if (buf == null) {
             String body = field.getBody();
             if (body == null) {
@@ -66,155 +65,44 @@ public class RawFieldParser {
         ParserCursor cursor = new ParserCursor(pos, buf.length());
         return parseRawBody(buf, cursor);
     }
-    
-    static final int[] DELIMS = { ';' };
 
     RawBody parseRawBody(final ByteSequence buf, final ParserCursor cursor) {
-        int pos = cursor.getPos();
-        int indexFrom = pos;
-        int indexTo = cursor.getUpperBound();
-        while (pos < indexTo) {
-            int ch = buf.byteAt(pos);
-            if (isOneOf(ch, DELIMS)) {
-                break;
-            }
-            pos++;
+        String value = parseToken(buf, cursor, SEMICOLON);
+        if (cursor.atEnd()) {
+            return new RawBody(value, new ArrayList<NameValuePair>());
         }
-        String value = copyTrimmed(buf, indexFrom, pos);
-        if (pos == indexTo) {
-            cursor.updatePos(pos);
-            return new RawBody(value, null);
-        }
-        cursor.updatePos(pos + 1);
+        cursor.updatePos(cursor.getPos() + 1);
         List<NameValuePair> params = parseParameters(buf, cursor);
         return new RawBody(value, params);
     }
-    
+
     List<NameValuePair> parseParameters(final ByteSequence buf, final ParserCursor cursor) {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
-        int pos = cursor.getPos();
-        int indexTo = cursor.getUpperBound();
-
-        while (pos < indexTo) {
-            int ch = buf.byteAt(pos);
-            if (isWhitespace(ch)) {
-                pos++;
-            } else {
-                break;
-            }
-        }
-        cursor.updatePos(pos);
-        if (cursor.atEnd()) {
-            return params;
-        }
-
+        skipWhiteSpace(buf, cursor);
         while (!cursor.atEnd()) {
-            NameValuePair param = parseParameter(buf, cursor, DELIMS);
+            NameValuePair param = parseParameter(buf, cursor);
             params.add(param);
         }
         return params;
     }
 
     NameValuePair parseParameter(final ByteSequence buf, final ParserCursor cursor) {
-        return parseParameter(buf, cursor, DELIMS);
+        String name = parseToken(buf, cursor, EQUAL_OR_SEMICOLON);
+        if (cursor.atEnd()) {
+            return new NameValuePair(name, null);
+        }
+        int delim = buf.byteAt(cursor.getPos());
+        cursor.updatePos(cursor.getPos() + 1);
+        if (delim == ';') {
+            return new NameValuePair(name, null);
+        }
+        String value = parseValue(buf, cursor, SEMICOLON);
+        if (!cursor.atEnd()) {
+            cursor.updatePos(cursor.getPos() + 1);
+        }
+        return new NameValuePair(name, value);
     }
-    
-    NameValuePair parseParameter(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
-        boolean terminated = false;
 
-        int pos = cursor.getPos();
-        int indexFrom = cursor.getPos();
-        int indexTo = cursor.getUpperBound();
-
-        // Find name
-        String name = null;
-        while (pos < indexTo) {
-            int ch = buf.byteAt(pos);
-            if (ch == '=') {
-                break;
-            }
-            if (isOneOf(ch, delimiters)) {
-                terminated = true;
-                break;
-            }
-            pos++;
-        }
-
-        if (pos == indexTo) {
-            terminated = true;
-            name = copyTrimmed(buf, indexFrom, indexTo);
-        } else {
-            name = copyTrimmed(buf, indexFrom, pos);
-            pos++;
-        }
-
-        if (terminated) {
-            cursor.updatePos(pos);
-            return new NameValuePair(name, null, false);
-        }
-
-        // Find value
-        String value = null;
-        int i1 = pos;
-
-        boolean qouted = false;
-        boolean escaped = false;
-        while (pos < indexTo) {
-            int ch = buf.byteAt(pos);
-            if (ch == '"' && !escaped) {
-                qouted = !qouted;
-            }
-            if (!qouted && !escaped && isOneOf(ch, delimiters)) {
-                terminated = true;
-                break;
-            }
-            if (escaped) {
-                escaped = false;
-            } else {
-                escaped = qouted && ch == '\\';
-            }
-            pos++;
-        }
-
-        int i2 = pos;
-        // Trim leading white spaces
-        while (i1 < i2 && (isWhitespace(buf.byteAt(i1)))) {
-            i1++;
-        }
-        // Trim trailing white spaces
-        while ((i2 > i1) && (isWhitespace(buf.byteAt(i2 - 1)))) {
-            i2--;
-        }
-        boolean quoted = false;
-        // Strip away quotes if necessary
-        if (((i2 - i1) >= 2)
-            && (buf.byteAt(i1) == '"')
-            && (buf.byteAt(i2 - 1) == '"')) {
-            quoted = true;
-            i1++;
-            i2--;
-        }
-        if (quoted) {
-            value = copyEscaped(buf, i1, i2);
-        } else {
-            value = copy(buf, i1, i2);
-        }
-        if (terminated) {
-            pos++;
-        }
-        cursor.updatePos(pos);
-        return new NameValuePair(name, value, quoted);
-    }
-    
-    static int indexOf(final ByteSequence buf, int b) {
-        for (int i = 0; i < buf.length(); i++) {
-            if (buf.byteAt(i) == b) {
-                return i;
-            }
-        }
-        return -1;
-    }
-    
     static boolean isOneOf(final int ch, final int[] chs) {
         if (chs != null) {
             for (int i = 0; i < chs.length; i++) {
@@ -225,49 +113,123 @@ public class RawFieldParser {
         }
         return false;
     }
-    
-    static boolean isWhitespace(int i) {
-        return i == SPACE || i == TAB || i == CR || i == LF;
-    }
-    
-    static String copy(final ByteSequence buf, int beginIndex, int endIndex) {
-        StringBuilder strbuf = new StringBuilder(endIndex - beginIndex);
-        for (int i = beginIndex; i < endIndex; i++) {
-            strbuf.append((char) (buf.byteAt(i) & 0xff));
-        }
-        return strbuf.toString();
-    }
 
-    static String copyTrimmed(final ByteSequence buf, int beginIndex, int endIndex) {
-        while (beginIndex < endIndex && isWhitespace(buf.byteAt(beginIndex))) {
-            beginIndex++;
-        }
-        while (endIndex > beginIndex && isWhitespace(buf.byteAt(endIndex - 1))) {
-            endIndex--;
-        }
-        return copy(buf, beginIndex, endIndex);
-    }
-
-    static String copyEscaped(final ByteSequence buf, int beginIndex, int endIndex) {
-        StringBuilder strbuf  = new StringBuilder(endIndex - beginIndex);
-        boolean escaped = false;
-        for (int i = beginIndex; i < endIndex; i++) {
-            char ch = (char) (buf.byteAt(i) & 0xff);
-            if (escaped) {
-                if (ch != '\"' && ch != '\\') {
-                    strbuf.append('\\');
+    static String parseToken(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
+        StringBuilder dst = new StringBuilder();
+        boolean whitespace = false;
+        while (!cursor.atEnd()) {
+            char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
+            if (isOneOf(current, delimiters)) {
+                break;
+            } else if (CharsetUtil.isWhitespace(current)) {
+                skipWhiteSpace(buf, cursor);
+                whitespace = true;
+            } else {
+                if (dst.length() > 0 && whitespace) {
+                    dst.append(' ');
                 }
-                strbuf.append(ch);
+                copyContent(buf, cursor, delimiters, dst);
+                whitespace = false;
+            }
+        }
+        return dst.toString();
+    }
+
+    static String parseValue(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
+        StringBuilder dst = new StringBuilder();
+        boolean whitespace = false;
+        while (!cursor.atEnd()) {
+            char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
+            if (isOneOf(current, delimiters)) {
+                break;
+            } else if (CharsetUtil.isWhitespace(current)) {
+                skipWhiteSpace(buf, cursor);
+                whitespace = true;
+            } else if (current == '\"') {
+                if (dst.length() > 0 && whitespace) {
+                    dst.append(' ');
+                }
+                copyQuotedContent(buf, cursor, dst);
+                whitespace = false;
+            } else {
+                if (dst.length() > 0 && whitespace) {
+                    dst.append(' ');
+                }
+                copyContent(buf, cursor, delimiters, dst);
+                whitespace = false;
+            }
+        }
+        return dst.toString();
+    }
+
+    static void skipWhiteSpace(final ByteSequence buf, final ParserCursor cursor) {
+        int pos = cursor.getPos();
+        int indexFrom = cursor.getPos();
+        int indexTo = cursor.getUpperBound();
+        for (int i = indexFrom; i < indexTo; i++) {
+            char current = (char) (buf.byteAt(i) & 0xff);
+            if (!CharsetUtil.isWhitespace(current)) {
+                break;
+            } else {
+                pos++;
+            }
+        }
+        cursor.updatePos(pos);
+    }
+
+    static void copyContent(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters,
+            final StringBuilder dst) {
+        int pos = cursor.getPos();
+        int indexFrom = cursor.getPos();
+        int indexTo = cursor.getUpperBound();
+        for (int i = indexFrom; i < indexTo; i++) {
+            char current = (char) (buf.byteAt(i) & 0xff);
+            if (isOneOf(current, delimiters) || CharsetUtil.isWhitespace(current)) {
+                break;
+            } else {
+                pos++;
+                dst.append(current);
+            }
+        }
+        cursor.updatePos(pos);
+    }
+
+    static void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
+            final StringBuilder dst) {
+        if (cursor.atEnd()) {
+            return;
+        }
+        int pos = cursor.getPos();
+        int indexFrom = cursor.getPos();
+        int indexTo = cursor.getUpperBound();
+        char current = (char) (buf.byteAt(pos) & 0xff);
+        if (current != '\"') {
+            return;
+        }
+        pos++;
+        indexFrom++;
+        boolean escaped = false;
+        for (int i = indexFrom; i < indexTo; i++, pos++) {
+            current = (char) (buf.byteAt(i) & 0xff);
+            if (escaped) {
+                if (current != '\"' && current != '\\') {
+                    dst.append('\\');
+                }
+                dst.append(current);
                 escaped = false;
             } else {
-                if (ch == '\\') {
+                if (current == '\"') {
+                    pos++;
+                    break;
+                }
+                if (current == '\\') {
                     escaped = true;
                 } else {
-                    strbuf.append(ch);
+                    dst.append(current);
                 }
             }
         }
-        return strbuf.toString();
+        cursor.updatePos(pos);
     }
 
 }
