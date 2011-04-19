@@ -38,6 +38,9 @@ public final class Event {
     /** Indicates that an obsolete syntax header has been detected */
     public static final Event OBSOLETE_HEADER 
         = new Event("Obsolete header encountered");
+    /** Indicates that while space characters have been found in the boundary */
+    public static final Event WHITESPACE_IN_BOUNDARY 
+        = new Event("Boundary may not contain CR or LF");
     
     private final String code;
     

@@ -77,9 +77,6 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         this.boundary[1] = (byte) '-';
         for (int i = 0; i < boundary.length(); i++) {
             byte ch = (byte) boundary.charAt(i);
-            if (ch == '\r' || ch == '\n') {
-                throw new IllegalArgumentException("Boundary may not contain CR or LF");
-            }
             this.boundary[i + 2] = ch;
         }
         
