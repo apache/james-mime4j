@@ -124,6 +124,8 @@ public class RawFieldParser {
             } else if (CharsetUtil.isWhitespace(current)) {
                 skipWhiteSpace(buf, cursor);
                 whitespace = true;
+            } else if (current == '(') {
+                skipComment(buf, cursor);
             } else {
                 if (dst.length() > 0 && whitespace) {
                     dst.append(' ');
@@ -145,6 +147,8 @@ public class RawFieldParser {
             } else if (CharsetUtil.isWhitespace(current)) {
                 skipWhiteSpace(buf, cursor);
                 whitespace = true;
+            } else if (current == '(') {
+                skipComment(buf, cursor);
             } else if (current == '\"') {
                 if (dst.length() > 0 && whitespace) {
                     dst.append(' ');
@@ -177,6 +181,43 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
+    static void skipComment(final ByteSequence buf, final ParserCursor cursor) {
+        if (cursor.atEnd()) {
+            return;
+        }
+        int pos = cursor.getPos();
+        int indexFrom = cursor.getPos();
+        int indexTo = cursor.getUpperBound();
+        char current = (char) (buf.byteAt(pos) & 0xff);
+        if (current != '(') {
+            return;
+        }
+        pos++;
+        indexFrom++;
+
+        int level = 1;
+        boolean escaped = false;
+        for (int i = indexFrom; i < indexTo; i++, pos++) {
+            current = (char) (buf.byteAt(i) & 0xff);
+            if (escaped) {
+                escaped = false;
+            } else {
+                if (current == '\\') {
+                    escaped = true;
+                } else if (current == '(') {
+                    level++;
+                } else if (current == ')') {
+                    level--;
+                }
+            }
+            if (level <= 0) {
+                pos++;
+                break;
+            }
+        }
+        cursor.updatePos(pos);
+    }
+
     static void copyContent(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters,
             final StringBuilder dst) {
         int pos = cursor.getPos();
@@ -184,7 +225,7 @@ public class RawFieldParser {
         int indexTo = cursor.getUpperBound();
         for (int i = indexFrom; i < indexTo; i++) {
             char current = (char) (buf.byteAt(i) & 0xff);
-            if (isOneOf(current, delimiters) || CharsetUtil.isWhitespace(current)) {
+            if (isOneOf(current, delimiters) || CharsetUtil.isWhitespace(current) || current == '(') {
                 break;
             } else {
                 pos++;

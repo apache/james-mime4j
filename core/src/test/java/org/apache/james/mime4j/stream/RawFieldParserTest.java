@@ -105,9 +105,34 @@ public class RawFieldParserTest extends TestCase {
         Assert.assertEquals("stuff and more stuff  ", strbuf1.toString());
     }
 
+    public void testSkipComments() throws Exception {
+        String s = "(some (((maybe))human readable) stuff())";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        RawFieldParser.skipComment(raw, cursor);
+        Assert.assertTrue(cursor.atEnd());
+    }
+
+    public void testSkipCommentsWithQuotedPairs() throws Exception {
+        String s = "(some (((\\)maybe))human readable\\() stuff())";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        RawFieldParser.skipComment(raw, cursor);
+        Assert.assertTrue(cursor.atEnd());
+    }
 
     public void testTokenParsingTokensWithUnquotedBlanks() throws Exception {
         String s = "  stuff and   \tsome\tmore  stuff  ;";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+        String result = RawFieldParser.parseToken(raw, cursor, new int[] { ';' });
+        Assert.assertEquals("stuff and some more stuff", result);
+    }
+
+    public void testTokenParsingTokensWithComments() throws Exception {
+        String s = " (blah-blah)  stuff(blah-blah) and some mo(blah-blah)re  stuff (blah-blah) ;";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
         String result = RawFieldParser.parseToken(raw, cursor, new int[] { ';' });
@@ -120,6 +145,14 @@ public class RawFieldParserTest extends TestCase {
         ParserCursor cursor = new ParserCursor(0, s.length());
         String result = RawFieldParser.parseValue(raw, cursor, new int[] { ';' });
         Assert.assertEquals("stuff and  some more  stuff  ;", result);
+    }
+
+    public void testTokenParsingQuotedValuesWithComments() throws Exception {
+        String s = " (blah blah)  \"(stuff)(and)(some)(more)(stuff)\" (yada yada) ";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+        String result = RawFieldParser.parseValue(raw, cursor, new int[] { ';' });
+        Assert.assertEquals("(stuff)(and)(some)(more)(stuff)", result);
     }
 
     public void testBasicParsing() throws Exception {
@@ -247,6 +280,14 @@ public class RawFieldParserTest extends TestCase {
         assertEquals("test", param.getName());
         assertEquals("stuff", param.getValue());
 
+        s = "test  = text(text of some kind)/stuff(stuff of some kind)";
+        buf = ContentUtil.encode(s);
+        cursor = new ParserCursor(0, s.length());
+
+        param = parser.parseParameter(buf, cursor);
+        assertEquals("test", param.getName());
+        assertEquals("text/stuff", param.getValue());
+
         s = "test  = \"  stuff\\\"\"";
         buf = ContentUtil.encode(s);
         cursor = new ParserCursor(0, s.length());
@@ -351,6 +392,23 @@ public class RawFieldParserTest extends TestCase {
         assertEquals("value2", params.get(3).getValue());
         assertEquals("param3", params.get(4).getName());
         assertEquals("value3", params.get(4).getValue());
+    }
+
+    public void testRawBodyParseWithComments() {
+        ByteSequence buf = ContentUtil.encode(
+                "  text/(nothing special)plain ; charset=(latin)ISO-8859-1; "
+                + "boundary=foo(bar);");
+        RawFieldParser parser = new RawFieldParser();
+        ParserCursor cursor = new ParserCursor(0, buf.length());
+        RawBody body = parser.parseRawBody(buf, cursor);
+        assertNotNull(body);
+        assertEquals("text/plain", body.getValue());
+        List<NameValuePair> params = body.getParams();
+        assertEquals(2, params.size());
+        assertEquals("charset", params.get(0).getName());
+        assertEquals("ISO-8859-1", params.get(0).getValue());
+        assertEquals("boundary", params.get(1).getName());
+        assertEquals("foo", params.get(1).getValue());
     }
 
     public void testRawBodyParseEmptyParam() {
