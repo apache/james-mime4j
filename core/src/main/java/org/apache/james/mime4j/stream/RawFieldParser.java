@@ -265,7 +265,7 @@ public class RawFieldParser {
                 }
                 if (current == '\\') {
                     escaped = true;
-                } else {
+                } else if (current != '\r' && current != '\n') {
                     dst.append(current);
                 }
             }
