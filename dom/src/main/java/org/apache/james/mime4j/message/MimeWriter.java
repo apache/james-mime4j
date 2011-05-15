@@ -31,9 +31,8 @@ import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.dom.field.FieldName;
-import org.apache.james.mime4j.dom.field.FieldRawData;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -195,10 +194,7 @@ public class MimeWriter {
      *             if an I/O error occurs.
      */
     public void writeField(Field field, OutputStream out) throws IOException {
-        ByteSequence raw = null;
-        if (field instanceof FieldRawData) {
-            raw = ((FieldRawData) field).getRaw();
-        }
+        ByteSequence raw = field.getRaw();
         if (raw == null) {
             StringBuilder buf = new StringBuilder();
             buf.append(field.getName());

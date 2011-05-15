@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.james.mime4j.dom.Header;
-import org.apache.james.mime4j.dom.field.Field;
+import org.apache.james.mime4j.stream.Field;
 
 /**
  * The header of an entity (see RFC 2045).

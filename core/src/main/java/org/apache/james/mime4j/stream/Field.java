@@ -17,15 +17,29 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.dom.field;
+package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Abstract MIME field.
  */
-public interface FieldRawData extends Field {
+public interface Field {
     
+    /**
+     * Gets the name of the field (<code>Subject</code>, <code>From</code>, etc).
+     * 
+     * @return the field name.
+     */
+    String getName();
+
+    /**
+     * Gets the unparsed and possibly encoded (see RFC 2047) field body string.
+     * 
+     * @return the unparsed field body string.
+     */
+    String getBody();
+
     /**
      * Gets original (raw) representation of the field, if available, 
      * <code>null</code> otherwise.

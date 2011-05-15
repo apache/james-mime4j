@@ -34,8 +34,8 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.stream.Field;
 
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).

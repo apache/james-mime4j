@@ -101,7 +101,7 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * 
      * @param field the MIME field.
      */
-    public void addField(RawField field) throws MimeException {
+    public void addField(Field field) throws MimeException {
         String name = field.getName().toLowerCase(Locale.US);
         
         if (name.equals("content-transfer-encoding") && !contentTransferEncSet) {
@@ -131,9 +131,15 @@ public class DefaultBodyDescriptor implements MutableBodyDescriptor {
         }
     }
 
-    private void parseContentType(RawField field) throws MimeException {
+    private void parseContentType(Field field) throws MimeException {
         contentTypeSet = true;
-        RawBody body = RawFieldParser.DEFAULT.parseRawBody(field);
+        RawField rawfield;
+        if (field instanceof RawField) {
+            rawfield = ((RawField) field);
+        } else {
+            rawfield = new RawField(field.getName(), field.getBody());
+        }
+        RawBody body = RawFieldParser.DEFAULT.parseRawBody(rawfield);
         String main = body.getValue();
         Map<String, String> params = new HashMap<String, String>();
         for (NameValuePair nmp: body.getParams()) {

@@ -21,7 +21,7 @@ package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.Field;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +56,7 @@ public abstract class AbstractContentHandler implements ContentHandler {
     public void epilogue(InputStream is) throws MimeException, IOException {
     }
     
-    public void field(RawField field) throws MimeException {
+    public void field(Field field) throws MimeException {
     }
     
     public void preamble(InputStream is) throws MimeException, IOException {

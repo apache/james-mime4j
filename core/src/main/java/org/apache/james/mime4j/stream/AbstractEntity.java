@@ -47,7 +47,7 @@ abstract class AbstractEntity implements EntityStateMachine {
     private int lineCount;
     private boolean endOfHeader;
     private int headerCount;
-    private RawField field;
+    private Field field;
 
     AbstractEntity(
             MimeEntityConfig config,
@@ -140,11 +140,12 @@ abstract class AbstractEntity implements EntityStateMachine {
             fieldBuilder.reset();
             readRawField();
             try {
-                field = fieldBuilder.build();
-                if (field == null) {
+                RawField rawfield = fieldBuilder.build();
+                field = rawfield;
+                if (rawfield == null) {
                     continue;
                 }
-                if (field.getDelimiterIdx() != field.getName().length()) {
+                if (rawfield.getDelimiterIdx() != rawfield.getName().length()) {
                     monitor(Event.OBSOLETE_HEADER);
                 }
                 body.addField(field);
@@ -194,7 +195,7 @@ abstract class AbstractEntity implements EntityStateMachine {
      * @throws IllegalStateException {@link #getState()} returns another
      *   value than {@link EntityState#T_FIELD}.
      */
-    public RawField getField() {
+    public Field getField() {
         switch (getState()) {
         case T_FIELD:
             return field;

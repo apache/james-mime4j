@@ -43,10 +43,10 @@ import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.FieldsTest;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MimeBuilder;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 
 public class MessageParserTest extends TestCase {

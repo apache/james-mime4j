@@ -23,10 +23,10 @@ import junit.framework.TestCase;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.james.mime4j.dom.Header;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MimeWriter;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ContentUtil;
 

@@ -33,11 +33,11 @@ import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
 import org.apache.james.mime4j.dom.field.AddressListField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
+import org.apache.james.mime4j.stream.Field;
 
 public abstract class AbstractMessage extends AbstractEntity implements Message {
 

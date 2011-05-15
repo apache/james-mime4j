@@ -32,13 +32,12 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
-import org.apache.james.mime4j.stream.RawField;
 
 /**
  * Utility class for copying message and parsing message elements.
@@ -212,8 +211,8 @@ public class MimeBuilder {
                 parser.stop();
             }
             @Override
-            public void field(RawField field) throws MimeException {
-                Field parsedField = DefaultFieldParser.parse(field.getRaw(), monitor); 
+            public void field(Field field) throws MimeException {
+                Field parsedField = DefaultFieldParser.parse(field, monitor); 
                 header.addField(parsedField);
             }
         });

@@ -23,6 +23,7 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.ParsedField;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -57,7 +58,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
     public static ParsedField parse(
             final ByteSequence raw, 
             final DecodeMonitor monitor) throws MimeException {
-        RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
+        Field rawField = RawFieldParser.DEFAULT.parseField(raw);
         return PARSER.parse(rawField.getName(), rawField.getBody(), raw, monitor);
     }
 
@@ -73,7 +74,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      * @throws MimeException if the raw string cannot be split into field name and body.
      */
     public static ParsedField parse(
-            final RawField rawField, 
+            final Field rawField, 
             final DecodeMonitor monitor) throws MimeException {
         return PARSER.parse(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
     }

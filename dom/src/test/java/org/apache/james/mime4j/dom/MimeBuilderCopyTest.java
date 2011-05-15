@@ -26,7 +26,6 @@ import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
@@ -34,6 +33,7 @@ import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MimeBuilder;
 import org.apache.james.mime4j.message.MultipartImpl;
+import org.apache.james.mime4j.stream.Field;
 
 import junit.framework.TestCase;
 

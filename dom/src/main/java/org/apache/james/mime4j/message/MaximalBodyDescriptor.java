@@ -39,6 +39,7 @@ import org.apache.james.mime4j.stream.DefaultBodyDescriptor;
 import org.apache.james.mime4j.stream.RawBody;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
 import org.apache.james.mime4j.stream.NameValuePair;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -119,7 +120,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
     }
 
     @Override
-    public void addField(RawField field) throws MimeException {
+    public void addField(Field field) throws MimeException {
         String name = field.getName().toLowerCase(Locale.US);;
         if (MimeUtil.MIME_HEADER_MIME_VERSION.equals(name) && !isMimeVersionSet) {
             parseMimeVersion(field);
@@ -140,7 +141,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         }
     }
     
-    private void parseMD5(final RawField field) {
+    private void parseMD5(final Field field) {
         String value = field.getBody();
         isContentMD5Set = true;
         if (value != null) {
@@ -148,7 +149,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         }
     }
 
-    private void parseLocation(final RawField field) {
+    private void parseLocation(final Field field) {
         isContentLocationSet = true;
         String value = field.getBody();
         if (value != null) {
@@ -169,7 +170,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         }
     }
     
-    private void parseLanguage(final RawField field) {
+    private void parseLanguage(final Field field) {
         isContentLanguageSet = true;
         String value = field.getBody();
         if (value != null) {
@@ -182,9 +183,15 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         }
     }
 
-    private void parseContentDisposition(final RawField field) throws MimeException {
+    private void parseContentDisposition(final Field field) throws MimeException {
         isContentDispositionSet = true;
-        RawBody body = RawFieldParser.DEFAULT.parseRawBody(field);
+        RawField rawfield;
+        if (field instanceof RawField) {
+            rawfield = ((RawField) field);
+        } else {
+            rawfield = new RawField(field.getName(), field.getBody());
+        }
+        RawBody body = RawFieldParser.DEFAULT.parseRawBody(rawfield);
         Map<String, String> params = new HashMap<String, String>();
         for (NameValuePair nmp: body.getParams()) {
             String name = nmp.getName().toLowerCase(Locale.US);
@@ -242,7 +249,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         return result;
     }
     
-    private void parseContentDescription(final RawField field) {
+    private void parseContentDescription(final Field field) {
         String value = field.getBody();
         if (value == null) {
             contentDescription = "";
@@ -252,7 +259,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         isContentDescriptionSet = true;
     }
 
-    private void parseContentId(final RawField field) {
+    private void parseContentId(final Field field) {
         String value = field.getBody();
         if (value == null) {
             contentId = "";
@@ -262,7 +269,7 @@ public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
         isContentIdSet = true;
     }
 
-    private void parseMimeVersion(RawField field) {
+    private void parseMimeVersion(Field field) {
         final StringReader reader = new StringReader(field.getBody());
         final MimeVersionParser parser = new MimeVersionParser(reader);
         try {

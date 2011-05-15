@@ -22,9 +22,9 @@ package org.apache.james.mime4j.message;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Header;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.RawField;
 
 /**
@@ -68,8 +68,8 @@ public abstract class SimpleContentHandler extends AbstractContentHandler {
      * @see org.apache.james.mime4j.parser.AbstractContentHandler#field(RawField)
      */
     @Override
-    public final void field(RawField field) throws MimeException {
-        Field parsedField = DefaultFieldParser.parse(field.getRaw(), monitor); 
+    public final void field(Field field) throws MimeException {
+        Field parsedField = DefaultFieldParser.parse(field, monitor); 
         currHeader.addField(parsedField);
     }
 

@@ -35,12 +35,11 @@ import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
-import org.apache.james.mime4j.dom.field.Field;
-import org.apache.james.mime4j.dom.field.FieldRawData;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.address.AddressBuilder;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -386,11 +385,9 @@ public class FieldsTest extends TestCase {
 
     public static String decode(Field f) throws IOException {
         String s = null;
-        if (f instanceof FieldRawData) {
-            ByteSequence raw = ((FieldRawData) f).getRaw();
-            if (raw != null) {
-                s = ContentUtil.decode(raw);
-            }
+        ByteSequence raw = f.getRaw();
+        if (raw != null) {
+            s = ContentUtil.decode(raw);
         }
         if (s == null) {
             StringBuilder buf = new StringBuilder();

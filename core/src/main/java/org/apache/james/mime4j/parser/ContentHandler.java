@@ -21,7 +21,7 @@ package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.Field;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -125,7 +125,7 @@ public interface ContentHandler {
      * @param rawField the MIME field.
      * @throws MimeException on processing errors
      */
-    void field(RawField rawField) throws MimeException;
+    void field(Field rawField) throws MimeException;
 
     /**
      * Called when there are no more header fields in a message or body part.

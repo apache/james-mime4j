@@ -22,9 +22,9 @@ package org.apache.james.mime4j.field;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.stream.Field;
 
 import junit.framework.TestCase;
 

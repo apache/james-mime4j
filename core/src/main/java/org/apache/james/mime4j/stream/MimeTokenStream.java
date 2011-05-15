@@ -344,7 +344,7 @@ public class MimeTokenStream {
      * @throws IllegalStateException {@link #getState()} returns another
      *   value than {@link #T_FIELD}.
      */
-    public RawField getField() {
+    public Field getField() {
         return currentStateMachine.getField();
     }
     

@@ -31,7 +31,7 @@ public interface MutableBodyDescriptor extends BodyDescriptor {
      * Adds a field to the body descriptor.
      * @param field the MIME field.
      */
-    void addField(RawField field) throws MimeException;
+    void addField(Field field) throws MimeException;
     
     MutableBodyDescriptor newChild();
 

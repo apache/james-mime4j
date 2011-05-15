@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.dom.field.FieldRawData;
 import org.apache.james.mime4j.dom.field.ParseException;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -28,7 +27,7 @@ import org.apache.james.mime4j.util.ByteSequence;
 /**
  * The base class of all field classes.
  */
-public abstract class AbstractField implements ParsedField, FieldRawData {
+public abstract class AbstractField implements ParsedField {
 
     private final String name;
     private final String body;

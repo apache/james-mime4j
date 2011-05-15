@@ -30,10 +30,10 @@ import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.field.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -103,7 +103,7 @@ class EntityBuilder implements ContentHandler {
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#field(RawField)
      */
-    public void field(RawField field) throws MimeException {
+    public void field(Field field) throws MimeException {
         expect(Header.class);
         Field parsedField = DefaultFieldParser.parse(field, monitor); 
         ((Header) stack.peek()).addField(parsedField);

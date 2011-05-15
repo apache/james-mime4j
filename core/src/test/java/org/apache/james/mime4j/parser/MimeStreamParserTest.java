@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
@@ -92,7 +92,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(RawField field) {
+            public void field(Field field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -116,7 +116,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(RawField field) {
+            public void field(Field field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -140,7 +140,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(RawField field) {
+            public void field(Field field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -201,7 +201,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(RawField field) {
+            public void field(Field field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -250,7 +250,7 @@ public class MimeStreamParserTest extends TestCase {
             }
 
             @Override
-            public void field(RawField field) {
+            public void field(Field field) {
                 fail("field shouldn't be called for empty stream");
             }
 
@@ -293,7 +293,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(RawField field) {
+            public void field(Field field) {
                 fail("No fields should be reported");
             }
             @Override
@@ -324,7 +324,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(RawField field) {
+            public void field(Field field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
             @Override
@@ -352,7 +352,7 @@ public class MimeStreamParserTest extends TestCase {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(RawField field) {
+            public void field(Field field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
@@ -371,7 +371,7 @@ public class MimeStreamParserTest extends TestCase {
         parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
-            public void field(RawField field) {
+            public void field(Field field) {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
