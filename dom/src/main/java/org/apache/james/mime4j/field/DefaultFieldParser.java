@@ -21,9 +21,14 @@ package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.field.AddressListField;
+import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.dom.field.MailboxField;
+import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -121,19 +126,19 @@ public class DefaultFieldParser extends DelegatingFieldParser {
         setFieldParser(FieldName.CONTENT_DISPOSITION,
                 ContentDispositionFieldImpl.PARSER);
 
-        final FieldParser<DateTimeFieldImpl> dateTimeParser = DateTimeFieldImpl.PARSER;
+        final FieldParser<DateTimeField> dateTimeParser = DateTimeFieldImpl.PARSER;
         setFieldParser(FieldName.DATE, dateTimeParser);
         setFieldParser(FieldName.RESENT_DATE, dateTimeParser);
 
-        final FieldParser<MailboxListFieldImpl> mailboxListParser = MailboxListFieldImpl.PARSER;
+        final FieldParser<MailboxListField> mailboxListParser = MailboxListFieldImpl.PARSER;
         setFieldParser(FieldName.FROM, mailboxListParser);
         setFieldParser(FieldName.RESENT_FROM, mailboxListParser);
 
-        final FieldParser<MailboxFieldImpl> mailboxParser = MailboxFieldImpl.PARSER;
+        final FieldParser<MailboxField> mailboxParser = MailboxFieldImpl.PARSER;
         setFieldParser(FieldName.SENDER, mailboxParser);
         setFieldParser(FieldName.RESENT_SENDER, mailboxParser);
 
-        final FieldParser<AddressListFieldImpl> addressListParser = AddressListFieldImpl.PARSER;
+        final FieldParser<AddressListField> addressListParser = AddressListFieldImpl.PARSER;
         setFieldParser(FieldName.TO, addressListParser);
         setFieldParser(FieldName.RESENT_TO, addressListParser);
         setFieldParser(FieldName.CC, addressListParser);

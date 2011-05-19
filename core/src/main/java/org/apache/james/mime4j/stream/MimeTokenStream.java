@@ -75,6 +75,7 @@ public class MimeTokenStream {
     private final MimeEntityConfig config;
     private final DecodeMonitor monitor;
     private final FieldBuilder fieldBuilder;
+    private final FieldParser<?> fieldParser;
     private final MutableBodyDescriptorFactory bodyDescFactory;
     private final LinkedList<EntityStateMachine> entities = new LinkedList<EntityStateMachine>();
     
@@ -96,31 +97,35 @@ public class MimeTokenStream {
     }
 
     public MimeTokenStream(final MimeEntityConfig config) {
-        this(config, null, null, null);
+        this(config, null, null, null, null);
     }
         
     public MimeTokenStream(
             final MimeEntityConfig config, 
+            final FieldParser<?> fieldParser,
             final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(config, null, null, bodyDescFactory);
+        this(config, null, null, fieldParser, bodyDescFactory);
     }
 
     public MimeTokenStream(
             final MimeEntityConfig config, 
             final DecodeMonitor monitor,
+            final FieldParser<?> fieldParser,
             final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(config, monitor, null, bodyDescFactory);
+        this(config, monitor, null, fieldParser, bodyDescFactory);
     }
 
     public MimeTokenStream(
             final MimeEntityConfig config, 
             final DecodeMonitor monitor,
             final FieldBuilder fieldBuilder,
+            final FieldParser<?> fieldParser,
             final MutableBodyDescriptorFactory bodyDescFactory) {
         super();
         this.config = config;
         this.fieldBuilder = fieldBuilder != null ? fieldBuilder : 
             new DefaultFieldBuilder(config.getMaxHeaderLen());
+        this.fieldParser = fieldParser;
         this.monitor = monitor != null ? monitor : 
             (config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
         this.bodyDescFactory = bodyDescFactory;
@@ -198,6 +203,7 @@ public class MimeTokenStream {
                 EntityState.T_END_MESSAGE,
                 monitor,
                 fieldBuilder,
+                fieldParser,
                 newBodyDescriptor);
 
         rootentity.setRecursionMode(recursionMode);

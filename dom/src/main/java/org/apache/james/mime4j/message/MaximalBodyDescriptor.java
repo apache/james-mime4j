@@ -35,7 +35,6 @@ import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
 import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
 import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.DefaultBodyDescriptor;
 import org.apache.james.mime4j.stream.RawBody;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
 import org.apache.james.mime4j.stream.NameValuePair;
@@ -48,7 +47,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * Parses and stores values for standard MIME header values.
  * 
  */
-public class MaximalBodyDescriptor extends DefaultBodyDescriptor {
+public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
 
     private static final int DEFAULT_MINOR_VERSION = 0;
     private static final int DEFAULT_MAJOR_VERSION = 1;

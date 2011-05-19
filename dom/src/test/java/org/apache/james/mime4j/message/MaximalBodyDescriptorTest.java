@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.dom.datetime.DateTime;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.MaximalBodyDescriptor;
 import org.apache.james.mime4j.message.MaximalBodyDescriptorFactory;
 import org.apache.james.mime4j.stream.BaseTestForBodyDescriptors;
@@ -41,7 +42,8 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         super.setUp();
         MimeEntityConfig config = new MimeEntityConfig();
         config.setStrictParsing(true);
-        parser = new MimeTokenStream(config, new MaximalBodyDescriptorFactory());
+        parser = new MimeTokenStream(config, 
+                DefaultFieldParser.getParser(), new MaximalBodyDescriptorFactory());
     }
 
     @Override

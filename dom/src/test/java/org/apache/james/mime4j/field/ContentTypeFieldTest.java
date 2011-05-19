@@ -48,7 +48,7 @@ public class ContentTypeFieldTest extends TestCase {
         assertEquals("x-app/yada", f.getMimeType());
         
         f = (ContentTypeField) DefaultFieldParser.parse("CONTENT-TYPE:   yada");
-        assertEquals("", f.getMimeType());
+        assertEquals(null, f.getMimeType());
     }
     
     public void testGetMimeTypeStatic() throws Exception {

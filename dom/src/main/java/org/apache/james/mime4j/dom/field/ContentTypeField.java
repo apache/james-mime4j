@@ -44,6 +44,16 @@ public interface ContentTypeField extends ParsedField {
     String getMimeType();
 
     /**
+     * Gets the media type defined in this Content-Type field.
+     */
+    String getMediaType();
+
+    /**
+     * Gets the subtype defined in this Content-Type field.
+     */
+    String getSubType();
+    
+    /**
      * Gets the value of a parameter. Parameter names are case-insensitive.
      * 
      * @param name

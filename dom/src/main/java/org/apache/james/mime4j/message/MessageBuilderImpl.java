@@ -26,6 +26,8 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
+import org.apache.james.mime4j.dom.field.ParsedField;
+import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
@@ -36,6 +38,7 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 public class MessageBuilderImpl implements MessageBuilder {
 
     private MimeBuilder mimeBuilder = null;
+    private FieldParser<? extends ParsedField> fieldParser = null;
     private BodyFactory bodyFactory = null;
     private MimeEntityConfig mimeEntityConfig = null;
     private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
@@ -67,12 +70,17 @@ public class MessageBuilderImpl implements MessageBuilder {
         return getMimeBuilder().parse(source, 
                 mimeEntityConfig,
                 decodeMonitor,
+                fieldParser,
                 bodyFactory, 
                 mutableBodyDescriptorFactory, 
                 contentDecoding,
                 flatMode);
     }
     
+    public void setFieldParser(FieldParser<? extends ParsedField> fieldParser) {
+        this.fieldParser = fieldParser;
+    }
+
     public void setBodyFactory(BodyFactory bodyFactory) {
         this.bodyFactory = bodyFactory;
     }

@@ -17,14 +17,13 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.field;
+package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.util.ByteSequence;
 
-public interface FieldParser<T extends ParsedField> {
+public interface FieldParser<T extends Field> {
     
-    T parse(final String name, final String body, final ByteSequence raw, DecodeMonitor monitor);
+    T parse(String name, String body, ByteSequence raw, DecodeMonitor monitor);
     
 }

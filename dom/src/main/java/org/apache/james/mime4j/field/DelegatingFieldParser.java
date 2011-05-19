@@ -24,10 +24,12 @@ import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ParsedField;
+import org.apache.james.mime4j.dom.field.UnstructuredField;
+import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
 public class DelegatingFieldParser implements FieldParser<ParsedField> {
-    private static final FieldParser<UnstructuredFieldImpl> DEFAULT_PARSER = UnstructuredFieldImpl.PARSER;
+    private static final FieldParser<UnstructuredField> DEFAULT_PARSER = UnstructuredFieldImpl.PARSER;
 
     private Map<String, FieldParser<? extends ParsedField>> parsers = new HashMap<String, FieldParser<? extends ParsedField>>();
 

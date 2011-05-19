@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j.message;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -25,13 +25,21 @@ import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.dom.field.ContentTypeField;
+import org.apache.james.mime4j.field.ContentTransferEncodingFieldImpl;
+import org.apache.james.mime4j.field.ContentTypeFieldImpl;
+import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.MutableBodyDescriptor;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * Encapsulates the values of the MIME-specific header fields 
  * (which starts with <code>Content-</code>). 
  */
-class DefaultBodyDescriptor implements MutableBodyDescriptor {
+public class MinimalBodyDescriptor implements MutableBodyDescriptor {
+    
     private static final String US_ASCII = "us-ascii";
 
     private static final String SUB_TYPE_EMAIL = "rfc822";
@@ -64,7 +72,7 @@ class DefaultBodyDescriptor implements MutableBodyDescriptor {
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
      */
-    public DefaultBodyDescriptor() {
+    public MinimalBodyDescriptor() {
         this(null, null);
     }
 
@@ -74,7 +82,7 @@ class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * @param parent the descriptor of the parent or <code>null</code> if this
      *        is the root descriptor.
      */
-    public DefaultBodyDescriptor(final BodyDescriptor parent, final DecodeMonitor monitor) {
+    public MinimalBodyDescriptor(final BodyDescriptor parent, final DecodeMonitor monitor) {
         if (parent != null && MimeUtil.isSameMimeType("multipart/digest", parent.getMimeType())) {
             this.mimeType = EMAIL_MESSAGE_MIME_TYPE;
             this.subType = SUB_TYPE_EMAIL;
@@ -92,7 +100,7 @@ class DefaultBodyDescriptor implements MutableBodyDescriptor {
     }
     
     public MutableBodyDescriptor newChild() {
-		return new DefaultBodyDescriptor(this, getDecodeMonitor());
+		return new MinimalBodyDescriptor(this, getDecodeMonitor());
     }
     
     /**
@@ -105,101 +113,73 @@ class DefaultBodyDescriptor implements MutableBodyDescriptor {
         String name = field.getName().toLowerCase(Locale.US);
         
         if (name.equals("content-transfer-encoding") && !contentTransferEncSet) {
-            contentTransferEncSet = true;
-            String value = field.getBody();
-            if (value != null) {
-                value = value.trim().toLowerCase(Locale.US);
-                if (value.length() > 0) {
-                    transferEncoding = value;
-                }
-            }
+            parseContentTransferEncoding(field);
         } else if (name.equals("content-length") && contentLength == -1) {
-            String value = field.getBody();
-            if (value != null) {
-                value = value.trim();
-                try {
-                    contentLength = Long.parseLong(value.trim());
-                } catch (NumberFormatException e) {
-                    if (monitor.warn("Invalid content length: " + value, 
-                            "ignoring Content-Length header")) {
-                        throw new MimeException("Invalid Content-Length header: " + value);
-                    }
-                }
-            }
+            parseContentLength(field);
         } else if (name.equals("content-type") && !contentTypeSet) {
             parseContentType(field);
         }
     }
 
-    private void parseContentType(Field field) throws MimeException {
-        contentTypeSet = true;
-        RawField rawfield;
-        if (field instanceof RawField) {
-            rawfield = ((RawField) field);
+    private void parseContentTransferEncoding(Field field) throws MimeException {
+        contentTransferEncSet = true;
+        ContentTransferEncodingField f;
+        if (field instanceof ContentTransferEncodingField) {
+            f = (ContentTransferEncodingField) field;
         } else {
-            rawfield = new RawField(field.getName(), field.getBody());
+            f = ContentTransferEncodingFieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), monitor);
         }
-        RawBody body = RawFieldParser.DEFAULT.parseRawBody(rawfield);
-        String main = body.getValue();
-        Map<String, String> params = new HashMap<String, String>();
-        for (NameValuePair nmp: body.getParams()) {
-            String name = nmp.getName().toLowerCase(Locale.US);
-            params.put(name, nmp.getValue());
-        }
-        
-        String type = null;
-        String subtype = null;
-        if (main != null) {
-            main = main.toLowerCase().trim();
-            int index = main.indexOf('/');
-            boolean valid = false;
-            if (index != -1) {
-                type = main.substring(0, index).trim();
-                subtype = main.substring(index + 1).trim();
-                if (type.length() > 0 && subtype.length() > 0) {
-                    main = type + "/" + subtype;
-                    valid = true;
+        transferEncoding = f.getEncoding();
+    }
+
+    private void parseContentLength(Field field) throws MimeException {
+        String value = field.getBody();
+        if (value != null) {
+            try {
+                long v = Long.parseLong(value);
+                if (v < 0) {
+                    if (monitor.warn("Negative content length: " + value, 
+                            "ignoring Content-Length header")) {
+                        throw new MimeException("Negative Content-Length header: " + value);
+                    }
+                } else {
+                    contentLength = v;
+                }
+            } catch (NumberFormatException e) {
+                if (monitor.warn("Invalid content length: " + value, 
+                        "ignoring Content-Length header")) {
+                    throw new MimeException("Invalid Content-Length header: " + value);
                 }
             }
-            
-            if (!valid) {
-                main = null;
-                type = null;
-                subtype = null;
-            }
         }
-        String b = params.get("boundary");
-        
-        if (main != null 
-                && ((main.startsWith("multipart/") && b != null) 
-                        || !main.startsWith("multipart/"))) {
-            mimeType = main;
-            this.subType = subtype;
-            this.mediaType = type;
+    }
+
+    private void parseContentType(Field field) throws MimeException {
+        contentTypeSet = true;
+        ContentTypeField f;
+        if (field instanceof ContentTypeField) {
+            f = (ContentTypeField) field;
+        } else {
+            f = ContentTypeFieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), monitor);
         }
-        
+        String mimetype = f.getMimeType();
+        if (mimetype != null) {
+            mimeType = mimetype;
+            mediaType = f.getMediaType();
+            subType = f.getSubType();
+        }
         if (MimeUtil.isMultipart(mimeType)) {
-            boundary = b;
+            boundary = f.getBoundary();
         }
-        
-        String c = params.get("charset");
-        charset = null;
-        if (c != null) {
-            c = c.trim();
-            if (c.length() > 0) {
-                charset = c.toLowerCase();
-            }
-        }
-        if (charset == null && MEDIA_TYPE_TEXT.equals(mediaType)) {
+        charset = f.getCharset();
+        if (charset == null && MEDIA_TYPE_TEXT.equalsIgnoreCase(mediaType)) {
             charset = US_ASCII;
         }
-        
-        /*
-         * Add all other parameters to parameters.
-         */
-        parameters.putAll(params);
-        parameters.remove("boundary");
+        parameters.putAll(f.getParameters());
         parameters.remove("charset");
+        parameters.remove("boundary");
     }
 
     /**

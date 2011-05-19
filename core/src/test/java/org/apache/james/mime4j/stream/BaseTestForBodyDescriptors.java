@@ -53,15 +53,6 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         assertEquals(2, bd.getContentTypeParameters().size());
         assertEquals(" value with\tspaces ", bd.getContentTypeParameters().get("param1"));
         assertEquals("\"value4 with escaped \" \"", bd.getContentTypeParameters().get("param2"));
-        
-        /*
-         * Make sure escaped characters (except ") are still escaped.
-         * The parameter value should be \n\"
-         */
-        bd = newBodyDescriptor();
-        bd.addField(new RawField("Content-Type ", "text/plain; param=\"\\n\\\\\\\"\""));
-        assertEquals(1, bd.getContentTypeParameters().size());
-        assertEquals("\\n\\\"", bd.getContentTypeParameters().get("param"));
     }
     
     public void testAddField() throws Exception {
@@ -73,10 +64,10 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         bd = newBodyDescriptor();
         bd.addField(new RawField("Content-Type ", "text/plain; charset=ISO-8859-1"));
         assertEquals("text/plain", bd.getMimeType());
-        assertEquals("iso-8859-1", bd.getCharset());
+        assertEquals("ISO-8859-1", bd.getCharset());
         bd.addField(new RawField("Content-Type ", "text/html; charset=us-ascii"));
         assertEquals("text/plain", bd.getMimeType());
-        assertEquals("iso-8859-1", bd.getCharset());
+        assertEquals("ISO-8859-1", bd.getCharset());
     }
     
     public void testGetMimeType() throws Exception {
@@ -144,7 +135,7 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         bd = newBodyDescriptor();
         assertEquals("us-ascii", bd.getCharset());
         bd.addField(new RawField("Content-Type ", "text/type; charset=ISO-8859-1"));
-        assertEquals("iso-8859-1", bd.getCharset());
+        assertEquals("ISO-8859-1", bd.getCharset());
         
         bd = newBodyDescriptor();
         assertEquals("us-ascii", bd.getCharset());
@@ -162,18 +153,6 @@ public abstract class BaseTestForBodyDescriptors extends TestCase {
         bd.addField(new RawField("Content-Type", "multipart/yada; boundary=yada"));
         assertEquals("yada", bd.getBoundary());
 
-        /*
-         * Test some weird parameters.
-         */
-        bd = newBodyDescriptor();
-        bd.addField(new RawField("Content-Type", "multipart/yada; boundary=yada yada"));
-        assertEquals("yada yada", bd.getBoundary());
-        
-        bd = newBodyDescriptor();
-        bd.addField(new RawField("Content-Type", "multipart/yada; boUNdarY= ya:*da; \tcharset\t =  big5"));
-        assertEquals("ya:*da", bd.getBoundary());
-        assertEquals("big5", bd.getCharset());
-        
         bd = newBodyDescriptor();
         bd.addField(new RawField("Content-Type", "multipart/yada; boUNdarY= \"ya \\\"\\\"\tda \\\"\"; "
                             + "\tcharset\t =  \"\\\"hepp\\\"  =us\t-ascii\""));

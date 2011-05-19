@@ -21,6 +21,7 @@ package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -56,8 +57,8 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
         return MimeUtil.ENC_7BIT;
     }
 
-    static final FieldParser<ContentTransferEncodingFieldImpl> PARSER = new FieldParser<ContentTransferEncodingFieldImpl>() {
-        public ContentTransferEncodingFieldImpl parse(final String name, final String body,
+    public static final FieldParser<ContentTransferEncodingField> PARSER = new FieldParser<ContentTransferEncodingField>() {
+        public ContentTransferEncodingField parse(final String name, final String body,
                 final ByteSequence raw, DecodeMonitor monitor) {
             return new ContentTransferEncodingFieldImpl(name, body, raw, monitor);
         }

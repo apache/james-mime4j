@@ -28,10 +28,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.field.contentdisposition.parser.ContentDispositionParser;
 import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
 import org.apache.james.mime4j.field.contentdisposition.parser.TokenMgrError;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
+import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
@@ -244,8 +246,8 @@ public class ContentDispositionFieldImpl extends AbstractField implements org.ap
         parsed = true;
     }
 
-    static final FieldParser<ContentDispositionFieldImpl> PARSER = new FieldParser<ContentDispositionFieldImpl>() {
-        public ContentDispositionFieldImpl parse(final String name, final String body,
+    public static final FieldParser<ContentDispositionField> PARSER = new FieldParser<ContentDispositionField>() {
+        public ContentDispositionField parse(final String name, final String body,
                 final ByteSequence raw, DecodeMonitor monitor) {
             return new ContentDispositionFieldImpl(name, body, raw, monitor);
         }

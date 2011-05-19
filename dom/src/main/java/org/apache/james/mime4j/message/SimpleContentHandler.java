@@ -22,9 +22,11 @@ package org.apache.james.mime4j.message;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.stream.RawField;
 
 /**
@@ -36,15 +38,19 @@ import org.apache.james.mime4j.stream.RawField;
  */
 public abstract class SimpleContentHandler extends AbstractContentHandler {
 
+    private final FieldParser<? extends ParsedField> fieldParser; 
     private final DecodeMonitor monitor;
     
-    public SimpleContentHandler(final DecodeMonitor monitor) {
+    public SimpleContentHandler(
+            final FieldParser<? extends ParsedField> fieldParser, 
+            final DecodeMonitor monitor) {
         super();
-        this.monitor = monitor;
+        this.fieldParser = fieldParser != null ? fieldParser : DefaultFieldParser.getParser();
+        this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
     }
     
     public SimpleContentHandler() {
-        this(null);
+        this(null, null);
     }
     
     /**
@@ -69,7 +75,13 @@ public abstract class SimpleContentHandler extends AbstractContentHandler {
      */
     @Override
     public final void field(Field field) throws MimeException {
-        Field parsedField = DefaultFieldParser.parse(field, monitor); 
+        ParsedField parsedField;
+        if (field instanceof ParsedField) {
+            parsedField = (ParsedField) field;
+        } else {
+            parsedField = fieldParser.parse(
+                    field.getName(), field.getBody(), field.getRaw(), monitor);
+        }
         currHeader.addField(parsedField);
     }
 

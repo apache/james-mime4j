@@ -30,6 +30,7 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.field.contenttype.parser.ContentTypeParser;
 import org.apache.james.mime4j.field.contenttype.parser.ParseException;
 import org.apache.james.mime4j.field.contenttype.parser.TokenMgrError;
+import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
@@ -38,7 +39,9 @@ import org.apache.james.mime4j.util.ByteSequence;
 public class ContentTypeFieldImpl extends AbstractField implements ContentTypeField {
     private boolean parsed = false;
 
-    private String mimeType = "";
+    private String mimeType = null;
+    private String mediaType = null;
+    private String subType = null;
     private Map<String, String> parameters = new HashMap<String, String>();
     private ParseException parseException;
 
@@ -68,6 +71,26 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     /**
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#getMediaType()
+     */
+    public String getMediaType() {
+        if (!parsed)
+            parse();
+
+        return mediaType;
+    }
+
+    /**
+     * @see org.apache.james.mime4j.dom.field.ContentTypeField#getSubType()
+     */
+    public String getSubType() {
+        if (!parsed)
+            parse();
+
+        return subType;
+    }
+
+    /**
      * @see org.apache.james.mime4j.dom.field.ContentTypeField#getParameter(java.lang.String)
      */
     public String getParameter(String name) {
@@ -94,7 +117,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
         if (!parsed)
             parse();
 
-        return this.mimeType.equalsIgnoreCase(mimeType);
+        return this.mimeType != null && this.mimeType.equalsIgnoreCase(mimeType);
     }
 
     /**
@@ -104,7 +127,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
         if (!parsed)
             parse();
 
-        return mimeType.startsWith(TYPE_MULTIPART_PREFIX);
+        return this.mimeType != null && mimeType.startsWith(TYPE_MULTIPART_PREFIX);
     }
 
     /**
@@ -135,7 +158,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
      */
     public static String getMimeType(ContentTypeField child,
             ContentTypeField parent) {
-        if (child == null || child.getMimeType().length() == 0
+        if (child == null || child.getMimeType() == null
                 || child.isMultipart() && child.getBoundary() == null) {
 
             if (parent != null && parent.isMimeType(TYPE_MULTIPART_DIGEST)) {
@@ -177,11 +200,11 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
             parseException = new ParseException(e.getMessage());
         }
 
-        final String type = parser.getType();
-        final String subType = parser.getSubType();
+        mediaType = parser.getType();
+        subType = parser.getSubType();
 
-        if (type != null && subType != null) {
-            mimeType = (type + "/" + subType).toLowerCase();
+        if (mediaType != null && subType != null) {
+            mimeType = (mediaType + "/" + subType).toLowerCase();
 
             List<String> paramNames = parser.getParamNames();
             List<String> paramValues = parser.getParamValues();
@@ -199,8 +222,8 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
         parsed = true;
     }
 
-    static final FieldParser<ContentTypeFieldImpl> PARSER = new FieldParser<ContentTypeFieldImpl>() {
-        public ContentTypeFieldImpl parse(final String name, final String body,
+    public static final FieldParser<ContentTypeField> PARSER = new FieldParser<ContentTypeField>() {
+        public ContentTypeField parse(final String name, final String body,
                 final ByteSequence raw, DecodeMonitor monitor) {
             return new ContentTypeFieldImpl(name, body, raw, monitor);
         }

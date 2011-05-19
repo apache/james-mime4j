@@ -21,8 +21,10 @@ package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.address.MailboxList;
+import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.field.address.ParseException;
+import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
@@ -71,8 +73,8 @@ public class MailboxListFieldImpl extends AbstractField implements org.apache.ja
         parsed = true;
     }
 
-    static final FieldParser<MailboxListFieldImpl> PARSER = new FieldParser<MailboxListFieldImpl>() {
-        public MailboxListFieldImpl parse(final String name, final String body,
+    public static final FieldParser<MailboxListField> PARSER = new FieldParser<MailboxListField>() {
+        public MailboxListField parse(final String name, final String body,
                 final ByteSequence raw, DecodeMonitor monitor) {
             return new MailboxListFieldImpl(name, body, raw, monitor);
         }

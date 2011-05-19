@@ -32,10 +32,12 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
+import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
@@ -202,6 +204,7 @@ public class MimeBuilder {
      */
     public Header parse(
             final InputStream is,
+            final FieldParser<? extends ParsedField> fieldParser,
             final DecodeMonitor monitor) throws IOException, MimeIOException {
         final HeaderImpl header = new HeaderImpl();
         final MimeStreamParser parser = new MimeStreamParser();
@@ -212,7 +215,13 @@ public class MimeBuilder {
             }
             @Override
             public void field(Field field) throws MimeException {
-                Field parsedField = DefaultFieldParser.parse(field, monitor); 
+                ParsedField parsedField;
+                if (field instanceof ParsedField) {
+                    parsedField = (ParsedField) field;
+                } else {
+                    parsedField = fieldParser.parse(
+                            field.getName(), field.getBody(), field.getRaw(), monitor);
+                }
                 header.addField(parsedField);
             }
         });
@@ -246,6 +255,7 @@ public class MimeBuilder {
             final InputStream is, 
             final MimeEntityConfig config,
             final DecodeMonitor monitor,
+            final FieldParser<? extends ParsedField> fieldParser,
             final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory,
             final boolean contentDecoding,
@@ -253,8 +263,12 @@ public class MimeBuilder {
         try {
             MessageImpl message = new MessageImpl();
             DecodeMonitor mon = monitor != null ? monitor : DecodeMonitor.SILENT;
-            MimeStreamParser parser = new MimeStreamParser(config, mon, bodyDescFactory);
-            parser.setContentHandler(new EntityBuilder(message, bodyFactory, mon));
+            FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser : 
+                DefaultFieldParser.getParser();
+            MutableBodyDescriptorFactory bdf = bodyDescFactory != null ? bodyDescFactory :
+                new MinimalBodyDescriptorFactory();
+            MimeStreamParser parser = new MimeStreamParser(config, mon, fp, bdf);
+            parser.setContentHandler(new EntityBuilder(message, fp, bodyFactory, mon));
             parser.setContentDecoding(contentDecoding);
             if (flatMode) {
                 parser.setFlat();
@@ -290,24 +304,27 @@ public class MimeBuilder {
             final InputStream is, 
             final MimeEntityConfig config,
             final DecodeMonitor monitor,
+            final FieldParser<? extends ParsedField> fieldParser,
             final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
-        return parse(is, config, monitor, bodyFactory, bodyDescFactory, true, false);
+        return parse(is, config, monitor, fieldParser, bodyFactory, bodyDescFactory, true, false);
     }
     
     public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
+            final FieldParser<? extends ParsedField> fieldParser,
             final BodyFactory bodyFactory, 
             final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
-        return parse(is, config, null, bodyFactory, bodyDescFactory);
+        return parse(is, config, null, fieldParser, bodyFactory, bodyDescFactory);
     }
 
     public Message parse(
             final InputStream is, 
             final MimeEntityConfig config,
+            final FieldParser<? extends ParsedField> fieldParser,
             final BodyFactory bodyFactory) throws IOException, MimeIOException {
-        return parse(is, config, null, bodyFactory, null);
+        return parse(is, config, null, fieldParser, bodyFactory, null);
     }
 
     /**
@@ -322,7 +339,7 @@ public class MimeBuilder {
      *             on MIME protocol violations.
      */
     public Message parse(InputStream is) throws IOException, MimeIOException {
-        return parse(is, null, null);
+        return parse(is, null, null, null);
     }
 
     /**
@@ -338,7 +355,7 @@ public class MimeBuilder {
      */
     public Message parse(InputStream is, MimeEntityConfig config) throws IOException,
             MimeIOException {
-        return parse(is, config, null);
+        return parse(is, config, null, null);
     }
     
 }

@@ -53,8 +53,9 @@ class MimeEntity extends AbstractEntity {
             EntityState endState,
             DecodeMonitor monitor,
             FieldBuilder fieldBuilder,
+            FieldParser<?> fieldParser,
             MutableBodyDescriptor body) {
-        super(config, startState, endState, monitor, fieldBuilder, body);
+        super(config, startState, endState, monitor, fieldBuilder, fieldParser, body);
         this.lineSource = lineSource;
         this.inbuffer = new BufferedLineReaderInputStream(
                 instream,
@@ -74,7 +75,7 @@ class MimeEntity extends AbstractEntity {
             MutableBodyDescriptor body) {
         this(lineSource, instream, config, startState, endState,
                 config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(config.getMaxHeaderLen()), body);
+                new DefaultFieldBuilder(config.getMaxHeaderLen()), null, body);
     }
 
     MimeEntity(
@@ -85,18 +86,19 @@ class MimeEntity extends AbstractEntity {
         this(lineSource, instream, config,
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(config.getMaxHeaderLen()), body);
+                new DefaultFieldBuilder(config.getMaxHeaderLen()), null, body);
     }
 
     MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
             FieldBuilder fieldBuilder,
+            FieldParser<?> fieldParser,
             MutableBodyDescriptor body) {
         this(lineSource, instream, new MimeEntityConfig(),
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
-                fieldBuilder, body);
+                fieldBuilder, fieldParser, body);
     }
 
     MimeEntity(
@@ -106,7 +108,7 @@ class MimeEntity extends AbstractEntity {
         this(lineSource, instream, new MimeEntityConfig(),
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(-1), body);
+                new DefaultFieldBuilder(-1), null, body);
     }
 
     public RecursionMode getRecursionMode() {
@@ -276,6 +278,7 @@ class MimeEntity extends AbstractEntity {
                     endState,
                     monitor,
                     fieldBuilder,
+                    fieldParser,
                     body.newChild());
             mimeentity.setRecursionMode(recursionMode);
             return mimeentity;
