@@ -19,13 +19,15 @@
 
 package org.apache.james.mime4j.dom.field;
 
-public interface ContentTransferEncodingField extends ParsedField {
+import java.util.List;
+
+public interface ContentLanguageField extends ParsedField {
 
     /**
-     * Gets the encoding defined in this field.
+     * Gets the content language(s) defined in this field.
      * 
-     * @return the content ID or <code>null</code> if not set.
+     * @return a list of content language(s).
      */
-    String getEncoding();
+    List<String> getLanguages();
 
 }

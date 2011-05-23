@@ -19,13 +19,10 @@
 
 package org.apache.james.mime4j.dom.field;
 
-public interface ContentTransferEncodingField extends ParsedField {
+public interface MimeVersionField extends ParsedField {
 
-    /**
-     * Gets the encoding defined in this field.
-     * 
-     * @return the content ID or <code>null</code> if not set.
-     */
-    String getEncoding();
+    int getMinorVersion();
+
+    int getMajorVersion();
 
 }

@@ -20,9 +20,10 @@
 package org.apache.james.mime4j.message;
 
 import java.io.ByteArrayInputStream;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.dom.datetime.DateTime;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.MaximalBodyDescriptor;
 import org.apache.james.mime4j.message.MaximalBodyDescriptorFactory;
@@ -55,21 +56,18 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         MaximalBodyDescriptor descriptor = describe(ExampleMail.RFC822_SIMPLE_BYTES);
         assertEquals(1, descriptor.getMimeMajorVersion());
         assertEquals(0, descriptor.getMimeMinorVersion());
-        assertNull(descriptor.getMimeVersionParseException());
     }
     
     public void testMimeVersion() throws Exception {
         MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION_BYTES);
         assertEquals(2, descriptor.getMimeMajorVersion());
         assertEquals(4, descriptor.getMimeMinorVersion());
-        assertNull(descriptor.getMimeVersionParseException());
     }
     
     public void testContentId() throws Exception {
         MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_8859_BYTES);
         assertEquals(1, descriptor.getMimeMajorVersion());
         assertEquals(0, descriptor.getMimeMinorVersion());
-        assertNull(descriptor.getMimeVersionParseException());
         assertEquals(ExampleMail.CONTENT_ID, descriptor.getContentId());
     }
 
@@ -77,7 +75,6 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_8859_BYTES);
         assertEquals(1, descriptor.getMimeMajorVersion());
         assertEquals(0, descriptor.getMimeMinorVersion());
-        assertNull(descriptor.getMimeVersionParseException());
         assertEquals(ExampleMail.CONTENT_DESCRIPTION, descriptor.getContentDescription());
     }
     
@@ -85,7 +82,6 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         MaximalBodyDescriptor descriptor = describe(ExampleMail.ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES_BYTES);
         assertEquals(4, descriptor.getMimeMajorVersion());
         assertEquals(1, descriptor.getMimeMinorVersion());
-        assertNull(descriptor.getMimeVersionParseException());
     }
     
     public void testContentDispositionType() throws Exception {
@@ -116,9 +112,13 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         assertNotNull(descriptor.getContentDispositionParameters());
         assertEquals(5, descriptor.getContentDispositionParameters().size());
         assertEquals("blob.png", descriptor.getContentDispositionFilename());
-        assertEquals(new DateTime("2008", 6, 21, 15, 32, 18, 0), descriptor.getContentDispositionModificationDate());
-        assertEquals(new DateTime("2008", 6, 20, 10, 15, 9, 0), descriptor.getContentDispositionCreationDate());
-        assertEquals(new DateTime("2008", 6, 22, 12, 8, 56, 0), descriptor.getContentDispositionReadDate());
+        
+        SimpleDateFormat dateparser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        dateparser.setTimeZone(TimeZone.getTimeZone("GMT"));
+        
+        assertEquals(dateparser.parse("2008-06-21 15:32:18"), descriptor.getContentDispositionModificationDate());
+        assertEquals(dateparser.parse("2008-06-20 10:15:09"), descriptor.getContentDispositionCreationDate());
+        assertEquals(dateparser.parse("2008-06-22 12:08:56"), descriptor.getContentDispositionReadDate());
         assertEquals(10234, descriptor.getContentDispositionSize());
     }
     

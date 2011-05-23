@@ -19,29 +19,31 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.StringReader;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.dom.datetime.DateTime;
-import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
-import org.apache.james.mime4j.field.datetime.parser.ParseException;
-import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
-import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
-import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
+import org.apache.james.mime4j.dom.field.ContentDescriptionField;
+import org.apache.james.mime4j.dom.field.ContentDispositionField;
+import org.apache.james.mime4j.dom.field.ContentIdField;
+import org.apache.james.mime4j.dom.field.ContentLanguageField;
+import org.apache.james.mime4j.dom.field.ContentLocationField;
+import org.apache.james.mime4j.dom.field.ContentMD5Field;
+import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.dom.field.MimeVersionField;
+import org.apache.james.mime4j.field.ContentDescriptionFieldImpl;
+import org.apache.james.mime4j.field.ContentDispositionFieldImpl;
+import org.apache.james.mime4j.field.ContentIdFieldImpl;
+import org.apache.james.mime4j.field.ContentLanguageFieldImpl;
+import org.apache.james.mime4j.field.ContentLocationFieldImpl;
+import org.apache.james.mime4j.field.ContentMD5FieldImpl;
+import org.apache.james.mime4j.field.MimeVersionFieldImpl;
 import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.RawBody;
-import org.apache.james.mime4j.stream.MutableBodyDescriptor;
-import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.RawField;
-import org.apache.james.mime4j.stream.RawFieldParser;
-import org.apache.james.mime4j.util.MimeUtil;
+import org.apache.james.mime4j.stream.MutableBodyDescriptor;
 
 /**
  * Parses and stores values for standard MIME header values.
@@ -49,35 +51,13 @@ import org.apache.james.mime4j.util.MimeUtil;
  */
 public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
 
-    private static final int DEFAULT_MINOR_VERSION = 0;
-    private static final int DEFAULT_MAJOR_VERSION = 1;
-    private boolean isMimeVersionSet;
-    private int mimeMinorVersion;
-    private int mimeMajorVersion;
-    private MimeException mimeVersionException;
-    private String contentId;
-    private boolean isContentIdSet;
-    private String contentDescription;
-    private boolean isContentDescriptionSet;
-    private String contentDispositionType;
-    private Map<String, String> contentDispositionParameters;
-    private DateTime contentDispositionModificationDate;
-    private MimeException contentDispositionModificationDateParseException;
-    private DateTime contentDispositionCreationDate;
-    private MimeException contentDispositionCreationDateParseException;
-    private DateTime contentDispositionReadDate;
-    private MimeException contentDispositionReadDateParseException;
-    private long contentDispositionSize;
-    private MimeException contentDispositionSizeParseException;
-    private boolean isContentDispositionSet;
-    private List<String> contentLanguage;
-    private MimeException contentLanguageParseException;
-    private boolean isContentLanguageSet;
-    private MimeException contentLocationParseException;
-    private String contentLocation;
-    private boolean isContentLocationSet;
-    private String contentMD5Raw;
-    private boolean isContentMD5Set;
+    private MimeVersionField mimeVersionField;
+    private ContentIdField contentIdField;
+    private ContentDescriptionField contentDescriptionField;
+    private ContentDispositionField contentDispositionField;
+    private ContentLanguageField contentLanguageField;
+    private ContentLocationField contentLocationField;
+    private ContentMD5Field contentMD5Field;
     
     protected MaximalBodyDescriptor() {
         this(null, null);
@@ -85,32 +65,6 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
 
     public MaximalBodyDescriptor(final BodyDescriptor parent, final DecodeMonitor monitor) {
         super(parent, monitor);
-        isMimeVersionSet = false;
-        mimeMajorVersion = DEFAULT_MAJOR_VERSION;
-        mimeMinorVersion = DEFAULT_MINOR_VERSION;
-        this.contentId = null;
-        this.isContentIdSet = false;
-        this.contentDescription = null;
-        this.isContentDescriptionSet = false;
-        this.contentDispositionType = null;
-        this.contentDispositionParameters = Collections.emptyMap();
-        this.contentDispositionModificationDate = null;
-        this.contentDispositionModificationDateParseException = null;
-        this.contentDispositionCreationDate = null;
-        this.contentDispositionCreationDateParseException = null;
-        this.contentDispositionReadDate = null;
-        this.contentDispositionReadDateParseException = null;
-        this.contentDispositionSize = -1;
-        this.contentDispositionSizeParseException = null;
-        this.isContentDispositionSet = false;
-        this.contentLanguage = null;
-        this.contentLanguageParseException = null;
-        this.isContentIdSet = false;
-        this.contentLocation = null;
-        this.contentLocationParseException = null;
-        this.isContentLocationSet = false;
-        this.contentMD5Raw = null;
-        this.isContentMD5Set = false;
     }
 
     @Override
@@ -120,20 +74,20 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
 
     @Override
     public void addField(Field field) throws MimeException {
-        String name = field.getName().toLowerCase(Locale.US);;
-        if (MimeUtil.MIME_HEADER_MIME_VERSION.equals(name) && !isMimeVersionSet) {
+        String name = field.getName();
+        if (name.equalsIgnoreCase(FieldName.MIME_VERSION) && mimeVersionField == null) {
             parseMimeVersion(field);
-        } else if (MimeUtil.MIME_HEADER_CONTENT_ID.equals(name) && !isContentIdSet) {
+        } else if (name.equalsIgnoreCase(FieldName.CONTENT_ID) && contentIdField == null) {
             parseContentId(field);
-        } else if (MimeUtil.MIME_HEADER_CONTENT_DESCRIPTION.equals(name) && !isContentDescriptionSet) {
+        } else if (name.equalsIgnoreCase(FieldName.CONTENT_DESCRIPTION) && contentDescriptionField == null) {
             parseContentDescription(field);
-        } else if (MimeUtil.MIME_HEADER_CONTENT_DISPOSITION.equals(name) && !isContentDispositionSet) {
+        } else if (name.equalsIgnoreCase(FieldName.CONTENT_DISPOSITION) && contentDispositionField == null) {
             parseContentDisposition(field);
-        } else if (MimeUtil.MIME_HEADER_LANGAUGE.equals(name) && !isContentLanguageSet) {
+        } else if (name.equalsIgnoreCase(FieldName.CONTENT_LANGUAGE) && contentLanguageField == null) {
             parseLanguage(field);
-        } else if (MimeUtil.MIME_HEADER_LOCATION.equals(name) && !isContentLocationSet) {
+        } else if (name.equalsIgnoreCase(FieldName.CONTENT_LOCATION) && contentLocationField == null) {
             parseLocation(field);
-        } else if (MimeUtil.MIME_HEADER_MD5.equals(name) && !isContentMD5Set) {
+        } else if (name.equalsIgnoreCase(FieldName.CONTENT_MD5) && contentMD5Field == null) {
             parseMD5(field);
         } else {
             super.addField(field);
@@ -141,150 +95,66 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
     }
     
     private void parseMD5(final Field field) {
-        String value = field.getBody();
-        isContentMD5Set = true;
-        if (value != null) {
-            contentMD5Raw = value.trim();
+        if (field instanceof ContentMD5Field) {
+            contentMD5Field = (ContentMD5Field) field;
+        } else {
+            contentMD5Field = ContentMD5FieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
         }
     }
 
     private void parseLocation(final Field field) {
-        isContentLocationSet = true;
-        String value = field.getBody();
-        if (value != null) {
-            final StringReader stringReader = new StringReader(value);
-            final StructuredFieldParser parser = new StructuredFieldParser(stringReader);
-            try {
-                // From RFC2017 3.1
-                /*
-                 * Extraction of the URL string from the URL-parameter is even simpler:
-                 * The enclosing quotes and any linear whitespace are removed and the
-                 * remaining material is the URL string.
-                 * Read more: http://www.faqs.org/rfcs/rfc2017.html#ixzz0aufO9nRL
-                 */
-                contentLocation = parser.parse().replaceAll("\\s", "");
-            } catch (MimeException e) { 
-                contentLocationParseException = e;
-            }
+        if (field instanceof ContentLocationField) {
+            contentLocationField = (ContentLocationField) field;
+        } else {
+            contentLocationField = ContentLocationFieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
         }
     }
     
     private void parseLanguage(final Field field) {
-        isContentLanguageSet = true;
-        String value = field.getBody();
-        if (value != null) {
-            try {
-                final ContentLanguageParser parser = new ContentLanguageParser(new StringReader(value));
-                contentLanguage = parser.parse();
-            } catch (MimeException e) {
-                contentLanguageParseException = e;
-            }
+        if (field instanceof ContentLanguageField) {
+            contentLanguageField = (ContentLanguageField) field;
+        } else {
+            contentLanguageField = ContentLanguageFieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
         }
     }
 
     private void parseContentDisposition(final Field field) throws MimeException {
-        isContentDispositionSet = true;
-        RawField rawfield;
-        if (field instanceof RawField) {
-            rawfield = ((RawField) field);
+        if (field instanceof ContentDispositionField) {
+            contentDispositionField = (ContentDispositionField) field;
         } else {
-            rawfield = new RawField(field.getName(), field.getBody());
+            contentDispositionField = ContentDispositionFieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
         }
-        RawBody body = RawFieldParser.DEFAULT.parseRawBody(rawfield);
-        Map<String, String> params = new HashMap<String, String>();
-        for (NameValuePair nmp: body.getParams()) {
-            String name = nmp.getName().toLowerCase(Locale.US);
-            params.put(name, nmp.getValue());
-        }
-        
-        contentDispositionType = body.getValue();
-        contentDispositionParameters = params;
-        
-        final String contentDispositionModificationDate 
-            = contentDispositionParameters.get(MimeUtil.PARAM_MODIFICATION_DATE);
-        if (contentDispositionModificationDate != null) {
-            try {
-                this.contentDispositionModificationDate = parseDate(contentDispositionModificationDate);
-            } catch (ParseException e) {
-                this.contentDispositionModificationDateParseException = e;
-            } 
-        }
-        
-        final String contentDispositionCreationDate 
-            = contentDispositionParameters.get(MimeUtil.PARAM_CREATION_DATE);
-        if (contentDispositionCreationDate != null) {
-            try {
-                this.contentDispositionCreationDate = parseDate(contentDispositionCreationDate);
-            } catch (ParseException e) {
-                this.contentDispositionCreationDateParseException = e;
-            }         
-        }
-        
-        final String contentDispositionReadDate 
-            = contentDispositionParameters.get(MimeUtil.PARAM_READ_DATE);
-        if (contentDispositionReadDate != null) {
-            try {
-                this.contentDispositionReadDate = parseDate(contentDispositionReadDate);
-            } catch (ParseException e) {
-                this.contentDispositionReadDateParseException = e;
-            }         
-        }
-        
-        final String size = contentDispositionParameters.get(MimeUtil.PARAM_SIZE);
-        if (size != null) {
-            try {
-                contentDispositionSize = Long.parseLong(size);
-            } catch (NumberFormatException e) {
-                this.contentDispositionSizeParseException = (MimeException) new MimeException(e.getMessage(), e).fillInStackTrace();
-            }
-        }
-        contentDispositionParameters.remove("");
     }
 
-    private DateTime parseDate(final String date) throws ParseException {
-        final StringReader stringReader = new StringReader(date);
-        final DateTimeParser parser = new DateTimeParser(stringReader);
-        DateTime result = parser.date_time();
-        return result;
-    }
-    
     private void parseContentDescription(final Field field) {
-        String value = field.getBody();
-        if (value == null) {
-            contentDescription = "";
+        if (field instanceof ContentDescriptionField) {
+            contentDescriptionField = (ContentDescriptionField) field;
         } else {
-            contentDescription = value.trim();
+            contentDescriptionField = ContentDescriptionFieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
         }
-        isContentDescriptionSet = true;
     }
 
     private void parseContentId(final Field field) {
-        String value = field.getBody();
-        if (value == null) {
-            contentId = "";
+        if (field instanceof ContentIdField) {
+            contentIdField = (ContentIdField) field;
         } else {
-            contentId = value.trim();
+            contentIdField = ContentIdFieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
         }
-        isContentIdSet = true;
     }
 
-    private void parseMimeVersion(Field field) {
-        final StringReader reader = new StringReader(field.getBody());
-        final MimeVersionParser parser = new MimeVersionParser(reader);
-        try {
-            parser.parse();
-            final int major = parser.getMajorVersion();
-            if (major != MimeVersionParser.INITIAL_VERSION_VALUE) {
-                mimeMajorVersion = major;
-            }
-            final int minor = parser.getMinorVersion();
-            if (minor != MimeVersionParser.INITIAL_VERSION_VALUE) {
-                mimeMinorVersion = minor;
-            }
-        } catch (MimeException e) {
-            this.mimeVersionException = e;
+    private void parseMimeVersion(final Field field) {
+        if (field instanceof MimeVersionField) {
+            mimeVersionField = (MimeVersionField) field;
+        } else {
+            mimeVersionField = MimeVersionFieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
         }
-        isMimeVersionSet = true;
     }
     
     /**
@@ -295,7 +165,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * @return positive integer
      */
     public int getMimeMajorVersion() {
-        return mimeMajorVersion;
+        return mimeVersionField != null ? mimeVersionField.getMajorVersion() : 
+            MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION;
     }
     
     /**
@@ -306,20 +177,11 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * @return positive integer
      */
     public int getMimeMinorVersion() {
-        return mimeMinorVersion;
+        return mimeVersionField != null ? mimeVersionField.getMinorVersion() : 
+            MimeVersionFieldImpl.DEFAULT_MINOR_VERSION;
     }
     
 
-    /**
-     * When the MIME version header exists but cannot be parsed
-     * this field will be contain the exception.
-     * @return <code>MimeException</code> if the mime header cannot
-     * be parsed, null otherwise
-     */
-    public MimeException getMimeVersionParseException() {
-        return mimeVersionException;
-    }
-    
     /**
      * Gets the value of the <a href='http://www.faqs.org/rfcs/rfc2045'>RFC</a> 
      * <code>Content-Description</code> header.
@@ -327,7 +189,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * null otherwise
      */
     public String getContentDescription() {
-        return contentDescription;
+        return contentDescriptionField != null ? contentDescriptionField.getDescription() : null;
     }
     
     /**
@@ -337,7 +199,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * null otherwise
      */
     public String getContentId() {
-        return contentId;
+        return contentIdField != null ? contentIdField.getId() : null;
     }
     
     /**
@@ -348,7 +210,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null when this has not been set
      */
     public String getContentDispositionType() {
-        return contentDispositionType;
+        return contentDispositionField != null ? contentDispositionField.getDispositionType() : null;
     }
     
     /**
@@ -358,7 +220,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * not null
      */
     public Map<String, String> getContentDispositionParameters() {
-        return contentDispositionParameters;
+        return contentDispositionField != null ? contentDispositionField.getParameters() : 
+            Collections.<String, String>emptyMap();
     }
     
     /**
@@ -368,7 +231,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null when it is not present
      */
     public String getContentDispositionFilename() {
-        return contentDispositionParameters.get(MimeUtil.PARAM_FILENAME);
+        return contentDispositionField != null ? contentDispositionField.getFilename() : null;
     }
     
     /**
@@ -377,17 +240,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * @return modification-date parameter value,
      * or null when this is not present
      */
-    public DateTime getContentDispositionModificationDate() {
-        return contentDispositionModificationDate;
-    }
-    
-    /**
-     * Gets any exception thrown during the parsing of {@link #getContentDispositionModificationDate()}
-     * @return <code>ParseException</code> when the modification-date parse fails,
-     * null otherwise
-     */
-    public MimeException getContentDispositionModificationDateParseException() {
-        return contentDispositionModificationDateParseException;
+    public Date getContentDispositionModificationDate() {
+        return contentDispositionField != null ? contentDispositionField.getModificationDate() : null;
     }
     
     /**
@@ -396,17 +250,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * @return creation-date parameter value,
      * or null when this is not present
      */
-    public DateTime getContentDispositionCreationDate() {
-        return contentDispositionCreationDate;
-    }
-    
-    /**
-     * Gets any exception thrown during the parsing of {@link #getContentDispositionCreationDate()}
-     * @return <code>ParseException</code> when the creation-date parse fails,
-     * null otherwise
-     */
-    public MimeException getContentDispositionCreationDateParseException() {
-        return contentDispositionCreationDateParseException;
+    public Date getContentDispositionCreationDate() {
+        return contentDispositionField != null ? contentDispositionField.getCreationDate() : null;
     }
     
     /**
@@ -415,17 +260,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * @return read-date parameter value,
      * or null when this is not present
      */
-    public DateTime getContentDispositionReadDate() {
-        return contentDispositionReadDate;
-    }
-    
-    /**
-     * Gets any exception thrown during the parsing of {@link #getContentDispositionReadDate()}
-     * @return <code>ParseException</code> when the read-date parse fails,
-     * null otherwise
-     */
-    public MimeException getContentDispositionReadDateParseException() {
-        return contentDispositionReadDateParseException;
+    public Date getContentDispositionReadDate() {
+        return contentDispositionField != null ? contentDispositionField.getReadDate() : null;
     }
     
     /**
@@ -435,16 +271,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or -1 if this size has not been set
      */
     public long getContentDispositionSize() {
-        return contentDispositionSize;
-    }
-    
-    /**
-     * Gets any exception thrown during the parsing of {@link #getContentDispositionSize()}
-     * @return <code>ParseException</code> when the read-date parse fails,
-     * null otherwise
-     */
-    public MimeException getContentDispositionSizeParseException() {
-        return contentDispositionSizeParseException;
+        return contentDispositionField != null ? contentDispositionField.getSize() : -1;
     }
     
     /**
@@ -456,18 +283,9 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null if no header exists
      */
     public List<String> getContentLanguage() {
-        return contentLanguage;
+        return contentLanguageField != null ? contentLanguageField.getLanguages() : 
+            Collections.<String>emptyList();
     }
-
-    /**
-     * Gets any exception thrown during the parsing of {@link #getContentLanguage()}
-     * @return <code>ParseException</code> when the content-language parse fails,
-     * null otherwise
-     */
-    public MimeException getContentLanguageParseException() {
-        return contentLanguageParseException;
-    }
-    
 
     /**
      * Get the <code>content-location</code> header value.
@@ -476,16 +294,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null if no header exists
      */
     public String getContentLocation() {
-        return contentLocation;
-    }
-    
-    /**
-     * Gets any exception thrown during the parsing of {@link #getContentLocation()}
-     * @return <code>ParseException</code> when the content-language parse fails,
-     * null otherwise
-     */
-    public MimeException getContentLocationParseException() {
-        return contentLocationParseException;
+        return contentLocationField != null ? contentLocationField.getLocation() : null;
     }
     
     /**
@@ -496,8 +305,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null if no header exists
      */
     public String getContentMD5Raw() {
-        return contentMD5Raw;
+        return contentMD5Field != null ? contentMD5Field.getMD5Raw() : null;
     }
-    
     
 } 

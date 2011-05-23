@@ -20,13 +20,15 @@
 package org.apache.james.mime4j.message;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.field.ContentLengthField;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
+import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.field.ContentLengthFieldImpl;
 import org.apache.james.mime4j.field.ContentTransferEncodingFieldImpl;
 import org.apache.james.mime4j.field.ContentTypeFieldImpl;
 import org.apache.james.mime4j.stream.BodyDescriptor;
@@ -63,11 +65,11 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
     private String mimeType = DEFAULT_MIME_TYPE;
     private String boundary = null;
     private String charset = US_ASCII;
-    private String transferEncoding = "7bit";
     private Map<String, String> parameters = new HashMap<String, String>();
-    private boolean contentTypeSet;
-    private boolean contentTransferEncSet;
-    private long contentLength = -1;
+
+    private ContentTypeField contentTypeField;
+    private ContentLengthField contentLengthField;
+    private ContentTransferEncodingField contentTransferEncodingField;
     
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
@@ -110,74 +112,55 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
      * @param field the MIME field.
      */
     public void addField(Field field) throws MimeException {
-        String name = field.getName().toLowerCase(Locale.US);
-        
-        if (name.equals("content-transfer-encoding") && !contentTransferEncSet) {
+        String name = field.getName();
+        if (name.equalsIgnoreCase(FieldName.CONTENT_TRANSFER_ENCODING)&& contentTransferEncodingField == null) {
             parseContentTransferEncoding(field);
-        } else if (name.equals("content-length") && contentLength == -1) {
+        } else if (name.equalsIgnoreCase(FieldName.CONTENT_LENGTH) && contentLengthField == null) {
             parseContentLength(field);
-        } else if (name.equals("content-type") && !contentTypeSet) {
+        } else if (name.equalsIgnoreCase(FieldName.CONTENT_TYPE) && contentTypeField == null) {
             parseContentType(field);
         }
     }
 
     private void parseContentTransferEncoding(Field field) throws MimeException {
-        contentTransferEncSet = true;
-        ContentTransferEncodingField f;
         if (field instanceof ContentTransferEncodingField) {
-            f = (ContentTransferEncodingField) field;
+            contentTransferEncodingField = (ContentTransferEncodingField) field;
         } else {
-            f = ContentTransferEncodingFieldImpl.PARSER.parse(
+            contentTransferEncodingField = ContentTransferEncodingFieldImpl.PARSER.parse(
                     field.getName(), field.getBody(), field.getRaw(), monitor);
         }
-        transferEncoding = f.getEncoding();
     }
 
     private void parseContentLength(Field field) throws MimeException {
-        String value = field.getBody();
-        if (value != null) {
-            try {
-                long v = Long.parseLong(value);
-                if (v < 0) {
-                    if (monitor.warn("Negative content length: " + value, 
-                            "ignoring Content-Length header")) {
-                        throw new MimeException("Negative Content-Length header: " + value);
-                    }
-                } else {
-                    contentLength = v;
-                }
-            } catch (NumberFormatException e) {
-                if (monitor.warn("Invalid content length: " + value, 
-                        "ignoring Content-Length header")) {
-                    throw new MimeException("Invalid Content-Length header: " + value);
-                }
-            }
+        if (field instanceof ContentLengthField) {
+            contentLengthField = (ContentLengthField) field;
+        } else {
+            contentLengthField = ContentLengthFieldImpl.PARSER.parse(
+                    field.getName(), field.getBody(), field.getRaw(), monitor);
         }
     }
 
     private void parseContentType(Field field) throws MimeException {
-        contentTypeSet = true;
-        ContentTypeField f;
         if (field instanceof ContentTypeField) {
-            f = (ContentTypeField) field;
+            contentTypeField = (ContentTypeField) field;
         } else {
-            f = ContentTypeFieldImpl.PARSER.parse(
+            contentTypeField = ContentTypeFieldImpl.PARSER.parse(
                     field.getName(), field.getBody(), field.getRaw(), monitor);
         }
-        String mimetype = f.getMimeType();
+        String mimetype = contentTypeField.getMimeType();
         if (mimetype != null) {
             mimeType = mimetype;
-            mediaType = f.getMediaType();
-            subType = f.getSubType();
+            mediaType = contentTypeField.getMediaType();
+            subType = contentTypeField.getSubType();
         }
         if (MimeUtil.isMultipart(mimeType)) {
-            boundary = f.getBoundary();
+            boundary = contentTypeField.getBoundary();
         }
-        charset = f.getCharset();
+        charset = contentTypeField.getCharset();
         if (charset == null && MEDIA_TYPE_TEXT.equalsIgnoreCase(mediaType)) {
             charset = US_ASCII;
         }
-        parameters.putAll(f.getParameters());
+        parameters.putAll(contentTypeField.getParameters());
         parameters.remove("charset");
         parameters.remove("boundary");
     }
@@ -224,7 +207,8 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
      * @return transferEncoding
      */
     public String getTransferEncoding() {
-        return transferEncoding;
+        return contentTransferEncodingField != null ? contentTransferEncodingField.getEncoding() : 
+            MimeUtil.ENC_7BIT;
     }
     
     @Override
@@ -233,7 +217,7 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
     }
 
     public long getContentLength() {
-        return contentLength;
+        return contentLengthField != null ? contentLengthField.getContentLength() : -1;
     }
 
     public String getMediaType() {

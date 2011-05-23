@@ -19,13 +19,13 @@
 
 package org.apache.james.mime4j.dom.field;
 
-public interface ContentTransferEncodingField extends ParsedField {
+public interface ContentMD5Field extends ParsedField {
 
     /**
-     * Gets the encoding defined in this field.
+     * Gets the content MD5 raw value defined in this field.
      * 
-     * @return the content ID or <code>null</code> if not set.
+     * @return the content MD5 raw value or <code>null</code> if not set.
      */
-    String getEncoding();
+    String getMD5Raw();
 
 }

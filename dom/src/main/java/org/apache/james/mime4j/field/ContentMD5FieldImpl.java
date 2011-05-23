@@ -19,23 +19,20 @@
 
 package org.apache.james.mime4j.field;
 
-import java.util.Locale;
-
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.dom.field.ContentMD5Field;
 import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.MimeUtil;
 
 /**
- * Represents a <code>Content-Transfer-Encoding</code> field.
+ * Represents a <code>Content-MD5</code> field.
  */
-public class ContentTransferEncodingFieldImpl extends AbstractField implements ContentTransferEncodingField {
+public class ContentMD5FieldImpl extends AbstractField implements ContentMD5Field {
 
     private boolean parsed = false;
-    private String encoding;
+    private String md5raw;
 
-    ContentTransferEncodingFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
+    ContentMD5FieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
         super(name, body, raw, monitor);
     }
 
@@ -43,40 +40,25 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
         parsed = true;
         String body = getBody();
         if (body != null) {
-            encoding = body.trim().toLowerCase(Locale.US);
+            md5raw = body.trim();
         } else {
-            encoding = null;
+            md5raw = null;
         }
     }
     
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentTransferEncodingField#getEncoding()
-     */
-    public String getEncoding() {
+    public String getMD5Raw() {
         if (!parsed) {
             parse();
         }
-        return encoding;
+        return md5raw;
     }
 
-    /**
-     * Gets the encoding of the given field if. Returns the default
-     * <code>7bit</code> if not set or if <code>f</code> is
-     * <code>null</code>.
-     * 
-     * @return the encoding.
-     */
-    public static String getEncoding(ContentTransferEncodingField f) {
-        if (f != null && f.getEncoding().length() != 0) {
-            return f.getEncoding();
-        }
-        return MimeUtil.ENC_7BIT;
-    }
-
-    public static final FieldParser<ContentTransferEncodingField> PARSER = new FieldParser<ContentTransferEncodingField>() {
-        public ContentTransferEncodingField parse(final String name, final String body,
+    public static final FieldParser<ContentMD5Field> PARSER = new FieldParser<ContentMD5Field>() {
+        public ContentMD5Field parse(final String name, final String body,
                 final ByteSequence raw, DecodeMonitor monitor) {
-            return new ContentTransferEncodingFieldImpl(name, body, raw, monitor);
+            return new ContentMD5FieldImpl(name, body, raw, monitor);
         }
     };
+
 }
+

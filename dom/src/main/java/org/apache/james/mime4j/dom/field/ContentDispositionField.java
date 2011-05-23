@@ -88,7 +88,7 @@ public interface ContentDispositionField extends ParsedField {
      * @return <code>true</code> if the disposition type of this field is
      *         <i>attachment</i>, <code>false</code> otherwise.
      */
-    public abstract boolean isAttachment();
+    boolean isAttachment();
 
     /**
      * Gets the value of the <code>filename</code> parameter if set.

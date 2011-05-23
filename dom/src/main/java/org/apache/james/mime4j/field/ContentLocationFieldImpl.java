@@ -19,23 +19,25 @@
 
 package org.apache.james.mime4j.field;
 
-import java.util.Locale;
+import java.io.StringReader;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.dom.field.ContentLocationField;
+import org.apache.james.mime4j.field.structured.parser.ParseException;
+import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
 import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.
  */
-public class ContentTransferEncodingFieldImpl extends AbstractField implements ContentTransferEncodingField {
+public class ContentLocationFieldImpl extends AbstractField implements ContentLocationField {
 
     private boolean parsed = false;
-    private String encoding;
+    private String location;
+    private ParseException parseException;
 
-    ContentTransferEncodingFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
+    ContentLocationFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
         super(name, body, raw, monitor);
     }
 
@@ -43,40 +45,44 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
         parsed = true;
         String body = getBody();
         if (body != null) {
-            encoding = body.trim().toLowerCase(Locale.US);
+            StringReader stringReader = new StringReader(body);
+            StructuredFieldParser parser = new StructuredFieldParser(stringReader);
+            try {
+                // From RFC2017 3.1
+                /*
+                 * Extraction of the URL string from the URL-parameter is even simpler:
+                 * The enclosing quotes and any linear whitespace are removed and the
+                 * remaining material is the URL string.
+                 * Read more: http://www.faqs.org/rfcs/rfc2017.html#ixzz0aufO9nRL
+                 */
+                location = parser.parse().replaceAll("\\s", "");
+            } catch (ParseException ex) { 
+                parseException = ex;
+                location = null;
+            }
         } else {
-            encoding = null;
+            location = null;
         }
     }
     
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentTransferEncodingField#getEncoding()
-     */
-    public String getEncoding() {
+    public String getLocation() {
         if (!parsed) {
             parse();
         }
-        return encoding;
+        return location;
     }
 
-    /**
-     * Gets the encoding of the given field if. Returns the default
-     * <code>7bit</code> if not set or if <code>f</code> is
-     * <code>null</code>.
-     * 
-     * @return the encoding.
-     */
-    public static String getEncoding(ContentTransferEncodingField f) {
-        if (f != null && f.getEncoding().length() != 0) {
-            return f.getEncoding();
-        }
-        return MimeUtil.ENC_7BIT;
+    @Override
+    public org.apache.james.mime4j.dom.field.ParseException getParseException() {
+        return parseException;
     }
 
-    public static final FieldParser<ContentTransferEncodingField> PARSER = new FieldParser<ContentTransferEncodingField>() {
-        public ContentTransferEncodingField parse(final String name, final String body,
+    public static final FieldParser<ContentLocationField> PARSER = new FieldParser<ContentLocationField>() {
+        public ContentLocationField parse(final String name, final String body,
                 final ByteSequence raw, DecodeMonitor monitor) {
-            return new ContentTransferEncodingFieldImpl(name, body, raw, monitor);
+            return new ContentLocationFieldImpl(name, body, raw, monitor);
         }
     };
+
 }
+

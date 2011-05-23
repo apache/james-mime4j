@@ -120,11 +120,26 @@ public class DefaultFieldParser extends DelegatingFieldParser {
     }
 
     public DefaultFieldParser() {
+        setFieldParser(FieldName.CONTENT_TYPE, 
+                ContentTypeFieldImpl.PARSER);
+        setFieldParser(FieldName.CONTENT_LENGTH,
+                ContentLengthFieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_TRANSFER_ENCODING,
                 ContentTransferEncodingFieldImpl.PARSER);
-        setFieldParser(FieldName.CONTENT_TYPE, ContentTypeFieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_DISPOSITION,
                 ContentDispositionFieldImpl.PARSER);
+        setFieldParser(FieldName.CONTENT_ID,
+                ContentDispositionFieldImpl.PARSER);
+        setFieldParser(FieldName.CONTENT_MD5,
+                ContentMD5FieldImpl.PARSER);
+        setFieldParser(FieldName.CONTENT_DESCRIPTION,
+                ContentDescriptionFieldImpl.PARSER);
+        setFieldParser(FieldName.CONTENT_LANGUAGE,
+                ContentLanguageFieldImpl.PARSER);
+        setFieldParser(FieldName.CONTENT_LOCATION,
+                ContentLocationFieldImpl.PARSER);
+        setFieldParser(FieldName.MIME_VERSION,
+                MimeVersionFieldImpl.PARSER);
 
         final FieldParser<DateTimeField> dateTimeParser = DateTimeFieldImpl.PARSER;
         setFieldParser(FieldName.DATE, dateTimeParser);

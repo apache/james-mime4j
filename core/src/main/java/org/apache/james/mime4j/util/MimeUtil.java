@@ -54,58 +54,6 @@ public final class MimeUtil {
      */
     public static final String ENC_7BIT = "7bit";
 
-    /** <code>MIME-Version</code> header name (lowercase) */
-    public static final String MIME_HEADER_MIME_VERSION = "mime-version";
-    /** <code>Content-ID</code> header name (lowercase) */
-    public static final String MIME_HEADER_CONTENT_ID = "content-id";
-    /** <code>Content-Description</code> header name (lowercase) */
-    public static final String MIME_HEADER_CONTENT_DESCRIPTION = "content-description";
-    /** 
-     * <code>Content-Disposition</code> header name (lowercase). 
-     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
-     */
-    public static final String MIME_HEADER_CONTENT_DISPOSITION = "content-disposition";
-    /** 
-     * <code>Content-Disposition</code> filename parameter (lowercase). 
-     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
-     */
-    public static final String PARAM_FILENAME = "filename";
-    /** 
-     * <code>Content-Disposition</code> modification-date parameter (lowercase). 
-     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
-     */
-    public static final String PARAM_MODIFICATION_DATE = "modification-date";
-    /** 
-     * <code>Content-Disposition</code> creation-date parameter (lowercase). 
-     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
-     */
-    public static final String PARAM_CREATION_DATE = "creation-date";
-    /** 
-     * <code>Content-Disposition</code> read-date parameter (lowercase). 
-     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
-     */
-    public static final String PARAM_READ_DATE = "read-date";
-    /** 
-     * <code>Content-Disposition</code> size parameter (lowercase). 
-     * See <a href='http://www.faqs.org/rfcs/rfc2183.html'>RFC2183</a>. 
-     */
-    public static final String PARAM_SIZE = "size";
-    /**
-     * <code>Content-Langauge</code> header (lower case).
-     * See <a href='http://www.faqs.org/rfcs/rfc4646.html'>RFC4646</a>.
-     */
-    public static final String MIME_HEADER_LANGAUGE = "content-language";
-    /**
-     * <code>Content-Location</code> header (lower case).
-     * See <a href='http://www.faqs.org/rfcs/rfc2557.html'>RFC2557</a>.
-     */
-    public static final String MIME_HEADER_LOCATION = "content-location";
-    /**
-     * <code>Content-MD5</code> header (lower case).
-     * See <a href='http://www.faqs.org/rfcs/rfc1864.html'>RFC1864</a>.
-     */
-    public static final String MIME_HEADER_MD5 = "content-md5";
-
     // used to create unique ids
     private static final Random random = new Random();
     
