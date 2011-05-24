@@ -150,8 +150,7 @@ abstract class AbstractEntity implements EntityStateMachine {
                     monitor(Event.OBSOLETE_HEADER);
                 }
                 if (fieldParser != null) {
-                    field = fieldParser.parse(
-                            rawfield.getName(), rawfield.getBody(), rawfield.getRaw(), monitor);
+                    field = fieldParser.parse(rawfield, monitor);
                 } else {
                     field = rawfield;
                 }

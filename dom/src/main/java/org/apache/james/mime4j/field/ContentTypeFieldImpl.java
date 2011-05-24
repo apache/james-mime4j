@@ -30,6 +30,7 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.field.contenttype.parser.ContentTypeParser;
 import org.apache.james.mime4j.field.contenttype.parser.ParseException;
 import org.apache.james.mime4j.field.contenttype.parser.TokenMgrError;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -223,9 +224,10 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     public static final FieldParser<ContentTypeField> PARSER = new FieldParser<ContentTypeField>() {
-        public ContentTypeField parse(final String name, final String body,
-                final ByteSequence raw, DecodeMonitor monitor) {
-            return new ContentTypeFieldImpl(name, body, raw, monitor);
+        
+        public ContentTypeField parse(final Field rawField, final DecodeMonitor monitor) {
+            return new ContentTypeFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
         }
+        
     };
 }

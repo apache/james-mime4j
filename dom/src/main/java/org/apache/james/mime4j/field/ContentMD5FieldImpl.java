@@ -21,6 +21,7 @@ package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentMD5Field;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -54,10 +55,11 @@ public class ContentMD5FieldImpl extends AbstractField implements ContentMD5Fiel
     }
 
     public static final FieldParser<ContentMD5Field> PARSER = new FieldParser<ContentMD5Field>() {
-        public ContentMD5Field parse(final String name, final String body,
-                final ByteSequence raw, DecodeMonitor monitor) {
-            return new ContentMD5FieldImpl(name, body, raw, monitor);
+        
+        public ContentMD5Field parse(final Field rawField, final DecodeMonitor monitor) {
+            return new ContentMD5FieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
         }
+        
     };
 
 }

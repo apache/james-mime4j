@@ -64,24 +64,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
             final ByteSequence raw, 
             final DecodeMonitor monitor) throws MimeException {
         Field rawField = RawFieldParser.DEFAULT.parseField(raw);
-        return PARSER.parse(rawField.getName(), rawField.getBody(), raw, monitor);
-    }
-
-    /**
-     * Parses the given <code>RawField</code> and returns an instance of the
-     * <code>Field</code> class. The type of the class returned depends on the
-     * field name; see {@link #parse(String)} for a table of field names and
-     * their corresponding classes.
-     * 
-     * @param rawField the raw field to parse.
-     * @param monitor a DecodeMonitor object used while parsing/decoding.
-     * @return a <code>ParsedField</code> instance.
-     * @throws MimeException if the raw string cannot be split into field name and body.
-     */
-    public static ParsedField parse(
-            final Field rawField, 
-            final DecodeMonitor monitor) throws MimeException {
-        return PARSER.parse(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+        return PARSER.parse(rawField, monitor);
     }
 
     /**
@@ -112,7 +95,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         // Do not retain the original raw representation as the field
         // may require folding
-        return PARSER.parse(rawField.getName(), rawField.getBody(), null, monitor);
+        return PARSER.parse(rawField, monitor);
     }
 
     public static ParsedField parse(final String rawStr) throws MimeException {

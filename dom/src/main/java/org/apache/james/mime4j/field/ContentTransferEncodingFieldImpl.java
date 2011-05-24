@@ -23,6 +23,7 @@ import java.util.Locale;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -74,9 +75,10 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
     }
 
     public static final FieldParser<ContentTransferEncodingField> PARSER = new FieldParser<ContentTransferEncodingField>() {
-        public ContentTransferEncodingField parse(final String name, final String body,
-                final ByteSequence raw, DecodeMonitor monitor) {
-            return new ContentTransferEncodingFieldImpl(name, body, raw, monitor);
+        
+        public ContentTransferEncodingField parse(final Field rawField, final DecodeMonitor monitor) {
+            return new ContentTransferEncodingFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
         }
+        
     };
 }

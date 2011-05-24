@@ -25,6 +25,7 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentLocationField;
 import org.apache.james.mime4j.field.structured.parser.ParseException;
 import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -78,10 +79,11 @@ public class ContentLocationFieldImpl extends AbstractField implements ContentLo
     }
 
     public static final FieldParser<ContentLocationField> PARSER = new FieldParser<ContentLocationField>() {
-        public ContentLocationField parse(final String name, final String body,
-                final ByteSequence raw, DecodeMonitor monitor) {
-            return new ContentLocationFieldImpl(name, body, raw, monitor);
+        
+        public ContentLocationField parse(final Field rawField, final DecodeMonitor monitor) {
+            return new ContentLocationFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
         }
+        
     };
 
 }

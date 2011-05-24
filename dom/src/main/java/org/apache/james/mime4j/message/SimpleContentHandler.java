@@ -79,8 +79,7 @@ public abstract class SimpleContentHandler extends AbstractContentHandler {
         if (field instanceof ParsedField) {
             parsedField = (ParsedField) field;
         } else {
-            parsedField = fieldParser.parse(
-                    field.getName(), field.getBody(), field.getRaw(), monitor);
+            parsedField = fieldParser.parse(field, monitor);
         }
         currHeader.addField(parsedField);
     }

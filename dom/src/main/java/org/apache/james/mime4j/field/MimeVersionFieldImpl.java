@@ -26,6 +26,7 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.mimeversion.parser.ParseException;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -90,10 +91,11 @@ public class MimeVersionFieldImpl extends AbstractField implements MimeVersionFi
     }
 
     public static final FieldParser<MimeVersionField> PARSER = new FieldParser<MimeVersionField>() {
-        public MimeVersionField parse(final String name, final String body,
-                final ByteSequence raw, DecodeMonitor monitor) {
-            return new MimeVersionFieldImpl(name, body, raw, monitor);
+        
+        public MimeVersionField parse(final Field rawField, final DecodeMonitor monitor) {
+            return new MimeVersionFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
         }
+        
     };
     
 }

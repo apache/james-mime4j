@@ -20,10 +20,9 @@
 package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.util.ByteSequence;
 
 public interface FieldParser<T extends Field> {
     
-    T parse(String name, String body, ByteSequence raw, DecodeMonitor monitor);
+    T parse(Field rawField, DecodeMonitor monitor);
     
 }

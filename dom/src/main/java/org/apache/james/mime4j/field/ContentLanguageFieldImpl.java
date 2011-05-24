@@ -27,6 +27,7 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentLanguageField;
 import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
 import org.apache.james.mime4j.field.language.parser.ParseException;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -72,10 +73,11 @@ public class ContentLanguageFieldImpl extends AbstractField implements ContentLa
     }
 
     public static final FieldParser<ContentLanguageField> PARSER = new FieldParser<ContentLanguageField>() {
-        public ContentLanguageField parse(final String name, final String body,
-                final ByteSequence raw, DecodeMonitor monitor) {
-            return new ContentLanguageFieldImpl(name, body, raw, monitor);
+        
+        public ContentLanguageField parse(final Field rawField, final DecodeMonitor monitor) {
+            return new ContentLanguageFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
         }
+        
     };
 
 }

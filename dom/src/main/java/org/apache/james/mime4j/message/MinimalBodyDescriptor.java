@@ -127,7 +127,7 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
             contentTransferEncodingField = (ContentTransferEncodingField) field;
         } else {
             contentTransferEncodingField = ContentTransferEncodingFieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), monitor);
+                    field, monitor);
         }
     }
 
@@ -136,7 +136,7 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
             contentLengthField = (ContentLengthField) field;
         } else {
             contentLengthField = ContentLengthFieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), monitor);
+                    field, monitor);
         }
     }
 
@@ -145,7 +145,7 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
             contentTypeField = (ContentTypeField) field;
         } else {
             contentTypeField = ContentTypeFieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), monitor);
+                    field, monitor);
         }
         String mimetype = contentTypeField.getMimeType();
         if (mimetype != null) {

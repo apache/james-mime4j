@@ -99,7 +99,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
             contentMD5Field = (ContentMD5Field) field;
         } else {
             contentMD5Field = ContentMD5FieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
+                    field, getDecodeMonitor());
         }
     }
 
@@ -108,7 +108,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
             contentLocationField = (ContentLocationField) field;
         } else {
             contentLocationField = ContentLocationFieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
+                    field, getDecodeMonitor());
         }
     }
     
@@ -117,7 +117,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
             contentLanguageField = (ContentLanguageField) field;
         } else {
             contentLanguageField = ContentLanguageFieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
+                    field, getDecodeMonitor());
         }
     }
 
@@ -126,7 +126,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
             contentDispositionField = (ContentDispositionField) field;
         } else {
             contentDispositionField = ContentDispositionFieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
+                    field, getDecodeMonitor());
         }
     }
 
@@ -135,7 +135,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
             contentDescriptionField = (ContentDescriptionField) field;
         } else {
             contentDescriptionField = ContentDescriptionFieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
+                    field, getDecodeMonitor());
         }
     }
 
@@ -144,7 +144,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
             contentIdField = (ContentIdField) field;
         } else {
             contentIdField = ContentIdFieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
+                    field, getDecodeMonitor());
         }
     }
 
@@ -153,7 +153,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
             mimeVersionField = (MimeVersionField) field;
         } else {
             mimeVersionField = MimeVersionFieldImpl.PARSER.parse(
-                    field.getName(), field.getBody(), field.getRaw(), getDecodeMonitor());
+                    field, getDecodeMonitor());
         }
     }
     
