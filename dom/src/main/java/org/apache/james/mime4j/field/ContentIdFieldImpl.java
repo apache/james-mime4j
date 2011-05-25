@@ -23,7 +23,6 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentIdField;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.
@@ -33,8 +32,8 @@ public class ContentIdFieldImpl extends AbstractField implements ContentIdField 
     private boolean parsed = false;
     private String id;
 
-    ContentIdFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    ContentIdFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     private void parse() {
@@ -57,7 +56,7 @@ public class ContentIdFieldImpl extends AbstractField implements ContentIdField 
     public static final FieldParser<ContentIdField> PARSER = new FieldParser<ContentIdField>() {
         
         public ContentIdField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentIdFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new ContentIdFieldImpl(rawField, monitor);
         }
         
     };

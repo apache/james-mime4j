@@ -24,18 +24,17 @@ import org.apache.james.mime4j.codec.DecoderUtil;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Simple unstructured field such as <code>Subject</code>.
  */
-public class UnstructuredFieldImpl extends AbstractField implements org.apache.james.mime4j.dom.field.UnstructuredField {
+public class UnstructuredFieldImpl extends AbstractField implements UnstructuredField {
     private boolean parsed = false;
 
     private String value;
 
-    UnstructuredFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    UnstructuredFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     /**
@@ -59,7 +58,7 @@ public class UnstructuredFieldImpl extends AbstractField implements org.apache.j
     public static final FieldParser<UnstructuredField> PARSER = new FieldParser<UnstructuredField>() {
         
         public UnstructuredField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new UnstructuredFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new UnstructuredFieldImpl(rawField, monitor);
         }
         
     };

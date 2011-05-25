@@ -26,7 +26,6 @@ import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.field.address.ParseException;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Mailbox-list field such as <code>From</code> or <code>Resent-From</code>.
@@ -37,8 +36,8 @@ public class MailboxListFieldImpl extends AbstractField implements org.apache.ja
     private MailboxList mailboxList;
     private ParseException parseException;
 
-    MailboxListFieldImpl(final String name, final String body, final ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    MailboxListFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     /**
@@ -77,7 +76,7 @@ public class MailboxListFieldImpl extends AbstractField implements org.apache.ja
     public static final FieldParser<MailboxListField> PARSER = new FieldParser<MailboxListField>() {
         
         public MailboxListField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new MailboxListFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new MailboxListFieldImpl(rawField, monitor);
         }
         
     };

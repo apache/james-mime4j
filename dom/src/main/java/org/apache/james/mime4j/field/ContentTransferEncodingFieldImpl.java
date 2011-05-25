@@ -25,7 +25,6 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -36,8 +35,8 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
     private boolean parsed = false;
     private String encoding;
 
-    ContentTransferEncodingFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    ContentTransferEncodingFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     private void parse() {
@@ -77,7 +76,7 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
     public static final FieldParser<ContentTransferEncodingField> PARSER = new FieldParser<ContentTransferEncodingField>() {
         
         public ContentTransferEncodingField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentTransferEncodingFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new ContentTransferEncodingFieldImpl(rawField, monitor);
         }
         
     };

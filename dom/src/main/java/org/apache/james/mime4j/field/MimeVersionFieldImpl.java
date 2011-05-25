@@ -28,7 +28,6 @@ import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.mimeversion.parser.ParseException;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Represents a <code>MIME-Version</code> field.
@@ -43,8 +42,8 @@ public class MimeVersionFieldImpl extends AbstractField implements MimeVersionFi
     private int minor = DEFAULT_MINOR_VERSION;
     private ParseException parsedException;    
 
-    MimeVersionFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    MimeVersionFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     private void parse() {
@@ -93,7 +92,7 @@ public class MimeVersionFieldImpl extends AbstractField implements MimeVersionFi
     public static final FieldParser<MimeVersionField> PARSER = new FieldParser<MimeVersionField>() {
         
         public MimeVersionField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new MimeVersionFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new MimeVersionFieldImpl(rawField, monitor);
         }
         
     };

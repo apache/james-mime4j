@@ -22,6 +22,8 @@ package org.apache.james.mime4j.field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ParseException;
 import org.apache.james.mime4j.dom.field.ParsedField;
+import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
@@ -29,19 +31,11 @@ import org.apache.james.mime4j.util.ByteSequence;
  */
 public abstract class AbstractField implements ParsedField {
 
-    private final String name;
-    private final String body;
-    private final ByteSequence raw;
-    protected DecodeMonitor monitor;
+    protected final Field rawField;
+    protected final DecodeMonitor monitor;
     
-    protected AbstractField(
-            final String name, 
-            final String body, 
-            final ByteSequence raw, 
-            final DecodeMonitor monitor) {
-        this.name = name;
-        this.body = body;
-        this.raw = raw;
+    protected AbstractField(final Field rawField, final DecodeMonitor monitor) {
+        this.rawField = rawField;
         this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
     }
     
@@ -52,7 +46,7 @@ public abstract class AbstractField implements ParsedField {
      * @return the field name.
      */
     public String getName() {
-        return name;
+        return rawField.getName();
     }
     
     /**
@@ -62,7 +56,7 @@ public abstract class AbstractField implements ParsedField {
      * @return the unfolded unparsed field body string.
      */
     public String getBody() {
-        return body;
+        return rawField.getBody();
     }
 
     /**
@@ -70,7 +64,7 @@ public abstract class AbstractField implements ParsedField {
      * <code>null</code> otherwise.
      */
     public ByteSequence getRaw() {
-        return raw;
+        return rawField.getRaw();
     }
 
     /**
@@ -86,10 +80,18 @@ public abstract class AbstractField implements ParsedField {
     public ParseException getParseException() {
         return null;
     }
-
+    
+    protected RawField getRawField() {
+        if (rawField instanceof RawField) {
+            return ((RawField) rawField);
+        } else {
+            return new RawField(rawField.getName(), rawField.getBody());
+        }
+    }
+    
     @Override
     public String toString() {
-        return name + ": " + body;
+        return rawField.toString();
     }
 
 }

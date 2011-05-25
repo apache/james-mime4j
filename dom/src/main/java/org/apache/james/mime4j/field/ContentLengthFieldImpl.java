@@ -23,7 +23,6 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentLengthField;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Represents a <code>Content-Length</code> field.
@@ -33,8 +32,8 @@ public class ContentLengthFieldImpl extends AbstractField implements ContentLeng
     private boolean parsed = false;
     private long contentLength;
 
-    ContentLengthFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    ContentLengthFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     private void parse() {
@@ -72,7 +71,7 @@ public class ContentLengthFieldImpl extends AbstractField implements ContentLeng
     public static final FieldParser<ContentLengthField> PARSER = new FieldParser<ContentLengthField>() {
         
         public ContentLengthField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentLengthFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new ContentLengthFieldImpl(rawField, monitor);
         }
         
     };

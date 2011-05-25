@@ -23,7 +23,6 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentDescriptionField;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Represents a <code>Content-Description</code> field.
@@ -33,8 +32,8 @@ public class ContentDescriptionFieldImpl extends AbstractField implements Conten
     private boolean parsed = false;
     private String description;
 
-    ContentDescriptionFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    ContentDescriptionFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     private void parse() {
@@ -57,7 +56,7 @@ public class ContentDescriptionFieldImpl extends AbstractField implements Conten
     public static final FieldParser<ContentDescriptionField> PARSER = new FieldParser<ContentDescriptionField>() {
         
         public ContentDescriptionField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentDescriptionFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new ContentDescriptionFieldImpl(rawField, monitor);
         }
         
     };

@@ -26,7 +26,6 @@ import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.field.address.ParseException;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Address list field such as <code>To</code> or <code>Reply-To</code>.
@@ -38,8 +37,8 @@ public class AddressListFieldImpl extends AbstractField implements org.apache.ja
     private AddressList addressList;
     private ParseException parseException;
 
-    AddressListFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    AddressListFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     /**
@@ -78,7 +77,7 @@ public class AddressListFieldImpl extends AbstractField implements org.apache.ja
     public static final FieldParser<AddressListField> PARSER = new FieldParser<AddressListField>() {
         
         public AddressListField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new AddressListFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new AddressListFieldImpl(rawField, monitor);
         }
         
     };

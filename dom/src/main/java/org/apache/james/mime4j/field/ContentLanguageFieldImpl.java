@@ -29,7 +29,6 @@ import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
 import org.apache.james.mime4j.field.language.parser.ParseException;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.
@@ -40,8 +39,8 @@ public class ContentLanguageFieldImpl extends AbstractField implements ContentLa
     private List<String> languages;
     private ParseException parseException;
 
-    ContentLanguageFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    ContentLanguageFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     private void parse() {
@@ -75,7 +74,7 @@ public class ContentLanguageFieldImpl extends AbstractField implements ContentLa
     public static final FieldParser<ContentLanguageField> PARSER = new FieldParser<ContentLanguageField>() {
         
         public ContentLanguageField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentLanguageFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new ContentLanguageFieldImpl(rawField, monitor);
         }
         
     };

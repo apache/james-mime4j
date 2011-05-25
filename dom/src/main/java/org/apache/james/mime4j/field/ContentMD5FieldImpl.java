@@ -23,7 +23,6 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentMD5Field;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Represents a <code>Content-MD5</code> field.
@@ -33,8 +32,8 @@ public class ContentMD5FieldImpl extends AbstractField implements ContentMD5Fiel
     private boolean parsed = false;
     private String md5raw;
 
-    ContentMD5FieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    ContentMD5FieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     private void parse() {
@@ -57,7 +56,7 @@ public class ContentMD5FieldImpl extends AbstractField implements ContentMD5Fiel
     public static final FieldParser<ContentMD5Field> PARSER = new FieldParser<ContentMD5Field>() {
         
         public ContentMD5Field parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentMD5FieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new ContentMD5FieldImpl(rawField, monitor);
         }
         
     };

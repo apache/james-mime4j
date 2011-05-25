@@ -27,7 +27,6 @@ import org.apache.james.mime4j.field.structured.parser.ParseException;
 import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
-import org.apache.james.mime4j.util.ByteSequence;
 
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.
@@ -38,8 +37,8 @@ public class ContentLocationFieldImpl extends AbstractField implements ContentLo
     private String location;
     private ParseException parseException;
 
-    ContentLocationFieldImpl(String name, String body, ByteSequence raw, DecodeMonitor monitor) {
-        super(name, body, raw, monitor);
+    ContentLocationFieldImpl(Field rawField, DecodeMonitor monitor) {
+        super(rawField, monitor);
     }
 
     private void parse() {
@@ -81,7 +80,7 @@ public class ContentLocationFieldImpl extends AbstractField implements ContentLo
     public static final FieldParser<ContentLocationField> PARSER = new FieldParser<ContentLocationField>() {
         
         public ContentLocationField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentLocationFieldImpl(rawField.getName(), rawField.getBody(), rawField.getRaw(), monitor);
+            return new ContentLocationFieldImpl(rawField, monitor);
         }
         
     };
