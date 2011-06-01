@@ -25,7 +25,7 @@ package org.apache.james.mime4j.codec;
  * and unexpected data.
  * 
  * 2 basic implementations are provided:
- * STRICT return "true" on any occourence.
+ * STRICT return "true" on any occurrence.
  * SILENT ignores any problem.
  * 
  * @see org.apache.james.mime4j.field.LoggingMonitor for an example

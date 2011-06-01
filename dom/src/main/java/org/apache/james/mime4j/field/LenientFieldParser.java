@@ -89,21 +89,21 @@ public class LenientFieldParser extends DelegatingFieldParser {
 
     public LenientFieldParser() {
         setFieldParser(FieldName.CONTENT_TYPE, 
-                ContentTypeFieldLenientImpl.PARSER);
+                ContentTypeFieldLenientImpl.PARSER);        // lenient 
         setFieldParser(FieldName.CONTENT_LENGTH,
-                ContentLengthFieldImpl.PARSER);
+                ContentLengthFieldImpl.PARSER);             // default
         setFieldParser(FieldName.CONTENT_TRANSFER_ENCODING,
-                ContentTransferEncodingFieldImpl.PARSER);
+                ContentTransferEncodingFieldImpl.PARSER);   // default
         setFieldParser(FieldName.CONTENT_DISPOSITION,
-                ContentDispositionFieldImpl.PARSER);
+                ContentDispositionFieldLenientImpl.PARSER); // lenient
         setFieldParser(FieldName.CONTENT_ID,
-                ContentDispositionFieldImpl.PARSER);
+                ContentIdFieldImpl.PARSER);                 // default
         setFieldParser(FieldName.CONTENT_MD5,
-                ContentMD5FieldImpl.PARSER);
+                ContentMD5FieldImpl.PARSER);                // default
         setFieldParser(FieldName.CONTENT_DESCRIPTION,
-                ContentDescriptionFieldImpl.PARSER);
+                ContentDescriptionFieldImpl.PARSER);        // default
         setFieldParser(FieldName.CONTENT_LANGUAGE,
-                ContentLanguageFieldImpl.PARSER);
+                ContentLanguageFieldLenientImpl.PARSER);    // lenient
         setFieldParser(FieldName.CONTENT_LOCATION,
                 ContentLocationFieldImpl.PARSER);
         setFieldParser(FieldName.MIME_VERSION,

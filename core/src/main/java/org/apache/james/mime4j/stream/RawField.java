@@ -68,7 +68,7 @@ public final class RawField implements Field {
         return null;
     }
 
-    int getDelimiterIdx() {
+    public int getDelimiterIdx() {
         return delimiterIdx;
     }
 

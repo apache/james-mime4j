@@ -66,7 +66,7 @@ public class RawFieldParser {
         return parseRawBody(buf, cursor);
     }
 
-    RawBody parseRawBody(final ByteSequence buf, final ParserCursor cursor) {
+    public RawBody parseRawBody(final ByteSequence buf, final ParserCursor cursor) {
         String value = parseToken(buf, cursor, SEMICOLON);
         if (cursor.atEnd()) {
             return new RawBody(value, new ArrayList<NameValuePair>());
@@ -76,7 +76,7 @@ public class RawFieldParser {
         return new RawBody(value, params);
     }
 
-    List<NameValuePair> parseParameters(final ByteSequence buf, final ParserCursor cursor) {
+    public List<NameValuePair> parseParameters(final ByteSequence buf, final ParserCursor cursor) {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         skipWhiteSpace(buf, cursor);
         while (!cursor.atEnd()) {
@@ -86,7 +86,7 @@ public class RawFieldParser {
         return params;
     }
 
-    NameValuePair parseParameter(final ByteSequence buf, final ParserCursor cursor) {
+    public NameValuePair parseParameter(final ByteSequence buf, final ParserCursor cursor) {
         String name = parseToken(buf, cursor, EQUAL_OR_SEMICOLON);
         if (cursor.atEnd()) {
             return new NameValuePair(name, null);
@@ -114,7 +114,7 @@ public class RawFieldParser {
         return false;
     }
 
-    static String parseToken(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
+    public static String parseToken(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
@@ -137,7 +137,7 @@ public class RawFieldParser {
         return dst.toString();
     }
 
-    static String parseValue(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
+    public static String parseValue(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
@@ -166,7 +166,7 @@ public class RawFieldParser {
         return dst.toString();
     }
 
-    static void skipWhiteSpace(final ByteSequence buf, final ParserCursor cursor) {
+    public static void skipWhiteSpace(final ByteSequence buf, final ParserCursor cursor) {
         int pos = cursor.getPos();
         int indexFrom = cursor.getPos();
         int indexTo = cursor.getUpperBound();
@@ -181,7 +181,7 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
-    static void skipComment(final ByteSequence buf, final ParserCursor cursor) {
+    public static void skipComment(final ByteSequence buf, final ParserCursor cursor) {
         if (cursor.atEnd()) {
             return;
         }
@@ -218,7 +218,7 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
-    static void copyContent(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters,
+    public static void copyContent(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters,
             final StringBuilder dst) {
         int pos = cursor.getPos();
         int indexFrom = cursor.getPos();
@@ -235,7 +235,7 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
-    static void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
+    public static void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst) {
         if (cursor.atEnd()) {
             return;

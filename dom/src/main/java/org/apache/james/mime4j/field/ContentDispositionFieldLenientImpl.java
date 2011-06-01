@@ -19,33 +19,40 @@
 
 package org.apache.james.mime4j.field;
 
-import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
-import org.apache.james.mime4j.field.contentdisposition.parser.ContentDispositionParser;
-import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
-import org.apache.james.mime4j.field.contentdisposition.parser.TokenMgrError;
-import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
+import org.apache.james.mime4j.stream.NameValuePair;
+import org.apache.james.mime4j.stream.RawBody;
+import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.RawFieldParser;
 
 /**
  * Represents a <code>Content-Disposition</code> field.
  */
-public class ContentDispositionFieldImpl extends AbstractField implements ContentDispositionField {
+public class ContentDispositionFieldLenientImpl extends AbstractField implements ContentDispositionField {
 
+    private static final String DEFAULT_DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss ZZZZ";
+    
+    private final List<String> datePatterns;
+    
     private boolean parsed = false;
 
     private String dispositionType = "";
     private Map<String, String> parameters = new HashMap<String, String>();
-    private ParseException parseException;
 
     private boolean creationDateParsed;
     private Date creationDate;
@@ -56,128 +63,87 @@ public class ContentDispositionFieldImpl extends AbstractField implements Conten
     private boolean readDateParsed;
     private Date readDate;
 
-    ContentDispositionFieldImpl(Field rawField, DecodeMonitor monitor) {
+    ContentDispositionFieldLenientImpl(final Field rawField, 
+            final Collection<String> dateParsers, final DecodeMonitor monitor) {
         super(rawField, monitor);
+        this.datePatterns = new ArrayList<String>();
+        if (dateParsers != null) {
+            this.datePatterns.addAll(dateParsers);
+        } else {
+            this.datePatterns.add(DEFAULT_DATE_FORMAT);
+        }
     }
 
-    /**
-     * Gets the exception that was raised during parsing of the field value, if
-     * any; otherwise, null.
-     */
-    @Override
-    public ParseException getParseException() {
-        if (!parsed)
-            parse();
-
-        return parseException;
-    }
-
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getDispositionType()
-     */
     public String getDispositionType() {
-        if (!parsed)
+        if (!parsed) {
             parse();
-
+        }
         return dispositionType;
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getParameter(java.lang.String)
-     */
     public String getParameter(String name) {
-        if (!parsed)
+        if (!parsed) {
             parse();
-
+        }
         return parameters.get(name.toLowerCase());
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getParameters()
-     */
     public Map<String, String> getParameters() {
-        if (!parsed)
+        if (!parsed) {
             parse();
-
+        }
         return Collections.unmodifiableMap(parameters);
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#isDispositionType(java.lang.String)
-     */
     public boolean isDispositionType(String dispositionType) {
-        if (!parsed)
+        if (!parsed) {
             parse();
-
+        }
         return this.dispositionType.equalsIgnoreCase(dispositionType);
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#isInline()
-     */
     public boolean isInline() {
-        if (!parsed)
+        if (!parsed) {
             parse();
-
+        }
         return dispositionType.equals(DISPOSITION_TYPE_INLINE);
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#isAttachment()
-     */
     public boolean isAttachment() {
-        if (!parsed)
+        if (!parsed) {
             parse();
-
+        }
         return dispositionType.equals(DISPOSITION_TYPE_ATTACHMENT);
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getFilename()
-     */
     public String getFilename() {
         return getParameter(PARAM_FILENAME);
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getCreationDate()
-     */
     public Date getCreationDate() {
         if (!creationDateParsed) {
             creationDate = parseDate(PARAM_CREATION_DATE);
             creationDateParsed = true;
         }
-
         return creationDate;
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getModificationDate()
-     */
     public Date getModificationDate() {
         if (!modificationDateParsed) {
             modificationDate = parseDate(PARAM_MODIFICATION_DATE);
             modificationDateParsed = true;
         }
-
         return modificationDate;
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getReadDate()
-     */
     public Date getReadDate() {
         if (!readDateParsed) {
             readDate = parseDate(PARAM_READ_DATE);
             readDateParsed = true;
         }
-
         return readDate;
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.ContentDispositionField#getSize()
-     */
     public long getSize() {
         String value = getParameter(PARAM_SIZE);
         if (value == null)
@@ -191,67 +157,48 @@ public class ContentDispositionFieldImpl extends AbstractField implements Conten
         }
     }
 
-    private Date parseDate(String paramName) {
-        String value = getParameter(paramName);
-        if (value == null) {
-            monitor.warn("Parsing " + paramName + " null", "returning null");
-            return null;
+    private void parse() {
+        parsed = true;
+        RawField f = getRawField();
+        RawBody body = RawFieldParser.DEFAULT.parseRawBody(f);
+        String main = body.getValue();
+        if (main != null) {
+            dispositionType = main.toLowerCase(Locale.US);
+        } else {
+            dispositionType = null;
         }
-
-        try {
-            return new DateTimeParser(new StringReader(value)).parseAll()
-                    .getDate();
-        } catch (org.apache.james.mime4j.field.datetime.parser.ParseException e) {
-            if (monitor.isListening()) {
-                monitor.warn(paramName + " parameter is invalid: " + value, 
-                        paramName + " parameter is ignored");
-            }
-            return null;
-        } catch (TokenMgrError e) {
-            monitor.warn(paramName + " parameter is invalid: " + value, 
-                    paramName + "parameter is ignored");
-            return null;
+        parameters.clear();
+        for (NameValuePair nmp: body.getParams()) {
+            String name = nmp.getName().toLowerCase(Locale.US);
+            parameters.put(name, nmp.getValue());
         }
     }
 
-    private void parse() {
-        String body = getBody();
-
-        ContentDispositionParser parser = new ContentDispositionParser(
-                new StringReader(body));
-        try {
-            parser.parseAll();
-        } catch (ParseException e) {
-            parseException = e;
-        } catch (TokenMgrError e) {
-            parseException = new ParseException(e.getMessage());
+    private Date parseDate(final String paramName) {
+        String value = getParameter(paramName);
+        if (value == null) {
+            return null;
         }
-
-        final String dispositionType = parser.getDispositionType();
-
-        if (dispositionType != null) {
-            this.dispositionType = dispositionType.toLowerCase(Locale.US);
-
-            List<String> paramNames = parser.getParamNames();
-            List<String> paramValues = parser.getParamValues();
-
-            if (paramNames != null && paramValues != null) {
-                final int len = Math.min(paramNames.size(), paramValues.size());
-                for (int i = 0; i < len; i++) {
-                    String paramName = paramNames.get(i).toLowerCase(Locale.US);
-                    String paramValue = paramValues.get(i);
-                    parameters.put(paramName, paramValue);
-                }
+        for (String datePattern: datePatterns) {
+            try {
+                SimpleDateFormat parser = new SimpleDateFormat(datePattern, Locale.US);
+                parser.setTimeZone(TimeZone.getTimeZone("GMT"));
+                parser.setLenient(true);
+                return parser.parse(value);
+            } catch (ParseException ignore) {
             }
         }
-
-        parsed = true;
+        if (monitor.isListening()) {
+            monitor.warn(paramName + " parameter is invalid: " + value, 
+                    paramName + " parameter is ignored");
+        }
+        return null;
     }
 
     public static final FieldParser<ContentDispositionField> PARSER = new FieldParser<ContentDispositionField>() {
         
         public ContentDispositionField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentDispositionFieldImpl(rawField, monitor);
+            return new ContentDispositionFieldLenientImpl(rawField, null, monitor);
         }
         
     };

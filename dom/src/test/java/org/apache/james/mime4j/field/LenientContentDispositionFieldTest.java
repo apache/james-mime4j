@@ -30,12 +30,12 @@ import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
-public class ContentDispositionFieldTest extends TestCase {
+public class LenientContentDispositionFieldTest extends TestCase {
 
     static ContentDispositionField parse(final String s) throws MimeException {
         ByteSequence raw = ContentUtil.encode(s);
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
-        return ContentDispositionFieldImpl.PARSER.parse(rawField, null);
+        return ContentDispositionFieldLenientImpl.PARSER.parse(rawField, null);
     }
     
     public void testDispositionTypeWithSemiColonNoParams() throws Exception {
@@ -60,7 +60,7 @@ public class ContentDispositionFieldTest extends TestCase {
     public void testGetParameter() throws Exception {
         ContentDispositionField f = parse("CONTENT-DISPOSITION:   inline ;"
                         + "  filename=yada yada");
-        assertEquals("yada", f.getParameter("filename"));
+        assertEquals("yada yada", f.getParameter("filename"));
 
         f = parse("Content-Disposition: x-yada;"
                         + "  fileNAme= \"ya:\\\"*da\"; " + "\tSIZE\t =  1234");
@@ -97,7 +97,7 @@ public class ContentDispositionFieldTest extends TestCase {
         assertEquals("yada.txt", f.getFilename());
 
         f = parse("Content-Disposition: inline; filename=yada yada.txt");
-        assertEquals("yada", f.getFilename());
+        assertEquals("yada yada.txt", f.getFilename());
 
         f = parse("Content-Disposition: inline; filename=\"yada yada.txt\"");
         assertEquals("yada yada.txt", f.getFilename());
@@ -113,7 +113,7 @@ public class ContentDispositionFieldTest extends TestCase {
 
         f = parse("Content-Disposition: inline; "
                         + "creation-date=Tue, 01 Jan 1970 00:00:00 +0000");
-        assertNull(f.getCreationDate());
+        assertEquals(new Date(0), f.getCreationDate());
 
         f = parse("Content-Disposition: attachment");
         assertNull(f.getCreationDate());

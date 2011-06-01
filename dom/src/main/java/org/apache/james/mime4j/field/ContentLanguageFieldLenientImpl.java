@@ -19,48 +19,63 @@
 
 package org.apache.james.mime4j.field;
 
-import java.io.StringReader;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentLanguageField;
-import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
-import org.apache.james.mime4j.field.language.parser.ParseException;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
+import org.apache.james.mime4j.stream.ParserCursor;
+import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.RawFieldParser;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
 
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.
  */
-public class ContentLanguageFieldImpl extends AbstractField implements ContentLanguageField {
+public class ContentLanguageFieldLenientImpl extends AbstractField implements ContentLanguageField {
 
+    private final static int   COMMA = ',';
+    private final static int[] DELIM = new int[] { COMMA };
+    
     private boolean parsed = false;
     private List<String> languages;
-    private ParseException parseException;
 
-    ContentLanguageFieldImpl(Field rawField, DecodeMonitor monitor) {
+    ContentLanguageFieldLenientImpl(final Field rawField, final DecodeMonitor monitor) {
         super(rawField, monitor);
     }
 
     private void parse() {
         parsed = true;
-        languages = Collections.<String>emptyList();
-        String body = getBody();
-        if (body != null) {
-            ContentLanguageParser parser = new ContentLanguageParser(new StringReader(body));
-            try {
-                languages = parser.parse();
-            } catch (ParseException ex) {
-                parseException = ex;
+        RawField f = getRawField();
+        ByteSequence buf = f.getRaw();
+        int pos = f.getDelimiterIdx() + 1;
+        if (buf == null) {
+            String body = f.getBody();
+            if (body == null) {
+                return;
+            }
+            buf = ContentUtil.encode(body);
+            pos = 0;
+        }
+        languages = new ArrayList<String>();
+        ParserCursor cursor = new ParserCursor(pos, buf.length());
+        for (;;) {
+            String token = RawFieldParser.parseToken(buf, cursor, DELIM);
+            if (token.length() > 0) {
+                languages.add(token);
+            }
+            if (cursor.atEnd()) {
+                break;
+            } else {
+                pos = cursor.getPos();
+                if (buf.byteAt(pos) == COMMA) {
+                    cursor.updatePos(pos + 1);
+                }
             }
         }
-    }
-
-    @Override
-    public org.apache.james.mime4j.dom.field.ParseException getParseException() {
-        return parseException;
     }
 
     public List<String> getLanguages() {
@@ -73,7 +88,7 @@ public class ContentLanguageFieldImpl extends AbstractField implements ContentLa
     public static final FieldParser<ContentLanguageField> PARSER = new FieldParser<ContentLanguageField>() {
         
         public ContentLanguageField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentLanguageFieldImpl(rawField, monitor);
+            return new ContentLanguageFieldLenientImpl(rawField, monitor);
         }
         
     };

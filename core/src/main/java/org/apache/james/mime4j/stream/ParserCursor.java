@@ -28,7 +28,7 @@ package org.apache.james.mime4j.stream;
  * <p/>
  * Copied from Apache HttpCore project
  */
-class ParserCursor {
+public class ParserCursor {
 
     private final int lowerBound;
     private final int upperBound;

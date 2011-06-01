@@ -44,6 +44,7 @@ public class ContentLocationFieldImpl extends AbstractField implements ContentLo
     private void parse() {
         parsed = true;
         String body = getBody();
+        location = null;
         if (body != null) {
             StringReader stringReader = new StringReader(body);
             StructuredFieldParser parser = new StructuredFieldParser(stringReader);
@@ -58,10 +59,7 @@ public class ContentLocationFieldImpl extends AbstractField implements ContentLo
                 location = parser.parse().replaceAll("\\s", "");
             } catch (ParseException ex) { 
                 parseException = ex;
-                location = null;
             }
-        } else {
-            location = null;
         }
     }
     

@@ -38,26 +38,24 @@ public class ContentLengthFieldImpl extends AbstractField implements ContentLeng
 
     private void parse() {
         parsed = true;
+        contentLength = -1;
         String body = getBody();
         if (body != null) {
             try {
-                long v = Long.parseLong(body);
-                if (v < 0) {
-                    if (monitor.warn("Negative content length: " + body, 
-                            "ignoring Content-Length header")) {
-                        contentLength = -1;
+                contentLength = Long.parseLong(body);
+                if (contentLength < 0) {
+                    contentLength = -1;
+                    if (monitor.isListening()) {
+                        monitor.warn("Negative content length: " + body, 
+                                "ignoring Content-Length header");
                     }
-                } else {
-                    contentLength = v;
                 }
             } catch (NumberFormatException e) {
-                if (monitor.warn("Invalid content length: " + body, 
-                        "ignoring Content-Length header")) {
-                    contentLength = -1;
+                if (monitor.isListening()) {
+                    monitor.warn("Invalid content length: " + body, 
+                            "ignoring Content-Length header");
                 }
             }
-        } else {
-            contentLength = -1;
         }
     }
     

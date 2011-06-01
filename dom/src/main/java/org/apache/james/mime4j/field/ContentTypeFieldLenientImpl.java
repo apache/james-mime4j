@@ -45,7 +45,7 @@ public class ContentTypeFieldLenientImpl extends AbstractField implements Conten
     private String subType = null;
     private Map<String, String> parameters = new HashMap<String, String>();
 
-    ContentTypeFieldLenientImpl(Field rawField, DecodeMonitor monitor) {
+    ContentTypeFieldLenientImpl(final Field rawField, final DecodeMonitor monitor) {
         super(rawField, monitor);
     }
 
@@ -126,6 +126,9 @@ public class ContentTypeFieldLenientImpl extends AbstractField implements Conten
                 }
             }
             if (!valid) {
+                if (monitor.isListening()) {
+                    monitor.warn("Invalid Content-Type: " + body, "Content-Type value ignored");
+                }
                 main = null;
                 type = null;
                 subtype = null;
