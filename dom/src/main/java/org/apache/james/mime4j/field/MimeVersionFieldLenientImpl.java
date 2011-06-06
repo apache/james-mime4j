@@ -19,11 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.dom.field.ContentLanguageField;
+import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.stream.ParserCursor;
@@ -33,23 +30,30 @@ import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
- * Represents a <code>Content-Transfer-Encoding</code> field.
+ * Represents a <code>MIME-Version</code> field.
  */
-public class ContentLanguageFieldLenientImpl extends AbstractField implements ContentLanguageField {
+public class MimeVersionFieldLenientImpl extends AbstractField implements MimeVersionField {
 
-    private final static int   COMMA = ',';
-    private final static int[] DELIM = new int[] { COMMA };
+    private final static int FULL_STOP  = '.';
+    private final static int[] DELIM1   = new int[] { FULL_STOP };
+    private final static int[] DELIM2   = new int[] {};
+    
+    
+    public static final int DEFAULT_MINOR_VERSION = 0;
+    public static final int DEFAULT_MAJOR_VERSION = 1;
     
     private boolean parsed = false;
-    private List<String> languages;
+    private int major = DEFAULT_MAJOR_VERSION;
+    private int minor = DEFAULT_MINOR_VERSION;
 
-    ContentLanguageFieldLenientImpl(final Field rawField, final DecodeMonitor monitor) {
+    MimeVersionFieldLenientImpl(Field rawField, DecodeMonitor monitor) {
         super(rawField, monitor);
     }
 
     private void parse() {
         parsed = true;
-        languages = new ArrayList<String>();
+        major = DEFAULT_MAJOR_VERSION;
+        minor = DEFAULT_MINOR_VERSION;
         RawField f = getRawField();
         ByteSequence buf = f.getRaw();
         int pos = f.getDelimiterIdx() + 1;
@@ -62,36 +66,47 @@ public class ContentLanguageFieldLenientImpl extends AbstractField implements Co
             pos = 0;
         }
         ParserCursor cursor = new ParserCursor(pos, buf.length());
-        for (;;) {
-            String token = RawFieldParser.parseToken(buf, cursor, DELIM);
-            if (token.length() > 0) {
-                languages.add(token);
+        String token1 = RawFieldParser.parseValue(buf, cursor, DELIM1);
+        try {
+            major = Integer.parseInt(token1);
+            if (major < 0) {
+                major = 0;
             }
-            if (cursor.atEnd()) {
-                break;
-            } else {
-                pos = cursor.getPos();
-                if (buf.byteAt(pos) == COMMA) {
-                    cursor.updatePos(pos + 1);
-                }
+        } catch (NumberFormatException ex) {
+        }
+        if (!cursor.atEnd() && buf.byteAt(cursor.getPos()) == FULL_STOP) {
+            cursor.updatePos(cursor.getPos() + 1);
+        }
+        String token2 = RawFieldParser.parseValue(buf, cursor, DELIM2);
+        try {
+            minor = Integer.parseInt(token2);
+            if (minor < 0) {
+                minor = 0;
             }
+        } catch (NumberFormatException ex) {
         }
     }
 
-    public List<String> getLanguages() {
+    public int getMinorVersion() {
         if (!parsed) {
             parse();
         }
-        return new ArrayList<String>(languages);
+        return minor;
     }
 
-    public static final FieldParser<ContentLanguageField> PARSER = new FieldParser<ContentLanguageField>() {
+    public int getMajorVersion() {
+        if (!parsed) {
+            parse();
+        }
+        return major;
+    }
+
+    public static final FieldParser<MimeVersionField> PARSER = new FieldParser<MimeVersionField>() {
         
-        public ContentLanguageField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentLanguageFieldLenientImpl(rawField, monitor);
+        public MimeVersionField parse(final Field rawField, final DecodeMonitor monitor) {
+            return new MimeVersionFieldLenientImpl(rawField, monitor);
         }
         
     };
-
+    
 }
-

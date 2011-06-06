@@ -24,15 +24,20 @@ import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ParsedField;
-import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
 
 public class DelegatingFieldParser implements FieldParser<ParsedField> {
-    private static final FieldParser<UnstructuredField> DEFAULT_PARSER = UnstructuredFieldImpl.PARSER;
 
-    private Map<String, FieldParser<? extends ParsedField>> parsers = new HashMap<String, FieldParser<? extends ParsedField>>();
+    private final FieldParser<? extends ParsedField> defaultParser;
+    private final Map<String, FieldParser<? extends ParsedField>> parsers;
 
+    public DelegatingFieldParser(final FieldParser<? extends ParsedField> defaultParser) {
+        super();
+        this.defaultParser = defaultParser;
+        this.parsers = new HashMap<String, FieldParser<? extends ParsedField>>();
+    }
+    
     /**
      * Sets the parser used for the field named <code>name</code>.
      * @param name the name of the field
@@ -45,7 +50,7 @@ public class DelegatingFieldParser implements FieldParser<ParsedField> {
     public FieldParser<? extends ParsedField> getParser(final String name) {
         final FieldParser<? extends ParsedField> field = parsers.get(name.toLowerCase());
         if (field == null) {
-            return DEFAULT_PARSER;
+            return defaultParser;
         }
         return field;
     }

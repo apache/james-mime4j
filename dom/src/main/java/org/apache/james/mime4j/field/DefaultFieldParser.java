@@ -103,6 +103,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
     }
 
     public DefaultFieldParser() {
+        super(UnstructuredFieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_TYPE, 
                 ContentTypeFieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_LENGTH,
@@ -124,19 +125,19 @@ public class DefaultFieldParser extends DelegatingFieldParser {
         setFieldParser(FieldName.MIME_VERSION,
                 MimeVersionFieldImpl.PARSER);
 
-        final FieldParser<DateTimeField> dateTimeParser = DateTimeFieldImpl.PARSER;
+        FieldParser<DateTimeField> dateTimeParser = DateTimeFieldImpl.PARSER;
         setFieldParser(FieldName.DATE, dateTimeParser);
         setFieldParser(FieldName.RESENT_DATE, dateTimeParser);
 
-        final FieldParser<MailboxListField> mailboxListParser = MailboxListFieldImpl.PARSER;
+        FieldParser<MailboxListField> mailboxListParser = MailboxListFieldImpl.PARSER;
         setFieldParser(FieldName.FROM, mailboxListParser);
         setFieldParser(FieldName.RESENT_FROM, mailboxListParser);
 
-        final FieldParser<MailboxField> mailboxParser = MailboxFieldImpl.PARSER;
+        FieldParser<MailboxField> mailboxParser = MailboxFieldImpl.PARSER;
         setFieldParser(FieldName.SENDER, mailboxParser);
         setFieldParser(FieldName.RESENT_SENDER, mailboxParser);
 
-        final FieldParser<AddressListField> addressListParser = AddressListFieldImpl.PARSER;
+        FieldParser<AddressListField> addressListParser = AddressListFieldImpl.PARSER;
         setFieldParser(FieldName.TO, addressListParser);
         setFieldParser(FieldName.RESENT_TO, addressListParser);
         setFieldParser(FieldName.CC, addressListParser);

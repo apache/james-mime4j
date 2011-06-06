@@ -88,6 +88,7 @@ public class LenientFieldParser extends DelegatingFieldParser {
     }
 
     public LenientFieldParser() {
+        super(UnstructuredFieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_TYPE, 
                 ContentTypeFieldLenientImpl.PARSER);        // lenient 
         setFieldParser(FieldName.CONTENT_LENGTH,
@@ -105,9 +106,9 @@ public class LenientFieldParser extends DelegatingFieldParser {
         setFieldParser(FieldName.CONTENT_LANGUAGE,
                 ContentLanguageFieldLenientImpl.PARSER);    // lenient
         setFieldParser(FieldName.CONTENT_LOCATION,
-                ContentLocationFieldImpl.PARSER);
+                ContentLocationFieldLenientImpl.PARSER);    // lenient
         setFieldParser(FieldName.MIME_VERSION,
-                MimeVersionFieldImpl.PARSER);
+                MimeVersionFieldImpl.PARSER);               // lenient
 
         final FieldParser<DateTimeField> dateTimeParser = DateTimeFieldImpl.PARSER;
         setFieldParser(FieldName.DATE, dateTimeParser);

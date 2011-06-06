@@ -19,48 +19,55 @@
 
 package org.apache.james.mime4j.field;
 
-import java.io.StringReader;
-
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentLocationField;
-import org.apache.james.mime4j.field.structured.parser.ParseException;
-import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
+import org.apache.james.mime4j.stream.ParserCursor;
+import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.RawFieldParser;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.ContentUtil;
 
 /**
  * Represents a <code>Content-Location</code> field.
  */
-public class ContentLocationFieldImpl extends AbstractField implements ContentLocationField {
+public class ContentLocationFieldLenientImpl extends AbstractField implements ContentLocationField {
 
+    private final static int[] DELIM = new int[] {};
+    
     private boolean parsed = false;
     private String location;
-    private ParseException parseException;
 
-    ContentLocationFieldImpl(Field rawField, DecodeMonitor monitor) {
+    ContentLocationFieldLenientImpl(Field rawField, DecodeMonitor monitor) {
         super(rawField, monitor);
     }
 
     private void parse() {
         parsed = true;
-        String body = getBody();
         location = null;
-        if (body != null) {
-            StringReader stringReader = new StringReader(body);
-            StructuredFieldParser parser = new StructuredFieldParser(stringReader);
-            try {
-                // From RFC2017 3.1
-                /*
-                 * Extraction of the URL string from the URL-parameter is even simpler:
-                 * The enclosing quotes and any linear whitespace are removed and the
-                 * remaining material is the URL string.
-                 * Read more: http://www.faqs.org/rfcs/rfc2017.html#ixzz0aufO9nRL
-                 */
-                location = parser.parse().replaceAll("\\s", "");
-            } catch (ParseException ex) { 
-                parseException = ex;
+        RawField f = getRawField();
+        ByteSequence buf = f.getRaw();
+        int pos = f.getDelimiterIdx() + 1;
+        if (buf == null) {
+            String body = f.getBody();
+            if (body == null) {
+                return;
+            }
+            buf = ContentUtil.encode(body);
+            pos = 0;
+        }
+        ParserCursor cursor = new ParserCursor(pos, buf.length());
+        String token = RawFieldParser.parseValue(buf, cursor, DELIM);
+        StringBuilder sb = new StringBuilder(token.length());
+        for (int i = 0; i < token.length(); i++) {
+            char ch = token.charAt(i);
+            if (!CharsetUtil.isWhitespace(ch)) {
+                sb.append(ch);
             }
         }
+        this.location = sb.toString();
     }
     
     public String getLocation() {
@@ -70,15 +77,10 @@ public class ContentLocationFieldImpl extends AbstractField implements ContentLo
         return location;
     }
 
-    @Override
-    public org.apache.james.mime4j.dom.field.ParseException getParseException() {
-        return parseException;
-    }
-
     public static final FieldParser<ContentLocationField> PARSER = new FieldParser<ContentLocationField>() {
         
         public ContentLocationField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentLocationFieldImpl(rawField, monitor);
+            return new ContentLocationFieldLenientImpl(rawField, monitor);
         }
         
     };
