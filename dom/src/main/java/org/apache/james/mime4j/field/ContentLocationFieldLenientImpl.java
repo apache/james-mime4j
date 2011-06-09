@@ -58,8 +58,9 @@ public class ContentLocationFieldLenientImpl extends AbstractField implements Co
             buf = ContentUtil.encode(body);
             pos = 0;
         }
+        RawFieldParser parser = RawFieldParser.DEFAULT;
         ParserCursor cursor = new ParserCursor(pos, buf.length());
-        String token = RawFieldParser.parseValue(buf, cursor, DELIM);
+        String token = parser.parseValue(buf, cursor, DELIM);
         StringBuilder sb = new StringBuilder(token.length());
         for (int i = 0; i < token.length(); i++) {
             char ch = token.charAt(i);

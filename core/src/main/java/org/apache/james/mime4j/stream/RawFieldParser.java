@@ -103,7 +103,7 @@ public class RawFieldParser {
         return new NameValuePair(name, value);
     }
 
-    static boolean isOneOf(final int ch, final int[] chs) {
+    public static boolean isOneOf(final int ch, final int[] chs) {
         if (chs != null) {
             for (int i = 0; i < chs.length; i++) {
                 if (ch == chs[i]) {
@@ -114,7 +114,7 @@ public class RawFieldParser {
         return false;
     }
 
-    public static String parseToken(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
+    public String parseToken(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
@@ -137,7 +137,7 @@ public class RawFieldParser {
         return dst.toString();
     }
 
-    public static String parseValue(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
+    public String parseValue(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
@@ -166,7 +166,7 @@ public class RawFieldParser {
         return dst.toString();
     }
 
-    public static void skipWhiteSpace(final ByteSequence buf, final ParserCursor cursor) {
+    public void skipWhiteSpace(final ByteSequence buf, final ParserCursor cursor) {
         int pos = cursor.getPos();
         int indexFrom = cursor.getPos();
         int indexTo = cursor.getUpperBound();
@@ -181,7 +181,7 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
-    public static void skipComment(final ByteSequence buf, final ParserCursor cursor) {
+    public void skipComment(final ByteSequence buf, final ParserCursor cursor) {
         if (cursor.atEnd()) {
             return;
         }
@@ -218,7 +218,20 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
-    public static void copyContent(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters,
+    public void skipAllWhiteSpace(final ByteSequence buf, final ParserCursor cursor) {
+        while (!cursor.atEnd()) {
+            char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
+            if (CharsetUtil.isWhitespace(current)) {
+                skipWhiteSpace(buf, cursor);
+            } else if (current == '(') {
+                skipComment(buf, cursor);
+            } else {
+                break;
+            }
+        }
+    }
+    
+    public void copyContent(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters,
             final StringBuilder dst) {
         int pos = cursor.getPos();
         int indexFrom = cursor.getPos();
@@ -235,7 +248,7 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
-    public static void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
+    public void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst) {
         if (cursor.atEnd()) {
             return;

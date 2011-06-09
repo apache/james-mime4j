@@ -30,18 +30,25 @@ import junit.framework.TestCase;
 
 public class RawFieldParserTest extends TestCase {
 
+    private RawFieldParser parser;
+    
+    @Override
+    protected void setUp() throws Exception {
+        parser = new RawFieldParser();
+    }
+
     public void testBasicTokenParsing() throws Exception {
         String s = "   raw: \" some stuff \"";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
 
-        RawFieldParser.skipWhiteSpace(raw, cursor);
+        parser.skipWhiteSpace(raw, cursor);
 
         Assert.assertFalse(cursor.atEnd());
         Assert.assertEquals(3, cursor.getPos());
 
         StringBuilder strbuf1 = new StringBuilder();
-        RawFieldParser.copyContent(raw, cursor, new int[] { ':' }, strbuf1);
+        parser.copyContent(raw, cursor, new int[] { ':' }, strbuf1);
 
         Assert.assertFalse(cursor.atEnd());
         Assert.assertEquals(6, cursor.getPos());
@@ -49,21 +56,21 @@ public class RawFieldParserTest extends TestCase {
         Assert.assertEquals(':', raw.byteAt(cursor.getPos()));
         cursor.updatePos(cursor.getPos() + 1);
 
-        RawFieldParser.skipWhiteSpace(raw, cursor);
+        parser.skipWhiteSpace(raw, cursor);
 
         Assert.assertFalse(cursor.atEnd());
         Assert.assertEquals(8, cursor.getPos());
 
         StringBuilder strbuf2 = new StringBuilder();
-        RawFieldParser.copyQuotedContent(raw, cursor, strbuf2);
+        parser.copyQuotedContent(raw, cursor, strbuf2);
 
         Assert.assertTrue(cursor.atEnd());
         Assert.assertEquals(" some stuff ", strbuf2.toString());
 
-        RawFieldParser.copyQuotedContent(raw, cursor, strbuf2);
+        parser.copyQuotedContent(raw, cursor, strbuf2);
         Assert.assertTrue(cursor.atEnd());
 
-        RawFieldParser.skipWhiteSpace(raw, cursor);
+        parser.skipWhiteSpace(raw, cursor);
         Assert.assertTrue(cursor.atEnd());
     }
 
@@ -72,25 +79,25 @@ public class RawFieldParserTest extends TestCase {
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
 
-        RawFieldParser.skipWhiteSpace(raw, cursor);
+        parser.skipWhiteSpace(raw, cursor);
 
         Assert.assertFalse(cursor.atEnd());
         Assert.assertEquals(0, cursor.getPos());
 
         StringBuilder strbuf1 = new StringBuilder();
-        RawFieldParser.copyContent(raw, cursor, new int[] { ':' }, strbuf1);
+        parser.copyContent(raw, cursor, new int[] { ':' }, strbuf1);
 
         Assert.assertFalse(cursor.atEnd());
         Assert.assertEquals("raw", strbuf1.toString());
         Assert.assertEquals(':', raw.byteAt(cursor.getPos()));
         cursor.updatePos(cursor.getPos() + 1);
 
-        RawFieldParser.skipWhiteSpace(raw, cursor);
+        parser.skipWhiteSpace(raw, cursor);
 
         Assert.assertFalse(cursor.atEnd());
 
         StringBuilder strbuf2 = new StringBuilder();
-        RawFieldParser.copyQuotedContent(raw, cursor, strbuf2);
+        parser.copyQuotedContent(raw, cursor, strbuf2);
 
         Assert.assertTrue(cursor.atEnd());
         Assert.assertEquals("\"some\\stuff\\", strbuf2.toString());
@@ -101,7 +108,7 @@ public class RawFieldParserTest extends TestCase {
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
         StringBuilder strbuf1 = new StringBuilder();
-        RawFieldParser.copyQuotedContent(raw, cursor, strbuf1);
+        parser.copyQuotedContent(raw, cursor, strbuf1);
         Assert.assertEquals("stuff and more stuff  ", strbuf1.toString());
     }
 
@@ -110,7 +117,7 @@ public class RawFieldParserTest extends TestCase {
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
 
-        RawFieldParser.skipComment(raw, cursor);
+        parser.skipComment(raw, cursor);
         Assert.assertTrue(cursor.atEnd());
     }
 
@@ -119,7 +126,7 @@ public class RawFieldParserTest extends TestCase {
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
 
-        RawFieldParser.skipComment(raw, cursor);
+        parser.skipComment(raw, cursor);
         Assert.assertTrue(cursor.atEnd());
     }
 
@@ -127,7 +134,7 @@ public class RawFieldParserTest extends TestCase {
         String s = "  stuff and   \tsome\tmore  stuff  ;";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
-        String result = RawFieldParser.parseToken(raw, cursor, new int[] { ';' });
+        String result = parser.parseToken(raw, cursor, new int[] { ';' });
         Assert.assertEquals("stuff and some more stuff", result);
     }
 
@@ -135,7 +142,7 @@ public class RawFieldParserTest extends TestCase {
         String s = " (blah-blah)  stuff(blah-blah) and some mo(blah-blah)re  stuff (blah-blah) ;";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
-        String result = RawFieldParser.parseToken(raw, cursor, new int[] { ';' });
+        String result = parser.parseToken(raw, cursor, new int[] { ';' });
         Assert.assertEquals("stuff and some more stuff", result);
     }
 
@@ -143,7 +150,7 @@ public class RawFieldParserTest extends TestCase {
         String s = "  stuff and    \" some more \"   \"stuff  ;";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
-        String result = RawFieldParser.parseValue(raw, cursor, new int[] { ';' });
+        String result = parser.parseValue(raw, cursor, new int[] { ';' });
         Assert.assertEquals("stuff and  some more  stuff  ;", result);
     }
 
@@ -151,15 +158,13 @@ public class RawFieldParserTest extends TestCase {
         String s = " (blah blah)  \"(stuff)(and)(some)(more)(stuff)\" (yada yada) ";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
-        String result = RawFieldParser.parseValue(raw, cursor, new int[] { ';' });
+        String result = parser.parseValue(raw, cursor, new int[] { ';' });
         Assert.assertEquals("(stuff)(and)(some)(more)(stuff)", result);
     }
 
     public void testBasicParsing() throws Exception {
         String s = "raw: stuff;\r\n  more stuff";
         ByteSequence raw = ContentUtil.encode(s);
-
-        RawFieldParser parser = new RawFieldParser();
 
         RawField field = parser.parseField(raw);
         Assert.assertSame(raw, field.getRaw());
@@ -172,8 +177,6 @@ public class RawFieldParserTest extends TestCase {
         String s = "raw:stuff";
         ByteSequence raw = ContentUtil.encode(s);
 
-        RawFieldParser parser = new RawFieldParser();
-
         RawField field = parser.parseField(raw);
         Assert.assertSame(raw, field.getRaw());
         Assert.assertEquals("raw", field.getName());
@@ -184,8 +187,6 @@ public class RawFieldParserTest extends TestCase {
     public void testParsingObsoleteSyntax() throws Exception {
         String s = "raw  \t  : stuff;\r\n  more stuff";
         ByteSequence raw = ContentUtil.encode(s);
-
-        RawFieldParser parser = new RawFieldParser();
 
         RawField field = parser.parseField(raw);
         Assert.assertSame(raw, field.getRaw());
@@ -198,8 +199,6 @@ public class RawFieldParserTest extends TestCase {
         String s = "raw    stuff;\r\n  more stuff";
         ByteSequence raw = ContentUtil.encode(s);
 
-        RawFieldParser parser = new RawFieldParser();
-
         try {
             parser.parseField(raw);
             fail("MimeException should have been thrown");
@@ -211,8 +210,6 @@ public class RawFieldParserTest extends TestCase {
         String s = "raw    \t \t";
         ByteSequence raw = ContentUtil.encode(s);
 
-        RawFieldParser parser = new RawFieldParser();
-
         try {
             parser.parseField(raw);
             fail("MimeException should have been thrown");
@@ -221,7 +218,6 @@ public class RawFieldParserTest extends TestCase {
     }
 
     public void testNameValueParseBasics() {
-        RawFieldParser parser = new RawFieldParser();
         String s = "test";
         ByteSequence buf = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
@@ -330,7 +326,6 @@ public class RawFieldParserTest extends TestCase {
     }
 
     public void testNameValueListParseBasics() {
-        RawFieldParser parser = new RawFieldParser();
         ByteSequence buf = ContentUtil.encode(
                 "test; test1 =  stuff   ; test2 =  \"stuff; stuff\"; test3=\"stuff");
         ParserCursor cursor = new ParserCursor(0, buf.length());
@@ -350,7 +345,6 @@ public class RawFieldParserTest extends TestCase {
 
     public void testNameValueListParseEmpty() {
         ByteSequence buf = ContentUtil.encode("    ");
-        RawFieldParser parser = new RawFieldParser();
         ParserCursor cursor = new ParserCursor(0, buf.length());
         List<NameValuePair> params = parser.parseParameters(buf, cursor);
         assertEquals(0, params.size());
@@ -359,7 +353,6 @@ public class RawFieldParserTest extends TestCase {
     public void testNameValueListParseEscaped() {
         ByteSequence buf = ContentUtil.encode(
           "test1 =  \"\\\"stuff\\\"\"; test2= \"\\\\\"; test3 = \"stuff; stuff\"");
-        RawFieldParser parser = new RawFieldParser();
         ParserCursor cursor = new ParserCursor(0, buf.length());
         List<NameValuePair> params = parser.parseParameters(buf, cursor);
         assertEquals(3, params.size());
@@ -375,7 +368,6 @@ public class RawFieldParserTest extends TestCase {
         ByteSequence buf = ContentUtil.encode(
                 "  text/plain ; charset=ISO-8859-1; "
                 + "boundary=foo; param1=value1; param2=\"value2\"; param3=value3");
-        RawFieldParser parser = new RawFieldParser();
         ParserCursor cursor = new ParserCursor(0, buf.length());
         RawBody body = parser.parseRawBody(buf, cursor);
         assertNotNull(body);
@@ -398,7 +390,6 @@ public class RawFieldParserTest extends TestCase {
         ByteSequence buf = ContentUtil.encode(
                 "  text/(nothing special)plain ; charset=(latin)ISO-8859-1; "
                 + "boundary=foo(bar);");
-        RawFieldParser parser = new RawFieldParser();
         ParserCursor cursor = new ParserCursor(0, buf.length());
         RawBody body = parser.parseRawBody(buf, cursor);
         assertNotNull(body);
@@ -414,7 +405,6 @@ public class RawFieldParserTest extends TestCase {
     public void testRawBodyParseEmptyParam() {
         ByteSequence buf = ContentUtil.encode(
                 "multipart/alternative;; boundary=\"boundary\"");
-        RawFieldParser parser = new RawFieldParser();
         ParserCursor cursor = new ParserCursor(0, buf.length());
         RawBody body = parser.parseRawBody(buf, cursor);
         assertNotNull(body);
@@ -430,7 +420,6 @@ public class RawFieldParserTest extends TestCase {
     public void testRawBodyParseFolded() {
         ByteSequence buf = ContentUtil.encode(
                 "multipart/alternative; boundary=\"simple\r\n boundary\"");
-        RawFieldParser parser = new RawFieldParser();
         ParserCursor cursor = new ParserCursor(0, buf.length());
         RawBody body = parser.parseRawBody(buf, cursor);
         assertNotNull(body);

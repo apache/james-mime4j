@@ -61,9 +61,10 @@ public class ContentLanguageFieldLenientImpl extends AbstractField implements Co
             buf = ContentUtil.encode(body);
             pos = 0;
         }
+        RawFieldParser parser = RawFieldParser.DEFAULT;
         ParserCursor cursor = new ParserCursor(pos, buf.length());
         for (;;) {
-            String token = RawFieldParser.parseToken(buf, cursor, DELIM);
+            String token = parser.parseToken(buf, cursor, DELIM);
             if (token.length() > 0) {
                 languages.add(token);
             }

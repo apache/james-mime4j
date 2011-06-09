@@ -65,8 +65,9 @@ public class MimeVersionFieldLenientImpl extends AbstractField implements MimeVe
             buf = ContentUtil.encode(body);
             pos = 0;
         }
+        RawFieldParser parser = RawFieldParser.DEFAULT;
         ParserCursor cursor = new ParserCursor(pos, buf.length());
-        String token1 = RawFieldParser.parseValue(buf, cursor, DELIM1);
+        String token1 = parser.parseValue(buf, cursor, DELIM1);
         try {
             major = Integer.parseInt(token1);
             if (major < 0) {
@@ -77,7 +78,7 @@ public class MimeVersionFieldLenientImpl extends AbstractField implements MimeVe
         if (!cursor.atEnd() && buf.byteAt(cursor.getPos()) == FULL_STOP) {
             cursor.updatePos(cursor.getPos() + 1);
         }
-        String token2 = RawFieldParser.parseValue(buf, cursor, DELIM2);
+        String token2 = parser.parseValue(buf, cursor, DELIM2);
         try {
             minor = Integer.parseInt(token2);
             if (minor < 0) {
