@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.stream;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import org.apache.james.mime4j.MimeException;
@@ -32,9 +33,17 @@ import org.apache.james.mime4j.util.ContentUtil;
  */
 public class RawFieldParser {
 
-    static final int[] COLON                   = { ':' };
-    static final int[] EQUAL_OR_SEMICOLON      = { '=', ';' };
-    static final int[] SEMICOLON               = { ';' };
+    public static BitSet INIT_BITSET(int ... b) {
+        BitSet bitset = new BitSet(b.length);
+        for (int i = 0; i < b.length; i++) {
+            bitset.set(b[i]);
+        }
+        return bitset;
+    }
+
+    static final BitSet COLON                   = INIT_BITSET(':');
+    static final BitSet EQUAL_OR_SEMICOLON      = INIT_BITSET('=', ';');
+    static final BitSet SEMICOLON               = INIT_BITSET(';');
 
     public static final RawFieldParser DEFAULT = new RawFieldParser();
 
@@ -103,23 +112,12 @@ public class RawFieldParser {
         return new NameValuePair(name, value);
     }
 
-    public static boolean isOneOf(final int ch, final int[] chs) {
-        if (chs != null) {
-            for (int i = 0; i < chs.length; i++) {
-                if (ch == chs[i]) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    public String parseToken(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
+    public String parseToken(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
             char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
-            if (isOneOf(current, delimiters)) {
+            if (delimiters != null && delimiters.get(current)) {
                 break;
             } else if (CharsetUtil.isWhitespace(current)) {
                 skipWhiteSpace(buf, cursor);
@@ -137,12 +135,12 @@ public class RawFieldParser {
         return dst.toString();
     }
 
-    public String parseValue(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters) {
+    public String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
             char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
-            if (isOneOf(current, delimiters)) {
+            if (delimiters != null && delimiters.get(current)) {
                 break;
             } else if (CharsetUtil.isWhitespace(current)) {
                 skipWhiteSpace(buf, cursor);
@@ -230,15 +228,16 @@ public class RawFieldParser {
             }
         }
     }
-    
-    public void copyContent(final ByteSequence buf, final ParserCursor cursor, final int[] delimiters,
+
+    public void copyContent(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
             final StringBuilder dst) {
         int pos = cursor.getPos();
         int indexFrom = cursor.getPos();
         int indexTo = cursor.getUpperBound();
         for (int i = indexFrom; i < indexTo; i++) {
             char current = (char) (buf.byteAt(i) & 0xff);
-            if (isOneOf(current, delimiters) || CharsetUtil.isWhitespace(current) || current == '(') {
+            if ((delimiters != null && delimiters.get(current))
+                    || CharsetUtil.isWhitespace(current) || current == '(') {
                 break;
             } else {
                 pos++;

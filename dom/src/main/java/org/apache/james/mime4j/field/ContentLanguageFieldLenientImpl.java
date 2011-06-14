@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.field;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -38,7 +39,7 @@ import org.apache.james.mime4j.util.ContentUtil;
 public class ContentLanguageFieldLenientImpl extends AbstractField implements ContentLanguageField {
 
     private final static int   COMMA = ',';
-    private final static int[] DELIM = new int[] { COMMA };
+    private final static BitSet DELIM = RawFieldParser.INIT_BITSET(COMMA);
     
     private boolean parsed = false;
     private List<String> languages;

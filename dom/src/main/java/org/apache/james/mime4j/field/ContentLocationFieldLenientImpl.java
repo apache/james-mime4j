@@ -35,8 +35,6 @@ import org.apache.james.mime4j.util.ContentUtil;
  */
 public class ContentLocationFieldLenientImpl extends AbstractField implements ContentLocationField {
 
-    private final static int[] DELIM = new int[] {};
-    
     private boolean parsed = false;
     private String location;
 
@@ -60,7 +58,7 @@ public class ContentLocationFieldLenientImpl extends AbstractField implements Co
         }
         RawFieldParser parser = RawFieldParser.DEFAULT;
         ParserCursor cursor = new ParserCursor(pos, buf.length());
-        String token = parser.parseValue(buf, cursor, DELIM);
+        String token = parser.parseValue(buf, cursor, null);
         StringBuilder sb = new StringBuilder(token.length());
         for (int i = 0; i < token.length(); i++) {
             char ch = token.charAt(i);

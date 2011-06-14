@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
+import java.util.BitSet;
+
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.stream.Field;
@@ -35,9 +37,7 @@ import org.apache.james.mime4j.util.ContentUtil;
 public class MimeVersionFieldLenientImpl extends AbstractField implements MimeVersionField {
 
     private final static int FULL_STOP  = '.';
-    private final static int[] DELIM1   = new int[] { FULL_STOP };
-    private final static int[] DELIM2   = new int[] {};
-    
+    private final static BitSet DELIM = RawFieldParser.INIT_BITSET(FULL_STOP);
     
     public static final int DEFAULT_MINOR_VERSION = 0;
     public static final int DEFAULT_MAJOR_VERSION = 1;
@@ -67,7 +67,7 @@ public class MimeVersionFieldLenientImpl extends AbstractField implements MimeVe
         }
         RawFieldParser parser = RawFieldParser.DEFAULT;
         ParserCursor cursor = new ParserCursor(pos, buf.length());
-        String token1 = parser.parseValue(buf, cursor, DELIM1);
+        String token1 = parser.parseValue(buf, cursor, DELIM);
         try {
             major = Integer.parseInt(token1);
             if (major < 0) {
@@ -78,7 +78,7 @@ public class MimeVersionFieldLenientImpl extends AbstractField implements MimeVe
         if (!cursor.atEnd() && buf.byteAt(cursor.getPos()) == FULL_STOP) {
             cursor.updatePos(cursor.getPos() + 1);
         }
-        String token2 = parser.parseValue(buf, cursor, DELIM2);
+        String token2 = parser.parseValue(buf, cursor, null);
         try {
             minor = Integer.parseInt(token2);
             if (minor < 0) {

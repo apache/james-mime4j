@@ -31,7 +31,7 @@ import junit.framework.TestCase;
 public class RawFieldParserTest extends TestCase {
 
     private RawFieldParser parser;
-    
+
     @Override
     protected void setUp() throws Exception {
         parser = new RawFieldParser();
@@ -48,7 +48,7 @@ public class RawFieldParserTest extends TestCase {
         Assert.assertEquals(3, cursor.getPos());
 
         StringBuilder strbuf1 = new StringBuilder();
-        parser.copyContent(raw, cursor, new int[] { ':' }, strbuf1);
+        parser.copyContent(raw, cursor, RawFieldParser.INIT_BITSET(':'), strbuf1);
 
         Assert.assertFalse(cursor.atEnd());
         Assert.assertEquals(6, cursor.getPos());
@@ -85,7 +85,7 @@ public class RawFieldParserTest extends TestCase {
         Assert.assertEquals(0, cursor.getPos());
 
         StringBuilder strbuf1 = new StringBuilder();
-        parser.copyContent(raw, cursor, new int[] { ':' }, strbuf1);
+        parser.copyContent(raw, cursor, RawFieldParser.INIT_BITSET(':'), strbuf1);
 
         Assert.assertFalse(cursor.atEnd());
         Assert.assertEquals("raw", strbuf1.toString());
@@ -134,7 +134,7 @@ public class RawFieldParserTest extends TestCase {
         String s = "  stuff and   \tsome\tmore  stuff  ;";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
-        String result = parser.parseToken(raw, cursor, new int[] { ';' });
+        String result = parser.parseToken(raw, cursor, RawFieldParser.INIT_BITSET(';'));
         Assert.assertEquals("stuff and some more stuff", result);
     }
 
@@ -142,7 +142,7 @@ public class RawFieldParserTest extends TestCase {
         String s = " (blah-blah)  stuff(blah-blah) and some mo(blah-blah)re  stuff (blah-blah) ;";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
-        String result = parser.parseToken(raw, cursor, new int[] { ';' });
+        String result = parser.parseToken(raw, cursor, RawFieldParser.INIT_BITSET(';'));
         Assert.assertEquals("stuff and some more stuff", result);
     }
 
@@ -150,7 +150,7 @@ public class RawFieldParserTest extends TestCase {
         String s = "  stuff and    \" some more \"   \"stuff  ;";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
-        String result = parser.parseValue(raw, cursor, new int[] { ';' });
+        String result = parser.parseValue(raw, cursor, RawFieldParser.INIT_BITSET(';'));
         Assert.assertEquals("stuff and  some more  stuff  ;", result);
     }
 
@@ -158,7 +158,7 @@ public class RawFieldParserTest extends TestCase {
         String s = " (blah blah)  \"(stuff)(and)(some)(more)(stuff)\" (yada yada) ";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
-        String result = parser.parseValue(raw, cursor, new int[] { ';' });
+        String result = parser.parseValue(raw, cursor, RawFieldParser.INIT_BITSET(';'));
         Assert.assertEquals("(stuff)(and)(some)(more)(stuff)", result);
     }
 
