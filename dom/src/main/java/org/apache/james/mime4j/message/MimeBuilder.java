@@ -34,6 +34,7 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.Field;
@@ -261,13 +262,17 @@ public class MimeBuilder {
             final boolean flatMode) throws IOException, MimeIOException {
         try {
             MessageImpl message = new MessageImpl();
-            DecodeMonitor mon = monitor != null ? monitor : DecodeMonitor.SILENT;
+            MimeEntityConfig cfg = config != null ? config : new MimeEntityConfig();
+            boolean strict = cfg.isStrictParsing();
+            DecodeMonitor mon = monitor != null ? monitor : 
+                strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;
             FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser : 
-                DefaultFieldParser.getParser();
+                strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser();
             MutableBodyDescriptorFactory bdf = bodyDescFactory != null ? bodyDescFactory :
                 new MinimalBodyDescriptorFactory();
-            MimeStreamParser parser = new MimeStreamParser(config, mon, fp, bdf);
-            parser.setContentHandler(new EntityBuilder(message, fp, bodyFactory, mon));
+            BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory(); 
+            MimeStreamParser parser = new MimeStreamParser(cfg, mon, fp, bdf);
+            parser.setContentHandler(new EntityBuilder(message, mon, fp, bf));
             parser.setContentDecoding(contentDecoding);
             if (flatMode) {
                 parser.setFlat();

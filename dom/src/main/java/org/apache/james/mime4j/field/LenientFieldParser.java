@@ -110,19 +110,19 @@ public class LenientFieldParser extends DelegatingFieldParser {
         setFieldParser(FieldName.MIME_VERSION,
                 MimeVersionFieldImpl.PARSER);               // lenient
 
-        final FieldParser<DateTimeField> dateTimeParser = DateTimeFieldImpl.PARSER;
+        FieldParser<DateTimeField> dateTimeParser = DateTimeFieldLenientImpl.PARSER;
         setFieldParser(FieldName.DATE, dateTimeParser);
         setFieldParser(FieldName.RESENT_DATE, dateTimeParser);
 
-        final FieldParser<MailboxListField> mailboxListParser = MailboxListFieldImpl.PARSER;
+        FieldParser<MailboxListField> mailboxListParser = MailboxListFieldLenientImpl.PARSER;
         setFieldParser(FieldName.FROM, mailboxListParser);
         setFieldParser(FieldName.RESENT_FROM, mailboxListParser);
 
-        final FieldParser<MailboxField> mailboxParser = MailboxFieldImpl.PARSER;
+        FieldParser<MailboxField> mailboxParser = MailboxFieldLenientImpl.PARSER;
         setFieldParser(FieldName.SENDER, mailboxParser);
         setFieldParser(FieldName.RESENT_SENDER, mailboxParser);
 
-        final FieldParser<AddressListField> addressListParser = AddressListFieldImpl.PARSER;
+        FieldParser<AddressListField> addressListParser = AddressListFieldLenientImpl.PARSER;
         setFieldParser(FieldName.TO, addressListParser);
         setFieldParser(FieldName.RESENT_TO, addressListParser);
         setFieldParser(FieldName.CC, addressListParser);

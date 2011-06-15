@@ -19,65 +19,64 @@
 
 package org.apache.james.mime4j.field;
 
+import java.util.Collections;
+
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Mailbox;
-import org.apache.james.mime4j.dom.field.MailboxField;
-import org.apache.james.mime4j.field.address.AddressBuilder;
-import org.apache.james.mime4j.field.address.ParseException;
+import org.apache.james.mime4j.dom.field.AddressListField;
+import org.apache.james.mime4j.field.address.LenientAddressBuilder;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
+import org.apache.james.mime4j.stream.ParserCursor;
+import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
 
 /**
- * Mailbox field such as <code>Sender</code> or <code>Resent-Sender</code>.
+ * Address list field such as <code>To</code> or <code>Reply-To</code>.
  */
-public class MailboxFieldImpl extends AbstractField implements MailboxField {
+public class AddressListFieldLenientImpl extends AbstractField implements AddressListField {
+
     private boolean parsed = false;
 
-    private Mailbox mailbox;
-    private ParseException parseException;
+    private AddressList addressList;
 
-    MailboxFieldImpl(Field rawField, DecodeMonitor monitor) {
+    AddressListFieldLenientImpl(final Field rawField, final DecodeMonitor monitor) {
         super(rawField, monitor);
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.MailboxField#getMailbox()
-     */
-    public Mailbox getMailbox() {
+    public AddressList getAddressList() {
         if (!parsed)
             parse();
 
-        return mailbox;
-    }
-
-    /**
-     * @see org.apache.james.mime4j.dom.field.MailboxField#getParseException()
-     */
-    @Override
-    public ParseException getParseException() {
-        if (!parsed)
-            parse();
-
-        return parseException;
+        return addressList;
     }
 
     private void parse() {
-        String body = getBody();
-
-        try {
-            mailbox = AddressBuilder.DEFAULT.parseMailbox(body, monitor);
-        } catch (ParseException e) {
-            parseException = e;
-        }
-
         parsed = true;
+        RawField f = getRawField();
+        ByteSequence buf = f.getRaw();
+        int pos = f.getDelimiterIdx() + 1;
+        if (buf == null) {
+            String body = f.getBody();
+            if (body == null) {
+                addressList = new AddressList(Collections.<Mailbox>emptyList(), true);
+                return;
+            }
+            buf = ContentUtil.encode(body);
+            pos = 0;
+        }
+        ParserCursor cursor = new ParserCursor(pos, buf.length());
+        addressList = LenientAddressBuilder.DEFAULT.parseAddressList(buf, cursor);
     }
 
-    public static final FieldParser<MailboxField> PARSER = new FieldParser<MailboxField>() {
-        
-        public MailboxField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new MailboxFieldImpl(rawField, monitor);
+    public static final FieldParser<AddressListField> PARSER = new FieldParser<AddressListField>() {
+
+        public AddressListField parse(final Field rawField, final DecodeMonitor monitor) {
+            return new AddressListFieldLenientImpl(rawField, monitor);
         }
-        
+
     };
+
 }

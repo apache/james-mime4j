@@ -23,7 +23,7 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.field.ParsedField;
-import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
@@ -45,7 +45,7 @@ public abstract class SimpleContentHandler extends AbstractContentHandler {
             final FieldParser<? extends ParsedField> fieldParser, 
             final DecodeMonitor monitor) {
         super();
-        this.fieldParser = fieldParser != null ? fieldParser : DefaultFieldParser.getParser();
+        this.fieldParser = fieldParser != null ? fieldParser : LenientFieldParser.getParser();
         this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
     }
     

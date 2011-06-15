@@ -31,7 +31,6 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.field.ParsedField;
-import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
@@ -47,25 +46,21 @@ import org.apache.james.mime4j.util.ByteSequence;
 class EntityBuilder implements ContentHandler {
 
     private final Entity entity;
-    private final Stack<Object> stack;
+    private final DecodeMonitor monitor;
     private final FieldParser<? extends ParsedField> fieldParser; 
     private final BodyFactory bodyFactory;
-    private final DecodeMonitor monitor;
+    private final Stack<Object> stack;
     
-    public EntityBuilder(Entity entity) {
-        this(entity, null, null, null);
-    }
-    
-    public EntityBuilder(
-            final Entity entity, 
+    EntityBuilder(
+            final Entity entity,
+            final DecodeMonitor monitor,
             final FieldParser<? extends ParsedField> fieldParser, 
-            final BodyFactory bodyFactory, 
-            final DecodeMonitor monitor) {
+            final BodyFactory bodyFactory) {
         this.entity = entity;
+        this.monitor = monitor;
+        this.fieldParser = fieldParser;
+        this.bodyFactory = bodyFactory;
         this.stack = new Stack<Object>();
-        this.fieldParser = fieldParser != null ? fieldParser : DefaultFieldParser.getParser();
-        this.bodyFactory = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
-        this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
     }
     
     private void expect(Class<?> c) {

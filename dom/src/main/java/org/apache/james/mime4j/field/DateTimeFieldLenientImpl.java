@@ -19,71 +19,71 @@
 
 package org.apache.james.mime4j.field;
 
-import java.io.StringReader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.DateTimeField;
-import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
-import org.apache.james.mime4j.field.datetime.parser.ParseException;
-import org.apache.james.mime4j.field.datetime.parser.TokenMgrError;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.FieldParser;
 
 /**
  * Date-time field such as <code>Date</code> or <code>Resent-Date</code>.
  */
-public class DateTimeFieldImpl extends AbstractField implements DateTimeField {
+public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeField {
+
+    private static final String DEFAULT_DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss ZZZZ";
+
+    private final List<String> datePatterns;
+
     private boolean parsed = false;
-
     private Date date;
-    private ParseException parseException;
 
-    DateTimeFieldImpl(Field rawField, DecodeMonitor monitor) {
+    DateTimeFieldLenientImpl(final Field rawField,
+            final Collection<String> dateParsers, final DecodeMonitor monitor) {
         super(rawField, monitor);
+        this.datePatterns = new ArrayList<String>();
+        if (dateParsers != null) {
+            this.datePatterns.addAll(dateParsers);
+        } else {
+            this.datePatterns.add(DEFAULT_DATE_FORMAT);
+        }
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.DateTimeField#getDate()
-     */
     public Date getDate() {
-        if (!parsed)
+        if (!parsed) {
             parse();
-
+        }
         return date;
     }
 
-    /**
-     * @see org.apache.james.mime4j.dom.field.DateTimeField#getParseException()
-     */
-    @Override
-    public ParseException getParseException() {
-        if (!parsed)
-            parse();
-
-        return parseException;
-    }
-
     private void parse() {
-        String body = getBody();
-
-        try {
-            date = new DateTimeParser(new StringReader(body)).parseAll()
-                    .getDate();
-        } catch (ParseException e) {
-            parseException = e;
-        } catch (TokenMgrError e) {
-            parseException = new ParseException(e.getMessage());
-        }
-
         parsed = true;
+        date = null;
+        String body = getBody();
+        for (String datePattern: datePatterns) {
+            try {
+                SimpleDateFormat parser = new SimpleDateFormat(datePattern, Locale.US);
+                parser.setTimeZone(TimeZone.getTimeZone("GMT"));
+                parser.setLenient(true);
+                date = parser.parse(body);
+                break;
+            } catch (ParseException ignore) {
+            }
+        }
     }
 
     public static final FieldParser<DateTimeField> PARSER = new FieldParser<DateTimeField>() {
-        
+
         public DateTimeField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new DateTimeFieldImpl(rawField, monitor);
+            return new DateTimeFieldLenientImpl(rawField, null, monitor);
         }
-        
+
     };
 }

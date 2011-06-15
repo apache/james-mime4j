@@ -30,7 +30,7 @@ import org.apache.james.mime4j.stream.FieldParser;
 /**
  * Address list field such as <code>To</code> or <code>Reply-To</code>.
  */
-public class AddressListFieldImpl extends AbstractField implements org.apache.james.mime4j.dom.field.AddressListField {
+public class AddressListFieldImpl extends AbstractField implements AddressListField {
 
     private boolean parsed = false;
 
