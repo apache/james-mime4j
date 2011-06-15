@@ -22,7 +22,7 @@ package org.apache.james.mime4j.stream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.MimeIOException;
 
 import junit.framework.TestCase;
 
@@ -84,13 +84,17 @@ public class StrictMimeTokenStreamTest extends TestCase {
         checkNextIs(EntityState.T_FIELD);
         checkNextIs(EntityState.T_END_HEADER);
         checkNextIs(EntityState.T_BODY);
-        InputStream out = parser.getInputStream();
-        assertEquals("Oh my god! Boundary is missing!\r\n", IOUtils.toString(out, "US-ASCII"));
-        checkNextIs(EntityState.T_END_BODYPART);
+        InputStream in = parser.getInputStream();
+        StringBuilder sb = new StringBuilder();
         try {
-            parser.next();
-            fail("MimeParseEventException should have been thrown");
-        } catch (MimeParseEventException expected) {
+            byte[] tmp = new byte[1024];
+            int l;
+            while ((l = in.read(tmp)) != -1) {
+                sb.append(new String(tmp, 0, l, "US-ASCII"));
+            }
+            fail("MimeIOException should have been thrown");
+        } catch (MimeIOException expected) {
+            assertEquals("Oh my god! Boundary is missing!\r\n", sb.toString());
         }
      }
     

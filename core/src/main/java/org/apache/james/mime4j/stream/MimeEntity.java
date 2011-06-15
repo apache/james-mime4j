@@ -215,7 +215,8 @@ class MimeEntity extends AbstractEntity {
     private void createMimePartStream() throws MimeException, IOException {
         String boundary = body.getBoundary();
         try {
-            currentMimePartStream = new MimeBoundaryInputStream(inbuffer, boundary);
+            currentMimePartStream = new MimeBoundaryInputStream(inbuffer, boundary, 
+                    config.isStrictParsing());
         } catch (IllegalArgumentException e) {
             // thrown when boundary is too long
             throw new MimeException(e.getMessage(), e);

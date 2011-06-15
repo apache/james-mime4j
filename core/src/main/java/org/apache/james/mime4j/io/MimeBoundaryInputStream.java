@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.io;
 
+import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 import java.io.IOException;
@@ -31,6 +33,7 @@ import java.io.IOException;
 public class MimeBoundaryInputStream extends LineReaderInputStream {
 
     private final byte[] boundary;
+    private final boolean strict;
     
     private boolean eof;
     private int limit;
@@ -55,8 +58,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
      * @param boundary Boundary string (not including leading hyphens).
      * @throws IllegalArgumentException when boundary is too long
      */
-    public MimeBoundaryInputStream(BufferedLineReaderInputStream inbuffer, String boundary) 
-            throws IOException {
+    public MimeBoundaryInputStream(
+            final BufferedLineReaderInputStream inbuffer, 
+            final String boundary, 
+            final boolean strict) throws IOException {
         super(inbuffer);
         int bufferSize = 2 * boundary.length();
         if (bufferSize < 4096) {
@@ -72,6 +77,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         this.initialLength = -1;
         this.completed = false;
         
+        this.strict = strict;
         this.boundary = new byte[boundary.length() + 2];
         this.boundary[0] = (byte) '-';
         this.boundary[1] = (byte) '-';
@@ -83,6 +89,19 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         fillBuffer();
     }
 
+    /**
+     * Creates a new MimeBoundaryInputStream.
+     * 
+     * @param inbuffer The underlying stream.
+     * @param boundary Boundary string (not including leading hyphens).
+     * @throws IllegalArgumentException when boundary is too long
+     */
+    public MimeBoundaryInputStream(
+            final BufferedLineReaderInputStream inbuffer, 
+            final String boundary) throws IOException {
+        this(inbuffer, boundary, false);
+    }
+    
     /**
      * Closes the underlying stream.
      * 
@@ -104,9 +123,9 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         if (completed) {
             return false;
         }
-        // System.out.println("rA!");
         if (endOfStream() && !hasData()) {
-            skipBoundary();            
+            skipBoundary();
+            verifyEndOfStream();
             return false;
         }
         return true;
@@ -117,13 +136,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
      */
     @Override
     public int read() throws IOException {
-        if (!readAllowed()) return -1;
         for (;;) {
+            if (!readAllowed()) return -1;
             if (hasData()) {
                 return buffer.read();
-            } else if (endOfStream()) {
-                skipBoundary();            
-                return -1;
             }
             fillBuffer();
         }
@@ -131,13 +147,14 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        if (!readAllowed()) return -1;
-        fillBuffer();
-        if (!hasData()) {
-            return read(b, off, len);
+        for (;;) {
+            if (!readAllowed()) return -1;
+            if (hasData()) {
+                int chunk = Math.min(len, limit - buffer.pos());
+                return buffer.read(b, off, chunk);
+            }
+            fillBuffer();
         }
-        int chunk = Math.min(len, limit - buffer.pos());
-        return buffer.read(b, off, chunk);
     }
 
     @Override
@@ -155,6 +172,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
                 bytesRead = fillBuffer();
                 if (endOfStream() && !hasData()) {
                     skipBoundary();
+                    verifyEndOfStream();
                     bytesRead = -1;
                     break;
                 }
@@ -178,6 +196,12 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             return -1;
         } else {
             return total;
+        }
+    }
+    
+    private void verifyEndOfStream() throws IOException {
+        if (strict && eof && !atBoundary) {
+            throw new MimeIOException(new MimeException("Unexpected end of stream"));
         }
     }
     
