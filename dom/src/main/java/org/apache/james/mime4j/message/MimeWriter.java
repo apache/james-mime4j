@@ -263,7 +263,7 @@ public class MimeWriter {
         String boundary = contentType.getBoundary();
         if (boundary == null)
             throw new IllegalArgumentException(
-                    "Multipart boundary not specified");
+                    "Multipart boundary not specified. Mime-Type: "+contentType.getMimeType()+", Raw: "+contentType.toString());
 
         return ContentUtil.encode(boundary);
     }
