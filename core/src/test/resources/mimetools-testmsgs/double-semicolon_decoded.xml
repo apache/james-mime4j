@@ -1,0 +1,30 @@
+<message>
+<header>
+<field>
+Mime-Version: 1.0</field>
+<field>
+Content-Type: multipart/alternative;; boundary="foo"</field>
+</header>
+<multipart>
+<preamble>
+Preamble
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset=us-ascii</field>
+</header>
+<text-body name="double-semicolon_decoded_1_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset=us-ascii</field>
+</header>
+<text-body name="double-semicolon_decoded_1_2.txt"/>
+</body-part>
+<epilogue>
+
+</epilogue>
+</multipart>
+</message>

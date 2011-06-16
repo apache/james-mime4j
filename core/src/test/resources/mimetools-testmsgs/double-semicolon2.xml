@@ -1,0 +1,34 @@
+<message>
+<header>
+<field>
+Mime-Version: 1.0</field>
+<field>
+Content-Type: multipart/alternative ; ; ; ;; ;;;;;;;; boundary="foo"</field>
+</header>
+<multipart>
+<preamble>
+Preamble
+</preamble>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset=us-ascii</field>
+</header>
+<body>
+The better part
+</body>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset=us-ascii</field>
+</header>
+<body>
+The worse part
+</body>
+</body-part>
+<epilogue>
+
+</epilogue>
+</multipart>
+</message>
