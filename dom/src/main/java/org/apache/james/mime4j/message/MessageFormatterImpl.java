@@ -41,7 +41,7 @@ public class MessageFormatterImpl implements MessageFormatter {
         
     }
     
-    public void writeTo(Message message, OutputStream out) throws IOException {
+    public void writeMessage(Message message, OutputStream out) throws IOException {
         getMimeWriter().writeMessage(message, out);
     }
 

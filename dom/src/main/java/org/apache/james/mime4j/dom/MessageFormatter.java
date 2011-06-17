@@ -27,6 +27,6 @@ import java.io.OutputStream;
  */
 public interface MessageFormatter {
     
-    void writeTo(Message message, OutputStream out) throws IOException;
+    void writeMessage(Message message, OutputStream out) throws IOException;
 
 }
