@@ -51,8 +51,7 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
 
     @Override
     public MessageFormatter newMessageFormatter() {
-        MessageFormatterImpl m = new MessageFormatterImpl();
-        return m;
+        return new MimeWriter();
     }
     
     @Override

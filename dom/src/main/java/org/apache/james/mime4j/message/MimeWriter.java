@@ -28,6 +28,7 @@ import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.MessageFormatter;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
@@ -47,7 +48,7 @@ import org.apache.james.mime4j.util.MimeUtil;
  * This class may be subclassed to implement custom strategies for writing
  * messages.
  */
-public class MimeWriter {
+public class MimeWriter implements MessageFormatter {
 
     private static final byte[] CRLF = { '\r', '\n' };
     private static final byte[] DASHES = { '-', '-' };
