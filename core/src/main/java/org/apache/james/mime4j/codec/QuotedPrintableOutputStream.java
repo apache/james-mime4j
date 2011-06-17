@@ -25,6 +25,11 @@ import java.io.OutputStream;
 
 /**
  * Performs Quoted-Printable encoding on an underlying stream.
+ * 
+ * Encodes every "required" char plus the dot ".". We encode the dot
+ * by default because this is a workaround for some "filter"/"antivirus"
+ * "old mua" having issues with dots at the beginning or the end of a
+ * qp encode line (maybe a bad dot-destuffing algo).
  */
 public class QuotedPrintableOutputStream extends FilterOutputStream {
     
@@ -33,6 +38,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
     private static final byte TB = 0x09;
     private static final byte SP = 0x20;
     private static final byte EQ = 0x3D;
+    private static final byte DOT = 0x2E;
     private static final byte CR = 0x0D;
     private static final byte LF = 0x0A;
     private static final byte QUOTED_PRINTABLE_LAST_PLAIN = 0x7E;
@@ -142,7 +148,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
                 escape(next);
             } else if (next > QUOTED_PRINTABLE_LAST_PLAIN) {
                 escape(next);
-            } else if (next == EQ) {
+            } else if (next == EQ || next == DOT) {
                 escape(next);
             } else {
                 plain(next);

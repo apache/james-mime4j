@@ -65,6 +65,30 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
                 toString(bos.toByteArray()));
     }
 
+    public void testEncodeSpecials() throws IOException {
+        ByteArrayOutputStream bos = null;
+        QuotedPrintableOutputStream encoder = null;
+        
+        bos = new ByteArrayOutputStream();
+        encoder = new QuotedPrintableOutputStream(bos, false);
+        encoder.write(fromString("Testing \u20ac special . chars = also at the end ="));
+        encoder.close();
+        assertEquals("Testing =E2=82=AC special =2E chars =3D also at the end =3D",
+                toString(bos.toByteArray()));
+    }
+
+    public void testEncodeWrapping() throws IOException {
+        ByteArrayOutputStream bos = null;
+        QuotedPrintableOutputStream encoder = null;
+        
+        bos = new ByteArrayOutputStream();
+        encoder = new QuotedPrintableOutputStream(bos, false);
+        encoder.write(fromString("This is a very very very very very very very very very very very very very very very long line"));
+        encoder.close();
+        assertEquals("This is a very very very very very very very very very very very very very =\r\nvery very long line",
+                toString(bos.toByteArray()));
+    }
+
     private byte[] fromString(String s) {
         try {
             return s.getBytes("UTF-8");
