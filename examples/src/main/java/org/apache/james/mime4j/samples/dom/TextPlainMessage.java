@@ -22,7 +22,7 @@ package org.apache.james.mime4j.samples.dom;
 import java.io.IOException;
 import java.util.Date;
 
-import org.apache.james.mime4j.dom.MessageFormatter;
+import org.apache.james.mime4j.dom.MessageWriter;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.field.address.ParseException;
@@ -64,7 +64,7 @@ public class TextPlainMessage {
 
         // 4) print message to standard output
 
-        MessageFormatter writer = new MimeWriter();
+        MessageWriter writer = new MimeWriter();
         writer.writeMessage(message, System.out);
 
         // 5) message is no longer needed and should be disposed of

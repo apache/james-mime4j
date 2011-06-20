@@ -20,7 +20,7 @@ package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageServiceFactory;
-import org.apache.james.mime4j.dom.MessageFormatter;
+import org.apache.james.mime4j.dom.MessageWriter;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
@@ -50,7 +50,7 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
     }
 
     @Override
-    public MessageFormatter newMessageFormatter() {
+    public MessageWriter newMessageWriter() {
         return new MimeWriter();
     }
     

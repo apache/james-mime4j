@@ -28,7 +28,7 @@ import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
-import org.apache.james.mime4j.dom.MessageFormatter;
+import org.apache.james.mime4j.dom.MessageWriter;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ParseException;
@@ -66,7 +66,7 @@ public class TransformMessage {
         // Create a new message by transforming the template.
         Message transformed = transform(template);
 
-        MessageFormatter writer = new MimeWriter();
+        MessageWriter writer = new MimeWriter();
         
         // Print transformed message.
         System.out.println("\n\nTransformed message:\n--------------------\n");

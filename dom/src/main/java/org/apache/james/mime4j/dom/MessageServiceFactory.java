@@ -36,7 +36,7 @@ public abstract class MessageServiceFactory {
 
     public abstract MessageBuilder newMessageBuilder();
     
-    public abstract MessageFormatter newMessageFormatter();
+    public abstract MessageWriter newMessageWriter();
     
     public abstract void setAttribute(String name, Object value) throws IllegalArgumentException;
         
