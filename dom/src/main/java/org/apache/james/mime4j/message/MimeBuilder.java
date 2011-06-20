@@ -30,6 +30,7 @@ import org.apache.james.mime4j.dom.Disposable;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.ParsedField;
@@ -45,14 +46,49 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 /**
  * Utility class for copying message and parsing message elements.
  */
-public class MimeBuilder {
+public class MimeBuilder implements MessageBuilder {
 
-    public static final MimeBuilder DEFAULT = new MimeBuilder();
+    private FieldParser<? extends ParsedField> fieldParser = null;
+    private BodyFactory bodyFactory = null;
+    private MimeEntityConfig config = null;
+    private MutableBodyDescriptorFactory bodyDescFactory = null;
+    private boolean contentDecoding = true;
+    private boolean flatMode = false;
+    private DecodeMonitor monitor = null;
     
-    protected MimeBuilder() {
+    public MimeBuilder() {
         super();
     }
 
+    public void setFieldParser(final FieldParser<? extends ParsedField> fieldParser) {
+        this.fieldParser = fieldParser;
+    }
+
+    public void setBodyFactory(final BodyFactory bodyFactory) {
+        this.bodyFactory = bodyFactory;
+    }
+
+    public void setMimeEntityConfig(final MimeEntityConfig config) {
+        this.config = config;
+    }
+
+    public void setMutableBodyDescriptorFactory(
+            final MutableBodyDescriptorFactory bodyDescFactory) {
+        this.bodyDescFactory  = bodyDescFactory;
+    }
+
+    public void setDecodeMonitor(final DecodeMonitor monitor) {
+        this.monitor = monitor;
+    }
+
+    public void setContentDecoding(boolean contentDecoding) {
+        this.contentDecoding = contentDecoding;
+    }
+
+    public void setFlatMode(boolean flatMode) {
+        this.flatMode = flatMode;
+    }
+    
     /**
      * Creates a new <code>Header</code> from the specified
      * <code>Header</code>. The <code>Header</code> instance is initialized
@@ -203,10 +239,7 @@ public class MimeBuilder {
      * @throws IOException on I/O errors.
      * @throws MimeIOException on MIME protocol violations.
      */
-    public Header parse(
-            final InputStream is,
-            final FieldParser<? extends ParsedField> fieldParser,
-            final DecodeMonitor monitor) throws IOException, MimeIOException {
+    public Header parseHeader(final InputStream is) throws IOException, MimeIOException {
         final HeaderImpl header = new HeaderImpl();
         final MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
@@ -233,33 +266,15 @@ public class MimeBuilder {
         return header;
     }
 
-    /**
-     * Parses the specified MIME message stream into a <code>Message</code>
-     * instance using given {@link MimeEntityConfig} and {@link StorageProvider}.
-     * 
-     * @param is
-     *            the stream to parse.
-     * @param config
-     *            {@link MimeEntityConfig} to use.
-     * @param bodyFactory
-     *            {@link BodyFactory} to use for storing text and binary
-     *            message bodies.
-     * @param bodyDescFactory
-     *            {@link MutableBodyDescriptorFactory} to use for creating body descriptors.
-     * @throws IOException
-     *             on I/O errors.
-     * @throws MimeIOException
-     *             on MIME protocol violations.
-     */
-    public Message parse(
-            final InputStream is, 
-            final MimeEntityConfig config,
-            final DecodeMonitor monitor,
-            final FieldParser<? extends ParsedField> fieldParser,
-            final BodyFactory bodyFactory, 
-            final MutableBodyDescriptorFactory bodyDescFactory,
-            final boolean contentDecoding,
-            final boolean flatMode) throws IOException, MimeIOException {
+    public Message newMessage() {
+        return new MessageImpl();
+    }
+
+    public Message newMessage(final Message source) {
+        return copy(source);
+    }
+
+    public Message parseMessage(final InputStream is) throws IOException, MimeIOException {
         try {
             MessageImpl message = new MessageImpl();
             MimeEntityConfig cfg = config != null ? config : new MimeEntityConfig();
@@ -286,80 +301,4 @@ public class MimeBuilder {
         }
     }
 
-    /**
-     * Parses the specified MIME message stream into a <code>Message</code>
-     * instance using given {@link MimeEntityConfig} and {@link StorageProvider}.
-     * 
-     * @param is
-     *            the stream to parse.
-     * @param config
-     *            {@link MimeEntityConfig} to use.
-     * @param storageProvider
-     *            {@link StorageProvider} to use for storing text and binary
-     *            message bodies.
-     * @param bodyDescFactory
-     *            {@link MutableBodyDescriptorFactory} to use for creating body descriptors.
-     * @throws IOException
-     *             on I/O errors.
-     * @throws MimeIOException
-     *             on MIME protocol violations.
-     */
-    public Message parse(
-            final InputStream is, 
-            final MimeEntityConfig config,
-            final DecodeMonitor monitor,
-            final FieldParser<? extends ParsedField> fieldParser,
-            final BodyFactory bodyFactory, 
-            final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
-        return parse(is, config, monitor, fieldParser, bodyFactory, bodyDescFactory, true, false);
-    }
-    
-    public Message parse(
-            final InputStream is, 
-            final MimeEntityConfig config,
-            final FieldParser<? extends ParsedField> fieldParser,
-            final BodyFactory bodyFactory, 
-            final MutableBodyDescriptorFactory bodyDescFactory) throws IOException, MimeIOException {
-        return parse(is, config, null, fieldParser, bodyFactory, bodyDescFactory);
-    }
-
-    public Message parse(
-            final InputStream is, 
-            final MimeEntityConfig config,
-            final FieldParser<? extends ParsedField> fieldParser,
-            final BodyFactory bodyFactory) throws IOException, MimeIOException {
-        return parse(is, config, null, fieldParser, bodyFactory, null);
-    }
-
-    /**
-     * Parses the specified MIME message stream into a <code>Message</code>
-     * instance.
-     * 
-     * @param is
-     *            the stream to parse.
-     * @throws IOException
-     *             on I/O errors.
-     * @throws MimeIOException
-     *             on MIME protocol violations.
-     */
-    public Message parse(InputStream is) throws IOException, MimeIOException {
-        return parse(is, null, null, null);
-    }
-
-    /**
-     * Parses the specified MIME message stream into a <code>Message</code>
-     * instance using given {@link MimeEntityConfig}.
-     * 
-     * @param is
-     *            the stream to parse.
-     * @throws IOException
-     *             on I/O errors.
-     * @throws MimeIOException
-     *             on MIME protocol violations.
-     */
-    public Message parse(InputStream is, MimeEntityConfig config) throws IOException,
-            MimeIOException {
-        return parse(is, config, null, null);
-    }
-    
 }

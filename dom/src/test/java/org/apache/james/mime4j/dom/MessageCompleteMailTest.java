@@ -55,7 +55,8 @@ public class MessageCompleteMailTest extends TestCase {
 
     private Message createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
-        Message message = MimeBuilder.DEFAULT.parse(in);
+        MimeBuilder builder = new MimeBuilder();
+        Message message = builder.parseMessage(in);
         return message;
     }
 }

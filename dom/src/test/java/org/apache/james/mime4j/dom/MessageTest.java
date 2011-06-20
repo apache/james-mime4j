@@ -134,10 +134,13 @@ public class MessageTest extends TestCase {
     public void testWriteTo() throws Exception {
         byte[] inputByte = getRawMessageAsByteArray();
 
-        Message m = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(inputByte));
+        MimeBuilder builder = new MimeBuilder();
+        MimeWriter writer = new MimeWriter();
+        
+        Message m = builder.parseMessage(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
-        MimeWriter.DEFAULT.writeMessage(m, out);
+        writer.writeMessage(m, out);
 
         InputStream output = new ByteArrayInputStream(out.toByteArray());
 
@@ -156,14 +159,17 @@ public class MessageTest extends TestCase {
 
         byte[] inputByte = getRawMessageAsByteArray();
 
-        Message m = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(inputByte));
+        MimeBuilder builder = new MimeBuilder();
+        MimeWriter writer = new MimeWriter();
+        
+        Message m = builder.parseMessage(new ByteArrayInputStream(inputByte));
         m.getHeader().addField(DefaultFieldParser.parse(testheader));
 
         assertEquals("header added", m.getHeader().getField(headerName)
                 .getBody(), headerValue);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        MimeWriter.DEFAULT.writeMessage(m, out);
+        writer.writeMessage(m, out);
         List<?> lines = IOUtils.readLines((new BufferedReader(
                 new InputStreamReader(new ByteArrayInputStream(out
                         .toByteArray())))));

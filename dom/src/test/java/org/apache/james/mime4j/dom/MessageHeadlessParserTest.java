@@ -42,10 +42,12 @@ public class MessageHeadlessParserTest extends TestCase {
 				+ "\r\n"
 				+ "Instead this should be better parsed as a text/plain body\r\n";
 
-		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
-		mimeEntityConfig.setMalformedHeaderStartsBody(true);
-		Message message = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(headlessContent
-				.getBytes("UTF-8")), mimeEntityConfig);
+		MimeEntityConfig config = new MimeEntityConfig();
+		config.setMalformedHeaderStartsBody(true);
+        MimeBuilder builder = new MimeBuilder();
+        builder.setMimeEntityConfig(config);
+		Message message = builder.parseMessage(
+		        new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
 		assertEquals("text/plain", message.getMimeType());
 		assertEquals(1, message.getHeader().getFields().size());
 		BufferedReader reader = new BufferedReader(((TextBody) message.getBody()).getReader());
@@ -60,10 +62,12 @@ public class MessageHeadlessParserTest extends TestCase {
 				+ "\r\n"
 				+ "Instead this should be better parsed as a text/plain body\r\n";
 
-		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
-		mimeEntityConfig.setMalformedHeaderStartsBody(true);
-		Message message = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(headlessContent
-				.getBytes("UTF-8")), mimeEntityConfig);
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setMalformedHeaderStartsBody(true);
+        MimeBuilder builder = new MimeBuilder();
+        builder.setMimeEntityConfig(config);
+        Message message = builder.parseMessage(
+                new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
 		assertEquals("text/plain", message.getMimeType());
 		assertEquals(0, message.getHeader().getFields().size());
 		BufferedReader reader = new BufferedReader(((TextBody) message.getBody()).getReader());
@@ -87,10 +91,13 @@ public class MessageHeadlessParserTest extends TestCase {
 				+ "Content-Type: image/jpeg\r\n" + "\r\n"
 				+ "all kind of stuff\r\n" + "--foo--\r\n";
 
-		MimeEntityConfig mimeEntityConfig = new MimeEntityConfig();
-		mimeEntityConfig.setHeadlessParsing(contentType);
-		Message message = MimeBuilder.DEFAULT.parse(new ByteArrayInputStream(headlessContent
-				.getBytes("UTF-8")), mimeEntityConfig);
+		MimeEntityConfig config = new MimeEntityConfig();
+		config.setHeadlessParsing(contentType);
+        MimeBuilder builder = new MimeBuilder();
+        builder.setMimeEntityConfig(config);
+
+		Message message = builder.parseMessage(
+		        new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
 		assertEquals("multipart/form-data", message.getMimeType());
 		assertEquals(1, message.getHeader().getFields().size());
 		ContentTypeField contentTypeField = ((ContentTypeField) message

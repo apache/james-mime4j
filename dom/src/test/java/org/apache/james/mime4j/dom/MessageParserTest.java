@@ -108,7 +108,9 @@ public class MessageParserTest extends TestCase {
             config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        Message m = MimeBuilder.DEFAULT.parse(url.openStream(), config);
+        MimeBuilder builder = new MimeBuilder();
+        builder.setMimeEntityConfig(config);
+        Message m = builder.parseMessage(url.openStream());
         
         String s = url.toString();
         String prefix = s.substring(0, s.lastIndexOf('.'));

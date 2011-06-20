@@ -63,7 +63,8 @@ public class HeaderTest extends TestCase {
         
         ByteArrayOutputStream outstream = new ByteArrayOutputStream();
         
-        MimeWriter.DEFAULT.writeHeader(header, outstream);
+        MimeWriter writer = new MimeWriter();
+        writer.writeHeader(header, outstream);
         byte[] b = outstream.toByteArray();
         ByteArrayBuffer buf = new ByteArrayBuffer(b.length);
         buf.append(b, 0, b.length);

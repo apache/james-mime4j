@@ -41,12 +41,6 @@ import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * Writes a message (or a part of a message) to an output stream.
- * <p>
- * This class cannot be instantiated; instead the static instance
- * {@link #DEFAULT} implements the default strategy for writing a message.
- * <p>
- * This class may be subclassed to implement custom strategies for writing
- * messages.
  */
 public class MimeWriter implements MessageFormatter {
 
@@ -54,14 +48,9 @@ public class MimeWriter implements MessageFormatter {
     private static final byte[] DASHES = { '-', '-' };
 
     /**
-     * The default message writer.
-     */
-    public static final MimeWriter DEFAULT = new MimeWriter();
-
-    /**
      * Protected constructor prevents direct instantiation.
      */
-    protected MimeWriter() {
+    public MimeWriter() {
     }
 
     /**

@@ -62,9 +62,12 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        Message inputMessage = MimeBuilder.DEFAULT.parse(url.openStream(), config);
+        MimeBuilder builder = new MimeBuilder();
+        MimeWriter writer = new MimeWriter();
+        builder.setMimeEntityConfig(config);
+        Message inputMessage = builder.parseMessage(url.openStream());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        MimeWriter.DEFAULT.writeMessage(inputMessage, out);
+        writer.writeMessage(inputMessage, out);
         
         String s = url.toString();
         URL msgout = new URL(s.substring(0, s.lastIndexOf('.')) + ".out");
@@ -74,7 +77,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
 	        assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
         } catch (FileNotFoundException e) {
         	FileOutputStream fos = new FileOutputStream(msgout.getPath()+".expected");
-	        MimeWriter.DEFAULT.writeMessage(inputMessage, fos);
+        	writer.writeMessage(inputMessage, fos);
         	fos.close();
         	fail("Expected file created");
         }

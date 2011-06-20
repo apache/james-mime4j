@@ -27,6 +27,8 @@ import java.util.Random;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.MessageBuilder;
+import org.apache.james.mime4j.dom.MessageFormatter;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ParseException;
@@ -64,9 +66,11 @@ public class TransformMessage {
         // Create a new message by transforming the template.
         Message transformed = transform(template);
 
+        MessageFormatter writer = new MimeWriter();
+        
         // Print transformed message.
         System.out.println("\n\nTransformed message:\n--------------------\n");
-        MimeWriter.DEFAULT.writeMessage(transformed, System.out);
+        writer.writeMessage(transformed, System.out);
 
         // Messages should be disposed of when they are no longer needed.
         // Disposing of a message also disposes of all child elements (e.g. body
@@ -76,7 +80,7 @@ public class TransformMessage {
         // Print original message to illustrate that it was not affected by the
         // transformation.
         System.out.println("\n\nOriginal template:\n------------------\n");
-        MimeWriter.DEFAULT.writeMessage(template, System.out);
+        writer.writeMessage(template, System.out);
 
         // Original message is no longer needed.
         template.dispose();
@@ -92,7 +96,8 @@ public class TransformMessage {
     private static Message transform(Message original) throws IOException, ParseException {
         // Create a copy of the template. The copy can be modified without
         // affecting the original.
-        Message message = MimeBuilder.DEFAULT.copy(original);
+        MessageBuilder builder = new MimeBuilder();
+        Message message = builder.newMessage(original);
 
         // In this example we know we have a multipart message. Use
         // Message#isMultipart() if uncertain.

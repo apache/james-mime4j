@@ -33,6 +33,6 @@ public interface MessageBuilder {
           
     Message newMessage(Message source);
           
-    Message parse(InputStream source) throws MimeException, IOException;
+    Message parseMessage(InputStream source) throws MimeException, IOException;
           
 }

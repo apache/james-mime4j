@@ -67,7 +67,8 @@ public class MultipartFormTest extends TestCase {
         multipart.addBodyPart(p3);
         
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        MimeWriter.DEFAULT.writeMultipart(multipart, out);
+        MimeWriter writer = new MimeWriter();
+        writer.writeMultipart(multipart, out);
         out.close();
         
         String expected = "--foo\r\n" +

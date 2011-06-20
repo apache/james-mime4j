@@ -40,11 +40,13 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreeSelectionModel;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.Mailbox;
@@ -364,8 +366,8 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
 
     public static void main(String[] args) {
         try {
-
-            final Message message = MimeBuilder.DEFAULT.parse(new FileInputStream(args[0]));
+            final MessageBuilder builder = new MimeBuilder();
+            final Message message = builder.parseMessage(new FileInputStream(args[0]));
 
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -381,6 +383,8 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
             System.err.println("The file '" + args[0] + "' could not be found.");
         } catch (IOException e) {
             System.err.println("The file '" + args[0] + "' could not be read.");
+        } catch (MimeException e) {
+            System.err.println("The file '" + args[0] + "' is invalid.");
         }
     }
 
