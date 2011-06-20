@@ -38,8 +38,8 @@ import junit.framework.TestSuite;
 
 import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.message.MimeBuilder;
-import org.apache.james.mime4j.message.MimeWriter;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 
 /**
@@ -62,8 +62,8 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             config.setMalformedHeaderStartsBody(true);
         }
         config.setMaxLineLen(-1);
-        MimeBuilder builder = new MimeBuilder();
-        MimeWriter writer = new MimeWriter();
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        DefaultMessageWriter writer = new DefaultMessageWriter();
         builder.setMimeEntityConfig(config);
         Message inputMessage = builder.parseMessage(url.openStream());
         ByteArrayOutputStream out = new ByteArrayOutputStream();

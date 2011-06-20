@@ -58,7 +58,7 @@ import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.address.AddressFormatter;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.MimeBuilder;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.stream.Field;
 
 /**
@@ -366,7 +366,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
 
     public static void main(String[] args) {
         try {
-            final MessageBuilder builder = new MimeBuilder();
+            final MessageBuilder builder = new DefaultMessageBuilder();
             final Message message = builder.parseMessage(new FileInputStream(args[0]));
 
             javax.swing.SwingUtilities.invokeLater(new Runnable() {

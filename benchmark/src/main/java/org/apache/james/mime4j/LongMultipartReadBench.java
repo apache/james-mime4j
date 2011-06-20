@@ -27,7 +27,7 @@ import java.io.InputStream;
 import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.MessageBuilder;
-import org.apache.james.mime4j.message.MimeBuilder;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.SimpleContentHandler;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.ContentHandler;
@@ -171,7 +171,7 @@ public class LongMultipartReadBench {
     private static final class MessageTest implements Test {
         public void run(byte[] content, int repetitions) throws Exception {
             DefaultStorageProvider.setInstance(new MemoryStorageProvider());
-            MessageBuilder builder = new MimeBuilder();
+            MessageBuilder builder = new DefaultMessageBuilder();
 
             for (int i = 0; i < repetitions; i++) {
                 builder.parseMessage(new ByteArrayInputStream(content));

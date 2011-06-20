@@ -40,7 +40,7 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
 
     @Override
     public MessageBuilder newMessageBuilder() {
-        MimeBuilder m = new MimeBuilder();
+        DefaultMessageBuilder m = new DefaultMessageBuilder();
         if (bodyFactory != null) m.setBodyFactory(bodyFactory);
         if (mimeEntityConfig != null) m.setMimeEntityConfig(mimeEntityConfig);
         if (mutableBodyDescriptorFactory != null) m.setMutableBodyDescriptorFactory(mutableBodyDescriptorFactory);
@@ -51,7 +51,7 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
 
     @Override
     public MessageWriter newMessageWriter() {
-        return new MimeWriter();
+        return new DefaultMessageWriter();
     }
     
     @Override

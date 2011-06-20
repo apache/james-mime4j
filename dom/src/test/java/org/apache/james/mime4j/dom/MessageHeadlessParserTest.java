@@ -28,7 +28,7 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
-import org.apache.james.mime4j.message.MimeBuilder;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 
 public class MessageHeadlessParserTest extends TestCase {
@@ -44,7 +44,7 @@ public class MessageHeadlessParserTest extends TestCase {
 
 		MimeEntityConfig config = new MimeEntityConfig();
 		config.setMalformedHeaderStartsBody(true);
-        MimeBuilder builder = new MimeBuilder();
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
 		Message message = builder.parseMessage(
 		        new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
@@ -64,7 +64,7 @@ public class MessageHeadlessParserTest extends TestCase {
 
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMalformedHeaderStartsBody(true);
-        MimeBuilder builder = new MimeBuilder();
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
         Message message = builder.parseMessage(
                 new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
@@ -93,7 +93,7 @@ public class MessageHeadlessParserTest extends TestCase {
 
 		MimeEntityConfig config = new MimeEntityConfig();
 		config.setHeadlessParsing(contentType);
-        MimeBuilder builder = new MimeBuilder();
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
 
 		Message message = builder.parseMessage(

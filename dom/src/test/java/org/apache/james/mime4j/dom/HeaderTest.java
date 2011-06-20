@@ -25,7 +25,7 @@ import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.HeaderImpl;
-import org.apache.james.mime4j.message.MimeWriter;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -63,7 +63,7 @@ public class HeaderTest extends TestCase {
         
         ByteArrayOutputStream outstream = new ByteArrayOutputStream();
         
-        MimeWriter writer = new MimeWriter();
+        DefaultMessageWriter writer = new DefaultMessageWriter();
         writer.writeHeader(header, outstream);
         byte[] b = outstream.toByteArray();
         ByteArrayBuffer buf = new ByteArrayBuffer(b.length);

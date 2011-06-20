@@ -44,8 +44,8 @@ import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.MimeBuilder;
-import org.apache.james.mime4j.message.MimeWriter;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
 
 public class MessageTest extends TestCase {
@@ -134,8 +134,8 @@ public class MessageTest extends TestCase {
     public void testWriteTo() throws Exception {
         byte[] inputByte = getRawMessageAsByteArray();
 
-        MimeBuilder builder = new MimeBuilder();
-        MimeWriter writer = new MimeWriter();
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        DefaultMessageWriter writer = new DefaultMessageWriter();
         
         Message m = builder.parseMessage(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -159,8 +159,8 @@ public class MessageTest extends TestCase {
 
         byte[] inputByte = getRawMessageAsByteArray();
 
-        MimeBuilder builder = new MimeBuilder();
-        MimeWriter writer = new MimeWriter();
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        DefaultMessageWriter writer = new DefaultMessageWriter();
         
         Message m = builder.parseMessage(new ByteArrayInputStream(inputByte));
         m.getHeader().addField(DefaultFieldParser.parse(testheader));

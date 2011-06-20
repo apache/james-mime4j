@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.message.MimeBuilder;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
 
 public class MessageCompleteMailTest extends TestCase {
 
@@ -55,7 +55,7 @@ public class MessageCompleteMailTest extends TestCase {
 
     private Message createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
-        MimeBuilder builder = new MimeBuilder();
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
         Message message = builder.parseMessage(in);
         return message;
     }

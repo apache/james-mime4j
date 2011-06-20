@@ -36,7 +36,7 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.MimeWriter;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.storage.Storage;
 import org.apache.james.mime4j.storage.StorageBodyFactory;
@@ -90,7 +90,7 @@ public class MultipartMessage {
 
         // 4) print message to standard output
 
-        MessageWriter writer = new MimeWriter();
+        MessageWriter writer = new DefaultMessageWriter();
         writer.writeMessage(message, System.out);
 
         // 5) message is no longer needed and should be disposed of

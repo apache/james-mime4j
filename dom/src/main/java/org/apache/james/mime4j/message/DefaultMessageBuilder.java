@@ -46,7 +46,7 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 /**
  * Utility class for copying message and parsing message elements.
  */
-public class MimeBuilder implements MessageBuilder {
+public class DefaultMessageBuilder implements MessageBuilder {
 
     private FieldParser<? extends ParsedField> fieldParser = null;
     private BodyFactory bodyFactory = null;
@@ -56,7 +56,7 @@ public class MimeBuilder implements MessageBuilder {
     private boolean flatMode = false;
     private DecodeMonitor monitor = null;
     
-    public MimeBuilder() {
+    public DefaultMessageBuilder() {
         super();
     }
 

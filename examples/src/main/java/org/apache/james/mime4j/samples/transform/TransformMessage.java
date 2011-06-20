@@ -35,8 +35,8 @@ import org.apache.james.mime4j.dom.field.ParseException;
 import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.MimeBuilder;
-import org.apache.james.mime4j.message.MimeWriter;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.StorageBodyFactory;
@@ -66,7 +66,7 @@ public class TransformMessage {
         // Create a new message by transforming the template.
         Message transformed = transform(template);
 
-        MessageWriter writer = new MimeWriter();
+        MessageWriter writer = new DefaultMessageWriter();
         
         // Print transformed message.
         System.out.println("\n\nTransformed message:\n--------------------\n");
@@ -96,7 +96,7 @@ public class TransformMessage {
     private static Message transform(Message original) throws IOException, ParseException {
         // Create a copy of the template. The copy can be modified without
         // affecting the original.
-        MessageBuilder builder = new MimeBuilder();
+        MessageBuilder builder = new DefaultMessageBuilder();
         Message message = builder.newMessage(original);
 
         // In this example we know we have a multipart message. Use

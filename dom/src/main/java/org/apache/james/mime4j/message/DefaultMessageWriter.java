@@ -42,7 +42,7 @@ import org.apache.james.mime4j.util.MimeUtil;
 /**
  * Writes a message (or a part of a message) to an output stream.
  */
-public class MimeWriter implements MessageWriter {
+public class DefaultMessageWriter implements MessageWriter {
 
     private static final byte[] CRLF = { '\r', '\n' };
     private static final byte[] DASHES = { '-', '-' };
@@ -50,7 +50,7 @@ public class MimeWriter implements MessageWriter {
     /**
      * Protected constructor prevents direct instantiation.
      */
-    public MimeWriter() {
+    public DefaultMessageWriter() {
     }
 
     /**
