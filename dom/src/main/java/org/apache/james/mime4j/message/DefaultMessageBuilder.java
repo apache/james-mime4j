@@ -230,16 +230,30 @@ public class DefaultMessageBuilder implements MessageBuilder {
         }
         return copy;
     }
-    
-    /**
-     * Creates a new <code>Header</code> from the specified stream.
-     * 
-     * @param is the stream to read the header from.
-     * 
-     * @throws IOException on I/O errors.
-     * @throws MimeIOException on MIME protocol violations.
-     */
+
+    public Header newHeader() {
+        return new HeaderImpl();
+    }
+
+    public Header newHeader(final Header source) {
+        return copy(source);
+    }
+
+    public Multipart newMultipart(final String subType) {
+        return new MultipartImpl(subType);
+    }
+
+    public Multipart newMultipart(final Multipart source) {
+        return copy(source);
+    }
+
     public Header parseHeader(final InputStream is) throws IOException, MimeIOException {
+        final MimeEntityConfig cfg = config != null ? config : new MimeEntityConfig();
+        boolean strict = cfg.isStrictParsing();
+        final DecodeMonitor mon = monitor != null ? monitor : 
+            strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;
+        final FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser : 
+            strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser();
         final HeaderImpl header = new HeaderImpl();
         final MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
@@ -253,7 +267,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
                 if (field instanceof ParsedField) {
                     parsedField = (ParsedField) field;
                 } else {
-                    parsedField = fieldParser.parse(field, monitor);
+                    parsedField = fp.parse(field, mon);
                 }
                 header.addField(parsedField);
             }
