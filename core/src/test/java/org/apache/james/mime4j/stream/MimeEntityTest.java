@@ -666,7 +666,7 @@ public class MimeEntityTest extends TestCase {
 
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream, fieldBuilder, null, new DefaultBodyDescriptor());
+                rawstream, fieldBuilder, new DefaultBodyDescriptor());
 
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());

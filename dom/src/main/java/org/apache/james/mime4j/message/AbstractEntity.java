@@ -35,7 +35,7 @@ import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
-import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.dom.field.ParsedField;
 
 /**
  * MIME entity. An entity has a header and a body (see RFC 2045).
@@ -524,7 +524,7 @@ public abstract class AbstractEntity implements Entity {
      * @return the header field or <code>null</code> if this entity has no
      *         header or the header contains no such field.
      */
-    <F extends Field> F obtainField(String fieldName) {
+    <F extends ParsedField> F obtainField(String fieldName) {
         Header header = getHeader();
         if (header == null)
             return null;

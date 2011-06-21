@@ -20,13 +20,27 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
 public class MaximalBodyDescriptorFactory implements MutableBodyDescriptorFactory {
 
+    private final FieldParser<?> fieldParser;
+    private final boolean parseAllFields;
+
+    public MaximalBodyDescriptorFactory() {
+        this(null, false);
+    }
+
+    public MaximalBodyDescriptorFactory(final 
+            FieldParser<?> fieldParser, final boolean parseAllFields) {
+        this.fieldParser = fieldParser;
+        this.parseAllFields = parseAllFields;
+    }
+
     public MutableBodyDescriptor newInstance(DecodeMonitor monitor) {
-        return new MaximalBodyDescriptor(null, monitor);
+        return new MaximalBodyDescriptor(null, fieldParser, parseAllFields, monitor);
     }
     
 } 

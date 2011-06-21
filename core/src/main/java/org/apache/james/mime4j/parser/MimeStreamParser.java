@@ -26,7 +26,7 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.EntityState;
-import org.apache.james.mime4j.stream.FieldParser;
+import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
@@ -66,9 +66,8 @@ public class MimeStreamParser {
             final MimeEntityConfig config, 
             boolean clone,
             final DecodeMonitor monitor,
-            final FieldParser<?> fieldParser,
             final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(new MimeTokenStream(clone ? config.clone() : config, monitor, fieldParser, bodyDescFactory));
+        this(new MimeTokenStream(clone ? config.clone() : config, monitor, bodyDescFactory));
     }
 
     public MimeStreamParser(final MimeEntityConfig config, boolean clone) {
@@ -78,18 +77,17 @@ public class MimeStreamParser {
     public MimeStreamParser(
             final MimeEntityConfig config,
             final DecodeMonitor monitor,
-            final FieldParser<?> fieldParser,
             final MutableBodyDescriptorFactory bodyDescFactory) {
         this(config != null ? config : new MimeEntityConfig(), config != null, 
-                monitor, fieldParser, bodyDescFactory);
+                monitor, bodyDescFactory);
     }
 
     public MimeStreamParser(final MimeEntityConfig config) {
-        this(config, null, null, null);
+        this(config, null, null);
     }
 
     public MimeStreamParser() {
-        this(new MimeEntityConfig(), false, null, null, null);
+        this(new MimeEntityConfig(), false, null, null);
     }
     
     /**
@@ -119,10 +117,10 @@ public class MimeStreamParser {
      */
     public void parse(InputStream inputStream) throws MimeException, IOException {
         if (mimeEntityConfig.getHeadlessParsing() != null) {
-            mimeTokenStream.parseHeadless(inputStream, mimeEntityConfig.getHeadlessParsing());
+            Field contentType = mimeTokenStream.parseHeadless(inputStream, mimeEntityConfig.getHeadlessParsing());
             handler.startMessage();
             handler.startHeader();
-            handler.field(new RawField("Content-Type", mimeEntityConfig.getHeadlessParsing()));
+            handler.field(contentType);
             handler.endHeader();
         } else {
             mimeTokenStream.parse(inputStream);

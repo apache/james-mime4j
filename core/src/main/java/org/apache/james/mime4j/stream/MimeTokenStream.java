@@ -75,7 +75,6 @@ public class MimeTokenStream {
     private final MimeEntityConfig config;
     private final DecodeMonitor monitor;
     private final FieldBuilder fieldBuilder;
-    private final FieldParser<?> fieldParser;
     private final MutableBodyDescriptorFactory bodyDescFactory;
     private final LinkedList<EntityStateMachine> entities = new LinkedList<EntityStateMachine>();
     
@@ -97,35 +96,31 @@ public class MimeTokenStream {
     }
 
     public MimeTokenStream(final MimeEntityConfig config) {
-        this(config, null, null, null, null);
+        this(config, null, null, null);
     }
         
     public MimeTokenStream(
             final MimeEntityConfig config, 
-            final FieldParser<?> fieldParser,
             final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(config, null, null, fieldParser, bodyDescFactory);
+        this(config, null, null, bodyDescFactory);
     }
 
     public MimeTokenStream(
             final MimeEntityConfig config, 
             final DecodeMonitor monitor,
-            final FieldParser<?> fieldParser,
             final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(config, monitor, null, fieldParser, bodyDescFactory);
+        this(config, monitor, null, bodyDescFactory);
     }
 
     public MimeTokenStream(
             final MimeEntityConfig config, 
             final DecodeMonitor monitor,
             final FieldBuilder fieldBuilder,
-            final FieldParser<?> fieldParser,
             final MutableBodyDescriptorFactory bodyDescFactory) {
         super();
         this.config = config;
         this.fieldBuilder = fieldBuilder != null ? fieldBuilder : 
             new DefaultFieldBuilder(config.getMaxHeaderLen());
-        this.fieldParser = fieldParser;
         this.monitor = monitor != null ? monitor : 
             (config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
         this.bodyDescFactory = bodyDescFactory;
@@ -139,26 +134,31 @@ public class MimeTokenStream {
         doParse(stream, newBodyDescriptor(), EntityState.T_START_MESSAGE);
     }
 
-    /** Instructs the {@code MimeTokenStream} to parse the given content with 
+    /** 
+     * <p>Instructs the {@code MimeTokenStream} to parse the given content with 
      * the content type. The message stream is assumed to have no message header
      * and is expected to begin with a message body. This can be the case when 
      * the message content is transmitted using a different transport protocol 
-     * such as HTTP.
-     * <p/>
-     * If the {@code MimeTokenStream} has already been in use, resets the streams
-     * internal state.
+     * such as HTTP.</p>
+     * <p>If the {@code MimeTokenStream} has already been in use, resets the 
+     * streams internal state.</p>
+     * @return a parsed Field representing the input contentType
      */    
-    public void parseHeadless(InputStream stream, String contentType) {
+    public Field parseHeadless(InputStream stream, String contentType) {
         if (contentType == null) {
             throw new IllegalArgumentException("Content type may not be null");
         }
+        Field newContentType;
         MutableBodyDescriptor newBodyDescriptor = newBodyDescriptor();
         try {
-            newBodyDescriptor.addField(new RawField("Content-Type", contentType));
+            RawField rawContentType = new RawField("Content-Type", contentType);
+            newContentType = newBodyDescriptor.addField(rawContentType);
+            if (newContentType == null) newContentType = rawContentType;
         } catch (MimeException ex) {
             // should never happen
             throw new IllegalArgumentException(ex.getMessage());
         }
+        
         doParse(stream, newBodyDescriptor, EntityState.T_END_HEADER);
         try {
             next();
@@ -169,6 +169,7 @@ public class MimeTokenStream {
             // This should never happen
             throw new IllegalStateException(e);
         }
+        return newContentType;
     }
 
     /**
@@ -203,7 +204,6 @@ public class MimeTokenStream {
                 EntityState.T_END_MESSAGE,
                 monitor,
                 fieldBuilder,
-                fieldParser,
                 newBodyDescriptor);
 
         rootentity.setRecursionMode(recursionMode);

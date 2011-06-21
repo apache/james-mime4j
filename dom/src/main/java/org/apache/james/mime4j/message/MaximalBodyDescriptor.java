@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentDescriptionField;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentIdField;
@@ -34,16 +35,12 @@ import org.apache.james.mime4j.dom.field.ContentLocationField;
 import org.apache.james.mime4j.dom.field.ContentMD5Field;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
-import org.apache.james.mime4j.field.ContentDescriptionFieldImpl;
-import org.apache.james.mime4j.field.ContentDispositionFieldImpl;
-import org.apache.james.mime4j.field.ContentIdFieldImpl;
-import org.apache.james.mime4j.field.ContentLanguageFieldImpl;
-import org.apache.james.mime4j.field.ContentLocationFieldImpl;
-import org.apache.james.mime4j.field.ContentMD5FieldImpl;
+import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.MimeVersionFieldImpl;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
+import org.apache.james.mime4j.stream.RawField;
 
 /**
  * Parses and stores values for standard MIME header values.
@@ -60,101 +57,77 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
     private ContentMD5Field contentMD5Field;
     
     protected MaximalBodyDescriptor() {
-        this(null, null);
+        this(null);
+    }
+    
+    protected MaximalBodyDescriptor(final BodyDescriptor parent) {
+        this(parent, null, true, null);
     }
 
-    public MaximalBodyDescriptor(final BodyDescriptor parent, final DecodeMonitor monitor) {
-        super(parent, monitor);
+    public MaximalBodyDescriptor(final BodyDescriptor parent, final FieldParser<?> fieldParser, final boolean parseAllFields, final DecodeMonitor monitor) {
+        super(parent, fieldParser, parseAllFields, monitor);
     }
 
     @Override
     public MutableBodyDescriptor newChild() {
-        return new MaximalBodyDescriptor(this, getDecodeMonitor());
+        return new MaximalBodyDescriptor(this, getFieldParser(), getParseAllFields(), getDecodeMonitor());
     }
 
     @Override
-    public void addField(Field field) throws MimeException {
+    public Field addField(RawField field) throws MimeException {
         String name = field.getName();
         if (name.equalsIgnoreCase(FieldName.MIME_VERSION) && mimeVersionField == null) {
-            parseMimeVersion(field);
+            return parseMimeVersion(field);
         } else if (name.equalsIgnoreCase(FieldName.CONTENT_ID) && contentIdField == null) {
-            parseContentId(field);
+            return parseContentId(field);
         } else if (name.equalsIgnoreCase(FieldName.CONTENT_DESCRIPTION) && contentDescriptionField == null) {
-            parseContentDescription(field);
+            return parseContentDescription(field);
         } else if (name.equalsIgnoreCase(FieldName.CONTENT_DISPOSITION) && contentDispositionField == null) {
-            parseContentDisposition(field);
+            return parseContentDisposition(field);
         } else if (name.equalsIgnoreCase(FieldName.CONTENT_LANGUAGE) && contentLanguageField == null) {
-            parseLanguage(field);
+            return parseLanguage(field);
         } else if (name.equalsIgnoreCase(FieldName.CONTENT_LOCATION) && contentLocationField == null) {
-            parseLocation(field);
+            return parseLocation(field);
         } else if (name.equalsIgnoreCase(FieldName.CONTENT_MD5) && contentMD5Field == null) {
-            parseMD5(field);
+            return parseMD5(field);
         } else {
-            super.addField(field);
+            return super.addField(field);
         }
     }
     
-    private void parseMD5(final Field field) {
-        if (field instanceof ContentMD5Field) {
-            contentMD5Field = (ContentMD5Field) field;
-        } else {
-            contentMD5Field = ContentMD5FieldImpl.PARSER.parse(
-                    field, getDecodeMonitor());
-        }
+    private ContentMD5Field parseMD5(final Field field) {
+        contentMD5Field = (ContentMD5Field) getFieldParser().parse(field, getDecodeMonitor());
+        return contentMD5Field;
     }
 
-    private void parseLocation(final Field field) {
-        if (field instanceof ContentLocationField) {
-            contentLocationField = (ContentLocationField) field;
-        } else {
-            contentLocationField = ContentLocationFieldImpl.PARSER.parse(
-                    field, getDecodeMonitor());
-        }
+    private ContentLocationField parseLocation(final Field field) {
+        contentLocationField = (ContentLocationField) getFieldParser().parse(field, getDecodeMonitor());
+        return contentLocationField;
     }
     
-    private void parseLanguage(final Field field) {
-        if (field instanceof ContentLanguageField) {
-            contentLanguageField = (ContentLanguageField) field;
-        } else {
-            contentLanguageField = ContentLanguageFieldImpl.PARSER.parse(
-                    field, getDecodeMonitor());
-        }
+    private ParsedField parseLanguage(final Field field) {
+        contentLanguageField = (ContentLanguageField) getFieldParser().parse(field, getDecodeMonitor());
+        return contentLanguageField;
     }
 
-    private void parseContentDisposition(final Field field) throws MimeException {
-        if (field instanceof ContentDispositionField) {
-            contentDispositionField = (ContentDispositionField) field;
-        } else {
-            contentDispositionField = ContentDispositionFieldImpl.PARSER.parse(
-                    field, getDecodeMonitor());
-        }
+    private ParsedField parseContentDisposition(final Field field) throws MimeException {
+        contentDispositionField = (ContentDispositionField) getFieldParser().parse(field, getDecodeMonitor());
+        return contentDispositionField;
     }
 
-    private void parseContentDescription(final Field field) {
-        if (field instanceof ContentDescriptionField) {
-            contentDescriptionField = (ContentDescriptionField) field;
-        } else {
-            contentDescriptionField = ContentDescriptionFieldImpl.PARSER.parse(
-                    field, getDecodeMonitor());
-        }
+    private ParsedField parseContentDescription(final Field field) {
+        contentDescriptionField = (ContentDescriptionField) getFieldParser().parse(field, getDecodeMonitor());
+        return contentDescriptionField;
     }
 
-    private void parseContentId(final Field field) {
-        if (field instanceof ContentIdField) {
-            contentIdField = (ContentIdField) field;
-        } else {
-            contentIdField = ContentIdFieldImpl.PARSER.parse(
-                    field, getDecodeMonitor());
-        }
+    private ContentIdField parseContentId(final Field field) {
+        contentIdField = (ContentIdField) getFieldParser().parse(field, getDecodeMonitor());
+        return contentIdField;
     }
 
-    private void parseMimeVersion(final Field field) {
-        if (field instanceof MimeVersionField) {
-            mimeVersionField = (MimeVersionField) field;
-        } else {
-            mimeVersionField = MimeVersionFieldImpl.PARSER.parse(
-                    field, getDecodeMonitor());
-        }
+    private MimeVersionField parseMimeVersion(final Field field) {
+        mimeVersionField = (MimeVersionField) getFieldParser().parse(field, getDecodeMonitor());
+        return mimeVersionField;
     }
     
     /**

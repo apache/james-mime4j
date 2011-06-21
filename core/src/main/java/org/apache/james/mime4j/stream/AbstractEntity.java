@@ -39,7 +39,6 @@ abstract class AbstractEntity implements EntityStateMachine {
     protected final MimeEntityConfig config;
     protected final DecodeMonitor monitor;
     protected final FieldBuilder fieldBuilder;
-    protected final FieldParser<?> fieldParser;
     protected final MutableBodyDescriptor body;
 
     private final ByteArrayBuffer linebuf;
@@ -56,7 +55,6 @@ abstract class AbstractEntity implements EntityStateMachine {
             EntityState endState,
             DecodeMonitor monitor,
             FieldBuilder fieldBuilder,
-            FieldParser<?> fieldParser,
             MutableBodyDescriptor body) {
         this.config = config;
         this.state = startState;
@@ -64,7 +62,6 @@ abstract class AbstractEntity implements EntityStateMachine {
         this.endState = endState;
         this.monitor = monitor;
         this.fieldBuilder = fieldBuilder;
-        this.fieldParser = fieldParser;
         this.body = body;
         this.linebuf = new ByteArrayBuffer(64);
         this.lineCount = 0;
@@ -149,12 +146,9 @@ abstract class AbstractEntity implements EntityStateMachine {
                 if (rawfield.getDelimiterIdx() != rawfield.getName().length()) {
                     monitor(Event.OBSOLETE_HEADER);
                 }
-                if (fieldParser != null) {
-                    field = fieldParser.parse(rawfield, monitor);
-                } else {
-                    field = rawfield;
-                }
-                body.addField(field);
+                Field newfield = body.addField(rawfield);
+                if (newfield != null) field = newfield;
+                else field = rawfield;
                 return true;
             } catch (MimeException e) {
                 monitor(Event.INVALID_HEADER);

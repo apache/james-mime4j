@@ -22,9 +22,9 @@ package org.apache.james.mime4j.field;
 import java.util.Locale;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**

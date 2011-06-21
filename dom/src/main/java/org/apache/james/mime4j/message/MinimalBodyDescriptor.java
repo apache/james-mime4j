@@ -24,16 +24,17 @@ import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentLengthField;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
-import org.apache.james.mime4j.field.ContentLengthFieldImpl;
-import org.apache.james.mime4j.field.ContentTransferEncodingFieldImpl;
-import org.apache.james.mime4j.field.ContentTypeFieldImpl;
+import org.apache.james.mime4j.dom.field.ParsedField;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
+import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -70,12 +71,23 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
     private ContentTypeField contentTypeField;
     private ContentLengthField contentLengthField;
     private ContentTransferEncodingField contentTransferEncodingField;
+
+    private final FieldParser<?> fieldParser;
+
+    private final boolean parseAllFields;
     
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
      */
     public MinimalBodyDescriptor() {
-        this(null, null);
+        this(null);
+    }
+
+    /**
+     * Creates a new root <code>BodyDescriptor</code> instance with the given parent
+     */
+    public MinimalBodyDescriptor(final BodyDescriptor parent) {
+        this(parent, null, false, null);
     }
 
     /**
@@ -84,7 +96,7 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
      * @param parent the descriptor of the parent or <code>null</code> if this
      *        is the root descriptor.
      */
-    public MinimalBodyDescriptor(final BodyDescriptor parent, final DecodeMonitor monitor) {
+    public MinimalBodyDescriptor(final BodyDescriptor parent, final FieldParser<?> fieldParser, boolean parseAllFields, final DecodeMonitor monitor) {
         if (parent != null && MimeUtil.isSameMimeType("multipart/digest", parent.getMimeType())) {
             this.mimeType = EMAIL_MESSAGE_MIME_TYPE;
             this.subType = SUB_TYPE_EMAIL;
@@ -94,6 +106,8 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
             this.subType = DEFAULT_SUB_TYPE;
             this.mediaType = DEFAULT_MEDIA_TYPE;
         }
+        this.fieldParser = fieldParser != null ? fieldParser : DefaultFieldParser.getParser();
+        this.parseAllFields = parseAllFields;
         this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
     }
     
@@ -101,8 +115,16 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
         return monitor;
     }
     
+    protected FieldParser<?> getFieldParser() {
+        return fieldParser;
+    }
+    
+    protected boolean getParseAllFields() {
+        return parseAllFields;
+    }
+    
     public MutableBodyDescriptor newChild() {
-		return new MinimalBodyDescriptor(this, getDecodeMonitor());
+        return new MinimalBodyDescriptor(this, getFieldParser(), getParseAllFields(), getDecodeMonitor());
     }
     
     /**
@@ -111,42 +133,32 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
      * 
      * @param field the MIME field.
      */
-    public void addField(Field field) throws MimeException {
+    public Field addField(RawField field) throws MimeException {
         String name = field.getName();
         if (name.equalsIgnoreCase(FieldName.CONTENT_TRANSFER_ENCODING)&& contentTransferEncodingField == null) {
-            parseContentTransferEncoding(field);
+            return parseContentTransferEncoding(field);
         } else if (name.equalsIgnoreCase(FieldName.CONTENT_LENGTH) && contentLengthField == null) {
-            parseContentLength(field);
+            return parseContentLength(field);
         } else if (name.equalsIgnoreCase(FieldName.CONTENT_TYPE) && contentTypeField == null) {
-            parseContentType(field);
-        }
+            return parseContentType(field);
+        } else if (getParseAllFields()) {
+            return getFieldParser().parse(field, monitor);
+        } else return null;
     }
 
-    private void parseContentTransferEncoding(Field field) throws MimeException {
-        if (field instanceof ContentTransferEncodingField) {
-            contentTransferEncodingField = (ContentTransferEncodingField) field;
-        } else {
-            contentTransferEncodingField = ContentTransferEncodingFieldImpl.PARSER.parse(
-                    field, monitor);
-        }
+    private ParsedField parseContentTransferEncoding(Field field) throws MimeException {
+        contentTransferEncodingField = (ContentTransferEncodingField) fieldParser.parse(field, monitor);
+        return contentTransferEncodingField;
     }
 
-    private void parseContentLength(Field field) throws MimeException {
-        if (field instanceof ContentLengthField) {
-            contentLengthField = (ContentLengthField) field;
-        } else {
-            contentLengthField = ContentLengthFieldImpl.PARSER.parse(
-                    field, monitor);
-        }
+    private ParsedField parseContentLength(Field field) throws MimeException {
+        contentLengthField = (ContentLengthField) fieldParser.parse(field, monitor);
+        return contentLengthField;
     }
 
-    private void parseContentType(Field field) throws MimeException {
-        if (field instanceof ContentTypeField) {
-            contentTypeField = (ContentTypeField) field;
-        } else {
-            contentTypeField = ContentTypeFieldImpl.PARSER.parse(
-                    field, monitor);
-        }
+    private ParsedField parseContentType(Field field) throws MimeException {
+        contentTypeField = (ContentTypeField) fieldParser.parse(field, monitor);
+
         String mimetype = contentTypeField.getMimeType();
         if (mimetype != null) {
             mimeType = mimetype;
@@ -163,6 +175,7 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
         parameters.putAll(contentTypeField.getParameters());
         parameters.remove("charset");
         parameters.remove("boundary");
+        return contentTypeField;
     }
 
     /**
