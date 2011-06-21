@@ -305,11 +305,11 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return indexOf(b, this.bufpos, bufferLen());
     }
     
-    public byte charAt(int pos) {
+    public int byteAt(int pos) {
         if (pos < this.bufpos || pos > this.buflen) {
             throw new IndexOutOfBoundsException("looking for "+pos+" in "+bufpos+"/"+buflen);
         }
-        return this.buffer[pos];
+        return this.buffer[pos] & 0xff;
     }
     
     protected byte[] buf() {

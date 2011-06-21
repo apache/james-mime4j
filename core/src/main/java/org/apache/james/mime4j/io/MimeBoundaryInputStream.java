@@ -231,7 +231,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         int i = buffer.indexOf(boundary);
         // NOTE this currently check only for LF. It doesn't check for canonical CRLF
         // and neither for isolated CR. This will require updates according to MIME4J-60
-        while (i > buffer.pos() && buffer.charAt(i-1) != '\n') {
+        while (i > buffer.pos() && buffer.byteAt(i-1) != '\n') {
             // skip the "fake" boundary (it does not contain LF or CR so we cannot have
             // another boundary starting before this is complete.
             i = i + boundary.length;
@@ -265,13 +265,13 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         int len = limit - buffer.pos();
         if (len >= 0 && initialLength == -1) initialLength = len;
         if (len > 0) {
-            if (buffer.charAt(limit - 1) == '\n') {
+            if (buffer.byteAt(limit - 1) == '\n') {
                 boundaryLen++;
                 limit--;
             }
         }
         if (len > 1) {
-            if (buffer.charAt(limit - 1) == '\r') {
+            if (buffer.byteAt(limit - 1) == '\r') {
                 boundaryLen++;
                 limit--;
             }
@@ -285,8 +285,8 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             boolean checkForLastPart = true;
             for (;;) {
                 if (buffer.length() > 1) {
-                    int ch1 = buffer.charAt(buffer.pos());
-                    int ch2 = buffer.charAt(buffer.pos() + 1);
+                    int ch1 = buffer.byteAt(buffer.pos());
+                    int ch2 = buffer.byteAt(buffer.pos() + 1);
                     
                     if (checkForLastPart) if (ch1 == '-' && ch2 == '-') {
                         this.lastPart = true;

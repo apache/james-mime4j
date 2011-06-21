@@ -39,12 +39,12 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         assertEquals('l', inbuffer.read());
         
         try {
-            inbuffer.charAt(1);
+            inbuffer.byteAt(1);
             fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
-            inbuffer.charAt(20);
+            inbuffer.byteAt(20);
             fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
