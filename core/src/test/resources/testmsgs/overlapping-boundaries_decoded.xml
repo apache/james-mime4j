@@ -1,0 +1,70 @@
+<message>
+<header>
+<field>
+Received: by WOMS INBOUNDER;
+	Tue, 21 Jun 2011 09:48:25 +0900 (KST)</field>
+<field>
+Date: Tue, 21 Jun 2011 09:48:25 +0900 (KST)</field>
+<field>
+From: =?UTF-8?B?6rmA7Jqp7ISx?= &lt;yskim@uwiseone.com&gt;</field>
+<field>
+Sender: =?UTF-8?B?6rmA7Jqp7ISx?= &lt;yskim@uwiseone.com&gt;</field>
+<field>
+To: =?UTF-8?B?6rmA7Jqp7ISx?= &lt;yskim@uwiseone.com&gt;</field>
+<field>
+Message-Id: &lt;643025386.114751308617305650.JavaMail.root@localhost.localdomain&gt;</field>
+<field>
+Subject: Test mail</field>
+<field>
+MIME-Version: 1.0</field>
+<field>
+Content-Type: multipart/mixed; 
+	boundary="----=_Part_22594_1940300205.1308617305650"</field>
+<field>
+X-WOInboundFlag: true</field>
+</header>
+<multipart>
+<body-part>
+<header>
+<field>
+Content-Type: multipart/alternative; 
+	boundary="----=_Part_22594_1940300205.13086173056501"</field>
+</header>
+<multipart>
+<body-part>
+<header>
+<field>
+Content-Type: text/plain; charset=UTF-8</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+<field>
+Content-Disposition: inline</field>
+</header>
+<text-body name="overlapping-boundaries_decoded_1_1_1.txt"/>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: text/html; charset=UTF-8</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+<field>
+Content-Disposition: inline</field>
+</header>
+<text-body name="overlapping-boundaries_decoded_1_1_2.txt"/>
+</body-part>
+</multipart>
+</body-part>
+<body-part>
+<header>
+<field>
+Content-Type: text/html; charset=UTF-8</field>
+<field>
+Content-Transfer-Encoding: base64</field>
+<field>
+Content-Disposition: inline</field>
+</header>
+<text-body name="overlapping-boundaries_decoded_1_2.txt"/>
+</body-part>
+</multipart>
+</message>

@@ -218,7 +218,7 @@ public class MimeBoundaryInputStreamTest extends TestCase {
      * Tests that a stream containing only a boundary is empty.
      */
     public void testPrefixIsBoundary() throws IOException {
-        String text = "Line 1\r\n\r\n--boundaryyada\r\n";
+        String text = "Line 1\r\n\r\n--boundary\r\n";
         
         ByteArrayInputStream bis = new ByteArrayInputStream(text.getBytes());
         BufferedLineReaderInputStream buffer = new BufferedLineReaderInputStream(bis, 4096); 
@@ -226,7 +226,7 @@ public class MimeBoundaryInputStreamTest extends TestCase {
             new MimeBoundaryInputStream(buffer, "boundary");
         assertEquals("Line 1\r\n", read(stream, 100));
         
-        text = "--boundaryyada\r\n";
+        text = "--boundary\r\n";
         
         bis = new ByteArrayInputStream(text.getBytes());
         buffer = new BufferedLineReaderInputStream(bis, 4096); 

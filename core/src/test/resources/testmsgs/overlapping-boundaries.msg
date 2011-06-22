@@ -1,0 +1,38 @@
+Received: by WOMS INBOUNDER;
+	Tue, 21 Jun 2011 09:48:25 +0900 (KST)
+Date: Tue, 21 Jun 2011 09:48:25 +0900 (KST)
+From: =?UTF-8?B?6rmA7Jqp7ISx?= <yskim@uwiseone.com>
+Sender: =?UTF-8?B?6rmA7Jqp7ISx?= <yskim@uwiseone.com>
+To: =?UTF-8?B?6rmA7Jqp7ISx?= <yskim@uwiseone.com>
+Message-Id: <643025386.114751308617305650.JavaMail.root@localhost.localdomain>
+Subject: Test mail
+MIME-Version: 1.0
+Content-Type: multipart/mixed; 
+	boundary="----=_Part_22594_1940300205.1308617305650"
+X-WOInboundFlag: true
+
+------=_Part_22594_1940300205.1308617305650
+Content-Type: multipart/alternative; 
+	boundary="----=_Part_22594_1940300205.13086173056501"
+
+------=_Part_22594_1940300205.13086173056501
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+
+dGVzdC4uLg==
+------=_Part_22594_1940300205.13086173056501
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+
+dGVzdC4uLg==
+------=_Part_22594_1940300205.13086173056501--
+
+------=_Part_22594_1940300205.1308617305650
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: base64
+Content-Disposition: inline
+
+aW1wb3J0YW50IHN0dWZm
+------=_Part_22594_1940300205.1308617305650--

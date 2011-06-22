@@ -22,6 +22,7 @@ package org.apache.james.mime4j.io;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 import java.io.IOException;
 
@@ -227,15 +228,30 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             bytesRead = 0;
         }
         
-        
-        int i = buffer.indexOf(boundary);
-        // NOTE this currently check only for LF. It doesn't check for canonical CRLF
-        // and neither for isolated CR. This will require updates according to MIME4J-60
-        while (i > buffer.pos() && buffer.byteAt(i-1) != '\n') {
-            // skip the "fake" boundary (it does not contain LF or CR so we cannot have
-            // another boundary starting before this is complete.
-            i = i + boundary.length;
-            i = buffer.indexOf(boundary, i, buffer.limit() - i);
+        int i;
+        int off = buffer.pos();
+        for (;;) {
+            i = buffer.indexOf(boundary, off, buffer.limit() - off);
+            if (i == -1) {
+                break;
+            }
+            // Make sure the boundary is either at the very beginning of the buffer 
+            // or preceded with LF
+            if (i == buffer.pos() || buffer.byteAt(i - 1) == '\n') {
+                int pos = i + boundary.length;
+                int remaining = buffer.limit() - pos;
+                if (remaining <= 0) {
+                    // Make sure the boundary is terminated with EOS
+                    break;
+                } else {
+                    // or with a whitespace or '-' char
+                    char ch = (char)(buffer.byteAt(pos));
+                    if (CharsetUtil.isWhitespace(ch) || ch == '-') {
+                        break;
+                    }
+                }
+            }
+            off = i + boundary.length;
         }
         if (i != -1) {
             limit = i;
@@ -245,8 +261,8 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             if (eof) {
                 limit = buffer.limit();
             } else {
-                limit = buffer.limit() - (boundary.length + 1); 
-                                          // \r\n + (boundary - one char)
+                limit = buffer.limit() - (boundary.length + 2); 
+                                // [LF] [boundary] [CR][LF] minus one char 
             }
         }
         return bytesRead;
