@@ -31,13 +31,30 @@ import org.apache.james.mime4j.io.LimitedInputStream;
 import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
+import org.apache.james.mime4j.io.MaxHeaderLimitException;
+import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
-class MimeEntity extends AbstractEntity {
+class MimeEntity implements EntityStateMachine {
 
+    private final EntityState endState;
+    private final MimeEntityConfig config;
+    private final DecodeMonitor monitor;
+    private final FieldBuilder fieldBuilder;
+    private final MutableBodyDescriptor body;
+
+    private final ByteArrayBuffer linebuf;
     private final LineNumberSource lineSource;
     private final BufferedLineReaderInputStream inbuffer;
+
+    private EntityState state;
+    private int lineCount;
+    private boolean endOfHeader;
+    private int headerCount;
+    private Field field;
 
     private RecursionMode recursionMode;
     private MimeBoundaryInputStream currentMimePartStream;
@@ -54,7 +71,17 @@ class MimeEntity extends AbstractEntity {
             DecodeMonitor monitor,
             FieldBuilder fieldBuilder,
             MutableBodyDescriptor body) {
-        super(config, startState, endState, monitor, fieldBuilder, body);
+        super();
+        this.config = config;
+        this.state = startState;
+        this.endState = endState;
+        this.monitor = monitor;
+        this.fieldBuilder = fieldBuilder;
+        this.body = body;
+        this.linebuf = new ByteArrayBuffer(64);
+        this.lineCount = 0;
+        this.endOfHeader = false;
+        this.headerCount = 0;
         this.lineSource = lineSource;
         this.inbuffer = new BufferedLineReaderInputStream(
                 instream,
@@ -109,6 +136,10 @@ class MimeEntity extends AbstractEntity {
                 new DefaultFieldBuilder(-1), body);
     }
 
+    public EntityState getState() {
+        return state;
+    }
+
     public RecursionMode getRecursionMode() {
         return recursionMode;
     }
@@ -121,17 +152,130 @@ class MimeEntity extends AbstractEntity {
         this.inbuffer.truncate();
     }
 
-    @Override
-    protected int getLineNumber() {
+    private int getLineNumber() {
         if (lineSource == null)
             return -1;
         else
             return lineSource.getLineNumber();
     }
 
-    @Override
-    protected LineReaderInputStream getDataStream() {
+    private LineReaderInputStream getDataStream() {
         return dataStream;
+    }
+
+    /**
+     * Creates an indicative message suitable for display
+     * based on the given event and the current state of the system.
+     * @param event <code>Event</code>, not null
+     * @return message suitable for use as a message in an exception
+     * or for logging
+     */
+    protected String message(Event event) {
+        final String message;
+        if (event == null) {
+            message = "Event is unexpectedly null.";
+        } else {
+            message = event.toString();
+        }
+
+        int lineNumber = getLineNumber();
+        if (lineNumber <= 0)
+            return message;
+        else
+            return "Line " + lineNumber + ": " + message;
+    }
+
+    protected void monitor(Event event) throws MimeException, IOException {
+        if (monitor.isListening()) {
+            String message = message(event);
+            if (monitor.warn(message, "ignoring")) {
+                throw new MimeParseEventException(event);
+            }
+        }
+    }
+
+    private void readRawField() throws IOException, MimeException {
+        if (endOfHeader)
+            throw new IllegalStateException();
+        LineReaderInputStream instream = getDataStream();
+        try {
+            for (;;) {
+                // If there's still data stuck in the line buffer
+                // copy it to the field buffer
+                int len = linebuf.length();
+                if (len > 0) {
+                    fieldBuilder.append(linebuf);
+                }
+                linebuf.clear();
+                if (instream.readLine(linebuf) == -1) {
+                    monitor(Event.HEADERS_PREMATURE_END);
+                    endOfHeader = true;
+                    break;
+                }
+                len = linebuf.length();
+                if (len > 0 && linebuf.byteAt(len - 1) == '\n') {
+                    len--;
+                }
+                if (len > 0 && linebuf.byteAt(len - 1) == '\r') {
+                    len--;
+                }
+                if (len == 0) {
+                    // empty line detected
+                    endOfHeader = true;
+                    break;
+                }
+                lineCount++;
+                if (lineCount > 1) {
+                    int ch = linebuf.byteAt(0);
+                    if (ch != CharsetUtil.SP && ch != CharsetUtil.HT) {
+                        // new header detected
+                        break;
+                    }
+                }
+            }
+        } catch (MaxLineLimitException e) {
+            throw new MimeException(e);
+        }
+    }
+
+    protected boolean nextField() throws MimeException, IOException {
+        int maxHeaderCount = config.getMaxHeaderCount();
+        // the loop is here to transparently skip invalid headers
+        for (;;) {
+            if (endOfHeader) {
+                return false;
+            }
+            if (maxHeaderCount > 0 && headerCount >= maxHeaderCount) {
+                throw new MaxHeaderLimitException("Maximum header limit exceeded");
+            }
+            headerCount++;
+            fieldBuilder.reset();
+            readRawField();
+            try {
+                RawField rawfield = fieldBuilder.build();
+                if (rawfield == null) {
+                    continue;
+                }
+                if (rawfield.getDelimiterIdx() != rawfield.getName().length()) {
+                    monitor(Event.OBSOLETE_HEADER);
+                }
+                Field newfield = body.addField(rawfield);
+                if (newfield != null) field = newfield;
+                else field = rawfield;
+                return true;
+            } catch (MimeException e) {
+                monitor(Event.INVALID_HEADER);
+                if (config.isMalformedHeaderStartsBody()) {
+                    LineReaderInputStream instream = getDataStream();
+                    ByteArrayBuffer buf = fieldBuilder.getRaw();
+                    // Complain, if raw data is not available or cannot be 'unread'
+                    if (buf == null || !instream.unread(buf)) {
+                        throw new MimeParseEventException(Event.INVALID_HEADER);
+                    }
+                    return false;
+                }
+            }
+        }
     }
 
     public EntityStateMachine advance() throws IOException, MimeException {
@@ -213,7 +357,7 @@ class MimeEntity extends AbstractEntity {
     private void createMimePartStream() throws MimeException, IOException {
         String boundary = body.getBoundary();
         try {
-            currentMimePartStream = new MimeBoundaryInputStream(inbuffer, boundary, 
+            currentMimePartStream = new MimeBoundaryInputStream(inbuffer, boundary,
                     config.isStrictParsing());
         } catch (IllegalArgumentException e) {
             // thrown when boundary is too long
@@ -293,6 +437,45 @@ class MimeEntity extends AbstractEntity {
     }
 
     /**
+     * <p>Gets a descriptor for the current entity.
+     * This method is valid if {@link #getState()} returns:</p>
+     * <ul>
+     * <li>{@link EntityState#T_BODY}</li>
+     * <li>{@link EntityState#T_START_MULTIPART}</li>
+     * <li>{@link EntityState#T_EPILOGUE}</li>
+     * <li>{@link EntityState#T_PREAMBLE}</li>
+     * </ul>
+     * @return <code>BodyDescriptor</code>, not nulls
+     */
+    public BodyDescriptor getBodyDescriptor() {
+        switch (getState()) {
+        case T_BODY:
+        case T_START_MULTIPART:
+        case T_PREAMBLE:
+        case T_EPILOGUE:
+        case T_END_OF_STREAM:
+            return body;
+        default:
+            throw new IllegalStateException("Invalid state :" + stateToString(state));
+        }
+    }
+
+    /**
+     * This method is valid, if {@link #getState()} returns {@link EntityState#T_FIELD}.
+     * @return String with the fields raw contents.
+     * @throws IllegalStateException {@link #getState()} returns another
+     *   value than {@link EntityState#T_FIELD}.
+     */
+    public Field getField() {
+        switch (getState()) {
+        case T_FIELD:
+            return field;
+        default:
+            throw new IllegalStateException("Invalid state :" + stateToString(state));
+        }
+    }
+
+    /**
      * @see org.apache.james.mime4j.stream.EntityStateMachine#getContentStream()
      */
     public InputStream getContentStream() {
@@ -312,6 +495,69 @@ class MimeEntity extends AbstractEntity {
      */
     public InputStream getDecodedContentStream() throws IllegalStateException {
         return decodedStream(getContentStream());
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + " [" + stateToString(state)
+        + "][" + body.getMimeType() + "][" + body.getBoundary() + "]";
+    }
+
+    /**
+     * Renders a state as a string suitable for logging.
+     * @param state
+     * @return rendered as string, not null
+     */
+    public static final String stateToString(EntityState state) {
+        final String result;
+        switch (state) {
+            case T_END_OF_STREAM:
+                result = "End of stream";
+                break;
+            case T_START_MESSAGE:
+                result = "Start message";
+                break;
+            case T_END_MESSAGE:
+                result = "End message";
+                break;
+            case T_RAW_ENTITY:
+                result = "Raw entity";
+                break;
+            case T_START_HEADER:
+                result = "Start header";
+                break;
+            case T_FIELD:
+                result = "Field";
+                break;
+            case T_END_HEADER:
+                result = "End header";
+                break;
+            case T_START_MULTIPART:
+                result = "Start multipart";
+                break;
+            case T_END_MULTIPART:
+                result = "End multipart";
+                break;
+            case T_PREAMBLE:
+                result = "Preamble";
+                break;
+            case T_EPILOGUE:
+                result = "Epilogue";
+                break;
+            case T_START_BODYPART:
+                result = "Start bodypart";
+                break;
+            case T_END_BODYPART:
+                result = "End bodypart";
+                break;
+            case T_BODY:
+                result = "Body";
+                break;
+            default:
+                result = "Unknown";
+                break;
+        }
+        return result;
     }
 
 }

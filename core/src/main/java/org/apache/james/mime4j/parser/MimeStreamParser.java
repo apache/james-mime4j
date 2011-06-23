@@ -30,7 +30,6 @@ import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
-import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RecursionMode;
 
 /**

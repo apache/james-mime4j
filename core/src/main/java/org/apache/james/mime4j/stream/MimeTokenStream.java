@@ -391,7 +391,7 @@ public class MimeTokenStream {
      * @return rendered as string, not null
      */
     public static final String stateToString(EntityState state) {
-        return AbstractEntity.stateToString(state);
+        return MimeEntity.stateToString(state);
     }
 
 
