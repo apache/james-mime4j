@@ -298,7 +298,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
             FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser : 
                 strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser();
             MutableBodyDescriptorFactory bdf = bodyDescFactory != null ? bodyDescFactory :
-                new MinimalBodyDescriptorFactory(fp, true);
+                new MinimalBodyDescriptorFactory(fp);
             BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
             MimeStreamParser parser = new MimeStreamParser(cfg, mon, bdf);
             // EntityBuilder expect the parser will send ParserFields for the well known fields

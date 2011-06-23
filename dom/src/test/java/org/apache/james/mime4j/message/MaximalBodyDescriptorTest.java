@@ -41,7 +41,7 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         MimeEntityConfig config = new MimeEntityConfig();
         config.setStrictParsing(true);
         parser = new MimeTokenStream(config, 
-                new MaximalBodyDescriptorFactory(null, false));
+                new MaximalBodyDescriptorFactory(null));
     }
 
     @Override

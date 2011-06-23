@@ -27,20 +27,18 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 public class MaximalBodyDescriptorFactory implements MutableBodyDescriptorFactory {
 
     private final FieldParser<?> fieldParser;
-    private final boolean parseAllFields;
 
     public MaximalBodyDescriptorFactory() {
-        this(null, false);
+        this(null);
     }
 
     public MaximalBodyDescriptorFactory(final 
-            FieldParser<?> fieldParser, final boolean parseAllFields) {
+            FieldParser<?> fieldParser) {
         this.fieldParser = fieldParser;
-        this.parseAllFields = parseAllFields;
     }
 
     public MutableBodyDescriptor newInstance(DecodeMonitor monitor) {
-        return new MaximalBodyDescriptor(null, fieldParser, parseAllFields, monitor);
+        return new MaximalBodyDescriptor(null, fieldParser, monitor);
     }
     
 } 

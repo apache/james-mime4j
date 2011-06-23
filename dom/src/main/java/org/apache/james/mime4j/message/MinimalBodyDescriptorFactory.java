@@ -27,16 +27,14 @@ import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 public class MinimalBodyDescriptorFactory implements MutableBodyDescriptorFactory {
 
     private final FieldParser<?> fieldParser;
-    private final boolean parseAllFields;
 
     public MinimalBodyDescriptorFactory(final 
-            FieldParser<?> fieldParser, final boolean parseAllFields) {
+            FieldParser<?> fieldParser) {
         this.fieldParser = fieldParser;
-        this.parseAllFields = parseAllFields;
     }
 
     public MutableBodyDescriptor newInstance(DecodeMonitor monitor) {
-        return new MinimalBodyDescriptor(null, fieldParser, parseAllFields, monitor);
+        return new MinimalBodyDescriptor(null, fieldParser, monitor);
     }
     
 } 

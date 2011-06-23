@@ -61,16 +61,16 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
     }
     
     protected MaximalBodyDescriptor(final BodyDescriptor parent) {
-        this(parent, null, true, null);
+        this(parent, null, null);
     }
 
-    public MaximalBodyDescriptor(final BodyDescriptor parent, final FieldParser<?> fieldParser, final boolean parseAllFields, final DecodeMonitor monitor) {
-        super(parent, fieldParser, parseAllFields, monitor);
+    public MaximalBodyDescriptor(final BodyDescriptor parent, final FieldParser<?> fieldParser, final DecodeMonitor monitor) {
+        super(parent, fieldParser, monitor);
     }
 
     @Override
     public MutableBodyDescriptor newChild() {
-        return new MaximalBodyDescriptor(this, getFieldParser(), getParseAllFields(), getDecodeMonitor());
+        return new MaximalBodyDescriptor(this, getFieldParser(), getDecodeMonitor());
     }
 
     @Override

@@ -74,8 +74,6 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
 
     private final FieldParser<?> fieldParser;
 
-    private final boolean parseAllFields;
-    
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
      */
@@ -87,7 +85,7 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
      * Creates a new root <code>BodyDescriptor</code> instance with the given parent
      */
     public MinimalBodyDescriptor(final BodyDescriptor parent) {
-        this(parent, null, false, null);
+        this(parent, null, null);
     }
 
     /**
@@ -96,7 +94,7 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
      * @param parent the descriptor of the parent or <code>null</code> if this
      *        is the root descriptor.
      */
-    public MinimalBodyDescriptor(final BodyDescriptor parent, final FieldParser<?> fieldParser, boolean parseAllFields, final DecodeMonitor monitor) {
+    public MinimalBodyDescriptor(final BodyDescriptor parent, final FieldParser<?> fieldParser, final DecodeMonitor monitor) {
         if (parent != null && MimeUtil.isSameMimeType("multipart/digest", parent.getMimeType())) {
             this.mimeType = EMAIL_MESSAGE_MIME_TYPE;
             this.subType = SUB_TYPE_EMAIL;
@@ -107,7 +105,6 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
             this.mediaType = DEFAULT_MEDIA_TYPE;
         }
         this.fieldParser = fieldParser != null ? fieldParser : DefaultFieldParser.getParser();
-        this.parseAllFields = parseAllFields;
         this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
     }
     
@@ -119,12 +116,8 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
         return fieldParser;
     }
     
-    protected boolean getParseAllFields() {
-        return parseAllFields;
-    }
-    
     public MutableBodyDescriptor newChild() {
-        return new MinimalBodyDescriptor(this, getFieldParser(), getParseAllFields(), getDecodeMonitor());
+        return new MinimalBodyDescriptor(this, getFieldParser(), getDecodeMonitor());
     }
     
     /**
@@ -141,9 +134,9 @@ public class MinimalBodyDescriptor implements MutableBodyDescriptor {
             return parseContentLength(field);
         } else if (name.equalsIgnoreCase(FieldName.CONTENT_TYPE) && contentTypeField == null) {
             return parseContentType(field);
-        } else if (getParseAllFields()) {
+        } else {
             return getFieldParser().parse(field, monitor);
-        } else return null;
+        }
     }
 
     private ParsedField parseContentTransferEncoding(Field field) throws MimeException {
