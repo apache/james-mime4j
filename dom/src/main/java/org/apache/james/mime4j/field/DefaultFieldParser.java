@@ -21,6 +21,7 @@ package org.apache.james.mime4j.field;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.AddressListField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.FieldName;
@@ -28,7 +29,6 @@ import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -113,7 +113,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
         setFieldParser(FieldName.CONTENT_DISPOSITION,
                 ContentDispositionFieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_ID,
-                ContentDispositionFieldImpl.PARSER);
+                ContentIdFieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_MD5,
                 ContentMD5FieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_DESCRIPTION,

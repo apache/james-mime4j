@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.codec.EncoderUtil;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.AddressListField;
@@ -43,7 +44,6 @@ import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.address.AddressFormatter;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 

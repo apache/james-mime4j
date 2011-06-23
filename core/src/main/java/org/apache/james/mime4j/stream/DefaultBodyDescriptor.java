@@ -101,7 +101,7 @@ class DefaultBodyDescriptor implements MutableBodyDescriptor {
      * 
      * @param field the MIME field.
      */
-    public void addField(Field field) throws MimeException {
+    public Field addField(RawField field) throws MimeException {
         String name = field.getName().toLowerCase(Locale.US);
         
         if (name.equals("content-transfer-encoding") && !contentTransferEncSet) {
@@ -129,6 +129,7 @@ class DefaultBodyDescriptor implements MutableBodyDescriptor {
         } else if (name.equals("content-type") && !contentTypeSet) {
             parseContentType(field);
         }
+        return null;
     }
 
     private void parseContentType(Field field) throws MimeException {

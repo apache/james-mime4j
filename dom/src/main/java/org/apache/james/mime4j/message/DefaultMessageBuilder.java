@@ -28,6 +28,7 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Disposable;
 import org.apache.james.mime4j.dom.Entity;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
@@ -39,7 +40,6 @@ import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
@@ -298,10 +298,12 @@ public class DefaultMessageBuilder implements MessageBuilder {
             FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser : 
                 strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser();
             MutableBodyDescriptorFactory bdf = bodyDescFactory != null ? bodyDescFactory :
-                new MinimalBodyDescriptorFactory();
-            BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory(); 
-            MimeStreamParser parser = new MimeStreamParser(cfg, mon, fp, bdf);
-            parser.setContentHandler(new EntityBuilder(message, mon, fp, bf));
+                new MinimalBodyDescriptorFactory(fp);
+            BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
+            MimeStreamParser parser = new MimeStreamParser(cfg, mon, bdf);
+            // EntityBuilder expect the parser will send ParserFields for the well known fields
+            // It will throw exceptions, otherwise.
+            parser.setContentHandler(new EntityBuilder(message, bf));
             parser.setContentDecoding(contentDecoding);
             if (flatMode) {
                 parser.setFlat();

@@ -24,17 +24,14 @@ import java.io.InputStream;
 import java.util.Stack;
 
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.FieldParser;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -46,19 +43,13 @@ import org.apache.james.mime4j.util.ByteSequence;
 class EntityBuilder implements ContentHandler {
 
     private final Entity entity;
-    private final DecodeMonitor monitor;
-    private final FieldParser<? extends ParsedField> fieldParser; 
     private final BodyFactory bodyFactory;
     private final Stack<Object> stack;
     
     EntityBuilder(
             final Entity entity,
-            final DecodeMonitor monitor,
-            final FieldParser<? extends ParsedField> fieldParser, 
             final BodyFactory bodyFactory) {
         this.entity = entity;
-        this.monitor = monitor;
-        this.fieldParser = fieldParser;
         this.bodyFactory = bodyFactory;
         this.stack = new Stack<Object>();
     }
@@ -105,13 +96,7 @@ class EntityBuilder implements ContentHandler {
      */
     public void field(Field field) throws MimeException {
         expect(Header.class);
-        ParsedField parsedField;
-        if (field instanceof ParsedField) {
-            parsedField = (ParsedField) field;
-        } else {
-            parsedField = fieldParser.parse(field, monitor);
-        }
-        ((Header) stack.peek()).addField(parsedField);
+        ((Header) stack.peek()).addField(field);
     }
     
     /**

@@ -23,11 +23,11 @@ import java.io.StringReader;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.mimeversion.parser.ParseException;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.FieldParser;
 
 /**
  * Represents a <code>MIME-Version</code> field.

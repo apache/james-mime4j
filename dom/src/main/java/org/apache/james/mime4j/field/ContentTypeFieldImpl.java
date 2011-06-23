@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.field.contenttype.parser.ContentTypeParser;
 import org.apache.james.mime4j.field.contenttype.parser.ParseException;
 import org.apache.james.mime4j.field.contenttype.parser.TokenMgrError;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.FieldParser;
 
 /**
  * Represents a <code>Content-Type</code> field.

@@ -20,13 +20,21 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.stream.MutableBodyDescriptor;
 import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
 public class MinimalBodyDescriptorFactory implements MutableBodyDescriptorFactory {
 
+    private final FieldParser<?> fieldParser;
+
+    public MinimalBodyDescriptorFactory(final 
+            FieldParser<?> fieldParser) {
+        this.fieldParser = fieldParser;
+    }
+
     public MutableBodyDescriptor newInstance(DecodeMonitor monitor) {
-        return new MinimalBodyDescriptor(null, monitor);
+        return new MinimalBodyDescriptor(null, fieldParser, monitor);
     }
     
 } 
