@@ -21,115 +21,106 @@ package org.apache.james.mime4j.message;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentDescriptionField;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentIdField;
 import org.apache.james.mime4j.dom.field.ContentLanguageField;
+import org.apache.james.mime4j.dom.field.ContentLengthField;
 import org.apache.james.mime4j.dom.field.ContentLocationField;
 import org.apache.james.mime4j.dom.field.ContentMD5Field;
+import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.MimeVersionFieldImpl;
 import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MutableBodyDescriptor;
-import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * Parses and stores values for standard MIME header values.
  * 
  */
-public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
+public class MaximalBodyDescriptor implements BodyDescriptor {
 
-    private MimeVersionField mimeVersionField;
-    private ContentIdField contentIdField;
-    private ContentDescriptionField contentDescriptionField;
-    private ContentDispositionField contentDispositionField;
-    private ContentLanguageField contentLanguageField;
-    private ContentLocationField contentLocationField;
-    private ContentMD5Field contentMD5Field;
+    private static final String CONTENT_TYPE = FieldName.CONTENT_TYPE.toLowerCase(Locale.US);
+    private static final String CONTENT_LENGTH = FieldName.CONTENT_LENGTH.toLowerCase(Locale.US);
+    private static final String CONTENT_TRANSFER_ENCODING = FieldName.CONTENT_TRANSFER_ENCODING.toLowerCase(Locale.US);
+    private static final String CONTENT_DISPOSITION = FieldName.CONTENT_DISPOSITION.toLowerCase(Locale.US);
+    private static final String CONTENT_ID = FieldName.CONTENT_ID.toLowerCase(Locale.US);
+    private static final String CONTENT_MD5 = FieldName.CONTENT_MD5.toLowerCase(Locale.US);
+    private static final String CONTENT_DESCRIPTION = FieldName.CONTENT_DESCRIPTION.toLowerCase(Locale.US);
+    private static final String CONTENT_LANGUAGE = FieldName.CONTENT_LANGUAGE.toLowerCase(Locale.US);
+    private static final String CONTENT_LOCATION = FieldName.CONTENT_LOCATION.toLowerCase(Locale.US);
+    private static final String MIME_VERSION = FieldName.MIME_VERSION.toLowerCase(Locale.US);
     
-    protected MaximalBodyDescriptor() {
-        this(null);
-    }
+    private final String mediaType;
+    private final String subType;
+    private final String mimeType;
+    private final String boundary;
+    private final String charset;
+    private final Map<String, ParsedField> fields;
     
-    protected MaximalBodyDescriptor(final BodyDescriptor parent) {
-        this(parent, null, null);
-    }
-
-    public MaximalBodyDescriptor(final BodyDescriptor parent, final FieldParser<?> fieldParser, final DecodeMonitor monitor) {
-        super(parent, fieldParser, monitor);
-    }
-
-    @Override
-    public MutableBodyDescriptor newChild() {
-        return new MaximalBodyDescriptor(this, getFieldParser(), getDecodeMonitor());
-    }
-
-    @Override
-    public Field addField(RawField field) throws MimeException {
-        String name = field.getName();
-        if (name.equalsIgnoreCase(FieldName.MIME_VERSION) && mimeVersionField == null) {
-            return parseMimeVersion(field);
-        } else if (name.equalsIgnoreCase(FieldName.CONTENT_ID) && contentIdField == null) {
-            return parseContentId(field);
-        } else if (name.equalsIgnoreCase(FieldName.CONTENT_DESCRIPTION) && contentDescriptionField == null) {
-            return parseContentDescription(field);
-        } else if (name.equalsIgnoreCase(FieldName.CONTENT_DISPOSITION) && contentDispositionField == null) {
-            return parseContentDisposition(field);
-        } else if (name.equalsIgnoreCase(FieldName.CONTENT_LANGUAGE) && contentLanguageField == null) {
-            return parseLanguage(field);
-        } else if (name.equalsIgnoreCase(FieldName.CONTENT_LOCATION) && contentLocationField == null) {
-            return parseLocation(field);
-        } else if (name.equalsIgnoreCase(FieldName.CONTENT_MD5) && contentMD5Field == null) {
-            return parseMD5(field);
-        } else {
-            return super.addField(field);
-        }
+    MaximalBodyDescriptor(
+            final String mimeType,
+            final String mediaType,
+            final String subType,
+            final String boundary,
+            final String charset,
+            final Map<String, ParsedField> fields) {
+        super();
+        this.mimeType = mimeType;
+        this.mediaType = mediaType;
+        this.subType = subType;
+        this.boundary = boundary;
+        this.charset = charset;
+        this.fields = fields != null ? new HashMap<String, ParsedField>(fields) : 
+            Collections.<String, ParsedField>emptyMap();
     }
     
-    private ContentMD5Field parseMD5(final Field field) {
-        contentMD5Field = (ContentMD5Field) getFieldParser().parse(field, getDecodeMonitor());
-        return contentMD5Field;
-    }
-
-    private ContentLocationField parseLocation(final Field field) {
-        contentLocationField = (ContentLocationField) getFieldParser().parse(field, getDecodeMonitor());
-        return contentLocationField;
+    public String getMimeType() {
+        return mimeType;
     }
     
-    private ParsedField parseLanguage(final Field field) {
-        contentLanguageField = (ContentLanguageField) getFieldParser().parse(field, getDecodeMonitor());
-        return contentLanguageField;
-    }
-
-    private ParsedField parseContentDisposition(final Field field) throws MimeException {
-        contentDispositionField = (ContentDispositionField) getFieldParser().parse(field, getDecodeMonitor());
-        return contentDispositionField;
-    }
-
-    private ParsedField parseContentDescription(final Field field) {
-        contentDescriptionField = (ContentDescriptionField) getFieldParser().parse(field, getDecodeMonitor());
-        return contentDescriptionField;
-    }
-
-    private ContentIdField parseContentId(final Field field) {
-        contentIdField = (ContentIdField) getFieldParser().parse(field, getDecodeMonitor());
-        return contentIdField;
-    }
-
-    private MimeVersionField parseMimeVersion(final Field field) {
-        mimeVersionField = (MimeVersionField) getFieldParser().parse(field, getDecodeMonitor());
-        return mimeVersionField;
+    public String getBoundary() {
+        return boundary;
     }
     
+    public String getCharset() {
+        return charset;
+    }
+    
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public String getSubType() {
+        return subType;
+    }
+
+    public Map<String, String> getContentTypeParameters() {
+        ContentTypeField contentTypeField = (ContentTypeField) fields.get(CONTENT_TYPE);
+        return contentTypeField != null ? contentTypeField.getParameters() : 
+            Collections.<String, String>emptyMap();
+    }
+    
+    public String getTransferEncoding() {
+        ContentTransferEncodingField contentTransferEncodingField = 
+            (ContentTransferEncodingField) fields.get(CONTENT_TRANSFER_ENCODING);
+        return contentTransferEncodingField != null ? contentTransferEncodingField.getEncoding() : 
+            MimeUtil.ENC_7BIT;
+    }
+    
+    public long getContentLength() {
+        ContentLengthField contentLengthField = (ContentLengthField) fields.get(CONTENT_LENGTH);
+        return contentLengthField != null ? contentLengthField.getContentLength() : -1;
+    }
+
     /**
      * Gets the MIME major version
      * as specified by the <code>MIME-Version</code>
@@ -138,6 +129,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * @return positive integer
      */
     public int getMimeMajorVersion() {
+        MimeVersionField mimeVersionField = (MimeVersionField) fields.get(MIME_VERSION);
         return mimeVersionField != null ? mimeVersionField.getMajorVersion() : 
             MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION;
     }
@@ -150,6 +142,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * @return positive integer
      */
     public int getMimeMinorVersion() {
+        MimeVersionField mimeVersionField = (MimeVersionField) fields.get(MIME_VERSION);
         return mimeVersionField != null ? mimeVersionField.getMinorVersion() : 
             MimeVersionFieldImpl.DEFAULT_MINOR_VERSION;
     }
@@ -162,6 +155,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * null otherwise
      */
     public String getContentDescription() {
+        ContentDescriptionField contentDescriptionField = 
+            (ContentDescriptionField) fields.get(CONTENT_DESCRIPTION);
         return contentDescriptionField != null ? contentDescriptionField.getDescription() : null;
     }
     
@@ -172,6 +167,7 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * null otherwise
      */
     public String getContentId() {
+        ContentIdField contentIdField = (ContentIdField) fields.get(CONTENT_ID);
         return contentIdField != null ? contentIdField.getId() : null;
     }
     
@@ -183,6 +179,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null when this has not been set
      */
     public String getContentDispositionType() {
+        ContentDispositionField contentDispositionField = 
+            (ContentDispositionField) fields.get(CONTENT_DISPOSITION);
         return contentDispositionField != null ? contentDispositionField.getDispositionType() : null;
     }
     
@@ -193,6 +191,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * not null
      */
     public Map<String, String> getContentDispositionParameters() {
+        ContentDispositionField contentDispositionField = 
+            (ContentDispositionField) fields.get(CONTENT_DISPOSITION);
         return contentDispositionField != null ? contentDispositionField.getParameters() : 
             Collections.<String, String>emptyMap();
     }
@@ -204,6 +204,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null when it is not present
      */
     public String getContentDispositionFilename() {
+        ContentDispositionField contentDispositionField = 
+            (ContentDispositionField) fields.get(CONTENT_DISPOSITION);
         return contentDispositionField != null ? contentDispositionField.getFilename() : null;
     }
     
@@ -214,6 +216,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null when this is not present
      */
     public Date getContentDispositionModificationDate() {
+        ContentDispositionField contentDispositionField = 
+            (ContentDispositionField) fields.get(CONTENT_DISPOSITION);
         return contentDispositionField != null ? contentDispositionField.getModificationDate() : null;
     }
     
@@ -224,6 +228,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null when this is not present
      */
     public Date getContentDispositionCreationDate() {
+        ContentDispositionField contentDispositionField = 
+            (ContentDispositionField) fields.get(CONTENT_DISPOSITION);
         return contentDispositionField != null ? contentDispositionField.getCreationDate() : null;
     }
     
@@ -234,6 +240,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null when this is not present
      */
     public Date getContentDispositionReadDate() {
+        ContentDispositionField contentDispositionField = 
+            (ContentDispositionField) fields.get(CONTENT_DISPOSITION);
         return contentDispositionField != null ? contentDispositionField.getReadDate() : null;
     }
     
@@ -244,6 +252,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or -1 if this size has not been set
      */
     public long getContentDispositionSize() {
+        ContentDispositionField contentDispositionField = 
+            (ContentDispositionField) fields.get(CONTENT_DISPOSITION);
         return contentDispositionField != null ? contentDispositionField.getSize() : -1;
     }
     
@@ -256,6 +266,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null if no header exists
      */
     public List<String> getContentLanguage() {
+        ContentLanguageField contentLanguageField = 
+            (ContentLanguageField) fields.get(CONTENT_LANGUAGE);
         return contentLanguageField != null ? contentLanguageField.getLanguages() : 
             Collections.<String>emptyList();
     }
@@ -267,6 +279,8 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null if no header exists
      */
     public String getContentLocation() {
+        ContentLocationField contentLocationField = 
+            (ContentLocationField) fields.get(CONTENT_LOCATION);
         return contentLocationField != null ? contentLocationField.getLocation() : null;
     }
     
@@ -278,7 +292,25 @@ public class MaximalBodyDescriptor extends MinimalBodyDescriptor {
      * or null if no header exists
      */
     public String getContentMD5Raw() {
+        ContentMD5Field contentMD5Field = (ContentMD5Field) fields.get(CONTENT_MD5);
         return contentMD5Field != null ? contentMD5Field.getMD5Raw() : null;
     }
     
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[mimeType=");
+        sb.append(mimeType);
+        sb.append(", mediaType=");
+        sb.append(mediaType);
+        sb.append(", subType=");
+        sb.append(subType);
+        sb.append(", boundary=");
+        sb.append(boundary);
+        sb.append(", charset=");
+        sb.append(charset);
+        sb.append("]");
+        return sb.toString();
+    }
+
 } 

@@ -21,8 +21,8 @@ package org.apache.james.mime4j.message;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageServiceFactory;
 import org.apache.james.mime4j.dom.MessageWriter;
+import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
-import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
 /**
  * The default MessageBuilderFactory bundled with Mime4j.
@@ -34,7 +34,7 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
 
     private BodyFactory bodyFactory = null;
     private MimeEntityConfig mimeEntityConfig = null;
-    private MutableBodyDescriptorFactory mutableBodyDescriptorFactory = null;
+    private BodyDescriptorBuilder bodyDescriptorBuilder = null;
     private Boolean flatMode = null;
     private Boolean contentDecoding = null;
 
@@ -43,7 +43,7 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
         DefaultMessageBuilder m = new DefaultMessageBuilder();
         if (bodyFactory != null) m.setBodyFactory(bodyFactory);
         if (mimeEntityConfig != null) m.setMimeEntityConfig(mimeEntityConfig);
-        if (mutableBodyDescriptorFactory != null) m.setMutableBodyDescriptorFactory(mutableBodyDescriptorFactory);
+        if (bodyDescriptorBuilder != null) m.setBodyDescriptorBuilder(bodyDescriptorBuilder);
         if (flatMode != null) m.setFlatMode(flatMode.booleanValue());
         if (contentDecoding != null) m.setContentDecoding(contentDecoding.booleanValue());
         return m;
@@ -68,8 +68,8 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
                 return;
             } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a MimeEntityConfig");
         } else if ("MutableBodyDescriptorFactory".equals(name)) {
-            if (value instanceof MutableBodyDescriptorFactory) {
-                this.mutableBodyDescriptorFactory  = (MutableBodyDescriptorFactory) value;
+            if (value instanceof BodyDescriptorBuilder) {
+                this.bodyDescriptorBuilder  = (BodyDescriptorBuilder) value;
                 return;
             } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a MutableBodyDescriptorFactory");
         } else if ("FlatMode".equals(name)) {

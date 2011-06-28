@@ -75,7 +75,7 @@ public class MimeTokenStream {
     private final MimeEntityConfig config;
     private final DecodeMonitor monitor;
     private final FieldBuilder fieldBuilder;
-    private final MutableBodyDescriptorFactory bodyDescFactory;
+    private final BodyDescriptorBuilder bodyDescBuilder;
     private final LinkedList<EntityStateMachine> entities = new LinkedList<EntityStateMachine>();
     
     private EntityState state = EntityState.T_END_OF_STREAM;
@@ -92,7 +92,7 @@ public class MimeTokenStream {
      * a stream that strictly validates the input.
      */
     public MimeTokenStream() {
-        this(new MimeEntityConfig());
+        this(null);
     }
 
     public MimeTokenStream(final MimeEntityConfig config) {
@@ -101,29 +101,30 @@ public class MimeTokenStream {
         
     public MimeTokenStream(
             final MimeEntityConfig config, 
-            final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(config, null, null, bodyDescFactory);
+            final BodyDescriptorBuilder bodyDescBuilder) {
+        this(config, null, null, bodyDescBuilder);
     }
 
     public MimeTokenStream(
             final MimeEntityConfig config, 
             final DecodeMonitor monitor,
-            final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(config, monitor, null, bodyDescFactory);
+            final BodyDescriptorBuilder bodyDescBuilder) {
+        this(config, monitor, null, bodyDescBuilder);
     }
 
     public MimeTokenStream(
             final MimeEntityConfig config, 
             final DecodeMonitor monitor,
             final FieldBuilder fieldBuilder,
-            final MutableBodyDescriptorFactory bodyDescFactory) {
+            final BodyDescriptorBuilder bodyDescBuilder) {
         super();
-        this.config = config;
+        this.config = config != null ? config : new MimeEntityConfig();
         this.fieldBuilder = fieldBuilder != null ? fieldBuilder : 
-            new DefaultFieldBuilder(config.getMaxHeaderLen());
+            new DefaultFieldBuilder(this.config.getMaxHeaderLen());
         this.monitor = monitor != null ? monitor : 
-            (config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
-        this.bodyDescFactory = bodyDescFactory;
+            (this.config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
+        this.bodyDescBuilder = bodyDescBuilder != null ? bodyDescBuilder : 
+            new FallbackBodyDescriptorBuilder();
     }
 
     /** Instructs the {@code MimeTokenStream} to parse the given streams contents.
@@ -131,7 +132,7 @@ public class MimeTokenStream {
      * internal state.
      */
     public void parse(InputStream stream) {
-        doParse(stream, newBodyDescriptor(), EntityState.T_START_MESSAGE);
+        doParse(stream, EntityState.T_START_MESSAGE);
     }
 
     /** 
@@ -149,17 +150,16 @@ public class MimeTokenStream {
             throw new IllegalArgumentException("Content type may not be null");
         }
         Field newContentType;
-        MutableBodyDescriptor newBodyDescriptor = newBodyDescriptor();
         try {
             RawField rawContentType = new RawField("Content-Type", contentType);
-            newContentType = newBodyDescriptor.addField(rawContentType);
+            newContentType = bodyDescBuilder.addField(rawContentType);
             if (newContentType == null) newContentType = rawContentType;
         } catch (MimeException ex) {
             // should never happen
             throw new IllegalArgumentException(ex.getMessage());
         }
         
-        doParse(stream, newBodyDescriptor, EntityState.T_END_HEADER);
+        doParse(stream, EntityState.T_END_HEADER);
         try {
             next();
         } catch (IOException e) {
@@ -172,23 +172,7 @@ public class MimeTokenStream {
         return newContentType;
     }
 
-    /**
-     * Creates a new instance of {@link BodyDescriptor}. Subclasses may override
-     * this in order to create body descriptors, that provide more specific
-     * information.
-     */
-    protected MutableBodyDescriptor newBodyDescriptor() {
-        final MutableBodyDescriptor result;
-        if (bodyDescFactory != null) {
-            result = bodyDescFactory.newInstance(monitor);
-        } else {
-            result = new DefaultBodyDescriptor(null, monitor);
-        }
-        return result;
-    }
-
-    public void doParse(InputStream stream,
-            MutableBodyDescriptor newBodyDescriptor, EntityState start) {
+    private void doParse(InputStream stream, EntityState start) {
         LineNumberSource lineSource = null;
         if (config.isCountLineNumbers()) {
             LineNumberInputStream lineInput = new LineNumberInputStream(stream);
@@ -204,7 +188,7 @@ public class MimeTokenStream {
                 EntityState.T_END_MESSAGE,
                 monitor,
                 fieldBuilder,
-                newBodyDescriptor);
+                bodyDescBuilder);
 
         rootentity.setRecursionMode(recursionMode);
         currentStateMachine = rootentity;

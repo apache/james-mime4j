@@ -19,13 +19,32 @@
 
 package org.apache.james.mime4j.stream;
 
-import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.MimeException;
 
-/**
- * {@link MutableBodyDescriptor} factory.
- */
-public interface MutableBodyDescriptorFactory {
+public interface BodyDescriptorBuilder {
 
-    MutableBodyDescriptor newInstance(DecodeMonitor monitor);
+    /**
+     * Resets the internal state.
+     */
+    void reset();
+
+    /**
+     * Adds a field to the builder updating its internal state. The field
+     * can be transformed as a result of this operation.
+     * @param field the MIME field.
+     *
+     * @return null or an elaborated field representing the same data.
+     */
+    Field addField(RawField field) throws MimeException;
+
+    /**
+     * Builds an instance of {@link BodyDescriptor} based on the internal
+     * state.
+     *
+     * @return body descriptor
+     */
+    BodyDescriptor build();
+
+    BodyDescriptorBuilder newChild();
 
 }

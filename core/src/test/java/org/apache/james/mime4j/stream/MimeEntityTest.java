@@ -51,7 +51,7 @@ public class MimeEntityTest extends TestCase {
 
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream, new DefaultBodyDescriptor());
+                rawstream, new FallbackBodyDescriptorBuilder());
 
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
@@ -127,7 +127,7 @@ public class MimeEntityTest extends TestCase {
 
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream, new DefaultBodyDescriptor());
+                rawstream, new FallbackBodyDescriptorBuilder());
 
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
@@ -211,7 +211,7 @@ public class MimeEntityTest extends TestCase {
 
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream, new DefaultBodyDescriptor());
+                rawstream, new FallbackBodyDescriptorBuilder());
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
@@ -321,7 +321,7 @@ public class MimeEntityTest extends TestCase {
 
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream, new DefaultBodyDescriptor());
+                rawstream, new FallbackBodyDescriptorBuilder());
 
         entity.setRecursionMode(RecursionMode.M_RAW);
 
@@ -416,7 +416,7 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 config,
-                new DefaultBodyDescriptor());
+                new FallbackBodyDescriptorBuilder());
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance(); // advances to T_START_HEADER
@@ -468,7 +468,7 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 config,
-                new DefaultBodyDescriptor());
+                new FallbackBodyDescriptorBuilder());
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
@@ -514,7 +514,7 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 config,
-                new DefaultBodyDescriptor());
+                new FallbackBodyDescriptorBuilder());
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
@@ -563,7 +563,7 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 config,
-                new DefaultBodyDescriptor());
+                new FallbackBodyDescriptorBuilder());
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
@@ -609,7 +609,7 @@ public class MimeEntityTest extends TestCase {
                 lineInput,
                 rawstream,
                 config,
-                new DefaultBodyDescriptor());
+                new FallbackBodyDescriptorBuilder());
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());
         entity.advance();
@@ -666,7 +666,7 @@ public class MimeEntityTest extends TestCase {
 
         MimeEntity entity = new MimeEntity(
                 lineInput,
-                rawstream, fieldBuilder, new DefaultBodyDescriptor());
+                rawstream, fieldBuilder, new FallbackBodyDescriptorBuilder());
 
 
         assertEquals(EntityState.T_START_MESSAGE, entity.getState());

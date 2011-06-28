@@ -19,8 +19,6 @@
 
 package org.apache.james.mime4j.stream;
 
-import java.util.Map;
-
 /**
  * Represents common content properties. 
  */
@@ -72,11 +70,6 @@ public interface ContentDescriptor {
      *   if no transfer-encoding was specified.
      */
     String getTransferEncoding();
-
-    /**
-     * Returns the map of parameters of the content-type header.
-     */
-    Map<String, String> getContentTypeParameters();
 
     /**
      * Returns the body descriptors content-length.

@@ -44,7 +44,7 @@ class MimeEntity implements EntityStateMachine {
     private final MimeEntityConfig config;
     private final DecodeMonitor monitor;
     private final FieldBuilder fieldBuilder;
-    private final MutableBodyDescriptor body;
+    private final BodyDescriptorBuilder bodyDescBuilder;
 
     private final ByteArrayBuffer linebuf;
     private final LineNumberSource lineSource;
@@ -55,6 +55,7 @@ class MimeEntity implements EntityStateMachine {
     private boolean endOfHeader;
     private int headerCount;
     private Field field;
+    private BodyDescriptor body;
 
     private RecursionMode recursionMode;
     private MimeBoundaryInputStream currentMimePartStream;
@@ -70,14 +71,14 @@ class MimeEntity implements EntityStateMachine {
             EntityState endState,
             DecodeMonitor monitor,
             FieldBuilder fieldBuilder,
-            MutableBodyDescriptor body) {
+            BodyDescriptorBuilder bodyDescBuilder) {
         super();
         this.config = config;
         this.state = startState;
         this.endState = endState;
         this.monitor = monitor;
         this.fieldBuilder = fieldBuilder;
-        this.body = body;
+        this.bodyDescBuilder = bodyDescBuilder;
         this.linebuf = new ByteArrayBuffer(64);
         this.lineCount = 0;
         this.endOfHeader = false;
@@ -98,42 +99,46 @@ class MimeEntity implements EntityStateMachine {
             MimeEntityConfig config,
             EntityState startState,
             EntityState endState,
-            MutableBodyDescriptor body) {
+            BodyDescriptorBuilder bodyDescBuilder) {
         this(lineSource, instream, config, startState, endState,
                 config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(config.getMaxHeaderLen()), body);
+                new DefaultFieldBuilder(config.getMaxHeaderLen()), 
+                bodyDescBuilder);
     }
 
     MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
             MimeEntityConfig config,
-            MutableBodyDescriptor body) {
+            BodyDescriptorBuilder bodyDescBuilder) {
         this(lineSource, instream, config,
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(config.getMaxHeaderLen()), body);
+                new DefaultFieldBuilder(config.getMaxHeaderLen()), 
+                bodyDescBuilder);
     }
 
     MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
             FieldBuilder fieldBuilder,
-            MutableBodyDescriptor body) {
+            BodyDescriptorBuilder bodyDescBuilder) {
         this(lineSource, instream, new MimeEntityConfig(),
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
-                fieldBuilder, body);
+                fieldBuilder, 
+                bodyDescBuilder);
     }
 
     MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
-            MutableBodyDescriptor body) {
+            BodyDescriptorBuilder bodyDescBuilder) {
         this(lineSource, instream, new MimeEntityConfig(),
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(-1), body);
+                new DefaultFieldBuilder(-1), 
+                bodyDescBuilder);
     }
 
     public EntityState getState() {
@@ -259,9 +264,8 @@ class MimeEntity implements EntityStateMachine {
                 if (rawfield.getDelimiterIdx() != rawfield.getName().length()) {
                     monitor(Event.OBSOLETE_HEADER);
                 }
-                Field newfield = body.addField(rawfield);
-                if (newfield != null) field = newfield;
-                else field = rawfield;
+                Field parsedField = bodyDescBuilder.addField(rawfield);
+                field = parsedField != null ? parsedField : rawfield;
                 return true;
             } catch (MimeException e) {
                 monitor(Event.INVALID_HEADER);
@@ -287,10 +291,12 @@ class MimeEntity implements EntityStateMachine {
             state = EntityState.T_START_HEADER;
             break;
         case T_START_HEADER:
+            bodyDescBuilder.reset();
         case T_FIELD:
             state = nextField() ? EntityState.T_FIELD : EntityState.T_END_HEADER;
             break;
         case T_END_HEADER:
+            body = bodyDescBuilder.build();
             String mimeType = body.getMimeType();
             if (recursionMode == RecursionMode.M_FLAT) {
                 state = EntityState.T_BODY;
@@ -421,7 +427,7 @@ class MimeEntity implements EntityStateMachine {
                     endState,
                     monitor,
                     fieldBuilder,
-                    body.newChild());
+                    bodyDescBuilder.newChild());
             mimeentity.setRecursionMode(recursionMode);
             return mimeentity;
         }

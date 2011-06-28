@@ -25,11 +25,11 @@ import java.io.InputStream;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
-import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 import org.apache.james.mime4j.stream.RecursionMode;
 
 /**
@@ -65,8 +65,8 @@ public class MimeStreamParser {
             final MimeEntityConfig config, 
             boolean clone,
             final DecodeMonitor monitor,
-            final MutableBodyDescriptorFactory bodyDescFactory) {
-        this(new MimeTokenStream(clone ? config.clone() : config, monitor, bodyDescFactory));
+            final BodyDescriptorBuilder bodyDescBuilder) {
+        this(new MimeTokenStream(clone ? config.clone() : config, monitor, bodyDescBuilder));
     }
 
     public MimeStreamParser(final MimeEntityConfig config, boolean clone) {
@@ -76,9 +76,9 @@ public class MimeStreamParser {
     public MimeStreamParser(
             final MimeEntityConfig config,
             final DecodeMonitor monitor,
-            final MutableBodyDescriptorFactory bodyDescFactory) {
+            final BodyDescriptorBuilder bodyDescBuilder) {
         this(config != null ? config : new MimeEntityConfig(), config != null, 
-                monitor, bodyDescFactory);
+                monitor, bodyDescBuilder);
     }
 
     public MimeStreamParser(final MimeEntityConfig config) {

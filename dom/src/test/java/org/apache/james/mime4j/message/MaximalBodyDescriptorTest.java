@@ -23,15 +23,17 @@ import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 
+import junit.framework.TestCase;
+
 import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.stream.BaseTestForBodyDescriptors;
 import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
-import org.apache.james.mime4j.stream.MutableBodyDescriptor;
+import org.apache.james.mime4j.stream.RawField;
 
-public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
+public class MaximalBodyDescriptorTest extends TestCase {
 
     MimeTokenStream parser;
     
@@ -40,13 +42,147 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         super.setUp();
         MimeEntityConfig config = new MimeEntityConfig();
         config.setStrictParsing(true);
-        parser = new MimeTokenStream(config, 
-                new MaximalBodyDescriptorFactory(null));
+        parser = new MimeTokenStream(config, new DefaultBodyDescriptorBuilder(null));
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    public void testAddField() throws Exception {
+        /*
+         * Make sure that only the first Content-Type header added is used.
+         */
+        BodyDescriptorBuilder builder = new DefaultBodyDescriptorBuilder(); 
+        builder.addField(new RawField("Content-Type ", "text/plain; charset=ISO-8859-1"));
+        BodyDescriptor bd = builder.build();
+        assertEquals("text/plain", bd.getMimeType());
+        assertEquals("ISO-8859-1", bd.getCharset());
+        builder.addField(new RawField("Content-Type ", "text/html; charset=us-ascii"));
+        bd = builder.build();
+        assertEquals("text/plain", bd.getMimeType());
+        assertEquals("ISO-8859-1", bd.getCharset());
+    }
+    
+    public void testGetMimeType() throws Exception {
+        BodyDescriptorBuilder builder = new DefaultBodyDescriptorBuilder(); 
+        builder.addField(new RawField("Content-Type ", "text/PLAIN"));
+        BodyDescriptor bd = builder.build();
+        assertEquals("text/plain", bd.getMimeType());
+        
+        builder.reset();
+        builder.addField(new RawField("content-type", "   TeXt / html   "));
+        bd = builder.build();
+        assertEquals("text/html", bd.getMimeType());
+        
+        builder.reset();
+        builder.addField(new RawField("CONTENT-TYPE", "   x-app/yada ;  param = yada"));
+        bd = builder.build();
+        assertEquals("x-app/yada", bd.getMimeType());
+        
+        builder.reset();
+        builder.addField(new RawField("CONTENT-TYPE", "   yada"));
+        bd = builder.build();
+        assertEquals("text/plain", bd.getMimeType());
+        
+        /*
+         * Make sure that only the first Content-Type header added is used.
+         */
+        builder.reset();
+        builder.addField(new RawField("Content-Type ", "text/plain"));
+        bd = builder.build();
+        assertEquals("text/plain", bd.getMimeType());
+        builder.addField(new RawField("Content-Type ", "text/html"));
+        bd = builder.build();
+        assertEquals("text/plain", bd.getMimeType());
+        
+        /*
+         * Implicit mime types.
+         */
+        BodyDescriptorBuilder parent = new DefaultBodyDescriptorBuilder();
+        parent.addField(new RawField("Content-Type", "mutlipart/alternative; boundary=foo"));
+        BodyDescriptorBuilder child = parent.newChild();
+        bd = child.build();
+        assertEquals("text/plain", bd.getMimeType());
+        child.addField(new RawField("Content-Type", " child/type"));
+        bd = child.build();
+        assertEquals("child/type", bd.getMimeType());
+        
+        parent.reset();
+        parent.addField(new RawField("Content-Type", "multipart/digest; boundary=foo"));
+        
+        child = parent.newChild();
+        bd = child.build();
+        assertEquals("message/rfc822", bd.getMimeType());
+        child.addField(new RawField("Content-Type", " child/type"));
+        bd = child.build();
+        assertEquals("child/type", bd.getMimeType());
+        
+    }
+    
+    public void testParameters() throws Exception {
+        BodyDescriptorBuilder builder = new DefaultBodyDescriptorBuilder(); 
+        /*
+         * Test charset.
+         */
+        BodyDescriptor bd = builder.build();
+        assertEquals("us-ascii", bd.getCharset());
+        builder.addField(new RawField("Content-Type ", "text/type; charset=ISO-8859-1"));
+        bd = builder.build();
+        assertEquals("ISO-8859-1", bd.getCharset());
+        
+        builder.reset();
+        bd = builder.build();
+        assertEquals("us-ascii", bd.getCharset());
+        builder.addField(new RawField("Content-Type ", "text/type"));
+        bd = builder.build();
+        assertEquals("us-ascii", bd.getCharset());
+        
+        /*
+         * Test boundary.
+         */
+        builder.reset();
+        builder.addField(new RawField("Content-Type", "text/html; boundary=yada yada"));
+        bd = builder.build();
+        assertNull(bd.getBoundary());
+
+        builder.reset();
+        builder.addField(new RawField("Content-Type", "multipart/yada; boundary=yada"));
+        bd = builder.build();
+        assertEquals("yada", bd.getBoundary());
+
+        builder.reset();
+        builder.addField(new RawField("Content-Type", "multipart/yada; boUNdarY= \"ya \\\"\\\"\tda \\\"\"; "
+                            + "\tcharset\t =  \"\\\"hepp\\\"  =us\t-ascii\""));
+        bd = builder.build();
+        assertEquals("ya \"\"\tda \"", bd.getBoundary());
+        assertEquals("\"hepp\"  =us\t-ascii", bd.getCharset());
+        
+    }
+    
+    public void testGetContentLength() throws Exception {
+        BodyDescriptorBuilder builder = new DefaultBodyDescriptorBuilder(); 
+        BodyDescriptor bd = builder.build();
+        assertEquals(-1, bd.getContentLength());
+
+        builder.addField(new RawField("Content-Length", "9901"));
+        bd = builder.build();
+        assertEquals(9901, bd.getContentLength());
+
+        // only the first content-length counts
+        builder.addField(new RawField("Content-Length", "1239901"));
+        bd = builder.build();
+        assertEquals(9901, bd.getContentLength());
+    }
+    
+    public void testDoDefaultToUsAsciiWhenUntyped() throws Exception {
+        BodyDescriptorBuilder builder = new DefaultBodyDescriptorBuilder(); 
+        builder.addField(new RawField("To", "me@example.org"));
+        BodyDescriptor bd = builder.build();
+        assertEquals("us-ascii", bd.getCharset());
+    }
+
+    public void testDoNotDefaultToUsAsciiForNonTextTypes() throws Exception {
+        BodyDescriptorBuilder builder = new DefaultBodyDescriptorBuilder(); 
+        builder.addField(new RawField("Content-Type", "image/png; name=blob.png"));
+        BodyDescriptor bd = builder.build();
+        assertNull(bd.getCharset());
     }
 
     public void testMimeVersionDefault() throws Exception {
@@ -185,13 +321,4 @@ public class MaximalBodyDescriptorTest extends BaseTestForBodyDescriptors {
         return (MaximalBodyDescriptor) descriptor;
     }
 
-    @Override
-    protected MutableBodyDescriptor newBodyDescriptor() {
-        return new MaximalBodyDescriptor();
-    }
-
-    @Override
-    protected MutableBodyDescriptor newBodyDescriptor(BodyDescriptor parent) {
-        return new MaximalBodyDescriptor(parent);
-    }
 }

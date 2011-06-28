@@ -39,9 +39,9 @@ import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
-import org.apache.james.mime4j.stream.MutableBodyDescriptorFactory;
 
 /**
  * Utility class for copying message and parsing message elements.
@@ -51,7 +51,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
     private FieldParser<? extends ParsedField> fieldParser = null;
     private BodyFactory bodyFactory = null;
     private MimeEntityConfig config = null;
-    private MutableBodyDescriptorFactory bodyDescFactory = null;
+    private BodyDescriptorBuilder bodyDescBuilder = null;
     private boolean contentDecoding = true;
     private boolean flatMode = false;
     private DecodeMonitor monitor = null;
@@ -72,9 +72,8 @@ public class DefaultMessageBuilder implements MessageBuilder {
         this.config = config;
     }
 
-    public void setMutableBodyDescriptorFactory(
-            final MutableBodyDescriptorFactory bodyDescFactory) {
-        this.bodyDescFactory  = bodyDescFactory;
+    public void setBodyDescriptorBuilder(final BodyDescriptorBuilder bodyDescBuilder) {
+        this.bodyDescBuilder  = bodyDescBuilder;
     }
 
     public void setDecodeMonitor(final DecodeMonitor monitor) {
@@ -295,12 +294,11 @@ public class DefaultMessageBuilder implements MessageBuilder {
             boolean strict = cfg.isStrictParsing();
             DecodeMonitor mon = monitor != null ? monitor : 
                 strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;
-            FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser : 
-                strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser();
-            MutableBodyDescriptorFactory bdf = bodyDescFactory != null ? bodyDescFactory :
-                new MinimalBodyDescriptorFactory(fp);
+            BodyDescriptorBuilder bdb = bodyDescBuilder != null ? bodyDescBuilder :
+                new DefaultBodyDescriptorBuilder(null, fieldParser != null ? fieldParser : 
+                    strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser(), mon);
             BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
-            MimeStreamParser parser = new MimeStreamParser(cfg, mon, bdf);
+            MimeStreamParser parser = new MimeStreamParser(cfg, mon, bdb);
             // EntityBuilder expect the parser will send ParserFields for the well known fields
             // It will throw exceptions, otherwise.
             parser.setContentHandler(new EntityBuilder(message, bf));
