@@ -32,7 +32,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
 public class MultipartTokensTest extends TestCase {
 
     private static final Charset US_ASCII = CharsetUtil.US_ASCII;
-    
+
     private static final String BODY = "A Preamble\r\n" +
                 "--1729\r\n\r\n" +
                 "Simple plain text\r\n" +
@@ -47,7 +47,7 @@ public class MultipartTokensTest extends TestCase {
             "Subject: Mail\r\n" +
             "Content-Type: multipart/mixed;boundary=1729\r\n\r\n" +
             BODY;
-    
+
     public static final String COMPLEX_MESSAGE = "To: Wile E. Cayote <wile@example.org>\r\n" +
     "From: Road Runner <runner@example.org>\r\n" +
     "Date: Tue, 19 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -67,8 +67,8 @@ public class MultipartTokensTest extends TestCase {
     "\r\n" +
     "--42--\r\n" +
     "A little epilogue\r\n";
-    
-    public static final String COMPLEX_QP_MESSAGE = 
+
+    public static final String COMPLEX_QP_MESSAGE =
         "Content-Transfer-Encoding: quoted-printable\r\n" +
         "Content-Type: message/rfc822; charset=us-ascii\r\n" +
         "\r\n" +
@@ -92,9 +92,9 @@ public class MultipartTokensTest extends TestCase {
         "------=3DNextPart--\r\n" +
         "\r\n" +
         "\r\n";
-    
+
     MimeTokenStream parser;
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -105,7 +105,7 @@ public class MultipartTokensTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
+
     public void testShouldParseSimpleMessage() throws Exception {
         parser.parse(new ByteArrayInputStream(US_ASCII.encode(MESSAGE).array()));
         checkState(EntityState.T_START_HEADER);
@@ -133,9 +133,9 @@ public class MultipartTokensTest extends TestCase {
         checkState(EntityState.T_END_MESSAGE);
         checkState(EntityState.T_END_OF_STREAM);
     }
-    
+
     public void testShouldParseMoreComplexMessage() throws Exception {
-        String message = 
+        String message =
             "Content-Type: multipart/alternative; boundary=\"outer-boundary\"\r\n" +
             "\r\n" +
             "--outer-boundary\r\n" +
@@ -149,7 +149,7 @@ public class MultipartTokensTest extends TestCase {
             "\r\n" +
             "foo\r\n" +
             "--outer-boundary--\r\n";
-        
+
         parser.parse(new ByteArrayInputStream(US_ASCII.encode(message).array()));
         checkState(EntityState.T_START_HEADER);
         checkState(EntityState.T_FIELD);
@@ -173,7 +173,7 @@ public class MultipartTokensTest extends TestCase {
         checkState(EntityState.T_END_MESSAGE);
         checkState(EntityState.T_END_OF_STREAM);
     }
-    
+
     public void testShouldParseMessageWithEmbeddedMessage() throws Exception {
         parser.parse(new ByteArrayInputStream(US_ASCII.encode(COMPLEX_MESSAGE).array()));
         checkState(EntityState.T_START_HEADER);
@@ -207,7 +207,7 @@ public class MultipartTokensTest extends TestCase {
                         checkState(EntityState.T_PREAMBLE);
                         checkState(EntityState.T_START_BODYPART);
                             checkState(EntityState.T_START_HEADER);
-                            checkState(EntityState.T_END_HEADER);   
+                            checkState(EntityState.T_END_HEADER);
                             checkState(EntityState.T_BODY);
                         checkState(EntityState.T_END_BODYPART);
                         checkState(EntityState.T_START_BODYPART);
@@ -251,7 +251,7 @@ public class MultipartTokensTest extends TestCase {
         checkState(EntityState.T_BODY);
         assertEquals("text/plain", parser.getBodyDescriptor().getMimeType());
         assertEquals("iso-8859-1", parser.getBodyDescriptor().getCharset());
-        assertEquals("Some text\r\n", 
+        assertEquals("Some text\r\n",
                 IOUtils.toString(parser.getInputStream()));
         checkState(EntityState.T_END_BODYPART);
         checkState(EntityState.T_START_BODYPART);
@@ -261,7 +261,7 @@ public class MultipartTokensTest extends TestCase {
         checkState(EntityState.T_BODY);
         assertEquals("text/html", parser.getBodyDescriptor().getMimeType());
         assertEquals("iso-8859-1", parser.getBodyDescriptor().getCharset());
-        assertEquals("<HTML><BODY>= Some HTML =</BODY></HTML>", 
+        assertEquals("<HTML><BODY>= Some HTML =</BODY></HTML>",
                 IOUtils.toString(parser.getInputStream()));
         checkState(EntityState.T_END_BODYPART);
         checkState(EntityState.T_EPILOGUE);
@@ -270,17 +270,17 @@ public class MultipartTokensTest extends TestCase {
         checkState(EntityState.T_END_MESSAGE);
         checkState(EntityState.T_END_OF_STREAM);
     }
-    
+
     public void testMultipartMessageWithoutHeader() throws Exception {
-        parser.parseHeadless(new ByteArrayInputStream(US_ASCII.encode(BODY).array()), 
+        parser.parseHeadless(new ByteArrayInputStream(US_ASCII.encode(BODY).array()),
                 "multipart/mixed;boundary=1729");
         // see https://issues.apache.org/jira/browse/MIME4J-153
         // checkState(EntityStates.T_END_HEADER);
-        
+
         // see https://issues.apache.org/jira/browse/MIME4J-153
         // checkState(EntityStates.T_START_MULTIPART);
-        
-        // actually T_START_MULTIPART is the first state, but the 
+
+        // actually T_START_MULTIPART is the first state, but the
         // checkState method calls next() before checking.
         checkState(EntityState.T_PREAMBLE);
         checkState(EntityState.T_START_BODYPART);
@@ -299,7 +299,7 @@ public class MultipartTokensTest extends TestCase {
         checkState(EntityState.T_END_MESSAGE);
         checkState(EntityState.T_END_OF_STREAM);
     }
-    
+
     private void checkState(final EntityState state) throws IOException, MimeException {
         assertEquals(MimeTokenStream.stateToString(state), MimeTokenStream.stateToString(parser.next()));
     }

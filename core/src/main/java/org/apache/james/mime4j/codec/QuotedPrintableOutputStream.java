@@ -25,16 +25,16 @@ import java.io.OutputStream;
 
 /**
  * Performs Quoted-Printable encoding on an underlying stream.
- * 
+ *
  * Encodes every "required" char plus the dot ".". We encode the dot
  * by default because this is a workaround for some "filter"/"antivirus"
  * "old mua" having issues with dots at the beginning or the end of a
  * qp encode line (maybe a bad dot-destuffing algo).
  */
 public class QuotedPrintableOutputStream extends FilterOutputStream {
-    
+
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 3;
-    
+
     private static final byte TB = 0x09;
     private static final byte SP = 0x20;
     private static final byte EQ = 0x3D;
@@ -49,7 +49,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
 
     private final byte[] outBuffer;
     private final boolean binary;
-    
+
     private boolean pendingSpace;
     private boolean pendingTab;
     private boolean pendingCR;
@@ -59,7 +59,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
     private boolean closed = false;
 
     private byte[] singleByte = new byte[1];
-    
+
     public QuotedPrintableOutputStream(int bufsize, OutputStream out, boolean binary) {
         super(out);
         this.outBuffer = new byte[bufsize];
@@ -74,18 +74,18 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
     public QuotedPrintableOutputStream(OutputStream out, boolean binary) {
         this(DEFAULT_BUFFER_SIZE, out, binary);
     }
-    
+
     private void encodeChunk(byte[] buffer, int off, int len) throws IOException {
         for (int inputIndex = off; inputIndex < len + off; inputIndex++) {
             encode(buffer[inputIndex]);
         }
     }
-    
+
     private void completeEncoding() throws IOException {
         writePending();
         flushOutput();
     }
-    
+
     private void writePending() throws IOException {
         if (pendingSpace) {
             plain(SP);
@@ -96,13 +96,13 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
         }
         clearPending();
     }
-    
+
     private void clearPending() throws IOException {
         pendingSpace  = false;
         pendingTab = false;
         pendingCR = false;
     }
-    
+
     private void encode(byte next) throws IOException {
         if (next == LF) {
             if (binary) {
@@ -110,7 +110,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
                 escape(next);
             } else {
                 if (pendingCR) {
-                    // Expect either space or tab pending 
+                    // Expect either space or tab pending
                     // but not both
                     if (pendingSpace) {
                         escape(SP);
@@ -155,35 +155,35 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
             }
         }
     }
-    
+
     private void plain(byte next) throws IOException {
         if (--nextSoftBreak <= 1) {
             softBreak();
         }
         write(next);
     }
-    
+
     private void escape(byte next) throws IOException {
         if (--nextSoftBreak <= QUOTED_PRINTABLE_OCTETS_PER_ESCAPE) {
             softBreak();
         }
-        
+
         int nextUnsigned = next & 0xff;
-        
+
         write(EQ);
         --nextSoftBreak;
         write(HEX_DIGITS[nextUnsigned >> 4]);
         --nextSoftBreak;
         write(HEX_DIGITS[nextUnsigned % 0x10]);
     }
-    
+
     private void write(byte next) throws IOException {
         outBuffer[outputIndex++] = next;
         if (outputIndex >= outBuffer.length) {
             flushOutput();
         }
     }
-    
+
     private void softBreak() throws IOException {
         write(EQ);
         lineBreak();
@@ -194,7 +194,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
         write(LF);
         nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH;
     }
-    
+
     void flushOutput() throws IOException {
         if (outputIndex < outBuffer.length) {
             out.write(outBuffer, 0, outputIndex);
@@ -203,7 +203,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
         }
         outputIndex = 0;
     }
-    
+
     @Override
     public void close() throws IOException {
         if (closed)

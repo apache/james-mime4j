@@ -33,7 +33,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
 public class MultipartStreamTest extends TestCase {
 
     private static final Charset US_ASCII = CharsetUtil.US_ASCII;
-    
+
     private static final String BODY = "A Preamble\r\n" +
                 "--1729\r\n\r\n" +
                 "Simple plain text\r\n" +
@@ -47,7 +47,7 @@ public class MultipartStreamTest extends TestCase {
             "Subject: Mail\r\n" +
             "Content-Type: multipart/mixed;boundary=1729\r\n\r\n" +
             BODY;
-    
+
     public static final String COMPLEX_MESSAGE = "To: Wile E. Cayote <wile@example.org>\r\n" +
     "From: Road Runner <runner@example.org>\r\n" +
     "Date: Tue, 19 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -66,9 +66,9 @@ public class MultipartStreamTest extends TestCase {
     "Custard!" +
     "\r\n" +
     "--42--\r\n";
-    
+
     MimeTokenStream parser;
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -79,7 +79,7 @@ public class MultipartStreamTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
+
     public void testShouldSupplyInputStreamForSimpleBody() throws Exception {
         parser.parse(new ByteArrayInputStream(US_ASCII.encode(MESSAGE).array()));
         checkState(EntityState.T_START_HEADER);
@@ -94,7 +94,7 @@ public class MultipartStreamTest extends TestCase {
         assertEquals(BODY, IOUtils.toString(out, "us-ascii"));
         checkState(EntityState.T_END_MULTIPART);
     }
-    
+
     public void testInputStreamShouldReadOnlyMessage() throws Exception {
         parser.parse(new ByteArrayInputStream(US_ASCII.encode(COMPLEX_MESSAGE).array()));
         checkState(EntityState.T_START_HEADER);

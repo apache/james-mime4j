@@ -28,7 +28,7 @@ import org.apache.james.mime4j.ExampleMail;
 public class MimeStreamTokenMessageRfc822Test extends TestCase {
 
     MimeTokenStream stream;
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -40,7 +40,7 @@ public class MimeStreamTokenMessageRfc822Test extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
+
     public void testShouldParseMessageRFC822CorrectWithDefaultConfiguration() throws Exception {
         nextIs(EntityState.T_START_HEADER);
         nextIs(EntityState.T_FIELD);
@@ -62,7 +62,7 @@ public class MimeStreamTokenMessageRfc822Test extends TestCase {
         nextIs(EntityState.T_END_MESSAGE);
         nextIs(EntityState.T_END_OF_STREAM);
     }
-    
+
     public void testShouldParseMessageRFC822CorrectWithNoRecurse() throws Exception {
         stream.setRecursionMode(RecursionMode.M_NO_RECURSE);
         nextIs(EntityState.T_START_HEADER);
@@ -77,7 +77,7 @@ public class MimeStreamTokenMessageRfc822Test extends TestCase {
         nextIs(EntityState.T_END_MESSAGE);
         nextIs(EntityState.T_END_OF_STREAM);
     }
-    
+
     public void testShouldParseMessageRFC822CorrectWithFlat() throws Exception {
         stream.setRecursionMode(RecursionMode.M_FLAT);
         nextIs(EntityState.T_START_HEADER);
@@ -92,7 +92,7 @@ public class MimeStreamTokenMessageRfc822Test extends TestCase {
         nextIs(EntityState.T_END_MESSAGE);
         nextIs(EntityState.T_END_OF_STREAM);
     }
-    
+
     private void nextIs(EntityState state) throws Exception {
         assertEquals(MimeTokenStream.stateToString(state), MimeTokenStream.stateToString(stream.next()));
     }

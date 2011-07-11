@@ -102,7 +102,7 @@ class MimeEntity implements EntityStateMachine {
             BodyDescriptorBuilder bodyDescBuilder) {
         this(lineSource, instream, config, startState, endState,
                 config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(config.getMaxHeaderLen()), 
+                new DefaultFieldBuilder(config.getMaxHeaderLen()),
                 bodyDescBuilder);
     }
 
@@ -114,7 +114,7 @@ class MimeEntity implements EntityStateMachine {
         this(lineSource, instream, config,
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(config.getMaxHeaderLen()), 
+                new DefaultFieldBuilder(config.getMaxHeaderLen()),
                 bodyDescBuilder);
     }
 
@@ -126,7 +126,7 @@ class MimeEntity implements EntityStateMachine {
         this(lineSource, instream, new MimeEntityConfig(),
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
-                fieldBuilder, 
+                fieldBuilder,
                 bodyDescBuilder);
     }
 
@@ -137,7 +137,7 @@ class MimeEntity implements EntityStateMachine {
         this(lineSource, instream, new MimeEntityConfig(),
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(-1), 
+                new DefaultFieldBuilder(-1),
                 bodyDescBuilder);
     }
 

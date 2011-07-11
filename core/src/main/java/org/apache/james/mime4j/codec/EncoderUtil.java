@@ -95,7 +95,7 @@ public class EncoderUtil {
      * href='http://www.faqs.org/rfcs/rfc5322.html'>RFC 5322</a> section 3.4
      * and <a href='http://www.faqs.org/rfcs/rfc2047.html'>RFC 2047</a> section
      * 5.3. The specified string should not be folded.
-     * 
+     *
      * @param displayName
      *            display-name to encode.
      * @return encoded display-name.
@@ -121,7 +121,7 @@ public class EncoderUtil {
      * 5322 section 3.4.1. Leading and trailing CFWS should have been removed
      * before calling this method. The specified string should not contain any
      * illegal (control or non-ASCII) characters.
-     * 
+     *
      * @param localPart
      *            the local part to encode
      * @return the encoded local part.
@@ -142,7 +142,7 @@ public class EncoderUtil {
      * Encodes the specified strings into a header parameter as described in RFC
      * 2045 section 5.1 and RFC 2183 section 2. The specified strings should not
      * contain any illegal (control or non-ASCII) characters.
-     * 
+     *
      * @param name
      *            parameter name.
      * @param value
@@ -163,7 +163,7 @@ public class EncoderUtil {
     /**
      * Shortcut method that encodes the specified text into an encoded-word if
      * the text has to be encoded.
-     * 
+     *
      * @param text
      *            text to encode.
      * @param usage
@@ -188,7 +188,7 @@ public class EncoderUtil {
      * fall into the printable ASCII character set or if the text contains a
      * 'word' (sequence of non-whitespace characters) longer than 77 characters
      * (including characters already used up in the line).
-     * 
+     *
      * @param text
      *            text to analyze.
      * @param usedCharacters
@@ -238,7 +238,7 @@ public class EncoderUtil {
      * <p>
      * This method assumes that zero characters have already been used up in the
      * current line.
-     * 
+     *
      * @param text
      *            text to encode.
      * @param usage
@@ -259,7 +259,7 @@ public class EncoderUtil {
      * <p>
      * The charset to encode the specified text into a byte array and the
      * encoding to use for the encoded-word are detected automatically.
-     * 
+     *
      * @param text
      *            text to encode.
      * @param usage
@@ -280,7 +280,7 @@ public class EncoderUtil {
      * Encodes the specified text into an encoded word or a sequence of encoded
      * words separated by space. The text is separated into a sequence of
      * encoded words if it does not fit in a single one.
-     * 
+     *
      * @param text
      *            text to encode.
      * @param usage
@@ -327,7 +327,7 @@ public class EncoderUtil {
     /**
      * Encodes the specified byte array using the B encoding defined in RFC
      * 2047.
-     * 
+     *
      * @param bytes
      *            byte array to encode.
      * @return encoded string.
@@ -367,7 +367,7 @@ public class EncoderUtil {
     /**
      * Encodes the specified byte array using the Q encoding defined in RFC
      * 2047.
-     * 
+     *
      * @param bytes
      *            byte array to encode.
      * @param usage
@@ -401,7 +401,7 @@ public class EncoderUtil {
     /**
      * Tests whether the specified string is a token as defined in RFC 2045
      * section 5.1.
-     * 
+     *
      * @param str
      *            string to test.
      * @return <code>true</code> if the specified string is a RFC 2045 token,

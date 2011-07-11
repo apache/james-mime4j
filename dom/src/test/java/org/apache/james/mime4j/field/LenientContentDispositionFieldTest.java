@@ -37,7 +37,7 @@ public class LenientContentDispositionFieldTest extends TestCase {
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return ContentDispositionFieldLenientImpl.PARSER.parse(rawField, null);
     }
-    
+
     public void testDispositionTypeWithSemiColonNoParams() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: inline;");
         assertEquals("inline", f.getDispositionType());

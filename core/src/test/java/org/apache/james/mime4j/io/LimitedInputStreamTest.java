@@ -52,5 +52,5 @@ public class LimitedInputStreamTest extends TestCase {
         } catch (IOException ex) {
         }
     }
-    
+
 }

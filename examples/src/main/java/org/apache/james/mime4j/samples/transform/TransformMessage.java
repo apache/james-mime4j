@@ -67,7 +67,7 @@ public class TransformMessage {
         Message transformed = transform(template);
 
         MessageWriter writer = new DefaultMessageWriter();
-        
+
         // Print transformed message.
         System.out.println("\n\nTransformed message:\n--------------------\n");
         writer.writeMessage(transformed, System.out);

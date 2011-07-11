@@ -36,31 +36,31 @@ public class ContentTransferEncodingFieldTest extends TestCase {
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return ContentTransferEncodingFieldImpl.PARSER.parse(rawField, null);
     }
-    
+
     public void testGetEncoding() throws Exception {
         ContentTransferEncodingField f = parse("Content-Transfer-Encoding: 8bit");
         assertEquals("8bit", f.getEncoding());
-        
+
         f = parse("Content-Transfer-Encoding:    BaSE64   ");
         assertEquals("base64", f.getEncoding());
-        
+
         f = parse("Content-Transfer-Encoding:       ");
         assertEquals("", f.getEncoding());
-        
+
         f = parse("Content-Transfer-Encoding:");
         assertEquals("", f.getEncoding());
     }
-    
+
     public void testGetEncodingStatic() throws Exception {
         ContentTransferEncodingField f = parse("Content-Transfer-Encoding: 8bit");
         assertEquals("8bit", ContentTransferEncodingFieldImpl.getEncoding(f));
-        
+
         f = null;
         assertEquals("7bit", ContentTransferEncodingFieldImpl.getEncoding(f));
-        
+
         f = parse("Content-Transfer-Encoding:       ");
         assertEquals("7bit", ContentTransferEncodingFieldImpl.getEncoding(f));
-        
+
         f = parse("Content-Transfer-Encoding:");
         assertEquals("7bit", ContentTransferEncodingFieldImpl.getEncoding(f));
     }

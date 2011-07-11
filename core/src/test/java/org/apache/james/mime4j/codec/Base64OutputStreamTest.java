@@ -31,7 +31,7 @@ public class Base64OutputStreamTest extends TestCase {
     public void testEncode() throws IOException {
         ByteArrayOutputStream bos = null;
         Base64OutputStream encoder = null;
-        
+
         /*
          * Simple initial test.
          */
@@ -45,7 +45,7 @@ public class Base64OutputStreamTest extends TestCase {
     public void testEncodeUnderlyingStreamStaysOpen() throws IOException {
         ByteArrayOutputStream bos = null;
         Base64OutputStream encoder = null;
-        
+
         bos = new ByteArrayOutputStream();
         encoder = new Base64OutputStream(bos);
         encoder.write(fromString("This is the plain text message!"));
@@ -56,7 +56,7 @@ public class Base64OutputStreamTest extends TestCase {
             fail();
         } catch (IOException expected) {
         }
-        
+
         bos.write('y');
         bos.write('a');
         bos.write('d');
@@ -196,7 +196,7 @@ public class Base64OutputStreamTest extends TestCase {
 
         return toString(b.toByteArray());
     }
-        
+
     private byte[] fromString(String s) {
         try {
             return s.getBytes("US-ASCII");
@@ -205,7 +205,7 @@ public class Base64OutputStreamTest extends TestCase {
             return null;
         }
     }
-    
+
     private String toString(byte[] b) {
         try {
             return new String(b, "US-ASCII");

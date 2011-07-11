@@ -38,21 +38,21 @@ import org.apache.james.mime4j.stream.RawField;
  */
 public abstract class SimpleContentHandler extends AbstractContentHandler {
 
-    private final FieldParser<? extends ParsedField> fieldParser; 
+    private final FieldParser<? extends ParsedField> fieldParser;
     private final DecodeMonitor monitor;
-    
+
     public SimpleContentHandler(
-            final FieldParser<? extends ParsedField> fieldParser, 
+            final FieldParser<? extends ParsedField> fieldParser,
             final DecodeMonitor monitor) {
         super();
         this.fieldParser = fieldParser != null ? fieldParser : LenientFieldParser.getParser();
         this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
     }
-    
+
     public SimpleContentHandler() {
         this(null, null);
     }
-    
+
     /**
      * Called after headers are parsed.
      */

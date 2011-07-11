@@ -62,7 +62,7 @@ public class MessageTest extends TestCase {
         headerEmpty = new HeaderImpl();
         headerMultipartMixed = new HeaderImpl();
         headerMultipartDigest = new HeaderImpl();
-        
+
         headerTextPlain.addField(
                 DefaultFieldParser.parse("Content-Type: text/plain"));
         headerMessageRFC822.addField(
@@ -76,67 +76,67 @@ public class MessageTest extends TestCase {
     public void testGetMimeType() {
         MessageImpl parent = null;
         MessageImpl child = null;
-        
+
         parent = new MessageImpl();
         child = new MessageImpl();
         child.setParent(parent);
         parent.setHeader(headerMultipartDigest);
         child.setHeader(headerEmpty);
-        assertEquals("multipart/digest, empty", "message/rfc822", 
+        assertEquals("multipart/digest, empty", "message/rfc822",
                 child.getMimeType());
         child.setHeader(headerTextPlain);
-        assertEquals("multipart/digest, text/plain", "text/plain", 
+        assertEquals("multipart/digest, text/plain", "text/plain",
                 child.getMimeType());
         child.setHeader(headerMessageRFC822);
-        assertEquals("multipart/digest, message/rfc822", "message/rfc822", 
+        assertEquals("multipart/digest, message/rfc822", "message/rfc822",
                 child.getMimeType());
-        
+
         parent = new MessageImpl();
         child = new MessageImpl();
         child.setParent(parent);
         parent.setHeader(headerMultipartMixed);
         child.setHeader(headerEmpty);
-        assertEquals("multipart/mixed, empty", "text/plain", 
+        assertEquals("multipart/mixed, empty", "text/plain",
                 child.getMimeType());
         child.setHeader(headerTextPlain);
-        assertEquals("multipart/mixed, text/plain", "text/plain", 
+        assertEquals("multipart/mixed, text/plain", "text/plain",
                 child.getMimeType());
         child.setHeader(headerMessageRFC822);
-        assertEquals("multipart/mixed, message/rfc822", "message/rfc822", 
+        assertEquals("multipart/mixed, message/rfc822", "message/rfc822",
                 child.getMimeType());
-        
+
         child = new MessageImpl();
         child.setHeader(headerEmpty);
         assertEquals("null, empty", "text/plain", child.getMimeType());
         child.setHeader(headerTextPlain);
         assertEquals("null, text/plain", "text/plain", child.getMimeType());
         child.setHeader(headerMessageRFC822);
-        assertEquals("null, message/rfc822", "message/rfc822", 
+        assertEquals("null, message/rfc822", "message/rfc822",
                 child.getMimeType());
     }
 
     public void testIsMultipart() {
         MessageImpl m = new MessageImpl();
-        
+
         m.setHeader(headerEmpty);
         assertTrue("empty", !m.isMultipart());
-        
+
         m.setHeader(headerTextPlain);
         assertTrue("text/plain", !m.isMultipart());
-        
+
         m.setHeader(headerMultipartDigest);
         assertTrue("multipart/digest", m.isMultipart());
-        
+
         m.setHeader(headerMultipartMixed);
         assertTrue("multipart/mixed", m.isMultipart());
     }
-    
+
     public void testWriteTo() throws Exception {
         byte[] inputByte = getRawMessageAsByteArray();
 
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         DefaultMessageWriter writer = new DefaultMessageWriter();
-        
+
         Message m = builder.parseMessage(new ByteArrayInputStream(inputByte));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
@@ -161,7 +161,7 @@ public class MessageTest extends TestCase {
 
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         DefaultMessageWriter writer = new DefaultMessageWriter();
-        
+
         Message m = builder.parseMessage(new ByteArrayInputStream(inputByte));
         m.getHeader().addField(DefaultFieldParser.parse(testheader));
 

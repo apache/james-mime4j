@@ -32,7 +32,7 @@ import java.util.TimeZone;
  * A utility class, which provides some MIME related application logic.
  */
 public final class MimeUtil {
-    
+
     /**
      * The <code>quoted-printable</code> encoding.
      */
@@ -56,7 +56,7 @@ public final class MimeUtil {
 
     // used to create unique ids
     private static final Random random = new Random();
-    
+
     // used to create unique ids
     private static int counter = 0;
 
@@ -64,7 +64,7 @@ public final class MimeUtil {
         // this is an utility class to be used statically.
         // this constructor protect from instantiation.
     }
-    
+
     /**
      * Returns, whether the given two MIME types are identical.
      */
@@ -73,7 +73,7 @@ public final class MimeUtil {
     }
 
     /**
-     * Returns true, if the given MIME type is that of a message. 
+     * Returns true, if the given MIME type is that of a message.
      */
     public static boolean isMessage(String pMimeType) {
         return pMimeType != null  &&  pMimeType.equalsIgnoreCase("message/rfc822");
@@ -103,7 +103,7 @@ public final class MimeUtil {
     /**
      * Creates a new unique message boundary string that can be used as boundary
      * parameter for the Content-Type header field of a message.
-     * 
+     *
      * @return a new unique message boundary string.
      */
     /* TODO - From rfc2045:
@@ -135,9 +135,9 @@ public final class MimeUtil {
      * header field such as Message-ID or In-Reply-To. If the given host name is
      * not <code>null</code> it will be used as suffix for the message ID
      * (following an at sign).
-     * 
+     *
      * The resulting string is enclosed in angle brackets (&lt; and &gt;);
-     * 
+     *
      * @param hostName host name to be included in the message ID or
      *            <code>null</code> if no host name should be included.
      * @return a new unique message identifier.
@@ -159,7 +159,7 @@ public final class MimeUtil {
 
     /**
      * Formats the specified date into a RFC 822 date-time string.
-     * 
+     *
      * @param date
      *            date to be formatted into a string.
      * @param zone
@@ -187,7 +187,7 @@ public final class MimeUtil {
      * longer than 76 characters a line break is inserted at the whitespace
      * character following the sequence resulting in a line longer than 76
      * characters.
-     * 
+     *
      * @param s
      *            string to split.
      * @param usedCharacters
@@ -226,7 +226,7 @@ public final class MimeUtil {
 
     /**
      * Unfold a multiple-line representation into a single line.
-     * 
+     *
      * @param s
      *            string to unfold.
      * @return unfolded string.

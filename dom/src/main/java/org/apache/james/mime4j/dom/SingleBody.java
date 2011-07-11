@@ -54,7 +54,7 @@ public abstract class SingleBody implements Body {
 
     /**
      * Gets a <code>InputStream</code> which reads the bytes of the body.
-     * 
+     *
      * @return the stream, transfer decoded
      * @throws IOException
      *             on I/O errors.
@@ -65,7 +65,7 @@ public abstract class SingleBody implements Body {
      * Writes this single body to the given stream. The default implementation copies
      * the input stream obtained by {@link #getInputStream()} to the specified output
      * stream. May be overwritten by a subclass to improve performance.
-     * 
+     *
      * @param out
      *            the stream to write to.
      * @throws IOException
@@ -98,7 +98,7 @@ public abstract class SingleBody implements Body {
      * <p>
      * This implementation always throws an
      * <code>UnsupportedOperationException</code>.
-     * 
+     *
      * @return a copy of this <code>SingleBody</code>.
      * @throws UnsupportedOperationException
      *             if the <code>copy</code> operation is not supported by this
@@ -112,16 +112,16 @@ public abstract class SingleBody implements Body {
      * Subclasses should override this method if they have allocated resources
      * that need to be freed explicitly (e.g. cannot be simply reclaimed by the
      * garbage collector).
-     * 
+     *
      * The default implementation of this method does nothing.
-     * 
+     *
      * @see org.apache.james.mime4j.dom.Disposable#dispose()
      */
     public void dispose() {
     }
 
     static final int DEFAULT_ENCODING_BUFFER_SIZE = 1024;
-    
+
     /**
      * Copies the contents of one stream to the other.
      * @param in not null

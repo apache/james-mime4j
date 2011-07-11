@@ -37,7 +37,7 @@ import org.apache.james.mime4j.stream.RawFieldParser;
  * Represents a <code>Content-Type</code> field.
  */
 public class ContentTypeFieldLenientImpl extends AbstractField implements ContentTypeField {
-    
+
     private boolean parsed = false;
 
     private String mimeType = null;
@@ -145,11 +145,11 @@ public class ContentTypeFieldLenientImpl extends AbstractField implements Conten
     }
 
     public static final FieldParser<ContentTypeField> PARSER = new FieldParser<ContentTypeField>() {
-        
+
         public ContentTypeField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentTypeFieldLenientImpl(rawField, monitor);
         }
-        
+
     };
 
 }

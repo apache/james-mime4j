@@ -28,7 +28,7 @@ import org.apache.james.mime4j.stream.Field;
  * Defines the API to write Message and other DOM objects to an output stream.
  */
 public interface MessageWriter {
-    
+
     void writeMessage(Message message, OutputStream out) throws IOException;
 
     void writeBody(Body body, OutputStream out) throws IOException;
@@ -36,7 +36,7 @@ public interface MessageWriter {
     void writeEntity(Entity entity, OutputStream out) throws IOException;
 
     void writeMultipart(Multipart multipart, OutputStream out) throws IOException;
-    
+
     void writeField(Field field, OutputStream out) throws IOException;
 
     void writeHeader(Header header, OutputStream out) throws IOException;

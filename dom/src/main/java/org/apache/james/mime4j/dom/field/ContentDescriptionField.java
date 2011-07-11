@@ -23,7 +23,7 @@ public interface ContentDescriptionField extends ParsedField {
 
     /**
      * Gets the content description defined in this field.
-     * 
+     *
      * @return the content description or <code>null</code> if not set.
      */
     String getDescription();

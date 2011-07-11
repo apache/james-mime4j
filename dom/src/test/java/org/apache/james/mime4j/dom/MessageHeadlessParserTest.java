@@ -34,33 +34,13 @@ import org.apache.james.mime4j.stream.MimeEntityConfig;
 public class MessageHeadlessParserTest extends TestCase {
 
 
-	public void testMalformedHeaderShouldEndHeader() throws Exception {
-		String headlessContent = "Subject: my subject\r\n"
-			    + "Hi, how are you?\r\n"
-				+ "This is a simple message with no CRLFCELF between headers and body.\r\n"
-				+ "ThisIsNotAnHeader: because this should be already in the body\r\n"
-				+ "\r\n"
-				+ "Instead this should be better parsed as a text/plain body\r\n";
-
-		MimeEntityConfig config = new MimeEntityConfig();
-		config.setMalformedHeaderStartsBody(true);
-        DefaultMessageBuilder builder = new DefaultMessageBuilder();
-        builder.setMimeEntityConfig(config);
-		Message message = builder.parseMessage(
-		        new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
-		assertEquals("text/plain", message.getMimeType());
-		assertEquals(1, message.getHeader().getFields().size());
-		BufferedReader reader = new BufferedReader(((TextBody) message.getBody()).getReader());
-		String firstLine = reader.readLine();
-		assertEquals("Hi, how are you?", firstLine);
-	}
-
-	public void testSimpleNonMimeTextHeadless() throws Exception {
-		String headlessContent = "Hi, how are you?\r\n"
-				+ "This is a simple message with no headers. While mime messages should start with\r\n"
-				+ "header: headervalue\r\n"
-				+ "\r\n"
-				+ "Instead this should be better parsed as a text/plain body\r\n";
+    public void testMalformedHeaderShouldEndHeader() throws Exception {
+        String headlessContent = "Subject: my subject\r\n"
+                + "Hi, how are you?\r\n"
+                + "This is a simple message with no CRLFCELF between headers and body.\r\n"
+                + "ThisIsNotAnHeader: because this should be already in the body\r\n"
+                + "\r\n"
+                + "Instead this should be better parsed as a text/plain body\r\n";
 
         MimeEntityConfig config = new MimeEntityConfig();
         config.setMalformedHeaderStartsBody(true);
@@ -68,42 +48,62 @@ public class MessageHeadlessParserTest extends TestCase {
         builder.setMimeEntityConfig(config);
         Message message = builder.parseMessage(
                 new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
-		assertEquals("text/plain", message.getMimeType());
-		assertEquals(0, message.getHeader().getFields().size());
-		BufferedReader reader = new BufferedReader(((TextBody) message.getBody()).getReader());
-		String firstLine = reader.readLine();
-		assertEquals("Hi, how are you?", firstLine);
-	}
+        assertEquals("text/plain", message.getMimeType());
+        assertEquals(1, message.getHeader().getFields().size());
+        BufferedReader reader = new BufferedReader(((TextBody) message.getBody()).getReader());
+        String firstLine = reader.readLine();
+        assertEquals("Hi, how are you?", firstLine);
+    }
 
-	public void testMultipartFormContent() throws Exception {
-		String contentType = "multipart/form-data; boundary=foo";
-		String headlessContent = "\r\n"
-				+ "--foo\r\nContent-Disposition: form-data; name=\"field01\""
-				+ "\r\n"
-				+ "\r\n"
-				+ "this stuff\r\n"
-				+ "--foo\r\n"
-				+ "Content-Disposition: form-data; name=\"field02\"\r\n"
-				+ "\r\n"
-				+ "that stuff\r\n"
-				+ "--foo\r\n"
-				+ "Content-Disposition: form-data; name=\"field03\"; filename=\"mypic.jpg\"\r\n"
-				+ "Content-Type: image/jpeg\r\n" + "\r\n"
-				+ "all kind of stuff\r\n" + "--foo--\r\n";
+    public void testSimpleNonMimeTextHeadless() throws Exception {
+        String headlessContent = "Hi, how are you?\r\n"
+                + "This is a simple message with no headers. While mime messages should start with\r\n"
+                + "header: headervalue\r\n"
+                + "\r\n"
+                + "Instead this should be better parsed as a text/plain body\r\n";
 
-		MimeEntityConfig config = new MimeEntityConfig();
-		config.setHeadlessParsing(contentType);
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setMalformedHeaderStartsBody(true);
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        builder.setMimeEntityConfig(config);
+        Message message = builder.parseMessage(
+                new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
+        assertEquals("text/plain", message.getMimeType());
+        assertEquals(0, message.getHeader().getFields().size());
+        BufferedReader reader = new BufferedReader(((TextBody) message.getBody()).getReader());
+        String firstLine = reader.readLine();
+        assertEquals("Hi, how are you?", firstLine);
+    }
+
+    public void testMultipartFormContent() throws Exception {
+        String contentType = "multipart/form-data; boundary=foo";
+        String headlessContent = "\r\n"
+                + "--foo\r\nContent-Disposition: form-data; name=\"field01\""
+                + "\r\n"
+                + "\r\n"
+                + "this stuff\r\n"
+                + "--foo\r\n"
+                + "Content-Disposition: form-data; name=\"field02\"\r\n"
+                + "\r\n"
+                + "that stuff\r\n"
+                + "--foo\r\n"
+                + "Content-Disposition: form-data; name=\"field03\"; filename=\"mypic.jpg\"\r\n"
+                + "Content-Type: image/jpeg\r\n" + "\r\n"
+                + "all kind of stuff\r\n" + "--foo--\r\n";
+
+        MimeEntityConfig config = new MimeEntityConfig();
+        config.setHeadlessParsing(contentType);
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
 
-		Message message = builder.parseMessage(
-		        new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
-		assertEquals("multipart/form-data", message.getMimeType());
-		assertEquals(1, message.getHeader().getFields().size());
-		ContentTypeField contentTypeField = ((ContentTypeField) message
-				.getHeader().getField(FieldName.CONTENT_TYPE));
-		assertEquals("foo", contentTypeField.getBoundary());
-		Multipart multipart = (Multipart) message.getBody();
-		assertEquals(3, multipart.getCount());
-	}
+        Message message = builder.parseMessage(
+                new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
+        assertEquals("multipart/form-data", message.getMimeType());
+        assertEquals(1, message.getHeader().getFields().size());
+        ContentTypeField contentTypeField = ((ContentTypeField) message
+                .getHeader().getField(FieldName.CONTENT_TYPE));
+        assertEquals("foo", contentTypeField.getBoundary());
+        Multipart multipart = (Multipart) message.getBody();
+        assertEquals(3, multipart.getCount());
+    }
 }

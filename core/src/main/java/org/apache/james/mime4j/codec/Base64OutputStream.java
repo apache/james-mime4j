@@ -31,7 +31,7 @@ import java.util.Set;
  * Format of Internet Message Bodies</cite> by Freed and Borenstein.
  * <p>
  * Code is based on Base64 and Base64OutputStream code from Commons-Codec 1.4.
- * 
+ *
  * @see <a href="http://www.ietf.org/rfc/rfc2045.txt">RFC 2045</a>
  */
 public class Base64OutputStream extends FilterOutputStream {
@@ -90,7 +90,7 @@ public class Base64OutputStream extends FilterOutputStream {
      * Creates a <code>Base64OutputStream</code> that writes the encoded data
      * to the given output stream using the default line length (76) and line
      * separator (CRLF).
-     * 
+     *
      * @param out
      *            underlying output stream.
      */
@@ -105,7 +105,7 @@ public class Base64OutputStream extends FilterOutputStream {
      * <p>
      * The given line length will be rounded up to the nearest multiple of 4. If
      * the line length is zero then the output will not be split into lines.
-     * 
+     *
      * @param out
      *            underlying output stream.
      * @param lineLength
@@ -126,7 +126,7 @@ public class Base64OutputStream extends FilterOutputStream {
      * <p>
      * The line separator must not include characters from the BASE64 alphabet
      * (including the padding character <code>=</code>).
-     * 
+     *
      * @param out
      *            underlying output stream.
      * @param lineLength

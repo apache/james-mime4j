@@ -42,7 +42,7 @@ public class Mailbox extends Address {
 
     /**
      * Creates a named mailbox with a route. Routes are obsolete.
-     * 
+     *
      * @param name
      *            the name of the e-mail address. May be <code>null</code>.
      * @param route
@@ -75,7 +75,7 @@ public class Mailbox extends Address {
 
     /**
      * Creates an unnamed mailbox without a route. Routes are obsolete.
-     * 
+     *
      * @param localPart
      *            The part of the e-mail address to the left of the "@".
      * @param domain
@@ -87,7 +87,7 @@ public class Mailbox extends Address {
 
     /**
      * Creates an unnamed mailbox with a route. Routes are obsolete.
-     * 
+     *
      * @param route
      *            The zero or more domains that make up the route. May be
      *            <code>null</code>.
@@ -102,7 +102,7 @@ public class Mailbox extends Address {
 
     /**
      * Creates a named mailbox without a route. Routes are obsolete.
-     * 
+     *
      * @param name
      *            the name of the e-mail address. May be <code>null</code>.
      * @param localPart
@@ -146,7 +146,7 @@ public class Mailbox extends Address {
 
     /**
      * Returns the address in the form <i>localPart@domain</i>.
-     * 
+     *
      * @return the address part of this mailbox.
      */
     public String getAddress() {
@@ -166,7 +166,7 @@ public class Mailbox extends Address {
     public int hashCode() {
         int hash = LangUtils.HASH_SEED;
         hash = LangUtils.hashCode(hash, this.localPart);
-        hash = LangUtils.hashCode(hash, this.domain != null ? 
+        hash = LangUtils.hashCode(hash, this.domain != null ?
                 this.domain.toLowerCase(Locale.US) : null);
         return hash;
     }
@@ -179,7 +179,7 @@ public class Mailbox extends Address {
      * The domain is considered to be case-insensitive but the local-part is not
      * (because of RFC 5321: <cite>the local-part of a mailbox MUST BE treated
      * as case sensitive</cite>).
-     * 
+     *
      * @param obj
      *            the object to test for equality.
      * @return <code>true</code> if the specified object is a
@@ -192,7 +192,7 @@ public class Mailbox extends Address {
         if (!(obj instanceof Mailbox))
             return false;
         Mailbox that = (Mailbox) obj;
-        return LangUtils.equals(this.localPart, that.localPart) && 
+        return LangUtils.equals(this.localPart, that.localPart) &&
             LangUtils.equalsIgnoreCase(this.domain, that.domain);
     }
 

@@ -28,23 +28,23 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
  * Performs Quoted-Printable decoding on an underlying stream.
  */
 public class QuotedPrintableInputStream extends InputStream {
-    
+
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 2;
-    
+
     private static final byte EQ = 0x3D;
     private static final byte CR = 0x0D;
     private static final byte LF = 0x0A;
-    
+
     private final byte[] singleByte = new byte[1];
-    
+
     private final InputStream in;
-    private final ByteArrayBuffer decodedBuf; 
-    private final ByteArrayBuffer blanks; 
-    
+    private final ByteArrayBuffer decodedBuf;
+    private final ByteArrayBuffer blanks;
+
     private final byte[] encoded;
     private int pos = 0; // current index into encoded buffer
     private int limit = 0; // current size of encoded buffer
-    
+
     private boolean closed;
 
     private final DecodeMonitor monitor;
@@ -70,15 +70,15 @@ public class QuotedPrintableInputStream extends InputStream {
     public QuotedPrintableInputStream(final InputStream in, boolean strict) {
         this(DEFAULT_BUFFER_SIZE, in, strict);
     }
-    
+
     public QuotedPrintableInputStream(final InputStream in) {
         this(in, false);
     }
-    
+
     /**
-     * Terminates Quoted-Printable coded content. This method does NOT close 
+     * Terminates Quoted-Printable coded content. This method does NOT close
      * the underlying input stream.
-     * 
+     *
      * @throws IOException on I/O errors.
      */
     @Override
@@ -96,7 +96,7 @@ public class QuotedPrintableInputStream extends InputStream {
             limit = 0;
             pos = 0;
         }
-        
+
         int capacity = encoded.length - limit;
         if (capacity > 0) {
             int bytesRead = in.read(encoded, limit, capacity);
@@ -108,7 +108,7 @@ public class QuotedPrintableInputStream extends InputStream {
             return 0;
         }
     }
-    
+
     private int getnext() {
         if (pos < limit) {
             byte b =  encoded[pos];
@@ -118,7 +118,7 @@ public class QuotedPrintableInputStream extends InputStream {
             return -1;
         }
     }
-    
+
     private int peek(int i) {
         if (pos + i < limit) {
             return encoded[pos + i] & 0xFF;
@@ -126,7 +126,7 @@ public class QuotedPrintableInputStream extends InputStream {
             return -1;
         }
     }
-    
+
     private int transfer(
             final int b, final byte[] buffer, final int from, final int to, boolean keepblanks) throws IOException {
         int index = from;
@@ -154,7 +154,7 @@ public class QuotedPrintableInputStream extends InputStream {
         }
         return index;
     }
-    
+
     private int read0(final byte[] buffer, final int off, final int len) throws IOException {
         boolean eof = false;
         int from = off;
@@ -168,14 +168,14 @@ public class QuotedPrintableInputStream extends InputStream {
             decodedBuf.remove(0, chunk);
             index += chunk;
         }
-        
+
         while (index < to) {
 
             if (limit - pos < 3) {
                 int bytesRead = fillBuffer();
                 eof = bytesRead == -1;
             }
-            
+
             // end of stream?
             if (limit - pos == 0 && eof) {
                 return index == from ? -1 : index - from;
@@ -193,14 +193,14 @@ public class QuotedPrintableInputStream extends InputStream {
                     if (monitor.warn("Found LF without CR", "Translating to CRLF"))
                         throw new IOException("Found LF without CR");
                 }
-                
+
                 if (b == CR) {
                     lastWasCR = true;
                     continue;
                 } else {
                     lastWasCR = false;
                 }
-                
+
                 if (b == LF) {
                     // at end of line
                     if (blanks.length() == 0) {

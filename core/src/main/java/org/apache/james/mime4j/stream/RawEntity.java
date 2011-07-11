@@ -23,21 +23,21 @@ package org.apache.james.mime4j.stream;
 import java.io.InputStream;
 
 /**
- * Raw MIME entity. Such entities will not be parsed into elements 
+ * Raw MIME entity. Such entities will not be parsed into elements
  * by the parser. They are meant to be consumed as a raw data stream
- * by the caller.  
+ * by the caller.
  */
 public class RawEntity implements EntityStateMachine {
 
     private final InputStream stream;
 
     private EntityState state;
-    
+
     RawEntity(InputStream stream) {
         this.stream = stream;
         this.state = EntityState.T_RAW_ENTITY;
     }
-    
+
     public EntityState getState() {
         return state;
     }
@@ -52,7 +52,7 @@ public class RawEntity implements EntityStateMachine {
         state = EntityState.T_END_OF_STREAM;
         return null;
     }
-    
+
     /**
      * Returns raw data stream.
      */
@@ -94,5 +94,5 @@ public class RawEntity implements EntityStateMachine {
     public InputStream getDecodedContentStream() throws IllegalStateException {
         throw new IllegalStateException("Raw entity does not support stream decoding");
     }
-    
+
 }

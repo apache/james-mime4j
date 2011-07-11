@@ -64,7 +64,7 @@ public class MultipartImpl extends AbstractMultipart {
 
     /**
      * Gets the preamble.
-     * 
+     *
      * @return the preamble.
      */
     @Override
@@ -78,7 +78,7 @@ public class MultipartImpl extends AbstractMultipart {
 
     /**
      * Sets the preamble.
-     * 
+     *
      * @param preamble
      *            the preamble.
      */
@@ -102,7 +102,7 @@ public class MultipartImpl extends AbstractMultipart {
 
     /**
      * Gets the epilogue.
-     * 
+     *
      * @return the epilogue.
      */
     @Override
@@ -116,7 +116,7 @@ public class MultipartImpl extends AbstractMultipart {
 
     /**
      * Sets the epilogue.
-     * 
+     *
      * @param epilogue
      *            the epilogue.
      */

@@ -109,5 +109,5 @@ public class Group extends Address {
         sb.append(";");
         return sb.toString();
     }
-    
+
 }

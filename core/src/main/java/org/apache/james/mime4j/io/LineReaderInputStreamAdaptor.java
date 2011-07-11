@@ -26,14 +26,14 @@ import java.io.InputStream;
 
 /**
  * <code>InputStream</code> used by the MIME parser to detect whether the
- * underlying data stream was used (read from) and whether the end of the 
+ * underlying data stream was used (read from) and whether the end of the
  * stream was reached.
  */
 public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
 
     private final LineReaderInputStream bis;
     private final int maxLineLen;
-    
+
     private boolean used = false;
     private boolean eof = false;
 
@@ -53,7 +53,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
             final InputStream is) {
         this(is, -1);
     }
-    
+
     @Override
     public int read() throws IOException {
         int i = in.read();
@@ -69,7 +69,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
         this.used = true;
         return i;
     }
-    
+
     @Override
     public int readLine(final ByteArrayBuffer dst)
             throws MaxLineLimitException, IOException {
@@ -104,7 +104,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
             return total;
         }
     }
-    
+
     public boolean eof() {
         return this.eof;
     }
@@ -112,37 +112,37 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
     public boolean isUsed() {
         return this.used;
     }
-    
+
     @Override
     public String toString() {
         return "[LineReaderInputStreamAdaptor: " + bis + "]";
     }
 
-	@Override
-	public boolean unread(ByteArrayBuffer buf) {
-		if (bis != null) {
-			return bis.unread(buf);
-		} else {
-			return false;
-		}
-	}
+    @Override
+    public boolean unread(ByteArrayBuffer buf) {
+        if (bis != null) {
+            return bis.unread(buf);
+        } else {
+            return false;
+        }
+    }
 
-	@Override
-	public long skip(long count) throws IOException {
-		if (count <= 0) {
-			return 0; // So specified by InputStream.skip(long).
-		}
-		final int bufferSize = count > 8192 ? 8192 : (int) count;
-		final byte[] buffer = new byte[bufferSize];
-		long result = 0;
-		while (count > 0) {
-			int res = read(buffer);
-			if (res == -1) {
-				break;
-			}
-			result += res;
-			count -= res;
-		}
-		return result;
-	}
+    @Override
+    public long skip(long count) throws IOException {
+        if (count <= 0) {
+            return 0; // So specified by InputStream.skip(long).
+        }
+        final int bufferSize = count > 8192 ? 8192 : (int) count;
+        final byte[] buffer = new byte[bufferSize];
+        long result = 0;
+        while (count > 0) {
+            int res = read(buffer);
+            if (res == -1) {
+                break;
+            }
+            result += res;
+            count -= res;
+        }
+        return result;
+    }
 }

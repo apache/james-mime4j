@@ -23,7 +23,7 @@ public interface ContentMD5Field extends ParsedField {
 
     /**
      * Gets the content MD5 raw value defined in this field.
-     * 
+     *
      * @return the content MD5 raw value or <code>null</code> if not set.
      */
     String getMD5Raw();

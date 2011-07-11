@@ -56,7 +56,7 @@ public class DefaultMessageWriter implements MessageWriter {
     /**
      * Write the specified <code>Body</code> to the specified
      * <code>OutputStream</code>.
-     * 
+     *
      * @param body
      *            the <code>Body</code> to write.
      * @param out
@@ -78,7 +78,7 @@ public class DefaultMessageWriter implements MessageWriter {
     /**
      * Write the specified <code>Entity</code> to the specified
      * <code>OutputStream</code>.
-     * 
+     *
      * @param entity
      *            the <code>Entity</code> to write.
      * @param out
@@ -111,7 +111,7 @@ public class DefaultMessageWriter implements MessageWriter {
     /**
      * Write the specified <code>Message</code> to the specified
      * <code>OutputStream</code>.
-     * 
+     *
      * @param entity
      *            the <code>Message</code> to write.
      * @param out
@@ -122,11 +122,11 @@ public class DefaultMessageWriter implements MessageWriter {
     public void writeMessage(Message message, OutputStream out) throws IOException {
         writeEntity(message, out);
     }
-    
+
     /**
      * Write the specified <code>Multipart</code> to the specified
      * <code>OutputStream</code>.
-     * 
+     *
      * @param multipart
      *            the <code>Multipart</code> to write.
      * @param out
@@ -175,7 +175,7 @@ public class DefaultMessageWriter implements MessageWriter {
     /**
      * Write the specified <code>Field</code> to the specified
      * <code>OutputStream</code>.
-     * 
+     *
      * @param field
      *            the <code>Field</code> to write.
      * @param out
@@ -202,7 +202,7 @@ public class DefaultMessageWriter implements MessageWriter {
     /**
      * Write the specified <code>Header</code> to the specified
      * <code>OutputStream</code>.
-     * 
+     *
      * @param header
      *            the <code>Header</code> to write.
      * @param out

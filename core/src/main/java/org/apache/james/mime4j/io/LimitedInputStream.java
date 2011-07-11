@@ -39,7 +39,7 @@ public class LimitedInputStream extends PositionInputStream {
             throw new IOException("Input stream limit exceeded");
         }
     }
-    
+
     @Override
     public int read() throws IOException {
         enforceLimit();
@@ -63,5 +63,5 @@ public class LimitedInputStream extends PositionInputStream {
     private int getBytesLeft() {
         return (int)Math.min(Integer.MAX_VALUE, limit - position);
     }
-    
+
 }

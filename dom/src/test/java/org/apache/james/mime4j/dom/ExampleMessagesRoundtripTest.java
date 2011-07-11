@@ -68,18 +68,18 @@ public class ExampleMessagesRoundtripTest extends TestCase {
         Message inputMessage = builder.parseMessage(url.openStream());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         writer.writeMessage(inputMessage, out);
-        
+
         String s = url.toString();
         URL msgout = new URL(s.substring(0, s.lastIndexOf('.')) + ".out");
         try {
-	        ByteArrayOutputStream expectedstream = new ByteArrayOutputStream();
-	        CodecUtil.copy(msgout.openStream(), expectedstream);
-	        assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
+            ByteArrayOutputStream expectedstream = new ByteArrayOutputStream();
+            CodecUtil.copy(msgout.openStream(), expectedstream);
+            assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
         } catch (FileNotFoundException e) {
-        	FileOutputStream fos = new FileOutputStream(msgout.getPath()+".expected");
-        	writer.writeMessage(inputMessage, fos);
-        	fos.close();
-        	fail("Expected file created");
+            FileOutputStream fos = new FileOutputStream(msgout.getPath()+".expected");
+            writer.writeMessage(inputMessage, fos);
+            fos.close();
+            fail("Expected file created");
         }
     }
 
@@ -87,7 +87,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
         return new ExampleMessagesRountripTestSuite();
     }
 
-    
+
     static class ExampleMessagesRountripTestSuite extends TestSuite {
 
         public ExampleMessagesRountripTestSuite() throws IOException, URISyntaxException {
@@ -96,17 +96,17 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             addTests("/mimetools-testmsgs");
         }
 
-		private void addTests(String testsFolder) throws URISyntaxException,
-				MalformedURLException, IOException {
-			URL resource = ExampleMessagesRountripTestSuite.class.getResource(testsFolder);
+        private void addTests(String testsFolder) throws URISyntaxException,
+                MalformedURLException, IOException {
+            URL resource = ExampleMessagesRountripTestSuite.class.getResource(testsFolder);
             if (resource != null) {
                 if (resource.getProtocol().equalsIgnoreCase("file")) {
                     File dir = new File(resource.toURI());
                     File[] files = dir.listFiles();
-                    
+
                     for (File f : files) {
                         if (f.getName().endsWith(".msg")) {
-                            addTest(new ExampleMessagesRoundtripTest(f.getName(), 
+                            addTest(new ExampleMessagesRoundtripTest(f.getName(),
                                     f.toURI().toURL()));
                         }
                     }
@@ -118,13 +118,13 @@ public class ExampleMessagesRoundtripTest extends TestCase {
                         String s = "/" + entry.toString();
                         File f = new File(s);
                         if (s.startsWith(testsFolder) && s.endsWith(".msg")) {
-                            addTest(new ExampleMessagesRoundtripTest(f.getName(), 
+                            addTest(new ExampleMessagesRoundtripTest(f.getName(),
                                     new URL("jar:file:" + jar.getName() + "!" + s)));
                         }
                     }
                 }
             }
-		}
-        
+        }
+
     }
 }

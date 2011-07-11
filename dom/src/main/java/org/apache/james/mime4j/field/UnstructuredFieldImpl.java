@@ -56,11 +56,11 @@ public class UnstructuredFieldImpl extends AbstractField implements Unstructured
     }
 
     public static final FieldParser<UnstructuredField> PARSER = new FieldParser<UnstructuredField>() {
-        
+
         public UnstructuredField parse(final Field rawField, final DecodeMonitor monitor) {
             return new UnstructuredFieldImpl(rawField, monitor);
         }
-        
+
     };
 
 }

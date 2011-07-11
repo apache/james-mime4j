@@ -40,7 +40,7 @@ public class ContentLanguageFieldLenientImpl extends AbstractField implements Co
 
     private final static int   COMMA = ',';
     private final static BitSet DELIM = RawFieldParser.INIT_BITSET(COMMA);
-    
+
     private boolean parsed = false;
     private List<String> languages;
 
@@ -88,11 +88,11 @@ public class ContentLanguageFieldLenientImpl extends AbstractField implements Co
     }
 
     public static final FieldParser<ContentLanguageField> PARSER = new FieldParser<ContentLanguageField>() {
-        
+
         public ContentLanguageField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentLanguageFieldLenientImpl(rawField, monitor);
         }
-        
+
     };
 
 }

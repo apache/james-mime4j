@@ -33,7 +33,7 @@ public class LineNumberInputStream extends FilterInputStream implements
 
     /**
      * Creates a new <code>LineNumberInputStream</code>.
-     * 
+     *
      * @param is
      *            the stream to read from.
      */

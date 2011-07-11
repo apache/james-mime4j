@@ -45,7 +45,7 @@ public class ContentDescriptionFieldImpl extends AbstractField implements Conten
             description = null;
         }
     }
-    
+
     public String getDescription() {
         if (!parsed) {
             parse();
@@ -54,11 +54,11 @@ public class ContentDescriptionFieldImpl extends AbstractField implements Conten
     }
 
     public static final FieldParser<ContentDescriptionField> PARSER = new FieldParser<ContentDescriptionField>() {
-        
+
         public ContentDescriptionField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentDescriptionFieldImpl(rawField, monitor);
         }
-        
+
     };
 
 }

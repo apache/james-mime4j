@@ -45,7 +45,7 @@ class EntityBuilder implements ContentHandler {
     private final Entity entity;
     private final BodyFactory bodyFactory;
     private final Stack<Object> stack;
-    
+
     EntityBuilder(
             final Entity entity,
             final BodyFactory bodyFactory) {
@@ -53,7 +53,7 @@ class EntityBuilder implements ContentHandler {
         this.bodyFactory = bodyFactory;
         this.stack = new Stack<Object>();
     }
-    
+
     private void expect(Class<?> c) {
         if (!c.isInstance(stack.peek())) {
             throw new IllegalStateException("Internal stack error: "
@@ -61,7 +61,7 @@ class EntityBuilder implements ContentHandler {
                     + stack.peek().getClass().getName() + "'");
         }
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#startMessage()
      */
@@ -75,7 +75,7 @@ class EntityBuilder implements ContentHandler {
             stack.push(m);
         }
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#endMessage()
      */
@@ -83,14 +83,14 @@ class EntityBuilder implements ContentHandler {
         expect(Message.class);
         stack.pop();
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#startHeader()
      */
     public void startHeader() throws MimeException {
         stack.push(new HeaderImpl());
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#field(RawField)
      */
@@ -98,7 +98,7 @@ class EntityBuilder implements ContentHandler {
         expect(Header.class);
         ((Header) stack.peek()).addField(field);
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#endHeader()
      */
@@ -108,34 +108,34 @@ class EntityBuilder implements ContentHandler {
         expect(Entity.class);
         ((Entity) stack.peek()).setHeader(h);
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#startMultipart(org.apache.james.mime4j.stream.BodyDescriptor)
      */
     public void startMultipart(final BodyDescriptor bd) throws MimeException {
         expect(Entity.class);
-        
+
         final Entity e = (Entity) stack.peek();
         final String subType = bd.getSubType();
         final Multipart multiPart = new MultipartImpl(subType);
         e.setBody(multiPart);
         stack.push(multiPart);
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#body(org.apache.james.mime4j.stream.BodyDescriptor, java.io.InputStream)
      */
     public void body(BodyDescriptor bd, final InputStream is) throws MimeException, IOException {
         expect(Entity.class);
-        
-        // NO NEED TO MANUALLY RUN DECODING. 
+
+        // NO NEED TO MANUALLY RUN DECODING.
         // The parser has a "setContentDecoding" method. We should
         // simply instantiate the MimeStreamParser with that method.
-        
+
         // final String enc = bd.getTransferEncoding();
-        
+
         final Body body;
-        
+
         /*
         final InputStream decodedStream;
         if (MimeUtil.ENC_BASE64.equals(enc)) {
@@ -146,35 +146,35 @@ class EntityBuilder implements ContentHandler {
             decodedStream = is;
         }
         */
-        
+
         if (bd.getMimeType().startsWith("text/")) {
             body = bodyFactory.textBody(is, bd.getCharset());
         } else {
             body = bodyFactory.binaryBody(is);
         }
-        
+
         Entity entity = ((Entity) stack.peek());
         entity.setBody(body);
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#endMultipart()
      */
     public void endMultipart() throws MimeException {
         stack.pop();
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#startBodyPart()
      */
     public void startBodyPart() throws MimeException {
         expect(Multipart.class);
-        
+
         BodyPart bodyPart = new BodyPart();
         ((Multipart) stack.peek()).addBodyPart(bodyPart);
         stack.push(bodyPart);
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#endBodyPart()
      */
@@ -182,7 +182,7 @@ class EntityBuilder implements ContentHandler {
         expect(BodyPart.class);
         stack.pop();
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#epilogue(java.io.InputStream)
      */
@@ -191,7 +191,7 @@ class EntityBuilder implements ContentHandler {
         ByteSequence bytes = loadStream(is);
         ((MultipartImpl) stack.peek()).setEpilogueRaw(bytes);
     }
-    
+
     /**
      * @see org.apache.james.mime4j.parser.ContentHandler#preamble(java.io.InputStream)
      */
@@ -200,7 +200,7 @@ class EntityBuilder implements ContentHandler {
         ByteSequence bytes = loadStream(is);
         ((MultipartImpl) stack.peek()).setPreambleRaw(bytes);
     }
-    
+
     /**
      * Unsupported.
      * @see org.apache.james.mime4j.parser.ContentHandler#raw(java.io.InputStream)

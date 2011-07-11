@@ -22,17 +22,17 @@ package org.apache.james.mime4j.stream;
 import org.apache.james.mime4j.MimeException;
 
 /**
- * Indicates that strict parsing has been enabled 
+ * Indicates that strict parsing has been enabled
  * and an optional invality has been found in the input.
  * {@link #getEvent()} indicates the type of invalidity.
  */
 public class MimeParseEventException extends MimeException {
-    
+
     private static final long serialVersionUID = 4632991604246852302L;
     private final Event event;
-    
+
     /**
-     * Constructs an exception 
+     * Constructs an exception
      * @param event <code>MimeTokenStream.Event</code>, not null
      */
     public MimeParseEventException(final Event event) {

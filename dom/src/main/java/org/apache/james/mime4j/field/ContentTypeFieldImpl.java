@@ -149,7 +149,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
      * MIME type from the parent if child is <code>null</code> or hasn't got a
      * MIME type value set. If child's MIME type is multipart but no boundary
      * has been set the MIME type of child will be derived from the parent.
-     * 
+     *
      * @param child
      *            the child.
      * @param parent
@@ -175,7 +175,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
      * Gets the value of the <code>charset</code> parameter if set for the
      * given field. Returns the default <code>us-ascii</code> if not set or if
      * <code>f</code> is <code>null</code>.
-     * 
+     *
      * @return the <code>charset</code> parameter value.
      */
     public static String getCharset(ContentTypeField f) {
@@ -223,10 +223,10 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     }
 
     public static final FieldParser<ContentTypeField> PARSER = new FieldParser<ContentTypeField>() {
-        
+
         public ContentTypeField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentTypeFieldImpl(rawField, monitor);
         }
-        
+
     };
 }

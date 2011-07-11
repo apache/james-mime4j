@@ -34,31 +34,31 @@ public class EOLConvertingInputStreamTest extends TestCase {
         testConvertBoth("Line 1\r\nLine 2\r\n", "Line 1\r\nLine 2\r\n");
         testConvertCR("Line 1\r\nLine 2\r\n", "Line 1\r\nLine 2\r\n");
         testConvertLF("Line 1\r\nLine 2\r\n", "Line 1\r\nLine 2\r\n");
-        
+
         testConvertBoth("Line 1\n\rLine 2\n\r", "Line 1\r\n\r\nLine 2\r\n\r\n");
         testConvertCR("Line 1\n\rLine 2\n\r", "Line 1\n\r\nLine 2\n\r\n");
         testConvertLF("Line 1\n\rLine 2\n\r", "Line 1\r\n\rLine 2\r\n\r");
-        
+
         testConvertBoth("Line 1\nLine 2\n", "Line 1\r\nLine 2\r\n");
         testConvertCR("Line 1\nLine 2\n", "Line 1\nLine 2\n");
         testConvertLF("Line 1\nLine 2\n", "Line 1\r\nLine 2\r\n");
-        
+
         testConvertBoth("Line 1\rLine 2\r", "Line 1\r\nLine 2\r\n");
         testConvertCR("Line 1\rLine 2\r", "Line 1\r\nLine 2\r\n");
         testConvertLF("Line 1\rLine 2\r", "Line 1\rLine 2\r");
-        
+
         testConvertBoth("\r\n", "\r\n");
         testConvertCR("\r\n", "\r\n");
         testConvertLF("\r\n", "\r\n");
-        
+
         testConvertBoth("\n", "\r\n");
         testConvertCR("\n", "\n");
         testConvertLF("\n", "\r\n");
-        
+
         testConvertBoth("\r", "\r\n");
         testConvertCR("\r", "\r\n");
         testConvertLF("\r", "\r");
-        
+
         testConvertBoth("", "");
         testConvertCR("", "");
         testConvertLF("", "");
@@ -66,37 +66,37 @@ public class EOLConvertingInputStreamTest extends TestCase {
 
     private void testConvertBoth(String s1, String s2) throws IOException {
         byte[] bytes = new byte[1024];
-        
+
         ByteArrayInputStream bais = new ByteArrayInputStream(fromString(s1));
-        EOLConvertingInputStream in = 
-            new EOLConvertingInputStream(bais, 
+        EOLConvertingInputStream in =
+            new EOLConvertingInputStream(bais,
                         EOLConvertingInputStream.CONVERT_BOTH);
         int n = in.read(bytes);
         assertEquals(s2, toString(bytes, n));
     }
-    
+
     private void testConvertCR(String s1, String s2) throws IOException {
         byte[] bytes = new byte[1024];
-        
+
         ByteArrayInputStream bais = new ByteArrayInputStream(fromString(s1));
-        EOLConvertingInputStream in = 
-            new EOLConvertingInputStream(bais, 
+        EOLConvertingInputStream in =
+            new EOLConvertingInputStream(bais,
                         EOLConvertingInputStream.CONVERT_CR);
         int n = in.read(bytes);
         assertEquals(s2, toString(bytes, n));
     }
-    
+
     private void testConvertLF(String s1, String s2) throws IOException {
         byte[] bytes = new byte[1024];
-        
+
         ByteArrayInputStream bais = new ByteArrayInputStream(fromString(s1));
-        EOLConvertingInputStream in = 
-            new EOLConvertingInputStream(bais, 
+        EOLConvertingInputStream in =
+            new EOLConvertingInputStream(bais,
                         EOLConvertingInputStream.CONVERT_LF);
         int n = in.read(bytes);
         assertEquals(s2, toString(bytes, n));
     }
-    
+
     private String toString(byte[] b, int len) {
         try {
             if (len == -1) {
@@ -107,8 +107,8 @@ public class EOLConvertingInputStreamTest extends TestCase {
             fail(e.getMessage());
             return null;
         }
-    }    
-    
+    }
+
     private byte[] fromString(String s) {
         try {
             return s.getBytes("US-ASCII");
@@ -116,5 +116,5 @@ public class EOLConvertingInputStreamTest extends TestCase {
             fail(e.getMessage());
             return null;
         }
-    }    
+    }
 }

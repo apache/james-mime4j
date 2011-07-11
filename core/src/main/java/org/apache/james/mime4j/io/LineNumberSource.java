@@ -23,7 +23,7 @@ public interface LineNumberSource {
     /**
      * Gets the current line number starting at 1 (the number of
      * <code>\r\n</code> read so far plus 1).
-     * 
+     *
      * @return the current line number.
      */
     int getLineNumber();

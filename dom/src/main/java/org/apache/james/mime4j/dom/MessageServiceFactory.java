@@ -23,7 +23,7 @@ import org.apache.james.mime4j.MimeException;
 
 /**
  * A MessageBuilderFactory is used to create EntityBuilder instances.
- * 
+ *
  * MessageBuilderFactory.newInstance() is used to get access to an implementation
  * of MessageBuilderFactory.
  * Then the method newMessageBuilder is used to create a new EntityBuilder object.
@@ -35,9 +35,9 @@ public abstract class MessageServiceFactory {
     }
 
     public abstract MessageBuilder newMessageBuilder();
-    
+
     public abstract MessageWriter newMessageWriter();
-    
+
     public abstract void setAttribute(String name, Object value) throws IllegalArgumentException;
-        
+
 }

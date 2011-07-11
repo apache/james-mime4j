@@ -41,7 +41,7 @@ import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
- * Represents a MIME message. 
+ * Represents a MIME message.
  */
 public class MessageImpl extends AbstractMessage {
 
@@ -126,7 +126,7 @@ public class MessageImpl extends AbstractMessage {
 
     @Override
     protected String calcCharset(ContentTypeField contentType) {
-        return ContentTypeFieldImpl.getCharset(contentType); 
+        return ContentTypeFieldImpl.getCharset(contentType);
     }
 
 }

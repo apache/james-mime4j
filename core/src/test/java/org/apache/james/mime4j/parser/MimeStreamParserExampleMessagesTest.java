@@ -64,22 +64,22 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
         config.setMaxLineLen(-1);
         parser = new MimeStreamParser(config);
         handler = new TestHandler();
-        
+
         parser.setContentHandler(handler);
         parser.parse(url.openStream());
-        
+
         String result = handler.sb.toString();
-        
+
         String s = url.toString();
         String prefix = s.substring(0, s.lastIndexOf('.'));
         URL xmlFileUrl = new URL(prefix + ".xml");
         try {
-	        InputStream openStream = xmlFileUrl.openStream();
-			String expected = IOUtils.toString(openStream, "ISO8859-1");
-	        assertEquals(expected, result);
+            InputStream openStream = xmlFileUrl.openStream();
+            String expected = IOUtils.toString(openStream, "ISO8859-1");
+            assertEquals(expected, result);
         } catch (FileNotFoundException e) {
-        	IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"));
-        	fail("Expected file created.");
+            IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"));
+            fail("Expected file created.");
         }
     }
 
@@ -94,17 +94,17 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
             addTests("/mimetools-testmsgs");
         }
 
-		private void addTests(String testsFolder) throws URISyntaxException,
-				MalformedURLException, IOException {
-			URL resource = MimeStreamParserExampleMessagesTestSuite.class.getResource(testsFolder);
+        private void addTests(String testsFolder) throws URISyntaxException,
+                MalformedURLException, IOException {
+            URL resource = MimeStreamParserExampleMessagesTestSuite.class.getResource(testsFolder);
             if (resource != null) {
                 if (resource.getProtocol().equalsIgnoreCase("file")) {
                     File dir = new File(resource.toURI());
                     File[] files = dir.listFiles();
-                    
+
                     for (File f : files) {
                         if (f.getName().endsWith(".msg")) {
-                            addTest(new MimeStreamParserExampleMessagesTest(f.getName(), 
+                            addTest(new MimeStreamParserExampleMessagesTest(f.getName(),
                                     f.toURI().toURL()));
                         }
                     }
@@ -116,13 +116,13 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
                         String s = "/" + entry.toString();
                         File f = new File(s);
                         if (s.startsWith(testsFolder) && s.endsWith(".msg")) {
-                            addTest(new MimeStreamParserExampleMessagesTest(f.getName(), 
+                            addTest(new MimeStreamParserExampleMessagesTest(f.getName(),
                                     new URL("jar:file:" + jar.getName() + "!" + s)));
                         }
                     }
                 }
             }
-		}
+        }
 
     }
 }

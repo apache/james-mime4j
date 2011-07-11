@@ -28,7 +28,7 @@ import org.apache.james.mime4j.field.datetime.parser.ParseException;
 import java.io.StringReader;
 
 public class DateTimeTest extends TestCase {
-    
+
     public void testExceptionTree() {
         // make sure that our ParseException extends MimeException.
         assertTrue(MimeException.class.isAssignableFrom(ParseException.class));

@@ -44,7 +44,7 @@ public class MimeVersionParserTest extends TestCase {
         check("0.1", 0, 1);
         check("123234234.0", 123234234, 0);
     }
-    
+
     public void testLineWithComments() throws Exception {
         check("2(A comment).4", 2, 4);
         check("2(.8).4", 2, 4);
@@ -52,11 +52,11 @@ public class MimeVersionParserTest extends TestCase {
         check("2.4(A comment)", 2, 4);
         check("2.(A comment)4", 2, 4);
     }
-    
+
     public void testLineWithNestedComments() throws Exception {
         check("2(4.45 ( Another ()comment () blah (Wobble(mix)))Whatever).4", 2, 4);
     }
-    
+
     public void testEmptyLine() throws Exception {
         try {
             parse("(This is just a comment)");
@@ -65,7 +65,7 @@ public class MimeVersionParserTest extends TestCase {
             //expected
         }
     }
-    
+
     private void check(String input, int expectedMajorVersion, int expectedMinorVersion) throws Exception {
         MimeVersionParser parser = parse(input);
         assertEquals("Major version number", expectedMajorVersion, parser.getMajorVersion());

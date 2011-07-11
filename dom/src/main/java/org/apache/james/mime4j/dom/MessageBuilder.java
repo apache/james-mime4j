@@ -30,19 +30,19 @@ import org.apache.james.mime4j.MimeException;
 public interface MessageBuilder {
 
     Header newHeader();
-    
+
     Header newHeader(Header source);
 
     Multipart newMultipart(String subType);
-    
+
     Multipart newMultipart(Multipart source);
 
     Message newMessage();
-          
+
     Message newMessage(Message source);
 
     Header parseHeader(InputStream source) throws MimeException, IOException;
-    
+
     Message parseMessage(InputStream source) throws MimeException, IOException;
-          
+
 }

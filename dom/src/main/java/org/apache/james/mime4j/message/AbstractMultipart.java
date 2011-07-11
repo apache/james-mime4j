@@ -51,7 +51,7 @@ public abstract class AbstractMultipart implements Multipart {
      * Gets the multipart sub-type. E.g. <code>alternative</code> (the
      * default) or <code>parallel</code>. See RFC 2045 for common sub-types
      * and their meaning.
-     * 
+     *
      * @return the multipart sub-type.
      */
     public String getSubType() {
@@ -62,7 +62,7 @@ public abstract class AbstractMultipart implements Multipart {
      * Sets the multipart sub-type. E.g. <code>alternative</code> or
      * <code>parallel</code>. See RFC 2045 for common sub-types and their
      * meaning.
-     * 
+     *
      * @param subType
      *            the sub-type.
      */
@@ -89,7 +89,7 @@ public abstract class AbstractMultipart implements Multipart {
 
     /**
      * Returns the number of body parts.
-     * 
+     *
      * @return number of <code>Entity</code> objects.
      */
     public int getCount() {
@@ -98,7 +98,7 @@ public abstract class AbstractMultipart implements Multipart {
 
     /**
      * Gets the list of body parts. The list is immutable.
-     * 
+     *
      * @return the list of <code>Entity</code> objects.
      */
     public List<Entity> getBodyParts() {
@@ -107,7 +107,7 @@ public abstract class AbstractMultipart implements Multipart {
 
     /**
      * Sets the list of body parts.
-     * 
+     *
      * @param bodyParts
      *            the new list of <code>Entity</code> objects.
      */
@@ -120,7 +120,7 @@ public abstract class AbstractMultipart implements Multipart {
 
     /**
      * Adds a body part to the end of the list of body parts.
-     * 
+     *
      * @param bodyPart
      *            the body part.
      */
@@ -134,7 +134,7 @@ public abstract class AbstractMultipart implements Multipart {
 
     /**
      * Inserts a body part at the specified position in the list of body parts.
-     * 
+     *
      * @param bodyPart
      *            the body part.
      * @param index
@@ -154,7 +154,7 @@ public abstract class AbstractMultipart implements Multipart {
     /**
      * Removes the body part at the specified position in the list of body
      * parts.
-     * 
+     *
      * @param index
      *            index of the body part to be removed.
      * @return the removed body part.
@@ -171,7 +171,7 @@ public abstract class AbstractMultipart implements Multipart {
     /**
      * Replaces the body part at the specified position in the list of body
      * parts with the specified body part.
-     * 
+     *
      * @param bodyPart
      *            body part to be stored at the specified position.
      * @param index
@@ -198,14 +198,14 @@ public abstract class AbstractMultipart implements Multipart {
 
     /**
      * Gets the preamble or null if the message has no preamble.
-     * 
+     *
      * @return the preamble.
      */
     public abstract String getPreamble();
 
     /**
      * Sets the preamble with a value or null to remove the preamble.
-     * 
+     *
      * @param preamble
      *            the preamble.
      */
@@ -213,14 +213,14 @@ public abstract class AbstractMultipart implements Multipart {
 
     /**
      * Gets the epilogue or null if the message has no epilogue
-     * 
+     *
      * @return the epilogue.
      */
     public abstract String getEpilogue();
 
     /**
      * Sets the epilogue value, or remove it if the value passed is null.
-     * 
+     *
      * @param epilogue
      *            the epilogue.
      */
@@ -229,7 +229,7 @@ public abstract class AbstractMultipart implements Multipart {
     /**
      * Disposes of the BodyParts of this Multipart. Note that the dispose call
      * does not get forwarded to the parent entity of this Multipart.
-     * 
+     *
      * @see org.apache.james.mime4j.dom.Disposable#dispose()
      */
     public void dispose() {

@@ -36,11 +36,11 @@ public class MimeVersionFieldImpl extends AbstractField implements MimeVersionFi
 
     public static final int DEFAULT_MINOR_VERSION = 0;
     public static final int DEFAULT_MAJOR_VERSION = 1;
-    
+
     private boolean parsed = false;
     private int major = DEFAULT_MAJOR_VERSION;
     private int minor = DEFAULT_MINOR_VERSION;
-    private ParseException parsedException;    
+    private ParseException parsedException;
 
     MimeVersionFieldImpl(Field rawField, DecodeMonitor monitor) {
         super(rawField, monitor);
@@ -90,11 +90,11 @@ public class MimeVersionFieldImpl extends AbstractField implements MimeVersionFi
     }
 
     public static final FieldParser<MimeVersionField> PARSER = new FieldParser<MimeVersionField>() {
-        
+
         public MimeVersionField parse(final Field rawField, final DecodeMonitor monitor) {
             return new MimeVersionFieldImpl(rawField, monitor);
         }
-        
+
     };
-    
+
 }

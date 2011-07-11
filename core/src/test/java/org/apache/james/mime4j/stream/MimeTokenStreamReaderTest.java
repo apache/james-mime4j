@@ -31,9 +31,9 @@ import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.MimeException;
 
 public class MimeTokenStreamReaderTest extends TestCase {
-    
+
     MimeTokenStream parser;
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -62,25 +62,25 @@ public class MimeTokenStreamReaderTest extends TestCase {
         String body = ExampleMail.ONE_PART_MIME_8859_BODY;
         checkSimpleMail(bytes, body, 13);
     }
-    
+
     public void testShouldReadOnePartMimeBase64ASCIIBody() throws Exception {
         byte[] bytes = ExampleMail.ONE_PART_MIME_BASE64_ASCII_BYTES;
         String body = ExampleMail.ONE_PART_MIME_BASE64_ASCII_BODY;
         checkSimpleMail(bytes, body, 11);
     }
-    
+
     public void testShouldReadOnePartMimeBase64Latin1Body() throws Exception {
         byte[] bytes = ExampleMail.ONE_PART_MIME_BASE64_LATIN1_BYTES;
         String body = ExampleMail.ONE_PART_MIME_BASE64_LATIN1_BODY;
         checkSimpleMail(bytes, body, 11);
     }
-    
+
     public void testShouldReadOnePartMimeQuotedPrintable() throws Exception {
         byte[] bytes = ExampleMail.ONE_PART_MIME_QUOTED_PRINTABLE_ASCII_BYTES;
         String body = ExampleMail.ONE_PART_MIME_QUOTED_PRINTABLE_ASCII_BODY;
         checkSimpleMail(bytes, body, 11);
     }
-    
+
     public void testShouldReadPartBodies() throws IOException, MimeException {
         InputStream in = new ByteArrayInputStream(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTES);
         parser.parse(in);
@@ -116,9 +116,9 @@ public class MimeTokenStreamReaderTest extends TestCase {
         checkBody(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BASE64);
         assertEquals(MimeTokenStream.stateToString(EntityState.T_END_BODYPART),MimeTokenStream.stateToString(parser.next()));
 
-        
+
     }
-    
+
     private void checkSimpleMail(byte[] bytes, String body, int fields) throws IOException, MimeException {
         InputStream in = new ByteArrayInputStream(bytes);
         parser.parse(in);

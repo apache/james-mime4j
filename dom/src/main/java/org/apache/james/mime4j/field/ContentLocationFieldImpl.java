@@ -57,12 +57,12 @@ public class ContentLocationFieldImpl extends AbstractField implements ContentLo
                  * Read more: http://www.faqs.org/rfcs/rfc2017.html#ixzz0aufO9nRL
                  */
                 location = parser.parse().replaceAll("\\s", "");
-            } catch (ParseException ex) { 
+            } catch (ParseException ex) {
                 parseException = ex;
             }
         }
     }
-    
+
     public String getLocation() {
         if (!parsed) {
             parse();
@@ -76,11 +76,11 @@ public class ContentLocationFieldImpl extends AbstractField implements ContentLo
     }
 
     public static final FieldParser<ContentLocationField> PARSER = new FieldParser<ContentLocationField>() {
-        
+
         public ContentLocationField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentLocationFieldImpl(rawField, monitor);
         }
-        
+
     };
 
 }

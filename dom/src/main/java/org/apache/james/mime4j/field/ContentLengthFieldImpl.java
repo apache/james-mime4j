@@ -46,19 +46,19 @@ public class ContentLengthFieldImpl extends AbstractField implements ContentLeng
                 if (contentLength < 0) {
                     contentLength = -1;
                     if (monitor.isListening()) {
-                        monitor.warn("Negative content length: " + body, 
+                        monitor.warn("Negative content length: " + body,
                                 "ignoring Content-Length header");
                     }
                 }
             } catch (NumberFormatException e) {
                 if (monitor.isListening()) {
-                    monitor.warn("Invalid content length: " + body, 
+                    monitor.warn("Invalid content length: " + body,
                             "ignoring Content-Length header");
                 }
             }
         }
     }
-    
+
     public long getContentLength() {
         if (!parsed) {
             parse();
@@ -67,10 +67,10 @@ public class ContentLengthFieldImpl extends AbstractField implements ContentLeng
     }
 
     public static final FieldParser<ContentLengthField> PARSER = new FieldParser<ContentLengthField>() {
-        
+
         public ContentLengthField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentLengthFieldImpl(rawField, monitor);
         }
-        
+
     };
 }

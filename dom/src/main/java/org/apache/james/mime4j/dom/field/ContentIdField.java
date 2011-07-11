@@ -23,7 +23,7 @@ public interface ContentIdField extends ParsedField {
 
     /**
      * Gets the content ID defined in this field.
-     * 
+     *
      * @return the content ID or <code>null</code> if not set.
      */
     String getId();

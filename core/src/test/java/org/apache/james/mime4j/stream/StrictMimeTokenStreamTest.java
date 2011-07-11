@@ -27,12 +27,12 @@ import org.apache.james.mime4j.MimeIOException;
 import junit.framework.TestCase;
 
 public class StrictMimeTokenStreamTest extends TestCase {
-    
+
     private static final String HEADER_ONLY = "From: foo@abr.com\r\nSubject: A subject\r\n";
     private static final String CORRECT_HEADERS = HEADER_ONLY + "\r\n";
-    
+
     MimeTokenStream parser;
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -45,10 +45,10 @@ public class StrictMimeTokenStreamTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
+
     public void testUnexpectedEndOfHeaders() throws Exception {
         parser.parse(new ByteArrayInputStream(HEADER_ONLY.getBytes("US-ASCII")));
-        
+
         checkNextIs(EntityState.T_START_HEADER);
         checkNextIs(EntityState.T_FIELD);
         try {
@@ -58,18 +58,18 @@ public class StrictMimeTokenStreamTest extends TestCase {
             assertEquals("Premature end of headers", Event.HEADERS_PREMATURE_END, e.getEvent());
         }
      }
-    
+
     public void testCorrectEndOfHeaders() throws Exception {
         parser.parse(new ByteArrayInputStream(CORRECT_HEADERS.getBytes("US-ASCII")));
-        
+
         checkNextIs(EntityState.T_START_HEADER);
         checkNextIs(EntityState.T_FIELD);
         checkNextIs(EntityState.T_FIELD);
         checkNextIs(EntityState.T_END_HEADER);
      }
-    
+
     public void testMissingBoundary() throws Exception {
-        String message = 
+        String message =
             "Content-Type: multipart/mixed;boundary=aaaa\r\n\r\n" +
             "--aaaa\r\n" +
             "Content-Type:text/plain; charset=US-ASCII\r\n\r\n" +
@@ -97,8 +97,8 @@ public class StrictMimeTokenStreamTest extends TestCase {
             assertEquals("Oh my god! Boundary is missing!\r\n", sb.toString());
         }
      }
-    
+
     private void checkNextIs(EntityState expected) throws Exception {
-        assertEquals(MimeTokenStream.stateToString(expected), MimeTokenStream.stateToString(parser.next()));        
+        assertEquals(MimeTokenStream.stateToString(expected), MimeTokenStream.stateToString(parser.next()));
     }
 }

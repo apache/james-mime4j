@@ -27,27 +27,27 @@ import org.apache.james.mime4j.dom.address.Mailbox;
 public class AddressFormatter {
 
     public static final AddressFormatter DEFAULT = new AddressFormatter();
-    
+
     protected AddressFormatter() {
         super();
     }
-    
+
     /**
      * Formats the address as a human readable string, not including the route.
      * The resulting string is intended for display purposes only and cannot be
      * used for transport purposes.
-     * 
+     *
      * For example, if the unparsed address was
-     * 
+     *
      * <"Joe Cheng"@joecheng.com>
-     * 
+     *
      * this method would return
-     * 
+     *
      * <Joe Cheng@joecheng.com>
-     * 
+     *
      * which is not valid for transport; the local part would need to be
      * re-quoted.
-     * 
+     *
      * @param includeRoute
      *            <code>true</code> if the route should be included if it
      *            exists, <code>false</code> otherwise.
@@ -71,7 +71,7 @@ public class AddressFormatter {
      * transport purposes. The route is never included in this representation
      * because routes are obsolete and RFC 5322 states that obsolete syntactic
      * forms MUST NOT be generated.
-     * 
+     *
      * @return a string representation of this address intended for transport
      *         purposes.
      */
@@ -87,7 +87,7 @@ public class AddressFormatter {
             throw new IllegalArgumentException("Unsuppported Address class: " + address.getClass());
         }
     }
-    
+
     public void format(final StringBuilder sb, final Mailbox mailbox, boolean includeRoute) {
         if (sb == null) {
             throw new IllegalArgumentException("StringBuilder may not be null");
@@ -117,13 +117,13 @@ public class AddressFormatter {
             sb.append('>');
         }
     }
-    
+
     public String format(final Mailbox mailbox, boolean includeRoute) {
         StringBuilder sb = new StringBuilder();
         format(sb, mailbox, includeRoute);
         return sb.toString();
     }
-    
+
     public void encode(final StringBuilder sb, final Mailbox mailbox) {
         if (sb == null) {
             throw new IllegalArgumentException("StringBuilder may not be null");
@@ -147,7 +147,7 @@ public class AddressFormatter {
             sb.append('>');
         }
     }
-    
+
     public String encode(final Mailbox mailbox) {
         StringBuilder sb = new StringBuilder();
         encode(sb, mailbox);
@@ -176,13 +176,13 @@ public class AddressFormatter {
         }
         sb.append(";");
     }
-    
+
     public String format(final Group group, boolean includeRoute) {
         StringBuilder sb = new StringBuilder();
         format(sb, group, includeRoute);
         return sb.toString();
     }
-    
+
     public void encode(final StringBuilder sb, final Group group) {
         if (sb == null) {
             throw new IllegalArgumentException("StringBuilder may not be null");

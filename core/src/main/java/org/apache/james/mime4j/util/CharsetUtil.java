@@ -24,10 +24,10 @@ import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 
 /**
- * Utility class for working with character sets. 
+ * Utility class for working with character sets.
  */
 public class CharsetUtil {
-    
+
     /** carriage return - line feed sequence */
     public static final String CRLF = "\r\n";
 
@@ -54,7 +54,7 @@ public class CharsetUtil {
     /**
      * Returns <code>true</code> if the specified character falls into the US
      * ASCII character set (Unicode range 0000 to 007f).
-     * 
+     *
      * @param ch
      *            character to test.
      * @return <code>true</code> if the specified character falls into the US
@@ -67,7 +67,7 @@ public class CharsetUtil {
     /**
      * Returns <code>true</code> if the specified string consists entirely of
      * US ASCII characters.
-     * 
+     *
      * @param s
      *            string to test.
      * @return <code>true</code> if the specified string consists entirely of
@@ -89,7 +89,7 @@ public class CharsetUtil {
     /**
      * Returns <code>true</code> if the specified character is a whitespace
      * character (CR, LF, SP or HT).
-     * 
+     *
      * @param ch
      *            character to test.
      * @return <code>true</code> if the specified character is a whitespace
@@ -102,7 +102,7 @@ public class CharsetUtil {
     /**
      * Returns <code>true</code> if the specified string consists entirely of
      * whitespace characters.
-     * 
+     *
      * @param s
      *            string to test.
      * @return <code>true</code> if the specified string consists entirely of
@@ -122,12 +122,12 @@ public class CharsetUtil {
     }
 
     /**
-     * Returns a {@link Charset} instance if character set with the given name 
-     * is recognized and supported by Java runtime. Returns <code>null</code> 
+     * Returns a {@link Charset} instance if character set with the given name
+     * is recognized and supported by Java runtime. Returns <code>null</code>
      * otherwise.
      * <p/>
-     * This method is a wrapper around {@link Charset#forName(String)} method 
-     * that catches {@link IllegalCharsetNameException} and 
+     * This method is a wrapper around {@link Charset#forName(String)} method
+     * that catches {@link IllegalCharsetNameException} and
      *  {@link UnsupportedCharsetException} and returns <code>null</code>.
      */
     public static Charset lookup(final String name) {
@@ -142,5 +142,5 @@ public class CharsetUtil {
             return null;
         }
     }
-    
+
  }

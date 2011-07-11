@@ -67,25 +67,25 @@ public class QuotedPrintableInputStreamTest extends TestCase {
         // TODO is this what we really expect from decoding a stream including CR with no LF?
         assertEquals("Invalid=\rCR\rHard line\r\n", new String(read(decoder), "ISO8859-1"));
     }
-    
+
     public void testSoftBreakLoneLFDecode() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = new ByteArrayInputStream("Soft line   =\nHard line   \r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
         assertEquals("Soft line   Hard line\r\n", new String(read(decoder), "ISO8859-1"));
     }
-    
+
     public void testSoftBreakTrailingBalnksDecode() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = new ByteArrayInputStream("Soft line   = \t \r\nHard line   \r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
         assertEquals("Soft line   Hard line\r\n", new String(read(decoder), "ISO8859-1"));
     }
-    
+
     public void testBrokenSoftBreakDecode() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = new ByteArrayInputStream("Soft line   =\rHard line   \r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
         assertEquals("Soft line   =\rHard line\r\n", new String(read(decoder), "ISO8859-1"));
     }
-    
+
     public void testEscapedEQDecode() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = new ByteArrayInputStream("width==340 height=3d200\r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
@@ -155,14 +155,14 @@ public class QuotedPrintableInputStreamTest extends TestCase {
         assertEquals('\u00e1', decoder.read());
         assertEquals('\u00e2', decoder.read());
         decoder.close();
-        
+
         try {
             decoder.read();
             fail();
         } catch (IOException expected) {
         }
     }
-    
+
     private byte[] read(InputStream is) throws IOException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         int b;

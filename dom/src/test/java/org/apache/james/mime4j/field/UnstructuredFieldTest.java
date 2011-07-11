@@ -28,13 +28,13 @@ public class UnstructuredFieldTest extends TestCase {
 
     public void testGetBody() throws Exception {
         UnstructuredField f = null;
-        
+
         f = (UnstructuredField) DefaultFieldParser.parse("Subject: Yada\r\n yada yada\r\n");
         assertEquals("Testing folding value 1", "Yada yada yada", f.getValue());
-        
+
         f = (UnstructuredField) DefaultFieldParser.parse("Subject:  \r\n\tyada");
         assertEquals("Testing folding value 2", " \tyada", f.getValue());
-        
+
         f = (UnstructuredField) DefaultFieldParser.parse("Subject:yada");
         assertEquals("Testing value without a leading ' '", "yada", f.getValue());
     }

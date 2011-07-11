@@ -45,14 +45,14 @@ class TestHandler implements ContentHandler {
         }
         return "" + c;
     }
-    
+
     private String escape(String s) {
         s = s.replaceAll("&", "&amp;");
         s = s.replaceAll(">", "&gt;");
         s = s.replaceAll("<", "&lt;");
         return s;
     }
-    
+
     public void epilogue(InputStream is) throws IOException {
         sb.append("<epilogue>\r\n");
         int b = 0;

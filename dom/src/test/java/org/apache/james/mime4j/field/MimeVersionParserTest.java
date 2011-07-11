@@ -35,7 +35,7 @@ public class MimeVersionParserTest extends TestCase {
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return MimeVersionFieldImpl.PARSER.parse(rawField, null);
     }
-    
+
     static void check(String input, int expectedMajorVersion, int expectedMinorVersion) throws Exception {
         MimeVersionField f = parse("MIME-Version: " + input);
         assertEquals("Major version number", expectedMajorVersion, f.getMajorVersion());
@@ -48,7 +48,7 @@ public class MimeVersionParserTest extends TestCase {
         check("0.1", 0, 1);
         check("123234234.0", 123234234, 0);
     }
-    
+
     public void testLineWithComments() throws Exception {
         check("2(A comment).4", 2, 4);
         check("2(.8).4", 2, 4);
@@ -56,16 +56,16 @@ public class MimeVersionParserTest extends TestCase {
         check("2.4(A comment)", 2, 4);
         check("2.(A comment)4", 2, 4);
     }
-    
+
     public void testLineWithNestedComments() throws Exception {
         check("2(4.45 ( Another ()comment () blah (Wobble(mix)))Whatever).4", 2, 4);
     }
-    
+
     public void testEmptyLine() throws Exception {
         MimeVersionField f = parse("MIME-Version: (This is just a comment)");
         assertEquals(MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION, f.getMajorVersion());
         assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
         assertNotNull(f.getParseException());
     }
-    
+
 }

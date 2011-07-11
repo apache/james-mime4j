@@ -56,18 +56,18 @@ public class TestUtil {
             "uu-junk",
             "uu-zeegee"
     };
-    
-    public static String readResource(String resource, String charset) 
+
+    public static String readResource(String resource, String charset)
             throws IOException {
-        
+
         return IOUtils.toString(readResourceAsStream(resource), charset);
     }
 
-    public static InputStream readResourceAsStream(String resource) 
+    public static InputStream readResourceAsStream(String resource)
             throws IOException {
 
         return new BufferedInputStream(
                 TestUtil.class.getResource(resource).openStream());
     }
-    
+
 }

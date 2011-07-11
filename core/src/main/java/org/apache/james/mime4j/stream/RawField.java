@@ -37,8 +37,8 @@ public final class RawField implements Field {
         if (name == null) {
             throw new IllegalArgumentException("Field may not be null");
         }
-    	this.raw = raw;
-    	this.delimiterIdx = delimiterIdx;
+        this.raw = raw;
+        this.delimiterIdx = delimiterIdx;
         this.name = name.trim();
         this.body = body;
     }
@@ -86,5 +86,5 @@ public final class RawField implements Field {
             return buf.toString();
         }
     }
-    
+
 }

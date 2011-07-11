@@ -47,29 +47,29 @@ public class HeaderTest extends TestCase {
         assertEquals("Headers equals", SUBJECT + "\r\n" + TO + "\r\n", header
                 .toString());
     }
-    
+
     private static final String SWISS_GERMAN_HELLO = "Gr\374ezi_z\344m\344";
 
     public void testWriteSpecialCharacters() throws Exception {
         String hello = SWISS_GERMAN_HELLO;
         Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("Hello: " + hello));
-        
+
         Field field = header.getField("Hello");
         assertNotNull(field);
         // field.getBody is already a 7 bit ASCII string, after MIME4J-151
         // assertEquals(hello, field.getBody());
         assertEquals(SWISS_GERMAN_HELLO, field.getBody());
-        
+
         ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-        
+
         DefaultMessageWriter writer = new DefaultMessageWriter();
         writer.writeHeader(header, outstream);
         byte[] b = outstream.toByteArray();
         ByteArrayBuffer buf = new ByteArrayBuffer(b.length);
         buf.append(b, 0, b.length);
         String s = ContentUtil.decode(buf);
-        
+
         assertEquals("Hello: " + SWISS_GERMAN_HELLO + "\r\n\r\n", s);
     }
 
@@ -135,5 +135,5 @@ public class HeaderTest extends TestCase {
 
         assertEquals("Message-ID", header.getFields().get(3).getName());
     }
-    
+
 }

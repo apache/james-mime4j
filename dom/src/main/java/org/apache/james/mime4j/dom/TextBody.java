@@ -35,7 +35,7 @@ public abstract class TextBody extends SingleBody {
 
     /**
      * Returns the MIME charset of this text body.
-     * 
+     *
      * @return the MIME charset.
      */
     public abstract String getMimeCharset();
@@ -43,7 +43,7 @@ public abstract class TextBody extends SingleBody {
     /**
      * Gets a <code>Reader</code> which may be used to read out the contents
      * of this body.
-     * 
+     *
      * @return the <code>Reader</code>.
      * @throws IOException
      *             on I/O errors.

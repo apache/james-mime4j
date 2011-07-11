@@ -28,7 +28,7 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
 public class DefaultFieldBuilder implements FieldBuilder {
 
     private static final BitSet FIELD_CHARS = new BitSet();
-    
+
     static {
         for (int i = 0x21; i <= 0x39; i++) {
             FIELD_CHARS.set(i);
@@ -45,11 +45,11 @@ public class DefaultFieldBuilder implements FieldBuilder {
         this.buf = new ByteArrayBuffer(1024);
         this.maxlen = maxlen;
     }
-    
+
     public void reset() {
         this.buf.clear();
     }
-    
+
     public void append(final ByteArrayBuffer line) throws MaxHeaderLengthLimitException {
         if (line == null) {
             return;
@@ -57,10 +57,10 @@ public class DefaultFieldBuilder implements FieldBuilder {
         int len = line.length();
         if (this.maxlen > 0 && this.buf.length() + len >= this.maxlen) {
             throw new MaxHeaderLengthLimitException("Maximum header length limit exceeded");
-        }        
+        }
         this.buf.append(line.buffer(), 0, line.length());
     }
-    
+
     public RawField build() throws MimeException {
         int len = this.buf.length();
         if (len > 0) {
@@ -77,15 +77,15 @@ public class DefaultFieldBuilder implements FieldBuilder {
         for (int i = 0; i < name.length(); i++) {
             char ch = name.charAt(i);
             if (!FIELD_CHARS.get(ch)) {
-                throw new MimeException("MIME field name contains illegal characters: " 
+                throw new MimeException("MIME field name contains illegal characters: "
                         + field.getName());
             }
         }
         return field;
     }
-    
+
     public ByteArrayBuffer getRaw() {
         return this.buf;
     }
-    
+
 }

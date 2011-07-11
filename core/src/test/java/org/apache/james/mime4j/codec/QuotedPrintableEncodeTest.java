@@ -31,7 +31,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 public class QuotedPrintableEncodeTest extends TestCase {
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -41,7 +41,7 @@ public class QuotedPrintableEncodeTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
+
     public void testEscapedSoftBreak() throws Exception {
         byte[] content = new byte[500];
         Arrays.fill(content, (byte)0x20);
@@ -61,7 +61,7 @@ public class QuotedPrintableEncodeTest extends TestCase {
         }
         check(content, expected);
     }
-    
+
     public void testPlainAsciiSoftBreak() throws Exception {
         byte[] content = new byte[500];
         Arrays.fill(content, (byte)0x29);
@@ -87,25 +87,25 @@ public class QuotedPrintableEncodeTest extends TestCase {
         expected[467] = '\n';
         check(content, expected);
     }
-    
+
     public void testPlainASCII() throws Exception {
         checkRoundtrip("Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage." +
                 "Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage." +
                 "Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage." +
                 "Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage.");
     }
-    
+
     public void testEncodeSpace() throws Exception {
         checkRoundtrip("                 ");
     }
-    
+
     public void testLetterEncoding() throws Exception {
         for (byte b=0;b<Byte.MAX_VALUE;b++) {
             byte[] content = {b};
             checkRoundtrip(content);
         }
     }
-    
+
     private void checkRoundtrip(String content) throws Exception {
         checkRoundtrip(content, CharsetUtil.US_ASCII);
     }
@@ -113,7 +113,7 @@ public class QuotedPrintableEncodeTest extends TestCase {
     private void checkRoundtrip(String content, Charset charset) throws Exception {
         checkRoundtrip(charset.encode(content).array());
     }
-    
+
     private void checkRoundtrip(byte[] content) throws Exception {
         InputStream in = new ByteArrayInputStream(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -124,14 +124,14 @@ public class QuotedPrintableEncodeTest extends TestCase {
         IOUtils.copy(in, out);
         assertEquals(content, out.toByteArray());
     }
-    
+
     private void check(byte[] content, byte[] expected) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.encodeQuotedPrintableBinary(in, out);
         assertEquals(expected, out.toByteArray());
     }
-    
+
     private void assertEquals(byte[] expected, byte[] actual) {
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {

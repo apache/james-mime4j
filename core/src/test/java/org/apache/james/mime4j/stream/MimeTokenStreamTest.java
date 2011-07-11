@@ -28,12 +28,12 @@ import org.apache.james.mime4j.ExampleMail;
 public class MimeTokenStreamTest extends TestCase {
 
     MimeTokenStream stream;
-    
+
     @Override
     public void setUp() throws Exception {
         stream = new MimeTokenStream();
     }
-    
+
     public void testSetRecursionModeBeforeParse() throws Exception {
         stream.setRecursionMode(RecursionMode.M_NO_RECURSE);
         stream.parse(new ByteArrayInputStream(ExampleMail.MAIL_WITH_RFC822_PART_BYTES));
@@ -75,8 +75,8 @@ public class MimeTokenStreamTest extends TestCase {
         checkNextIs(EntityState.T_END_MESSAGE);
         checkNextIs(EntityState.T_END_OF_STREAM);
     }
-    
+
     private void checkNextIs(EntityState expected) throws Exception {
-        assertEquals(MimeTokenStream.stateToString(expected), MimeTokenStream.stateToString(stream.next()));        
+        assertEquals(MimeTokenStream.stateToString(expected), MimeTokenStream.stateToString(stream.next()));
     }
 }

@@ -33,7 +33,7 @@ public interface BodyFactory {
     /**
      * Creates a {@link BinaryBody} that holds the content of the given input
      * stream.
-     * 
+     *
      * @param is
      *            input stream to create a message body from.
      * @return a binary body.
@@ -51,7 +51,7 @@ public interface BodyFactory {
      * calling {@link TextBody#getReader() getReader()} on the returned object.
      * If the MIME charset has no corresponding Java charset or the Java charset
      * cannot be used for decoding then &quot;us-ascii&quot; is used instead.
-     * 
+     *
      * @param is
      *            input stream to create a message body from.
      * @param mimeCharset

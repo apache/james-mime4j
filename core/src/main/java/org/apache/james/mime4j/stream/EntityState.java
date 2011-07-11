@@ -45,7 +45,7 @@ public enum EntityState {
     T_START_HEADER,
     /**
      * This token indicates, that a message parts field has now
-     * been parsed. 
+     * been parsed.
      */
     T_FIELD,
     /**
@@ -63,12 +63,12 @@ public enum EntityState {
     T_END_MULTIPART,
     /**
      * This token indicates, that a multiparts preamble is being
-     * parsed. 
+     * parsed.
      */
     T_PREAMBLE,
     /**
      * This token indicates, that a multiparts epilogue is being
-     * parsed. 
+     * parsed.
      */
     T_EPILOGUE,
     /**

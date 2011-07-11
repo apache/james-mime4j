@@ -33,26 +33,26 @@ public abstract class AbstractField implements ParsedField {
 
     protected final Field rawField;
     protected final DecodeMonitor monitor;
-    
+
     protected AbstractField(final Field rawField, final DecodeMonitor monitor) {
         this.rawField = rawField;
         this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
     }
-    
+
     /**
-     * Gets the name of the field (<code>Subject</code>, 
+     * Gets the name of the field (<code>Subject</code>,
      * <code>From</code>, etc).
-     * 
+     *
      * @return the field name.
      */
     public String getName() {
         return rawField.getName();
     }
-    
+
     /**
-     * Gets the unfolded, unparsed and possibly encoded (see RFC 2047) field 
+     * Gets the unfolded, unparsed and possibly encoded (see RFC 2047) field
      * body string.
-     * 
+     *
      * @return the unfolded unparsed field body string.
      */
     public String getBody() {
@@ -60,7 +60,7 @@ public abstract class AbstractField implements ParsedField {
     }
 
     /**
-     * Gets original (raw) representation of the field, if available, 
+     * Gets original (raw) representation of the field, if available,
      * <code>null</code> otherwise.
      */
     public ByteSequence getRaw() {
@@ -68,19 +68,19 @@ public abstract class AbstractField implements ParsedField {
     }
 
     /**
-     * @see ParsedField#isValidField() 
+     * @see ParsedField#isValidField()
      */
     public boolean isValidField() {
         return getParseException() == null;
     }
 
     /**
-     * @see ParsedField#getParseException() 
+     * @see ParsedField#getParseException()
      */
     public ParseException getParseException() {
         return null;
     }
-    
+
     protected RawField getRawField() {
         if (rawField instanceof RawField) {
             return ((RawField) rawField);
@@ -88,7 +88,7 @@ public abstract class AbstractField implements ParsedField {
             return new RawField(rawField.getName(), rawField.getBody());
         }
     }
-    
+
     @Override
     public String toString() {
         return rawField.toString();

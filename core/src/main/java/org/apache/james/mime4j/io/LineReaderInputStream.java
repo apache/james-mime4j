@@ -26,7 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Input stream capable of reading lines of text. 
+ * Input stream capable of reading lines of text.
  */
 public abstract class LineReaderInputStream extends FilterInputStream {
 
@@ -36,27 +36,27 @@ public abstract class LineReaderInputStream extends FilterInputStream {
 
     /**
      * Reads one line of text into the given {@link ByteArrayBuffer}.
-     *  
+     *
      * @param dst Destination
-     * @return number of bytes copied or <code>-1</code> if the end of 
+     * @return number of bytes copied or <code>-1</code> if the end of
      * the stream has been reached.
-     * 
+     *
      * @throws MaxLineLimitException if the line exceeds a limit on
      *   the line length imposed by a subclass.
      * @throws IOException in case of an I/O error.
      */
     public abstract int readLine(final ByteArrayBuffer dst)
             throws MaxLineLimitException, IOException;
-    
+
     /**
      * Tries to unread the last read line.
-     * 
+     *
      * Implementation may refuse to unread a new buffer until the previous
      * unread one has been competely consumed.
-     * 
+     *
      * Implementations will directly use the byte array backed by buf, so
      * make sure to not alter it anymore once this method has been called.
-     * 
+     *
      * @return true if the unread has been succesfull.
      */
     public abstract boolean unread(ByteArrayBuffer buf);

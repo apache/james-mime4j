@@ -25,7 +25,7 @@ import org.apache.james.mime4j.MimeException;
  * Signals a I/O error due to the header count exceeding the maximum limit.
  */
 public class MaxHeaderLimitException extends MimeException {
-    
+
     private static final long serialVersionUID = 2154269045186186769L;
 
     public MaxHeaderLimitException(final String message) {

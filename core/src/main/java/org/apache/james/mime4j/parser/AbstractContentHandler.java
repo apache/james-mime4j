@@ -29,48 +29,48 @@ import java.io.InputStream;
 /**
  * Abstract <code>ContentHandler</code> with default implementations of all
  * the methods of the <code>ContentHandler</code> interface.
- * 
+ *
  * The default is to do nothing.
  */
 public abstract class AbstractContentHandler implements ContentHandler {
-    
+
     public void endMultipart() throws MimeException {
     }
-    
+
     public void startMultipart(BodyDescriptor bd) throws MimeException {
     }
-    
+
     public void body(BodyDescriptor bd, InputStream is)
             throws MimeException, IOException {
     }
-    
+
     public void endBodyPart() throws MimeException {
     }
-    
+
     public void endHeader() throws MimeException {
     }
-    
+
     public void endMessage() throws MimeException {
     }
-    
+
     public void epilogue(InputStream is) throws MimeException, IOException {
     }
-    
+
     public void field(Field field) throws MimeException {
     }
-    
+
     public void preamble(InputStream is) throws MimeException, IOException {
     }
-    
+
     public void startBodyPart() throws MimeException {
     }
-    
+
     public void startHeader() throws MimeException {
     }
-    
+
     public void startMessage() throws MimeException {
     }
-    
+
     public void raw(InputStream is) throws MimeException, IOException {
     }
 

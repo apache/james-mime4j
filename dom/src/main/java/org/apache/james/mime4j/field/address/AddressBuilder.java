@@ -30,14 +30,14 @@ import org.apache.james.mime4j.dom.address.Mailbox;
 public class AddressBuilder {
 
     public static final AddressBuilder DEFAULT = new AddressBuilder();
-    
+
     protected AddressBuilder() {
         super();
     }
-    
+
     /**
      * Parses the specified raw string into an address.
-     * 
+     *
      * @param rawAddressString
      *            string to parse.
      * @param monitor the DecodeMonitor to be used while parsing/decoding
@@ -57,7 +57,7 @@ public class AddressBuilder {
     /**
      * Parse the address list string, such as the value of a From, To, Cc, Bcc,
      * Sender, or Reply-To header.
-     * 
+     *
      * The string MUST be unfolded already.
      * @param monitor the DecodeMonitor to be used while parsing/decoding
      */
@@ -74,7 +74,7 @@ public class AddressBuilder {
 
     /**
      * Parses the specified raw string into a mailbox address.
-     * 
+     *
      * @param rawMailboxString
      *            string to parse.
      * @param monitor the DecodeMonitor to be used while parsing/decoding.
@@ -95,7 +95,7 @@ public class AddressBuilder {
 
     /**
      * Parses the specified raw string into a group address.
-     * 
+     *
      * @param rawGroupString
      *            string to parse.
      * @return a <code>Group</code> object for the specified string.
@@ -106,7 +106,7 @@ public class AddressBuilder {
         Address address = parseAddress(rawGroupString, monitor);
         if (!(address instanceof Group))
             throw new ParseException("Not a group address");
-    
+
         return (Group) address;
     }
 

@@ -23,7 +23,7 @@ public interface ContentTransferEncodingField extends ParsedField {
 
     /**
      * Gets the encoding defined in this field.
-     * 
+     *
      * @return the content ID or <code>null</code> if not set.
      */
     String getEncoding();

@@ -25,114 +25,114 @@ import java.util.Locale;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 public class ExampleMail {
-    
-    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MULTIPART_MIXED = "--4.66920160910299\r\n" + 
-            "Content-Type: image/gif\r\n" + 
-            "Content-Transfer-Encoding: base64\r\n" + 
-            "MIME-Version: 1.0\r\n" + 
-            "Content-ID: 238478934723847238947892374\r\n" + 
-            "Content-Description: Bogus Image Data\r\n" + 
-            "\r\n" + 
-            "ABCDFEGHIJKLMNO\r\n" + 
-            "\r\n" + 
-            "--4.66920160910299\r\n" + 
-            "Content-Type: message/rfc822\r\n" + 
-            "\r\n" + 
-            "From: Timothy Tayler <timothy@example.org>\r\n" + 
-            "To: John Smith <john@example.org>\r\n" + 
-            "Date: Sat, 16 Feb 2008 12:00:00 +0000 (GMT)\r\n" + 
-            "Subject: Another Example Email\r\n" + 
-            "Content-Type: multipart/mixed;boundary=2.50290787509\r\n" + 
-            "\r\n" + 
-            "Yet another preamble\r\n" + 
-            "\r\n" + 
-            "--2.50290787509\r\n" + 
-            "Content-Type: text/plain\r\n" + 
-            "\r\n" + 
-            "Rhubard AND Custard!\r\n" + 
-            "\r\n" + 
-            "--2.50290787509\r\n" + 
-            "Content-Type: multipart/alternative;boundary=3.243F6A8885A308D3\r\n" + 
-            "\r\n" + 
-            "--3.243F6A8885A308D3\r\n" + 
-            "Content-Type: text/plain\r\n" + 
-            "\r\n" + 
-            "Rhubard?Custard?\r\n" + 
-            "\r\n" + 
-            "--3.243F6A8885A308D3\r\n" + 
-            "\r\n" + 
-            "Content-Type: text/richtext\r\n" + 
-            "\r\n" + 
-            "Rhubard?Custard?\r\n" + 
-            "\r\n" + 
-            "--3.243F6A8885A308D3--\r\n" + 
-            "\r\n" + 
-            "--2.50290787509--\r\n" + 
-            "\r\n" + 
+
+    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MULTIPART_MIXED = "--4.66920160910299\r\n" +
+            "Content-Type: image/gif\r\n" +
+            "Content-Transfer-Encoding: base64\r\n" +
+            "MIME-Version: 1.0\r\n" +
+            "Content-ID: 238478934723847238947892374\r\n" +
+            "Content-Description: Bogus Image Data\r\n" +
+            "\r\n" +
+            "ABCDFEGHIJKLMNO\r\n" +
+            "\r\n" +
+            "--4.66920160910299\r\n" +
+            "Content-Type: message/rfc822\r\n" +
+            "\r\n" +
+            "From: Timothy Tayler <timothy@example.org>\r\n" +
+            "To: John Smith <john@example.org>\r\n" +
+            "Date: Sat, 16 Feb 2008 12:00:00 +0000 (GMT)\r\n" +
+            "Subject: Another Example Email\r\n" +
+            "Content-Type: multipart/mixed;boundary=2.50290787509\r\n" +
+            "\r\n" +
+            "Yet another preamble\r\n" +
+            "\r\n" +
+            "--2.50290787509\r\n" +
+            "Content-Type: text/plain\r\n" +
+            "\r\n" +
+            "Rhubard AND Custard!\r\n" +
+            "\r\n" +
+            "--2.50290787509\r\n" +
+            "Content-Type: multipart/alternative;boundary=3.243F6A8885A308D3\r\n" +
+            "\r\n" +
+            "--3.243F6A8885A308D3\r\n" +
+            "Content-Type: text/plain\r\n" +
+            "\r\n" +
+            "Rhubard?Custard?\r\n" +
+            "\r\n" +
+            "--3.243F6A8885A308D3\r\n" +
+            "\r\n" +
+            "Content-Type: text/richtext\r\n" +
+            "\r\n" +
+            "Rhubard?Custard?\r\n" +
+            "\r\n" +
+            "--3.243F6A8885A308D3--\r\n" +
+            "\r\n" +
+            "--2.50290787509--\r\n" +
+            "\r\n" +
             "--4.66920160910299--";
 
-    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MAIL = "From: Timothy Tayler <timothy@example.org>\r\n" + 
-            "To: Samual Smith <samual@example.org>\r\n" + 
-            "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" + 
-            "Subject: A Multipart Alternative Email\r\n" + 
-            "Content-Type: multipart/alternative;boundary=42\r\n" + 
-            "\r\n" + 
-            "This message has a premable\r\n" + 
-            "\r\n" + 
-            "--42\r\n" + 
-            "Content-Type: text/plain; charset=US-ASCII\r\n" + 
-            "\r\n" + 
-            "Custard!\r\n" + 
-            "\r\n" + 
-            "--42\r\n" + 
-            "Content-Type: application/octet-stream\r\n" + 
-            "\r\n" + 
-            "CUSTARDCUSTARDCUSTARD\r\n" + 
-            "\r\n" + 
+    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MAIL = "From: Timothy Tayler <timothy@example.org>\r\n" +
+            "To: Samual Smith <samual@example.org>\r\n" +
+            "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" +
+            "Subject: A Multipart Alternative Email\r\n" +
+            "Content-Type: multipart/alternative;boundary=42\r\n" +
+            "\r\n" +
+            "This message has a premable\r\n" +
+            "\r\n" +
+            "--42\r\n" +
+            "Content-Type: text/plain; charset=US-ASCII\r\n" +
+            "\r\n" +
+            "Custard!\r\n" +
+            "\r\n" +
+            "--42\r\n" +
+            "Content-Type: application/octet-stream\r\n" +
+            "\r\n" +
+            "CUSTARDCUSTARDCUSTARD\r\n" +
+            "\r\n" +
             "--42--\r\n";
 
-    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_BODY = "Start with a preamble\r\n" + 
-            "\r\n" + 
-            "--1729\r\n" + 
-            "Content-Type: text/plain; charset=US-ASCII\r\n" + 
-            "\r\n" + 
-            "Rhubarb!\r\n" + 
-            "\r\n" + 
-            "--1729\r\n" + 
-            "Content-Type: application/octet-stream\r\n" + 
-            "Content-Transfer-Encoding: base64\r\n" + 
-            "\r\n" + 
-            "987654321AHPLA\r\n" + 
-            "\r\n" + 
-            "--1729\r\n" + 
-            "Content-Type: message/rfc822\r\n" + 
-            "\r\n" + 
-            MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MAIL + 
-            "\r\n" + 
-            "--1729\r\n" + 
-            "Content-Type: multipart/mixed; boundary=4.66920160910299\r\n" + 
-            "\r\n" + 
+    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES_BODY = "Start with a preamble\r\n" +
+            "\r\n" +
+            "--1729\r\n" +
+            "Content-Type: text/plain; charset=US-ASCII\r\n" +
+            "\r\n" +
+            "Rhubarb!\r\n" +
+            "\r\n" +
+            "--1729\r\n" +
+            "Content-Type: application/octet-stream\r\n" +
+            "Content-Transfer-Encoding: base64\r\n" +
+            "\r\n" +
+            "987654321AHPLA\r\n" +
+            "\r\n" +
+            "--1729\r\n" +
+            "Content-Type: message/rfc822\r\n" +
+            "\r\n" +
+            MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MAIL +
+            "\r\n" +
+            "--1729\r\n" +
+            "Content-Type: multipart/mixed; boundary=4.66920160910299\r\n" +
+            "\r\n" +
             MIME_MULTIPART_EMBEDDED_MESSAGES_INNER_MULTIPART_MIXED + "\r\n" +
-            "--1729--\r\n" + 
+            "--1729--\r\n" +
             "\r\n";
-    
+
     public static final String MD5_CONTENT = "Q2hlY2sgSW50ZWdyaXR5IQ==";
     public static final String CONTENT_DESCRIPTION = "Blah blah blah";
     public static final String CONTENT_ID = "<f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>";
     public static final Charset US_ASCII = CharsetUtil.US_ASCII;
     public static final Charset LATIN1 = CharsetUtil.ISO_8859_1;
-    
-    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES = 
-        "From: Timothy Tayler <timothy@example.org>\r\n" + 
-        "To: Samual Smith <samual@example.org>\r\n" + 
-        "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" + 
-        "Subject: A Multipart Email\r\n" + 
-        "Content-Type: multipart/mixed;boundary=1729\r\n" + 
-        "\r\n" + 
-        MIME_MULTIPART_EMBEDDED_MESSAGES_BODY; 
 
-    
-    public static final String MULTIPART_WITH_CONTENT_LOCATION = 
+    public static final String MIME_MULTIPART_EMBEDDED_MESSAGES =
+        "From: Timothy Tayler <timothy@example.org>\r\n" +
+        "To: Samual Smith <samual@example.org>\r\n" +
+        "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" +
+        "Subject: A Multipart Email\r\n" +
+        "Content-Type: multipart/mixed;boundary=1729\r\n" +
+        "\r\n" +
+        MIME_MULTIPART_EMBEDDED_MESSAGES_BODY;
+
+
+    public static final String MULTIPART_WITH_CONTENT_LOCATION =
         "From: Timothy Tayler <timothy@example.org>\r\n" +
         "To: Samual Smith <samual@example.org>\r\n" +
         "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" +
@@ -166,7 +166,7 @@ public class ExampleMail {
         "\r\n--1729--\r\n" +
         "This is the epilogue\r\n";
 
-    public static final String MULTIPART_WITH_BINARY_ATTACHMENTS_HEADER = 
+    public static final String MULTIPART_WITH_BINARY_ATTACHMENTS_HEADER =
         "Return-Path: <robertburrelldonkin@blueyonder.co.uk>\r\n" +
         "Received: (qmail 18554 invoked from network); 25 May 2008 14:38:53 -0000\r\n" +
         "Received: from unknown (HELO p3presmtp01-16.prod.phx3.secureserver.net)\r\n" +
@@ -217,7 +217,7 @@ public class ExampleMail {
         "X-fetched-from: mail.xmlmapt.org\r\n" +
         "X-Evolution-Source: imap://rob@thebes/\r\n" +
         "\r\n";
-    
+
     public static final String MULTIPART_WITH_BINARY_ATTACHMENTS_BODY = "--=-tIdGYVstQJghyEDATnJ+\r\n" +
         "Content-Type: text/plain\r\n" +
         "Content-Transfer-Encoding: 7bit\r\n" +
@@ -332,11 +332,11 @@ public class ExampleMail {
     public static final String ONE_PART_MIME_ASCII_BODY = "A single part MIME mail.\r\n";
 
     public static final String RFC822_SIMPLE_BODY = "This is a very simple email.\r\n";
-    
+
     public static final String ONE_PART_MIME_8859_BODY = "M\u00F6nchengladbach\r\n";
-    
+
     public static final String ONE_PART_MIME_BASE64_LATIN1_BODY = "Hello Mo\u00F6nchengladbach\r\n";
-    
+
     public static final String ONE_PART_MIME_QUOTED_PRINTABLE_ASCII_BODY = "Sonnet LXXXI By William Shakespeare\r\n" +
             "Or I shall live your epitaph to make,\r\n" +
             "Or you survive when I in earth am rotten;\r\n" +
@@ -351,12 +351,12 @@ public class ExampleMail {
             "And tongues to be, your being shall rehearse,\r\n" +
             "When all the breathers of this world are dead;\r\n" +
             "  You still shall live,--such virtue hath my pen,--\r\n" +
-            "  Where breath most breathes, even in the mouths of men.\r\n"; 
-    
+            "  Where breath most breathes, even in the mouths of men.\r\n";
+
     private static final byte[] ONE_PART_MIME_BASE64_LATIN1_ENCODED = EncodeUtils.toBase64(latin1(ONE_PART_MIME_BASE64_LATIN1_BODY));
-    
+
     public static final String ONE_PART_MIME_BASE64_ASCII_BODY = "Hello, World!\r\n";
-    
+
     public static final String ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS =
         "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
         "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
@@ -387,7 +387,7 @@ public class ExampleMail {
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n" +
     ONE_PART_MIME_ASCII_BODY;
-    
+
     public static final String ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
     "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
     "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
@@ -400,7 +400,7 @@ public class ExampleMail {
     "Content-Disposition: inline\r\n" +
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n" + ONE_PART_MIME_ASCII_BODY;
-    
+
     public static final String ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
     "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
     "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
@@ -414,7 +414,7 @@ public class ExampleMail {
     "Content-Disposition: inline\r\n" +
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n" + ONE_PART_MIME_ASCII_BODY;
-    
+
     public static final String INNER_MAIL = "From: Timothy Tayler <tim@example.org>\r\n" +
     "To: Joshua Tetley <joshua@example.org>\r\n" +
     "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
@@ -448,7 +448,7 @@ public class ExampleMail {
     "Last part is plain text\r\n" +
     "--1729--\r\n" +
     "The End";
-        
+
     public static final String ONE_PART_MIME_8859 = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
     "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
     "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
@@ -464,7 +464,7 @@ public class ExampleMail {
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n" +
     ONE_PART_MIME_8859_BODY;
-    
+
     public static final String ONE_PART_MIME_BASE64_ASCII_HEADERS = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
     "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
     "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
@@ -477,7 +477,7 @@ public class ExampleMail {
     "Content-Disposition: inline\r\n" +
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n";
-    
+
     public static final String ONE_PART_MIME_BASE64_LATIN1_HEADERS = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
     "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
     "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
@@ -490,7 +490,7 @@ public class ExampleMail {
     "Content-Disposition: inline\r\n" +
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n";
-    
+
     public static final String ONE_PART_MIME_QUOTED_PRINTABLE_ASCII = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
     "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
     "Date: Thu, 6 Mar 2008 18:02:03 +0000\r\n" +
@@ -503,9 +503,9 @@ public class ExampleMail {
     "Content-Disposition: inline\r\n" +
     "Delivered-To: robertburrelldonkin@gmail.com\r\n" +
     "\r\n" + breakLines(ONE_PART_MIME_QUOTED_PRINTABLE_ASCII_BODY.replaceAll("\r\n", "=0D=0A"));
-    
-    
-    public static final String RFC_SIMPLE = 
+
+
+    public static final String RFC_SIMPLE =
             "From: Timothy Tayler <timothy@example.org>\r\n" +
             "To: Samual Smith <samual@example.org>\r\n" +
             "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" +
@@ -513,7 +513,7 @@ public class ExampleMail {
             "\r\n" +
             RFC822_SIMPLE_BODY;
 
-    public static final String MIME_RFC822_SIMPLE = 
+    public static final String MIME_RFC822_SIMPLE =
         "From: Samual Smith <sam@example.org>\r\n" +
         "To: Joshua Tetley <josh@example.org>\r\n" +
         "Date: Thu, 14 Feb 2008 12:30:00 +0000 (GMT)\r\n" +
@@ -521,7 +521,7 @@ public class ExampleMail {
         "MIME-Version: 1.0\r\n" +
         "Content-Type: message/rfc822\r\n" +
         "\r\n" + RFC_SIMPLE;
-    
+
     public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_7BIT = "Sonnet XXXIII By William Shakespeare\r\n" +
             "\r\n" +
             "Full many a glorious morning have I seen\r\n" +
@@ -538,7 +538,7 @@ public class ExampleMail {
             "The region cloud hath mask'd him from me now.\r\n" +
             "  Yet him for this my love no whit disdaineth;\r\n" +
             "  Suns of the world may stain when heaven's sun staineth.\r\n";
-            
+
     public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_QUOTED_PRINTABLE = "Sonnet XXXV By William Shakespeare\r\n" +
             "\r\n" +
             "No more be griev'd at that which thou hast done:\r\n" +
@@ -554,8 +554,8 @@ public class ExampleMail {
             "And 'gainst myself a lawful plea commence:\r\n" +
             "Such civil war is in my love and hate,\r\n" +
             "  That I an accessary needs must be,\r\n" +
-            "  To that sweet thief which sourly robs from me.\r\n"; 
-    
+            "  To that sweet thief which sourly robs from me.\r\n";
+
     public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BASE64 = "Sonnet XXXVIII By William Shakespeare\r\n" +
             "\r\n" +
             "How can my muse want subject to invent,\r\n" +
@@ -572,8 +572,8 @@ public class ExampleMail {
             "Eternal numbers to outlive long date.\r\n" +
             "  If my slight muse do please these curious days,\r\n" +
             "  The pain be mine, but thine shall be the praise.\r\n";
-        
-    public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_ONE = 
+
+    public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_ONE =
             "From: Timothy Tayler <timothy@example.org>\r\n" +
             "To: Samual Smith <samual@example.org>\r\n" +
             "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" +
@@ -585,21 +585,21 @@ public class ExampleMail {
             "--1729\r\n" +
             "Content-Type: text/plain; charset=US-ASCII\r\n" +
             "Content-Transfer-Encoding: 7bit\r\n\r\n";
-    
-    public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_TWO = 
+
+    public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_TWO =
             "\r\n--1729\r\n" +
             "Content-Type: text/plain; charset=US-ASCII\r\n" +
             "Content-Transfer-Encoding: Quoted-Printable\r\n\r\n";
-    
-    public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_THREE = 
+
+    public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_THREE =
             "\r\n--1729\r\n" +
             "Content-Type: text/plain; charset=US-ASCII\r\n" +
             "Content-Transfer-Encoding: base64\r\n\r\n";
-            
-    public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END = 
+
+    public static final String MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END =
             "\r\n--1729--\r\n";
-    
-    public static final String MIME_MULTIPART_ALTERNATIVE = 
+
+    public static final String MIME_MULTIPART_ALTERNATIVE =
         "From: Timothy Tayler <timothy@example.org>\r\n" +
         "To: Samual Smith <samual@example.org>\r\n" +
         "Date: Thu, 14 Feb 2008 12:00:00 +0000 (GMT)\r\n" +
@@ -620,8 +620,8 @@ public class ExampleMail {
         "<html><head><title>Rhubarb</title></head><body>Rhubarb!</body></html>\r\n" +
         "\r\n--1729--\r\n" +
         "This is the epilogue\r\n";
-    
-    
+
+
     private static final byte[][] MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTE_ARRAYS = {
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_ONE),
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_7BIT),
@@ -631,7 +631,7 @@ public class ExampleMail {
         EncodeUtils.toBase64(ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BASE64)),
         ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END),
     };
-    
+
     public static final byte[] MIME_RFC822_SIMPLE_BYTES = ascii(MIME_RFC822_SIMPLE);
     public static final byte[] MULTIPART_WITH_CONTENT_LOCATION_BYTES = ascii(MULTIPART_WITH_CONTENT_LOCATION);
     public static final byte[] ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS_BYTES = ascii(ONE_PART_MIME_WITH_CONTENT_DISPOSITION_PARAMETERS);
@@ -651,24 +651,24 @@ public class ExampleMail {
     public static final byte[] ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES).array();
     public static final byte[] MAIL_WITH_RFC822_PART_BYTES = ascii(MAIL_WITH_RFC822_PART);
     public static final byte[] MIME_MULTIPART_EMBEDDED_MESSAGES_BYTES = ascii(MIME_MULTIPART_EMBEDDED_MESSAGES);
-    
+
     public static final byte[] ascii(String text) {
-        
+
         return US_ASCII.encode(text).array();
     }
-    
+
     public static final byte[] latin1(String text) {
-        
+
         return LATIN1.encode(text).array();
     }
-        
+
     public static final byte[] join(byte[] one, byte[] two) {
         byte[] results = new byte[one.length + two.length];
         System.arraycopy(one, 0, results, 0, one.length);
         System.arraycopy(two, 0, results, one.length, two.length);
         return results;
     }
-    
+
     public static final byte[] join(byte[][] byteArrays) {
         int length = 0;
         for (byte[] bytes : byteArrays) {
@@ -682,7 +682,7 @@ public class ExampleMail {
         }
         return results;
     }
-    
+
     public static String breakLines(String original) {
         StringBuilder buffer = new StringBuilder(original);
         int count = 76;
@@ -690,10 +690,10 @@ public class ExampleMail {
             if (buffer.charAt(count) == '=') {
                 count = count - 1;
             } else if (buffer.charAt(count-1) == '=') {
-                count = count - 4;                
+                count = count - 4;
             } else if (buffer.charAt(count-2) == '=') {
                 count = count - 3;
-            }    
+            }
             buffer.insert(count, '\n');
             buffer.insert(count, '\r');
             buffer.insert(count, '=');

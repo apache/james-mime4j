@@ -34,10 +34,10 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         byte[] b2 = pattern.getBytes("US-ASCII");
         BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
-        
+
         assertEquals('b', inbuffer.read());
         assertEquals('l', inbuffer.read());
-        
+
         try {
             inbuffer.byteAt(1);
             fail("IndexOutOfBoundsException should have been thrown");
@@ -91,7 +91,7 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         }
         assertEquals(10, inbuffer.indexOf((byte)'y', 2, 17));
     }
-      
+
     public void testBasicOperations() throws Exception {
         String text = "bla bla yada yada haha haha";
         byte[] b1 = text.getBytes("US-ASCII");
@@ -107,14 +107,14 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         assertEquals(2, inbuffer.pos());
         assertEquals(27, inbuffer.limit());
         assertEquals(25, inbuffer.length());
-        
+
         byte[] tmp1 = new byte[3];
         assertEquals(3, inbuffer.read(tmp1));
 
         assertEquals(5, inbuffer.pos());
         assertEquals(27, inbuffer.limit());
         assertEquals(22, inbuffer.length());
-        
+
         byte[] tmp2 = new byte[22];
         assertEquals(22, inbuffer.read(tmp2));
 
@@ -138,7 +138,7 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         int i = inbuffer.indexOf(b2);
         assertEquals(7, i);
     }
-    
+
     public void testPatternMatching2() throws Exception {
         String text = "disddisdissdsidsidsiid";
         String pattern = "siid";
@@ -149,7 +149,7 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         int i = inbuffer.indexOf(b2);
         assertEquals(18, i);
     }
-    
+
     public void testPatternMatching3() throws Exception {
         String text = "bla bla yada yada haha haha";
         String pattern = "blah";
@@ -160,7 +160,7 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         int i = inbuffer.indexOf(b2);
         assertEquals(-1, i);
     }
-    
+
     public void testPatternMatching4() throws Exception {
         String text = "bla bla yada yada haha haha";
         String pattern = "bla";
@@ -199,7 +199,7 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         i = inbuffer.indexOf((byte)'g', inbuffer.pos(), inbuffer.length() - 3);
         assertEquals(-1, i);
     }
-    
+
     public void test0xFFInBinaryStream() throws Exception {
         byte[] b1 = new byte[] {1, 2, 3, (byte) 0xff, 10, 1, 2, 3};
         byte[] b2 = new byte[] {10};

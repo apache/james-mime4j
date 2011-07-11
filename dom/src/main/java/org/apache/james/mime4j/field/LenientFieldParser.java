@@ -37,10 +37,10 @@ import org.apache.james.mime4j.util.ContentUtil;
 public class LenientFieldParser extends DelegatingFieldParser {
 
     private static final LenientFieldParser PARSER = new LenientFieldParser();
-    
+
     /**
      * Gets the default parser used to parse fields.
-     * 
+     *
      * @return the default field parser
      */
     public static LenientFieldParser getParser() {
@@ -51,23 +51,23 @@ public class LenientFieldParser extends DelegatingFieldParser {
      * Parses the given byte sequence and returns an instance of the
      * <code>Field</code> class. The type of the class returned depends on the
      * field name.
-     * 
+     *
      * @param raw the bytes to parse.
      * @param monitor a DecodeMonitor object used while parsing/decoding.
      * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
      */
     public static ParsedField parse(
-            final ByteSequence raw, 
+            final ByteSequence raw,
             final DecodeMonitor monitor) throws MimeException {
         Field rawField = RawFieldParser.DEFAULT.parseField(raw);
         return PARSER.parse(rawField, monitor);
     }
 
     /**
-     * Parses the given string and returns an instance of the <code>Field</code> class. 
+     * Parses the given string and returns an instance of the <code>Field</code> class.
      * The type of the class returned depends on the field name.
-     * 
+     *
      * @param rawStr the string to parse.
      * @param monitor a DecodeMonitor object used while parsing/decoding.
      * @return a <code>ParsedField</code> instance.
@@ -89,8 +89,8 @@ public class LenientFieldParser extends DelegatingFieldParser {
 
     public LenientFieldParser() {
         super(UnstructuredFieldImpl.PARSER);
-        setFieldParser(FieldName.CONTENT_TYPE, 
-                ContentTypeFieldLenientImpl.PARSER);        // lenient 
+        setFieldParser(FieldName.CONTENT_TYPE,
+                ContentTypeFieldLenientImpl.PARSER);        // lenient
         setFieldParser(FieldName.CONTENT_LENGTH,
                 ContentLengthFieldImpl.PARSER);             // default
         setFieldParser(FieldName.CONTENT_TRANSFER_ENCODING,

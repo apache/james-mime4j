@@ -34,7 +34,7 @@ public class ContentUtil {
     /**
      * Encodes the specified string into an immutable sequence of bytes using
      * the US-ASCII charset.
-     * 
+     *
      * @param string
      *            string to encode.
      * @return encoded string as an immutable sequence of bytes.
@@ -53,7 +53,7 @@ public class ContentUtil {
     /**
      * Encodes the specified string into an immutable sequence of bytes using
      * the specified charset.
-     * 
+     *
      * @param charset
      *            Java charset to be used for the conversion.
      * @param string
@@ -76,7 +76,7 @@ public class ContentUtil {
     /**
      * Decodes the specified sequence of bytes into a string using the US-ASCII
      * charset.
-     * 
+     *
      * @param byteSequence
      *            sequence of bytes to decode.
      * @return decoded string.
@@ -91,7 +91,7 @@ public class ContentUtil {
     /**
      * Decodes the specified sequence of bytes into a string using the specified
      * charset.
-     * 
+     *
      * @param charset
      *            Java charset to be used for the conversion.
      * @param byteSequence
@@ -105,7 +105,7 @@ public class ContentUtil {
     /**
      * Decodes a sub-sequence of the specified sequence of bytes into a string
      * using the US-ASCII charset.
-     * 
+     *
      * @param byteSequence
      *            sequence of bytes to decode.
      * @param offset
@@ -128,7 +128,7 @@ public class ContentUtil {
     /**
      * Decodes a sub-sequence of the specified sequence of bytes into a string
      * using the specified charset.
-     * 
+     *
      * @param charset
      *            Java charset to be used for the conversion.
      * @param byteSequence

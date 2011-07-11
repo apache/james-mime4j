@@ -24,7 +24,7 @@ package org.apache.james.mime4j.util;
  * A resizable byte array.
  */
 public final class ByteArrayBuffer implements ByteSequence {
-    
+
     private byte[] buffer;
     private int len;
 
@@ -33,13 +33,13 @@ public final class ByteArrayBuffer implements ByteSequence {
         if (capacity < 0) {
             throw new IllegalArgumentException("Buffer capacity may not be negative");
         }
-        this.buffer = new byte[capacity]; 
+        this.buffer = new byte[capacity];
     }
 
     public ByteArrayBuffer(byte[] bytes, boolean dontCopy) {
         this(bytes, bytes.length, dontCopy);
     }
-    
+
     public ByteArrayBuffer(byte[] bytes, int len, boolean dontCopy) {
         if (bytes == null)
             throw new IllegalArgumentException();
@@ -61,7 +61,7 @@ public final class ByteArrayBuffer implements ByteSequence {
         System.arraycopy(this.buffer, 0, newbuffer, 0, this.len);
         this.buffer = newbuffer;
     }
-    
+
     public void append(final byte[] b, int off, int len) {
         if (b == null) {
             return;
@@ -93,26 +93,26 @@ public final class ByteArrayBuffer implements ByteSequence {
     public void clear() {
         this.len = 0;
     }
-    
+
     public byte[] toByteArray() {
-        byte[] b = new byte[this.len]; 
+        byte[] b = new byte[this.len];
         if (this.len > 0) {
             System.arraycopy(this.buffer, 0, b, 0, this.len);
         }
         return b;
     }
-    
+
     public byte byteAt(int i) {
         if (i < 0 || i >= this.len)
             throw new IndexOutOfBoundsException();
 
         return this.buffer[i];
     }
-    
+
     public int capacity() {
         return this.buffer.length;
     }
-    
+
     public int length() {
         return this.len;
     }
@@ -149,7 +149,7 @@ public final class ByteArrayBuffer implements ByteSequence {
         }
         this.len = len;
     }
-    
+
     public void remove(int off, int len) {
         if ((off < 0) || (off > this.len) || (len < 0) ||
                 ((off + len) < 0) || ((off + len) > this.len)) {
@@ -164,13 +164,13 @@ public final class ByteArrayBuffer implements ByteSequence {
         }
         this.len -= len;
     }
-    
+
     public boolean isEmpty() {
-        return this.len == 0; 
+        return this.len == 0;
     }
-    
+
     public boolean isFull() {
-        return this.len == this.buffer.length; 
+        return this.len == this.buffer.length;
     }
 
     @Override

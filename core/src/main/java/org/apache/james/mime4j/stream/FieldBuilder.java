@@ -24,12 +24,12 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 public interface FieldBuilder {
 
-    void reset(); 
-    
+    void reset();
+
     void append(ByteArrayBuffer line) throws MimeException;
-    
+
     RawField build() throws MimeException;
-    
+
     ByteArrayBuffer getRaw();
-    
+
 }

@@ -71,11 +71,11 @@ public class ContentLanguageFieldImpl extends AbstractField implements ContentLa
     }
 
     public static final FieldParser<ContentLanguageField> PARSER = new FieldParser<ContentLanguageField>() {
-        
+
         public ContentLanguageField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentLanguageFieldImpl(rawField, monitor);
         }
-        
+
     };
 
 }

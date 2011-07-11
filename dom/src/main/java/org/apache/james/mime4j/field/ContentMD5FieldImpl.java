@@ -45,7 +45,7 @@ public class ContentMD5FieldImpl extends AbstractField implements ContentMD5Fiel
             md5raw = null;
         }
     }
-    
+
     public String getMD5Raw() {
         if (!parsed) {
             parse();
@@ -54,11 +54,11 @@ public class ContentMD5FieldImpl extends AbstractField implements ContentMD5Fiel
     }
 
     public static final FieldParser<ContentMD5Field> PARSER = new FieldParser<ContentMD5Field>() {
-        
+
         public ContentMD5Field parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentMD5FieldImpl(rawField, monitor);
         }
-        
+
     };
 
 }

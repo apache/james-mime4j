@@ -25,27 +25,27 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Input buffer that can be used to search for patterns using Quick Search 
- * algorithm in data read from an {@link InputStream}. 
+ * Input buffer that can be used to search for patterns using Quick Search
+ * algorithm in data read from an {@link InputStream}.
  */
 public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
     private boolean truncated;
-    
+
     boolean tempBuffer = false;
-    
+
     private byte[] origBuffer;
     private int origBufpos;
     private int origBuflen;
-    
+
     private byte[] buffer;
     private int bufpos;
     private int buflen;
-    
+
     private final int maxLineLen;
-    
+
     public BufferedLineReaderInputStream(
-            final InputStream instream, 
+            final InputStream instream,
             int buffersize,
             int maxLineLen) {
         super(instream);
@@ -63,7 +63,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     }
 
     public BufferedLineReaderInputStream(
-            final InputStream instream, 
+            final InputStream instream,
             int buffersize) {
         this(instream, buffersize, -1);
     }
@@ -76,26 +76,26 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
         this.buffer = newbuffer;
     }
-    
+
     public void ensureCapacity(int len) {
         if (len > this.buffer.length) {
             expand(len);
         }
     }
-    
+
     public int fillBuffer() throws IOException {
-    	if (tempBuffer) {
-    		// we was on tempBuffer.
-    		// check that we completed the tempBuffer
-    		if (bufpos != buflen) throw new IllegalStateException("unread only works when a buffer is fully read before the next refill is asked!");
-    		// restore the original buffer
-    		buffer = origBuffer;
-    		buflen = origBuflen;
-    		bufpos = origBufpos;
-    		tempBuffer = false;
-    		// return that we just read bufferLen data.
-    		return bufferLen();
-    	}
+        if (tempBuffer) {
+            // we was on tempBuffer.
+            // check that we completed the tempBuffer
+            if (bufpos != buflen) throw new IllegalStateException("unread only works when a buffer is fully read before the next refill is asked!");
+            // restore the original buffer
+            buffer = origBuffer;
+            buflen = origBuflen;
+            bufpos = origBufpos;
+            tempBuffer = false;
+            // return that we just read bufferLen data.
+            return bufferLen();
+        }
         // compact the buffer if necessary
         if (this.bufpos > 0) { // could swtich to (this.buffer.length / 2) but needs a 4*boundary capacity, then (instead of 2).
             int len = bufferLen();
@@ -117,9 +117,9 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
     }
 
-	private int bufferLen() {
-		return this.buflen - this.bufpos;
-	}
+    private int bufferLen() {
+        return this.buflen - this.bufpos;
+    }
 
     public boolean hasBufferedData() {
         return bufferLen() > 0;
@@ -129,11 +129,11 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         clear();
         this.truncated = true;
     }
-    
+
     protected boolean readAllowed() {
-    	return !this.truncated;
+        return !this.truncated;
     }
-    
+
     @Override
     public int read() throws IOException {
         if (!readAllowed()) return -1;
@@ -146,7 +146,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
         return this.buffer[this.bufpos++] & 0xff;
     }
-    
+
     @Override
     public int read(final byte[] b, int off, int len) throws IOException {
         if (!readAllowed()) return -1;
@@ -168,7 +168,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         this.bufpos += chunk;
         return chunk;
     }
-    
+
     @Override
     public int read(final byte[] b) throws IOException {
         if (!readAllowed()) return -1;
@@ -177,7 +177,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
         return read(b, 0, b.length);
     }
-    
+
     @Override
     public boolean markSupported() {
         return false;
@@ -225,11 +225,11 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
     }
 
-	/**
+    /**
      * Implements quick search algorithm as published by
-     * <p> 
-     * SUNDAY D.M., 1990, 
-     * A very fast substring search algorithm, 
+     * <p>
+     * SUNDAY D.M., 1990,
+     * A very fast substring search algorithm,
      * Communications of the ACM . 33(8):132-142.
      * </p>
      */
@@ -243,7 +243,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         if (len < pattern.length) {
             return -1;
         }
-        
+
         int[] shiftTable = new int[256];
         for (int i = 0; i < shiftTable.length; i++) {
             shiftTable[i] = pattern.length + 1;
@@ -252,7 +252,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             int x = pattern[i] & 0xff;
             shiftTable[x] = pattern.length - i;
         }
-        
+
         int j = 0;
         while (j <= len - pattern.length) {
             int cur = off + j;
@@ -266,8 +266,8 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             if (match) {
                 return cur;
             }
-            
-            int pos = cur + pattern.length; 
+
+            int pos = cur + pattern.length;
             if (pos >= this.buffer.length) {
                 break;
             }
@@ -276,12 +276,12 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
         return -1;
     }
-    
+
     /**
      * Implements quick search algorithm as published by
-     * <p> 
-     * SUNDAY D.M., 1990, 
-     * A very fast substring search algorithm, 
+     * <p>
+     * SUNDAY D.M., 1990,
+     * A very fast substring search algorithm,
      * Communications of the ACM . 33(8):132-142.
      * </p>
      */
@@ -300,41 +300,41 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
         return -1;
     }
-    
+
     public int indexOf(byte b) {
         return indexOf(b, this.bufpos, bufferLen());
     }
-    
+
     public int byteAt(int pos) {
         if (pos < this.bufpos || pos > this.buflen) {
             throw new IndexOutOfBoundsException("looking for "+pos+" in "+bufpos+"/"+buflen);
         }
         return this.buffer[pos] & 0xff;
     }
-    
+
     protected byte[] buf() {
-        return this.buffer;        
+        return this.buffer;
     }
-    
+
     protected int pos() {
         return this.bufpos;
     }
-    
+
     protected int limit() {
         return this.buflen;
     }
-    
+
     protected int length() {
         return bufferLen();
     }
-    
+
     public int capacity() {
         return this.buffer.length;
     }
-    
+
     protected int skip(int n) {
         int chunk = Math.min(n, bufferLen());
-        this.bufpos += chunk; 
+        this.bufpos += chunk;
         return chunk;
     }
 
@@ -342,7 +342,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         this.bufpos = 0;
         this.buflen = 0;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
@@ -373,17 +373,17 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return buffer.toString();
     }
 
-	@Override
-	public boolean unread(ByteArrayBuffer buf) {
-	    if (tempBuffer) return false;
-		origBuffer = buffer;
-		origBuflen = buflen;
-		origBufpos = bufpos;
-		bufpos = 0;
-		buflen = buf.length();
-		buffer = buf.buffer();
-		tempBuffer = true;
-		return true;
-	}
+    @Override
+    public boolean unread(ByteArrayBuffer buf) {
+        if (tempBuffer) return false;
+        origBuffer = buffer;
+        origBuflen = buflen;
+        origBufpos = bufpos;
+        bufpos = 0;
+        buflen = buf.length();
+        buffer = buf.buffer();
+        tempBuffer = true;
+        return true;
+    }
 
 }

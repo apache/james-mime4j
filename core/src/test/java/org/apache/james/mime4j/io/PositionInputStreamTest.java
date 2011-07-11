@@ -49,5 +49,5 @@ public class PositionInputStreamTest extends TestCase {
         assertTrue(countingStream.read(tmp) == -1);
         assertEquals(7, countingStream.getPosition());
     }
-    
+
 }

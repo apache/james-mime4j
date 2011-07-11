@@ -47,14 +47,14 @@ public class CodecUtilTest extends TestCase {
         CodecUtil.copy(in, out);
         assertEquals(content, out.toByteArray());
     }
-    
+
     public void testEncodeQuotedPrintableLargeInput() throws Exception {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 1024 * 5; i++) {
             sb.append((char) ('0' + (i % 10)));
         }
         String expected = sb.toString().replaceAll("(\\d{75})", "$1=\r\n");
-        
+
         InputStream in = new ByteArrayInputStream(sb.toString().getBytes("US-ASCII"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.encodeQuotedPrintableBinary(in, out);
@@ -70,7 +70,7 @@ public class CodecUtilTest extends TestCase {
         String actual = new String(out.toByteArray(), "US-ASCII");
         assertEquals("7bit=20content=20with=20euro=20=A4=20symbol", actual);
     }
-    
+
     public void testBase64OutputStream() throws Exception {
         StringBuilder sb = new StringBuilder(2048);
         for (int i = 0; i < 128; i++) {
@@ -87,14 +87,14 @@ public class CodecUtilTest extends TestCase {
         CodecUtil.copy(new ByteArrayInputStream(input.getBytes()), outb64);
         outb64.flush();
         outb64.close();
-        
+
         InputStream is = new Base64InputStream(new ByteArrayInputStream(out2.toByteArray()));
         ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
         CodecUtil.copy(is, outRoundtrip);
         String output = new String(outRoundtrip.toByteArray());
         return output;
     }
-    
+
     /**
      * This test is a proof for MIME4J-67
      */
@@ -111,14 +111,14 @@ public class CodecUtilTest extends TestCase {
     private String roundtripUsingEncoder(String input) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.encodeBase64(new ByteArrayInputStream(input.getBytes()), out);
-        
+
         InputStream is = new Base64InputStream(new ByteArrayInputStream(out.toByteArray()));
         ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
         CodecUtil.copy(is, outRoundtrip);
         String output = new String(outRoundtrip.toByteArray());
         return output;
-    } 
-    
+    }
+
     /* performance test, not a unit test */
     /*
     public void testPerformance() throws Exception {
@@ -140,18 +140,18 @@ public class CodecUtilTest extends TestCase {
             long time3 = System.currentTimeMillis();
             roundtripUsingEncoder(input);
             long time4 = System.currentTimeMillis();
-            
+
             totalEncoder1 += time2-time1;
             totalStream1 += time3-time2;
             totalEncoder2 += time4-time3;
         }
-        
+
         System.out.println("Encoder 1st: "+totalEncoder1);
         System.out.println("Encoder 2nd: "+totalEncoder2);
         System.out.println("Stream 1st: "+totalStream1);
     }
     */
-    
+
     private void assertEquals(byte[] expected, byte[] actual) {
         StringBuilder buffer = new StringBuilder(expected.length);
         assertEquals(expected.length, actual.length);

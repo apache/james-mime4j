@@ -48,7 +48,7 @@ public final class MimeEntityConfig implements Cloneable {
 
     /**
      * @see #setMalformedHeaderStartsBody(boolean)
-     * 
+     *
      * @return true if malformed header should "end" the headers and be part of
      *         the body
      */
@@ -59,7 +59,7 @@ public final class MimeEntityConfig implements Cloneable {
     /**
      * Define the behaviour for dealing with malformed headers while in lenient
      * mode
-     * 
+     *
      * @param malformedHeaderStartsBody
      *            <code>true</code> to make the parser interpret a malformed
      *            header as end of the headers and as part of the body (as if
@@ -73,9 +73,9 @@ public final class MimeEntityConfig implements Cloneable {
 
     /**
      * Returns the value of the strict parsing mode
-     * 
+     *
      * @see #setStrictParsing(boolean)
-     * 
+     *
      * @return value of the strict parsing mode
      */
     public boolean isStrictParsing() {
@@ -90,7 +90,7 @@ public final class MimeEntityConfig implements Cloneable {
      * <code>false</code> minor violations will result in a warning in the log.
      * <p>
      * Default value: <code>false</code>
-     * 
+     *
      * @param strictParsing
      *            value of the strict parsing mode
      */
@@ -100,9 +100,9 @@ public final class MimeEntityConfig implements Cloneable {
 
     /**
      * Returns the maximum line length limit
-     * 
+     *
      * @see #setMaxLineLen(int)
-     * 
+     *
      * @return value of the the maximum line length limit
      */
     public int getMaxLineLen() {
@@ -116,7 +116,7 @@ public final class MimeEntityConfig implements Cloneable {
      * positive value the line length check will be disabled.
      * <p>
      * Default value: <code>1000</code>
-     * 
+     *
      * @param maxLineLen
      *            maximum line length limit
      */
@@ -126,9 +126,9 @@ public final class MimeEntityConfig implements Cloneable {
 
     /**
      * Returns the maximum header limit
-     * 
+     *
      * @see #setMaxHeaderCount(int)
-     * 
+     *
      * @return value of the the maximum header limit
      */
     public int getMaxHeaderCount() {
@@ -142,7 +142,7 @@ public final class MimeEntityConfig implements Cloneable {
      * header limit check will be disabled.
      * <p>
      * Default value: <code>1000</code>
-     * 
+     *
      * @param maxHeaderCount
      *            maximum header limit
      */
@@ -152,9 +152,9 @@ public final class MimeEntityConfig implements Cloneable {
 
     /**
      * Returns the maximum header length limit
-     * 
+     *
      * @see #setMaxHeaderLen(int)
-     * 
+     *
      * @return value of the maximum header length limit
      */
     public int getMaxHeaderLen() {
@@ -173,7 +173,7 @@ public final class MimeEntityConfig implements Cloneable {
      * terminators).
      * <p>
      * Default value: <code>10000</code>
-     * 
+     *
      * @param maxHeaderLen
      *            maximum header length limit
      */
@@ -183,9 +183,9 @@ public final class MimeEntityConfig implements Cloneable {
 
     /**
      * Returns the maximum content length limit
-     * 
+     *
      * @see #setMaxContentLen(long)
-     * 
+     *
      * @return value of the the maximum content length limit
      */
     public long getMaxContentLen() {
@@ -199,7 +199,7 @@ public final class MimeEntityConfig implements Cloneable {
      * the content length check will be disabled.
      * <p>
      * Default value: <code>-1</code>
-     * 
+     *
      * @param maxContentLen
      *            maximum content length limit
      */
@@ -209,7 +209,7 @@ public final class MimeEntityConfig implements Cloneable {
 
     /**
      * Returns the value of the line number counting mode.
-     * 
+     *
      * @return value of the line number counting mode.
      */
     public boolean isCountLineNumbers() {
@@ -221,7 +221,7 @@ public final class MimeEntityConfig implements Cloneable {
      * numbers are included in the debug output.
      * <p>
      * Default value: <code>false</code>
-     * 
+     *
      * @param countLineNumbers
      *            value of the line number counting mode.
      */
@@ -232,7 +232,7 @@ public final class MimeEntityConfig implements Cloneable {
     /**
      * Returns the value of the default content type. When not null, indicates
      * that the parsing should be headless.
-     * 
+     *
      * @return default content type when parsing headless, null otherwise
      * @see org.apache.james.mime4j.parser.MimeStreamParser#parse(java.io.InputStream)
      */
@@ -245,7 +245,7 @@ public final class MimeEntityConfig implements Cloneable {
      * should be headless.
      * <p>
      * Default value: <code>null</code>
-     * 
+     *
      * @param contentType
      *            value of the default content type when parsing headless, null
      *            otherwise

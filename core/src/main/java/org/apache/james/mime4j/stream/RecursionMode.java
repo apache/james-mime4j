@@ -24,22 +24,22 @@ package org.apache.james.mime4j.stream;
  */
 public enum RecursionMode {
 
-    /** 
-     * Recursively parse every <code>message/rfc822</code> part 
+    /**
+     * Recursively parse every <code>message/rfc822</code> part
      */
     M_RECURSE,
     /**
-     * Do not recurse <code>message/rfc822</code> parts 
+     * Do not recurse <code>message/rfc822</code> parts
      */
     M_NO_RECURSE,
-    /** 
+    /**
      * Parse into raw entities
      */
     M_RAW,
     /**
      * Do not recurse <code>message/rfc822</code> parts
-     * and treat multiparts as a single flat body. 
+     * and treat multiparts as a single flat body.
      */
     M_FLAT
-    
+
 }

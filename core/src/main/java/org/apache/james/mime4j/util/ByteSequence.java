@@ -31,14 +31,14 @@ public interface ByteSequence {
 
     /**
      * Returns the length of this byte sequence.
-     * 
+     *
      * @return the number of <code>byte</code>s in this sequence.
      */
     int length();
 
     /**
      * Returns the <code>byte</code> value at the specified index.
-     * 
+     *
      * @param index
      *            the index of the <code>byte</code> value to be returned.
      * @return the corresponding <code>byte</code> value
@@ -50,7 +50,7 @@ public interface ByteSequence {
     /**
      * Copies the contents of this byte sequence into a newly allocated byte
      * array and returns that array.
-     * 
+     *
      * @return a byte array holding a copy of this byte sequence.
      */
     byte[] toByteArray();

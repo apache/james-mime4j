@@ -37,7 +37,7 @@ public class LenientContentLanguageFieldTest extends TestCase {
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return ContentLanguageFieldLenientImpl.PARSER.parse(rawField, null);
     }
-    
+
     public void testGetLanguage() throws Exception {
         ContentLanguageField f = parse("Content-Language: en, de");
         List<String> langs = f.getLanguages();
@@ -46,14 +46,14 @@ public class LenientContentLanguageFieldTest extends TestCase {
         assertEquals("en", langs.get(0));
         assertEquals("de", langs.get(1));
     }
-    
+
     public void testGetLanguageEmpty() throws Exception {
         ContentLanguageField f = parse("Content-Language: ");
         List<String> langs = f.getLanguages();
         assertNotNull(langs);
         assertEquals(0, langs.size());
     }
-    
+
     public void testGetLanguageWithComments() throws Exception {
         ContentLanguageField f = parse("Content-Language: en (yada yada), (blah blah)de");
         List<String> langs = f.getLanguages();
@@ -62,7 +62,7 @@ public class LenientContentLanguageFieldTest extends TestCase {
         assertEquals("en", langs.get(0));
         assertEquals("de", langs.get(1));
     }
-    
+
     public void testGetLanguageWithUnderscore() throws Exception {
         ContentLanguageField f = parse("Content-Language: en, en_GB (Great Britain)");
         List<String> langs = f.getLanguages();
@@ -71,7 +71,7 @@ public class LenientContentLanguageFieldTest extends TestCase {
         assertEquals("en", langs.get(0));
         assertEquals("en_GB", langs.get(1));
     }
-    
+
     public void testGetLanguageWithEmptyElement() throws Exception {
         ContentLanguageField f = parse("Content-Language: en,, de,");
         List<String> langs = f.getLanguages();
@@ -80,5 +80,5 @@ public class LenientContentLanguageFieldTest extends TestCase {
         assertEquals("en", langs.get(0));
         assertEquals("de", langs.get(1));
     }
-    
+
 }

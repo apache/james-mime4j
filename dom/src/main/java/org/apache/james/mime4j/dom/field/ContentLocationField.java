@@ -23,7 +23,7 @@ public interface ContentLocationField extends ParsedField {
 
     /**
      * Gets the content location defined in this field.
-     * 
+     *
      * @return the content location or <code>null</code> if not set.
      */
     String getLocation();

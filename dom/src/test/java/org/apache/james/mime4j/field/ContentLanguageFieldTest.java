@@ -37,7 +37,7 @@ public class ContentLanguageFieldTest extends TestCase {
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return ContentLanguageFieldImpl.PARSER.parse(rawField, null);
     }
-    
+
     public void testGetLanguage() throws Exception {
         ContentLanguageField f = parse("Content-Language: en, de");
         List<String> langs = f.getLanguages();
@@ -46,7 +46,7 @@ public class ContentLanguageFieldTest extends TestCase {
         assertEquals("en", langs.get(0));
         assertEquals("de", langs.get(1));
     }
-    
+
     public void testGetLanguageWithComments() throws Exception {
         ContentLanguageField f = parse("Content-Language: en (yada yada), (blah blah)de");
         List<String> langs = f.getLanguages();
@@ -55,7 +55,7 @@ public class ContentLanguageFieldTest extends TestCase {
         assertEquals("en", langs.get(0));
         assertEquals("de", langs.get(1));
     }
-    
+
     public void testGetLanguageWithUnderscore() throws Exception {
         ContentLanguageField f = parse("Content-Language: en, en_GB (Great Britain)");
         List<String> langs = f.getLanguages();
@@ -63,7 +63,7 @@ public class ContentLanguageFieldTest extends TestCase {
         assertEquals(0, langs.size());
         assertNotNull(f.getParseException());
     }
-    
+
     public void testGetLanguageWithEmptyElement() throws Exception {
         ContentLanguageField f = parse("Content-Language: en,, de");
         List<String> langs = f.getLanguages();
@@ -71,5 +71,5 @@ public class ContentLanguageFieldTest extends TestCase {
         assertEquals(0, langs.size());
         assertNotNull(f.getParseException());
     }
-    
+
 }

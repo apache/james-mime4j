@@ -52,7 +52,7 @@ public class StorageBodyFactory implements BodyFactory {
     /**
      * Creates a new <code>BodyFactory</code> instance that uses the given
      * storage provider for creating message bodies from input streams.
-     * 
+     *
      * @param storageProvider
      *            a storage provider or <code>null</code> to use the default
      *            one.
@@ -60,16 +60,16 @@ public class StorageBodyFactory implements BodyFactory {
     public StorageBodyFactory(
             final StorageProvider storageProvider,
             final DecodeMonitor monitor) {
-        this.storageProvider = 
+        this.storageProvider =
             storageProvider != null ? storageProvider : DefaultStorageProvider.getInstance();
-        this.monitor = 
+        this.monitor =
             monitor != null ? monitor : DecodeMonitor.SILENT;
     }
 
     /**
      * Returns the <code>StorageProvider</code> this <code>BodyFactory</code>
      * uses to create message bodies from input streams.
-     * 
+     *
      * @return a <code>StorageProvider</code>.
      */
     public StorageProvider getStorageProvider() {
@@ -79,7 +79,7 @@ public class StorageBodyFactory implements BodyFactory {
     /**
      * Creates a {@link BinaryBody} that holds the content of the given input
      * stream.
-     * 
+     *
      * @param is
      *            input stream to create a message body from.
      * @return a binary body.
@@ -103,7 +103,7 @@ public class StorageBodyFactory implements BodyFactory {
      * method. Instead the message body created by this method takes care of
      * deleting the storage when it gets disposed of (see
      * {@link Disposable#dispose()}).
-     * 
+     *
      * @param storage
      *            storage to create a message body from.
      * @return a binary body.
@@ -124,7 +124,7 @@ public class StorageBodyFactory implements BodyFactory {
      * &quot;us-ascii&quot; is used to decode the byte content of the
      * <code>Storage</code> into a character stream when calling
      * {@link TextBody#getReader() getReader()} on the returned object.
-     * 
+     *
      * @param is
      *            input stream to create a message body from.
      * @return a text body.
@@ -149,7 +149,7 @@ public class StorageBodyFactory implements BodyFactory {
      * calling {@link TextBody#getReader() getReader()} on the returned object.
      * If the MIME charset has no corresponding Java charset or the Java charset
      * cannot be used for decoding then &quot;us-ascii&quot; is used instead.
-     * 
+     *
      * @param is
      *            input stream to create a message body from.
      * @param mimeCharset
@@ -183,7 +183,7 @@ public class StorageBodyFactory implements BodyFactory {
      * method. Instead the message body created by this method takes care of
      * deleting the storage when it gets disposed of (see
      * {@link Disposable#dispose()}).
-     * 
+     *
      * @param storage
      *            storage to create a message body from.
      * @return a text body.
@@ -214,7 +214,7 @@ public class StorageBodyFactory implements BodyFactory {
      * method. Instead the message body created by this method takes care of
      * deleting the storage when it gets disposed of (see
      * {@link Disposable#dispose()}).
-     * 
+     *
      * @param storage
      *            storage to create a message body from.
      * @param mimeCharset
@@ -241,7 +241,7 @@ public class StorageBodyFactory implements BodyFactory {
      * a byte stream when calling
      * {@link SingleBody#writeTo(java.io.OutputStream) writeTo(OutputStream)} on
      * the returned object.
-     * 
+     *
      * @param text
      *            text to create a message body from.
      * @return a text body.
@@ -262,7 +262,7 @@ public class StorageBodyFactory implements BodyFactory {
      * the returned object. If the MIME charset has no corresponding Java
      * charset or the Java charset cannot be used for encoding then
      * &quot;us-ascii&quot; is used instead.
-     * 
+     *
      * @param text
      *            text to create a message body from.
      * @param mimeCharset
@@ -280,7 +280,7 @@ public class StorageBodyFactory implements BodyFactory {
     }
 
     private static Charset toJavaCharset(
-            final String mimeCharset, 
+            final String mimeCharset,
             boolean forEncoding,
             final DecodeMonitor monitor) {
         Charset charset = CharsetUtil.lookup(mimeCharset);

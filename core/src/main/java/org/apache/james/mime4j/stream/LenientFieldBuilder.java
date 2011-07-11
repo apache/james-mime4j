@@ -28,17 +28,17 @@ public class LenientFieldBuilder implements FieldBuilder {
 
     private final ByteArrayBuffer buf;
     private final int maxlen;
-    
+
 
     public LenientFieldBuilder(int maxlen) {
         this.buf = new ByteArrayBuffer(1024);
         this.maxlen = maxlen;
     }
-    
+
     public void reset() {
         this.buf.clear();
     }
-    
+
     public void append(final ByteArrayBuffer line) throws MaxHeaderLengthLimitException {
         if (line == null) {
             return;
@@ -52,11 +52,11 @@ public class LenientFieldBuilder implements FieldBuilder {
         }
         int beginIndex = 0;
         int endIndex = len;
-        while (beginIndex < endIndex 
+        while (beginIndex < endIndex
                 && CharsetUtil.isWhitespace((char)(line.byteAt(beginIndex) & 0xff))) {
             beginIndex++;
         }
-        while (endIndex > beginIndex 
+        while (endIndex > beginIndex
                 && CharsetUtil.isWhitespace((char)(line.byteAt(endIndex - 1) & 0xff))) {
             endIndex--;
         }
@@ -65,7 +65,7 @@ public class LenientFieldBuilder implements FieldBuilder {
         }
         this.buf.append(line.buffer(), beginIndex, endIndex - beginIndex);
     }
-    
+
     public RawField build() throws MimeException {
         if (this.buf == null) {
             return null;
@@ -74,9 +74,9 @@ public class LenientFieldBuilder implements FieldBuilder {
         // Discard modified raw data
         return new RawField(field.getName(), field.getBody());
     }
-    
+
     public ByteArrayBuffer getRaw() {
         return null;
     }
-    
+
 }

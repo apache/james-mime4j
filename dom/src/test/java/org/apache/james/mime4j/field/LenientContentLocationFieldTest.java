@@ -35,29 +35,29 @@ public class LenientContentLocationFieldTest extends TestCase {
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return ContentLocationFieldLenientImpl.PARSER.parse(rawField, null);
     }
-    
+
     public void testGetSimpleLocation() throws Exception {
         ContentLocationField f = parse("Content-Location: stuff");
         String location = f.getLocation();
         assertEquals("stuff", location);
     }
-    
+
     public void testGetQuotedLocation() throws Exception {
         ContentLocationField f = parse("Content-Location: \" stuff \"");
         String location = f.getLocation();
         assertEquals("stuff", location);
     }
-    
+
     public void testGetLocationWithBlanks() throws Exception {
         ContentLocationField f = parse("Content-Location: this / that \t/what not");
         String location = f.getLocation();
         assertEquals("this/that/whatnot", location);
     }
-    
+
     public void testGetLocationWithCommens() throws Exception {
         ContentLocationField f = parse("Content-Location: this(blah) / that (yada) /what not");
         String location = f.getLocation();
         assertEquals("this/that/whatnot", location);
     }
-    
+
 }

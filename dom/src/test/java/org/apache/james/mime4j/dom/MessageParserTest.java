@@ -50,7 +50,7 @@ import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 
 public class MessageParserTest extends TestCase {
-    
+
     private URL url;
 
     public MessageParserTest(String name, URL url) {
@@ -61,25 +61,25 @@ public class MessageParserTest extends TestCase {
     public static Test suite() throws IOException, URISyntaxException {
         return new MessageParserTestSuite();
     }
-    
+
     static class MessageParserTestSuite extends TestSuite {
-        
+
         public MessageParserTestSuite() throws IOException, URISyntaxException {
             addTests("/testmsgs");
             addTests("/mimetools-testmsgs");
         }
 
-		private void addTests(String testsFolder) throws URISyntaxException,
-				MalformedURLException, IOException {
-			URL resource = MessageParserTestSuite.class.getResource(testsFolder);
+        private void addTests(String testsFolder) throws URISyntaxException,
+                MalformedURLException, IOException {
+            URL resource = MessageParserTestSuite.class.getResource(testsFolder);
             if (resource != null) {
                 if (resource.getProtocol().equalsIgnoreCase("file")) {
                     File dir = new File(resource.toURI());
                     File[] files = dir.listFiles();
-                    
+
                     for (File f : files) {
                         if (f.getName().endsWith(".msg")) {
-                            addTest(new MessageParserTest(f.getName(), 
+                            addTest(new MessageParserTest(f.getName(),
                                     f.toURI().toURL()));
                         }
                     }
@@ -91,16 +91,16 @@ public class MessageParserTest extends TestCase {
                         String s = "/" + entry.toString();
                         File f = new File(s);
                         if (s.startsWith(testsFolder) && s.endsWith(".msg")) {
-                            addTest(new MessageParserTest(f.getName(), 
+                            addTest(new MessageParserTest(f.getName(),
                                     new URL("jar:file:" + jar.getName() + "!" + s)));
                         }
                     }
                 }
             }
-		}
-        
+        }
+
     }
-    
+
     @Override
     protected void runTest() throws IOException {
         MimeEntityConfig config = new MimeEntityConfig();
@@ -111,18 +111,18 @@ public class MessageParserTest extends TestCase {
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
         Message m = builder.parseMessage(url.openStream());
-        
+
         String s = url.toString();
         String prefix = s.substring(0, s.lastIndexOf('.'));
         URL xmlFileUrl = new URL(prefix + "_decoded.xml");
-        
+
         String result = getStructure(m, prefix, "1");
         try {
-	        String expected = IOUtils.toString(xmlFileUrl.openStream(), "ISO8859-1");
-	        assertEquals(expected, result);
+            String expected = IOUtils.toString(xmlFileUrl.openStream(), "ISO8859-1");
+            assertEquals(expected, result);
         } catch (FileNotFoundException ex) {
-        	IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"), "ISO8859-1");
-        	fail("Expected file created.");
+            IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"), "ISO8859-1");
+            fail("Expected file created.");
         }
     }
 
@@ -132,17 +132,17 @@ public class MessageParserTest extends TestCase {
         return s.replaceAll(">", "&gt;");
     }
 
-    private String getStructure(Entity e, String prefix, String id) 
+    private String getStructure(Entity e, String prefix, String id)
             throws IOException {
-        
+
         StringBuilder sb = new StringBuilder();
-        
+
         if (e instanceof MessageImpl) {
             sb.append("<message>\r\n");
         } else {
             sb.append("<body-part>\r\n");
-        }            
-        
+        }
+
         sb.append("<header>\r\n");
         for (Field field : e.getHeader().getFields()) {
             sb.append("<field>\r\n"
@@ -150,11 +150,11 @@ public class MessageParserTest extends TestCase {
                     + "</field>\r\n");
         }
         sb.append("</header>\r\n");
-        
+
         if (e.getBody() instanceof Multipart) {
             sb.append("<multipart>\r\n");
-            
-            Multipart multipart =(Multipart) e.getBody(); 
+
+            Multipart multipart =(Multipart) e.getBody();
             List<Entity> parts = multipart.getBodyParts();
 
             if (multipart.getPreamble() != null) {
@@ -162,7 +162,7 @@ public class MessageParserTest extends TestCase {
                 sb.append(escape(multipart.getPreamble()));
                 sb.append("</preamble>\r\n");
             }
-            
+
             int i = 1;
             for (Entity bodyPart : parts) {
                 sb.append(getStructure(bodyPart, prefix, id + "_" + (i++)));
@@ -173,20 +173,20 @@ public class MessageParserTest extends TestCase {
                 sb.append(escape(multipart.getEpilogue()));
                 sb.append("</epilogue>\r\n");
             }
-            
+
             sb.append("</multipart>\r\n");
-            
+
         } else if (e.getBody() instanceof MessageImpl) {
             sb.append(getStructure((MessageImpl) e.getBody(), prefix, id + "_1"));
         } else {
             Body b = e.getBody();
-            String s = prefix + "_decoded_" + id 
+            String s = prefix + "_decoded_" + id
                             + (b instanceof TextBody ? ".txt" : ".bin");
             String tag = b instanceof TextBody ? "text-body" : "binary-body";
             File f = new File(s);
             sb.append("<" + tag + " name=\"" + f.getName() + "\"/>\r\n");
             URL expectedUrl = new URL(s);
-                
+
             if (b instanceof TextBody) {
                 String charset = e.getCharset();
                 if (charset == null) {
@@ -195,41 +195,41 @@ public class MessageParserTest extends TestCase {
 
                 String s2 = IOUtils.toString(((TextBody) b).getReader());
                 try {
-	                String s1 = IOUtils.toString(expectedUrl.openStream(), charset);
-	                assertEquals(f.getName(), s1, s2);
+                    String s1 = IOUtils.toString(expectedUrl.openStream(), charset);
+                    assertEquals(f.getName(), s1, s2);
                 } catch (FileNotFoundException ex) {
-                	IOUtils.write(s2, new FileOutputStream(expectedUrl.getPath()+".expected"));
-                	fail("Expected file created.");
+                    IOUtils.write(s2, new FileOutputStream(expectedUrl.getPath()+".expected"));
+                    fail("Expected file created.");
                 }
             } else {
-            	try {
-            		assertEqualsBinary(f.getName(), expectedUrl.openStream(),
+                try {
+                    assertEqualsBinary(f.getName(), expectedUrl.openStream(),
                         ((BinaryBody) b).getInputStream());
-            	} catch (FileNotFoundException ex) {
-                	IOUtils.copy(((BinaryBody) b).getInputStream(), new FileOutputStream(expectedUrl.getPath()+".expected"));
-                	fail("Expected file created.");
-            	}
+                } catch (FileNotFoundException ex) {
+                    IOUtils.copy(((BinaryBody) b).getInputStream(), new FileOutputStream(expectedUrl.getPath()+".expected"));
+                    fail("Expected file created.");
+                }
             }
         }
-        
+
         if (e instanceof MessageImpl) {
             sb.append("</message>\r\n");
         } else {
             sb.append("</body-part>\r\n");
-        }            
-        
+        }
+
         return sb.toString();
     }
 
-    private void assertEqualsBinary(String msg, InputStream a, InputStream b) 
+    private void assertEqualsBinary(String msg, InputStream a, InputStream b)
             throws IOException {
-        
+
         int pos = 0;
         while (true) {
             int b1 = a.read();
             int b2 = b.read();
             assertEquals(msg + " (Position " + (++pos) + ")", b1, b2);
-            
+
             if (b1 == -1 || b2 == -1) {
                 break;
             }

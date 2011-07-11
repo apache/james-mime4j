@@ -55,7 +55,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
     private boolean contentDecoding = true;
     private boolean flatMode = false;
     private DecodeMonitor monitor = null;
-    
+
     public DefaultMessageBuilder() {
         super();
     }
@@ -87,14 +87,14 @@ public class DefaultMessageBuilder implements MessageBuilder {
     public void setFlatMode(boolean flatMode) {
         this.flatMode = flatMode;
     }
-    
+
     /**
      * Creates a new <code>Header</code> from the specified
      * <code>Header</code>. The <code>Header</code> instance is initialized
      * with a copy of the list of {@link Field}s of the specified
      * <code>Header</code>. The <code>Field</code> objects are not copied
      * because they are immutable and can safely be shared between headers.
-     * 
+     *
      * @param other
      *            header to copy.
      */
@@ -111,7 +111,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
      * <code>Entity</code>. The <code>BodyPart</code> instance is initialized
      * with copies of header and body of the specified <code>Entity</code>.
      * The parent entity of the new body part is <code>null</code>.
-     * 
+     *
      * @param other
      *            body part to copy.
      * @throws UnsupportedOperationException
@@ -124,7 +124,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
      *             {@link SingleBody}.
      */
     public BodyPart copy(Entity other) {
-        BodyPart copy = new BodyPart(); 
+        BodyPart copy = new BodyPart();
         if (other.getHeader() != null) {
             copy.setHeader(copy(other.getHeader()));
         }
@@ -140,7 +140,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
      * initialized with copies of preamble, epilogue, sub type and the list of
      * body parts of the specified <code>Multipart</code>. The parent entity
      * of the new multipart is <code>null</code>.
-     * 
+     *
      * @param other
      *            multipart to copy.
      * @throws UnsupportedOperationException
@@ -162,7 +162,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
         return copy;
     }
 
-    
+
     /**
      * Returns a copy of the given {@link Body} that can be used (and modified)
      * independently of the original. The copy should be
@@ -171,7 +171,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
      * The {@link Body#getParent() parent} of the returned copy is
      * <code>null</code>, that is, the copy is detached from the parent
      * entity of the original.
-     * 
+     *
      * @param body
      *            body to copy.
      * @return a copy of the given body.
@@ -207,7 +207,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
      * initialized with copies of header and body of the specified
      * <code>Message</code>. The parent entity of the new message is
      * <code>null</code>.
-     * 
+     *
      * @param other
      *            message to copy.
      * @throws UnsupportedOperationException
@@ -249,9 +249,9 @@ public class DefaultMessageBuilder implements MessageBuilder {
     public Header parseHeader(final InputStream is) throws IOException, MimeIOException {
         final MimeEntityConfig cfg = config != null ? config : new MimeEntityConfig();
         boolean strict = cfg.isStrictParsing();
-        final DecodeMonitor mon = monitor != null ? monitor : 
+        final DecodeMonitor mon = monitor != null ? monitor :
             strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;
-        final FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser : 
+        final FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser :
             strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser();
         final HeaderImpl header = new HeaderImpl();
         final MimeStreamParser parser = new MimeStreamParser();
@@ -292,10 +292,10 @@ public class DefaultMessageBuilder implements MessageBuilder {
             MessageImpl message = new MessageImpl();
             MimeEntityConfig cfg = config != null ? config : new MimeEntityConfig();
             boolean strict = cfg.isStrictParsing();
-            DecodeMonitor mon = monitor != null ? monitor : 
+            DecodeMonitor mon = monitor != null ? monitor :
                 strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;
             BodyDescriptorBuilder bdb = bodyDescBuilder != null ? bodyDescBuilder :
-                new DefaultBodyDescriptorBuilder(null, fieldParser != null ? fieldParser : 
+                new DefaultBodyDescriptorBuilder(null, fieldParser != null ? fieldParser :
                     strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser(), mon);
             BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
             MimeStreamParser parser = new MimeStreamParser(cfg, mon, bdb);

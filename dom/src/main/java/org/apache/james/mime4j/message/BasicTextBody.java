@@ -32,13 +32,13 @@ class BasicTextBody extends TextBody {
 
     private final byte[] content;
     private final String charset;
-    
+
     BasicTextBody(final byte[] content, final String charset) {
         super();
         this.content = content;
         this.charset = charset;
     }
-    
+
     @Override
     public String getMimeCharset() {
         return this.charset;
@@ -58,5 +58,5 @@ class BasicTextBody extends TextBody {
     public SingleBody copy() {
         return new BasicTextBody(this.content, this.charset);
     }
-    
+
 }

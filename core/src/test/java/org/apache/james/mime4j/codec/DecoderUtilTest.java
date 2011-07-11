@@ -42,25 +42,25 @@ public class DecoderUtilTest extends TestCase {
     }
 
     public void testDecodeSomeEncodedWords() {
-        assertEquals("  \u00e1\u00e2\u00e3\t\u00e4", 
+        assertEquals("  \u00e1\u00e2\u00e3\t\u00e4",
                 DecoderUtil.decodeEncodedWords("=?iso-8859-1?Q?_=20=e1=e2=E3=09=E4?="));
-        assertEquals("Word 1 '  \u00e2\u00e3\t\u00e4'. Word 2 '  \u00e2\u00e3\t\u00e4'", 
+        assertEquals("Word 1 '  \u00e2\u00e3\t\u00e4'. Word 2 '  \u00e2\u00e3\t\u00e4'",
                 DecoderUtil.decodeEncodedWords("Word 1 '=?iso-8859-1?Q?_=20=e2=E3=09=E4?="
                         + "'. Word 2 '=?iso-8859-1?q?_=20=e2=E3=09=E4?='"));
-        assertEquals("=?iso-8859-YADA?Q?_=20=t1=e2=E3=09=E4?=", 
+        assertEquals("=?iso-8859-YADA?Q?_=20=t1=e2=E3=09=E4?=",
                 DecoderUtil.decodeEncodedWords("=?iso-8859-YADA?Q?_=20=t1=e2=E3=09=E4?="));
-        assertEquals("A short text", 
+        assertEquals("A short text",
                 DecoderUtil.decodeEncodedWords("=?US-ASCII?B?QSBzaG9ydCB0ZXh0?="));
-        assertEquals("A short text again!", 
+        assertEquals("A short text again!",
                 DecoderUtil.decodeEncodedWords("=?US-ASCII?b?QSBzaG9ydCB0ZXh0IGFnYWluIQ==?="));
     }
 
     public void testDecodeJapaneseEncodedWords() {
         String enc = "=?ISO-2022-JP?B?GyRCTCQbKEobJEI+NRsoShskQkJ6GyhKGyRCOS0bKEo=?= "
                  + "=?ISO-2022-JP?B?GyRCOXAbKEobJEIiKBsoShskQiU1GyhKGyRCJSQbKEo=?= "
-                 + "=?ISO-2022-JP?B?GyRCJUkbKEobJEIlUxsoShskQiU4GyhKGyRCJU0bKEo=?= "  
+                 + "=?ISO-2022-JP?B?GyRCJUkbKEobJEIlUxsoShskQiU4GyhKGyRCJU0bKEo=?= "
                  + "=?ISO-2022-JP?B?GyRCJTkbKEobJEIkThsoShskQjdoGyhKGyRCRGobKEo=?= "
-                 + "=?ISO-2022-JP?B?GyRCSEcbKEobJEIkRxsoShskQiQ5GyhKGyRCISobKEo=?=";      
+                 + "=?ISO-2022-JP?B?GyRCSEcbKEobJEIkRxsoShskQiQ5GyhKGyRCISobKEo=?=";
 
         String dec = DecoderUtil.decodeEncodedWords(enc);
         assertEquals("\u672A\u627F\u8AFE\u5E83\u544A\u203B\u30B5\u30A4\u30C9\u30D3"
@@ -120,5 +120,5 @@ public class DecoderUtilTest extends TestCase {
     public void testFunnyInputDoesNotRaiseOutOfMemoryError() {
         // Bug detected on June 7, 2005. Decoding the following string caused OutOfMemoryError.
         assertEquals("=3?!!\\=?\"!g6P\"!Xp:\"!", DecoderUtil.decodeEncodedWords("=3?!!\\=?\"!g6P\"!Xp:\"!"));
-    }    
+    }
 }

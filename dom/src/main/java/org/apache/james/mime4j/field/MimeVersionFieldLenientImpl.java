@@ -38,10 +38,10 @@ public class MimeVersionFieldLenientImpl extends AbstractField implements MimeVe
 
     private final static int FULL_STOP  = '.';
     private final static BitSet DELIM = RawFieldParser.INIT_BITSET(FULL_STOP);
-    
+
     public static final int DEFAULT_MINOR_VERSION = 0;
     public static final int DEFAULT_MAJOR_VERSION = 1;
-    
+
     private boolean parsed = false;
     private int major = DEFAULT_MAJOR_VERSION;
     private int minor = DEFAULT_MINOR_VERSION;
@@ -103,11 +103,11 @@ public class MimeVersionFieldLenientImpl extends AbstractField implements MimeVe
     }
 
     public static final FieldParser<MimeVersionField> PARSER = new FieldParser<MimeVersionField>() {
-        
+
         public MimeVersionField parse(final Field rawField, final DecodeMonitor monitor) {
             return new MimeVersionFieldLenientImpl(rawField, monitor);
         }
-        
+
     };
-    
+
 }

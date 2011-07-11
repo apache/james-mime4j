@@ -30,7 +30,7 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
     public void testEncode() throws IOException {
         ByteArrayOutputStream bos = null;
         QuotedPrintableOutputStream encoder = null;
-        
+
         /*
          * Simple initial test.
          */
@@ -45,7 +45,7 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
     public void testEncodeUnderlyingStreamStaysOpen() throws IOException {
         ByteArrayOutputStream bos = null;
         QuotedPrintableOutputStream encoder = null;
-        
+
         bos = new ByteArrayOutputStream();
         encoder = new QuotedPrintableOutputStream(bos, false);
         encoder.write(fromString("This is the plain text message containing a few euros: 100 \u20ac!"));
@@ -56,7 +56,7 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
             fail();
         } catch (IOException expected) {
         }
-        
+
         bos.write('y');
         bos.write('a');
         bos.write('d');
@@ -68,7 +68,7 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
     public void testEncodeSpecials() throws IOException {
         ByteArrayOutputStream bos = null;
         QuotedPrintableOutputStream encoder = null;
-        
+
         bos = new ByteArrayOutputStream();
         encoder = new QuotedPrintableOutputStream(bos, false);
         encoder.write(fromString("Testing \u20ac special . chars = also at the end ="));
@@ -80,7 +80,7 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
     public void testEncodeWrapping() throws IOException {
         ByteArrayOutputStream bos = null;
         QuotedPrintableOutputStream encoder = null;
-        
+
         bos = new ByteArrayOutputStream();
         encoder = new QuotedPrintableOutputStream(bos, false);
         encoder.write(fromString("This is a very very very very very very very very very very very very very very very long line"));

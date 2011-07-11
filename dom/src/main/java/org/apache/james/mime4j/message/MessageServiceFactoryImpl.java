@@ -26,7 +26,7 @@ import org.apache.james.mime4j.stream.MimeEntityConfig;
 
 /**
  * The default MessageBuilderFactory bundled with Mime4j.
- * 
+ *
  * Supports the "StorageProvider", "MimeEntityConfig" and "MutableBodyDescriptorFactory"
  * attributes.
  */
@@ -53,7 +53,7 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
     public MessageWriter newMessageWriter() {
         return new DefaultMessageWriter();
     }
-    
+
     @Override
     public void setAttribute(String name, Object value)
             throws IllegalArgumentException {
@@ -83,9 +83,9 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
                 return;
             } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a Boolean");
         }
-            
+
         throw new IllegalArgumentException("Unsupported attribute: "+name);
-        
+
     }
 
 }

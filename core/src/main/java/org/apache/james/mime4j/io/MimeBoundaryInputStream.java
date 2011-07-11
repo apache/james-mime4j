@@ -35,7 +35,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
 
     private final byte[] boundary;
     private final boolean strict;
-    
+
     private boolean eof;
     private int limit;
     private boolean atBoundary;
@@ -47,21 +47,21 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
 
     /**
      * Store the first buffer length.
-     * Used to distinguish between an empty preamble and 
-     * no preamble. 
+     * Used to distinguish between an empty preamble and
+     * no preamble.
      */
     private int initialLength;
 
     /**
      * Creates a new MimeBoundaryInputStream.
-     * 
+     *
      * @param inbuffer The underlying stream.
      * @param boundary Boundary string (not including leading hyphens).
      * @throws IllegalArgumentException when boundary is too long
      */
     public MimeBoundaryInputStream(
-            final BufferedLineReaderInputStream inbuffer, 
-            final String boundary, 
+            final BufferedLineReaderInputStream inbuffer,
+            final String boundary,
             final boolean strict) throws IOException {
         super(inbuffer);
         int bufferSize = 2 * boundary.length();
@@ -77,7 +77,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         this.lastPart = false;
         this.initialLength = -1;
         this.completed = false;
-        
+
         this.strict = strict;
         this.boundary = new byte[boundary.length() + 2];
         this.boundary[0] = (byte) '-';
@@ -86,26 +86,26 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             byte ch = (byte) boundary.charAt(i);
             this.boundary[i + 2] = ch;
         }
-        
+
         fillBuffer();
     }
 
     /**
      * Creates a new MimeBoundaryInputStream.
-     * 
+     *
      * @param inbuffer The underlying stream.
      * @param boundary Boundary string (not including leading hyphens).
      * @throws IllegalArgumentException when boundary is too long
      */
     public MimeBoundaryInputStream(
-            final BufferedLineReaderInputStream inbuffer, 
+            final BufferedLineReaderInputStream inbuffer,
             final String boundary) throws IOException {
         this(inbuffer, boundary, false);
     }
-    
+
     /**
      * Closes the underlying stream.
-     * 
+     *
      * @throws IOException on I/O errors.
      */
     @Override
@@ -119,7 +119,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     public boolean markSupported() {
         return false;
     }
-    
+
     public boolean readAllowed() throws IOException {
         if (completed) {
             return false;
@@ -145,7 +145,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             fillBuffer();
         }
     }
-    
+
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         for (;;) {
@@ -164,7 +164,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             throw new IllegalArgumentException("Destination buffer may not be null");
         }
         if (!readAllowed()) return -1;
-        
+
         int total = 0;
         boolean found = false;
         int bytesRead = 0;
@@ -199,21 +199,21 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             return total;
         }
     }
-    
+
     private void verifyEndOfStream() throws IOException {
         if (strict && eof && !atBoundary) {
             throw new MimeIOException(new MimeException("Unexpected end of stream"));
         }
     }
-    
-	private boolean endOfStream() {
+
+    private boolean endOfStream() {
         return eof || atBoundary;
     }
-    
+
     private boolean hasData() {
         return limit > buffer.pos() && limit <= buffer.limit();
     }
-    
+
     private int fillBuffer() throws IOException {
         if (eof) {
             return -1;
@@ -222,12 +222,12 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         if (!hasData()) {
             bytesRead = buffer.fillBuffer();
             if (bytesRead == -1) {
-            	eof = true;
+                eof = true;
             }
         } else {
             bytesRead = 0;
         }
-        
+
         int i;
         int off = buffer.pos();
         for (;;) {
@@ -235,7 +235,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             if (i == -1) {
                 break;
             }
-            // Make sure the boundary is either at the very beginning of the buffer 
+            // Make sure the boundary is either at the very beginning of the buffer
             // or preceded with LF
             if (i == buffer.pos() || buffer.byteAt(i - 1) == '\n') {
                 int pos = i + boundary.length;
@@ -261,21 +261,21 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             if (eof) {
                 limit = buffer.limit();
             } else {
-                limit = buffer.limit() - (boundary.length + 2); 
-                                // [LF] [boundary] [CR][LF] minus one char 
+                limit = buffer.limit() - (boundary.length + 2);
+                                // [LF] [boundary] [CR][LF] minus one char
             }
         }
         return bytesRead;
     }
-    
+
     public boolean isEmptyStream() {
         return initialLength == 0;
     }
-    
+
     public boolean isFullyConsumed() {
         return completed && !buffer.hasBufferedData();
     }
-    
+
     private void calculateBoundaryLen() throws IOException {
         boundaryLen = boundary.length;
         int len = limit - buffer.pos();
@@ -293,7 +293,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             }
         }
     }
-    
+
     private void skipBoundary() throws IOException {
         if (!completed) {
             completed = true;
@@ -303,14 +303,14 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
                 if (buffer.length() > 1) {
                     int ch1 = buffer.byteAt(buffer.pos());
                     int ch2 = buffer.byteAt(buffer.pos() + 1);
-                    
+
                     if (checkForLastPart) if (ch1 == '-' && ch2 == '-') {
                         this.lastPart = true;
                         buffer.skip(2);
                         checkForLastPart = false;
                         continue;
                     }
-                    
+
                     if (ch1 == '\r' && ch2 == '\n') {
                         buffer.skip(2);
                         break;
@@ -321,7 +321,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
                         // ignoring everything in a line starting with a boundary.
                         buffer.skip(1);
                     }
-                    
+
                 } else {
                     if (eof) {
                         break;
@@ -331,11 +331,11 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             }
         }
     }
-    
+
     public boolean isLastPart() {
-        return lastPart;        
+        return lastPart;
     }
-    
+
     public boolean eof() {
         return eof && !buffer.hasBufferedData();
     }
@@ -349,8 +349,8 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         return buffer.toString();
     }
 
-	@Override
-	public boolean unread(ByteArrayBuffer buf) {
-		return false;
-	}
+    @Override
+    public boolean unread(ByteArrayBuffer buf) {
+        return false;
+    }
 }

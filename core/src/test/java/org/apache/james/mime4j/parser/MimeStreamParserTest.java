@@ -50,7 +50,7 @@ public class MimeStreamParserTest extends TestCase {
         sb.append("After this line the body ends.\r\n");
         sb.append("\r\n");
         sb.append("--myboundary--\r\n");
-        
+
         StringBuilder epilogue = new StringBuilder();
         epilogue.append("Content-type: text/plain\r\n");
         epilogue.append("\r\n");
@@ -59,13 +59,13 @@ public class MimeStreamParserTest extends TestCase {
         epilogue.append("\r\n");
         epilogue.append("--myboundary--\r\n");
         epilogue.append("This is still the epilogue.\r\n");
-        
+
         sb.append(epilogue.toString());
-        
+
         ByteArrayInputStream bais = new ByteArrayInputStream(sb.toString().getBytes("US-ASCII"));
-        
+
         final StringBuilder actual = new StringBuilder();
-        
+
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -77,10 +77,10 @@ public class MimeStreamParserTest extends TestCase {
             }
         });
         parser.parse(bais);
-        
+
         assertEquals(epilogue.toString(), actual.toString());
     }
-    
+
     public void testParseOneLineFields() throws Exception {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
@@ -88,7 +88,7 @@ public class MimeStreamParserTest extends TestCase {
         sb.append(expected.getLast() + "\r\n");
         expected.add("Subject: A subject");
         sb.append(expected.getLast() + "\r\n");
-        
+
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -96,23 +96,23 @@ public class MimeStreamParserTest extends TestCase {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
-        
+
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
-        
+
         assertEquals(0, expected.size());
     }
-    
+
     public void testCRWithoutLFInHeader() throws Exception {
         /*
          * Test added because \r:s not followed by \n:s in the header would
-         * cause an infinite loop. 
+         * cause an infinite loop.
          */
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
         expected.add("The-field: This field\r\rcontains CR:s\r\r"
                         + "not\r\n\tfollowed by LF");
         sb.append(expected.getLast() + "\r\n");
-        
+
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -120,12 +120,12 @@ public class MimeStreamParserTest extends TestCase {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
-        
+
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
-        
+
         assertEquals(0, expected.size());
     }
-    
+
     public void testParseMultiLineFields() throws Exception {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
@@ -136,7 +136,7 @@ public class MimeStreamParserTest extends TestCase {
         sb.append(expected.getLast() + "\r\n");
         expected.add("Subject: A folded subject\r\n Line 2\r\n\tLine 3");
         sb.append(expected.getLast() + "\r\n");
-        
+
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -144,12 +144,12 @@ public class MimeStreamParserTest extends TestCase {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
-        
+
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
-        
+
         assertEquals(0, expected.size());
     }
-    
+
     public void testStop() throws Exception {
         final MimeStreamParser parser = new MimeStreamParser();
         TestHandler handler = new TestHandler() {
@@ -178,13 +178,13 @@ public class MimeStreamParserTest extends TestCase {
                         + "<body>\r\n"
                         + "</body>\r\n"
                         + "</message>\r\n";
-        
+
         parser.parse(new ByteArrayInputStream(msg.getBytes()));
         String result = handler.sb.toString();
-        
+
         assertEquals(expected, result);
     }
-    
+
     /*
      * Tests that invalid fields are ignored.
      */
@@ -197,7 +197,7 @@ public class MimeStreamParserTest extends TestCase {
         expected.add("Subject: A subject");
         sb.append(expected.getLast() + "\r\n");
         sb.append("A line which should be ignored\r\n");
-        
+
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -205,9 +205,9 @@ public class MimeStreamParserTest extends TestCase {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
-        
+
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
-        
+
         assertEquals(0, expected.size());
     }
 
@@ -221,14 +221,14 @@ public class MimeStreamParserTest extends TestCase {
         expected.add("endHeader");
         expected.add("body");
         expected.add("endMessage");
-        
+
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void body(BodyDescriptor bd, InputStream is) {
                 assertEquals(expected.removeFirst(), "body");
             }
-            
+
             @Override
             public void endMultipart() {
                 fail("endMultipart shouldn't be called for empty stream");
@@ -274,12 +274,12 @@ public class MimeStreamParserTest extends TestCase {
                 assertEquals(expected.removeFirst(), "startMessage");
             }
         });
-        
+
         parser.parse(new ByteArrayInputStream(new byte[0]));
-        
+
         assertEquals(0, expected.size());
     }
-    
+
     /*
      * Tests parsing of empty headers.
      */
@@ -287,9 +287,9 @@ public class MimeStreamParserTest extends TestCase {
         StringBuilder sb = new StringBuilder();
         sb.append("\r\n");
         sb.append("The body is right here\r\n");
-        
+
         final StringBuilder body = new StringBuilder();
-        
+
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -304,12 +304,12 @@ public class MimeStreamParserTest extends TestCase {
                 }
             }
         });
-        
+
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
-        
+
         assertEquals("The body is right here\r\n", body.toString());
     }
-    
+
     /*
      * Tests parsing of empty body.
      */
@@ -320,7 +320,7 @@ public class MimeStreamParserTest extends TestCase {
         sb.append(expected.getLast() + "\r\n");
         expected.add("Subject: A subject");
         sb.append(expected.getLast() + "\r\n\r\n");
-        
+
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -332,12 +332,12 @@ public class MimeStreamParserTest extends TestCase {
                 assertEquals(-1, is.read());
             }
         });
-        
+
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
-        
+
         assertEquals(0, expected.size());
     }
-    
+
     /*
      * Tests that invalid fields are ignored.
      */
@@ -348,7 +348,7 @@ public class MimeStreamParserTest extends TestCase {
         sb.append(expected.getLast() + "\r\n");
         expected.add("Subject: A subject");
         sb.append(expected.getLast());
-        
+
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -356,18 +356,18 @@ public class MimeStreamParserTest extends TestCase {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
-        
+
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
-        
+
         assertEquals(0, expected.size());
-        
+
         sb = new StringBuilder();
         expected.clear();
         expected.add("From: some@one.com");
         sb.append(expected.getLast() + "\r\n");
         expected.add("Subject: A subject");
         sb.append(expected.getLast() + "\r\n");
-        
+
         parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
@@ -375,12 +375,12 @@ public class MimeStreamParserTest extends TestCase {
                 assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
-        
+
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
-        
+
         assertEquals(0, expected.size());
     }
-    
+
     public void testAutomaticContentDecoding() throws Exception {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentDecoding(true);
@@ -412,15 +412,15 @@ public class MimeStreamParserTest extends TestCase {
                         + "Who ate my cake?\n"
                         + "</body>\r\n"
                         + "</message>\r\n";
-        
+
         parser.parse(new ByteArrayInputStream(msg.getBytes()));
         String result = handler.sb.toString();
-        
+
         assertEquals(expected, result);
     }
-    
+
     protected String decode(ByteSequence byteSequence) {
         return ContentUtil.decode(byteSequence);
     }
-    
+
 }

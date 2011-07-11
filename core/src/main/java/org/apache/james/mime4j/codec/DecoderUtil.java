@@ -38,20 +38,20 @@ public class DecoderUtil {
             "(.*?)=\\?([^\\?]+?)\\?(\\w)\\?([^\\?]+?)\\?=", Pattern.DOTALL);
 
     /**
-     * Decodes a string containing quoted-printable encoded data. 
-     * 
+     * Decodes a string containing quoted-printable encoded data.
+     *
      * @param s the string to decode.
      * @return the decoded bytes.
      */
     private static byte[] decodeQuotedPrintable(String s, DecodeMonitor monitor) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         try {
             byte[] bytes = s.getBytes("US-ASCII");
-            
+
             QuotedPrintableInputStream is = new QuotedPrintableInputStream(
                                                new ByteArrayInputStream(bytes), monitor);
-            
+
             int b = 0;
             while ((b = is.read()) != -1) {
                 baos.write(b);
@@ -60,26 +60,26 @@ public class DecoderUtil {
             // This should never happen!
             throw new IllegalStateException(e);
         }
-        
+
         return baos.toByteArray();
     }
-    
+
     /**
-     * Decodes a string containing base64 encoded data. 
-     * 
+     * Decodes a string containing base64 encoded data.
+     *
      * @param s the string to decode.
-     * @param monitor 
+     * @param monitor
      * @return the decoded bytes.
      */
     private static byte[] decodeBase64(String s, DecodeMonitor monitor) {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        
+
         try {
             byte[] bytes = s.getBytes("US-ASCII");
-            
+
             Base64InputStream is = new Base64InputStream(
                                         new ByteArrayInputStream(bytes), monitor);
-            
+
             int b = 0;
             while ((b = is.read()) != -1) {
                 baos.write(b);
@@ -88,41 +88,41 @@ public class DecoderUtil {
             // This should never happen!
             throw new IllegalStateException(e);
         }
-        
+
         return baos.toByteArray();
     }
-    
+
     /**
-     * Decodes an encoded text encoded with the 'B' encoding (described in 
+     * Decodes an encoded text encoded with the 'B' encoding (described in
      * RFC 2047) found in a header field body.
-     * 
+     *
      * @param encodedText the encoded text to decode.
      * @param charset the Java charset to use.
-     * @param monitor 
+     * @param monitor
      * @return the decoded string.
-     * @throws UnsupportedEncodingException if the given Java charset isn't 
+     * @throws UnsupportedEncodingException if the given Java charset isn't
      *         supported.
      */
-    static String decodeB(String encodedText, String charset, DecodeMonitor monitor) 
+    static String decodeB(String encodedText, String charset, DecodeMonitor monitor)
             throws UnsupportedEncodingException {
         byte[] decodedBytes = decodeBase64(encodedText, monitor);
         return new String(decodedBytes, charset);
     }
-    
+
     /**
-     * Decodes an encoded text encoded with the 'Q' encoding (described in 
+     * Decodes an encoded text encoded with the 'Q' encoding (described in
      * RFC 2047) found in a header field body.
-     * 
+     *
      * @param encodedText the encoded text to decode.
      * @param charset the Java charset to use.
      * @return the decoded string.
-     * @throws UnsupportedEncodingException if the given Java charset isn't 
+     * @throws UnsupportedEncodingException if the given Java charset isn't
      *         supported.
      */
     static String decodeQ(String encodedText, String charset, DecodeMonitor monitor)
             throws UnsupportedEncodingException {
         encodedText = replaceUnderscores(encodedText);
-        
+
         byte[] decodedBytes = decodeQuotedPrintable(encodedText, monitor);
         return new String(decodedBytes, charset);
     }
@@ -135,7 +135,7 @@ public class DecoderUtil {
      * Decodes a string containing encoded words as defined by RFC 2047. Encoded
      * words have the form =?charset?enc?encoded-text?= where enc is either 'Q'
      * or 'q' for quoted-printable and 'B' or 'b' for base64.
-     * 
+     *
      * @param body the string to decode
      * @param monitor the DecodeMonitor to be used.
      * @return the decoded string.
@@ -181,13 +181,13 @@ public class DecoderUtil {
             final String encoding, final String encodedText, final DecodeMonitor monitor) {
         Charset charset = CharsetUtil.lookup(mimeCharset);
         if (charset == null) {
-            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded", 
+            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
                     "Mime charser '", mimeCharset, "' doesn't have a corresponding Java charset");
             return null;
         }
 
         if (encodedText.length() == 0) {
-            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded", 
+            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
                     "Missing encoded text in encoded word");
             return null;
         }
@@ -198,17 +198,17 @@ public class DecoderUtil {
             } else if (encoding.equalsIgnoreCase("B")) {
                 return DecoderUtil.decodeB(encodedText, charset.name(), monitor);
             } else {
-                monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded", 
+                monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
                         "Warning: Unknown encoding in encoded word");
                 return null;
             }
         } catch (UnsupportedEncodingException e) {
             // should not happen because of isDecodingSupported check above
-            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded", 
+            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
                     "Unsupported encoding (", e.getMessage(), ") in encoded word");
             return null;
         } catch (RuntimeException e) {
-            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded", 
+            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
                     "Could not decode (", e.getMessage(), ") encoded word");
             return null;
         }
@@ -226,7 +226,7 @@ public class DecoderUtil {
             text.append(encodedWord);
             text.append(")");
             String exceptionDesc = text.toString();
-            if (monitor.warn(exceptionDesc, dropDesc)) 
+            if (monitor.warn(exceptionDesc, dropDesc))
                 throw new IllegalArgumentException(text.toString());
         }
     }
@@ -250,7 +250,7 @@ public class DecoderUtil {
                 sb.append(c);
             }
         }
-        
+
         return sb.toString();
     }
 }

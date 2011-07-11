@@ -302,7 +302,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                 ContentTypeField field = (ContentTypeField) o;
                 StringBuilder sb = new StringBuilder();
                 sb.append("MIME type: " + field.getMimeType() + "\n");
-                for (Map.Entry<String, String> entry : field.getParameters().entrySet()) { 
+                for (Map.Entry<String, String> entry : field.getParameters().entrySet()) {
                     sb.append(entry.getKey() + " = " + entry.getValue() + "\n");
                 }
                 textView.setText(sb.toString());

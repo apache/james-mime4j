@@ -62,7 +62,7 @@ public class Fields {
      * Creates a <i>Content-Type</i> field from the specified raw field value.
      * The specified string gets folded into a multiple-line representation if
      * necessary but is otherwise taken as is.
-     * 
+     *
      * @param contentType
      *            raw content type containing a MIME type and optional
      *            parameters.
@@ -76,7 +76,7 @@ public class Fields {
     /**
      * Creates a <i>Content-Type</i> field from the specified MIME type and
      * parameters.
-     * 
+     *
      * @param mimeType
      *            a MIME type (such as <code>&quot;text/plain&quot;</code> or
      *            <code>&quot;application/octet-stream&quot;</code>).
@@ -108,7 +108,7 @@ public class Fields {
     /**
      * Creates a <i>Content-Transfer-Encoding</i> field from the specified raw
      * field value.
-     * 
+     *
      * @param contentTransferEncoding
      *            an encoding mechanism such as <code>&quot;7-bit&quot;</code>
      *            or <code>&quot;quoted-printable&quot;</code>.
@@ -124,7 +124,7 @@ public class Fields {
      * Creates a <i>Content-Disposition</i> field from the specified raw field
      * value. The specified string gets folded into a multiple-line
      * representation if necessary but is otherwise taken as is.
-     * 
+     *
      * @param contentDisposition
      *            raw content disposition containing a disposition type and
      *            optional parameters.
@@ -139,7 +139,7 @@ public class Fields {
     /**
      * Creates a <i>Content-Disposition</i> field from the specified
      * disposition type and parameters.
-     * 
+     *
      * @param dispositionType
      *            a disposition type (usually <code>&quot;inline&quot;</code>
      *            or <code>&quot;attachment&quot;</code>).
@@ -171,7 +171,7 @@ public class Fields {
     /**
      * Creates a <i>Content-Disposition</i> field from the specified
      * disposition type and filename.
-     * 
+     *
      * @param dispositionType
      *            a disposition type (usually <code>&quot;inline&quot;</code>
      *            or <code>&quot;attachment&quot;</code>).
@@ -188,7 +188,7 @@ public class Fields {
 
     /**
      * Creates a <i>Content-Disposition</i> field from the specified values.
-     * 
+     *
      * @param dispositionType
      *            a disposition type (usually <code>&quot;inline&quot;</code>
      *            or <code>&quot;attachment&quot;</code>).
@@ -208,7 +208,7 @@ public class Fields {
 
     /**
      * Creates a <i>Content-Disposition</i> field from the specified values.
-     * 
+     *
      * @param dispositionType
      *            a disposition type (usually <code>&quot;inline&quot;</code>
      *            or <code>&quot;attachment&quot;</code>).
@@ -258,7 +258,7 @@ public class Fields {
     /**
      * Creates a <i>Date</i> field from the specified <code>Date</code>
      * value. The default time zone of the host is used to format the date.
-     * 
+     *
      * @param date
      *            date value for the header field.
      * @return the newly created <i>Date</i> field.
@@ -270,7 +270,7 @@ public class Fields {
     /**
      * Creates a date field from the specified field name and <code>Date</code>
      * value. The default time zone of the host is used to format the date.
-     * 
+     *
      * @param fieldName
      *            a field name such as <code>Date</code> or
      *            <code>Resent-Date</code>.
@@ -286,7 +286,7 @@ public class Fields {
     /**
      * Creates a date field from the specified field name, <code>Date</code>
      * and <code>TimeZone</code> values.
-     * 
+     *
      * @param fieldName
      *            a field name such as <code>Date</code> or
      *            <code>Resent-Date</code>.
@@ -303,7 +303,7 @@ public class Fields {
 
     /**
      * Creates a <i>Message-ID</i> field for the specified host name.
-     * 
+     *
      * @param hostname
      *            host name to be included in the message ID or
      *            <code>null</code> if no host name should be included.
@@ -317,7 +317,7 @@ public class Fields {
     /**
      * Creates a <i>Subject</i> field from the specified string value. The
      * specified string may contain non-ASCII characters.
-     * 
+     *
      * @param subject
      *            the subject string.
      * @return the newly created <i>Subject</i> field.
@@ -332,7 +332,7 @@ public class Fields {
 
     /**
      * Creates a <i>Sender</i> field for the specified mailbox address.
-     * 
+     *
      * @param mailbox
      *            address to be included in the field.
      * @return the newly created <i>Sender</i> field.
@@ -343,7 +343,7 @@ public class Fields {
 
     /**
      * Creates a <i>From</i> field for the specified mailbox address.
-     * 
+     *
      * @param mailbox
      *            address to be included in the field.
      * @return the newly created <i>From</i> field.
@@ -354,7 +354,7 @@ public class Fields {
 
     /**
      * Creates a <i>From</i> field for the specified mailbox addresses.
-     * 
+     *
      * @param mailboxes
      *            addresses to be included in the field.
      * @return the newly created <i>From</i> field.
@@ -365,7 +365,7 @@ public class Fields {
 
     /**
      * Creates a <i>From</i> field for the specified mailbox addresses.
-     * 
+     *
      * @param mailboxes
      *            addresses to be included in the field.
      * @return the newly created <i>From</i> field.
@@ -376,7 +376,7 @@ public class Fields {
 
     /**
      * Creates a <i>To</i> field for the specified mailbox or group address.
-     * 
+     *
      * @param address
      *            mailbox or group address to be included in the field.
      * @return the newly created <i>To</i> field.
@@ -387,7 +387,7 @@ public class Fields {
 
     /**
      * Creates a <i>To</i> field for the specified mailbox or group addresses.
-     * 
+     *
      * @param addresses
      *            mailbox or group addresses to be included in the field.
      * @return the newly created <i>To</i> field.
@@ -398,7 +398,7 @@ public class Fields {
 
     /**
      * Creates a <i>To</i> field for the specified mailbox or group addresses.
-     * 
+     *
      * @param addresses
      *            mailbox or group addresses to be included in the field.
      * @return the newly created <i>To</i> field.
@@ -409,7 +409,7 @@ public class Fields {
 
     /**
      * Creates a <i>Cc</i> field for the specified mailbox or group address.
-     * 
+     *
      * @param address
      *            mailbox or group address to be included in the field.
      * @return the newly created <i>Cc</i> field.
@@ -420,7 +420,7 @@ public class Fields {
 
     /**
      * Creates a <i>Cc</i> field for the specified mailbox or group addresses.
-     * 
+     *
      * @param addresses
      *            mailbox or group addresses to be included in the field.
      * @return the newly created <i>Cc</i> field.
@@ -431,7 +431,7 @@ public class Fields {
 
     /**
      * Creates a <i>Cc</i> field for the specified mailbox or group addresses.
-     * 
+     *
      * @param addresses
      *            mailbox or group addresses to be included in the field.
      * @return the newly created <i>Cc</i> field.
@@ -442,7 +442,7 @@ public class Fields {
 
     /**
      * Creates a <i>Bcc</i> field for the specified mailbox or group address.
-     * 
+     *
      * @param address
      *            mailbox or group address to be included in the field.
      * @return the newly created <i>Bcc</i> field.
@@ -453,7 +453,7 @@ public class Fields {
 
     /**
      * Creates a <i>Bcc</i> field for the specified mailbox or group addresses.
-     * 
+     *
      * @param addresses
      *            mailbox or group addresses to be included in the field.
      * @return the newly created <i>Bcc</i> field.
@@ -464,7 +464,7 @@ public class Fields {
 
     /**
      * Creates a <i>Bcc</i> field for the specified mailbox or group addresses.
-     * 
+     *
      * @param addresses
      *            mailbox or group addresses to be included in the field.
      * @return the newly created <i>Bcc</i> field.
@@ -476,7 +476,7 @@ public class Fields {
     /**
      * Creates a <i>Reply-To</i> field for the specified mailbox or group
      * address.
-     * 
+     *
      * @param address
      *            mailbox or group address to be included in the field.
      * @return the newly created <i>Reply-To</i> field.
@@ -488,7 +488,7 @@ public class Fields {
     /**
      * Creates a <i>Reply-To</i> field for the specified mailbox or group
      * addresses.
-     * 
+     *
      * @param addresses
      *            mailbox or group addresses to be included in the field.
      * @return the newly created <i>Reply-To</i> field.
@@ -500,7 +500,7 @@ public class Fields {
     /**
      * Creates a <i>Reply-To</i> field for the specified mailbox or group
      * addresses.
-     * 
+     *
      * @param addresses
      *            mailbox or group addresses to be included in the field.
      * @return the newly created <i>Reply-To</i> field.
@@ -513,7 +513,7 @@ public class Fields {
      * Creates a mailbox field from the specified field name and mailbox
      * address. Valid field names are <code>Sender</code> and
      * <code>Resent-Sender</code>.
-     * 
+     *
      * @param fieldName
      *            the name of the mailbox field (<code>Sender</code> or
      *            <code>Resent-Sender</code>).
@@ -530,7 +530,7 @@ public class Fields {
      * Creates a mailbox-list field from the specified field name and mailbox
      * addresses. Valid field names are <code>From</code> and
      * <code>Resent-From</code>.
-     * 
+     *
      * @param fieldName
      *            the name of the mailbox field (<code>From</code> or
      *            <code>Resent-From</code>).
@@ -550,7 +550,7 @@ public class Fields {
      * <code>Cc</code>, <code>Bcc</code>, <code>Reply-To</code>,
      * <code>Resent-To</code>, <code>Resent-Cc</code> and
      * <code>Resent-Bcc</code>.
-     * 
+     *
      * @param fieldName
      *            the name of the mailbox field (<code>To</code>,
      *            <code>Cc</code>, <code>Bcc</code>, <code>Reply-To</code>,

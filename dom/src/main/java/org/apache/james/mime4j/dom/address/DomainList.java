@@ -59,7 +59,7 @@ public class DomainList extends AbstractList<String> implements Serializable {
 
     /**
      * Gets the domain name or domain literal at the specified index.
-     * 
+     *
      * @throws IndexOutOfBoundsException
      *             If index is &lt; 0 or &gt;= size().
      */

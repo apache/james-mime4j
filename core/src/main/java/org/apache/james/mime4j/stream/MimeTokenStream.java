@@ -71,23 +71,23 @@ import org.apache.james.mime4j.util.CharsetUtil;
  * one instance per thread.</p>
  */
 public class MimeTokenStream {
-    
+
     private final MimeEntityConfig config;
     private final DecodeMonitor monitor;
     private final FieldBuilder fieldBuilder;
     private final BodyDescriptorBuilder bodyDescBuilder;
     private final LinkedList<EntityStateMachine> entities = new LinkedList<EntityStateMachine>();
-    
+
     private EntityState state = EntityState.T_END_OF_STREAM;
     private EntityStateMachine currentStateMachine;
     private RecursionMode recursionMode = RecursionMode.M_RECURSE;
     private MimeEntity rootentity;
-    
+
     /**
      * Constructs a standard (lax) stream.
      * Optional validation events will be logged only.
-     * Use {@link MimeEntityConfig#setStrictParsing(boolean)} to turn on strict 
-     * parsing mode and pass the config object to 
+     * Use {@link MimeEntityConfig#setStrictParsing(boolean)} to turn on strict
+     * parsing mode and pass the config object to
      * {@link MimeTokenStream#MimeTokenStream(MimeEntityConfig)} to create
      * a stream that strictly validates the input.
      */
@@ -98,32 +98,32 @@ public class MimeTokenStream {
     public MimeTokenStream(final MimeEntityConfig config) {
         this(config, null, null, null);
     }
-        
+
     public MimeTokenStream(
-            final MimeEntityConfig config, 
+            final MimeEntityConfig config,
             final BodyDescriptorBuilder bodyDescBuilder) {
         this(config, null, null, bodyDescBuilder);
     }
 
     public MimeTokenStream(
-            final MimeEntityConfig config, 
+            final MimeEntityConfig config,
             final DecodeMonitor monitor,
             final BodyDescriptorBuilder bodyDescBuilder) {
         this(config, monitor, null, bodyDescBuilder);
     }
 
     public MimeTokenStream(
-            final MimeEntityConfig config, 
+            final MimeEntityConfig config,
             final DecodeMonitor monitor,
             final FieldBuilder fieldBuilder,
             final BodyDescriptorBuilder bodyDescBuilder) {
         super();
         this.config = config != null ? config : new MimeEntityConfig();
-        this.fieldBuilder = fieldBuilder != null ? fieldBuilder : 
+        this.fieldBuilder = fieldBuilder != null ? fieldBuilder :
             new DefaultFieldBuilder(this.config.getMaxHeaderLen());
-        this.monitor = monitor != null ? monitor : 
+        this.monitor = monitor != null ? monitor :
             (this.config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
-        this.bodyDescBuilder = bodyDescBuilder != null ? bodyDescBuilder : 
+        this.bodyDescBuilder = bodyDescBuilder != null ? bodyDescBuilder :
             new FallbackBodyDescriptorBuilder();
     }
 
@@ -135,16 +135,16 @@ public class MimeTokenStream {
         doParse(stream, EntityState.T_START_MESSAGE);
     }
 
-    /** 
-     * <p>Instructs the {@code MimeTokenStream} to parse the given content with 
+    /**
+     * <p>Instructs the {@code MimeTokenStream} to parse the given content with
      * the content type. The message stream is assumed to have no message header
-     * and is expected to begin with a message body. This can be the case when 
-     * the message content is transmitted using a different transport protocol 
+     * and is expected to begin with a message body. This can be the case when
+     * the message content is transmitted using a different transport protocol
      * such as HTTP.</p>
-     * <p>If the {@code MimeTokenStream} has already been in use, resets the 
+     * <p>If the {@code MimeTokenStream} has already been in use, resets the
      * streams internal state.</p>
      * @return a parsed Field representing the input contentType
-     */    
+     */
     public Field parseHeadless(InputStream stream, String contentType) {
         if (contentType == null) {
             throw new IllegalArgumentException("Content type may not be null");
@@ -158,7 +158,7 @@ public class MimeTokenStream {
             // should never happen
             throw new IllegalArgumentException(ex.getMessage());
         }
-        
+
         doParse(stream, EntityState.T_END_HEADER);
         try {
             next();
@@ -184,7 +184,7 @@ public class MimeTokenStream {
                 lineSource,
                 stream,
                 config,
-                start, 
+                start,
                 EntityState.T_END_MESSAGE,
                 monitor,
                 fieldBuilder,
@@ -199,7 +199,7 @@ public class MimeTokenStream {
 
     /**
      * Determines if this parser is currently in raw mode.
-     * 
+     *
      * @return <code>true</code> if in raw mode, <code>false</code>
      *         otherwise.
      * @see #setRecursionMode(int)
@@ -207,7 +207,7 @@ public class MimeTokenStream {
     public boolean isRaw() {
         return recursionMode == RecursionMode.M_RAW;
     }
-    
+
     /**
      * Gets the current recursion mode.
      * The recursion mode specifies the approach taken to parsing parts.
@@ -220,7 +220,7 @@ public class MimeTokenStream {
     public RecursionMode getRecursionMode() {
         return recursionMode;
     }
-    
+
     /**
      * Sets the current recursion.
      * The recursion mode specifies the approach taken to parsing parts.
@@ -240,7 +240,7 @@ public class MimeTokenStream {
     /**
      * Finishes the parsing and stops reading lines.
      * NOTE: No more lines will be parsed but the parser
-     * will still trigger 'end' events to match previously 
+     * will still trigger 'end' events to match previously
      * triggered 'start' events.
      */
     public void stop() {
@@ -259,7 +259,7 @@ public class MimeTokenStream {
      * <p/>
      * This method is valid, if {@link #getState()} returns either of
      * {@link #T_RAW_ENTITY}, {@link #T_PREAMBLE}, or {@link #T_EPILOGUE}.
-     * 
+     *
      * @return Data stream, depending on the current state.
      * @throws IllegalStateException {@link #getState()} returns an
      *   invalid value.
@@ -267,14 +267,14 @@ public class MimeTokenStream {
     public InputStream getInputStream() {
         return currentStateMachine.getContentStream();
     }
-    
+
     /**
-     * This method returns a transfer decoded stream based on the MIME 
+     * This method returns a transfer decoded stream based on the MIME
      * fields with the standard defaults.
      * <p/>
      * This method is valid, if {@link #getState()} returns either of
      * {@link #T_RAW_ENTITY}, {@link #T_PREAMBLE}, or {@link #T_EPILOGUE}.
-     * 
+     *
      * @return Data stream, depending on the current state.
      * @throws IllegalStateException {@link #getState()} returns an
      *   invalid value.
@@ -285,17 +285,17 @@ public class MimeTokenStream {
 
     /**
      * Gets a reader configured for the current body or body part.
-     * The reader will return a transfer and charset decoded 
+     * The reader will return a transfer and charset decoded
      * stream of characters based on the MIME fields with the standard
      * defaults.
      * This is a conveniance method and relies on {@link #getInputStream()}.
      * Consult the javadoc for that method for known limitations.
-     * 
+     *
      * @return <code>Reader</code>, not null
-     * @see #getInputStream 
+     * @see #getInputStream
      * @throws IllegalStateException {@link #getState()} returns an
-     *   invalid value 
-     * @throws UnsupportedCharsetException if there is no JVM support 
+     *   invalid value
+     * @throws UnsupportedCharsetException if there is no JVM support
      * for decoding the charset
      * @throws IllegalCharsetNameException if the charset name specified
      * in the mime type is illegal
@@ -312,7 +312,7 @@ public class MimeTokenStream {
         final InputStream instream = getDecodedInputStream();
         return new InputStreamReader(instream, charset);
     }
-    
+
     /**
      * <p>Gets a descriptor for the current entity.
      * This method is valid if {@link #getState()} returns:</p>
@@ -337,7 +337,7 @@ public class MimeTokenStream {
     public Field getField() {
         return currentStateMachine.getField();
     }
-    
+
     /**
      * This method advances the token stream to the next token.
      * @throws IllegalStateException The method has been called, although
@@ -371,7 +371,7 @@ public class MimeTokenStream {
 
     /**
      * Renders a state as a string suitable for logging.
-     * @param state 
+     * @param state
      * @return rendered as string, not null
      */
     public static final String stateToString(EntityState state) {

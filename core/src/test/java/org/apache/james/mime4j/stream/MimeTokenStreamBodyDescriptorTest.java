@@ -28,7 +28,7 @@ import org.apache.james.mime4j.ExampleMail;
 public class MimeTokenStreamBodyDescriptorTest extends TestCase {
 
     MimeTokenStream parser;
-    
+
     @Override
     protected void setUp() throws Exception {
         super.setUp();
@@ -56,7 +56,7 @@ public class MimeTokenStreamBodyDescriptorTest extends TestCase {
         assertEquals("1729", descriptor.getBoundary());
         assertEquals( "multipart/alternative", descriptor.getMimeType());
     }
-    
+
     public void testShouldReturnValidDescriptorForEpilogue() throws Exception {
         assertEquals(MimeTokenStream.stateToString(EntityState.T_START_HEADER), MimeTokenStream.stateToString(parser.next()));
         assertEquals(MimeTokenStream.stateToString(EntityState.T_FIELD), MimeTokenStream.stateToString(parser.next()));

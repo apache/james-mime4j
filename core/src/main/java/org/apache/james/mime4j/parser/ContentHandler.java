@@ -30,7 +30,7 @@ import java.io.InputStream;
  * <p>
  * Receives notifications of the content of a plain RFC822 or MIME message.
  * Implement this interface and register an instance of that implementation
- * with a <code>MimeStreamParser</code> instance using its 
+ * with a <code>MimeStreamParser</code> instance using its
  * {@link org.apache.james.mime4j.stream.MimeStreamParser#setContentHandler(ContentHandler)}
  * method. The parser uses the <code>ContentHandler</code> instance to report
  * basic message-related events like the start and end of the body of a
@@ -38,7 +38,7 @@ import java.io.InputStream;
  * </p>
  * <p>
  * Throwing an exception from an event method will terminate the message
- * processing, i.e. no new events will be generated for that message. 
+ * processing, i.e. no new events will be generated for that message.
  * <p>
  * Events will be generated in the order the corresponding elements occur in
  * the message stream parsed by the parser. E.g.:
@@ -75,7 +75,7 @@ import java.io.InputStream;
  * body containing two body parts.
  * </p>
  * <p>
- * See MIME RFCs 2045-2049 for more information on the structure of MIME 
+ * See MIME RFCs 2045-2049 for more information on the structure of MIME
  * messages and RFC 822 and 2822 for the general structure of Internet mail
  * messages.
  * </p>
@@ -83,7 +83,7 @@ import java.io.InputStream;
 public interface ContentHandler {
 
     /**
-     * Called when a new message starts (a top level message or an embedded 
+     * Called when a new message starts (a top level message or an embedded
      * rfc822 message).
      *
      * @throws MimeException on processing errors
@@ -121,7 +121,7 @@ public interface ContentHandler {
 
     /**
      * Called for each field of a header.
-     * 
+     *
      * @param rawField the MIME field.
      * @throws MimeException on processing errors
      */
@@ -137,7 +137,7 @@ public interface ContentHandler {
     /**
      * Called for the preamble (whatever comes before the first body part)
      * of a <code>multipart/*</code> entity.
-     * 
+     *
      * @param is used to get the contents of the preamble.
      * @throws MimeException on processing errors
      * @throws IOException should be thrown on I/O errors.
@@ -145,9 +145,9 @@ public interface ContentHandler {
     void preamble(InputStream is) throws MimeException, IOException;
 
     /**
-     * Called for the epilogue (whatever comes after the final body part) 
+     * Called for the epilogue (whatever comes after the final body part)
      * of a <code>multipart/*</code> entity.
-     * 
+     *
      * @param is used to get the contents of the epilogue.
      * @throws MimeException on processing errors
      * @throws IOException should be thrown on I/O errors.
@@ -156,11 +156,11 @@ public interface ContentHandler {
 
     /**
      * Called when the body of a multipart entity is about to be parsed.
-     * 
-     * @param bd encapsulates the values (either read from the 
-     *        message stream or, if not present, determined implictly 
-     *        as described in the 
-     *        MIME rfc:s) of the <code>Content-Type</code> and 
+     *
+     * @param bd encapsulates the values (either read from the
+     *        message stream or, if not present, determined implictly
+     *        as described in the
+     *        MIME rfc:s) of the <code>Content-Type</code> and
      *        <code>Content-Transfer-Encoding</code> header fields.
      * @throws MimeException on processing errors
      */
@@ -174,11 +174,11 @@ public interface ContentHandler {
     void endMultipart() throws MimeException;
 
     /**
-     * Called when the body of a discrete (non-multipart) entity is about to 
+     * Called when the body of a discrete (non-multipart) entity is about to
      * be parsed.
-     * 
+     *
      * @param bd see {@link #startMultipart(BodyDescriptor)}
-     * @param is the contents of the body. NOTE: this is the raw body contents 
+     * @param is the contents of the body. NOTE: this is the raw body contents
      *           - it will not be decoded if encoded. The <code>bd</code>
      *           parameter should be used to determine how the stream data
      *           should be decoded.
@@ -189,9 +189,9 @@ public interface ContentHandler {
         throws MimeException, IOException;
 
     /**
-     * Called when a new entity (message or body part) starts and the 
+     * Called when a new entity (message or body part) starts and the
      * parser is in <code>raw</code> mode.
-     * 
+     *
      * @param is the raw contents of the entity.
      * @throws MimeException on processing errors
      * @throws IOException should be thrown on I/O errors.

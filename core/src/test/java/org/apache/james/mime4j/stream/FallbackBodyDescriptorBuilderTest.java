@@ -27,7 +27,7 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
         /*
          * Make sure that only the first Content-Type header added is used.
          */
-        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder(); 
+        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
         builder.addField(new RawField("Content-Type ", "text/plain; charset=ISO-8859-1"));
         BodyDescriptor bd = builder.build();
         assertEquals("text/plain", bd.getMimeType());
@@ -37,28 +37,28 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
         assertEquals("text/plain", bd.getMimeType());
         assertEquals("ISO-8859-1", bd.getCharset());
     }
-    
+
     public void testGetMimeType() throws Exception {
-        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder(); 
+        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
         builder.addField(new RawField("Content-Type ", "text/PLAIN"));
         BodyDescriptor bd = builder.build();
         assertEquals("text/plain", bd.getMimeType());
-        
+
         builder.reset();
         builder.addField(new RawField("content-type", "   TeXt / html   "));
         bd = builder.build();
         assertEquals("text/html", bd.getMimeType());
-        
+
         builder.reset();
         builder.addField(new RawField("CONTENT-TYPE", "   x-app/yada ;  param = yada"));
         bd = builder.build();
         assertEquals("x-app/yada", bd.getMimeType());
-        
+
         builder.reset();
         builder.addField(new RawField("CONTENT-TYPE", "   yada"));
         bd = builder.build();
         assertEquals("text/plain", bd.getMimeType());
-        
+
         /*
          * Make sure that only the first Content-Type header added is used.
          */
@@ -69,7 +69,7 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
         builder.addField(new RawField("Content-Type ", "text/html"));
         bd = builder.build();
         assertEquals("text/plain", bd.getMimeType());
-        
+
         /*
          * Implicit mime types.
          */
@@ -81,21 +81,21 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
         child.addField(new RawField("Content-Type", " child/type"));
         bd = child.build();
         assertEquals("child/type", bd.getMimeType());
-        
+
         parent.reset();
         parent.addField(new RawField("Content-Type", "multipart/digest; boundary=foo"));
-        
+
         child = parent.newChild();
         bd = child.build();
         assertEquals("message/rfc822", bd.getMimeType());
         child.addField(new RawField("Content-Type", " child/type"));
         bd = child.build();
         assertEquals("child/type", bd.getMimeType());
-        
+
     }
-    
+
     public void testParameters() throws Exception {
-        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder(); 
+        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
         /*
          * Test charset.
          */
@@ -104,14 +104,14 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
         builder.addField(new RawField("Content-Type ", "text/type; charset=ISO-8859-1"));
         bd = builder.build();
         assertEquals("ISO-8859-1", bd.getCharset());
-        
+
         builder.reset();
         bd = builder.build();
         assertEquals("us-ascii", bd.getCharset());
         builder.addField(new RawField("Content-Type ", "text/type"));
         bd = builder.build();
         assertEquals("us-ascii", bd.getCharset());
-        
+
         /*
          * Test boundary.
          */
@@ -131,11 +131,11 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
         bd = builder.build();
         assertEquals("ya \"\"\tda \"", bd.getBoundary());
         assertEquals("\"hepp\"  =us\t-ascii", bd.getCharset());
-        
+
     }
-    
+
     public void testGetContentLength() throws Exception {
-        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder(); 
+        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
         BodyDescriptor bd = builder.build();
         assertEquals(-1, bd.getContentLength());
 
@@ -148,19 +148,19 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
         bd = builder.build();
         assertEquals(9901, bd.getContentLength());
     }
-    
+
     public void testDoDefaultToUsAsciiWhenUntyped() throws Exception {
-        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder(); 
+        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
         builder.addField(new RawField("To", "me@example.org"));
         BodyDescriptor bd = builder.build();
         assertEquals("us-ascii", bd.getCharset());
     }
 
     public void testDoNotDefaultToUsAsciiForNonTextTypes() throws Exception {
-        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder(); 
+        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
         builder.addField(new RawField("Content-Type", "image/png; name=blob.png"));
         BodyDescriptor bd = builder.build();
         assertNull(bd.getCharset());
     }
-    
+
 }

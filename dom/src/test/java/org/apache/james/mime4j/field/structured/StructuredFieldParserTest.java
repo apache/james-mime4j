@@ -41,32 +41,32 @@ public class StructuredFieldParserTest extends TestCase {
         final String string = "Field Value";
         assertEquals(string, parse(string));
     }
-    
+
     public void testTrim() throws Exception {
         final String string = "Field Value";
         assertEquals(string, parse("    \t\r\n" + string + "  \t\r\n  "));
     }
-    
+
     public void testFolding() throws Exception {
         assertEquals("Field Value", parse("Field \t\r\n  Value"));
     }
-    
+
     public void testQuotedString() throws Exception {
         assertEquals("Field    Value", parse("\"Field    Value\""));
         assertEquals("Field\t\r\nValue", parse("\"Field\t\r\nValue\""));
         assertEquals("Field\t\r\nValue", parse("\"Field\t\r\n       \t       Value\""));
     }
-    
+
     public void testComments() throws Exception {
         assertEquals("Field", parse("Fi(This is a comment)eld"));
         assertEquals("Field Value", parse("Fi(This is a comment)eld (A (very (nested) )comment)Value"));
     }
-    
+
     public void testQuotedInComments() throws Exception {
         assertEquals("Fi(This is a comment)eld", parse("\"Fi(This is a comment)eld\""));
         assertEquals("Field Value", parse("Fi(This is a comment)eld (A (very (nested) )comment)Value"));
     }
-    
+
     private String parse(String in) throws Exception {
         StructuredFieldParser parser = new StructuredFieldParser(new StringReader(in));
         parser.setFoldingPreserved(true);

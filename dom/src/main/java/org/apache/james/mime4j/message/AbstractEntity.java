@@ -55,44 +55,44 @@ public abstract class AbstractEntity implements Entity {
     /**
      * Gets the parent entity of this entity.
      * Returns <code>null</code> if this is the root entity.
-     * 
+     *
      * @return the parent or <code>null</code>.
      */
     public Entity getParent() {
         return parent;
     }
-    
+
     /**
      * Sets the parent entity of this entity.
-     * 
+     *
      * @param parent the parent entity or <code>null</code> if
      *        this will be the root entity.
      */
     public void setParent(Entity parent) {
         this.parent = parent;
     }
-    
+
     /**
      * Gets the entity header.
-     * 
+     *
      * @return the header.
      */
     public Header getHeader() {
         return header;
     }
-    
+
     /**
      * Sets the entity header.
-     * 
+     *
      * @param header the header.
      */
     public void setHeader(Header header) {
         this.header = header;
     }
-    
+
     /**
      * Gets the body of this entity.
-     * 
+     *
      * @return the body,
      */
     public Body getBody() {
@@ -101,7 +101,7 @@ public abstract class AbstractEntity implements Entity {
 
     /**
      * Sets the body of this entity.
-     * 
+     *
      * @param body the body.
      * @throws IllegalStateException if the body has already been set.
      */
@@ -117,7 +117,7 @@ public abstract class AbstractEntity implements Entity {
      * Removes and returns the body of this entity. The removed body may be
      * attached to another entity. If it is no longer needed it should be
      * {@link Disposable#dispose() disposed} of.
-     * 
+     *
      * @return the removed body or <code>null</code> if no body was set.
      */
     public Body removeBody() {
@@ -135,7 +135,7 @@ public abstract class AbstractEntity implements Entity {
      * Sets the specified message as body of this entity and the content type to
      * &quot;message/rfc822&quot;. A <code>Header</code> is created if this
      * entity does not already have one.
-     * 
+     *
      * @param message
      *            the message to set as body.
      */
@@ -148,7 +148,7 @@ public abstract class AbstractEntity implements Entity {
      * content type accordingly and creates a message boundary string. A
      * <code>Header</code> is created if this entity does not already have
      * one.
-     * 
+     *
      * @param multipart
      *            the multipart to set as body.
      */
@@ -165,7 +165,7 @@ public abstract class AbstractEntity implements Entity {
      * content type accordingly and creates a message boundary string. A
      * <code>Header</code> is created if this entity does not already have
      * one.
-     * 
+     *
      * @param multipart
      *            the multipart to set as body.
      * @param parameters
@@ -185,7 +185,7 @@ public abstract class AbstractEntity implements Entity {
      * Sets the specified <code>TextBody</code> as body of this entity and the
      * content type to &quot;text/plain&quot;. A <code>Header</code> is
      * created if this entity does not already have one.
-     * 
+     *
      * @param textBody
      *            the <code>TextBody</code> to set as body.
      * @see org.apache.james.mime4j.message.BodyFactory#textBody(String)
@@ -199,7 +199,7 @@ public abstract class AbstractEntity implements Entity {
      * sets the content type according to the specified sub-type. A
      * <code>Header</code> is created if this entity does not already have
      * one.
-     * 
+     *
      * @param textBody
      *            the <code>TextBody</code> to set as body.
      * @param subtype
@@ -223,7 +223,7 @@ public abstract class AbstractEntity implements Entity {
      * Sets the body of this entity and sets the content-type to the specified
      * value. A <code>Header</code> is created if this entity does not already
      * have one.
-     * 
+     *
      * @param body
      *            the body.
      * @param mimeType
@@ -238,7 +238,7 @@ public abstract class AbstractEntity implements Entity {
      * Sets the body of this entity and sets the content-type to the specified
      * value. A <code>Header</code> is created if this entity does not already
      * have one.
-     * 
+     *
      * @param body
      *            the body.
      * @param mimeType
@@ -259,49 +259,49 @@ public abstract class AbstractEntity implements Entity {
      * Determines the MIME type of this <code>Entity</code>. The MIME type
      * is derived by looking at the parent's Content-Type field if no
      * Content-Type field is set for this <code>Entity</code>.
-     * 
+     *
      * @return the MIME type.
      */
     public String getMimeType() {
-        ContentTypeField child = 
+        ContentTypeField child =
             getContentTypeField();
-        ContentTypeField parent = getParent() != null 
+        ContentTypeField parent = getParent() != null
             ? (ContentTypeField) getParent().getHeader().
                                                 getField(FieldName.CONTENT_TYPE)
             : null;
-        
+
         return calcMimeType(child, parent);
     }
 
     private ContentTypeField getContentTypeField() {
         return (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE);
     }
-    
+
     /**
      * Determines the MIME character set encoding of this <code>Entity</code>.
-     * 
+     *
      * @return the MIME character set encoding.
      */
     public String getCharset() {
         return calcCharset((ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE));
     }
-    
+
     /**
      * Determines the transfer encoding of this <code>Entity</code>.
-     * 
+     *
      * @return the transfer encoding.
      */
     public String getContentTransferEncoding() {
-        ContentTransferEncodingField f = (ContentTransferEncodingField) 
+        ContentTransferEncodingField f = (ContentTransferEncodingField)
                         getHeader().getField(FieldName.CONTENT_TRANSFER_ENCODING);
-        
+
         return calcTransferEncoding(f);
     }
 
     /**
      * Sets the transfer encoding of this <code>Entity</code> to the specified
      * value.
-     * 
+     *
      * @param contentTransferEncoding
      *            transfer encoding to use.
      */
@@ -313,7 +313,7 @@ public abstract class AbstractEntity implements Entity {
     /**
      * Return the disposition type of the content disposition of this
      * <code>Entity</code>.
-     * 
+     *
      * @return the disposition type or <code>null</code> if no disposition
      *         type has been set.
      */
@@ -329,7 +329,7 @@ public abstract class AbstractEntity implements Entity {
      * Sets the content disposition of this <code>Entity</code> to the
      * specified disposition type. No filename, size or date parameters
      * are included in the content disposition.
-     * 
+     *
      * @param dispositionType
      *            disposition type value (usually <code>inline</code> or
      *            <code>attachment</code>).
@@ -344,7 +344,7 @@ public abstract class AbstractEntity implements Entity {
      * Sets the content disposition of this <code>Entity</code> to the
      * specified disposition type and filename. No size or date parameters are
      * included in the content disposition.
-     * 
+     *
      * @param dispositionType
      *            disposition type value (usually <code>inline</code> or
      *            <code>attachment</code>).
@@ -362,7 +362,7 @@ public abstract class AbstractEntity implements Entity {
      * Sets the content disposition of this <code>Entity</code> to the
      * specified values. No date parameters are included in the content
      * disposition.
-     * 
+     *
      * @param dispositionType
      *            disposition type value (usually <code>inline</code> or
      *            <code>attachment</code>).
@@ -383,7 +383,7 @@ public abstract class AbstractEntity implements Entity {
     /**
      * Sets the content disposition of this <code>Entity</code> to the
      * specified values.
-     * 
+     *
      * @param dispositionType
      *            disposition type value (usually <code>inline</code> or
      *            <code>attachment</code>).
@@ -413,7 +413,7 @@ public abstract class AbstractEntity implements Entity {
     /**
      * Returns the filename parameter of the content disposition of this
      * <code>Entity</code>.
-     * 
+     *
      * @return the filename parameter of the content disposition or
      *         <code>null</code> if the filename has not been set.
      */
@@ -424,13 +424,13 @@ public abstract class AbstractEntity implements Entity {
 
         return field.getFilename();
     }
-    
+
     /**
      * Sets the filename parameter of the content disposition of this
      * <code>Entity</code> to the specified value. If this entity does not
      * have a content disposition header field a new one with disposition type
      * <code>attachment</code> is created.
-     * 
+     *
      * @param filename
      *            filename parameter value or <code>null</code> if the
      *            parameter should be removed.
@@ -462,20 +462,20 @@ public abstract class AbstractEntity implements Entity {
     /**
      * Determines if the MIME type of this <code>Entity</code> matches the
      * given one. MIME types are case-insensitive.
-     * 
+     *
      * @param type the MIME type to match against.
      * @return <code>true</code> on match, <code>false</code> otherwise.
      */
     public boolean isMimeType(String type) {
         return getMimeType().equalsIgnoreCase(type);
     }
-    
+
     /**
      * Determines if the MIME type of this <code>Entity</code> is
      * <code>multipart/*</code>. Since multipart-entities must have
      * a boundary parameter in the <code>Content-Type</code> field this
      * method returns <code>false</code> if no boundary exists.
-     * 
+     *
      * @return <code>true</code> on match, <code>false</code> otherwise.
      */
     public boolean isMultipart() {
@@ -489,10 +489,10 @@ public abstract class AbstractEntity implements Entity {
     /**
      * Disposes of the body of this entity. Note that the dispose call does not
      * get forwarded to the parent entity of this Entity.
-     * 
+     *
      * Subclasses that need to free resources should override this method and
      * invoke super.dispose().
-     * 
+     *
      * @see org.apache.james.mime4j.dom.Disposable#dispose()
      */
     public void dispose() {
@@ -504,7 +504,7 @@ public abstract class AbstractEntity implements Entity {
     /**
      * Obtains the header of this entity. Creates and sets a new header if this
      * entity's header is currently <code>null</code>.
-     * 
+     *
      * @return the header of this entity; never <code>null</code>.
      */
     Header obtainHeader() {
@@ -516,7 +516,7 @@ public abstract class AbstractEntity implements Entity {
 
     /**
      * Obtains the header field with the specified name.
-     * 
+     *
      * @param <F>
      *            concrete field type.
      * @param fieldName

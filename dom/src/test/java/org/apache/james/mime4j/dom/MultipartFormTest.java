@@ -37,13 +37,13 @@ public class MultipartFormTest extends TestCase {
 
     public void testMultipartFormContent() throws Exception {
         BasicBodyFactory bodyFactory = new BasicBodyFactory();
-        
+
         MessageImpl message = new MessageImpl();
         Header header = new HeaderImpl();
         header.addField(
                 DefaultFieldParser.parse("Content-Type: multipart/form-data; boundary=foo"));
         message.setHeader(header);
-        
+
         Multipart multipart = new MultipartImpl("alternative");
         multipart.setParent(message);
         BodyPart p1 = new BodyPart();
@@ -65,12 +65,12 @@ public class MultipartFormTest extends TestCase {
         multipart.addBodyPart(p1);
         multipart.addBodyPart(p2);
         multipart.addBodyPart(p3);
-        
+
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DefaultMessageWriter writer = new DefaultMessageWriter();
         writer.writeMultipart(multipart, out);
         out.close();
-        
+
         String expected = "--foo\r\n" +
             "Content-Type: text/plain\r\n" +
             "\r\n" +
@@ -87,5 +87,5 @@ public class MultipartFormTest extends TestCase {
         String s = out.toString("US-ASCII");
         assertEquals(expected, s);
     }
-    
+
 }

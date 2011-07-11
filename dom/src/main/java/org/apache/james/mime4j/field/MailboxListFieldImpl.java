@@ -74,10 +74,10 @@ public class MailboxListFieldImpl extends AbstractField implements MailboxListFi
     }
 
     public static final FieldParser<MailboxListField> PARSER = new FieldParser<MailboxListField>() {
-        
+
         public MailboxListField parse(final Field rawField, final DecodeMonitor monitor) {
             return new MailboxListFieldImpl(rawField, monitor);
         }
-        
+
     };
 }

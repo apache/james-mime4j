@@ -33,7 +33,7 @@ public interface Message extends Entity, Body {
     /**
      * Returns the value of the <i>Message-ID</i> header field of this message
      * or <code>null</code> if it is not present.
-     * 
+     *
      * @return the identifier of this message.
      */
     String getMessageId();
@@ -42,7 +42,7 @@ public interface Message extends Entity, Body {
      * Creates and sets a new <i>Message-ID</i> header field for this message.
      * A <code>Header</code> is created if this message does not already have
      * one.
-     * 
+     *
      * @param hostname
      *            host name to be included in the identifier or
      *            <code>null</code> if no host name should be included.
@@ -52,7 +52,7 @@ public interface Message extends Entity, Body {
     /**
      * Returns the (decoded) value of the <i>Subject</i> header field of this
      * message or <code>null</code> if it is not present.
-     * 
+     *
      * @return the subject of this message.
      */
     String getSubject();
@@ -62,7 +62,7 @@ public interface Message extends Entity, Body {
      * string may contain non-ASCII characters, in which case it gets encoded as
      * an 'encoded-word' automatically. A <code>Header</code> is created if
      * this message does not already have one.
-     * 
+     *
      * @param subject
      *            subject to set or <code>null</code> to remove the subject
      *            header field.
@@ -72,7 +72,7 @@ public interface Message extends Entity, Body {
     /**
      * Returns the value of the <i>Date</i> header field of this message as
      * <code>Date</code> object or <code>null</code> if it is not present.
-     * 
+     *
      * @return the date of this message.
      */
     Date getDate();
@@ -81,7 +81,7 @@ public interface Message extends Entity, Body {
      * Sets the <i>Date</i> header field for this message. This method uses the
      * default <code>TimeZone</code> of this host to encode the specified
      * <code>Date</code> object into a string.
-     * 
+     *
      * @param date
      *            date to set or <code>null</code> to remove the date header
      *            field.
@@ -92,7 +92,7 @@ public interface Message extends Entity, Body {
      * Sets the <i>Date</i> header field for this message. The specified
      * <code>TimeZone</code> is used to encode the specified <code>Date</code>
      * object into a string.
-     * 
+     *
      * @param date
      *            date to set or <code>null</code> to remove the date header
      *            field.
@@ -105,7 +105,7 @@ public interface Message extends Entity, Body {
      * Returns the value of the <i>Sender</i> header field of this message as
      * <code>Mailbox</code> object or <code>null</code> if it is not
      * present.
-     * 
+     *
      * @return the sender of this message.
      */
     Mailbox getSender();
@@ -113,7 +113,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Sender</i> header field of this message to the specified
      * mailbox address.
-     * 
+     *
      * @param sender
      *            address to set or <code>null</code> to remove the header
      *            field.
@@ -124,7 +124,7 @@ public interface Message extends Entity, Body {
      * Returns the value of the <i>From</i> header field of this message as
      * <code>MailboxList</code> object or <code>null</code> if it is not
      * present.
-     * 
+     *
      * @return value of the from field of this message.
      */
     MailboxList getFrom();
@@ -132,7 +132,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>From</i> header field of this message to the specified
      * mailbox address.
-     * 
+     *
      * @param from
      *            address to set or <code>null</code> to remove the header
      *            field.
@@ -142,7 +142,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>From</i> header field of this message to the specified
      * mailbox addresses.
-     * 
+     *
      * @param from
      *            addresses to set or <code>null</code> or no arguments to
      *            remove the header field.
@@ -152,7 +152,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>From</i> header field of this message to the specified
      * mailbox addresses.
-     * 
+     *
      * @param from
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
@@ -163,7 +163,7 @@ public interface Message extends Entity, Body {
      * Returns the value of the <i>To</i> header field of this message as
      * <code>AddressList</code> object or <code>null</code> if it is not
      * present.
-     * 
+     *
      * @return value of the to field of this message.
      */
     AddressList getTo();
@@ -171,7 +171,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>To</i> header field of this message to the specified
      * address.
-     * 
+     *
      * @param to
      *            address to set or <code>null</code> to remove the header
      *            field.
@@ -181,7 +181,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>To</i> header field of this message to the specified
      * addresses.
-     * 
+     *
      * @param to
      *            addresses to set or <code>null</code> or no arguments to
      *            remove the header field.
@@ -191,7 +191,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>To</i> header field of this message to the specified
      * addresses.
-     * 
+     *
      * @param to
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
@@ -202,7 +202,7 @@ public interface Message extends Entity, Body {
      * Returns the value of the <i>Cc</i> header field of this message as
      * <code>AddressList</code> object or <code>null</code> if it is not
      * present.
-     * 
+     *
      * @return value of the cc field of this message.
      */
     AddressList getCc();
@@ -210,7 +210,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Cc</i> header field of this message to the specified
      * address.
-     * 
+     *
      * @param cc
      *            address to set or <code>null</code> to remove the header
      *            field.
@@ -220,7 +220,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Cc</i> header field of this message to the specified
      * addresses.
-     * 
+     *
      * @param cc
      *            addresses to set or <code>null</code> or no arguments to
      *            remove the header field.
@@ -230,7 +230,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Cc</i> header field of this message to the specified
      * addresses.
-     * 
+     *
      * @param cc
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
@@ -241,7 +241,7 @@ public interface Message extends Entity, Body {
      * Returns the value of the <i>Bcc</i> header field of this message as
      * <code>AddressList</code> object or <code>null</code> if it is not
      * present.
-     * 
+     *
      * @return value of the bcc field of this message.
      */
     AddressList getBcc();
@@ -249,7 +249,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Bcc</i> header field of this message to the specified
      * address.
-     * 
+     *
      * @param bcc
      *            address to set or <code>null</code> to remove the header
      *            field.
@@ -259,7 +259,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Bcc</i> header field of this message to the specified
      * addresses.
-     * 
+     *
      * @param bcc
      *            addresses to set or <code>null</code> or no arguments to
      *            remove the header field.
@@ -269,7 +269,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Bcc</i> header field of this message to the specified
      * addresses.
-     * 
+     *
      * @param bcc
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
@@ -280,7 +280,7 @@ public interface Message extends Entity, Body {
      * Returns the value of the <i>Reply-To</i> header field of this message as
      * <code>AddressList</code> object or <code>null</code> if it is not
      * present.
-     * 
+     *
      * @return value of the reply to field of this message.
      */
     AddressList getReplyTo();
@@ -288,7 +288,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Reply-To</i> header field of this message to the specified
      * address.
-     * 
+     *
      * @param replyTo
      *            address to set or <code>null</code> to remove the header
      *            field.
@@ -298,7 +298,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Reply-To</i> header field of this message to the specified
      * addresses.
-     * 
+     *
      * @param replyTo
      *            addresses to set or <code>null</code> or no arguments to
      *            remove the header field.
@@ -308,7 +308,7 @@ public interface Message extends Entity, Body {
     /**
      * Sets the <i>Reply-To</i> header field of this message to the specified
      * addresses.
-     * 
+     *
      * @param replyTo
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.

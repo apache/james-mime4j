@@ -25,7 +25,7 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 
 public final class LoggingMonitor extends DecodeMonitor {
     private static Log log = LogFactory.getLog(LoggingMonitor.class);
-    
+
     public static DecodeMonitor MONITOR = new LoggingMonitor();
 
     @Override
@@ -37,7 +37,7 @@ public final class LoggingMonitor extends DecodeMonitor {
         }
         return false;
     }
-    
+
     public boolean isListening() {
         return true;
     }

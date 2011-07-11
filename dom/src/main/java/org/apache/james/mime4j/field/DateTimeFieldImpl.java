@@ -80,10 +80,10 @@ public class DateTimeFieldImpl extends AbstractField implements DateTimeField {
     }
 
     public static final FieldParser<DateTimeField> PARSER = new FieldParser<DateTimeField>() {
-        
+
         public DateTimeField parse(final Field rawField, final DecodeMonitor monitor) {
             return new DateTimeFieldImpl(rawField, monitor);
         }
-        
+
     };
 }

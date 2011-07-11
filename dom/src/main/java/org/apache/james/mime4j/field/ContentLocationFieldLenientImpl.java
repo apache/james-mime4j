@@ -68,7 +68,7 @@ public class ContentLocationFieldLenientImpl extends AbstractField implements Co
         }
         this.location = sb.toString();
     }
-    
+
     public String getLocation() {
         if (!parsed) {
             parse();
@@ -77,11 +77,11 @@ public class ContentLocationFieldLenientImpl extends AbstractField implements Co
     }
 
     public static final FieldParser<ContentLocationField> PARSER = new FieldParser<ContentLocationField>() {
-        
+
         public ContentLocationField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentLocationFieldLenientImpl(rawField, monitor);
         }
-        
+
     };
 
 }

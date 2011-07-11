@@ -74,10 +74,10 @@ public class MailboxFieldImpl extends AbstractField implements MailboxField {
     }
 
     public static final FieldParser<MailboxField> PARSER = new FieldParser<MailboxField>() {
-        
+
         public MailboxField parse(final Field rawField, final DecodeMonitor monitor) {
             return new MailboxFieldImpl(rawField, monitor);
         }
-        
+
     };
 }

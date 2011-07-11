@@ -36,65 +36,65 @@ public class ContentTypeFieldTest extends TestCase {
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return ContentTypeFieldImpl.PARSER.parse(rawField, null);
     }
-    
+
     public void testMimeTypeWithSemiColonNoParams() throws Exception  {
         ContentTypeField f = parse("Content-Type: text/html;");
         assertEquals("text/html", f.getMimeType());
     }
-    
+
     public void testGetMimeType() throws Exception {
         ContentTypeField f = parse("Content-Type: text/PLAIN");
         assertEquals("text/plain", f.getMimeType());
-        
+
         f = parse("content-type:   TeXt / html   ");
         assertEquals("text/html", f.getMimeType());
-        
+
         f = parse("CONTENT-TYPE:   x-app/yada ;"
                                                     + "  param = yada");
         assertEquals("x-app/yada", f.getMimeType());
-        
+
         f = parse("CONTENT-TYPE:   yada");
         assertEquals(null, f.getMimeType());
     }
-    
+
     public void testGetMimeTypeStatic() throws Exception {
         ContentTypeField child = parse("Content-Type: child/type");;
         ContentTypeField parent = parse("Content-Type: parent/type");
-        
+
         assertEquals("child/type", ContentTypeFieldImpl.getMimeType(child, parent));
-        
+
         child = null;
         parent = parse("Content-Type: parent/type");
         assertEquals("text/plain", ContentTypeFieldImpl.getMimeType(child, parent));
         parent = parse("Content-Type: multipart/digest");
         assertEquals("message/rfc822", ContentTypeFieldImpl.getMimeType(child, parent));
-        
+
         child = parse("Content-Type:");
         parent = parse("Content-Type: parent/type");
         assertEquals("text/plain", ContentTypeFieldImpl.getMimeType(child, parent));
         parent = parse("Content-Type: multipart/digest");
         assertEquals("message/rfc822", ContentTypeFieldImpl.getMimeType(child, parent));
     }
-    
+
     public void testGetCharsetStatic() throws Exception {
         ContentTypeField f = parse("Content-Type: some/type; charset=iso8859-1");
         assertEquals("iso8859-1", ContentTypeFieldImpl.getCharset(f));
-        
+
         f = parse("Content-Type: some/type;");
         assertEquals("us-ascii", ContentTypeFieldImpl.getCharset(f));
     }
-    
+
     public void testGetParameter() throws Exception {
         ContentTypeField f = parse("CONTENT-TYPE:   text / html ;"
                                                 + "  boundary=yada yada");
         assertEquals("yada", f.getParameter("boundary"));
-        
+
         f = parse("Content-Type: x-app/yada;"
                                                 + "  boUNdarY= \"ya:\\\"*da\"; "
                                                 + "\tcharset\t =  us-ascii");
         assertEquals("ya:\"*da", f.getParameter("boundary"));
         assertEquals("us-ascii", f.getParameter("charset"));
-        
+
         f = parse("Content-Type: x-app/yada;  "
                             + "boUNdarY= \"ya \\\"\\\"\tda \\\"\"; "
                             + "\tcharset\t =  \"\\\"hepp\\\"  =us\t-ascii\"");

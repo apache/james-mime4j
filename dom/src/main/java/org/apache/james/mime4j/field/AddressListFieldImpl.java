@@ -75,10 +75,10 @@ public class AddressListFieldImpl extends AbstractField implements AddressListFi
     }
 
     public static final FieldParser<AddressListField> PARSER = new FieldParser<AddressListField>() {
-        
+
         public AddressListField parse(final Field rawField, final DecodeMonitor monitor) {
             return new AddressListFieldImpl(rawField, monitor);
         }
-        
+
     };
 }

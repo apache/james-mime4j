@@ -36,7 +36,7 @@ public class MimeIOException extends IOException {
 
     /**
      * Constructs an IO exception based on {@link MimeException}.
-     * 
+     *
      * @param cause the cause.
      */
     public MimeIOException(MimeException cause) {
@@ -47,7 +47,7 @@ public class MimeIOException extends IOException {
     /**
      * Returns the <code>MimeException</code> that caused this
      * <code>MimeIOException</code>.
-     * 
+     *
      * @return the cause of this <code>MimeIOException</code>.
      */
     @Override

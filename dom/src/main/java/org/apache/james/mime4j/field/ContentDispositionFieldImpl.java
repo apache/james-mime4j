@@ -203,12 +203,12 @@ public class ContentDispositionFieldImpl extends AbstractField implements Conten
                     .getDate();
         } catch (org.apache.james.mime4j.field.datetime.parser.ParseException e) {
             if (monitor.isListening()) {
-                monitor.warn(paramName + " parameter is invalid: " + value, 
+                monitor.warn(paramName + " parameter is invalid: " + value,
                         paramName + " parameter is ignored");
             }
             return null;
         } catch (TokenMgrError e) {
-            monitor.warn(paramName + " parameter is invalid: " + value, 
+            monitor.warn(paramName + " parameter is invalid: " + value,
                     paramName + "parameter is ignored");
             return null;
         }
@@ -249,10 +249,10 @@ public class ContentDispositionFieldImpl extends AbstractField implements Conten
     }
 
     public static final FieldParser<ContentDispositionField> PARSER = new FieldParser<ContentDispositionField>() {
-        
+
         public ContentDispositionField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentDispositionFieldImpl(rawField, monitor);
         }
-        
+
     };
 }

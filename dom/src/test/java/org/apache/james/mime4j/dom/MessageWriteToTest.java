@@ -39,7 +39,7 @@ public class MessageWriteToTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
+
     public void testSimpleMail() throws Exception {
         Message message = createMessage(ExampleMail.RFC822_SIMPLE_BYTES);
         assertFalse("Not multipart", message.isMultipart());
@@ -48,7 +48,7 @@ public class MessageWriteToTest extends TestCase {
         writer.writeMessage(message, out);
         assertEquals(out.toByteArray(), ExampleMail.RFC822_SIMPLE_BYTES);
     }
-    
+
     private void assertEquals(byte[] expected, byte[] actual) {
         StringBuilder buffer = new StringBuilder(expected.length);
         assertEquals(new String(expected), new String(actual));
@@ -58,7 +58,7 @@ public class MessageWriteToTest extends TestCase {
             assertEquals("Mismatch@" + i, expected[i], actual[i]);
         }
     }
-    
+
     public void testBinaryAttachment() throws Exception {
         Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
         assertTrue("Is multipart", message.isMultipart());
@@ -67,7 +67,7 @@ public class MessageWriteToTest extends TestCase {
         writer.writeMessage(message, out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
     }
-    
+
     public void testBinaryAttachmentNoPreamble() throws Exception {
         Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES);
         assertTrue("Is multipart", message.isMultipart());
@@ -76,7 +76,7 @@ public class MessageWriteToTest extends TestCase {
         writer.writeMessage(message, out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES, out.toByteArray());
     }
-    
+
     public void testBinaryAttachmentPreambleEpilogue() throws Exception {
         Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES);
         assertTrue("Is multipart", message.isMultipart());
@@ -85,7 +85,7 @@ public class MessageWriteToTest extends TestCase {
         writer.writeMessage(message, out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES, out.toByteArray());
     }
-    
+
     private Message createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
         DefaultMessageBuilder builder = new DefaultMessageBuilder();

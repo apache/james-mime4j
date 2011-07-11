@@ -25,7 +25,7 @@ public interface ContentLanguageField extends ParsedField {
 
     /**
      * Gets the content language(s) defined in this field.
-     * 
+     *
      * @return a list of content language(s).
      */
     List<String> getLanguages();

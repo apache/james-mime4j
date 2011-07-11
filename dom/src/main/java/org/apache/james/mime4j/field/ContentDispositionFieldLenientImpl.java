@@ -46,9 +46,9 @@ import org.apache.james.mime4j.stream.RawFieldParser;
 public class ContentDispositionFieldLenientImpl extends AbstractField implements ContentDispositionField {
 
     private static final String DEFAULT_DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss ZZZZ";
-    
+
     private final List<String> datePatterns;
-    
+
     private boolean parsed = false;
 
     private String dispositionType = "";
@@ -63,7 +63,7 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
     private boolean readDateParsed;
     private Date readDate;
 
-    ContentDispositionFieldLenientImpl(final Field rawField, 
+    ContentDispositionFieldLenientImpl(final Field rawField,
             final Collection<String> dateParsers, final DecodeMonitor monitor) {
         super(rawField, monitor);
         this.datePatterns = new ArrayList<String>();
@@ -189,17 +189,17 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
             }
         }
         if (monitor.isListening()) {
-            monitor.warn(paramName + " parameter is invalid: " + value, 
+            monitor.warn(paramName + " parameter is invalid: " + value,
                     paramName + " parameter is ignored");
         }
         return null;
     }
 
     public static final FieldParser<ContentDispositionField> PARSER = new FieldParser<ContentDispositionField>() {
-        
+
         public ContentDispositionField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentDispositionFieldLenientImpl(rawField, null, monitor);
         }
-        
+
     };
 }

@@ -38,7 +38,7 @@ public interface ContentTypeField extends ParsedField {
 
     /**
      * Gets the MIME type defined in this Content-Type field.
-     * 
+     *
      * @return the MIME type or an empty string if not set.
      */
     String getMimeType();
@@ -52,10 +52,10 @@ public interface ContentTypeField extends ParsedField {
      * Gets the subtype defined in this Content-Type field.
      */
     String getSubType();
-    
+
     /**
      * Gets the value of a parameter. Parameter names are case-insensitive.
-     * 
+     *
      * @param name
      *            the name of the parameter to get.
      * @return the parameter value or <code>null</code> if not set.
@@ -64,14 +64,14 @@ public interface ContentTypeField extends ParsedField {
 
     /**
      * Gets all parameters.
-     * 
+     *
      * @return the parameters.
      */
     Map<String, String> getParameters();
 
     /**
      * Determines if the MIME type of this field matches the given one.
-     * 
+     *
      * @param mimeType
      *            the MIME type to match against.
      * @return <code>true</code> if the MIME type of this field matches,
@@ -81,7 +81,7 @@ public interface ContentTypeField extends ParsedField {
 
     /**
      * Determines if the MIME type of this field is <code>multipart/*</code>.
-     * 
+     *
      * @return <code>true</code> if this field is has a
      *         <code>multipart/*</code> MIME type, <code>false</code>
      *         otherwise.
@@ -90,7 +90,7 @@ public interface ContentTypeField extends ParsedField {
 
     /**
      * Gets the value of the <code>boundary</code> parameter if set.
-     * 
+     *
      * @return the <code>boundary</code> parameter value or <code>null</code>
      *         if not set.
      */
@@ -98,7 +98,7 @@ public interface ContentTypeField extends ParsedField {
 
     /**
      * Gets the value of the <code>charset</code> parameter if set.
-     * 
+     *
      * @return the <code>charset</code> parameter value or <code>null</code>
      *         if not set.
      */

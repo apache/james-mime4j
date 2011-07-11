@@ -30,7 +30,7 @@ public class ParseException extends MimeException {
 
     /**
      * Constructs a new parse exception with the specified detail message.
-     * 
+     *
      * @param message
      *            detail message
      */
@@ -40,7 +40,7 @@ public class ParseException extends MimeException {
 
     /**
      * Constructs a new parse exception with the specified cause.
-     * 
+     *
      * @param cause
      *            the cause
      */
@@ -51,7 +51,7 @@ public class ParseException extends MimeException {
     /**
      * Constructs a new parse exception with the specified detail message and
      * cause.
-     * 
+     *
      * @param message
      *            detail message
      * @param cause

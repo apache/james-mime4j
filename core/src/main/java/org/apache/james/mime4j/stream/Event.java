@@ -22,25 +22,25 @@ package org.apache.james.mime4j.stream;
 /**
  * Enumerates events which can be monitored.
  */
-public final class Event { 
+public final class Event {
 
     /** Indicates that a body part ended prematurely. */
-    public static final Event MIME_BODY_PREMATURE_END 
+    public static final Event MIME_BODY_PREMATURE_END
         = new Event("Body part ended prematurely. " +
-                "Boundary detected in header or EOF reached."); 
+                "Boundary detected in header or EOF reached.");
     /** Indicates that unexpected end of headers detected.*/
-    public static final Event HEADERS_PREMATURE_END 
+    public static final Event HEADERS_PREMATURE_END
         = new Event("Unexpected end of headers detected. " +
                 "Higher level boundary detected or EOF reached.");
     /** Indicates that unexpected end of headers detected.*/
-    public static final Event INVALID_HEADER 
+    public static final Event INVALID_HEADER
         = new Event("Invalid header encountered");
     /** Indicates that an obsolete syntax header has been detected */
-    public static final Event OBSOLETE_HEADER 
+    public static final Event OBSOLETE_HEADER
         = new Event("Obsolete header encountered");
-    
+
     private final String code;
-    
+
     public Event(final String code) {
         super();
         if (code == null) {
@@ -48,7 +48,7 @@ public final class Event {
         }
         this.code = code;
     }
-    
+
     @Override
     public int hashCode() {
         return code.hashCode();
@@ -65,10 +65,10 @@ public final class Event {
             return false;
         }
     }
-    
+
     @Override
     public String toString() {
         return code;
     }
-    
+
 }

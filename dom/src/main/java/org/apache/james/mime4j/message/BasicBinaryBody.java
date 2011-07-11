@@ -28,20 +28,20 @@ import org.apache.james.mime4j.dom.BinaryBody;
 class BasicBinaryBody extends BinaryBody {
 
     private final byte[] content;
-    
+
     BasicBinaryBody(final byte[] content) {
         super();
         this.content = content;
     }
-    
+
     @Override
     public InputStream getInputStream() throws IOException {
         return new ByteArrayInputStream(this.content);
     }
-    
+
     @Override
     public BasicBinaryBody copy() {
         return new BasicBinaryBody(this.content);
     }
-    
+
 }

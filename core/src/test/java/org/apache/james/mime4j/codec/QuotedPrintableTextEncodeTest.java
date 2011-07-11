@@ -41,7 +41,7 @@ public class QuotedPrintableTextEncodeTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
+
     public void testEscapedSoftBreak() throws Exception {
         byte[] content = new byte[500];
         Arrays.fill(content, (byte)0x18);
@@ -61,7 +61,7 @@ public class QuotedPrintableTextEncodeTest extends TestCase {
         }
         check(content, expected);
     }
-    
+
     public void testPlainAsciiSoftBreak() throws Exception {
         byte[] content = new byte[500];
         Arrays.fill(content, (byte)0x29);
@@ -87,28 +87,28 @@ public class QuotedPrintableTextEncodeTest extends TestCase {
         expected[467] = '\n';
         check(content, expected);
     }
-    
+
     public void testPlainASCII() throws Exception {
         checkRoundtrip("Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage." +
                 "Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage." +
                 "Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage." +
                 "Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage.");
     }
-    
+
     public void testEncodeSpace() throws Exception {
         checkRoundtrip("                 A");
     }
-    
+
     public void testLetterEncoding() throws Exception {
         for (byte b=0;b<Byte.MAX_VALUE;b++) {
             byte[] content = {b};
             // White space is only escaped when followed by CRLF
-            if (b != 10 && b != 13 && b != 32 && b != 9) { 
+            if (b != 10 && b != 13 && b != 32 && b != 9) {
                 checkRoundtrip(content);
             }
         }
     }
-    
+
     public void testCRLFShouldResetLineCount() throws Exception {
         StringBuilder buffer = new StringBuilder(4096);
         for (int i=0;i<1000;i++) {
@@ -117,31 +117,31 @@ public class QuotedPrintableTextEncodeTest extends TestCase {
         String longLine = buffer.toString();
         check(longLine, longLine);
     }
-    
+
     public void testDontEscapeLF() throws Exception {
         check("Ready\nFor\n", "Ready\nFor\n");
     }
-    
+
     public void testDontEscapeCR() throws Exception {
         check("Ready\rFor\r", "Ready\rFor\r");
     }
-    
+
     public void testEscapeSpaceAtLineEnd() throws Exception {
         check("      \r\n", "     =20\r\n");
     }
-    
+
     public void testDontEscapeSpaceBeforeLineEnd() throws Exception {
         check("      ", "      ");
     }
-    
+
     public void testDontEscapeTabsBeforeLineEnd() throws Exception {
         check("\t\t\t\t", "\t\t\t\t");
     }
-    
+
     public void testDontWhiteSpaceBeforeLineEnd() throws Exception {
         check("  \t\t  \t", "  \t\t  \t");
     }
-    
+
     private void checkRoundtrip(String content) throws Exception {
         checkRoundtrip(content, CharsetUtil.US_ASCII);
     }
@@ -149,7 +149,7 @@ public class QuotedPrintableTextEncodeTest extends TestCase {
     private void checkRoundtrip(String content, Charset charset) throws Exception {
         checkRoundtrip(charset.encode(content).array());
     }
-    
+
     private void checkRoundtrip(byte[] content) throws Exception {
         InputStream in = new ByteArrayInputStream(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -160,20 +160,20 @@ public class QuotedPrintableTextEncodeTest extends TestCase {
         IOUtils.copy(in, out);
         assertEquals(content, out.toByteArray());
     }
-    
+
     private void check(String content, String expected) throws Exception {
         Charset ascii = CharsetUtil.US_ASCII;
         check(ascii.encode(content).array(), ascii.encode(expected).array());
     }
 
-    
+
     private void check(byte[] content, byte[] expected) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.encodeQuotedPrintable(in, out);
         assertEquals(expected, out.toByteArray());
     }
-    
+
     private void assertEquals(byte[] expected, byte[] actual) {
         assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {

@@ -35,7 +35,7 @@ public class LenientMimeVersionParserTest extends TestCase {
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return MimeVersionFieldLenientImpl.PARSER.parse(rawField, null);
     }
-    
+
     static void check(String input, int expectedMajorVersion, int expectedMinorVersion) throws Exception {
         MimeVersionField f = parse("MIME-Version: " + input);
         assertEquals("Major version number", expectedMajorVersion, f.getMajorVersion());
@@ -48,7 +48,7 @@ public class LenientMimeVersionParserTest extends TestCase {
         check("0.1", 0, 1);
         check("123234234.0", 123234234, 0);
     }
-    
+
     public void testLineWithComments() throws Exception {
         check("2(A comment).4", 2, 4);
         check("2(.8).4", 2, 4);
@@ -56,37 +56,37 @@ public class LenientMimeVersionParserTest extends TestCase {
         check("2.4(A comment)", 2, 4);
         check("2.(A comment)4", 2, 4);
     }
-    
+
     public void testLineWithNestedComments() throws Exception {
         check("2(4.45 ( Another ()comment () blah (Wobble(mix)))Whatever).4", 2, 4);
     }
-    
+
     public void testMalformed1() throws Exception {
         MimeVersionField f = parse("MIME-Version: 5  ");
         assertEquals(5, f.getMajorVersion());
         assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
         assertNull(f.getParseException());
     }
-    
+
     public void testMalformed2() throws Exception {
         MimeVersionField f = parse("MIME-Version: 5.  ");
         assertEquals(5, f.getMajorVersion());
         assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
         assertNull(f.getParseException());
     }
-    
+
     public void testMalformed3() throws Exception {
         MimeVersionField f = parse("MIME-Version: .5  ");
         assertEquals(MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION, f.getMajorVersion());
         assertEquals(5, f.getMinorVersion());
         assertNull(f.getParseException());
     }
-    
+
     public void testMalformed4() throws Exception {
         MimeVersionField f = parse("MIME-Version: crap ");
         assertEquals(MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION, f.getMajorVersion());
         assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
         assertNull(f.getParseException());
     }
-    
+
 }

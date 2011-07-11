@@ -75,7 +75,7 @@ public class PositionInputStream extends FilterInputStream {
     @Override
     public long skip(long n) throws IOException {
         final long c = in.skip(n);
-        if (c > 0) 
+        if (c > 0)
             position += c;
         return c;
     }
@@ -83,7 +83,7 @@ public class PositionInputStream extends FilterInputStream {
     @Override
     public int read(byte b[], int off, int len) throws IOException {
         final int c = in.read(b, off, len);
-        if (c > 0) 
+        if (c > 0)
             position += c;
         return c;
     }

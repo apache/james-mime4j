@@ -30,7 +30,7 @@ public class ServiceLoaderException extends RuntimeException {
     public ServiceLoaderException(Throwable cause) {
         super(cause);
     }
-    
+
     public ServiceLoaderException(String message, Throwable cause) {
         super(message, cause);
     }

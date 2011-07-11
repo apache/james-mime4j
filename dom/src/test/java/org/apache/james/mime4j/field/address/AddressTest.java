@@ -41,13 +41,13 @@ public class AddressTest extends TestCase {
     public void testNullConstructorAndBadUsage() {
         AddressList al = new AddressList(null, false);
         assertEquals(0, al.size());
-        
+
         try {
             al.get(-1);
             fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
-        
+
         try {
             al.get(0);
             fail("Expected index out of bound exception!");
@@ -55,24 +55,24 @@ public class AddressTest extends TestCase {
         }
     }
 
-    
+
     public void testEmptyDomainList() {
         DomainList dl = new DomainList(null, false);
         assertEquals(0, dl.size());
-        
+
         try {
             dl.get(-1);
             fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
-        
+
         try {
             dl.get(0);
             fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
     }
-    
+
     public void testDomainList() {
         List<String> al = new ArrayList<String>();
         al.add("example.com");
@@ -82,28 +82,28 @@ public class AddressTest extends TestCase {
         assertEquals(1, dl.size());
         al.add("foo.example.com");
         assertEquals(2, dl.size());
-        
+
         // cloned arraylist
         DomainList dlcopy = new DomainList(al, false);
         assertEquals(2, dlcopy.size());
         al.add("bar.example.com");
         assertEquals(2, dlcopy.size());
-        
+
         // check route string
         assertEquals("@example.com,@foo.example.com", dlcopy.toRouteString());
     }
-    
+
 
     public void testEmptyMailboxList() {
         MailboxList ml = new MailboxList(null, false);
         assertEquals(0, ml.size());
-        
+
         try {
             ml.get(-1);
             fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
-        
+
         try {
             ml.get(0);
             fail("Expected index out of bound exception!");
@@ -120,14 +120,14 @@ public class AddressTest extends TestCase {
         assertEquals(1, ml.size());
         al.add(new Mailbox("local2", "foo.example.com"));
         assertEquals(2, ml.size());
-        
+
         // cloned arraylist
         MailboxList mlcopy = new MailboxList(al, false);
         assertEquals(2, mlcopy.size());
         al.add(new Mailbox("local3", "bar.example.com"));
         assertEquals(2, mlcopy.size());
     }
-    
+
     public void testMailboxEquals() throws Exception {
         Mailbox m1 = new Mailbox("john.doe", "acme.org");
         Mailbox m2 = new Mailbox("john doe", "acme.org");
@@ -139,7 +139,7 @@ public class AddressTest extends TestCase {
         assertFalse(m1.equals(m4));
         assertFalse(m1.equals(null));
     }
-    
+
     public void testMailboxHashCode() throws Exception {
         Mailbox m1 = new Mailbox("john.doe", "acme.org");
         Mailbox m2 = new Mailbox("john doe", "acme.org");

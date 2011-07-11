@@ -48,7 +48,7 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
             encoding = null;
         }
     }
-    
+
     /**
      * @see org.apache.james.mime4j.dom.field.ContentTransferEncodingField#getEncoding()
      */
@@ -63,7 +63,7 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
      * Gets the encoding of the given field if. Returns the default
      * <code>7bit</code> if not set or if <code>f</code> is
      * <code>null</code>.
-     * 
+     *
      * @return the encoding.
      */
     public static String getEncoding(ContentTransferEncodingField f) {
@@ -74,10 +74,10 @@ public class ContentTransferEncodingFieldImpl extends AbstractField implements C
     }
 
     public static final FieldParser<ContentTransferEncodingField> PARSER = new FieldParser<ContentTransferEncodingField>() {
-        
+
         public ContentTransferEncodingField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentTransferEncodingFieldImpl(rawField, monitor);
         }
-        
+
     };
 }

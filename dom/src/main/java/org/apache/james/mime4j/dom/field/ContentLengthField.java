@@ -23,7 +23,7 @@ public interface ContentLengthField extends ParsedField {
 
     /**
      * Gets the content length value defined in this field.
-     * 
+     *
      * @return the content length value.
      */
     long getContentLength();

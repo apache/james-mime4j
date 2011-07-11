@@ -38,14 +38,14 @@ public class MessageCompleteMailTest extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
     }
-    
+
     public void testMultipartAlternative() throws Exception {
         Message message = createMessage(ExampleMail.MIME_MULTIPART_ALTERNATIVE_BYTES);
         assertTrue("Should be a multipart/alternative mail", message.isMultipart());
         Multipart part = (Multipart)message.getBody();
         assertEquals("alternative", part.getSubType());
-    }    
-    
+    }
+
     public void testMultipartMixed() throws Exception {
         Message message = createMessage(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTES);
         assertTrue("Should be a multipart/mixed mail", message.isMultipart());

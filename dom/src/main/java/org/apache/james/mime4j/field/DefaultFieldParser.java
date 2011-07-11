@@ -37,11 +37,11 @@ import org.apache.james.mime4j.util.ContentUtil;
 public class DefaultFieldParser extends DelegatingFieldParser {
 
     private static final DefaultFieldParser PARSER = new DefaultFieldParser();
-    
+
 
     /**
      * Gets the default parser used to parse fields.
-     * 
+     *
      * @return the default field parser
      */
     public static DefaultFieldParser getParser() {
@@ -54,21 +54,21 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      * <code>Field</code> class. The type of the class returned depends on the
      * field name; see {@link #parse(String)} for a table of field names and
      * their corresponding classes.
-     * 
+     *
      * @param raw the bytes to parse.
      * @param monitor a DecodeMonitor object used while parsing/decoding.
      * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
      */
     public static ParsedField parse(
-            final ByteSequence raw, 
+            final ByteSequence raw,
             final DecodeMonitor monitor) throws MimeException {
         Field rawField = RawFieldParser.DEFAULT.parseField(raw);
         return PARSER.parse(rawField, monitor);
     }
 
     /**
-     * Parses the given string and returns an instance of the 
+     * Parses the given string and returns an instance of the
      * <code>Field</code> class. The type of the class returned depends on
      * the field name:
      * <p>
@@ -83,7 +83,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
      *   <tr><td>{@link AddressListFieldImpl}</td><td>To, Cc, Bcc, Reply-To, Resent-To, Resent-Cc, Resent-Bcc</td></tr>
      *   <tr><td>{@link UnstructuredFieldImpl}</td><td>Subject and others</td></tr>
      * </table>
-     * 
+     *
      * @param rawStr the string to parse.
      * @return a <code>ParsedField</code> instance.
      * @throws MimeException if the raw string cannot be split into field name and body.
@@ -104,7 +104,7 @@ public class DefaultFieldParser extends DelegatingFieldParser {
 
     public DefaultFieldParser() {
         super(UnstructuredFieldImpl.PARSER);
-        setFieldParser(FieldName.CONTENT_TYPE, 
+        setFieldParser(FieldName.CONTENT_TYPE,
                 ContentTypeFieldImpl.PARSER);
         setFieldParser(FieldName.CONTENT_LENGTH,
                 ContentLengthFieldImpl.PARSER);

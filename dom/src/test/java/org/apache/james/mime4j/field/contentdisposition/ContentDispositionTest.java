@@ -30,5 +30,5 @@ public class ContentDispositionTest extends TestCase {
         // make sure that our ParseException extends MimeException.
         assertTrue(MimeException.class.isAssignableFrom(ParseException.class));
     }
-    
+
 }

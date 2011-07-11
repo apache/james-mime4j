@@ -30,14 +30,14 @@ public interface Body extends Disposable {
 
     /**
      * Gets the parent of this body.
-     * 
+     *
      * @return the parent.
      */
     Entity getParent();
 
     /**
      * Sets the parent of this body.
-     * 
+     *
      * @param parent
      *            the parent.
      */

@@ -45,7 +45,7 @@ public class ContentIdFieldImpl extends AbstractField implements ContentIdField 
             id = null;
         }
     }
-    
+
     public String getId() {
         if (!parsed) {
             parse();
@@ -54,11 +54,11 @@ public class ContentIdFieldImpl extends AbstractField implements ContentIdField 
     }
 
     public static final FieldParser<ContentIdField> PARSER = new FieldParser<ContentIdField>() {
-        
+
         public ContentIdField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentIdFieldImpl(rawField, monitor);
         }
-        
+
     };
 
 }

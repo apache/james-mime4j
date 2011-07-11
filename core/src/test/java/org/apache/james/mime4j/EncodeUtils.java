@@ -21,18 +21,18 @@ package org.apache.james.mime4j;
 
 
 public class EncodeUtils {
-    
+
     public static final int MASK = 0x3F;
-    public static final int FIRST_MASK = MASK << 18; 
-    public static final int SECOND_MASK = MASK << 12; 
-    public static final int THIRD_MASK = MASK << 6; 
-    public static final int FORTH_MASK = MASK; 
-    
+    public static final int FIRST_MASK = MASK << 18;
+    public static final int SECOND_MASK = MASK << 12;
+    public static final int THIRD_MASK = MASK << 6;
+    public static final int FORTH_MASK = MASK;
+
     public static final byte[] ENCODING = {'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N',
         'O', 'P' ,'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i',
         'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '0', '1', '2', '3',
         '4', '5', '6', '7', '8', '9', '+', '/'};
-    
+
     public static final void main(String[] args) throws Exception {
         byte[] bytes = {(byte) 0, (byte) 128, (byte) 0};
         System.out.println(new String(toBase64(bytes)));
@@ -40,7 +40,7 @@ public class EncodeUtils {
         System.out.println(new String(toBase64("Monday".getBytes())));
         System.out.println(new String(toBase64("M\u00F6nchengladbach\r\n".getBytes("ISO-8859-1"))));
     }
-    
+
     public static byte[] toBase64(byte[] in) {
         int inputLength = in.length;
         int outputLength = (int) Math.floor((4*inputLength) / 3f) + 3;
@@ -62,7 +62,7 @@ public class EncodeUtils {
             index = (quantum & FORTH_MASK);
             outputIndex = setResult(results, outputIndex, ENCODING[index]);
         }
-        
+
         switch (inputLength - inputIndex) {
             case 1:
                 int quantum = in[inputIndex++] << 16;
@@ -73,7 +73,7 @@ public class EncodeUtils {
                 outputIndex = setResult(results, outputIndex, (byte) '=');
                 outputIndex = setResult(results, outputIndex, (byte) '=');
                 break;
-                
+
             case 2:
                 quantum = (in[inputIndex++] << 16) + (in[inputIndex++] << 8);
                 index = (quantum & FIRST_MASK) >> 18;
@@ -85,7 +85,7 @@ public class EncodeUtils {
                 outputIndex = setResult(results, outputIndex, (byte) '=');
                 break;
         }
-        
+
         return results;
     }
 

@@ -27,7 +27,7 @@ public interface ParsedField extends Field {
     /**
      * Returns <code>true</code> if this field is valid, i.e. no errors were
      * encountered while parsing the field value.
-     * 
+     *
      * @return <code>true</code> if this field is valid, <code>false</code>
      *         otherwise.
      * @see #getParseException()
@@ -38,7 +38,7 @@ public interface ParsedField extends Field {
      * Returns the exception that was thrown by the field parser while parsing
      * the field value. The result is <code>null</code> if the field is valid
      * and no errors were encountered.
-     * 
+     *
      * @return the exception that was thrown by the field parser or
      *         <code>null</code> if the field is valid.
      */

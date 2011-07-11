@@ -34,7 +34,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
 public class BasicBodyFactory implements BodyFactory {
 
     private static String DEFAULT_CHARSET = CharsetUtil.DEFAULT_CHARSET.name();
-    
+
     public BinaryBody binaryBody(final InputStream is) throws IOException {
         return new BasicBinaryBody(bufferContent(is));
     }
@@ -42,7 +42,7 @@ public class BasicBodyFactory implements BodyFactory {
     public TextBody textBody(final InputStream is, final String mimeCharset) throws IOException {
         return new BasicTextBody(bufferContent(is), mimeCharset);
     }
- 
+
     private static byte[] bufferContent(final InputStream is) throws IOException {
         if (is == null) {
             throw new IllegalArgumentException("Input stream may not be null");
@@ -55,7 +55,7 @@ public class BasicBodyFactory implements BodyFactory {
         }
         return buf.toByteArray();
     }
-    
+
     public TextBody textBody(final String text, final String mimeCharset) throws UnsupportedEncodingException {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
@@ -66,7 +66,7 @@ public class BasicBodyFactory implements BodyFactory {
     public TextBody textBody(final String text) throws UnsupportedEncodingException {
         return textBody(text, DEFAULT_CHARSET);
     }
-    
+
     public BinaryBody binaryBody(final byte[] buf) {
         return new BasicBinaryBody(buf);
     }

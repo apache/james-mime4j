@@ -36,7 +36,7 @@ public abstract class AbstractHeader implements Header {
 
     private List<Field> fields = new LinkedList<Field>();
     private Map<String, List<Field>> fieldMap = new HashMap<String, List<Field>>();
-    
+
     /**
      * Creates a new empty <code>Header</code>.
      */
@@ -49,7 +49,7 @@ public abstract class AbstractHeader implements Header {
      * with a copy of the list of {@link Field}s of the specified
      * <code>Header</code>. The <code>Field</code> objects are not copied
      * because they are immutable and can safely be shared between headers.
-     * 
+     *
      * @param other
      *            header to copy.
      */
@@ -61,7 +61,7 @@ public abstract class AbstractHeader implements Header {
 
     /**
      * Adds a field to the end of the list of fields.
-     * 
+     *
      * @param field the field to add.
      */
     public void addField(Field field) {
@@ -73,11 +73,11 @@ public abstract class AbstractHeader implements Header {
         values.add(field);
         fields.add(field);
     }
-    
+
     /**
      * Gets the fields of this header. The returned list will not be
      * modifiable.
-     * 
+     *
      * @return the list of <code>Field</code> objects.
      */
     public List<Field> getFields() {
@@ -87,7 +87,7 @@ public abstract class AbstractHeader implements Header {
     /**
      * Gets a <code>Field</code> given a field name. If there are multiple
      * such fields defined in this header the first one will be returned.
-     * 
+     *
      * @param name the field name (e.g. From, Subject).
      * @return the field or <code>null</code> if none found.
      */
@@ -98,10 +98,10 @@ public abstract class AbstractHeader implements Header {
         }
         return null;
     }
-    
+
     /**
-     * Gets all <code>Field</code>s having the specified field name. 
-     * 
+     * Gets all <code>Field</code>s having the specified field name.
+     *
      * @param name the field name (e.g. From, Subject).
      * @return the list of fields.
      */
@@ -119,7 +119,7 @@ public abstract class AbstractHeader implements Header {
 
     /**
      * Returns an iterator over the list of fields of this header.
-     * 
+     *
      * @return an iterator.
      */
     public Iterator<Field> iterator() {
@@ -128,7 +128,7 @@ public abstract class AbstractHeader implements Header {
 
     /**
      * Removes all <code>Field</code>s having the specified field name.
-     * 
+     *
      * @param name
      *            the field name (e.g. From, Subject).
      * @return number of fields removed.
@@ -151,13 +151,13 @@ public abstract class AbstractHeader implements Header {
     /**
      * Sets or replaces a field. This method is useful for header fields such as
      * Subject or Message-ID that should not occur more than once in a message.
-     * 
+     *
      * If this <code>Header</code> does not already contain a header field of
      * the same name as the given field then it is added to the end of the list
      * of fields (same behavior as {@link #addField(Field)}). Otherwise the
      * first occurrence of a field with the same name is replaced by the given
      * field and all further occurrences are removed.
-     * 
+     *
      * @param field the field to set.
      */
     public void setField(Field field) {
@@ -189,7 +189,7 @@ public abstract class AbstractHeader implements Header {
     /**
      * Return Header Object as String representation. Each headerline is
      * seperated by "\r\n"
-     * 
+     *
      * @return headers
      */
     @Override

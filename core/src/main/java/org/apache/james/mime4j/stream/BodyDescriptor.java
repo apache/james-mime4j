@@ -20,8 +20,8 @@
 package org.apache.james.mime4j.stream;
 
 /**
- * Encapsulates the values of the MIME-specific header fields 
- * (which starts with <code>Content-</code>). 
+ * Encapsulates the values of the MIME-specific header fields
+ * (which starts with <code>Content-</code>).
  */
 public interface BodyDescriptor extends ContentDescriptor {
 

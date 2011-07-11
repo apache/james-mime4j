@@ -76,13 +76,13 @@ class ServiceLoader {
          } catch (IOException ex) {
              throw new ServiceLoaderException(ex);
          } catch (ClassNotFoundException ex) {
-             throw new ServiceLoaderException("Unknown SPI class '" 
+             throw new ServiceLoaderException("Unknown SPI class '"
                      + spiClass.getName() + "'", ex);
          } catch (IllegalAccessException ex) {
              // Not visible
              return null;
          } catch (InstantiationException ex) {
-             throw new ServiceLoaderException("SPI class '" 
+             throw new ServiceLoaderException("SPI class '"
                      + spiClass.getName() + "' cannot be instantiated", ex);
         }
     }

@@ -37,7 +37,7 @@ public class DelegatingFieldParser implements FieldParser<ParsedField> {
         this.defaultParser = defaultParser;
         this.parsers = new HashMap<String, FieldParser<? extends ParsedField>>();
     }
-    
+
     /**
      * Sets the parser used for the field named <code>name</code>.
      * @param name the name of the field
@@ -46,7 +46,7 @@ public class DelegatingFieldParser implements FieldParser<ParsedField> {
     public void setFieldParser(final String name, final FieldParser<? extends ParsedField> parser) {
         parsers.put(name.toLowerCase(), parser);
     }
-    
+
     public FieldParser<? extends ParsedField> getParser(final String name) {
         final FieldParser<? extends ParsedField> field = parsers.get(name.toLowerCase());
         if (field == null) {
@@ -54,7 +54,7 @@ public class DelegatingFieldParser implements FieldParser<ParsedField> {
         }
         return field;
     }
-    
+
     public ParsedField parse(final Field rawField, final DecodeMonitor monitor) {
         final FieldParser<? extends ParsedField> parser = getParser(rawField.getName());
         return parser.parse(rawField, monitor);

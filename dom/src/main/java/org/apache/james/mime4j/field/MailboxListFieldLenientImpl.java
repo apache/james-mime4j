@@ -61,7 +61,7 @@ public class MailboxListFieldLenientImpl extends AbstractField implements Mailbo
         if (buf == null) {
             String body = f.getBody();
             if (body == null) {
-                mailboxList = new MailboxList(Collections.<Mailbox>emptyList(), true);            
+                mailboxList = new MailboxList(Collections.<Mailbox>emptyList(), true);
                 return;
             }
             buf = ContentUtil.encode(body);

@@ -41,10 +41,10 @@ public class BodyPart extends AbstractEntity {
     public BodyPart() {
     }
 
-	@Override
-	protected String newUniqueBoundary() {
-		return MimeUtil.createUniqueBoundary();
-	}
+    @Override
+    protected String newUniqueBoundary() {
+        return MimeUtil.createUniqueBoundary();
+    }
 
     @Override
     protected ContentDispositionField newContentDisposition(
@@ -84,7 +84,7 @@ public class BodyPart extends AbstractEntity {
 
     @Override
     protected String calcCharset(ContentTypeField contentType) {
-        return ContentTypeFieldImpl.getCharset(contentType); 
+        return ContentTypeFieldImpl.getCharset(contentType);
     }
 
 }
