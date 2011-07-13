@@ -35,50 +35,42 @@ import org.apache.james.mime4j.stream.RecursionMode;
 /**
  * <p>
  * Parses MIME (or RFC822) message streams of bytes or characters and reports
- * parsing events to a <code>ContentHandler</code> instance.
+ * parsing events to a {@link ContentHandler} instance.
  * </p>
  * <p>
  * Typical usage:<br/>
  * <pre>
  *      ContentHandler handler = new MyHandler();
- *      MimeStreamParser parser = new MimeStreamParser();
+ *      MimeEntityConfig config = new MimeEntityConfig();
+ *      MimeStreamParser parser = new MimeStreamParser(config);
  *      parser.setContentHandler(handler);
- *      parser.parse(new FileInputStream("mime.msg"));
+ *      InputStream instream = new FileInputStream("mime.msg");
+ *      try {
+ *          parser.parse(instream);
+ *      } finally {
+ *          instream.close();
+ *      }
  * </pre>
  */
 public class MimeStreamParser {
 
     private ContentHandler handler = null;
     private boolean contentDecoding;
-    private final MimeEntityConfig mimeEntityConfig;
 
     private final MimeTokenStream mimeTokenStream;
 
     public MimeStreamParser(MimeTokenStream tokenStream) {
         super();
         this.mimeTokenStream = tokenStream;
-        this.mimeEntityConfig = tokenStream.getConfig();
         this.contentDecoding = false;
     }
 
     public MimeStreamParser(
             final MimeEntityConfig config,
-            boolean clone,
             final DecodeMonitor monitor,
             final BodyDescriptorBuilder bodyDescBuilder) {
-        this(new MimeTokenStream(clone ? config.clone() : config, monitor, bodyDescBuilder));
-    }
-
-    public MimeStreamParser(final MimeEntityConfig config, boolean clone) {
-        this(new MimeTokenStream(clone ? config.clone() : config, null, null));
-    }
-
-    public MimeStreamParser(
-            final MimeEntityConfig config,
-            final DecodeMonitor monitor,
-            final BodyDescriptorBuilder bodyDescBuilder) {
-        this(config != null ? config : new MimeEntityConfig(), config != null,
-                monitor, bodyDescBuilder);
+        this(new MimeTokenStream(config != null ? config.clone() : new MimeEntityConfig(),
+                monitor, bodyDescBuilder));
     }
 
     public MimeStreamParser(final MimeEntityConfig config) {
@@ -86,7 +78,7 @@ public class MimeStreamParser {
     }
 
     public MimeStreamParser() {
-        this(new MimeEntityConfig(), false, null, null);
+        this(new MimeTokenStream(new MimeEntityConfig(), null, null));
     }
 
     /**
@@ -106,23 +98,26 @@ public class MimeStreamParser {
     }
 
     /**
-     * Parses a stream of bytes containing a MIME message. If the mime config of this
-     * object contains a not null defaultContentType
-     * ({@link MimeEntityConfig#getDefaultContentType()}) a headless parsing is performed.
+     * Parses a stream of bytes containing a MIME message. Please note that if the
+     * {@link MimeEntityConfig} associated with the mime stream returns a not null Content-Type
+     * value from its {@link MimeEntityConfig#getHeadlessParsing()} method, the message is
+     * assumed to have no head section and the headless parsing mode will be used.
      *
-     * @param is the stream to parse.
+     * @param instream the stream to parse.
      * @throws MimeException if the message can not be processed
      * @throws IOException on I/O errors.
      */
-    public void parse(InputStream inputStream) throws MimeException, IOException {
-        if (mimeEntityConfig.getHeadlessParsing() != null) {
-            Field contentType = mimeTokenStream.parseHeadless(inputStream, mimeEntityConfig.getHeadlessParsing());
+    public void parse(InputStream instream) throws MimeException, IOException {
+        MimeEntityConfig config = mimeTokenStream.getConfig();
+        if (config.getHeadlessParsing() != null) {
+            Field contentType = mimeTokenStream.parseHeadless(
+                    instream, config.getHeadlessParsing());
             handler.startMessage();
             handler.startHeader();
             handler.field(contentType);
             handler.endHeader();
         } else {
-            mimeTokenStream.parse(inputStream);
+            mimeTokenStream.parse(instream);
         }
         OUTER: for (;;) {
             EntityState state = mimeTokenStream.getState();
@@ -187,7 +182,7 @@ public class MimeStreamParser {
      *
      * @return <code>true</code> if in raw mode, <code>false</code>
      *         otherwise.
-     * @see #setRaw(boolean)
+     * @see #setRaw()
      */
     public boolean isRaw() {
         return mimeTokenStream.isRaw();
@@ -213,7 +208,7 @@ public class MimeStreamParser {
     }
 
     /**
-     * Enables recursive mode. In tihs mode rfc822 parts are recursively
+     * Enables recursive mode. In this mode rfc822 parts are recursively
      * parsed.
      */
     public void setRecurse() {

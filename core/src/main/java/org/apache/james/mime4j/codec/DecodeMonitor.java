@@ -19,17 +19,15 @@
 
 package org.apache.james.mime4j.codec;
 
-
 /**
  * This class is used to drive how decoder/parser should deal with malformed
  * and unexpected data.
  *
  * 2 basic implementations are provided:
- * STRICT return "true" on any occurrence.
- * SILENT ignores any problem.
- *
- * @see org.apache.james.mime4j.field.LoggingMonitor for an example
- * about logging malformations via Commons-logging.
+ * <ul>
+ * <li>{@link #STRICT} return "true" on any occurrence</li>
+ * <li>{@link #SILENT} ignores any problem</li>
+ * </ul>
  */
 public class DecodeMonitor {
 

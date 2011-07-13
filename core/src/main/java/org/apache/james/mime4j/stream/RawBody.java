@@ -22,6 +22,13 @@ package org.apache.james.mime4j.stream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class represents a field's body consisting of a textual value and a number of optional
+ * name / value parameters separated with semicolon.
+ * <pre>
+ * value; param1 = value1; param2 = "value2";
+ * </pre>
+ */
 public final class RawBody {
 
     private final String value;

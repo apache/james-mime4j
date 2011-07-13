@@ -27,10 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * Abstract <code>ContentHandler</code> with default implementations of all
- * the methods of the <code>ContentHandler</code> interface.
- *
- * The default is to do nothing.
+ * Abstract base class for custom {@link ContentHandler} implementations. Methods of this class
+ * take no action and are expected to be selectively overridden by super-classes.
  */
 public abstract class AbstractContentHandler implements ContentHandler {
 

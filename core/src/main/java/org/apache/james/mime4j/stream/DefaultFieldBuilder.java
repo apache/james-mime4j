@@ -25,6 +25,10 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
+/**
+ * Default implementation of {@link FieldBuilder}.
+ *
+ */
 public class DefaultFieldBuilder implements FieldBuilder {
 
     private static final BitSet FIELD_CHARS = new BitSet();

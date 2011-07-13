@@ -42,26 +42,31 @@ import org.apache.james.mime4j.util.CharsetUtil;
  * </p>
  * <pre>
  *      MimeTokenStream stream = new MimeTokenStream();
- *      stream.parse(new FileInputStream("mime.msg"));
- *      for (int state = stream.getState();
- *           state != MimeTokenStream.T_END_OF_STREAM;
- *           state = stream.next()) {
- *          switch (state) {
- *            case MimeTokenStream.T_BODY:
- *              System.out.println("Body detected, contents = "
- *                + stream.getInputStream() + ", header data = "
- *                + stream.getBodyDescriptor());
- *              break;
- *            case MimeTokenStream.T_FIELD:
- *              System.out.println("Header field detected: "
- *                + stream.getField());
- *              break;
- *            case MimeTokenStream.T_START_MULTIPART:
- *              System.out.println("Multipart message detexted,"
- *                + " header data = "
- *                + stream.getBodyDescriptor());
- *            ...
+ *      InputStream instream = new FileInputStream("mime.msg");
+ *      try {
+ *          stream.parse(instream);
+ *          for (int state = stream.getState();
+ *              state != MimeTokenStream.T_END_OF_STREAM;
+ *              state = stream.next()) {
+ *              switch (state) {
+ *              case MimeTokenStream.T_BODY:
+ *                  System.out.println("Body detected, contents = "
+ *                  + stream.getInputStream() + ", header data = "
+ *                  + stream.getBodyDescriptor());
+ *                  break;
+ *              case MimeTokenStream.T_FIELD:
+ *                  System.out.println("Header field detected: "
+ *                  + stream.getField());
+ *                  break;
+ *              case MimeTokenStream.T_START_MULTIPART:
+ *                  System.out.println("Multipart message detexted,"
+ *                  + " header data = "
+ *                  + stream.getBodyDescriptor());
+ *              ...
+ *              }
  *          }
+ *      } finally {
+ *          instream.close();
  *      }
  * </pre>
  * <p>Instances of {@link MimeTokenStream} are reusable: Invoking the
@@ -202,7 +207,7 @@ public class MimeTokenStream {
      *
      * @return <code>true</code> if in raw mode, <code>false</code>
      *         otherwise.
-     * @see #setRecursionMode(int)
+     * @see #setRecursionMode(RecursionMode)
      */
     public boolean isRaw() {
         return recursionMode == RecursionMode.M_RAW;
@@ -211,11 +216,12 @@ public class MimeTokenStream {
     /**
      * Gets the current recursion mode.
      * The recursion mode specifies the approach taken to parsing parts.
-     * {@link #M_RAW}  mode does not parse the part at all.
-     * {@link #M_RECURSE} mode recursively parses each mail
-     * when an <code>message/rfc822</code> part is encounted;
-     * {@link #M_NO_RECURSE} does not.
-     * @return {@link #M_RECURSE}, {@link #M_RAW} or {@link #M_NO_RECURSE}
+     * {@link RecursionMode#M_RAW}  mode does not parse the part at all.
+     * {@link RecursionMode#M_RECURSE} mode recursively parses each mail
+     * when an <code>message/rfc822</code> part is encountered;
+     * {@link RecursionMode#M_NO_RECURSE} does not.
+     * @return {@link RecursionMode#M_RECURSE}, {@link RecursionMode#M_RAW} or
+     *   {@link RecursionMode#M_NO_RECURSE}
      */
     public RecursionMode getRecursionMode() {
         return recursionMode;
@@ -224,11 +230,12 @@ public class MimeTokenStream {
     /**
      * Sets the current recursion.
      * The recursion mode specifies the approach taken to parsing parts.
-     * {@link #M_RAW}  mode does not parse the part at all.
-     * {@link #M_RECURSE} mode recursively parses each mail
-     * when an <code>message/rfc822</code> part is encounted;
-     * {@link #M_NO_RECURSE} does not.
-     * @param mode {@link #M_RECURSE}, {@link #M_RAW} or {@link #M_NO_RECURSE}
+     * {@link RecursionMode#M_RAW}  mode does not parse the part at all.
+     * {@link RecursionMode#M_RECURSE} mode recursively parses each mail
+     * when an <code>message/rfc822</code> part is encountered;
+     * {@link RecursionMode#M_NO_RECURSE} does not.
+     * @param mode {@link RecursionMode#M_RECURSE}, {@link RecursionMode#M_RAW} or
+     *   {@link RecursionMode#M_NO_RECURSE}
      */
     public void setRecursionMode(RecursionMode mode) {
         recursionMode = mode;
@@ -258,7 +265,8 @@ public class MimeTokenStream {
      * This method returns the raw entity, preamble, or epilogue contents.
      * <p/>
      * This method is valid, if {@link #getState()} returns either of
-     * {@link #T_RAW_ENTITY}, {@link #T_PREAMBLE}, or {@link #T_EPILOGUE}.
+     * {@link EntityState#T_RAW_ENTITY}, {@link EntityState#T_PREAMBLE}, or
+     * {@link EntityState#T_EPILOGUE}.
      *
      * @return Data stream, depending on the current state.
      * @throws IllegalStateException {@link #getState()} returns an
@@ -273,7 +281,8 @@ public class MimeTokenStream {
      * fields with the standard defaults.
      * <p/>
      * This method is valid, if {@link #getState()} returns either of
-     * {@link #T_RAW_ENTITY}, {@link #T_PREAMBLE}, or {@link #T_EPILOGUE}.
+     * {@link EntityState#T_RAW_ENTITY}, {@link EntityState#T_PREAMBLE}, or
+     * {@link EntityState#T_EPILOGUE}.
      *
      * @return Data stream, depending on the current state.
      * @throws IllegalStateException {@link #getState()} returns an
@@ -317,10 +326,10 @@ public class MimeTokenStream {
      * <p>Gets a descriptor for the current entity.
      * This method is valid if {@link #getState()} returns:</p>
      * <ul>
-     * <li>{@link #T_BODY}</li>
-     * <li>{@link #T_START_MULTIPART}</li>
-     * <li>{@link #T_EPILOGUE}</li>
-     * <li>{@link #T_PREAMBLE}</li>
+     * <li>{@link EntityState#T_BODY}</li>
+     * <li>{@link EntityState#T_START_MULTIPART}</li>
+     * <li>{@link EntityState#T_EPILOGUE}</li>
+     * <li>{@link EntityState#T_PREAMBLE}</li>
      * </ul>
      * @return <code>BodyDescriptor</code>, not nulls
      */
@@ -329,10 +338,10 @@ public class MimeTokenStream {
     }
 
     /**
-     * This method is valid, if {@link #getState()} returns {@link #T_FIELD}.
+     * This method is valid, if {@link #getState()} returns {@link EntityState#T_FIELD}.
      * @return String with the fields raw contents.
      * @throws IllegalStateException {@link #getState()} returns another
-     *   value than {@link #T_FIELD}.
+     *   value than {@link EntityState#T_FIELD}.
      */
     public Field getField() {
         return currentStateMachine.getField();
@@ -341,7 +350,7 @@ public class MimeTokenStream {
     /**
      * This method advances the token stream to the next token.
      * @throws IllegalStateException The method has been called, although
-     *   {@link #getState()} was already {@link #T_END_OF_STREAM}.
+     *   {@link #getState()} was already {@link EntityState#T_END_OF_STREAM}.
      */
     public EntityState next() throws IOException, MimeException {
         if (state == EntityState.T_END_OF_STREAM  ||  currentStateMachine == null) {

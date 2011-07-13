@@ -22,7 +22,7 @@ package org.apache.james.mime4j.stream;
 import org.apache.james.mime4j.MimeException;
 
 /**
- * MIME entity configuration
+ * Properties used to configure the behavior of MIME stream parsers.
  */
 public final class MimeEntityConfig implements Cloneable {
 

@@ -22,14 +22,17 @@ package org.apache.james.mime4j.stream;
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
- * Abstract MIME field.
+ * This interface represents an abstract MIME field. A MIME field must have a non <code>null</code>
+ * name and a content body (unfolded but unparsed and possibly encoded). Optionally implementing
+ * classes may also retain the original (raw) representation in a form of {@link ByteSequence}.
+ * <p/>
+ * Specific implementations of this interface may also use a richer model to represent the field
+ * if its body can be parsed into a set of constituent elements.
  */
 public interface Field {
 
     /**
-     * Gets the name of the field (<code>Subject</code>, <code>From</code>, etc).
-     *
-     * @return the field name.
+     * Returns the name of the field.
      */
     String getName();
 

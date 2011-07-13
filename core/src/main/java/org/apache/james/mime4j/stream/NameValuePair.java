@@ -21,6 +21,9 @@ package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.util.LangUtils;
 
+/**
+ * A name / value tuple
+ */
 public final class NameValuePair {
 
     private final String name;

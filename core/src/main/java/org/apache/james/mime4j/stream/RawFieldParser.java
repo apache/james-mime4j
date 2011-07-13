@@ -29,7 +29,10 @@ import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
- * The basic immutable MIME field.
+ * Low level parser for header field elements. The parsing routines of this class are designed
+ * to produce near zero intermediate garbage and make no intermediate copies of input data.
+ * <p/>
+ * This class is immutable and thread safe.
  */
 public class RawFieldParser {
 
@@ -47,6 +50,11 @@ public class RawFieldParser {
 
     public static final RawFieldParser DEFAULT = new RawFieldParser();
 
+    /**
+     * Parses the sequence of bytes into {@link RawField}.
+     *
+     * @throws MimeException if the input data does not contain a valid MIME field.
+     */
     public RawField parseField(final ByteSequence raw) throws MimeException {
         if (raw == null) {
             return null;
@@ -60,6 +68,11 @@ public class RawFieldParser {
         return new RawField(raw, cursor.getPos(), name, null);
     }
 
+    /**
+     * Parses the field body containing a value with parameters into {@link RawBody}.
+     *
+     * @param field unstructured (raw) field
+     */
     public RawBody parseRawBody(final RawField field) {
         ByteSequence buf = field.getRaw();
         int pos = field.getDelimiterIdx() + 1;
@@ -75,6 +88,12 @@ public class RawFieldParser {
         return parseRawBody(buf, cursor);
     }
 
+    /**
+     * Parses the sequence of bytes containing a value with parameters into {@link RawBody}.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     */
     public RawBody parseRawBody(final ByteSequence buf, final ParserCursor cursor) {
         String value = parseToken(buf, cursor, SEMICOLON);
         if (cursor.atEnd()) {
@@ -85,6 +104,13 @@ public class RawFieldParser {
         return new RawBody(value, params);
     }
 
+    /**
+     * Parses the sequence of bytes containing field parameters delimited with semicolon into
+     * a list of {@link NameValuePair}s.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     */
     public List<NameValuePair> parseParameters(final ByteSequence buf, final ParserCursor cursor) {
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         skipWhiteSpace(buf, cursor);
@@ -95,6 +121,13 @@ public class RawFieldParser {
         return params;
     }
 
+    /**
+     * Parses the sequence of bytes containing a field parameter delimited with semicolon into
+     * {@link NameValuePair}.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     */
     public NameValuePair parseParameter(final ByteSequence buf, final ParserCursor cursor) {
         String name = parseToken(buf, cursor, EQUAL_OR_SEMICOLON);
         if (cursor.atEnd()) {
@@ -112,6 +145,15 @@ public class RawFieldParser {
         return new NameValuePair(name, value);
     }
 
+    /**
+     * Extracts from the sequence of bytes a token terminated with any of the given delimiters
+     * discarding semantically insignificant whitespace characters and comments.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     * @param delimiters set of delimiting characters. Can be <code>null</code> if the token
+     *  is not delimited by any character.
+     */
     public String parseToken(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
@@ -135,6 +177,16 @@ public class RawFieldParser {
         return dst.toString();
     }
 
+    /**
+     * Extracts from the sequence of bytes a value which can be enclosed in quote marks and
+     * terminated with any of the given delimiters discarding semantically insignificant
+     * whitespace characters and comments.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     * @param delimiters set of delimiting characters. Can be <code>null</code> if the value
+     *  is not delimited by any character.
+     */
     public String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
@@ -164,6 +216,13 @@ public class RawFieldParser {
         return dst.toString();
     }
 
+    /**
+     * Skips semantically insignificant whitespace characters and moves the cursor to the closest
+     * non-whitespace character.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     */
     public void skipWhiteSpace(final ByteSequence buf, final ParserCursor cursor) {
         int pos = cursor.getPos();
         int indexFrom = cursor.getPos();
@@ -179,6 +238,14 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
+    /**
+     * Skips semantically insignificant content if the current position is positioned at the
+     * beginning of a comment and moves the cursor past the end of the comment.
+     * Nested comments and escaped characters are recognized and handled appropriately.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     */
     public void skipComment(final ByteSequence buf, final ParserCursor cursor) {
         if (cursor.atEnd()) {
             return;
@@ -216,6 +283,14 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
+    /**
+     * Skips semantically insignificant whitespace characters and comments and moves the cursor
+     * to the closest semantically significant non-whitespace character.
+     * Nested comments and escaped characters are recognized and handled appropriately.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     */
     public void skipAllWhiteSpace(final ByteSequence buf, final ParserCursor cursor) {
         while (!cursor.atEnd()) {
             char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
@@ -229,6 +304,16 @@ public class RawFieldParser {
         }
     }
 
+    /**
+     * Transfers content into the destination buffer until a whitespace character, a comment,
+     * or any of the given delimiters is encountered.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     * @param delimiters set of delimiting characters. Can be <code>null</code> if the value
+     *  is delimited by a whitespace or a comment only.
+     * @param dst destination buffer
+     */
     public void copyContent(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
             final StringBuilder dst) {
         int pos = cursor.getPos();
@@ -247,6 +332,13 @@ public class RawFieldParser {
         cursor.updatePos(pos);
     }
 
+    /**
+     * Transfers content enclosed with quote marks into the destination buffer.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     * @param dst destination buffer
+     */
     public void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst) {
         if (cursor.atEnd()) {
