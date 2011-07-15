@@ -21,7 +21,9 @@ package org.apache.james.mime4j.dom.field;
 
 import org.apache.james.mime4j.stream.Field;
 
-
+/**
+ * A structured field that has been processed by a parsing routine.
+ */
 public interface ParsedField extends Field {
 
     /**

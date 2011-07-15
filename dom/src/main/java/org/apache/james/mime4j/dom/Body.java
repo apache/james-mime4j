@@ -20,8 +20,8 @@
 package org.apache.james.mime4j.dom;
 
 /**
- * Encapsulates the body of an entity (see RFC 2045).
- * <p>
+ * A body of an MIME entity (as defined in RFC 2045).
+ * <p/>
  * A body can be a {@link Message}, a {@link Multipart} or a {@link SingleBody}.
  * This interface should not be implemented directly by classes other than
  * those.

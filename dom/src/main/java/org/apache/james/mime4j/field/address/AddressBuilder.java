@@ -27,6 +27,9 @@ import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 
+/**
+ * Default (strict) builder for {@link Address} and its subclasses.
+ */
 public class AddressBuilder {
 
     public static final AddressBuilder DEFAULT = new AddressBuilder();

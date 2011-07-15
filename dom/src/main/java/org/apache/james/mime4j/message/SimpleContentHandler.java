@@ -27,7 +27,6 @@ import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.RawField;
 
 /**
  * Abstract implementation of ContentHandler that automates common
@@ -71,7 +70,7 @@ public abstract class SimpleContentHandler extends AbstractContentHandler {
     }
 
     /**
-     * @see org.apache.james.mime4j.parser.AbstractContentHandler#field(RawField)
+     * @see org.apache.james.mime4j.parser.AbstractContentHandler#field(Field)
      */
     @Override
     public final void field(Field field) throws MimeException {

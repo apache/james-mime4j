@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.dom;
 
 /**
- * MIME entity. An entity has a header and a body (see RFC 2045).
+ * A MIME entity. An entity has a header and a body (as defined in RFC 2045).
  */
 public interface Entity extends Disposable {
 

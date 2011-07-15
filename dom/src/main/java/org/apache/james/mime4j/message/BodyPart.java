@@ -31,7 +31,7 @@ import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
- * Represents a MIME body part  (see RFC 2045).
+ * A MIME body part (as defined in RFC 2045).
  */
 public class BodyPart extends AbstractEntity {
 

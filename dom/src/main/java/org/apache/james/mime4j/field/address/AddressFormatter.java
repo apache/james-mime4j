@@ -24,6 +24,9 @@ import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 
+/**
+ * Default formatter for {@link Address} and its subclasses.
+ */
 public class AddressFormatter {
 
     public static final AddressFormatter DEFAULT = new AddressFormatter();
@@ -51,7 +54,6 @@ public class AddressFormatter {
      * @param includeRoute
      *            <code>true</code> if the route should be included if it
      *            exists, <code>false</code> otherwise.
-     * @return a string representation of this address intended to be displayed.
      */
     public void format(final StringBuilder sb, final Address address, boolean includeRoute) {
         if (address == null) {
@@ -71,9 +73,6 @@ public class AddressFormatter {
      * transport purposes. The route is never included in this representation
      * because routes are obsolete and RFC 5322 states that obsolete syntactic
      * forms MUST NOT be generated.
-     *
-     * @return a string representation of this address intended for transport
-     *         purposes.
      */
     public void encode(final StringBuilder sb, final Address address) {
         if (address == null) {

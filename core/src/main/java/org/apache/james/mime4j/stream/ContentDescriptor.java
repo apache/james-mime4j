@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.stream;
 
 /**
- * Descriptor containing common MIME content properties.
+ * A descriptor containing common MIME content properties.
  */
 public interface ContentDescriptor {
 

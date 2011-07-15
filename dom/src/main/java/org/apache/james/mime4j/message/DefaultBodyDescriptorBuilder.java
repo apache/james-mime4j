@@ -36,6 +36,9 @@ import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
+/**
+ * Default {@link BodyDescriptorBuilder} implementation.
+ */
 public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
 
     private static final String CONTENT_TYPE = FieldName.CONTENT_TYPE.toLowerCase(Locale.US);
@@ -67,9 +70,6 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
 
     /**
      * Creates a new <code>BodyDescriptor</code> instance.
-     *
-     * @param parent the descriptor of the parent or <code>null</code> if this
-     *        is the root descriptor.
      */
     public DefaultBodyDescriptorBuilder(
             final String parentMimeType,

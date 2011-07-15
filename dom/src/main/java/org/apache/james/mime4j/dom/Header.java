@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.james.mime4j.stream.Field;
 
 /**
- * The header of an entity (see RFC 2045).
+ * A header of an MIME entity (as defined in RFC 2045).
  */
 public interface Header extends Iterable<Field> {
 

@@ -23,8 +23,15 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.stream.Field;
 
+/**
+ * A parser or transformation process intended to convert raw (unstructured) {@link Field}s into
+ * structured {@link ParsedField}s.
+ */
 public interface FieldParser<T extends ParsedField> {
 
+    /**
+     * Parses raw (unstructured) field and converts it into a structured field.
+     */
     T parse(Field rawField, DecodeMonitor monitor);
 
 }

@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.AddressListField;
@@ -41,7 +42,7 @@ import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
- * Represents a MIME message.
+ * Default implementation of {@link Message}.
  */
 public class MessageImpl extends AbstractMessage {
 

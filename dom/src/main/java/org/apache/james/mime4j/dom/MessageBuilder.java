@@ -25,7 +25,9 @@ import java.io.InputStream;
 import org.apache.james.mime4j.MimeException;
 
 /**
- * Defines the API to obtain Message instances from a mime stream.
+ * An interface to build instances of {@link Message} and other DOM elements either without
+ * any content, by copying content of an existing object or by reading content from
+ * an {@link InputStream}.
  */
 public interface MessageBuilder {
 

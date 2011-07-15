@@ -19,15 +19,12 @@
 
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
- * Represents a MIME multipart body (see RFC 2045).A multipart body has a
- * ordered list of body parts. The multipart body also has a preamble and
- * epilogue. The preamble consists of whatever characters appear before the
- * first body part while the epilogue consists of whatever characters come after
- * the last body part.
+ * Default implementation of {@link Multipart}.
  */
 public class MultipartImpl extends AbstractMultipart {
 

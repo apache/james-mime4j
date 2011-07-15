@@ -22,11 +22,10 @@ package org.apache.james.mime4j.dom;
 import java.util.List;
 
 /**
- * Represents a MIME multipart body (see RFC 2045).A multipart body has a
- * ordered list of body parts. The multipart body also has a preamble and
- * epilogue. The preamble consists of whatever characters appear before the
- * first body part while the epilogue consists of whatever characters come after
- * the last body part.
+ * A MIME multipart body (as defined in RFC 2045). A multipart body has a ordered list of
+ * body parts. The multipart body also has a preamble and epilogue. The preamble consists of
+ * whatever characters appear before the first body part while the epilogue consists of whatever
+ * characters come after the last body part.
  */
 public interface Multipart extends Body {
 

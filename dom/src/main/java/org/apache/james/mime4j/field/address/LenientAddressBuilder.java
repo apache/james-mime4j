@@ -35,6 +35,10 @@ import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 
+/**
+ * Lenient (tolerant to non-critical format violations) builder for {@link Address}
+ * and its subclasses.
+ */
 public class LenientAddressBuilder {
 
     private static final int AT                = '@';

@@ -44,7 +44,7 @@ import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MimeEntityConfig;
 
 /**
- * Utility class for copying message and parsing message elements.
+ * Default implementation of {@link MessageBuilder}.
  */
 public class DefaultMessageBuilder implements MessageBuilder {
 

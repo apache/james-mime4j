@@ -30,7 +30,7 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.stream.Field;
 
 /**
- * The header of an entity (see RFC 2045).
+ * Abstract MIME header.
  */
 public abstract class AbstractHeader implements Header {
 

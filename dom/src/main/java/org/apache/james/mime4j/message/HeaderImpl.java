@@ -19,8 +19,10 @@
 
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.dom.Header;
+
 /**
- * The header of an entity (see RFC 2045).
+ * Default implementation of {@link Header}.
  */
 public class HeaderImpl extends AbstractHeader {
 

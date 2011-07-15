@@ -40,7 +40,7 @@ import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
- * Writes a message (or a part of a message) to an output stream.
+ * Default implementation of {@link MessageWriter}.
  */
 public class DefaultMessageWriter implements MessageWriter {
 
@@ -112,7 +112,7 @@ public class DefaultMessageWriter implements MessageWriter {
      * Write the specified <code>Message</code> to the specified
      * <code>OutputStream</code>.
      *
-     * @param entity
+     * @param message
      *            the <code>Message</code> to write.
      * @param out
      *            the OutputStream to write to.

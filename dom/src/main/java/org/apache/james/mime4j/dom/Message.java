@@ -28,6 +28,9 @@ import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
 
+/**
+ * An MIME message (as defined in RFC 2045).
+ */
 public interface Message extends Entity, Body {
 
     /**

@@ -43,8 +43,7 @@ import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
- * Parses and stores values for standard MIME header values.
- *
+ * Extended {@link BodyDescriptor} implementation with complete content details.
  */
 public class MaximalBodyDescriptor implements BodyDescriptor {
 

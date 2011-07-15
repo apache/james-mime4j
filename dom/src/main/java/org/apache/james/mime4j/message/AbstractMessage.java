@@ -40,6 +40,9 @@ import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.stream.Field;
 
+/**
+ * Abstract MIME message.
+ */
 public abstract class AbstractMessage extends AbstractEntity implements Message {
 
     /**

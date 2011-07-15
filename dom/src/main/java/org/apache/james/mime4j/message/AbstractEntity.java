@@ -38,7 +38,7 @@ import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.ParsedField;
 
 /**
- * MIME entity. An entity has a header and a body (see RFC 2045).
+ * Abstract MIME entity.
  */
 public abstract class AbstractEntity implements Entity {
     private Header header = null;
@@ -188,7 +188,7 @@ public abstract class AbstractEntity implements Entity {
      *
      * @param textBody
      *            the <code>TextBody</code> to set as body.
-     * @see org.apache.james.mime4j.message.BodyFactory#textBody(String)
+     * @see org.apache.james.mime4j.message.BodyFactory#textBody(java.io.InputStream, String)
      */
     public void setText(TextBody textBody) {
         setText(textBody, "plain");
@@ -205,7 +205,6 @@ public abstract class AbstractEntity implements Entity {
      * @param subtype
      *            the text subtype (e.g. &quot;plain&quot;, &quot;html&quot; or
      *            &quot;xml&quot;).
-     * @see org.apache.james.mime4j.message.BodyFactory#textBody(String)
      */
     public void setText(TextBody textBody, String subtype) {
         String mimeType = "text/" + subtype;
