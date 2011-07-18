@@ -1,10 +1,3 @@
-Next Release
-------------
-
-Mime4J storage contains support for encrypted storage through the standard Java cryptography
-API. When used in conjunction with a JRE with strong cryptography enabled, this library will
-use strong cryptography. See README.
-
 Release 0.7
 -------------------
 
@@ -13,20 +6,28 @@ supported.
 
 The 0.7 release brings another round of API enhancements, bug fixes and performance optimizations. 
 A major effort has been put in code reorganization, separating parsing code from DOM manipulation
-code. Mime4J 0.7 introduces the "dom" package collecting base/abstract classes and interfaces for
-MIME-DOM manipulation aiming to provide the base for a full featured traversable DOM.
-Mime4J 0.7 improve support for headless messages, malformed separation between headers and body
-and adds support for "obsolete" rfc822 syntax (e.g: "Header<somespace>: " style).
-Parsing performance for quoted printable streams have been considerably improved.
-A "DecodeMonitor" object has been introduced in most code to define how to deal with malformed
-input (Lenient vs Strict behaviours).
+code. Mime4J has been restructured into three separate modules: 'core', 'dom' and 'storage'. 
+The 'core' package provides an event-driven SAX style parser that relies on a callback mechanism 
+to report parsing events such as the start of an entity header the start of a body, etc. 
+The 'dom' package contains base/abstract classes and interfaces for MIME-DOM manipulation aiming 
+to provide the base for a full featured traversable DOM. Per default the Mime4J DOM builder stores 
+content of individual body parts in memory. The 'storage' package provides support for more
+complex storage backends such on-disk storage systems, overflow on max limit, or encrypted storage 
+through JSSE API. 
+
+Mime4J 0.7 improves support for headless messages, malformed separation between headers and body
+and adds support for "obsolete" rfc822 syntax (e.g: "Header<somespace>: " style). Parsing 
+performance for quoted printable streams have been considerably improved. A "DecodeMonitor" object 
+has been introduced in most code to define how to deal with malformed input (Lenient vs Strict 
+behaviours). Mime4J 0.7 also provides LenientFieldParser as an alternative to DefaultFieldParser
+when a higher degree of tolerance to non-severe MIME field format violations is desired. 
 
 Upgrade Notes
 -------------
 
- * The defualt field parsing logic has been moved from AbstractField to DefaultFieldParser. 
- * many classes have been moved from org.apache.james.mime4j.parser to 
-   org.apache.james.mime4j.stream package (ContentHandler, DefaultBodyDescriptor, RawField..)
+ * The default field parsing logic has been moved from AbstractField to DefaultFieldParser. 
+ * Low level MIME stream classes have been moved from org.apache.james.mime4j.parser to 
+   org.apache.james.mime4j.stream package (Field, RawField, MimeTokenStream, ...)
  * "dom" classes/interfaces have been moved from the .message and .field package to the .dom
    package tree.
  * The method decodeBaseQuotedPrintable() of class o.a.j.mime4j.codec.DecoderUtil has been renamed
