@@ -38,7 +38,7 @@ import junit.framework.TestSuite;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MimeConfig;
 
 /**
  * Creates a TestSuite running the test for each .msg file in the test resouce folder.
@@ -57,7 +57,7 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
     protected void runTest() throws Throwable {
         MimeStreamParser parser = null;
         TestHandler handler = null;
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         if (getName().startsWith("malformedHeaderStartsBody")) {
             config.setMalformedHeaderStartsBody(true);
         }

@@ -22,7 +22,7 @@ import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageServiceFactory;
 import org.apache.james.mime4j.dom.MessageWriter;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MimeConfig;
 
 /**
  * The default MessageBuilderFactory bundled with Mime4j.
@@ -33,7 +33,7 @@ import org.apache.james.mime4j.stream.MimeEntityConfig;
 public class MessageServiceFactoryImpl extends MessageServiceFactory {
 
     private BodyFactory bodyFactory = null;
-    private MimeEntityConfig mimeEntityConfig = null;
+    private MimeConfig mimeEntityConfig = null;
     private BodyDescriptorBuilder bodyDescriptorBuilder = null;
     private Boolean flatMode = null;
     private Boolean contentDecoding = null;
@@ -63,8 +63,8 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
                 return;
             } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a BodyFactory");
         } else if ("MimeEntityConfig".equals(name)) {
-            if (value instanceof MimeEntityConfig) {
-                this.mimeEntityConfig = (MimeEntityConfig) value;
+            if (value instanceof MimeConfig) {
+                this.mimeEntityConfig = (MimeConfig) value;
                 return;
             } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a MimeEntityConfig");
         } else if ("MutableBodyDescriptorFactory".equals(name)) {

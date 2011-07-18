@@ -395,7 +395,7 @@ public class MimeEntityTest extends TestCase {
     }
 
     public void testMaxLineLimitCheck() throws Exception {
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setMaxLineLen(50);
 
         String message =
@@ -461,7 +461,7 @@ public class MimeEntityTest extends TestCase {
         LineNumberInputStream lineInput = new LineNumberInputStream(instream);
         BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
 
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setMaxLineLen(100);
         config.setMaxHeaderLen(200);
         MimeEntity entity = new MimeEntity(
@@ -489,7 +489,7 @@ public class MimeEntityTest extends TestCase {
     }
 
     public void testMaxHeaderLengthMayExceedMaxLineLength() throws Exception {
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setMaxLineLen(50);
         config.setMaxHeaderLen(130);
 
@@ -557,7 +557,7 @@ public class MimeEntityTest extends TestCase {
         LineNumberInputStream lineInput = new LineNumberInputStream(instream);
         BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
 
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setMaxHeaderCount(20);
         MimeEntity entity = new MimeEntity(
                 lineInput,
@@ -603,7 +603,7 @@ public class MimeEntityTest extends TestCase {
         LineNumberInputStream lineInput = new LineNumberInputStream(instream);
         BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
 
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setMaxContentLen(100);
         MimeEntity entity = new MimeEntity(
                 lineInput,

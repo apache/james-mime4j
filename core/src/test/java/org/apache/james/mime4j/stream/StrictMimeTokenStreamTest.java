@@ -36,7 +36,7 @@ public class StrictMimeTokenStreamTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setStrictParsing(true);
         parser = new MimeTokenStream(config);
     }

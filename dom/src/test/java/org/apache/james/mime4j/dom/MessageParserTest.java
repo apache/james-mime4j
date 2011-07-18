@@ -47,7 +47,7 @@ import org.apache.james.mime4j.field.FieldsTest;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MimeConfig;
 
 public class MessageParserTest extends TestCase {
 
@@ -103,7 +103,7 @@ public class MessageParserTest extends TestCase {
 
     @Override
     protected void runTest() throws IOException {
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         if (getName().startsWith("malformedHeaderStartsBody")) {
             config.setMalformedHeaderStartsBody(true);
         }

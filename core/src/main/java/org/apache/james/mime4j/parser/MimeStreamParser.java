@@ -28,7 +28,7 @@ import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.stream.RecursionMode;
 
@@ -66,19 +66,19 @@ public class MimeStreamParser {
     }
 
     public MimeStreamParser(
-            final MimeEntityConfig config,
+            final MimeConfig config,
             final DecodeMonitor monitor,
             final BodyDescriptorBuilder bodyDescBuilder) {
-        this(new MimeTokenStream(config != null ? config.clone() : new MimeEntityConfig(),
+        this(new MimeTokenStream(config != null ? config.clone() : new MimeConfig(),
                 monitor, bodyDescBuilder));
     }
 
-    public MimeStreamParser(final MimeEntityConfig config) {
+    public MimeStreamParser(final MimeConfig config) {
         this(config, null, null);
     }
 
     public MimeStreamParser() {
-        this(new MimeTokenStream(new MimeEntityConfig(), null, null));
+        this(new MimeTokenStream(new MimeConfig(), null, null));
     }
 
     /**
@@ -99,8 +99,8 @@ public class MimeStreamParser {
 
     /**
      * Parses a stream of bytes containing a MIME message. Please note that if the
-     * {@link MimeEntityConfig} associated with the mime stream returns a not null Content-Type
-     * value from its {@link MimeEntityConfig#getHeadlessParsing()} method, the message is
+     * {@link MimeConfig} associated with the mime stream returns a not null Content-Type
+     * value from its {@link MimeConfig#getHeadlessParsing()} method, the message is
      * assumed to have no head section and the headless parsing mode will be used.
      *
      * @param instream the stream to parse.
@@ -108,7 +108,7 @@ public class MimeStreamParser {
      * @throws IOException on I/O errors.
      */
     public void parse(InputStream instream) throws MimeException, IOException {
-        MimeEntityConfig config = mimeTokenStream.getConfig();
+        MimeConfig config = mimeTokenStream.getConfig();
         if (config.getHeadlessParsing() != null) {
             Field contentType = mimeTokenStream.parseHeadless(
                     instream, config.getHeadlessParsing());

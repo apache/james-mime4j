@@ -41,7 +41,7 @@ import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MimeConfig;
 
 /**
  * Default implementation of {@link MessageBuilder}.
@@ -50,7 +50,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
 
     private FieldParser<? extends ParsedField> fieldParser = null;
     private BodyFactory bodyFactory = null;
-    private MimeEntityConfig config = null;
+    private MimeConfig config = null;
     private BodyDescriptorBuilder bodyDescBuilder = null;
     private boolean contentDecoding = true;
     private boolean flatMode = false;
@@ -68,7 +68,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
         this.bodyFactory = bodyFactory;
     }
 
-    public void setMimeEntityConfig(final MimeEntityConfig config) {
+    public void setMimeEntityConfig(final MimeConfig config) {
         this.config = config;
     }
 
@@ -247,7 +247,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
     }
 
     public Header parseHeader(final InputStream is) throws IOException, MimeIOException {
-        final MimeEntityConfig cfg = config != null ? config : new MimeEntityConfig();
+        final MimeConfig cfg = config != null ? config : new MimeConfig();
         boolean strict = cfg.isStrictParsing();
         final DecodeMonitor mon = monitor != null ? monitor :
             strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;
@@ -290,7 +290,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
     public Message parseMessage(final InputStream is) throws IOException, MimeIOException {
         try {
             MessageImpl message = new MessageImpl();
-            MimeEntityConfig cfg = config != null ? config : new MimeEntityConfig();
+            MimeConfig cfg = config != null ? config : new MimeConfig();
             boolean strict = cfg.isStrictParsing();
             DecodeMonitor mon = monitor != null ? monitor :
                 strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;

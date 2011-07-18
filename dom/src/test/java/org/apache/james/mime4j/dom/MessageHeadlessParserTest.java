@@ -29,7 +29,7 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MimeConfig;
 
 public class MessageHeadlessParserTest extends TestCase {
 
@@ -42,7 +42,7 @@ public class MessageHeadlessParserTest extends TestCase {
                 + "\r\n"
                 + "Instead this should be better parsed as a text/plain body\r\n";
 
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setMalformedHeaderStartsBody(true);
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
@@ -62,7 +62,7 @@ public class MessageHeadlessParserTest extends TestCase {
                 + "\r\n"
                 + "Instead this should be better parsed as a text/plain body\r\n";
 
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setMalformedHeaderStartsBody(true);
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
@@ -91,7 +91,7 @@ public class MessageHeadlessParserTest extends TestCase {
                 + "Content-Type: image/jpeg\r\n" + "\r\n"
                 + "all kind of stuff\r\n" + "--foo--\r\n";
 
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setHeadlessParsing(contentType);
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);

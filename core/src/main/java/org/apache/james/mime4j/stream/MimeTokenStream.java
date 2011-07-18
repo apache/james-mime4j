@@ -77,7 +77,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
  */
 public class MimeTokenStream {
 
-    private final MimeEntityConfig config;
+    private final MimeConfig config;
     private final DecodeMonitor monitor;
     private final FieldBuilder fieldBuilder;
     private final BodyDescriptorBuilder bodyDescBuilder;
@@ -91,39 +91,39 @@ public class MimeTokenStream {
     /**
      * Constructs a standard (lax) stream.
      * Optional validation events will be logged only.
-     * Use {@link MimeEntityConfig#setStrictParsing(boolean)} to turn on strict
+     * Use {@link MimeConfig#setStrictParsing(boolean)} to turn on strict
      * parsing mode and pass the config object to
-     * {@link MimeTokenStream#MimeTokenStream(MimeEntityConfig)} to create
+     * {@link MimeTokenStream#MimeTokenStream(MimeConfig)} to create
      * a stream that strictly validates the input.
      */
     public MimeTokenStream() {
         this(null);
     }
 
-    public MimeTokenStream(final MimeEntityConfig config) {
+    public MimeTokenStream(final MimeConfig config) {
         this(config, null, null, null);
     }
 
     public MimeTokenStream(
-            final MimeEntityConfig config,
+            final MimeConfig config,
             final BodyDescriptorBuilder bodyDescBuilder) {
         this(config, null, null, bodyDescBuilder);
     }
 
     public MimeTokenStream(
-            final MimeEntityConfig config,
+            final MimeConfig config,
             final DecodeMonitor monitor,
             final BodyDescriptorBuilder bodyDescBuilder) {
         this(config, monitor, null, bodyDescBuilder);
     }
 
     public MimeTokenStream(
-            final MimeEntityConfig config,
+            final MimeConfig config,
             final DecodeMonitor monitor,
             final FieldBuilder fieldBuilder,
             final BodyDescriptorBuilder bodyDescBuilder) {
         super();
-        this.config = config != null ? config : new MimeEntityConfig();
+        this.config = config != null ? config : new MimeConfig();
         this.fieldBuilder = fieldBuilder != null ? fieldBuilder :
             new DefaultFieldBuilder(this.config.getMaxHeaderLen());
         this.monitor = monitor != null ? monitor :
@@ -388,7 +388,7 @@ public class MimeTokenStream {
     }
 
 
-    public MimeEntityConfig getConfig() {
+    public MimeConfig getConfig() {
         return config;
     }
 }

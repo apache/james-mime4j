@@ -24,7 +24,7 @@ import org.apache.james.mime4j.MimeException;
 /**
  * Properties used to configure the behavior of MIME stream parsers.
  */
-public final class MimeEntityConfig implements Cloneable {
+public final class MimeConfig implements Cloneable {
 
     private boolean strictParsing;
     private int maxLineLen;
@@ -35,7 +35,7 @@ public final class MimeEntityConfig implements Cloneable {
     private String headlessParsing;
     private boolean malformedHeaderStartsBody;
 
-    public MimeEntityConfig() {
+    public MimeConfig() {
         this.strictParsing = false;
         this.countLineNumbers = false;
         this.malformedHeaderStartsBody = false;
@@ -256,9 +256,9 @@ public final class MimeEntityConfig implements Cloneable {
     }
 
     @Override
-    public MimeEntityConfig clone() {
+    public MimeConfig clone() {
         try {
-            return (MimeEntityConfig) super.clone();
+            return (MimeConfig) super.clone();
         } catch (CloneNotSupportedException e) {
             // this shouldn't happen, since we are Cloneable
             throw new InternalError();

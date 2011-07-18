@@ -29,7 +29,7 @@ import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.EntityState;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.stream.RawField;
 
@@ -40,7 +40,7 @@ public class MaximalBodyDescriptorTest extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         config.setStrictParsing(true);
         parser = new MimeTokenStream(config, new DefaultBodyDescriptorBuilder(null));
     }

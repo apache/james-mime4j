@@ -40,7 +40,7 @@ import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
-import org.apache.james.mime4j.stream.MimeEntityConfig;
+import org.apache.james.mime4j.stream.MimeConfig;
 
 /**
  * Creates a TestSuite running the test for each .msg file in the test resouce folder.
@@ -57,7 +57,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
 
     @Override
     protected void runTest() throws Throwable {
-        MimeEntityConfig config = new MimeEntityConfig();
+        MimeConfig config = new MimeConfig();
         if (getName().startsWith("malformedHeaderStartsBody")) {
             config.setMalformedHeaderStartsBody(true);
         }

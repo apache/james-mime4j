@@ -41,7 +41,7 @@ import org.apache.james.mime4j.util.MimeUtil;
 class MimeEntity implements EntityStateMachine {
 
     private final EntityState endState;
-    private final MimeEntityConfig config;
+    private final MimeConfig config;
     private final DecodeMonitor monitor;
     private final FieldBuilder fieldBuilder;
     private final BodyDescriptorBuilder bodyDescBuilder;
@@ -66,7 +66,7 @@ class MimeEntity implements EntityStateMachine {
     MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
-            MimeEntityConfig config,
+            MimeConfig config,
             EntityState startState,
             EntityState endState,
             DecodeMonitor monitor,
@@ -96,7 +96,7 @@ class MimeEntity implements EntityStateMachine {
     MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
-            MimeEntityConfig config,
+            MimeConfig config,
             EntityState startState,
             EntityState endState,
             BodyDescriptorBuilder bodyDescBuilder) {
@@ -109,7 +109,7 @@ class MimeEntity implements EntityStateMachine {
     MimeEntity(
             LineNumberSource lineSource,
             InputStream instream,
-            MimeEntityConfig config,
+            MimeConfig config,
             BodyDescriptorBuilder bodyDescBuilder) {
         this(lineSource, instream, config,
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
@@ -123,7 +123,7 @@ class MimeEntity implements EntityStateMachine {
             InputStream instream,
             FieldBuilder fieldBuilder,
             BodyDescriptorBuilder bodyDescBuilder) {
-        this(lineSource, instream, new MimeEntityConfig(),
+        this(lineSource, instream, new MimeConfig(),
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
                 fieldBuilder,
@@ -134,7 +134,7 @@ class MimeEntity implements EntityStateMachine {
             LineNumberSource lineSource,
             InputStream instream,
             BodyDescriptorBuilder bodyDescBuilder) {
-        this(lineSource, instream, new MimeEntityConfig(),
+        this(lineSource, instream, new MimeConfig(),
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
                 new DefaultFieldBuilder(-1),
