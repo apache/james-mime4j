@@ -18,6 +18,7 @@
  ****************************************************************/
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageServiceFactory;
 import org.apache.james.mime4j.dom.MessageWriter;
@@ -35,6 +36,7 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
     private BodyFactory bodyFactory = null;
     private MimeConfig mimeEntityConfig = null;
     private BodyDescriptorBuilder bodyDescriptorBuilder = null;
+    private DecodeMonitor decodeMonitor = null;
     private Boolean flatMode = null;
     private Boolean contentDecoding = null;
 
@@ -46,6 +48,7 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
         if (bodyDescriptorBuilder != null) m.setBodyDescriptorBuilder(bodyDescriptorBuilder);
         if (flatMode != null) m.setFlatMode(flatMode.booleanValue());
         if (contentDecoding != null) m.setContentDecoding(contentDecoding.booleanValue());
+        if (decodeMonitor != null) m.setDecodeMonitor(decodeMonitor);
         return m;
     }
 
@@ -66,12 +69,17 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
             if (value instanceof MimeConfig) {
                 this.mimeEntityConfig = (MimeConfig) value;
                 return;
-            } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a MimeEntityConfig");
+            } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a MimeConfig");
         } else if ("MutableBodyDescriptorFactory".equals(name)) {
             if (value instanceof BodyDescriptorBuilder) {
                 this.bodyDescriptorBuilder  = (BodyDescriptorBuilder) value;
                 return;
             } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a MutableBodyDescriptorFactory");
+        } else if ("DecodeMonitor".equals(name)) {
+            if (value instanceof DecodeMonitor) {
+                this.decodeMonitor = (DecodeMonitor) value;
+                return;
+            } else throw new IllegalArgumentException("Unsupported attribute value type for "+name+", expected a DecodeMonitor");
         } else if ("FlatMode".equals(name)) {
             if (value instanceof Boolean) {
                 this.flatMode  = (Boolean) value;
