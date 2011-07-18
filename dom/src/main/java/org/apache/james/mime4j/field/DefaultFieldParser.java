@@ -23,41 +23,52 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.AddressListField;
+import org.apache.james.mime4j.dom.field.ContentDescriptionField;
+import org.apache.james.mime4j.dom.field.ContentDispositionField;
+import org.apache.james.mime4j.dom.field.ContentIdField;
+import org.apache.james.mime4j.dom.field.ContentLanguageField;
+import org.apache.james.mime4j.dom.field.ContentLengthField;
+import org.apache.james.mime4j.dom.field.ContentLocationField;
+import org.apache.james.mime4j.dom.field.ContentMD5Field;
+import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
+import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
+import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.dom.field.ParsedField;
+import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
+/**
+ * Default (strict) implementation of the {@link FieldParser} interface. 
+ */
 public class DefaultFieldParser extends DelegatingFieldParser {
 
     private static final DefaultFieldParser PARSER = new DefaultFieldParser();
 
-
     /**
-     * Gets the default parser used to parse fields.
+     * Gets the default instance of this class.
      *
-     * @return the default field parser
+     * @return the default instance
      */
     public static DefaultFieldParser getParser() {
         return PARSER;
     }
 
-
     /**
-     * Parses the given byte sequence and returns an instance of the
-     * <code>Field</code> class. The type of the class returned depends on the
-     * field name; see {@link #parse(String)} for a table of field names and
-     * their corresponding classes.
+     * Parses the given byte sequence and returns an instance of the {@link ParsedField} class. 
+     * The type of the class returned depends on the field name; see {@link #parse(String)} for 
+     * a table of field names and their corresponding classes.
      *
      * @param raw the bytes to parse.
-     * @param monitor a DecodeMonitor object used while parsing/decoding.
-     * @return a <code>ParsedField</code> instance.
+     * @param monitor decoding monitor used while parsing/decoding.
+     * @return a parsed field.
      * @throws MimeException if the raw string cannot be split into field name and body.
      */
     public static ParsedField parse(
@@ -68,24 +79,30 @@ public class DefaultFieldParser extends DelegatingFieldParser {
     }
 
     /**
-     * Parses the given string and returns an instance of the
-     * <code>Field</code> class. The type of the class returned depends on
-     * the field name:
+     * Parses the given string and returns an instance of the {@link ParsedField} class. 
+     * The type of the class returned depends on the field name:
      * <p>
      * <table>
      *   <tr><th>Class returned</th><th>Field names</th></tr>
-     *   <tr><td>{@link ContentTypeFieldImpl}</td><td>Content-Type</td></tr>
-     *   <tr><td>{@link ContentTransferEncodingFieldImpl}</td><td>Content-Transfer-Encoding</td></tr>
-     *   <tr><td>{@link ContentDispositionFieldImpl}</td><td>Content-Disposition</td></tr>
-     *   <tr><td>{@link DateTimeFieldImpl}</td><td>Date, Resent-Date</td></tr>
-     *   <tr><td>{@link MailboxFieldImpl}</td><td>Sender, Resent-Sender</td></tr>
-     *   <tr><td>{@link MailboxListFieldImpl}</td><td>From, Resent-From</td></tr>
-     *   <tr><td>{@link AddressListFieldImpl}</td><td>To, Cc, Bcc, Reply-To, Resent-To, Resent-Cc, Resent-Bcc</td></tr>
-     *   <tr><td>{@link UnstructuredFieldImpl}</td><td>Subject and others</td></tr>
+     *   <tr><td>{@link ContentTypeField}</td><td>Content-Type</td></tr>
+     *   <tr><td>{@link ContentLengthField}</td><td>Content-Length</td></tr>
+     *   <tr><td>{@link ContentTransferEncodingField}</td><td>Content-Transfer-Encoding</td></tr>
+     *   <tr><td>{@link ContentDispositionField}</td><td>Content-Disposition</td></tr>
+     *   <tr><td>{@link ContentDescriptionField}</td><td>Content-Description</td></tr>
+     *   <tr><td>{@link ContentIdField}</td><td>Content-ID</td></tr>
+     *   <tr><td>{@link ContentMD5Field}</td><td>Content-MD5</td></tr>
+     *   <tr><td>{@link ContentLanguageField}</td><td>Content-Language</td></tr>
+     *   <tr><td>{@link ContentLocationField}</td><td>Content-Location</td></tr>
+     *   <tr><td>{@link MimeVersionField}</td><td>MIME-Version</td></tr>
+     *   <tr><td>{@link DateTimeField}</td><td>Date, Resent-Date</td></tr>
+     *   <tr><td>{@link MailboxField}</td><td>Sender, Resent-Sender</td></tr>
+     *   <tr><td>{@link MailboxListField}</td><td>From, Resent-From</td></tr>
+     *   <tr><td>{@link AddressListField}</td><td>To, Cc, Bcc, Reply-To, Resent-To, Resent-Cc, Resent-Bcc</td></tr>
+     *   <tr><td>{@link UnstructuredField}</td><td>Subject and others</td></tr>
      * </table>
      *
      * @param rawStr the string to parse.
-     * @return a <code>ParsedField</code> instance.
+     * @return a parsed field.
      * @throws MimeException if the raw string cannot be split into field name and body.
      */
     public static ParsedField parse(
