@@ -21,13 +21,13 @@
   <parent>
     <artifactId>apache-mime4j-project</artifactId>
     <groupId>org.apache.james</groupId>
-    <version>0.7</version>
+    <version>0.8-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
   <artifactId>apache-mime4j-examples</artifactId>
   <name>Apache JAMES Mime4j (Code Examples)</name>
-  <version>0.7</version>
+  <version>0.8-SNAPSHOT</version>
   <description>Examples for Mime4J stream based MIME message parser</description>
   
   <dependencies>
