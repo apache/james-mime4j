@@ -31,14 +31,42 @@
       <directory>${project.basedir}/..</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
-        <include>LICENSE.*</include>
-        <include>NOTICE.*</include>
+        <include>LICENSE</include>
+        <include>NOTICE</include>
         <include>RELEASE_NOTES.txt</include>
         <include>README</include>
       </includes>
     </fileSet>
     <fileSet>
       <directory>${project.basedir}/../core/target</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>apache-mime4j*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/../dom/target</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>apache-mime4j*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/../storage/target</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>apache-mime4j*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/../benchmark/target</directory>
+      <outputDirectory>/</outputDirectory>
+      <includes>
+        <include>apache-mime4j*.jar</include>
+      </includes>
+    </fileSet>
+    <fileSet>
+      <directory>${project.basedir}/../examples/target</directory>
       <outputDirectory>/</outputDirectory>
       <includes>
         <include>apache-mime4j*.jar</include>
