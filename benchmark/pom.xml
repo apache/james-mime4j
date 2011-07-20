@@ -21,13 +21,13 @@
   <parent>
     <artifactId>apache-mime4j-project</artifactId>
     <groupId>org.apache.james</groupId>
-    <version>0.8-SNAPSHOT</version>
+    <version>0.7</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.apache.james</groupId>
   <artifactId>apache-mime4j-benchmark</artifactId>
   <name>Apache JAMES Mime4j (Benchmarks)</name>
-  <version>0.8-SNAPSHOT</version>
+  <version>0.7</version>
   <description>Benchmarks for MIME4J stream based MIME message parser</description>
 
   <dependencies>
