@@ -34,6 +34,15 @@
     optimizations. As of this release Mime4j requires a Java 1.5 compatible 
     runtime.    
     
-    The next release will be version 0.7. The main focus of the development 
-    efforts will be on optimization of MIME header parsing and further 
-    enhancement of DOM capabilities.
+    The 0.7 release brings another round of API enhancements, bug fixes and performance optimizations. 
+	A major effort has been put in code reorganization, separating parsing code from DOM manipulation
+	code. Mime4J has been restructured into three separate modules: 'core', 'dom' and 'storage'. 
+	The 'core' package provides an event-driven SAX style parser that relies on a callback mechanism 
+	to report parsing events such as the start of an entity header the start of a body, etc. 
+	The 'dom' package contains base/abstract classes and interfaces for MIME-DOM manipulation aiming 
+	to provide the base for a full featured traversable DOM. Per default the Mime4J DOM builder stores 
+	content of individual body parts in memory. The 'storage' package provides support for more
+	complex storage backends such on-disk storage systems, overflow on max limit, or encrypted storage 
+	through JSSE API. 
+
+    The next release will be version 0.8.
