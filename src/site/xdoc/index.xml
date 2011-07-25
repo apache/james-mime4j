@@ -22,16 +22,16 @@
  -->
 <document>
     <properties>
-        <title>Mime4j</title>
+        <title>Mime4J</title>
     </properties>
     <body>
         <section name="Mime4j">
             <p>
-                Apache Mime4j is developed by the 
+                Apache James Mime4J is developed by the 
                 <a href="http://james.apache.org/">Apache James</a> team but now has a
                 dedicated <a href="http://james.apache.org/mail.html#Mime4j">mailing list</a>.
             </p>
-            <p> mime4j provides a parser, 
+            <p>Apache James Mime4J provides a parser, 
                 <a href="apidocs/org/apache/james/mime4j/parser/MimeStreamParser.html">
                     <code>MimeStreamParser</code>
                 </a>, for e-mail message streams in plain rfc822 and MIME
