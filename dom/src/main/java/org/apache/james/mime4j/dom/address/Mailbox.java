@@ -55,7 +55,7 @@ public class Mailbox extends Address {
      */
     public Mailbox(String name, DomainList route, String localPart,
             String domain) {
-        if (localPart == null || localPart.length() == 0)
+        if (localPart == null)
             throw new IllegalArgumentException();
 
         this.name = name == null || name.length() == 0 ? null : name;

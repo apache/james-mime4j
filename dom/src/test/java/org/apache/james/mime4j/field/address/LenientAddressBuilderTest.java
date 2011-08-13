@@ -61,6 +61,24 @@ public class LenientAddressBuilderTest extends TestCase {
         assertEquals("some one@somehost.somewhere.com", mailbox.getAddress());
     }
 
+    public void testParseMailboxNullAddress() throws Exception {
+        String s = "<>";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        Mailbox mailbox = parser.parseMailboxAddress(null, raw, cursor);
+        assertEquals("", mailbox.getAddress());
+    }
+    
+    public void testParseMailboxEmptyAddress() throws Exception {
+        String s = "<    >";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        Mailbox mailbox = parser.parseMailboxAddress(null, raw, cursor);
+        assertEquals("", mailbox.getAddress());
+    }
+    
     public void testParseAddressQuotedLocalPart() throws Exception {
         String s = "<  \"some  one\"   @ some host . some where . com >";
         ByteSequence raw = ContentUtil.encode(s);
