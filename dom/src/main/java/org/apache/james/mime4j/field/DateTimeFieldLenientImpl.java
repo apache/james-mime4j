@@ -38,7 +38,9 @@ import org.apache.james.mime4j.stream.Field;
  */
 public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeField {
 
-    private static final String DEFAULT_DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss ZZZZ";
+    private static final String[] DEFAULT_DATE_FORMATS =  { 
+        "EEE, dd MMM yyyy hh:mm:ss ZZZZ", 
+        "dd MMM yyyy hh:mm:ss ZZZZ"};
 
     private final List<String> datePatterns;
 
@@ -52,7 +54,9 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         if (dateParsers != null) {
             this.datePatterns.addAll(dateParsers);
         } else {
-            this.datePatterns.add(DEFAULT_DATE_FORMAT);
+            for (String pattern: DEFAULT_DATE_FORMATS) {
+                this.datePatterns.add(pattern);
+            }
         }
     }
 
@@ -86,4 +90,17 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
 
     };
+    
+    public static FieldParser<DateTimeField> createParser(final Collection<String> dateParsers) {
+        
+        return new FieldParser<DateTimeField>() {
+
+            public DateTimeField parse(final Field rawField, final DecodeMonitor monitor) {
+                return new DateTimeFieldLenientImpl(rawField, dateParsers, monitor);
+            }
+
+        };
+        
+    }
+    
 }
