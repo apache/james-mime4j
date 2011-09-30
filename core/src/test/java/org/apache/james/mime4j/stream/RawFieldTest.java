@@ -51,4 +51,14 @@ public class RawFieldTest extends TestCase {
         Assert.assertEquals("raw: ", field2.toString());
     }
 
+    public void testTabAfterDelimiter() throws Exception {
+        String s = "raw:\tstuff;\r\n  more stuff";
+        ByteSequence raw = ContentUtil.encode(s);
+        RawField field = new RawField(raw, 3, "raw", null);
+        Assert.assertSame(raw, field.getRaw());
+        Assert.assertEquals("raw", field.getName());
+        Assert.assertEquals("stuff;  more stuff", field.getBody());
+        Assert.assertEquals(s, field.toString());
+    }
+    
 }

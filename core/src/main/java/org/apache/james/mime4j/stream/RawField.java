@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -65,7 +66,9 @@ public final class RawField implements Field {
         if (raw != null) {
             int len = raw.length();
             int off = delimiterIdx + 1;
-            if (len > off + 1 && (raw.byteAt(off) & 0xff) == 0x20) off++;
+            if (len > off + 1 && (CharsetUtil.isWhitespace((char) (raw.byteAt(off) & 0xff)))) {
+                off++;
+            }
             return MimeUtil.unfold(ContentUtil.decode(raw, off, len - off));
         }
         return null;
