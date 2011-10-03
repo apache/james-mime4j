@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.Mailbox;
@@ -39,6 +41,8 @@ import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.ContentTransferEncodingFieldImpl;
 import org.apache.james.mime4j.field.ContentTypeFieldImpl;
 import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.field.MimeVersionFieldLenientImpl;
+import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -50,6 +54,10 @@ public class MessageImpl extends AbstractMessage {
      * Creates a new empty <code>Message</code>.
      */
     public MessageImpl() {
+        super();
+        Header header = obtainHeader();
+        RawField rawField = new RawField(FieldName.MIME_VERSION, "1.0");
+        header.addField(MimeVersionFieldLenientImpl.PARSER.parse(rawField, DecodeMonitor.SILENT));
     }
 
     @Override

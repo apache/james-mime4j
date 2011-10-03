@@ -39,17 +39,6 @@ import junit.framework.TestCase;
 
 public class MimeBuilderCopyTest extends TestCase {
 
-    public void testCopyEmptyMessage() throws Exception {
-        MessageImpl original = new MessageImpl();
-
-        DefaultMessageBuilder builder = new DefaultMessageBuilder();
-        Message copy = builder.copy(original);
-
-        assertNull(copy.getHeader());
-        assertNull(copy.getBody());
-        assertNull(copy.getParent());
-    }
-
     public void testCopyMessage() throws Exception {
         MessageImpl parent = new MessageImpl();
         Header header = new HeaderImpl();

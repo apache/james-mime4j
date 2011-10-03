@@ -39,6 +39,8 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
@@ -175,6 +177,15 @@ public class MessageTest extends TestCase {
                         .toByteArray())))));
 
         assertTrue("header added", lines.contains(testheader));
+    }
+
+    public void testMimeVersion() throws Exception {
+        MessageImpl m = new MessageImpl();
+        assertNotNull(m.getHeader());
+        MimeVersionField field = (MimeVersionField) m.getHeader().getField(FieldName.MIME_VERSION);
+        assertNotNull(field);
+        assertEquals(1, field.getMajorVersion());
+        assertEquals(0, field.getMinorVersion());
     }
 
     public void testGetMessageId() throws Exception {
