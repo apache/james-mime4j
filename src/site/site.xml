@@ -18,11 +18,6 @@
   under the License.
 -->
 <project name="Apache James Mime4J">
-    <skin>
-        <groupId>org.apache.james</groupId>
-        <artifactId>james-skin</artifactId>
-        <version>1.7-SNAPSHOT</version>
-    </skin>
 
     <bannerLeft>
         <name>JAMES Mime4J</name>
@@ -30,12 +25,6 @@
         <href>http://james.apache.org/</href>
         <alt>james-mime4j-logo.gif</alt>
     </bannerLeft>
-
-    <bannerRight>
-        <name>The Apache Software Foundation</name>
-        <src>images/logos/asf-logo-reduced.gif</src>
-        <href>http://www.apache.org/index.html</href>
-    </bannerRight>
 
   <body>
     <menu name="mime4j">

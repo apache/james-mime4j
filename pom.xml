@@ -26,7 +26,7 @@
     <parent>
         <artifactId>james-project</artifactId>
         <groupId>org.apache.james</groupId>
-        <version>1.6</version>
+        <version>1.7</version>
         <relativePath></relativePath>
     </parent>
 
@@ -50,10 +50,6 @@
         </mailingList>
     </mailingLists>
 
-    <prerequisites>
-        <maven>3.0.2</maven>
-    </prerequisites>
-
     <modules>
         <module>core</module>
         <module>dom</module>
@@ -75,13 +71,12 @@
     <distributionManagement>
         <site>
             <id>mime4j-website</id>
-            <url>scp://people.apache.org/www/james.apache.org/mime4j/</url>
+            <url>scpexe://people.apache.org/www/james.apache.org/mime4j/</url>
         </site>
     </distributionManagement>
 
     <properties>
         <target.jdk>1.5</target.jdk>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencyManagement>
@@ -117,101 +112,6 @@
     </dependencyManagement>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-clean-plugin</artifactId>
-                    <version>2.4.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.5</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-site-plugin</artifactId>
-                    <version>3.0-beta-3</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surfire-plugin</artifactId>
-                    <version>2.7.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surfire-report-plugin</artifactId>
-                    <version>2.7.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>2.3.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.rat</groupId>
-                    <artifactId>apache-rat-plugin</artifactId>
-                    <version>0.7</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.3.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.3.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.7</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-remote-resources-plugin</artifactId>
-                    <version>1.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>2.1.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.2.0</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-doap-plugin</artifactId>
-                    <version>1.1</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-jxr-plugin</artifactId>
-                    <version>2.2</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-surefire-report-plugin</artifactId>
-                    <version>2.8</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-pmd-plugin</artifactId>
-                    <version>2.5</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>2.3.2</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-
         <plugins>
             <plugin>
                 <groupId>org.apache.rat</groupId>
@@ -244,15 +144,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${target.jdk}</source>
-                    <target>${target.jdk}</target>
-                    <encoding>iso8859-1</encoding>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
@@ -273,22 +164,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>aggregate</id>
-                        <goals>
-                            <goal>aggregate</goal>
-                        </goals>
-                        <phase>site</phase>
-                    </execution>
-                    <execution>
-                        <id>javadoc-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <inherited>true</inherited>
                 <configuration>
                     <excludePackageNames>org.apache.james.mime4j.field.address.parser:org.apache.james.mime4j.field.contentdisposition.parser:org.apache.james.mime4j.field.contenttype.parser:org.apache.james.mime4j.field.datetime.parser:org.apache.james.mime4j.field.language.parser:org.apache.james.mime4j.field.mimeversion.parser:org.apache.james.mime4j.field.structured.parser</excludePackageNames>
                 </configuration>
@@ -346,192 +222,18 @@
                     </instructions>
                 </configuration>
             </plugin>
-            <!--
-                <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-doap-plugin</artifactId>
-                <configuration>
-                <doapOptions>
-                <programmingLanguage>java</programmingLanguage>
-                <category>mail</category>
-                </doapOptions>
-                <asfExtOptions>
-                <included>true</included>
-                <charter>The mission of the Apache JAMES mime4j project is to create and maintain software libraries related to MIME handling</charter>
-                </asfExtOptions>
-                </configuration>
-                <executions>
-                <execution>
-                <id>package</id>
-                <phase>package</phase>
-                <goals>
-                <goal>generate</goal>
-                </goals>
-                </execution>
-                </executions>
-                </plugin>
-            -->
-
-            <!-- Site generation -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-site-plugin</artifactId>
+            <plugin>      
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>emma-maven-plugin</artifactId>
+                <inherited>true</inherited>          
                 <executions>
                     <execution>
-                        <id>attach-descriptor</id>
+                        <phase>process-classes</phase>               
                         <goals>
-                            <goal>attach-descriptor</goal>
+                            <goal>instrument</goal>
                         </goals>
-                        <configuration>
-                            <siteDirectory>${basedir}/src/site</siteDirectory>
-                            <generateReports>false</generateReports>
-                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <siteDirectory>${maven-site-plugin.siteDirectory}</siteDirectory>
-                    <generateReports>${maven-site-plugin.generateReports}</generateReports>
-                    <reportPlugins>
-                        <!-- Order matters. First project-info-reports, second jxr. -->
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-project-info-reports-plugin</artifactId>
-                            <reports>
-                                <report>dependencies</report>
-                                <report>dependency-management</report>
-                                <report>dependency-convergence</report>
-                                <report>distribution-management</report>
-                                <report>index</report>
-                                <report>license</report>
-                                <report>mailing-list</report>
-                                <report>modules</report>
-                                <report>plugin-management</report>
-                                <report>plugins</report>
-                                <report>project-team</report>
-                                <report>scm</report>
-                                <report>summary</report>
-                            </reports>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-jxr-plugin</artifactId>
-                            <configuration>
-                                <aggregate>true</aggregate>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-surefire-report-plugin</artifactId>
-                            <configuration>
-                                <aggregate>true</aggregate>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.rat</groupId>
-                            <artifactId>apache-rat-plugin</artifactId>
-                            <configuration>
-                                <excludes>
-                                    <exclude>NOTICE.*</exclude>
-                                    <exclude>LICENSE.*</exclude>
-                                    <exclude>**/main/resources/long-multipart.msg</exclude>
-                                    <exclude>**/main/resources/META-INF/services/org.apache.james.mime4j.dom.MessageServiceFactory</exclude>
-                                    <exclude>**/test/resources/testmsgs/*</exclude>
-                                    <exclude>**/test/resources/mimetools-testmsgs/*</exclude>
-                                    <!-- Generated by Maven -->
-                                    <exclude>release.properties</exclude>
-                                    <exclude>dist/**/*</exclude>
-                                    <!-- Eclipse -->
-                                    <exclude>**/.*</exclude>
-                                    <exclude>.*/**/*</exclude>
-                                </excludes>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-pmd-plugin</artifactId>
-                            <configuration>
-                                <aggregate>true</aggregate>
-                                <targetJdk>${target.jdk}</targetJdk>
-                                <rulesets>
-                                    <ruleset>/rulesets/basic.xml</ruleset>
-                                    <ruleset>/rulesets/unusedcode.xml</ruleset>
-                                    <ruleset>/rulesets/imports.xml</ruleset>
-                                </rulesets>
-                                <format>xml</format>
-                                <linkXref>true</linkXref>
-                                <sourceEncoding>utf-8</sourceEncoding>
-                                <minimumTokens>100</minimumTokens>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-javadoc-plugin</artifactId>
-                            <configuration>
-                                <minmemory>256m</minmemory>
-                                <maxmemory>1g</maxmemory>
-                                <linksource>true</linksource>
-                                <tags>
-                                    <tag>
-                                        <name>note</name>
-                                        <placement>a</placement>
-                                        <head>NOTE</head>
-                                    </tag>
-                                    <tag>
-                                        <name>todo</name>
-                                        <placement>a</placement>
-                                        <head>TODO</head>
-                                    </tag>
-                                    <tag>
-                                        <name>warning</name>
-                                        <placement>a</placement>
-                                        <head>WARNING</head>
-                                    </tag>
-                                </tags>
-                                <source>1.5</source>
-                            </configuration>
-                            <reportSets>
-                                <reportSet>
-                                    <reports>
-                                        <report>aggregate</report>
-                                        <report>test-aggregate</report>
-                                    </reports>
-                                </reportSet>
-                            </reportSets>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.codehaus.mojo</groupId>
-                            <artifactId>findbugs-maven-plugin</artifactId>
-                            <configuration>
-                                <xrefLocation>${project.reporting.outputDirectory}/../xref</xrefLocation>
-                                <xrefTestLocation>${project.reporting.outputDirectory}/../xref-test</xrefTestLocation>
-                                <!-- required by dashboard plugin and hudson -->
-                                <xmlOutput>true</xmlOutput>
-                                <effort>Max</effort>
-                                <findbugsXmlOutput>true</findbugsXmlOutput>
-                                <findbugsXmlWithMessages>true</findbugsXmlWithMessages>
-                            </configuration>
-                        </plugin>
-                        <!--
-                            <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-changes-plugin</artifactId>
-                            <configuration>
-                            <onlyCurrentVersion>true</onlyCurrentVersion>
-                            <resolutionIds>Fixed</resolutionIds>
-                            <statusIds>Resolved,Closed</statusIds>
-                            <columnNames>Type,Key,Summary,Status,Resolution,Fix Version</columnNames>
-                            </configuration>
-                            <reportSets>
-                            <reportSet>
-                            <reports>
-                            <report>jira-report</report>
-                            </reports>
-                            </reportSet>
-                            </reportSets>
-                            </plugin>
-                        -->
-                    </reportPlugins>
-                </configuration>
             </plugin>
         </plugins>
     </build>
