@@ -64,6 +64,10 @@
         </site>
     </distributionManagement>
 
+    <properties>
+        <target.jdk>1.5</target.jdk>
+    </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
