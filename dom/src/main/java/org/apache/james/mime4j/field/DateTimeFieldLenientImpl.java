@@ -39,8 +39,8 @@ import org.apache.james.mime4j.stream.Field;
 public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeField {
 
     private static final String[] DEFAULT_DATE_FORMATS =  { 
-        "EEE, dd MMM yyyy hh:mm:ss ZZZZ", 
-        "dd MMM yyyy hh:mm:ss ZZZZ"};
+        "EEE, dd MMM yyyy HH:mm:ss ZZZZ", 
+        "dd MMM yyyy HH:mm:ss ZZZZ"};
 
     private final List<String> datePatterns;
 
