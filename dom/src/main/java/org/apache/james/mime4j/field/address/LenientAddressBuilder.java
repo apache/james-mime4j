@@ -50,7 +50,6 @@ public class LenientAddressBuilder {
 
     private static final BitSet AT_AND_CLOSING_BRACKET = RawFieldParser.INIT_BITSET(AT, CLOSING_BRACKET);
     private static final BitSet CLOSING_BRACKET_ONLY   = RawFieldParser.INIT_BITSET(CLOSING_BRACKET);
-    private static final BitSet COMMA_AND_COLON        = RawFieldParser.INIT_BITSET(COMMA, COLON);
     private static final BitSet COMMA_ONLY             = RawFieldParser.INIT_BITSET(COMMA);
     private static final BitSet COLON_ONLY             = RawFieldParser.INIT_BITSET(COLON);
     private static final BitSet SEMICOLON_ONLY         = RawFieldParser.INIT_BITSET(SEMICOLON);
@@ -81,10 +80,17 @@ public class LenientAddressBuilder {
         return dst.toString();
     }
 
-    DomainList parseRoute(final ByteSequence buf, final ParserCursor cursor) {
+    DomainList parseRoute(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
+        BitSet bitset = RawFieldParser.INIT_BITSET(COMMA, COLON);
+        if (delimiters != null) {
+            bitset.or(delimiters);
+        }
         List<String> domains = null;
-        while (!cursor.atEnd()) {
+        for (;;) {
             this.parser.skipAllWhiteSpace(buf, cursor);
+            if (cursor.atEnd()) {
+                break;
+            }
             int pos = cursor.getPos();
             int current = (char) (buf.byteAt(pos) & 0xff);
             if (current == AT) {
@@ -92,12 +98,15 @@ public class LenientAddressBuilder {
             } else {
                 break;
             }
-            String s = parseDomain(buf, cursor, COMMA_AND_COLON);
+            String s = parseDomain(buf, cursor, bitset);
             if (s != null && s.length() > 0) {
                 if (domains == null) {
                     domains = new ArrayList<String>();
                 }
                 domains.add(s);
+            }
+            if (cursor.atEnd()) {
+                break;
             }
             pos = cursor.getPos();
             current = (char) (buf.byteAt(pos) & 0xff);
@@ -126,7 +135,7 @@ public class LenientAddressBuilder {
         } else {
             return new Mailbox(null, null, openingText, null);
         }
-        DomainList domainList = parseRoute(buf, cursor);
+        DomainList domainList = parseRoute(buf, cursor, CLOSING_BRACKET_ONLY);
         String localPart = this.parser.parseValue(buf, cursor, AT_AND_CLOSING_BRACKET);
         if (cursor.atEnd()) {
             return new Mailbox(openingText, domainList, localPart, null);

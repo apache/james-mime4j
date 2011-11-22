@@ -122,7 +122,7 @@ public class LenientAddressBuilderTest extends TestCase {
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
 
-        DomainList route = parser.parseRoute(raw, cursor);
+        DomainList route = parser.parseRoute(raw, cursor, null);
         assertNotNull(route);
         assertEquals(3, route.size());
         assertEquals("a", route.get(0));
@@ -131,12 +131,26 @@ public class LenientAddressBuilderTest extends TestCase {
         assertEquals('m', raw.byteAt(cursor.getPos()));
     }
 
+    public void testParseAddressStartingWithAt() throws Exception {
+        String s = "<@somehost.com@somehost.com>";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        Mailbox mailbox = parser.parseMailboxAddress(null, raw, cursor);
+        assertEquals("", mailbox.getLocalPart());
+        assertEquals(null, mailbox.getDomain());
+        DomainList route = mailbox.getRoute();
+        assertNotNull(route);
+        assertEquals(1, route.size());
+        assertEquals("somehost.com@somehost.com", route.get(0));
+    }
+    
     public void testParseNoRoute() throws Exception {
         String s = "stuff";
         ByteSequence raw = ContentUtil.encode(s);
         ParserCursor cursor = new ParserCursor(0, s.length());
 
-        DomainList route = parser.parseRoute(raw, cursor);
+        DomainList route = parser.parseRoute(raw, cursor, null);
         assertNull(route);
     }
 
