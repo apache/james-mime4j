@@ -30,13 +30,13 @@
   MimeTokenStream}}. In terms of speed, you should not note
   any differences.
 
-  * {{{Token Streams}Token Streams}}
+  * {{{Token_Streams}Token Streams}}
 
-  * {{{Sample Token Stream}Sample Token Stream}}
+  * {{{Sample_Token_Stream}Sample Token Stream}}
 
-  * {{{Event Handlers}Event Handlers}}
+  * {{{Event_Handlers}Event Handlers}}
 
-  * {{{Sample Event Stream}Sample Event Stream}}
+  * {{{Sample_Event_Stream}Sample Event Stream}}
 
 {Token Streams}
 
@@ -146,7 +146,7 @@
 
   A little bit of additional code allows us to create an example, which
   is functionally equivalent to the example from the section on
-  {{{Token Streams}Token Streams}}:
+  {{{Token_Streams}Token Streams}}:
 
 --------------------------------------------------------------------  
   ContentHandler handler = new MyContentHandler();

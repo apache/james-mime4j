@@ -27,15 +27,15 @@
     </bannerLeft>
 
   <body>
-    <menu name="mime4j">
+    <menu name="Documentation">
       <item name="Overview" href="/index.html"/>
       <item name="Status" href="/status.html"/>
       <item name="Example" href="/samples.html"/>
       <item name="Usage" href="/usage.html"/>
       <item name="Javadoc" href="/apidocs/index.html"/>
       <item name="Start" href="/start/index.html" collapse="true">
-        <item name="Download" href="/start/download.html" collapse="true"/>
-        <item name="Build" href="/start/build.html" collapse="true"/>
+        <item name="Download" href="/start/download.html" />
+        <item name="Build" href="/start/build.html" />
       </item>
     </menu>
     

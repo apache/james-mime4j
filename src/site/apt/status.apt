@@ -45,4 +45,5 @@
 	complex storage backends such on-disk storage systems, overflow on max limit, or encrypted storage 
 	through JSSE API. 
 
-    The next release will be version 0.8.
+    The next release will be version 0.8. As of this release Mime4j requires a Java 1.6 compatible 
+    runtime.
