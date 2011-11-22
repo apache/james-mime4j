@@ -32,15 +32,18 @@
       <item name="Status" href="/status.html"/>
       <item name="Example" href="/samples.html"/>
       <item name="Usage" href="/usage.html"/>
-      <item name="Javadoc" href="/apidocs/index.html"/>
-      <item name="Start" href="/start/index.html" collapse="true">
-        <item name="Download" href="/start/download.html" />
-        <item name="Build" href="/start/build.html" />
-      </item>
     </menu>
     
-    <menu ref="reports" />
+    <menu name="Developers Corner">
+      <item name="Download" href="/start/download.html" />
+      <item name="Build" href="/start/build.html" />
+    </menu>
     
+    <menu name="References">
+      <item name="Javadoc" href="/apidocs/index.html" />
+      <item name="Issue Tracker" href="http://issues.apache.org/jira/browse/MIME4J/" />
+    </menu>
+
     <menu name="Related Projects">
     	<item name="httpmime" href="http://hc.apache.org/httpcomponents-client/httpmime/index.html" />
     </menu>
