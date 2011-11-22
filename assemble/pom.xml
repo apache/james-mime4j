@@ -78,4 +78,31 @@
             </plugin>
         </plugins>
     </build>
+    
+    <profiles>
+        <profile>
+            <id>site-reports</id>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <!--
+                            Disable generation of technical reports for 'pom' project, because
+                            of following problems:
+                            - site-plugin configuration can't be overwritten yet
+                              (https://jira.codehaus.org/browse/MSITE-484)
+                            - cobertura-plugin fails with NPE
+                              (http://jira.codehaus.org/browse/MCOBERTURA-148)
+                        -->
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-site-plugin</artifactId>
+                            <configuration>
+                                <generateReports>false</generateReports>
+                            </configuration>
+                        </plugin>
+                     </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
 </project>
