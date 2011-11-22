@@ -30,9 +30,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache.james</groupId>
     <artifactId>apache-mime4j-examples</artifactId>
-    <version>0.8-SNAPSHOT</version>
 
     <name>Apache JAMES Mime4j (Code Examples)</name>
     <description>Examples for Mime4J stream based MIME message parser</description>

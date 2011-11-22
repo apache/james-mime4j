@@ -30,13 +30,10 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache.james</groupId>
     <artifactId>apache-mime4j</artifactId>
-    <version>0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Apache JAMES Mime4j (Assembly)</name>
-    <description>Java stream based MIME message parser</description>
 
     <dependencies>
         <dependency>
@@ -63,8 +60,8 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-beta-5</version>
                 <configuration>
                     <descriptorSourceDirectory>${basedir}/src/assemble/</descriptorSourceDirectory>
                     <tarLongFileMode>gnu</tarLongFileMode>

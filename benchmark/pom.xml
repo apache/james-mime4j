@@ -30,9 +30,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.apache.james</groupId>
     <artifactId>apache-mime4j-benchmark</artifactId>
-    <version>0.8-SNAPSHOT</version>
 
     <name>Apache JAMES Mime4j (Benchmarks)</name>
     <description>Benchmarks for MIME4J stream based MIME message parser</description>
