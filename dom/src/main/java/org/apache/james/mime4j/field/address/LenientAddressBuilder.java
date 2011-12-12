@@ -24,6 +24,8 @@ import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.codec.DecoderUtil;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.DomainList;
@@ -54,12 +56,14 @@ public class LenientAddressBuilder {
     private static final BitSet COLON_ONLY             = RawFieldParser.INIT_BITSET(COLON);
     private static final BitSet SEMICOLON_ONLY         = RawFieldParser.INIT_BITSET(SEMICOLON);
 
-    public static final LenientAddressBuilder DEFAULT = new LenientAddressBuilder();
+    public static final LenientAddressBuilder DEFAULT = new LenientAddressBuilder(DecodeMonitor.SILENT);
 
+    private final DecodeMonitor monitor;
     private final RawFieldParser parser;
 
-    protected LenientAddressBuilder() {
+    protected LenientAddressBuilder(final DecodeMonitor monitor) {
         super();
+        this.monitor = monitor;
         this.parser = new RawFieldParser();
     }
 
@@ -123,40 +127,47 @@ public class LenientAddressBuilder {
         return domains != null ? new DomainList(domains, true) : null;
     }
 
+    private Mailbox createMailbox(
+            final String name, final DomainList route, final String localPart, final String domain) {
+        return new Mailbox(
+                name != null ? DecoderUtil.decodeEncodedWords(name, this.monitor) : null, 
+                        route, localPart, domain);
+    }
+    
     Mailbox parseMailboxAddress(
             final String openingText, final ByteSequence buf, final ParserCursor cursor) {
         if (cursor.atEnd()) {
-            return new Mailbox(null, null, openingText, null);
+            return createMailbox(null, null, openingText, null);
         }
         int pos = cursor.getPos();
         char current = (char) (buf.byteAt(pos) & 0xff);
         if (current == OPENING_BRACKET) {
             cursor.updatePos(pos + 1);
         } else {
-            return new Mailbox(null, null, openingText, null);
+            return createMailbox(null, null, openingText, null);
         }
         DomainList domainList = parseRoute(buf, cursor, CLOSING_BRACKET_ONLY);
         String localPart = this.parser.parseValue(buf, cursor, AT_AND_CLOSING_BRACKET);
         if (cursor.atEnd()) {
-            return new Mailbox(openingText, domainList, localPart, null);
+            return createMailbox(openingText, domainList, localPart, null);
         }
         pos = cursor.getPos();
         current = (char) (buf.byteAt(pos) & 0xff);
         if (current == AT) {
             cursor.updatePos(pos + 1);
         } else {
-            return new Mailbox(openingText, domainList, localPart, null);
+            return createMailbox(openingText, domainList, localPart, null);
         }
         String domain = parseDomain(buf, cursor, CLOSING_BRACKET_ONLY);
         if (cursor.atEnd()) {
-            return new Mailbox(openingText, domainList, localPart, domain);
+            return createMailbox(openingText, domainList, localPart, domain);
         }
         pos = cursor.getPos();
         current = (char) (buf.byteAt(pos) & 0xff);
         if (current == CLOSING_BRACKET) {
             cursor.updatePos(pos + 1);
         } else {
-            return new Mailbox(openingText, domainList, localPart, domain);
+            return createMailbox(openingText, domainList, localPart, domain);
         }
         while (!cursor.atEnd()) {
             pos = cursor.getPos();
@@ -169,7 +180,7 @@ public class LenientAddressBuilder {
                 break;
             }
         }
-        return new Mailbox(openingText, domainList, localPart, domain);
+        return createMailbox(openingText, domainList, localPart, domain);
     }
 
     private Mailbox createMailbox(final String localPart) {

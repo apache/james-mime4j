@@ -68,6 +68,13 @@ public class DefaultAddressBuilderTest extends TestCase {
 
     }
 
+    public void testParseMailboxEncoded() throws ParseException {
+        Mailbox mailbox1 = parser.parseMailbox("=?ISO-8859-1?B?c3R1ZmY=?= <stuff@localhost.localdomain>");
+        assertEquals("stuff", mailbox1.getName());
+        assertEquals("stuff", mailbox1.getLocalPart());
+        assertEquals("localhost.localdomain", mailbox1.getDomain());
+    }
+
     public void testParseMailboxObsoleteSynatax() throws ParseException {
         Mailbox mailbox1 = parser.parseMailbox("< (route)(obsolete) " +
                 "@host1.domain1 , @host2 . domain2:  foo@bar.org>");

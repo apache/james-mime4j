@@ -180,6 +180,13 @@ public class LenientAddressBuilderTest extends TestCase {
         assertEquals("hans.mueller@acme.org", mailbox5.getAddress());
     }
 
+    public void testParseMailboxEncoded() throws ParseException {
+        Mailbox mailbox1 = parser.parseMailbox("=?ISO-8859-1?B?c3R1ZmY=?= <stuff@localhost.localdomain>");
+        assertEquals("stuff", mailbox1.getName());
+        assertEquals("stuff", mailbox1.getLocalPart());
+        assertEquals("localhost.localdomain", mailbox1.getDomain());
+    }
+
     public void testParseMailboxNonASCII() throws Exception {
         Mailbox mailbox1 = parser.parseMailbox(
                 "Hans M\374ller <hans.mueller@acme.org>");
