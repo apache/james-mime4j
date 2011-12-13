@@ -107,6 +107,11 @@ public class DecoderUtilTest extends TestCase {
         assertEquals("variable ${target.nl}", DecoderUtil.decodeEncodedWords("=?utf-8?Q?variable=20${target.nl}?="));
     }
 
+    // see MIME4J-209
+    public void testEncodedTextMayContainQuestionMark() {
+        assertEquals("?", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q???="));
+    }
+    
     public void testNonWhiteSpaceBetweenEncodedWordsIsRetained() {
         assertEquals("a b c", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?= b =?ISO-8859-1?Q?c?="));
         assertEquals("a\rb\nc", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?a?=\rb\n=?ISO-8859-1?Q?c?="));

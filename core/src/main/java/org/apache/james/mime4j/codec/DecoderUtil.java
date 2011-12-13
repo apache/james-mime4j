@@ -35,7 +35,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
 public class DecoderUtil {
 
     private static final Pattern PATTERN_ENCODED_WORD = Pattern.compile(
-            "(.*?)=\\?([^\\?]+?)\\?(\\w)\\?([^\\?]+?)\\?=", Pattern.DOTALL);
+            "(.*?)=\\?(.+?)\\?(\\w)\\?(.+?)\\?=", Pattern.DOTALL);
 
     /**
      * Decodes a string containing quoted-printable encoded data.
