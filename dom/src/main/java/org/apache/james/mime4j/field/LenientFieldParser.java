@@ -51,14 +51,14 @@ import org.apache.james.mime4j.util.ContentUtil;
  */
 public class LenientFieldParser extends DelegatingFieldParser {
 
-    private static final LenientFieldParser PARSER = new LenientFieldParser();
+    private static final FieldParser<ParsedField> PARSER = new LenientFieldParser();
 
     /**
      * Gets the default instance of this class.
      *
      * @return the default instance
      */
-    public static LenientFieldParser getParser() {
+    public static FieldParser<ParsedField> getParser() {
         return PARSER;
     }
 

@@ -50,14 +50,14 @@ import org.apache.james.mime4j.util.ContentUtil;
  */
 public class DefaultFieldParser extends DelegatingFieldParser {
 
-    private static final DefaultFieldParser PARSER = new DefaultFieldParser();
+    private static final FieldParser<ParsedField> PARSER = new DefaultFieldParser();
 
     /**
      * Gets the default instance of this class.
      *
      * @return the default instance
      */
-    public static DefaultFieldParser getParser() {
+    public static FieldParser<ParsedField> getParser() {
         return PARSER;
     }
 
