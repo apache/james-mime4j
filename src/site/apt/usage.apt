@@ -47,21 +47,21 @@
 
 --------------------------------------------------------------------
   MimeTokenStream stream = new MimeTokenStream();
-  stream.parse(new BufferedInputStream(new FileInputStream("mime.msg")));
-  for (int state = stream.getState();
-       state != MimeTokenStream.T_END_OF_STREAM;
+  stream.parse(new FileInputStream("mime.msg"));
+  for (EntityState state = stream.getState();
+       state != EntityState.T_END_OF_STREAM;
        state = stream.next()) {
     switch (state) {
-      case MimeTokenStream.T_BODY:
+      case T_BODY:
         System.out.println("Body detected, contents = "
           + stream.getInputStream() + ", header data = "
           + stream.getBodyDescriptor());
         break;
-      case MimeTokenStream.T_FIELD:
+      case T_FIELD:
         System.out.println("Header field detected: "
           + stream.getField());
         break;
-      case MimeTokenStream.T_START_MULTIPART:
+      case T_START_MULTIPART:
         System.out.println("Multipart message detexted,"
           + " header data = "
           + stream.getBodyDescriptor());
@@ -126,8 +126,9 @@
   implement an event handler:
 
 --------------------------------------------------------------------  
-  public class MyContentHandler extends org.apache.james.mime4j.parser.ContentHandler {
-      public body(BodyDescriptor bd, InputStream is)
+  public class MyContentHandler extends AbstractContentHandler {
+      
+      public void body(BodyDescriptor bd, InputStream is)
               throws MimeException, IOException {
           System.out.println("Body detected, contents = "
               + is + ", header data = " + bd);
@@ -152,7 +153,7 @@
   ContentHandler handler = new MyContentHandler();
   MimeStreamParser parser = new MimeStreamParser();
   parser.setContentHandler(handler);
-  parser.parse(new BufferedInputStream(new FileInputStream("mime.msg")));
+  parser.parse(new FileInputStream("mime.msg"));
 --------------------------------------------------------------------  
 
 {Sample Event Stream}

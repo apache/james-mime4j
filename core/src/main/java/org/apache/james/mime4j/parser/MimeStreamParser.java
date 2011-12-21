@@ -41,7 +41,7 @@ import org.apache.james.mime4j.stream.RecursionMode;
  * Typical usage:<br/>
  * <pre>
  *      ContentHandler handler = new MyHandler();
- *      MimeEntityConfig config = new MimeEntityConfig();
+ *      MimeConfig config = new MimeConfig();
  *      MimeStreamParser parser = new MimeStreamParser(config);
  *      parser.setContentHandler(handler);
  *      InputStream instream = new FileInputStream("mime.msg");
