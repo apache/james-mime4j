@@ -1,3 +1,21 @@
+Release 0.7.2
+-------------------
+
+Mime4J is a flexible MIME parsing library written in Java. SAX, DOM and pull parsing styles are 
+supported.
+
+The 0.7.2 release fixes several non-critical bugs found since release 0.7.1. 
+
+
+Release 0.7.1
+-------------------
+
+Mime4J is a flexible MIME parsing library written in Java. SAX, DOM and pull parsing styles are 
+supported.
+
+The 0.7.1 release fixes several non-critical bugs found since release 0.7. 
+
+
 Release 0.7
 -------------------
 
