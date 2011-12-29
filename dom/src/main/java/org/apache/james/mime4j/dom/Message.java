@@ -199,7 +199,7 @@ public interface Message extends Entity, Body {
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
      */
-    void setTo(Collection<Address> to);
+    void setTo(Collection<? extends Address> to);
 
     /**
      * Returns the value of the <i>Cc</i> header field of this message as
@@ -238,7 +238,7 @@ public interface Message extends Entity, Body {
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
      */
-    void setCc(Collection<Address> cc);
+    void setCc(Collection<? extends Address> cc);
 
     /**
      * Returns the value of the <i>Bcc</i> header field of this message as
@@ -277,7 +277,7 @@ public interface Message extends Entity, Body {
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
      */
-    void setBcc(Collection<Address> bcc);
+    void setBcc(Collection<? extends Address> bcc);
 
     /**
      * Returns the value of the <i>Reply-To</i> header field of this message as
@@ -316,6 +316,6 @@ public interface Message extends Entity, Body {
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
      */
-    void setReplyTo(Collection<Address> replyTo);
+    void setReplyTo(Collection<? extends Address> replyTo);
 
 }

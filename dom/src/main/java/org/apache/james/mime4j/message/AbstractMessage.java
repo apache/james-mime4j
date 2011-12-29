@@ -271,7 +271,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
      */
-    public void setTo(Collection<Address> to) {
+    public void setTo(Collection<? extends Address> to) {
         setAddressList(FieldName.TO, to);
     }
 
@@ -318,7 +318,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
      */
-    public void setCc(Collection<Address> cc) {
+    public void setCc(Collection<? extends Address> cc) {
         setAddressList(FieldName.CC, cc);
     }
 
@@ -365,7 +365,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
      */
-    public void setBcc(Collection<Address> bcc) {
+    public void setBcc(Collection<? extends Address> bcc) {
         setAddressList(FieldName.BCC, bcc);
     }
 
@@ -412,7 +412,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      *            addresses to set or <code>null</code> or an empty collection
      *            to remove the header field.
      */
-    public void setReplyTo(Collection<Address> replyTo) {
+    public void setReplyTo(Collection<? extends Address> replyTo) {
         setAddressList(FieldName.REPLY_TO, replyTo);
     }
 
@@ -480,7 +480,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
                 .asList(addresses));
     }
 
-    private void setAddressList(String fieldName, Collection<Address> addresses) {
+    private void setAddressList(String fieldName, Collection<? extends Address> addresses) {
         Header header = obtainHeader();
 
         if (addresses == null || addresses.isEmpty()) {
@@ -490,7 +490,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
         }
     }
 
-    protected abstract AddressListField newAddressList(String fieldName, Collection<Address> addresses);
+    protected abstract AddressListField newAddressList(String fieldName, Collection<? extends Address> addresses);
 
     protected abstract UnstructuredField newSubject(String subject);
 

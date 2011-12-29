@@ -88,7 +88,7 @@ public class MessageImpl extends AbstractMessage {
 
     @Override
     protected AddressListField newAddressList(String fieldName,
-            Collection<Address> addresses) {
+            Collection<? extends Address> addresses) {
         return Fields.addressList(fieldName, addresses);
     }
 

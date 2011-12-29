@@ -561,7 +561,7 @@ public class Fields {
      * @return the newly created address-list field.
      */
     public static AddressListField addressList(String fieldName,
-            Iterable<Address> addresses) {
+            Iterable<? extends Address> addresses) {
         checkValidFieldName(fieldName);
         return addressList0(fieldName, addresses);
     }
@@ -584,7 +584,7 @@ public class Fields {
     }
 
     private static AddressListField addressList0(String fieldName,
-            Iterable<Address> addresses) {
+            Iterable<? extends Address> addresses) {
         String fieldValue = encodeAddresses(addresses);
         return parse(AddressListFieldImpl.PARSER, fieldName, fieldValue);
     }
