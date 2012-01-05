@@ -23,6 +23,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.TextBody;
@@ -32,8 +34,6 @@ import org.apache.james.mime4j.util.CharsetUtil;
  * Factory for creating message bodies.
  */
 public class BasicBodyFactory implements BodyFactory {
-
-    private static String DEFAULT_CHARSET = CharsetUtil.DEFAULT_CHARSET.name();
 
     public BinaryBody binaryBody(final InputStream is) throws IOException {
         return new BasicBinaryBody(bufferContent(is));
@@ -60,11 +60,23 @@ public class BasicBodyFactory implements BodyFactory {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
         }
-        return new BasicTextBody(text.getBytes(mimeCharset), mimeCharset);
+        Charset charset = Charset.forName(mimeCharset);
+        try {
+            return new StringBody(text, charset);
+        } catch (UnsupportedCharsetException ex) {
+            throw new UnsupportedEncodingException(ex.getMessage());
+        }
     }
 
-    public TextBody textBody(final String text) throws UnsupportedEncodingException {
-        return textBody(text, DEFAULT_CHARSET);
+    public TextBody textBody(final String text, final Charset charset) {
+        if (text == null) {
+            throw new IllegalArgumentException("Text may not be null");
+        }
+        return new StringBody(text, charset);
+    }
+
+    public TextBody textBody(final String text) {
+        return textBody(text, CharsetUtil.DEFAULT_CHARSET);
     }
 
     public BinaryBody binaryBody(final byte[] buf) {
