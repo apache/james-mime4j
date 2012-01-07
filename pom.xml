@@ -28,7 +28,7 @@
     </parent>
 
     <artifactId>apache-mime4j-project</artifactId>
-    <version>0.7.2</version>
+    <version>0.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Apache JAMES Mime4j Project</name>
@@ -46,9 +46,9 @@
     </modules>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-project-0.7.2</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/tags/apache-mime4j-project-0.7.2</developerConnection>
-        <url>http://svn.apache.org/viewvc/james/mime4j/tags/apache-mime4j-project-0.7.2</url>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/james/mime4j/trunk</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/james/mime4j/trunk</developerConnection>
+        <url>http://svn.apache.org/viewvc/james/mime4j/trunk/</url>
     </scm>
     <issueManagement>
         <url>http://issues.apache.org/jira/browse/MIME4J</url>
