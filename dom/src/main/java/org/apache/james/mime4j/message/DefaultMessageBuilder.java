@@ -254,7 +254,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
         final FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser :
             strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser();
         final HeaderImpl header = new HeaderImpl();
-        final MimeStreamParser parser = new MimeStreamParser();
+        final MimeStreamParser parser = new MimeStreamParser(cfg, mon, null);
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void endHeader() {
