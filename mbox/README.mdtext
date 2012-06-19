@@ -1,0 +1,17 @@
+# Apache James Mime4j Mbox Iterator
+
+Apache James Mbox Iterator provides an iterator like interface over mbox files. It's designed
+to allow easy parsing with mime4j.
+
+It uses NIO memory mapped files and should provide fast processing capabilities.
+
+## Dependencies
+
+It has no direct dependencies other than the JDK and Google Guava (for convenience).
+
+## Building
+
+The project uses Maven as a build tool. To build go to the root directory and run:
+
+$ mvn clean package
+

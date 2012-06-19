@@ -18,41 +18,36 @@
     under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>apache-mime4j-project</artifactId>
         <groupId>org.apache.james</groupId>
+        <artifactId>apache-mime4j-project</artifactId>
         <version>0.8-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>apache-mime4j-examples</artifactId>
+    <artifactId>apache-mime4j-mbox-iterator</artifactId>
+    <packaging>jar</packaging>
 
-    <name>Apache JAMES Mime4j (Code Examples)</name>
-    <description>Examples for Mime4J stream based MIME message parser</description>
+    <name>Apache JAMES Mime4j (Mbox Iterator)</name>
+    <description>Provides a fast iterator like interface for Mbox files using NIO.</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>apache-mime4j-dom</artifactId>
-            <version>${project.version}</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>apache-mime4j-mbox-iterator</artifactId>
-            <version>0.8-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.james</groupId>
-            <artifactId>apache-mime4j-storage</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-            <scope>compile</scope>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
         </dependency>
     </dependencies>
+
 </project>
