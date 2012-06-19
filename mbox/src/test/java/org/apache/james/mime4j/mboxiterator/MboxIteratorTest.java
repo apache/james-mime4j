@@ -18,21 +18,15 @@
  ****************************************************************/
 package org.apache.james.mime4j.mboxiterator;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+import java.io.*;
 
 /**
  * Tests for {@link MboxIterator}.
- *
- * @author estan
  */
 public class MboxIteratorTest {
 
@@ -68,11 +62,23 @@ public class MboxIteratorTest {
     private void iterateWithMaxMessage(int maxMessageSize) throws IOException {
         int count = 0;
         for (CharBufferWrapper msg : MboxIterator.fromFile(MBOX_PATH).maxMessageSize(maxMessageSize).build()) {
-            String message = Files.toString(new File(MBOX_PATH + "-" + count), Charsets.UTF_8);
+            String message = fileToString(new File(MBOX_PATH + "-" + count));
             //MboxIterator.printCharBuffer(msg);
             Assert.assertEquals("String sizes match for file " + count, message.length(), msg.toString().length());
             Assert.assertEquals("Missmatch with file " + count, message, msg.toString());
             count++;
         }
     }
+
+    private static String fileToString(File file) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(file));
+        StringBuilder sb = new StringBuilder();
+        int ch;
+        while ((ch = reader.read()) != -1) {
+            sb.append((char) ch);
+        }
+        reader.close();
+        return sb.toString();
+    }
+
 }

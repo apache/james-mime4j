@@ -18,8 +18,6 @@
  ****************************************************************/
 package org.apache.james.mime4j.mboxiterator;
 
-import com.google.common.base.Charsets;
-
 import java.io.*;
 import java.nio.Buffer;
 import java.nio.CharBuffer;
@@ -207,7 +205,7 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
     public static class Builder {
 
         private final File file;
-        private Charset charset = Charsets.UTF_8;
+        private Charset charset = Charset.forName("UTF-8");
         private String regexpPattern = FromLinePatterns.DEFAULT;
         private int flags = Pattern.MULTILINE;
         /**

@@ -18,7 +18,6 @@
  ****************************************************************/
 package org.apache.james.mime4j.samples.mbox;
 
-import com.google.common.base.Charsets;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
@@ -33,6 +32,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 
 /**
@@ -41,7 +41,7 @@ import java.nio.charset.CharsetEncoder;
  */
 public class IterateOverMbox {
 
-    private final static CharsetEncoder ENCODER = Charsets.UTF_8.newEncoder();
+    private final static CharsetEncoder ENCODER = Charset.forName("UTF-8").newEncoder();
 
     // simple example of how to split an mbox into individual files
     public static void main(String[] args) throws Exception {
@@ -53,9 +53,9 @@ public class IterateOverMbox {
         long start = System.currentTimeMillis();
         int count = 0;
 
-        for (CharBufferWrapper message : MboxIterator.fromFile(mbox).charset(Charsets.UTF_8).build()) {
+        for (CharBufferWrapper message : MboxIterator.fromFile(mbox).charset(ENCODER.charset()).build()) {
             // saveMessageToFile(count, buf);
-            System.out.println(messageSummary(message.asInputStreamUTF8Encoded()));
+            System.out.println(messageSummary(message.asInputStream(ENCODER.charset())));
             count++;
         }
         System.out.println("Found " + count + " messages");
@@ -72,6 +72,14 @@ public class IterateOverMbox {
         fout.close();
     }
 
+    /**
+     * Parse a message and return a simple {@link String} representation of some important fields.
+     *
+     * @param messageBytes the message as {@link java.io.InputStream}
+     * @return String
+     * @throws IOException
+     * @throws MimeException
+     */
     private static String messageSummary(InputStream messageBytes) throws IOException, MimeException {
         MessageBuilder builder = new DefaultMessageBuilder();
         Message message = builder.parseMessage(messageBytes);

@@ -18,9 +18,6 @@
  ****************************************************************/
 package org.apache.james.mime4j.mboxiterator;
 
-import com.google.common.base.Charsets;
-import com.google.common.base.Preconditions;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -35,12 +32,10 @@ public class CharBufferWrapper {
     private final CharBuffer messageBuffer;
 
     public CharBufferWrapper(CharBuffer messageBuffer) {
-        Preconditions.checkNotNull(messageBuffer);
+        if (messageBuffer == null) {
+            throw new IllegalStateException("The buffer is null");
+        }
         this.messageBuffer = messageBuffer;
-    }
-
-    public InputStream asInputStreamUTF8Encoded() {
-        return new ByteBufferInputStream(Charsets.UTF_8.encode(messageBuffer));
     }
 
     public InputStream asInputStream(Charset encoding) {
