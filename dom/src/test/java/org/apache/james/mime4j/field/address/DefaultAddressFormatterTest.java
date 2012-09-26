@@ -44,7 +44,7 @@ public class DefaultAddressFormatterTest extends TestCase {
         al.add(new Mailbox("test", "example.com"));
         al.add(new Mailbox("Foo!", "foo", "example.com"));
         DomainList dl = new DomainList(new ArrayList<String>(
-                Arrays.asList(new String[] {"foo.example.com"})), true);
+                Arrays.asList(new String[] {"foo.example.com"})));
         Mailbox mailbox = new Mailbox("Foo Bar", dl, "foo2", "example.com");
         assertSame(dl, mailbox.getRoute());
         al.add(mailbox);

@@ -33,7 +33,7 @@ public class Mailbox extends Address {
     private static final long serialVersionUID = 1L;
 
     private static final DomainList EMPTY_ROUTE_LIST = new DomainList(
-            Collections.<String> emptyList(), true);
+            Collections.<String> emptyList());
 
     private final String name;
     private final DomainList route;

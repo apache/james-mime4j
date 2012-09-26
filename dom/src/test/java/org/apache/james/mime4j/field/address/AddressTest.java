@@ -57,7 +57,7 @@ public class AddressTest extends TestCase {
 
 
     public void testEmptyDomainList() {
-        DomainList dl = new DomainList(null, false);
+        DomainList dl = new DomainList(null);
         assertEquals(0, dl.size());
 
         try {
@@ -77,14 +77,14 @@ public class AddressTest extends TestCase {
         List<String> al = new ArrayList<String>();
         al.add("example.com");
 
-        // shared arraylist
-        DomainList dl = new DomainList(al, true);
+        // changing the list passed does not change DomainList's state
+        DomainList dl = new DomainList(al);
         assertEquals(1, dl.size());
         al.add("foo.example.com");
-        assertEquals(2, dl.size());
+        assertEquals(1, dl.size());
 
         // cloned arraylist
-        DomainList dlcopy = new DomainList(al, false);
+        DomainList dlcopy = new DomainList(al);
         assertEquals(2, dlcopy.size());
         al.add("bar.example.com");
         assertEquals(2, dlcopy.size());

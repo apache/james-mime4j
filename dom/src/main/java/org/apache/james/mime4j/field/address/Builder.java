@@ -164,7 +164,7 @@ class Builder {
             else
                 throw new ParseException();
         }
-        return new DomainList(results, true);
+        return new DomainList(results);
     }
 
     private Mailbox buildAddrSpec(ASTaddr_spec node) {

@@ -124,7 +124,7 @@ public class LenientAddressBuilder {
                 break;
             }
         }
-        return domains != null ? new DomainList(domains, true) : null;
+        return domains != null ? new DomainList(domains) : null;
     }
 
     private Mailbox createMailbox(

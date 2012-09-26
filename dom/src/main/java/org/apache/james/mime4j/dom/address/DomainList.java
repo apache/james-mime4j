@@ -29,24 +29,17 @@ import java.util.List;
  * An immutable, random-access list of Strings (that are supposedly domain names
  * or domain literals).
  */
-public class DomainList extends AbstractList<String> implements Serializable {
+public final class DomainList extends AbstractList<String> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private final List<String> domains;
 
     /**
-     * @param domains
-     *            A List that contains only String objects.
-     * @param dontCopy
-     *            true iff it is not possible for the domains list to be
-     *            modified by someone else.
+     * @param domains  A List that contains only String objects.
      */
-    public DomainList(List<String> domains, boolean dontCopy) {
-        if (domains != null)
-            this.domains = dontCopy ? domains : new ArrayList<String>(domains);
-        else
-            this.domains = Collections.emptyList();
+    public DomainList(List<String> domains) {
+        this.domains = (domains == null) ? Collections.<String>emptyList():new ArrayList<String>(domains);
     }
 
     /**
