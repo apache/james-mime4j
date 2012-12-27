@@ -53,4 +53,9 @@ public class LenientDateTimeFieldTest extends TestCase {
         assertEquals(43200000L, f.getDate().getTime());
     }
 
+    public void testMime4j219() throws Exception {
+        DateTimeField f = parse("Date: Tue, 17 Jul 2012 22:23:35.882 0000");
+        assertEquals(1342563815882L,f.getDate().getTime());
+    }
+
 }
