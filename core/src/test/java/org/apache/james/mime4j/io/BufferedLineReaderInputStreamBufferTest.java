@@ -19,14 +19,14 @@
 
 package org.apache.james.mime4j.io;
 
-import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 
-import junit.framework.TestCase;
+public class BufferedLineReaderInputStreamBufferTest {
 
-public class BufferedLineReaderInputStreamBufferTest extends TestCase {
-
+    @Test
     public void testInvalidInput() throws Exception {
         String text = "blah blah yada yada";
         byte[] b1 = text.getBytes("US-ASCII");
@@ -35,99 +35,101 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
 
-        assertEquals('b', inbuffer.read());
-        assertEquals('l', inbuffer.read());
+        Assert.assertEquals('b', inbuffer.read());
+        Assert.assertEquals('l', inbuffer.read());
 
         try {
             inbuffer.byteAt(1);
-            fail("IndexOutOfBoundsException should have been thrown");
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
             inbuffer.byteAt(20);
-            fail("IndexOutOfBoundsException should have been thrown");
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
             inbuffer.indexOf(b2, -1, 3);
-            fail("IndexOutOfBoundsException should have been thrown");
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
             inbuffer.indexOf(b2, 1, 3);
-            fail("IndexOutOfBoundsException should have been thrown");
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
             inbuffer.indexOf(b2, 2, -1);
-            fail("IndexOutOfBoundsException should have been thrown");
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
             inbuffer.indexOf(b2, 2, 18);
-            fail("IndexOutOfBoundsException should have been thrown");
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
-        assertEquals(5, inbuffer.indexOf(b2, 2, 17));
+        Assert.assertEquals(5, inbuffer.indexOf(b2, 2, 17));
         try {
-            inbuffer.indexOf((byte)' ', -1, 3);
-            fail("IndexOutOfBoundsException should have been thrown");
-        } catch (IndexOutOfBoundsException expected) {
-        }
-        try {
-            inbuffer.indexOf((byte)' ', 1, 3);
-            fail("IndexOutOfBoundsException should have been thrown");
+            inbuffer.indexOf((byte) ' ', -1, 3);
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
-            inbuffer.indexOf((byte)' ', 2, -1);
-            fail("IndexOutOfBoundsException should have been thrown");
+            inbuffer.indexOf((byte) ' ', 1, 3);
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
         try {
-            inbuffer.indexOf((byte)' ', 2, 18);
-            fail("IndexOutOfBoundsException should have been thrown");
+            inbuffer.indexOf((byte) ' ', 2, -1);
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
         } catch (IndexOutOfBoundsException expected) {
         }
-        assertEquals(10, inbuffer.indexOf((byte)'y', 2, 17));
+        try {
+            inbuffer.indexOf((byte) ' ', 2, 18);
+            Assert.fail("IndexOutOfBoundsException should have been thrown");
+        } catch (IndexOutOfBoundsException expected) {
+        }
+        Assert.assertEquals(10, inbuffer.indexOf((byte) 'y', 2, 17));
     }
 
+    @Test
     public void testBasicOperations() throws Exception {
         String text = "bla bla yada yada haha haha";
         byte[] b1 = text.getBytes("US-ASCII");
         BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
-        assertEquals(0, inbuffer.pos());
-        assertEquals(27, inbuffer.limit());
-        assertEquals(27, inbuffer.length());
+        Assert.assertEquals(0, inbuffer.pos());
+        Assert.assertEquals(27, inbuffer.limit());
+        Assert.assertEquals(27, inbuffer.length());
 
         inbuffer.read();
         inbuffer.read();
 
-        assertEquals(2, inbuffer.pos());
-        assertEquals(27, inbuffer.limit());
-        assertEquals(25, inbuffer.length());
+        Assert.assertEquals(2, inbuffer.pos());
+        Assert.assertEquals(27, inbuffer.limit());
+        Assert.assertEquals(25, inbuffer.length());
 
         byte[] tmp1 = new byte[3];
-        assertEquals(3, inbuffer.read(tmp1));
+        Assert.assertEquals(3, inbuffer.read(tmp1));
 
-        assertEquals(5, inbuffer.pos());
-        assertEquals(27, inbuffer.limit());
-        assertEquals(22, inbuffer.length());
+        Assert.assertEquals(5, inbuffer.pos());
+        Assert.assertEquals(27, inbuffer.limit());
+        Assert.assertEquals(22, inbuffer.length());
 
         byte[] tmp2 = new byte[22];
-        assertEquals(22, inbuffer.read(tmp2));
+        Assert.assertEquals(22, inbuffer.read(tmp2));
 
-        assertEquals(27, inbuffer.pos());
-        assertEquals(27, inbuffer.limit());
-        assertEquals(0, inbuffer.length());
+        Assert.assertEquals(27, inbuffer.pos());
+        Assert.assertEquals(27, inbuffer.limit());
+        Assert.assertEquals(0, inbuffer.length());
 
-        assertEquals(-1, inbuffer.read(tmp1));
-        assertEquals(-1, inbuffer.read(tmp1));
-        assertEquals(-1, inbuffer.read());
-        assertEquals(-1, inbuffer.read());
+        Assert.assertEquals(-1, inbuffer.read(tmp1));
+        Assert.assertEquals(-1, inbuffer.read(tmp1));
+        Assert.assertEquals(-1, inbuffer.read());
+        Assert.assertEquals(-1, inbuffer.read());
     }
 
+    @Test
     public void testPatternMatching1() throws Exception {
         String text = "blabla d is the word";
         String pattern = "d";
@@ -136,9 +138,10 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
-        assertEquals(7, i);
+        Assert.assertEquals(7, i);
     }
 
+    @Test
     public void testPatternMatching2() throws Exception {
         String text = "disddisdissdsidsidsiid";
         String pattern = "siid";
@@ -147,9 +150,10 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
-        assertEquals(18, i);
+        Assert.assertEquals(18, i);
     }
 
+    @Test
     public void testPatternMatching3() throws Exception {
         String text = "bla bla yada yada haha haha";
         String pattern = "blah";
@@ -158,9 +162,10 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
-        assertEquals(-1, i);
+        Assert.assertEquals(-1, i);
     }
 
+    @Test
     public void testPatternMatching4() throws Exception {
         String text = "bla bla yada yada haha haha";
         String pattern = "bla";
@@ -169,9 +174,10 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
-        assertEquals(0, i);
+        Assert.assertEquals(0, i);
     }
 
+    @Test
     public void testPatternOutOfBound() throws Exception {
         String text = "bla bla yada yada haha haha";
         String pattern1 = "bla bla";
@@ -182,11 +188,12 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         byte[] tmp = new byte[3];
         inbuffer.read(tmp);
         int i = inbuffer.indexOf(b2, inbuffer.pos(), inbuffer.length());
-        assertEquals(-1, i);
+        Assert.assertEquals(-1, i);
         i = inbuffer.indexOf(b2, inbuffer.pos(), inbuffer.length() - 1);
-        assertEquals(-1, i);
+        Assert.assertEquals(-1, i);
     }
 
+    @Test
     public void testCharOutOfBound() throws Exception {
         String text = "zzz blah blah blah ggg";
         byte[] b1 = text.getBytes("US-ASCII");
@@ -194,18 +201,19 @@ public class BufferedLineReaderInputStreamBufferTest extends TestCase {
         inbuffer.fillBuffer();
         byte[] tmp = new byte[3];
         inbuffer.read(tmp);
-        int i = inbuffer.indexOf((byte)'z', inbuffer.pos(), inbuffer.length());
-        assertEquals(-1, i);
-        i = inbuffer.indexOf((byte)'g', inbuffer.pos(), inbuffer.length() - 3);
-        assertEquals(-1, i);
+        int i = inbuffer.indexOf((byte) 'z', inbuffer.pos(), inbuffer.length());
+        Assert.assertEquals(-1, i);
+        i = inbuffer.indexOf((byte) 'g', inbuffer.pos(), inbuffer.length() - 3);
+        Assert.assertEquals(-1, i);
     }
 
+    @Test
     public void test0xFFInBinaryStream() throws Exception {
-        byte[] b1 = new byte[] {1, 2, 3, (byte) 0xff, 10, 1, 2, 3};
-        byte[] b2 = new byte[] {10};
+        byte[] b1 = new byte[]{1, 2, 3, (byte) 0xff, 10, 1, 2, 3};
+        byte[] b2 = new byte[]{10};
         BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
-        assertEquals(4, i);
+        Assert.assertEquals(4, i);
     }
 }

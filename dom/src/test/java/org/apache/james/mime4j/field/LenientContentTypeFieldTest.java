@@ -25,10 +25,10 @@ import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class LenientContentTypeFieldTest extends TestCase {
+public class LenientContentTypeFieldTest {
 
     static ContentTypeField parse(final String s) throws MimeException {
         ByteSequence raw = ContentUtil.encode(s);
@@ -36,55 +36,60 @@ public class LenientContentTypeFieldTest extends TestCase {
         return ContentTypeFieldLenientImpl.PARSER.parse(rawField, null);
     }
 
-    public void testMimeTypeWithSemiColonNoParams() throws Exception  {
+    @Test
+    public void testMimeTypeWithSemiColonNoParams() throws Exception {
         ContentTypeField f = parse("Content-Type: text/html;");
-        assertEquals("text/html", f.getMimeType());
+        Assert.assertEquals("text/html", f.getMimeType());
     }
 
-    public void testMimeTypeWithMultipleSemiColon() throws Exception  {
+    @Test
+    public void testMimeTypeWithMultipleSemiColon() throws Exception {
         ContentTypeField f = parse("Content-Type: text/html;;;");
-        assertEquals("text/html", f.getMimeType());
-        assertEquals(1, f.getParameters().size());
+        Assert.assertEquals("text/html", f.getMimeType());
+        Assert.assertEquals(1, f.getParameters().size());
     }
 
-    public void testMimeTypeWithNonameParam() throws Exception  {
+    @Test
+    public void testMimeTypeWithNonameParam() throws Exception {
         ContentTypeField f = parse("Content-Type: text/html;=stuff");
-        assertEquals("text/html", f.getMimeType());
-        assertEquals(1, f.getParameters().size());
-        assertEquals("stuff", f.getParameter(""));
+        Assert.assertEquals("text/html", f.getMimeType());
+        Assert.assertEquals(1, f.getParameters().size());
+        Assert.assertEquals("stuff", f.getParameter(""));
     }
 
+    @Test
     public void testGetMimeType() throws Exception {
         ContentTypeField f = parse("Content-Type: text/PLAIN");
-        assertEquals("text/plain", f.getMimeType());
+        Assert.assertEquals("text/plain", f.getMimeType());
 
         f = parse("content-type:   TeXt / html   ");
-        assertEquals("text/html", f.getMimeType());
+        Assert.assertEquals("text/html", f.getMimeType());
 
         f = parse("CONTENT-TYPE:   x-app/yada ;"
-                                                    + "  param = yada");
-        assertEquals("x-app/yada", f.getMimeType());
+                + "  param = yada");
+        Assert.assertEquals("x-app/yada", f.getMimeType());
 
         f = parse("CONTENT-TYPE:   yada");
-        assertEquals(null, f.getMimeType());
+        Assert.assertEquals(null, f.getMimeType());
     }
 
+    @Test
     public void testGetParameter() throws Exception {
         ContentTypeField f = parse("CONTENT-TYPE:   text / html ;"
-                                                + "  boundary=yada yada");
-        assertEquals("yada yada", f.getParameter("boundary"));
+                + "  boundary=yada yada");
+        Assert.assertEquals("yada yada", f.getParameter("boundary"));
 
         f = parse("Content-Type: x-app/yada;"
-                                                + "  boUNdarY= \"ya:\\\"*da\"; "
-                                                + "\tcharset\t =  us-ascii");
-        assertEquals("ya:\"*da", f.getParameter("boundary"));
-        assertEquals("us-ascii", f.getParameter("charset"));
+                + "  boUNdarY= \"ya:\\\"*da\"; "
+                + "\tcharset\t =  us-ascii");
+        Assert.assertEquals("ya:\"*da", f.getParameter("boundary"));
+        Assert.assertEquals("us-ascii", f.getParameter("charset"));
 
         f = parse("Content-Type: x-app/yada;  "
-                            + "boUNdarY= \"ya \\\"\\\"\tda \\\"\"; "
-                            + "\tcharset\t =  \"\\\"hepp\\\"  =us\t-ascii\"");
-        assertEquals("ya \"\"\tda \"", f.getParameter("boundary"));
-        assertEquals("\"hepp\"  =us\t-ascii", f.getParameter("charset"));
+                + "boUNdarY= \"ya \\\"\\\"\tda \\\"\"; "
+                + "\tcharset\t =  \"\\\"hepp\\\"  =us\t-ascii\"");
+        Assert.assertEquals("ya \"\"\tda \"", f.getParameter("boundary"));
+        Assert.assertEquals("\"hepp\"  =us\t-ascii", f.getParameter("charset"));
     }
 
 }

@@ -19,30 +19,27 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.ExampleMail;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
-
-import org.apache.james.mime4j.ExampleMail;
-
-public class MimeTokenEmbeddedMessageTest extends TestCase {
+public class MimeTokenEmbeddedMessageTest {
 
     MimeTokenStream stream;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         stream = new MimeTokenStream();
         InputStream in = new ByteArrayInputStream(ExampleMail.MIME_MULTIPART_EMBEDDED_MESSAGES_BYTES);
         stream.parse(in);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testWhenRecurseShouldVisitInnerMailsAndInnerMultiparts() throws Exception {
         stream.setRecursionMode(RecursionMode.M_RECURSE);
 
@@ -126,6 +123,7 @@ public class MimeTokenEmbeddedMessageTest extends TestCase {
     }
 
 
+    @Test
     public void testWhenFlatAtStartShouldIgnoreMultipartStructure() throws Exception {
         stream.setRecursionMode(RecursionMode.M_FLAT);
         nextIs(EntityState.T_START_HEADER);
@@ -143,6 +141,7 @@ public class MimeTokenEmbeddedMessageTest extends TestCase {
         nextIs(EntityState.T_END_MESSAGE);
     }
 
+    @Test
     public void testWhenFlatShouldIgnoreInnerMailsAndInnerMultiparts() throws Exception {
         nextIs(EntityState.T_START_HEADER);
         nextIs(EntityState.T_FIELD);
@@ -200,15 +199,15 @@ public class MimeTokenEmbeddedMessageTest extends TestCase {
     private void checkInputStream(String expected) throws Exception {
         InputStream inputStream = stream.getInputStream();
         int next = inputStream.read();
-        int i=0;
+        int i = 0;
         while (next != -1) {
-            assertEquals("@" + i, expected.charAt(i++), (char) next);
+            Assert.assertEquals("@" + i, expected.charAt(i++), (char) next);
             next = inputStream.read();
         }
-        assertEquals(expected.length(), i);
+        Assert.assertEquals(expected.length(), i);
     }
 
     private void nextIs(EntityState state) throws Exception {
-        assertEquals(MimeTokenStream.stateToString(state), MimeTokenStream.stateToString(stream.next()));
+        Assert.assertEquals(MimeTokenStream.stateToString(state), MimeTokenStream.stateToString(stream.next()));
     }
 }

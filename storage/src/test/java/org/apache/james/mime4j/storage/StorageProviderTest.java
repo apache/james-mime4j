@@ -19,16 +19,17 @@
 
 package org.apache.james.mime4j.storage;
 
+import org.apache.james.mime4j.codec.CodecUtil;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.james.mime4j.codec.CodecUtil;
+public class StorageProviderTest {
 
-import junit.framework.TestCase;
-
-public class StorageProviderTest extends TestCase {
-
+    @Test
     public void testMemoryStorageProvider() throws Exception {
         StorageProvider provider = new MemoryStorageProvider();
 
@@ -40,6 +41,7 @@ public class StorageProviderTest extends TestCase {
         testDelete(provider);
     }
 
+    @Test
     public void testTempFileStorageProvider() throws Exception {
         StorageProvider provider = new TempFileStorageProvider();
 
@@ -51,6 +53,7 @@ public class StorageProviderTest extends TestCase {
         testDelete(provider);
     }
 
+    @Test
     public void testThresholdStorageProvider() throws Exception {
         final int threshold = 5000;
         StorageProvider backend = new TempFileStorageProvider();
@@ -68,6 +71,7 @@ public class StorageProviderTest extends TestCase {
         testDelete(provider);
     }
 
+    @Test
     public void testCipherStorageProvider() throws Exception {
         StorageProvider backend = new TempFileStorageProvider();
         StorageProvider provider = new CipherStorageProvider(backend);
@@ -89,7 +93,7 @@ public class StorageProviderTest extends TestCase {
     private void testStore(StorageProvider provider, int size)
             throws IOException {
         byte[] data = createData(size);
-        assertEquals(size, data.length);
+        Assert.assertEquals(size, data.length);
 
         Storage storage = provider.store(new ByteArrayInputStream(data));
 
@@ -99,9 +103,9 @@ public class StorageProviderTest extends TestCase {
     }
 
     private void testCreateStorageOutputStream(StorageProvider provider,
-            int size) throws IOException {
+                                               int size) throws IOException {
         byte[] data = createData(size);
-        assertEquals(size, data.length);
+        Assert.assertEquals(size, data.length);
 
         StorageOutputStream out = provider.createStorageOutputStream();
         CodecUtil.copy(new ByteArrayInputStream(data), out);
@@ -113,9 +117,9 @@ public class StorageProviderTest extends TestCase {
     }
 
     private void verifyData(byte[] expected, byte[] actual) {
-        assertEquals(expected.length, actual.length);
+        Assert.assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i]);
+            Assert.assertEquals(expected[i], actual[i]);
         }
     }
 
@@ -136,7 +140,7 @@ public class StorageProviderTest extends TestCase {
         // getInputStream has to throw an IllegalStateException
         try {
             storage.getInputStream();
-            fail();
+            Assert.fail();
         } catch (IllegalStateException expected) {
         }
 

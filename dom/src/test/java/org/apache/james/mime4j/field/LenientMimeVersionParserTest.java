@@ -19,16 +19,17 @@
 
 package org.apache.james.mime4j.field;
 
-import junit.framework.TestCase;
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
-public class LenientMimeVersionParserTest extends TestCase {
+public class LenientMimeVersionParserTest {
 
     static MimeVersionField parse(final String s) throws MimeException {
         ByteSequence raw = ContentUtil.encode(s);
@@ -42,6 +43,7 @@ public class LenientMimeVersionParserTest extends TestCase {
         assertEquals("Minor version number", expectedMinorVersion, f.getMinorVersion());
     }
 
+    @Test
     public void testPlainLine() throws Exception {
         check("2.4", 2, 4);
         check("25.344", 25, 344);
@@ -49,6 +51,7 @@ public class LenientMimeVersionParserTest extends TestCase {
         check("123234234.0", 123234234, 0);
     }
 
+    @Test
     public void testLineWithComments() throws Exception {
         check("2(A comment).4", 2, 4);
         check("2(.8).4", 2, 4);
@@ -57,36 +60,41 @@ public class LenientMimeVersionParserTest extends TestCase {
         check("2.(A comment)4", 2, 4);
     }
 
+    @Test
     public void testLineWithNestedComments() throws Exception {
         check("2(4.45 ( Another ()comment () blah (Wobble(mix)))Whatever).4", 2, 4);
     }
 
+    @Test
     public void testMalformed1() throws Exception {
         MimeVersionField f = parse("MIME-Version: 5  ");
-        assertEquals(5, f.getMajorVersion());
-        assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
-        assertNull(f.getParseException());
+        Assert.assertEquals(5, f.getMajorVersion());
+        Assert.assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
+        Assert.assertNull(f.getParseException());
     }
 
+    @Test
     public void testMalformed2() throws Exception {
         MimeVersionField f = parse("MIME-Version: 5.  ");
-        assertEquals(5, f.getMajorVersion());
-        assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
-        assertNull(f.getParseException());
+        Assert.assertEquals(5, f.getMajorVersion());
+        Assert.assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
+        Assert.assertNull(f.getParseException());
     }
 
+    @Test
     public void testMalformed3() throws Exception {
         MimeVersionField f = parse("MIME-Version: .5  ");
-        assertEquals(MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION, f.getMajorVersion());
-        assertEquals(5, f.getMinorVersion());
-        assertNull(f.getParseException());
+        Assert.assertEquals(MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION, f.getMajorVersion());
+        Assert.assertEquals(5, f.getMinorVersion());
+        Assert.assertNull(f.getParseException());
     }
 
+    @Test
     public void testMalformed4() throws Exception {
         MimeVersionField f = parse("MIME-Version: crap ");
-        assertEquals(MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION, f.getMajorVersion());
-        assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
-        assertNull(f.getParseException());
+        Assert.assertEquals(MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION, f.getMajorVersion());
+        Assert.assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
+        Assert.assertNull(f.getParseException());
     }
 
 }

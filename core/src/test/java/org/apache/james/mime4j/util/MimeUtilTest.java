@@ -19,18 +19,21 @@
 
 package org.apache.james.mime4j.util;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class MimeUtilTest extends TestCase {
+public class MimeUtilTest {
 
+    @Test
     public void testFold() throws Exception {
-        assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 68));
-        assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 69));
-        assertEquals("this\r\n is a test", MimeUtil.fold("this is a test", 70));
-        assertEquals("this  \r\n   is a test", MimeUtil.fold(
+        Assert.assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 68));
+        Assert.assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 69));
+        Assert.assertEquals("this\r\n is a test", MimeUtil.fold("this is a test", 70));
+        Assert.assertEquals("this  \r\n   is a test", MimeUtil.fold(
                 "this     is a test", 70));
     }
 
+    @Test
     public void testFoldOverlyLongNonWhitespace() throws Exception {
         String ninety = "1234567890123456789012345678901234567890"
                 + "12345678901234567890123456789012345678901234567890";
@@ -40,30 +43,31 @@ public class MimeUtilTest extends TestCase {
         String expected = String.format(
                 "testing 1 2\r\n %s\r\n testing\r\n %s", ninety, ninety);
 
-        assertEquals(expected, MimeUtil.fold(input, 0));
+        Assert.assertEquals(expected, MimeUtil.fold(input, 0));
     }
 
+    @Test
     public void testUnfold() throws Exception {
-        assertEquals("", MimeUtil.unfold(""));
-        assertEquals("x", MimeUtil.unfold("x"));
-        assertEquals(" x ", MimeUtil.unfold(" x "));
+        Assert.assertEquals("", MimeUtil.unfold(""));
+        Assert.assertEquals("x", MimeUtil.unfold("x"));
+        Assert.assertEquals(" x ", MimeUtil.unfold(" x "));
 
-        assertEquals("", MimeUtil.unfold("\r"));
-        assertEquals("", MimeUtil.unfold("\n"));
-        assertEquals("", MimeUtil.unfold("\r\n"));
+        Assert.assertEquals("", MimeUtil.unfold("\r"));
+        Assert.assertEquals("", MimeUtil.unfold("\n"));
+        Assert.assertEquals("", MimeUtil.unfold("\r\n"));
 
-        assertEquals(" ", MimeUtil.unfold(" \n"));
-        assertEquals(" ", MimeUtil.unfold("\n "));
-        assertEquals(" ", MimeUtil.unfold(" \r\n"));
-        assertEquals(" ", MimeUtil.unfold("\r\n "));
+        Assert.assertEquals(" ", MimeUtil.unfold(" \n"));
+        Assert.assertEquals(" ", MimeUtil.unfold("\n "));
+        Assert.assertEquals(" ", MimeUtil.unfold(" \r\n"));
+        Assert.assertEquals(" ", MimeUtil.unfold("\r\n "));
 
-        assertEquals("this is a test", MimeUtil.unfold("this is\r\n a test"));
-        assertEquals("this is a test", MimeUtil.unfold("this is\r\n a test"));
-        assertEquals("this is a test", MimeUtil.unfold("this\r\n is a test"));
-        assertEquals("this     is a test", MimeUtil
+        Assert.assertEquals("this is a test", MimeUtil.unfold("this is\r\n a test"));
+        Assert.assertEquals("this is a test", MimeUtil.unfold("this is\r\n a test"));
+        Assert.assertEquals("this is a test", MimeUtil.unfold("this\r\n is a test"));
+        Assert.assertEquals("this     is a test", MimeUtil
                 .unfold("this  \r\n   is a test"));
 
-        assertEquals("this is a test", MimeUtil
+        Assert.assertEquals("this is a test", MimeUtil
                 .unfold("this\r\n is\r\n a\r\n test"));
     }
 

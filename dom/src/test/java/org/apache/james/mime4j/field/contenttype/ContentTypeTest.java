@@ -22,18 +22,20 @@ package org.apache.james.mime4j.field.contenttype;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.contenttype.parser.ContentTypeParser;
 import org.apache.james.mime4j.field.contenttype.parser.ParseException;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.StringReader;
 
-import junit.framework.TestCase;
+public class ContentTypeTest {
 
-public class ContentTypeTest extends TestCase {
-
+    @Test
     public void testExceptionTree() {
         // make sure that our ParseException extends MimeException.
-        assertTrue(MimeException.class.isAssignableFrom(ParseException.class));
+        Assert.assertTrue(MimeException.class.isAssignableFrom(ParseException.class));
     }
 
+    @Test
     public void testContentType() throws ParseException {
         test("one/two; three          =  four", "one", "two");
         test("one/(foo)two; three          =  \"four\"", "one", "two");
@@ -50,8 +52,8 @@ public class ContentTypeTest extends TestCase {
         String type = parser.getType();
         String subtype = parser.getSubType();
 
-        assertEquals(expectedType, type);
-        assertEquals(expectedSubtype, subtype);
+        Assert.assertEquals(expectedType, type);
+        Assert.assertEquals(expectedSubtype, subtype);
     }
 
 }

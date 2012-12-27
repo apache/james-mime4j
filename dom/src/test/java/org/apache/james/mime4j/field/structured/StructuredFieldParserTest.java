@@ -19,52 +19,48 @@
 
 package org.apache.james.mime4j.field.structured;
 
+import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.StringReader;
 
-import junit.framework.TestCase;
+public class StructuredFieldParserTest {
 
-import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
-
-public class StructuredFieldParserTest extends TestCase {
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testSimpleField() throws Exception {
         final String string = "Field Value";
-        assertEquals(string, parse(string));
+        Assert.assertEquals(string, parse(string));
     }
 
+    @Test
     public void testTrim() throws Exception {
         final String string = "Field Value";
-        assertEquals(string, parse("    \t\r\n" + string + "  \t\r\n  "));
+        Assert.assertEquals(string, parse("    \t\r\n" + string + "  \t\r\n  "));
     }
 
+    @Test
     public void testFolding() throws Exception {
-        assertEquals("Field Value", parse("Field \t\r\n  Value"));
+        Assert.assertEquals("Field Value", parse("Field \t\r\n  Value"));
     }
 
+    @Test
     public void testQuotedString() throws Exception {
-        assertEquals("Field    Value", parse("\"Field    Value\""));
-        assertEquals("Field\t\r\nValue", parse("\"Field\t\r\nValue\""));
-        assertEquals("Field\t\r\nValue", parse("\"Field\t\r\n       \t       Value\""));
+        Assert.assertEquals("Field    Value", parse("\"Field    Value\""));
+        Assert.assertEquals("Field\t\r\nValue", parse("\"Field\t\r\nValue\""));
+        Assert.assertEquals("Field\t\r\nValue", parse("\"Field\t\r\n       \t       Value\""));
     }
 
+    @Test
     public void testComments() throws Exception {
-        assertEquals("Field", parse("Fi(This is a comment)eld"));
-        assertEquals("Field Value", parse("Fi(This is a comment)eld (A (very (nested) )comment)Value"));
+        Assert.assertEquals("Field", parse("Fi(This is a comment)eld"));
+        Assert.assertEquals("Field Value", parse("Fi(This is a comment)eld (A (very (nested) )comment)Value"));
     }
 
+    @Test
     public void testQuotedInComments() throws Exception {
-        assertEquals("Fi(This is a comment)eld", parse("\"Fi(This is a comment)eld\""));
-        assertEquals("Field Value", parse("Fi(This is a comment)eld (A (very (nested) )comment)Value"));
+        Assert.assertEquals("Fi(This is a comment)eld", parse("\"Fi(This is a comment)eld\""));
+        Assert.assertEquals("Field Value", parse("Fi(This is a comment)eld (A (very (nested) )comment)Value"));
     }
 
     private String parse(String in) throws Exception {

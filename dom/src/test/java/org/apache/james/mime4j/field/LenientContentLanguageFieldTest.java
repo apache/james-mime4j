@@ -19,18 +19,18 @@
 
 package org.apache.james.mime4j.field;
 
-import java.util.List;
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.field.ContentLanguageField;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import java.util.List;
 
-public class LenientContentLanguageFieldTest extends TestCase {
+public class LenientContentLanguageFieldTest {
 
     static ContentLanguageField parse(final String s) throws MimeException {
         ByteSequence raw = ContentUtil.encode(s);
@@ -38,47 +38,52 @@ public class LenientContentLanguageFieldTest extends TestCase {
         return ContentLanguageFieldLenientImpl.PARSER.parse(rawField, null);
     }
 
+    @Test
     public void testGetLanguage() throws Exception {
         ContentLanguageField f = parse("Content-Language: en, de");
         List<String> langs = f.getLanguages();
-        assertNotNull(langs);
-        assertEquals(2, langs.size());
-        assertEquals("en", langs.get(0));
-        assertEquals("de", langs.get(1));
+        Assert.assertNotNull(langs);
+        Assert.assertEquals(2, langs.size());
+        Assert.assertEquals("en", langs.get(0));
+        Assert.assertEquals("de", langs.get(1));
     }
 
+    @Test
     public void testGetLanguageEmpty() throws Exception {
         ContentLanguageField f = parse("Content-Language: ");
         List<String> langs = f.getLanguages();
-        assertNotNull(langs);
-        assertEquals(0, langs.size());
+        Assert.assertNotNull(langs);
+        Assert.assertEquals(0, langs.size());
     }
 
+    @Test
     public void testGetLanguageWithComments() throws Exception {
         ContentLanguageField f = parse("Content-Language: en (yada yada), (blah blah)de");
         List<String> langs = f.getLanguages();
-        assertNotNull(langs);
-        assertEquals(2, langs.size());
-        assertEquals("en", langs.get(0));
-        assertEquals("de", langs.get(1));
+        Assert.assertNotNull(langs);
+        Assert.assertEquals(2, langs.size());
+        Assert.assertEquals("en", langs.get(0));
+        Assert.assertEquals("de", langs.get(1));
     }
 
+    @Test
     public void testGetLanguageWithUnderscore() throws Exception {
         ContentLanguageField f = parse("Content-Language: en, en_GB (Great Britain)");
         List<String> langs = f.getLanguages();
-        assertNotNull(langs);
-        assertEquals(2, langs.size());
-        assertEquals("en", langs.get(0));
-        assertEquals("en_GB", langs.get(1));
+        Assert.assertNotNull(langs);
+        Assert.assertEquals(2, langs.size());
+        Assert.assertEquals("en", langs.get(0));
+        Assert.assertEquals("en_GB", langs.get(1));
     }
 
+    @Test
     public void testGetLanguageWithEmptyElement() throws Exception {
         ContentLanguageField f = parse("Content-Language: en,, de,");
         List<String> langs = f.getLanguages();
-        assertNotNull(langs);
-        assertEquals(2, langs.size());
-        assertEquals("en", langs.get(0));
-        assertEquals("de", langs.get(1));
+        Assert.assertNotNull(langs);
+        Assert.assertEquals(2, langs.size());
+        Assert.assertEquals("en", langs.get(0));
+        Assert.assertEquals("de", langs.get(1));
     }
 
 }

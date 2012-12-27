@@ -19,15 +19,17 @@
 
 package org.apache.james.mime4j;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class MimeIOExceptionTest extends TestCase {
+public class MimeIOExceptionTest {
 
+    @Test
     public void testMimeIOExceptionMimeException() {
         MimeException cause = new MimeException("cause");
         MimeIOException e = new MimeIOException(cause);
-        assertEquals("cause", e.getMessage());
-        assertSame(cause, e.getCause());
+        Assert.assertEquals("cause", e.getMessage());
+        Assert.assertSame(cause, e.getCause());
     }
 
 }

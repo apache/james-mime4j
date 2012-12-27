@@ -19,23 +19,25 @@
 package org.apache.james.mime4j.dom;
 
 import org.apache.james.mime4j.MimeException;
+import org.junit.Assert;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+public class MessageServiceFactoryTest {
 
-public class MessageServiceFactoryTest extends TestCase {
-
+    @Test
     public void testNewInstance() throws MimeException {
         MessageServiceFactory factory = MessageServiceFactory.newInstance();
-        assertNotNull(factory);
+        Assert.assertNotNull(factory);
     }
 
 
+    @Test
     public void testNewMessageBuilder() throws MimeException {
         MessageServiceFactory factory = MessageServiceFactory.newInstance();
-        assertNotNull(factory);
+        Assert.assertNotNull(factory);
         MessageBuilder builder = factory.newMessageBuilder();
         Message message = builder.newMessage();
-        assertNotNull(message);
+        Assert.assertNotNull(message);
     }
 
 }

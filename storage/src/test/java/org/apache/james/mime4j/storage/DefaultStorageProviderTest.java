@@ -19,26 +19,30 @@
 
 package org.apache.james.mime4j.storage;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class DefaultStorageProviderTest extends TestCase {
+public class DefaultStorageProviderTest {
 
-    @Override
-    protected void tearDown() throws Exception {
+    @After
+    public void tearDown() throws Exception {
         System.getProperties().remove(
                 DefaultStorageProvider.DEFAULT_STORAGE_PROVIDER_PROPERTY);
         DefaultStorageProvider.reset();
     }
 
+    @Test
     public void testDefaultInstance() throws Exception {
         System.getProperties().remove(
                 DefaultStorageProvider.DEFAULT_STORAGE_PROVIDER_PROPERTY);
         DefaultStorageProvider.reset();
 
         StorageProvider instance = DefaultStorageProvider.getInstance();
-        assertTrue(instance instanceof ThresholdStorageProvider);
+        Assert.assertTrue(instance instanceof ThresholdStorageProvider);
     }
 
+    @Test
     public void testSetDefaultProperty() throws Exception {
         System.setProperty(
                 DefaultStorageProvider.DEFAULT_STORAGE_PROVIDER_PROPERTY,
@@ -46,14 +50,15 @@ public class DefaultStorageProviderTest extends TestCase {
         DefaultStorageProvider.reset();
 
         StorageProvider instance = DefaultStorageProvider.getInstance();
-        assertTrue(instance instanceof MemoryStorageProvider);
+        Assert.assertTrue(instance instanceof MemoryStorageProvider);
     }
 
+    @Test
     public void testSetter() throws Exception {
         StorageProvider instance = new MemoryStorageProvider();
 
         DefaultStorageProvider.setInstance(instance);
-        assertSame(instance, DefaultStorageProvider.getInstance());
+        Assert.assertSame(instance, DefaultStorageProvider.getInstance());
     }
 
 }

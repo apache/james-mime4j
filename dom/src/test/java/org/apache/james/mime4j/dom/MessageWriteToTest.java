@@ -19,30 +19,23 @@
 
 package org.apache.james.mime4j.dom;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
-public class MessageWriteToTest extends TestCase {
+public class MessageWriteToTest {
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testSimpleMail() throws Exception {
         Message message = createMessage(ExampleMail.RFC822_SIMPLE_BYTES);
-        assertFalse("Not multipart", message.isMultipart());
+        Assert.assertFalse("Not multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DefaultMessageWriter writer = new DefaultMessageWriter();
         writer.writeMessage(message, out);
@@ -51,35 +44,38 @@ public class MessageWriteToTest extends TestCase {
 
     private void assertEquals(byte[] expected, byte[] actual) {
         StringBuilder buffer = new StringBuilder(expected.length);
-        assertEquals(new String(expected), new String(actual));
-        assertEquals(expected.length, actual.length);
+        Assert.assertEquals(new String(expected), new String(actual));
+        Assert.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
-            buffer.append((char)actual[i]);
-            assertEquals("Mismatch@" + i, expected[i], actual[i]);
+            buffer.append((char) actual[i]);
+            Assert.assertEquals("Mismatch@" + i, expected[i], actual[i]);
         }
     }
 
+    @Test
     public void testBinaryAttachment() throws Exception {
         Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES);
-        assertTrue("Is multipart", message.isMultipart());
+        Assert.assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DefaultMessageWriter writer = new DefaultMessageWriter();
         writer.writeMessage(message, out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES, out.toByteArray());
     }
 
+    @Test
     public void testBinaryAttachmentNoPreamble() throws Exception {
         Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES);
-        assertTrue("Is multipart", message.isMultipart());
+        Assert.assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DefaultMessageWriter writer = new DefaultMessageWriter();
         writer.writeMessage(message, out);
         assertEquals(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES, out.toByteArray());
     }
 
+    @Test
     public void testBinaryAttachmentPreambleEpilogue() throws Exception {
         Message message = createMessage(ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES);
-        assertTrue("Is multipart", message.isMultipart());
+        Assert.assertTrue("Is multipart", message.isMultipart());
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         DefaultMessageWriter writer = new DefaultMessageWriter();
         writer.writeMessage(message, out);

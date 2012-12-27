@@ -19,14 +19,17 @@
 
 package org.apache.james.mime4j.codec;
 
+import org.junit.Assert;
+import static org.junit.Assert.fail;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import junit.framework.TestCase;
+public class QuotedPrintableOutputStreamTest {
 
-public class QuotedPrintableOutputStreamTest extends TestCase {
-
+    @Test
     public void testEncode() throws IOException {
         ByteArrayOutputStream bos = null;
         QuotedPrintableOutputStream encoder = null;
@@ -38,10 +41,11 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
         encoder = new QuotedPrintableOutputStream(bos, false);
         encoder.write(fromString("This is the plain text message containing a few euros: 100 \u20ac!"));
         encoder.close();
-        assertEquals("This is the plain text message containing a few euros: 100 =E2=82=AC!",
+        Assert.assertEquals("This is the plain text message containing a few euros: 100 =E2=82=AC!",
                 toString(bos.toByteArray()));
     }
 
+    @Test
     public void testEncodeUnderlyingStreamStaysOpen() throws IOException {
         ByteArrayOutputStream bos = null;
         QuotedPrintableOutputStream encoder = null;
@@ -53,7 +57,7 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
 
         try {
             encoder.write('b');
-            fail();
+            Assert.fail();
         } catch (IOException expected) {
         }
 
@@ -61,10 +65,11 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
         bos.write('a');
         bos.write('d');
         bos.write('a');
-        assertEquals("This is the plain text message containing a few euros: 100 =E2=82=AC!yada",
+        Assert.assertEquals("This is the plain text message containing a few euros: 100 =E2=82=AC!yada",
                 toString(bos.toByteArray()));
     }
 
+    @Test
     public void testEncodeSpecials() throws IOException {
         ByteArrayOutputStream bos = null;
         QuotedPrintableOutputStream encoder = null;
@@ -73,10 +78,11 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
         encoder = new QuotedPrintableOutputStream(bos, false);
         encoder.write(fromString("Testing \u20ac special . chars = also at the end ="));
         encoder.close();
-        assertEquals("Testing =E2=82=AC special =2E chars =3D also at the end =3D",
+        Assert.assertEquals("Testing =E2=82=AC special =2E chars =3D also at the end =3D",
                 toString(bos.toByteArray()));
     }
 
+    @Test
     public void testEncodeWrapping() throws IOException {
         ByteArrayOutputStream bos = null;
         QuotedPrintableOutputStream encoder = null;
@@ -85,7 +91,7 @@ public class QuotedPrintableOutputStreamTest extends TestCase {
         encoder = new QuotedPrintableOutputStream(bos, false);
         encoder.write(fromString("This is a very very very very very very very very very very very very very very very long line"));
         encoder.close();
-        assertEquals("This is a very very very very very very very very very very very very very =\r\nvery very long line",
+        Assert.assertEquals("This is a very very very very very very very very very very very very very =\r\nvery very long line",
                 toString(bos.toByteArray()));
     }
 

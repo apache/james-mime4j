@@ -25,155 +25,166 @@ import org.apache.james.mime4j.dom.address.DomainList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
-import org.apache.james.mime4j.field.address.ParseException;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-public class DefaultAddressBuilderTest extends TestCase {
+public class DefaultAddressBuilderTest {
 
     private AddressBuilder parser;
 
-    @Override
-    protected void setUp() throws Exception {
+    @Before
+    public void setUp() throws Exception {
         parser = AddressBuilder.DEFAULT;
     }
 
+    @Test
     public void testParseMailbox() throws ParseException {
         Mailbox mailbox1 = parser.parseMailbox("John Doe <jdoe@machine(comment).  example>");
-        assertEquals("John Doe", mailbox1.getName());
-        assertEquals("jdoe", mailbox1.getLocalPart());
-        assertEquals("machine.example", mailbox1.getDomain());
+        Assert.assertEquals("John Doe", mailbox1.getName());
+        Assert.assertEquals("jdoe", mailbox1.getLocalPart());
+        Assert.assertEquals("machine.example", mailbox1.getDomain());
 
         Mailbox mailbox2 = parser.parseMailbox("Mary Smith \t    \t\t  <mary@example.net>");
-        assertEquals("Mary Smith", mailbox2.getName());
-        assertEquals("mary", mailbox2.getLocalPart());
-        assertEquals("example.net", mailbox2.getDomain());
+        Assert.assertEquals("Mary Smith", mailbox2.getName());
+        Assert.assertEquals("mary", mailbox2.getLocalPart());
+        Assert.assertEquals("example.net", mailbox2.getDomain());
 
         Mailbox mailbox3 = parser.parseMailbox("john.doe@acme.org");
-        assertNull(mailbox3.getName());
-        assertEquals("john.doe@acme.org", mailbox3.getAddress());
+        Assert.assertNull(mailbox3.getName());
+        Assert.assertEquals("john.doe@acme.org", mailbox3.getAddress());
 
         Mailbox mailbox4 = parser.parseMailbox("Mary Smith <mary@example.net>");
-        assertEquals("Mary Smith", mailbox4.getName());
-        assertEquals("mary@example.net", mailbox4.getAddress());
+        Assert.assertEquals("Mary Smith", mailbox4.getName());
+        Assert.assertEquals("mary@example.net", mailbox4.getAddress());
 
         // non-ascii should be allowed in quoted strings
         Mailbox mailbox5 = parser.parseMailbox(
                 "\"Hans M\374ller\" <hans.mueller@acme.org>");
-        assertEquals("Hans M\374ller", mailbox5.getName());
-        assertEquals("hans.mueller@acme.org", mailbox5.getAddress());
+        Assert.assertEquals("Hans M\374ller", mailbox5.getName());
+        Assert.assertEquals("hans.mueller@acme.org", mailbox5.getAddress());
 
     }
 
+    @Test
     public void testParseMailboxEncoded() throws ParseException {
         Mailbox mailbox1 = parser.parseMailbox("=?ISO-8859-1?B?c3R1ZmY=?= <stuff@localhost.localdomain>");
-        assertEquals("stuff", mailbox1.getName());
-        assertEquals("stuff", mailbox1.getLocalPart());
-        assertEquals("localhost.localdomain", mailbox1.getDomain());
+        Assert.assertEquals("stuff", mailbox1.getName());
+        Assert.assertEquals("stuff", mailbox1.getLocalPart());
+        Assert.assertEquals("localhost.localdomain", mailbox1.getDomain());
     }
 
+    @Test
     public void testParseMailboxObsoleteSynatax() throws ParseException {
         Mailbox mailbox1 = parser.parseMailbox("< (route)(obsolete) " +
                 "@host1.domain1 , @host2 . domain2:  foo@bar.org>");
-        assertEquals(null, mailbox1.getName());
-        assertEquals("foo", mailbox1.getLocalPart());
-        assertEquals("bar.org", mailbox1.getDomain());
+        Assert.assertEquals(null, mailbox1.getName());
+        Assert.assertEquals("foo", mailbox1.getLocalPart());
+        Assert.assertEquals("bar.org", mailbox1.getDomain());
         DomainList domainList = mailbox1.getRoute();
-        assertNotNull(domainList);
-        assertEquals(2, domainList.size());
-        assertEquals("host1.domain1", domainList.get(0));
-        assertEquals("host2.domain2", domainList.get(1));
+        Assert.assertNotNull(domainList);
+        Assert.assertEquals(2, domainList.size());
+        Assert.assertEquals("host1.domain1", domainList.get(0));
+        Assert.assertEquals("host2.domain2", domainList.get(1));
     }
 
+    @Test
     public void testParseInvalidMailbox() throws Exception {
         try {
             parser.parseMailbox("g: Mary Smith <mary@example.net>;");
-            fail();
+            Assert.fail();
         } catch (ParseException expected) {
         }
         try {
             parser.parseMailbox("Mary Smith <mary@example.net>, hans.mueller@acme.org");
-            fail();
+            Assert.fail();
         } catch (ParseException expected) {
         }
     }
 
+    @Test
     public void testParseAddressList() throws ParseException {
         AddressList addrList1 = parser.parseAddressList("John Doe <jdoe@machine(comment).  example>");
-        assertEquals(1, addrList1.size());
-        Mailbox mailbox1 = (Mailbox)addrList1.get(0);
-        assertEquals("John Doe", mailbox1.getName());
-        assertEquals("jdoe", mailbox1.getLocalPart());
-        assertEquals("machine.example", mailbox1.getDomain());
+        Assert.assertEquals(1, addrList1.size());
+        Mailbox mailbox1 = (Mailbox) addrList1.get(0);
+        Assert.assertEquals("John Doe", mailbox1.getName());
+        Assert.assertEquals("jdoe", mailbox1.getLocalPart());
+        Assert.assertEquals("machine.example", mailbox1.getDomain());
 
         AddressList addrList2 = parser.parseAddressList("Mary Smith \t    \t\t  <mary@example.net>");
-        assertEquals(1, addrList2.size());
-        Mailbox mailbox2 = (Mailbox)addrList2.get(0);
-        assertEquals("Mary Smith", mailbox2.getName());
-        assertEquals("mary", mailbox2.getLocalPart());
-        assertEquals("example.net", mailbox2.getDomain());
+        Assert.assertEquals(1, addrList2.size());
+        Mailbox mailbox2 = (Mailbox) addrList2.get(0);
+        Assert.assertEquals("Mary Smith", mailbox2.getName());
+        Assert.assertEquals("mary", mailbox2.getLocalPart());
+        Assert.assertEquals("example.net", mailbox2.getDomain());
     }
 
+    @Test
     public void testEmptyGroup() throws ParseException {
         AddressList addrList = parser.parseAddressList("undisclosed-recipients:;");
-        assertEquals(1, addrList.size());
-        Group group = (Group)addrList.get(0);
-        assertEquals(0, group.getMailboxes().size());
-        assertEquals("undisclosed-recipients", group.getName());
+        Assert.assertEquals(1, addrList.size());
+        Group group = (Group) addrList.get(0);
+        Assert.assertEquals(0, group.getMailboxes().size());
+        Assert.assertEquals("undisclosed-recipients", group.getName());
     }
 
+    @Test
     public void testMessyGroupAndMailbox() throws ParseException {
         AddressList addrList = parser.parseAddressList(
                 "Marketing  folks :  Jane Smith < jane @ example . net >," +
-                " \" Jack \\\"Jackie\\\" Jones \" < jjones@example.com > (comment(comment)); ,, (comment)  ," +
-                " <@example . net,@example(ignore\\)).com:(ignore)john@(ignore)example.net>");
-        assertEquals(2, addrList.size());
+                        " \" Jack \\\"Jackie\\\" Jones \" < jjones@example.com > (comment(comment)); ,, (comment)  ," +
+                        " <@example . net,@example(ignore\\)).com:(ignore)john@(ignore)example.net>");
+        Assert.assertEquals(2, addrList.size());
 
-        Group group = (Group)addrList.get(0);
-        assertEquals("Marketing  folks", group.getName());
-        assertEquals(2, group.getMailboxes().size());
+        Group group = (Group) addrList.get(0);
+        Assert.assertEquals("Marketing  folks", group.getName());
+        Assert.assertEquals(2, group.getMailboxes().size());
 
         Mailbox mailbox1 = group.getMailboxes().get(0);
         Mailbox mailbox2 = group.getMailboxes().get(1);
 
-        assertEquals("Jane Smith", mailbox1.getName());
-        assertEquals("jane", mailbox1.getLocalPart());
-        assertEquals("example.net", mailbox1.getDomain());
+        Assert.assertEquals("Jane Smith", mailbox1.getName());
+        Assert.assertEquals("jane", mailbox1.getLocalPart());
+        Assert.assertEquals("example.net", mailbox1.getDomain());
 
-        assertEquals(" Jack \"Jackie\" Jones ", mailbox2.getName());
-        assertEquals("jjones", mailbox2.getLocalPart());
-        assertEquals("example.com", mailbox2.getDomain());
+        Assert.assertEquals(" Jack \"Jackie\" Jones ", mailbox2.getName());
+        Assert.assertEquals("jjones", mailbox2.getLocalPart());
+        Assert.assertEquals("example.com", mailbox2.getDomain());
 
-        Mailbox mailbox = (Mailbox)addrList.get(1);
-        assertEquals("john", mailbox.getLocalPart());
-        assertEquals("example.net", mailbox.getDomain());
-        assertEquals(2, mailbox.getRoute().size());
-        assertEquals("example.net", mailbox.getRoute().get(0));
-        assertEquals("example.com", mailbox.getRoute().get(1));
+        Mailbox mailbox = (Mailbox) addrList.get(1);
+        Assert.assertEquals("john", mailbox.getLocalPart());
+        Assert.assertEquals("example.net", mailbox.getDomain());
+        Assert.assertEquals(2, mailbox.getRoute().size());
+        Assert.assertEquals("example.net", mailbox.getRoute().get(0));
+        Assert.assertEquals("example.com", mailbox.getRoute().get(1));
     }
 
+    @Test
     public void testEmptyAddressList() throws ParseException {
-        assertEquals(0, parser.parseAddressList("  \t   \t ").size());
-        assertEquals(0, parser.parseAddressList("  \t  ,  , , ,,, , \t ").size());
+        Assert.assertEquals(0, parser.parseAddressList("  \t   \t ").size());
+        Assert.assertEquals(0, parser.parseAddressList("  \t  ,  , , ,,, , \t ").size());
     }
 
+    @Test
     public void testSimpleForm() throws ParseException {
         AddressList addrList = parser.parseAddressList("\"a b c d e f g\" (comment) @example.net");
-        assertEquals(1, addrList.size());
-        Mailbox mailbox = (Mailbox)addrList.get(0);
-        assertEquals("a b c d e f g", mailbox.getLocalPart());
-        assertEquals("example.net", mailbox.getDomain());
+        Assert.assertEquals(1, addrList.size());
+        Mailbox mailbox = (Mailbox) addrList.get(0);
+        Assert.assertEquals("a b c d e f g", mailbox.getLocalPart());
+        Assert.assertEquals("example.net", mailbox.getDomain());
     }
 
+    @Test
     public void testFlatten() throws ParseException {
         AddressList addrList = parser.parseAddressList("dev : one@example.com, two@example.com; , ,,, marketing:three@example.com ,four@example.com;, five@example.com");
-        assertEquals(3, addrList.size());
-        assertEquals(5, addrList.flatten().size());
+        Assert.assertEquals(3, addrList.size());
+        Assert.assertEquals(5, addrList.flatten().size());
     }
 
+    @Test
     public void testTortureTest() throws ParseException {
 
         // Source: http://mailformat.dan.info/headers/from.html
@@ -219,16 +230,17 @@ public class DefaultAddressBuilderTest extends TestCase {
 
     }
 
+    @Test
     public void testLexicalError() {
         // ensure that TokenMgrError doesn't get thrown
         try {
             parser.parseAddressList(")");
-            fail("Expected parsing error");
-        }
-        catch (ParseException e) {
+            Assert.fail("Expected parsing error");
+        } catch (ParseException e) {
         }
     }
 
+    @Test
     public void testAddressList() throws ParseException {
         AddressList addlist = parser.parseAddressList("foo@example.com, bar@example.com, third@example.com");
         List<Address> al = new ArrayList<Address>();
@@ -236,70 +248,74 @@ public class DefaultAddressBuilderTest extends TestCase {
 
         // shared arraylist
         AddressList dl = new AddressList(al, true);
-        assertEquals(1, dl.size());
+        Assert.assertEquals(1, dl.size());
         al.add(addlist.get(1));
-        assertEquals(2, dl.size());
+        Assert.assertEquals(2, dl.size());
 
         // cloned arraylist
         AddressList dlcopy = new AddressList(al, false);
-        assertEquals(2, dlcopy.size());
+        Assert.assertEquals(2, dlcopy.size());
         al.add(addlist.get(2));
-        assertEquals(2, dlcopy.size());
+        Assert.assertEquals(2, dlcopy.size());
 
         // check route string
-        assertEquals(2, dlcopy.flatten().size());
+        Assert.assertEquals(2, dlcopy.flatten().size());
     }
 
+    @Test
     public void testParseAddress() throws Exception {
         Address address = parser.parseAddress("Mary Smith <mary@example.net>");
-        assertTrue(address instanceof Mailbox);
-        assertEquals("Mary Smith", ((Mailbox) address).getName());
-        assertEquals("mary@example.net", ((Mailbox) address).getAddress());
+        Assert.assertTrue(address instanceof Mailbox);
+        Assert.assertEquals("Mary Smith", ((Mailbox) address).getName());
+        Assert.assertEquals("mary@example.net", ((Mailbox) address).getAddress());
 
         address = parser.parseAddress("group: Mary Smith <mary@example.net>;");
-        assertTrue(address instanceof Group);
-        assertEquals("group", ((Group) address).getName());
-        assertEquals("Mary Smith", ((Group) address).getMailboxes().get(0)
+        Assert.assertTrue(address instanceof Group);
+        Assert.assertEquals("group", ((Group) address).getName());
+        Assert.assertEquals("Mary Smith", ((Group) address).getMailboxes().get(0)
                 .getName());
-        assertEquals("mary@example.net", ((Group) address).getMailboxes()
+        Assert.assertEquals("mary@example.net", ((Group) address).getMailboxes()
                 .get(0).getAddress());
     }
 
+    @Test
     public void testParseInvalidAddress() throws Exception {
         try {
             parser.parseGroup("john.doe@acme.org, jane.doe@acme.org");
-            fail();
+            Assert.fail();
         } catch (ParseException expected) {
         }
     }
 
+    @Test
     public void testParseGroup() throws Exception {
         Group group = parser.parseGroup(
                 "group: john.doe@acme.org, Mary Smith <mary@example.net>;");
-        assertEquals("group", group.getName());
+        Assert.assertEquals("group", group.getName());
 
         MailboxList mailboxes = group.getMailboxes();
-        assertEquals(2, mailboxes.size());
+        Assert.assertEquals(2, mailboxes.size());
 
         Mailbox mailbox1 = mailboxes.get(0);
-        assertNull(mailbox1.getName());
-        assertEquals("john.doe@acme.org", mailbox1.getAddress());
+        Assert.assertNull(mailbox1.getName());
+        Assert.assertEquals("john.doe@acme.org", mailbox1.getAddress());
 
         Mailbox mailbox2 = mailboxes.get(1);
-        assertEquals("Mary Smith", mailbox2.getName());
-        assertEquals("mary@example.net", mailbox2.getAddress());
+        Assert.assertEquals("Mary Smith", mailbox2.getName());
+        Assert.assertEquals("mary@example.net", mailbox2.getAddress());
     }
 
+    @Test
     public void testParseInvalidGroup() throws Exception {
         try {
             parser.parseGroup("john.doe@acme.org");
-            fail();
+            Assert.fail();
         } catch (ParseException expected) {
         }
 
         try {
             parser.parseGroup("g1: john.doe@acme.org;, g2: mary@example.net;");
-            fail();
+            Assert.fail();
         } catch (ParseException expected) {
         }
     }

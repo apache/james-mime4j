@@ -19,22 +19,21 @@
 
 package org.apache.james.mime4j.parser;
 
+import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
 
-import junit.framework.TestCase;
+public class MimeStreamParserTest {
 
-import org.apache.james.mime4j.parser.AbstractContentHandler;
-import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.util.ByteSequence;
-import org.apache.james.mime4j.util.ContentUtil;
-
-public class MimeStreamParserTest extends TestCase {
-
+    @Test
     public void testBoundaryInEpilogue() throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("From: foo@bar.com\r\n");
@@ -78,9 +77,10 @@ public class MimeStreamParserTest extends TestCase {
         });
         parser.parse(bais);
 
-        assertEquals(epilogue.toString(), actual.toString());
+        Assert.assertEquals(epilogue.toString(), actual.toString());
     }
 
+    @Test
     public void testParseOneLineFields() throws Exception {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
@@ -93,15 +93,16 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), decode(field.getRaw()));
+                Assert.assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
 
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
 
-        assertEquals(0, expected.size());
+        Assert.assertEquals(0, expected.size());
     }
 
+    @Test
     public void testCRWithoutLFInHeader() throws Exception {
         /*
          * Test added because \r:s not followed by \n:s in the header would
@@ -110,29 +111,30 @@ public class MimeStreamParserTest extends TestCase {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
         expected.add("The-field: This field\r\rcontains CR:s\r\r"
-                        + "not\r\n\tfollowed by LF");
+                + "not\r\n\tfollowed by LF");
         sb.append(expected.getLast() + "\r\n");
 
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), decode(field.getRaw()));
+                Assert.assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
 
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
 
-        assertEquals(0, expected.size());
+        Assert.assertEquals(0, expected.size());
     }
 
+    @Test
     public void testParseMultiLineFields() throws Exception {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
         expected.add("Received: by netmbx.netmbx.de (/\\==/\\ Smail3.1.28.1)\r\n"
-                   + "\tfrom mail.cs.tu-berlin.de with smtp\r\n"
-                   + "\tid &lt;m0uWPrO-0004wpC&gt;;"
-                        + " Wed, 19 Jun 96 18:12 MES");
+                + "\tfrom mail.cs.tu-berlin.de with smtp\r\n"
+                + "\tid &lt;m0uWPrO-0004wpC&gt;;"
+                + " Wed, 19 Jun 96 18:12 MES");
         sb.append(expected.getLast() + "\r\n");
         expected.add("Subject: A folded subject\r\n Line 2\r\n\tLine 3");
         sb.append(expected.getLast() + "\r\n");
@@ -141,15 +143,16 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), decode(field.getRaw()));
+                Assert.assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
 
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
 
-        assertEquals(0, expected.size());
+        Assert.assertEquals(0, expected.size());
     }
 
+    @Test
     public void testStop() throws Exception {
         final MimeStreamParser parser = new MimeStreamParser();
         TestHandler handler = new TestHandler() {
@@ -162,32 +165,33 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(handler);
 
         String msg = "Subject: Yada yada\r\n"
-                   + "From: foo@bar.com\r\n"
-                   + "\r\n"
-                   + "Line 1\r\n"
-                   + "Line 2\r\n";
+                + "From: foo@bar.com\r\n"
+                + "\r\n"
+                + "Line 1\r\n"
+                + "Line 2\r\n";
         String expected = "<message>\r\n"
-                        + "<header>\r\n"
-                        + "<field>\r\n"
-                        + "Subject: Yada yada"
-                        + "</field>\r\n"
-                        + "<field>\r\n"
-                        + "From: foo@bar.com"
-                        + "</field>\r\n"
-                        + "</header>\r\n"
-                        + "<body>\r\n"
-                        + "</body>\r\n"
-                        + "</message>\r\n";
+                + "<header>\r\n"
+                + "<field>\r\n"
+                + "Subject: Yada yada"
+                + "</field>\r\n"
+                + "<field>\r\n"
+                + "From: foo@bar.com"
+                + "</field>\r\n"
+                + "</header>\r\n"
+                + "<body>\r\n"
+                + "</body>\r\n"
+                + "</message>\r\n";
 
         parser.parse(new ByteArrayInputStream(msg.getBytes()));
         String result = handler.sb.toString();
 
-        assertEquals(expected, result);
+        Assert.assertEquals(expected, result);
     }
 
     /*
      * Tests that invalid fields are ignored.
      */
+    @Test
     public void testInvalidFields() throws Exception {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
@@ -202,18 +206,19 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), decode(field.getRaw()));
+                Assert.assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
 
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
 
-        assertEquals(0, expected.size());
+        Assert.assertEquals(0, expected.size());
     }
 
     /*
      * Tests that empty streams still generate the expected series of events.
      */
+    @Test
     public void testEmptyStream() throws Exception {
         final LinkedList<String> expected = new LinkedList<String>();
         expected.add("startMessage");
@@ -226,63 +231,64 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void body(BodyDescriptor bd, InputStream is) {
-                assertEquals(expected.removeFirst(), "body");
+                Assert.assertEquals(expected.removeFirst(), "body");
             }
 
             @Override
             public void endMultipart() {
-                fail("endMultipart shouldn't be called for empty stream");
+                Assert.fail("endMultipart shouldn't be called for empty stream");
             }
 
             @Override
             public void endBodyPart() {
-                fail("endBodyPart shouldn't be called for empty stream");
+                Assert.fail("endBodyPart shouldn't be called for empty stream");
             }
 
             @Override
             public void endHeader() {
-                assertEquals(expected.removeFirst(), "endHeader");
+                Assert.assertEquals(expected.removeFirst(), "endHeader");
             }
 
             @Override
             public void endMessage() {
-                assertEquals(expected.removeFirst(), "endMessage");
+                Assert.assertEquals(expected.removeFirst(), "endMessage");
             }
 
             @Override
             public void field(Field field) {
-                fail("field shouldn't be called for empty stream");
+                Assert.fail("field shouldn't be called for empty stream");
             }
 
             @Override
             public void startMultipart(BodyDescriptor bd) {
-                fail("startMultipart shouldn't be called for empty stream");
+                Assert.fail("startMultipart shouldn't be called for empty stream");
             }
 
             @Override
             public void startBodyPart() {
-                fail("startBodyPart shouldn't be called for empty stream");
+                Assert.fail("startBodyPart shouldn't be called for empty stream");
             }
 
             @Override
             public void startHeader() {
-                assertEquals(expected.removeFirst(), "startHeader");
+                Assert.assertEquals(expected.removeFirst(), "startHeader");
             }
 
             @Override
             public void startMessage() {
-                assertEquals(expected.removeFirst(), "startMessage");
+                Assert.assertEquals(expected.removeFirst(), "startMessage");
             }
         });
 
         parser.parse(new ByteArrayInputStream(new byte[0]));
 
-        assertEquals(0, expected.size());
+        Assert.assertEquals(0, expected.size());
     }
 
     /*
      * Tests parsing of empty headers.
      */
+    @Test
     public void testEmpyHeader() throws Exception {
         StringBuilder sb = new StringBuilder();
         sb.append("\r\n");
@@ -294,8 +300,9 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                fail("No fields should be reported");
+                Assert.fail("No fields should be reported");
             }
+
             @Override
             public void body(BodyDescriptor bd, InputStream is) throws IOException {
                 int b;
@@ -307,12 +314,13 @@ public class MimeStreamParserTest extends TestCase {
 
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
 
-        assertEquals("The body is right here\r\n", body.toString());
+        Assert.assertEquals("The body is right here\r\n", body.toString());
     }
 
     /*
      * Tests parsing of empty body.
      */
+    @Test
     public void testEmptyBody() throws Exception {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
@@ -325,22 +333,24 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), decode(field.getRaw()));
+                Assert.assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
+
             @Override
             public void body(BodyDescriptor bd, InputStream is) throws IOException {
-                assertEquals(-1, is.read());
+                Assert.assertEquals(-1, is.read());
             }
         });
 
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
 
-        assertEquals(0, expected.size());
+        Assert.assertEquals(0, expected.size());
     }
 
     /*
      * Tests that invalid fields are ignored.
      */
+    @Test
     public void testPrematureEOFAfterFields() throws Exception {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
@@ -353,13 +363,13 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), decode(field.getRaw()));
+                Assert.assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
 
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
 
-        assertEquals(0, expected.size());
+        Assert.assertEquals(0, expected.size());
 
         sb = new StringBuilder();
         expected.clear();
@@ -372,15 +382,16 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
-                assertEquals(expected.removeFirst(), decode(field.getRaw()));
+                Assert.assertEquals(expected.removeFirst(), decode(field.getRaw()));
             }
         });
 
         parser.parse(new ByteArrayInputStream(sb.toString().getBytes()));
 
-        assertEquals(0, expected.size());
+        Assert.assertEquals(0, expected.size());
     }
 
+    @Test
     public void testAutomaticContentDecoding() throws Exception {
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentDecoding(true);
@@ -388,35 +399,35 @@ public class MimeStreamParserTest extends TestCase {
         parser.setContentHandler(handler);
 
         String msg = "Subject: Yada yada\r\n"
-                   + "From: foo@bar.com\r\n"
-                   + "Content-Type: application/octet-stream\r\n"
-                   + "Content-Transfer-Encoding: base64\r\n"
-                   + "\r\n"
-                   + "V2hvIGF0ZSBteSBjYWtlPwo=";
+                + "From: foo@bar.com\r\n"
+                + "Content-Type: application/octet-stream\r\n"
+                + "Content-Transfer-Encoding: base64\r\n"
+                + "\r\n"
+                + "V2hvIGF0ZSBteSBjYWtlPwo=";
         String expected = "<message>\r\n"
-                        + "<header>\r\n"
-                        + "<field>\r\n"
-                        + "Subject: Yada yada"
-                        + "</field>\r\n"
-                        + "<field>\r\n"
-                        + "From: foo@bar.com"
-                        + "</field>\r\n"
-                        + "<field>\r\n"
-                        + "Content-Type: application/octet-stream"
-                        + "</field>\r\n"
-                        + "<field>\r\n"
-                        + "Content-Transfer-Encoding: base64"
-                        + "</field>\r\n"
-                        + "</header>\r\n"
-                        + "<body>\r\n"
-                        + "Who ate my cake?\n"
-                        + "</body>\r\n"
-                        + "</message>\r\n";
+                + "<header>\r\n"
+                + "<field>\r\n"
+                + "Subject: Yada yada"
+                + "</field>\r\n"
+                + "<field>\r\n"
+                + "From: foo@bar.com"
+                + "</field>\r\n"
+                + "<field>\r\n"
+                + "Content-Type: application/octet-stream"
+                + "</field>\r\n"
+                + "<field>\r\n"
+                + "Content-Transfer-Encoding: base64"
+                + "</field>\r\n"
+                + "</header>\r\n"
+                + "<body>\r\n"
+                + "Who ate my cake?\n"
+                + "</body>\r\n"
+                + "</message>\r\n";
 
         parser.parse(new ByteArrayInputStream(msg.getBytes()));
         String result = handler.sb.toString();
 
-        assertEquals(expected, result);
+        Assert.assertEquals(expected, result);
     }
 
     protected String decode(ByteSequence byteSequence) {

@@ -19,6 +19,12 @@
 
 package org.apache.james.mime4j.parser;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.stream.MimeConfig;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -31,14 +37,6 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.parser.MimeStreamParser;
-import org.apache.james.mime4j.stream.MimeConfig;
 
 /**
  * Creates a TestSuite running the test for each .msg file in the test resouce folder.
@@ -78,7 +76,7 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
             String expected = IOUtils.toString(openStream, "ISO8859-1");
             assertEquals(expected, result);
         } catch (FileNotFoundException e) {
-            IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"));
+            IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath() + ".expected"));
             fail("Expected file created.");
         }
     }

@@ -24,131 +24,138 @@ import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.DomainList;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
-import org.apache.james.mime4j.field.address.ParseException;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
+public class AddressTest {
 
-public class AddressTest extends TestCase {
-
+    @Test
     public void testExceptionTree() {
         // make sure that our ParseException extends MimeException.
-        assertTrue(MimeException.class.isAssignableFrom(ParseException.class));
+        Assert.assertTrue(MimeException.class.isAssignableFrom(ParseException.class));
     }
 
+    @Test
     public void testNullConstructorAndBadUsage() {
         AddressList al = new AddressList(null, false);
-        assertEquals(0, al.size());
+        Assert.assertEquals(0, al.size());
 
         try {
             al.get(-1);
-            fail("Expected index out of bound exception!");
+            Assert.fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
 
         try {
             al.get(0);
-            fail("Expected index out of bound exception!");
+            Assert.fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
     }
 
 
+    @Test
     public void testEmptyDomainList() {
         DomainList dl = new DomainList(null);
-        assertEquals(0, dl.size());
+        Assert.assertEquals(0, dl.size());
 
         try {
             dl.get(-1);
-            fail("Expected index out of bound exception!");
+            Assert.fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
 
         try {
             dl.get(0);
-            fail("Expected index out of bound exception!");
+            Assert.fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
     }
 
+    @Test
     public void testDomainList() {
         List<String> al = new ArrayList<String>();
         al.add("example.com");
 
         // changing the list passed does not change DomainList's state
         DomainList dl = new DomainList(al);
-        assertEquals(1, dl.size());
+        Assert.assertEquals(1, dl.size());
         al.add("foo.example.com");
-        assertEquals(1, dl.size());
+        Assert.assertEquals(1, dl.size());
 
         // cloned arraylist
         DomainList dlcopy = new DomainList(al);
-        assertEquals(2, dlcopy.size());
+        Assert.assertEquals(2, dlcopy.size());
         al.add("bar.example.com");
-        assertEquals(2, dlcopy.size());
+        Assert.assertEquals(2, dlcopy.size());
 
         // check route string
-        assertEquals("@example.com,@foo.example.com", dlcopy.toRouteString());
+        Assert.assertEquals("@example.com,@foo.example.com", dlcopy.toRouteString());
     }
 
 
+    @Test
     public void testEmptyMailboxList() {
         MailboxList ml = new MailboxList(null, false);
-        assertEquals(0, ml.size());
+        Assert.assertEquals(0, ml.size());
 
         try {
             ml.get(-1);
-            fail("Expected index out of bound exception!");
+            Assert.fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
 
         try {
             ml.get(0);
-            fail("Expected index out of bound exception!");
+            Assert.fail("Expected index out of bound exception!");
         } catch (IndexOutOfBoundsException e) {
         }
     }
 
+    @Test
     public void testMailboxList() {
         List<Mailbox> al = new ArrayList<Mailbox>();
-        al.add(new Mailbox("local","example.com"));
+        al.add(new Mailbox("local", "example.com"));
 
         // shared arraylist
         MailboxList ml = new MailboxList(al, true);
-        assertEquals(1, ml.size());
+        Assert.assertEquals(1, ml.size());
         al.add(new Mailbox("local2", "foo.example.com"));
-        assertEquals(2, ml.size());
+        Assert.assertEquals(2, ml.size());
 
         // cloned arraylist
         MailboxList mlcopy = new MailboxList(al, false);
-        assertEquals(2, mlcopy.size());
+        Assert.assertEquals(2, mlcopy.size());
         al.add(new Mailbox("local3", "bar.example.com"));
-        assertEquals(2, mlcopy.size());
+        Assert.assertEquals(2, mlcopy.size());
     }
 
+    @Test
     public void testMailboxEquals() throws Exception {
         Mailbox m1 = new Mailbox("john.doe", "acme.org");
         Mailbox m2 = new Mailbox("john doe", "acme.org");
         Mailbox m3 = new Mailbox("john.doe", "Acme.Org");
         Mailbox m4 = new Mailbox("john.doe", null);
-        assertTrue(m1.equals(m1));
-        assertFalse(m1.equals(m2));
-        assertTrue(m1.equals(m3));
-        assertFalse(m1.equals(m4));
-        assertFalse(m1.equals(null));
+        Assert.assertTrue(m1.equals(m1));
+        Assert.assertFalse(m1.equals(m2));
+        Assert.assertTrue(m1.equals(m3));
+        Assert.assertFalse(m1.equals(m4));
+        Assert.assertFalse(m1.equals(null));
     }
 
+    @Test
     public void testMailboxHashCode() throws Exception {
         Mailbox m1 = new Mailbox("john.doe", "acme.org");
         Mailbox m2 = new Mailbox("john doe", "acme.org");
         Mailbox m3 = new Mailbox("john.doe", "Acme.Org");
         Mailbox m4 = new Mailbox("john.doe", null);
-        assertTrue(m1.hashCode() == m1.hashCode());
-        assertFalse(m1.hashCode() == m2.hashCode());
-        assertTrue(m1.hashCode() == m3.hashCode());
-        assertFalse(m1.hashCode() == m4.hashCode());
+        Assert.assertTrue(m1.hashCode() == m1.hashCode());
+        Assert.assertFalse(m1.hashCode() == m2.hashCode());
+        Assert.assertTrue(m1.hashCode() == m3.hashCode());
+        Assert.assertFalse(m1.hashCode() == m4.hashCode());
     }
 
 }

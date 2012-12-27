@@ -19,6 +19,23 @@
 
 package org.apache.james.mime4j.dom;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.dom.address.Group;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.dom.field.MimeVersionField;
+import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.field.address.AddressBuilder;
+import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
+import org.apache.james.mime4j.message.HeaderImpl;
+import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.MultipartImpl;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -30,34 +47,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.dom.Header;
-import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.SingleBody;
-import org.apache.james.mime4j.dom.address.Group;
-import org.apache.james.mime4j.dom.address.Mailbox;
-import org.apache.james.mime4j.dom.field.FieldName;
-import org.apache.james.mime4j.dom.field.MimeVersionField;
-import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.james.mime4j.field.address.AddressBuilder;
-import org.apache.james.mime4j.message.BodyPart;
-import org.apache.james.mime4j.message.HeaderImpl;
-import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.DefaultMessageBuilder;
-import org.apache.james.mime4j.message.DefaultMessageWriter;
-import org.apache.james.mime4j.message.MultipartImpl;
-
-public class MessageTest extends TestCase {
+public class MessageTest {
     private Header headerTextPlain = null;
     private Header headerMessageRFC822 = null;
     private Header headerEmpty = null;
     private Header headerMultipartMixed = null;
     private Header headerMultipartDigest = null;
 
-    @Override
+    @Before
     public void setUp() throws Exception {
         headerTextPlain = new HeaderImpl();
         headerMessageRFC822 = new HeaderImpl();
@@ -75,6 +72,7 @@ public class MessageTest extends TestCase {
                 DefaultFieldParser.parse("Content-Type: multipart/digest; boundary=foo"));
     }
 
+    @Test
     public void testGetMimeType() {
         MessageImpl parent = null;
         MessageImpl child = null;
@@ -84,13 +82,13 @@ public class MessageTest extends TestCase {
         child.setParent(parent);
         parent.setHeader(headerMultipartDigest);
         child.setHeader(headerEmpty);
-        assertEquals("multipart/digest, empty", "message/rfc822",
+        Assert.assertEquals("multipart/digest, empty", "message/rfc822",
                 child.getMimeType());
         child.setHeader(headerTextPlain);
-        assertEquals("multipart/digest, text/plain", "text/plain",
+        Assert.assertEquals("multipart/digest, text/plain", "text/plain",
                 child.getMimeType());
         child.setHeader(headerMessageRFC822);
-        assertEquals("multipart/digest, message/rfc822", "message/rfc822",
+        Assert.assertEquals("multipart/digest, message/rfc822", "message/rfc822",
                 child.getMimeType());
 
         parent = new MessageImpl();
@@ -98,41 +96,43 @@ public class MessageTest extends TestCase {
         child.setParent(parent);
         parent.setHeader(headerMultipartMixed);
         child.setHeader(headerEmpty);
-        assertEquals("multipart/mixed, empty", "text/plain",
+        Assert.assertEquals("multipart/mixed, empty", "text/plain",
                 child.getMimeType());
         child.setHeader(headerTextPlain);
-        assertEquals("multipart/mixed, text/plain", "text/plain",
+        Assert.assertEquals("multipart/mixed, text/plain", "text/plain",
                 child.getMimeType());
         child.setHeader(headerMessageRFC822);
-        assertEquals("multipart/mixed, message/rfc822", "message/rfc822",
+        Assert.assertEquals("multipart/mixed, message/rfc822", "message/rfc822",
                 child.getMimeType());
 
         child = new MessageImpl();
         child.setHeader(headerEmpty);
-        assertEquals("null, empty", "text/plain", child.getMimeType());
+        Assert.assertEquals("null, empty", "text/plain", child.getMimeType());
         child.setHeader(headerTextPlain);
-        assertEquals("null, text/plain", "text/plain", child.getMimeType());
+        Assert.assertEquals("null, text/plain", "text/plain", child.getMimeType());
         child.setHeader(headerMessageRFC822);
-        assertEquals("null, message/rfc822", "message/rfc822",
+        Assert.assertEquals("null, message/rfc822", "message/rfc822",
                 child.getMimeType());
     }
 
+    @Test
     public void testIsMultipart() {
         MessageImpl m = new MessageImpl();
 
         m.setHeader(headerEmpty);
-        assertTrue("empty", !m.isMultipart());
+        Assert.assertTrue("empty", !m.isMultipart());
 
         m.setHeader(headerTextPlain);
-        assertTrue("text/plain", !m.isMultipart());
+        Assert.assertTrue("text/plain", !m.isMultipart());
 
         m.setHeader(headerMultipartDigest);
-        assertTrue("multipart/digest", m.isMultipart());
+        Assert.assertTrue("multipart/digest", m.isMultipart());
 
         m.setHeader(headerMultipartMixed);
-        assertTrue("multipart/mixed", m.isMultipart());
+        Assert.assertTrue("multipart/mixed", m.isMultipart());
     }
 
+    @Test
     public void testWriteTo() throws Exception {
         byte[] inputByte = getRawMessageAsByteArray();
 
@@ -149,11 +149,12 @@ public class MessageTest extends TestCase {
         int b = -1;
         int i = 0;
         while ((b = output.read()) != -1) {
-            assertEquals("same byte", b, inputByte[i]);
+            Assert.assertEquals("same byte", b, inputByte[i]);
             i++;
         }
     }
 
+    @Test
     public void testAddHeaderWriteTo() throws Exception {
         String headerName = "testheader";
         String headerValue = "testvalue";
@@ -167,7 +168,7 @@ public class MessageTest extends TestCase {
         Message m = builder.parseMessage(new ByteArrayInputStream(inputByte));
         m.getHeader().addField(DefaultFieldParser.parse(testheader));
 
-        assertEquals("header added", m.getHeader().getField(headerName)
+        Assert.assertEquals("header added", m.getHeader().getField(headerName)
                 .getBody(), headerValue);
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -176,121 +177,132 @@ public class MessageTest extends TestCase {
                 new InputStreamReader(new ByteArrayInputStream(out
                         .toByteArray())))));
 
-        assertTrue("header added", lines.contains(testheader));
+        Assert.assertTrue("header added", lines.contains(testheader));
     }
 
+    @Test
     public void testMimeVersion() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNotNull(m.getHeader());
+        Assert.assertNotNull(m.getHeader());
         MimeVersionField field = (MimeVersionField) m.getHeader().getField(FieldName.MIME_VERSION);
-        assertNotNull(field);
-        assertEquals(1, field.getMajorVersion());
-        assertEquals(0, field.getMinorVersion());
+        Assert.assertNotNull(field);
+        Assert.assertEquals(1, field.getMajorVersion());
+        Assert.assertEquals(0, field.getMinorVersion());
     }
 
+    @Test
     public void testGetMessageId() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNull(m.getMessageId());
+        Assert.assertNull(m.getMessageId());
 
         String id = "<msg17@localhost>";
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Message-ID: " + id));
         m.setHeader(header);
-        assertEquals(id, m.getMessageId());
+        Assert.assertEquals(id, m.getMessageId());
     }
 
+    @Test
     public void testCreateMessageId() throws Exception {
         MessageImpl m = new MessageImpl();
         m.createMessageId("hostname");
 
         String id = m.getMessageId();
-        assertNotNull(id);
-        assertTrue(id.startsWith("<Mime4j."));
-        assertTrue(id.endsWith("@hostname>"));
+        Assert.assertNotNull(id);
+        Assert.assertTrue(id.startsWith("<Mime4j."));
+        Assert.assertTrue(id.endsWith("@hostname>"));
     }
 
+    @Test
     public void testGetSubject() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNull(m.getSubject());
+        Assert.assertNull(m.getSubject());
 
         String subject = "testing 1 2";
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Subject: " + subject));
         m.setHeader(header);
-        assertEquals(subject, m.getSubject());
+        Assert.assertEquals(subject, m.getSubject());
 
         header.setField(DefaultFieldParser.parse("Subject: =?windows-1252?Q?99_=80?="));
-        assertEquals("99 \u20ac", m.getSubject());
+        Assert.assertEquals("99 \u20ac", m.getSubject());
     }
 
+    @Test
     public void testSetSubject() throws Exception {
         MessageImpl m = new MessageImpl();
 
         m.setSubject("Semmelbr\366sel");
-        assertEquals("Semmelbr\366sel", m.getSubject());
-        assertEquals("=?ISO-8859-1?Q?Semmelbr=F6sel?=", m.getHeader().getField(
+        Assert.assertEquals("Semmelbr\366sel", m.getSubject());
+        Assert.assertEquals("=?ISO-8859-1?Q?Semmelbr=F6sel?=", m.getHeader().getField(
                 "Subject").getBody());
 
         m.setSubject(null);
-        assertNull(m.getHeader().getField("Subject"));
+        Assert.assertNull(m.getHeader().getField("Subject"));
     }
 
+    @Test
     public void testGetDate() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNull(m.getDate());
+        Assert.assertNull(m.getDate());
 
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Date: Thu, 1 Jan 1970 05:30:00 +0530"));
         m.setHeader(header);
 
-        assertEquals(new Date(0), m.getDate());
+        Assert.assertEquals(new Date(0), m.getDate());
     }
 
+    @Test
     public void testSetDate() throws Exception {
         MessageImpl m = new MessageImpl();
 
         m.setDate(new Date(86400000), TimeZone.getTimeZone("GMT"));
-        assertEquals(new Date(86400000), m.getDate());
-        assertEquals("Fri, 2 Jan 1970 00:00:00 +0000", m.getHeader().getField(
+        Assert.assertEquals(new Date(86400000), m.getDate());
+        Assert.assertEquals("Fri, 2 Jan 1970 00:00:00 +0000", m.getHeader().getField(
                 "Date").getBody());
 
         m.setDate(null);
-        assertNull(m.getHeader().getField("Date"));
+        Assert.assertNull(m.getHeader().getField("Date"));
     }
 
+    @Test
     public void testGetSender() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNull(m.getSender());
+        Assert.assertNull(m.getSender());
 
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Sender: john.doe@example.net"));
         m.setHeader(header);
 
-        assertEquals("john.doe@example.net", m.getSender().getAddress());
+        Assert.assertEquals("john.doe@example.net", m.getSender().getAddress());
     }
 
+    @Test
     public void testSetSender() throws Exception {
         MessageImpl m = new MessageImpl();
 
         m.setSender(AddressBuilder.DEFAULT.parseMailbox("john.doe@example.net"));
-        assertEquals("john.doe@example.net", m.getHeader().getField("Sender")
+        Assert.assertEquals("john.doe@example.net", m.getHeader().getField("Sender")
                 .getBody());
 
         m.setSender(null);
-        assertNull(m.getHeader().getField("Sender"));
+        Assert.assertNull(m.getHeader().getField("Sender"));
     }
 
+    @Test
     public void testGetFrom() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNull(m.getFrom());
+        Assert.assertNull(m.getFrom());
 
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("From: john.doe@example.net"));
         m.setHeader(header);
 
-        assertEquals("john.doe@example.net", m.getFrom().get(0).getAddress());
+        Assert.assertEquals("john.doe@example.net", m.getFrom().get(0).getAddress());
     }
 
+    @Test
     public void testSetFrom() throws Exception {
         MessageImpl m = new MessageImpl();
 
@@ -298,33 +310,35 @@ public class MessageTest extends TestCase {
         Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
 
         m.setFrom(mailbox1);
-        assertEquals("john.doe@example.net", m.getHeader().getField("From")
+        Assert.assertEquals("john.doe@example.net", m.getHeader().getField("From")
                 .getBody());
 
         m.setFrom(mailbox1, mailbox2);
-        assertEquals("john.doe@example.net, jane.doe@example.net", m
+        Assert.assertEquals("john.doe@example.net, jane.doe@example.net", m
                 .getHeader().getField("From").getBody());
 
         m.setFrom(Arrays.asList(mailbox1, mailbox2));
-        assertEquals("john.doe@example.net, jane.doe@example.net", m
+        Assert.assertEquals("john.doe@example.net, jane.doe@example.net", m
                 .getHeader().getField("From").getBody());
 
         m.setFrom((Mailbox) null);
-        assertNull(m.getHeader().getField("From"));
+        Assert.assertNull(m.getHeader().getField("From"));
     }
 
+    @Test
     public void testGetTo() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNull(m.getTo());
+        Assert.assertNull(m.getTo());
 
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("To: john.doe@example.net"));
         m.setHeader(header);
 
-        assertEquals("john.doe@example.net", ((Mailbox) m.getTo().get(0))
+        Assert.assertEquals("john.doe@example.net", ((Mailbox) m.getTo().get(0))
                 .getAddress());
     }
 
+    @Test
     public void testSetTo() throws Exception {
         MessageImpl m = new MessageImpl();
 
@@ -334,35 +348,37 @@ public class MessageTest extends TestCase {
         Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
 
         m.setTo(group);
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
                 .getHeader().getField("To").getBody());
 
         m.setTo(group, mailbox3);
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
                 + "Mary Smith <mary@example.net>", m.getHeader().getField("To")
                 .getBody());
 
         m.setTo(Arrays.asList(group, mailbox3));
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
                 + "Mary Smith <mary@example.net>", m.getHeader().getField("To")
                 .getBody());
 
         m.setTo((Mailbox) null);
-        assertNull(m.getHeader().getField("To"));
+        Assert.assertNull(m.getHeader().getField("To"));
     }
 
+    @Test
     public void testGetCc() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNull(m.getCc());
+        Assert.assertNull(m.getCc());
 
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Cc: john.doe@example.net"));
         m.setHeader(header);
 
-        assertEquals("john.doe@example.net", ((Mailbox) m.getCc().get(0))
+        Assert.assertEquals("john.doe@example.net", ((Mailbox) m.getCc().get(0))
                 .getAddress());
     }
 
+    @Test
     public void testSetCc() throws Exception {
         MessageImpl m = new MessageImpl();
 
@@ -372,35 +388,37 @@ public class MessageTest extends TestCase {
         Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
 
         m.setCc(group);
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
                 .getHeader().getField("Cc").getBody());
 
         m.setCc(group, mailbox3);
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
                 + "Mary Smith <mary@example.net>", m.getHeader().getField("Cc")
                 .getBody());
 
         m.setCc(Arrays.asList(group, mailbox3));
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
                 + "Mary Smith <mary@example.net>", m.getHeader().getField("Cc")
                 .getBody());
 
         m.setCc((Mailbox) null);
-        assertNull(m.getHeader().getField("Cc"));
+        Assert.assertNull(m.getHeader().getField("Cc"));
     }
 
+    @Test
     public void testGetBcc() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNull(m.getBcc());
+        Assert.assertNull(m.getBcc());
 
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Bcc: john.doe@example.net"));
         m.setHeader(header);
 
-        assertEquals("john.doe@example.net", ((Mailbox) m.getBcc().get(0))
+        Assert.assertEquals("john.doe@example.net", ((Mailbox) m.getBcc().get(0))
                 .getAddress());
     }
 
+    @Test
     public void testSetBcc() throws Exception {
         MessageImpl m = new MessageImpl();
 
@@ -410,35 +428,37 @@ public class MessageTest extends TestCase {
         Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
 
         m.setBcc(group);
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
                 .getHeader().getField("Bcc").getBody());
 
         m.setBcc(group, mailbox3);
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
                 + "Mary Smith <mary@example.net>", m.getHeader()
                 .getField("Bcc").getBody());
 
         m.setBcc(Arrays.asList(group, mailbox3));
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
                 + "Mary Smith <mary@example.net>", m.getHeader()
                 .getField("Bcc").getBody());
 
         m.setBcc((Mailbox) null);
-        assertNull(m.getHeader().getField("Bcc"));
+        Assert.assertNull(m.getHeader().getField("Bcc"));
     }
 
+    @Test
     public void testGetReplyTo() throws Exception {
         MessageImpl m = new MessageImpl();
-        assertNull(m.getReplyTo());
+        Assert.assertNull(m.getReplyTo());
 
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Reply-To: john.doe@example.net"));
         m.setHeader(header);
 
-        assertEquals("john.doe@example.net", ((Mailbox) m.getReplyTo().get(0))
+        Assert.assertEquals("john.doe@example.net", ((Mailbox) m.getReplyTo().get(0))
                 .getAddress());
     }
 
+    @Test
     public void testSetReplyTo() throws Exception {
         MessageImpl m = new MessageImpl();
 
@@ -448,23 +468,24 @@ public class MessageTest extends TestCase {
         Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
 
         m.setReplyTo(group);
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
                 .getHeader().getField("Reply-To").getBody());
 
         m.setReplyTo(group, mailbox3);
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
                 + "Mary Smith <mary@example.net>", m.getHeader().getField(
                 "Reply-To").getBody());
 
         m.setReplyTo(Arrays.asList(group, mailbox3));
-        assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
+        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
                 + "Mary Smith <mary@example.net>", m.getHeader().getField(
                 "Reply-To").getBody());
 
         m.setReplyTo((Mailbox) null);
-        assertNull(m.getHeader().getField("Reply-To"));
+        Assert.assertNull(m.getHeader().getField("Reply-To"));
     }
 
+    @Test
     public void testDisposeGetsPropagatedToBody() throws Exception {
         DummyBody body1 = new DummyBody();
         BodyPart part1 = new BodyPart();
@@ -484,13 +505,13 @@ public class MessageTest extends TestCase {
         m.setHeader(headerMultipartMixed);
         m.setBody(mp);
 
-        assertFalse(body1.disposed);
-        assertFalse(body2.disposed);
+        Assert.assertFalse(body1.disposed);
+        Assert.assertFalse(body2.disposed);
 
         m.dispose();
 
-        assertTrue(body1.disposed);
-        assertTrue(body2.disposed);
+        Assert.assertTrue(body1.disposed);
+        Assert.assertTrue(body2.disposed);
     }
 
     private byte[] getRawMessageAsByteArray() {

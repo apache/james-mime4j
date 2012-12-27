@@ -19,14 +19,14 @@
 
 package org.apache.james.mime4j;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.io.IOUtils;
-
 public class TestUtil {
-    public static final String[] TEST_MESSAGES = new String[] {
+    public static final String[] TEST_MESSAGES = new String[]{
             "2002_06_12_doublebound",
             "ak-0696",
             "bluedot-postcard",

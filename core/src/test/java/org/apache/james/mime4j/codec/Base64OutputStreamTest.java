@@ -19,15 +19,18 @@
 
 package org.apache.james.mime4j.codec;
 
+import org.junit.Assert;
+import static org.junit.Assert.fail;
+import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
-import junit.framework.TestCase;
+public class Base64OutputStreamTest {
 
-public class Base64OutputStreamTest extends TestCase {
-
+    @Test
     public void testEncode() throws IOException {
         ByteArrayOutputStream bos = null;
         Base64OutputStream encoder = null;
@@ -39,9 +42,10 @@ public class Base64OutputStreamTest extends TestCase {
         encoder = new Base64OutputStream(bos);
         encoder.write(fromString("This is the plain text message!"));
         encoder.close();
-        assertEquals("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==\r\n", toString(bos.toByteArray()));
+        Assert.assertEquals("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==\r\n", toString(bos.toByteArray()));
     }
 
+    @Test
     public void testEncodeUnderlyingStreamStaysOpen() throws IOException {
         ByteArrayOutputStream bos = null;
         Base64OutputStream encoder = null;
@@ -53,7 +57,7 @@ public class Base64OutputStreamTest extends TestCase {
 
         try {
             encoder.write('b');
-            fail();
+            Assert.fail();
         } catch (IOException expected) {
         }
 
@@ -61,40 +65,43 @@ public class Base64OutputStreamTest extends TestCase {
         bos.write('a');
         bos.write('d');
         bos.write('a');
-        assertEquals("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==\r\nyada", toString(bos.toByteArray()));
+        Assert.assertEquals("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==\r\nyada", toString(bos.toByteArray()));
     }
 
+    @Test
     public void testNoLineSeparators() throws IOException {
-        assertEquals("", encodeNoLs(""));
-        assertEquals("YQ==", encodeNoLs("a"));
-        assertEquals("YWI=", encodeNoLs("ab"));
-        assertEquals("YWJj", encodeNoLs("abc"));
-        assertEquals("YWJjZA==", encodeNoLs("abcd"));
-        assertEquals("YWJjZGU=", encodeNoLs("abcde"));
-        assertEquals("YWJjZGVm", encodeNoLs("abcdef"));
-        assertEquals("YWJjZGVmZw==", encodeNoLs("abcdefg"));
-        assertEquals("YWJjZGVmZ2g=", encodeNoLs("abcdefgh"));
-        assertEquals("YWJjZGVmZ2hp", encodeNoLs("abcdefghi"));
-        assertEquals("DQoMCQ==", encodeNoLs("\r\n\f\t"));
-        assertEquals("LT0/VGhhdCdzIGEgdGVzdD89LQ==",
+        Assert.assertEquals("", encodeNoLs(""));
+        Assert.assertEquals("YQ==", encodeNoLs("a"));
+        Assert.assertEquals("YWI=", encodeNoLs("ab"));
+        Assert.assertEquals("YWJj", encodeNoLs("abc"));
+        Assert.assertEquals("YWJjZA==", encodeNoLs("abcd"));
+        Assert.assertEquals("YWJjZGU=", encodeNoLs("abcde"));
+        Assert.assertEquals("YWJjZGVm", encodeNoLs("abcdef"));
+        Assert.assertEquals("YWJjZGVmZw==", encodeNoLs("abcdefg"));
+        Assert.assertEquals("YWJjZGVmZ2g=", encodeNoLs("abcdefgh"));
+        Assert.assertEquals("YWJjZGVmZ2hp", encodeNoLs("abcdefghi"));
+        Assert.assertEquals("DQoMCQ==", encodeNoLs("\r\n\f\t"));
+        Assert.assertEquals("LT0/VGhhdCdzIGEgdGVzdD89LQ==",
                 encodeNoLs("-=?That's a test?=-"));
     }
 
+    @Test
     public void testLineSeparators() throws IOException {
-        assertEquals("", encodeLs(""));
-        assertEquals("YQ==\r\n", encodeLs("a"));
-        assertEquals("YWJjZA==\r\n", encodeLs("abcd"));
-        assertEquals("YWJjZGVmZw==\r\n", encodeLs("abcdefg"));
-        assertEquals("YWJjZGVmZ2g=\r\n", encodeLs("abcdefgh"));
-        assertEquals("YWJjZGVmZ2hp\r\n", encodeLs("abcdefghi"));
-        assertEquals("YWJjZGVmZ2hp\r\nag==\r\n", encodeLs("abcdefghij"));
-        assertEquals("YWJjZGVmZ2hp\r\nams=\r\n", encodeLs("abcdefghijk"));
-        assertEquals("YWJjZGVmZ2hp\r\namts\r\n", encodeLs("abcdefghijkl"));
+        Assert.assertEquals("", encodeLs(""));
+        Assert.assertEquals("YQ==\r\n", encodeLs("a"));
+        Assert.assertEquals("YWJjZA==\r\n", encodeLs("abcd"));
+        Assert.assertEquals("YWJjZGVmZw==\r\n", encodeLs("abcdefg"));
+        Assert.assertEquals("YWJjZGVmZ2g=\r\n", encodeLs("abcdefgh"));
+        Assert.assertEquals("YWJjZGVmZ2hp\r\n", encodeLs("abcdefghi"));
+        Assert.assertEquals("YWJjZGVmZ2hp\r\nag==\r\n", encodeLs("abcdefghij"));
+        Assert.assertEquals("YWJjZGVmZ2hp\r\nams=\r\n", encodeLs("abcdefghijk"));
+        Assert.assertEquals("YWJjZGVmZ2hp\r\namts\r\n", encodeLs("abcdefghijkl"));
     }
 
     /**
      * tests {@link OutputStream#write(int)}
      */
+    @Test
     public void testWriteInt() throws IOException {
         byte[] bytes = fromString("123456789012345678901234567890123456789012"
                 + "3456789012345678901234567890123456789012345678901234567890"
@@ -115,12 +122,13 @@ public class Base64OutputStreamTest extends TestCase {
                 + "OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0\r\nNQ==\r"
                 + "\n";
 
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     /**
      * tests {@link OutputStream#write(byte[], int, int)} with various offsets
      */
+    @Test
     public void testWriteOffset() throws IOException {
         byte[] bytes = fromString("123456789012345678901234567890123456789012"
                 + "3456789012345678901234567890123456789012345678901234567890"
@@ -143,12 +151,13 @@ public class Base64OutputStreamTest extends TestCase {
                 + "OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0\r\nNQ==\r"
                 + "\n";
 
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     /**
      * tests {@link OutputStream#flush()} while writing
      */
+    @Test
     public void testWriteFlush() throws IOException {
         byte[] bytes = fromString("123456789012345678901234567890123456789012"
                 + "3456789012345678901234567890123456789012345678901234567890"
@@ -172,15 +181,15 @@ public class Base64OutputStreamTest extends TestCase {
                 + "OTAxMjM0NTY3ODkwMTIzNDU2Nzg5MDEyMzQ1Njc4OTAxMjM0\r\nNQ==\r"
                 + "\n";
 
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
     private String encodeNoLs(String str) throws IOException {
-        return encode(str, 0, new byte[] {});
+        return encode(str, 0, new byte[]{});
     }
 
     private String encodeLs(String str) throws IOException {
-        return encode(str, 12, new byte[] { '\r', '\n' });
+        return encode(str, 12, new byte[]{'\r', '\n'});
     }
 
     private String encode(String str, int lineLength, byte[] lineSeparator)

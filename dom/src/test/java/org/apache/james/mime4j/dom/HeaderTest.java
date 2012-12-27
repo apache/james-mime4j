@@ -19,47 +19,48 @@
 
 package org.apache.james.mime4j.dom;
 
-import junit.framework.TestCase;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
+import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class HeaderTest extends TestCase {
+public class HeaderTest {
 
     public static final String SUBJECT = "Subject: test";
 
     public static final String TO = "To: anyuser <any@user>";
 
+    @Test
     public void testHeader() throws Exception {
         Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse(SUBJECT));
         header.addField(DefaultFieldParser.parse(TO));
 
-        assertNotNull("Subject found", header.getField("Subject"));
-        assertNotNull("To found", header.getField("To"));
+        Assert.assertNotNull("Subject found", header.getField("Subject"));
+        Assert.assertNotNull("To found", header.getField("To"));
 
-        assertEquals("Headers equals", SUBJECT + "\r\n" + TO + "\r\n", header
+        Assert.assertEquals("Headers equals", SUBJECT + "\r\n" + TO + "\r\n", header
                 .toString());
     }
 
     private static final String SWISS_GERMAN_HELLO = "Gr\374ezi_z\344m\344";
 
+    @Test
     public void testWriteSpecialCharacters() throws Exception {
         String hello = SWISS_GERMAN_HELLO;
         Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("Hello: " + hello));
 
         Field field = header.getField("Hello");
-        assertNotNull(field);
+        Assert.assertNotNull(field);
         // field.getBody is already a 7 bit ASCII string, after MIME4J-151
         // assertEquals(hello, field.getBody());
-        assertEquals(SWISS_GERMAN_HELLO, field.getBody());
+        Assert.assertEquals(SWISS_GERMAN_HELLO, field.getBody());
 
         ByteArrayOutputStream outstream = new ByteArrayOutputStream();
 
@@ -70,41 +71,44 @@ public class HeaderTest extends TestCase {
         buf.append(b, 0, b.length);
         String s = ContentUtil.decode(buf);
 
-        assertEquals("Hello: " + SWISS_GERMAN_HELLO + "\r\n\r\n", s);
+        Assert.assertEquals("Hello: " + SWISS_GERMAN_HELLO + "\r\n\r\n", s);
     }
 
+    @Test
     public void testRemoveFields() throws Exception {
         Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("Received: from foo by bar for james"));
         header.addField(DefaultFieldParser.parse("Content-type: text/plain; charset=US-ASCII"));
         header.addField(DefaultFieldParser.parse("ReCeIvEd: from bar by foo for james"));
 
-        assertEquals(3, header.getFields().size());
-        assertEquals(2, header.getFields("received").size());
-        assertEquals(1, header.getFields("Content-Type").size());
+        Assert.assertEquals(3, header.getFields().size());
+        Assert.assertEquals(2, header.getFields("received").size());
+        Assert.assertEquals(1, header.getFields("Content-Type").size());
 
-        assertEquals(2, header.removeFields("rEcEiVeD"));
+        Assert.assertEquals(2, header.removeFields("rEcEiVeD"));
 
-        assertEquals(1, header.getFields().size());
-        assertEquals(0, header.getFields("received").size());
-        assertEquals(1, header.getFields("Content-Type").size());
+        Assert.assertEquals(1, header.getFields().size());
+        Assert.assertEquals(0, header.getFields("received").size());
+        Assert.assertEquals(1, header.getFields("Content-Type").size());
 
-        assertEquals("Content-type", header.getFields().get(0).getName());
+        Assert.assertEquals("Content-type", header.getFields().get(0).getName());
     }
 
+    @Test
     public void testRemoveNonExistantField() throws Exception {
         Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("Received: from foo by bar for james"));
         header.addField(DefaultFieldParser.parse("Content-type: text/plain; charset=US-ASCII"));
         header.addField(DefaultFieldParser.parse("ReCeIvEd: from bar by foo for james"));
 
-        assertEquals(0, header.removeFields("noSuchField"));
+        Assert.assertEquals(0, header.removeFields("noSuchField"));
 
-        assertEquals(3, header.getFields().size());
-        assertEquals(2, header.getFields("received").size());
-        assertEquals(1, header.getFields("Content-Type").size());
+        Assert.assertEquals(3, header.getFields().size());
+        Assert.assertEquals(2, header.getFields("received").size());
+        Assert.assertEquals(1, header.getFields("Content-Type").size());
     }
 
+    @Test
     public void testSetField() throws Exception {
         Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("From: mime4j@james.apache.org"));
@@ -114,14 +118,15 @@ public class HeaderTest extends TestCase {
 
         header.setField(DefaultFieldParser.parse("received: from nobody by noone for james"));
 
-        assertEquals(3, header.getFields().size());
-        assertEquals(1, header.getFields("received").size());
+        Assert.assertEquals(3, header.getFields().size());
+        Assert.assertEquals(1, header.getFields("received").size());
 
-        assertEquals("From", header.getFields().get(0).getName());
-        assertEquals("received", header.getFields().get(1).getName());
-        assertEquals("Content-type", header.getFields().get(2).getName());
+        Assert.assertEquals("From", header.getFields().get(0).getName());
+        Assert.assertEquals("received", header.getFields().get(1).getName());
+        Assert.assertEquals("Content-type", header.getFields().get(2).getName());
     }
 
+    @Test
     public void testSetNonExistantField() throws Exception {
         Header header = new HeaderImpl();
         header.addField(DefaultFieldParser.parse("Received: from foo by bar for james"));
@@ -130,10 +135,10 @@ public class HeaderTest extends TestCase {
 
         header.setField(DefaultFieldParser.parse("Message-ID: <msg9901@apache.org>"));
 
-        assertEquals(4, header.getFields().size());
-        assertEquals(1, header.getFields("message-id").size());
+        Assert.assertEquals(4, header.getFields().size());
+        Assert.assertEquals(1, header.getFields("message-id").size());
 
-        assertEquals("Message-ID", header.getFields().get(3).getName());
+        Assert.assertEquals("Message-ID", header.getFields().get(3).getName());
     }
 
 }

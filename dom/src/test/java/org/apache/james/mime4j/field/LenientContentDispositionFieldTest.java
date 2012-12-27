@@ -19,18 +19,18 @@
 
 package org.apache.james.mime4j.field;
 
-import java.util.Date;
-
-import junit.framework.TestCase;
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class LenientContentDispositionFieldTest extends TestCase {
+import java.util.Date;
+
+public class LenientContentDispositionFieldTest {
 
     static ContentDispositionField parse(final String s) throws MimeException {
         ByteSequence raw = ContentUtil.encode(s);
@@ -38,131 +38,140 @@ public class LenientContentDispositionFieldTest extends TestCase {
         return ContentDispositionFieldLenientImpl.PARSER.parse(rawField, null);
     }
 
+    @Test
     public void testDispositionTypeWithSemiColonNoParams() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: inline;");
-        assertEquals("inline", f.getDispositionType());
+        Assert.assertEquals("inline", f.getDispositionType());
     }
 
+    @Test
     public void testGetDispositionType() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: attachment");
-        assertEquals("attachment", f.getDispositionType());
+        Assert.assertEquals("attachment", f.getDispositionType());
 
         f = parse("content-disposition:   InLiNe   ");
-        assertEquals("inline", f.getDispositionType());
+        Assert.assertEquals("inline", f.getDispositionType());
 
         f = parse("CONTENT-DISPOSITION:   x-yada ;" + "  param = yada");
-        assertEquals("x-yada", f.getDispositionType());
+        Assert.assertEquals("x-yada", f.getDispositionType());
 
         f = parse("CONTENT-DISPOSITION:   ");
-        assertEquals("", f.getDispositionType());
+        Assert.assertEquals("", f.getDispositionType());
     }
 
+    @Test
     public void testGetParameter() throws Exception {
         ContentDispositionField f = parse("CONTENT-DISPOSITION:   inline ;"
-                        + "  filename=yada yada");
-        assertEquals("yada yada", f.getParameter("filename"));
+                + "  filename=yada yada");
+        Assert.assertEquals("yada yada", f.getParameter("filename"));
 
         f = parse("Content-Disposition: x-yada;"
-                        + "  fileNAme= \"ya:\\\"*da\"; " + "\tSIZE\t =  1234");
-        assertEquals("ya:\"*da", f.getParameter("filename"));
-        assertEquals("1234", f.getParameter("size"));
+                + "  fileNAme= \"ya:\\\"*da\"; " + "\tSIZE\t =  1234");
+        Assert.assertEquals("ya:\"*da", f.getParameter("filename"));
+        Assert.assertEquals("1234", f.getParameter("size"));
 
         f = parse("Content-Disposition: x-yada;  "
-                        + "fileNAme= \"ya \\\"\\\"\tda \\\"\"; "
-                        + "\tx-Yada\t =  \"\\\"hepp\\\"  =us\t-ascii\"");
-        assertEquals("ya \"\"\tda \"", f.getParameter("filename"));
-        assertEquals("\"hepp\"  =us\t-ascii", f.getParameter("x-yada"));
+                + "fileNAme= \"ya \\\"\\\"\tda \\\"\"; "
+                + "\tx-Yada\t =  \"\\\"hepp\\\"  =us\t-ascii\"");
+        Assert.assertEquals("ya \"\"\tda \"", f.getParameter("filename"));
+        Assert.assertEquals("\"hepp\"  =us\t-ascii", f.getParameter("x-yada"));
     }
 
+    @Test
     public void testIsDispositionType() throws Exception {
         ContentDispositionField f = parse("Content-Disposition:INline");
-        assertTrue(f.isDispositionType("InLiNe"));
-        assertFalse(f.isDispositionType("NiLiNe"));
-        assertTrue(f.isInline());
-        assertFalse(f.isAttachment());
+        Assert.assertTrue(f.isDispositionType("InLiNe"));
+        Assert.assertFalse(f.isDispositionType("NiLiNe"));
+        Assert.assertTrue(f.isInline());
+        Assert.assertFalse(f.isAttachment());
 
         f = parse("Content-Disposition: attachment");
-        assertTrue(f.isDispositionType("ATTACHMENT"));
-        assertFalse(f.isInline());
-        assertTrue(f.isAttachment());
+        Assert.assertTrue(f.isDispositionType("ATTACHMENT"));
+        Assert.assertFalse(f.isInline());
+        Assert.assertTrue(f.isAttachment());
 
         f = parse("Content-Disposition: x-something");
-        assertTrue(f.isDispositionType("x-SomeThing"));
-        assertFalse(f.isInline());
-        assertFalse(f.isAttachment());
+        Assert.assertTrue(f.isDispositionType("x-SomeThing"));
+        Assert.assertFalse(f.isInline());
+        Assert.assertFalse(f.isAttachment());
     }
 
+    @Test
     public void testGetFilename() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: inline; filename=yada.txt");
-        assertEquals("yada.txt", f.getFilename());
+        Assert.assertEquals("yada.txt", f.getFilename());
 
         f = parse("Content-Disposition: inline; filename=yada yada.txt");
-        assertEquals("yada yada.txt", f.getFilename());
+        Assert.assertEquals("yada yada.txt", f.getFilename());
 
         f = parse("Content-Disposition: inline; filename=\"yada yada.txt\"");
-        assertEquals("yada yada.txt", f.getFilename());
+        Assert.assertEquals("yada yada.txt", f.getFilename());
 
         f = parse("Content-Disposition: inline");
-        assertNull(f.getFilename());
+        Assert.assertNull(f.getFilename());
     }
 
+    @Test
     public void testGetCreationDate() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: inline; "
-                        + "creation-date=\"Tue, 01 Jan 1970 00:00:00 +0000\"");
-        assertEquals(new Date(0), f.getCreationDate());
+                + "creation-date=\"Tue, 01 Jan 1970 00:00:00 +0000\"");
+        Assert.assertEquals(new Date(0), f.getCreationDate());
 
         f = parse("Content-Disposition: inline; "
-                        + "creation-date=Tue, 01 Jan 1970 00:00:00 +0000");
-        assertEquals(new Date(0), f.getCreationDate());
+                + "creation-date=Tue, 01 Jan 1970 00:00:00 +0000");
+        Assert.assertEquals(new Date(0), f.getCreationDate());
 
         f = parse("Content-Disposition: attachment");
-        assertNull(f.getCreationDate());
+        Assert.assertNull(f.getCreationDate());
     }
 
+    @Test
     public void testGetModificationDate() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: inline; "
-                        + "modification-date=\"Tue, 01 Jan 1970 00:00:00 +0000\"");
-        assertEquals(new Date(0), f.getModificationDate());
+                + "modification-date=\"Tue, 01 Jan 1970 00:00:00 +0000\"");
+        Assert.assertEquals(new Date(0), f.getModificationDate());
 
         f = parse("Content-Disposition: inline; "
-                        + "modification-date=\"Wed, 12 Feb 1997 16:29:51 -0500\"");
-        assertEquals(new Date(855782991000l), f.getModificationDate());
+                + "modification-date=\"Wed, 12 Feb 1997 16:29:51 -0500\"");
+        Assert.assertEquals(new Date(855782991000l), f.getModificationDate());
 
         f = parse("Content-Disposition: inline; "
-                        + "modification-date=yesterday");
-        assertNull(f.getModificationDate());
+                + "modification-date=yesterday");
+        Assert.assertNull(f.getModificationDate());
 
         f = parse("Content-Disposition: attachment");
-        assertNull(f.getModificationDate());
+        Assert.assertNull(f.getModificationDate());
     }
 
+    @Test
     public void testGetReadDate() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: inline; "
-                        + "read-date=\"Tue, 01 Jan 1970 00:00:00 +0000\"");
-        assertEquals(new Date(0), f.getReadDate());
+                + "read-date=\"Tue, 01 Jan 1970 00:00:00 +0000\"");
+        Assert.assertEquals(new Date(0), f.getReadDate());
 
         f = parse("Content-Disposition: inline; read-date=");
-        assertNull(f.getReadDate());
+        Assert.assertNull(f.getReadDate());
 
         f = parse("Content-Disposition: attachment");
-        assertNull(f.getReadDate());
+        Assert.assertNull(f.getReadDate());
     }
 
+    @Test
     public void testGetSize() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: attachment; size=0");
-        assertEquals(0, f.getSize());
+        Assert.assertEquals(0, f.getSize());
 
         f = parse("Content-Disposition: attachment; size=matters");
-        assertEquals(-1, f.getSize());
+        Assert.assertEquals(-1, f.getSize());
 
         f = parse("Content-Disposition: attachment");
-        assertEquals(-1, f.getSize());
+        Assert.assertEquals(-1, f.getSize());
 
         f = parse("Content-Disposition: attachment; size=-12");
-        assertEquals(-1, f.getSize());
+        Assert.assertEquals(-1, f.getSize());
 
         f = parse("Content-Disposition: attachment; size=12");
-        assertEquals(12, f.getSize());
+        Assert.assertEquals(12, f.getSize());
     }
 
 }

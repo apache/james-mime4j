@@ -19,14 +19,14 @@
 
 package org.apache.james.mime4j.stream;
 
+import junit.framework.Assert;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Test;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
+public class RawFieldTest {
 
-public class RawFieldTest extends TestCase {
-
+    @Test
     public void testPrivateConstructor() throws Exception {
         String s = "raw: stuff;\r\n  more stuff";
         ByteSequence raw = ContentUtil.encode(s);
@@ -37,6 +37,7 @@ public class RawFieldTest extends TestCase {
         Assert.assertEquals(s, field.toString());
     }
 
+    @Test
     public void testPublicConstructor() throws Exception {
         RawField field1 = new RawField("raw", "stuff");
         Assert.assertNull(field1.getRaw());
@@ -51,6 +52,7 @@ public class RawFieldTest extends TestCase {
         Assert.assertEquals("raw: ", field2.toString());
     }
 
+    @Test
     public void testTabAfterDelimiter() throws Exception {
         String s = "raw:\tstuff;\r\n  more stuff";
         ByteSequence raw = ContentUtil.encode(s);
@@ -60,5 +62,5 @@ public class RawFieldTest extends TestCase {
         Assert.assertEquals("stuff;  more stuff", field.getBody());
         Assert.assertEquals(s, field.toString());
     }
-    
+
 }

@@ -19,37 +19,36 @@
 
 package org.apache.james.mime4j.io;
 
-import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
-import org.apache.james.mime4j.io.LineReaderInputStream;
-import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
-import junit.framework.TestCase;
+public class BufferedLineReaderInputStreamTest {
 
-public class BufferedLineReaderInputStreamTest extends TestCase {
-
+    @Test
     public void testBasicOperations() throws Exception {
         String text = "ah blahblah";
         byte[] b1 = text.getBytes("US-ASCII");
         BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
 
-        assertEquals((byte)'a', instream.read());
-        assertEquals((byte)'h', instream.read());
-        assertEquals((byte)' ', instream.read());
+        Assert.assertEquals((byte) 'a', instream.read());
+        Assert.assertEquals((byte) 'h', instream.read());
+        Assert.assertEquals((byte) ' ', instream.read());
 
         byte[] tmp1 = new byte[4];
-        assertEquals(4, instream.read(tmp1));
-        assertEquals(4, instream.read(tmp1));
+        Assert.assertEquals(4, instream.read(tmp1));
+        Assert.assertEquals(4, instream.read(tmp1));
 
-        assertEquals(-1, instream.read(tmp1));
-        assertEquals(-1, instream.read(tmp1));
-        assertEquals(-1, instream.read());
-        assertEquals(-1, instream.read());
+        Assert.assertEquals(-1, instream.read(tmp1));
+        Assert.assertEquals(-1, instream.read(tmp1));
+        Assert.assertEquals(-1, instream.read());
+        Assert.assertEquals(-1, instream.read());
     }
 
+    @Test
     public void testBasicReadLine() throws Exception {
 
         String[] teststrs = new String[5];
@@ -79,12 +78,13 @@ public class BufferedLineReaderInputStreamTest extends TestCase {
             linebuf.clear();
             instream.readLine(linebuf);
             String s = new String(linebuf.toByteArray(), "US-ASCII");
-            assertEquals(teststr, s);
+            Assert.assertEquals(teststr, s);
         }
-        assertEquals(-1, instream.readLine(linebuf));
-        assertEquals(-1, instream.readLine(linebuf));
+        Assert.assertEquals(-1, instream.readLine(linebuf));
+        Assert.assertEquals(-1, instream.readLine(linebuf));
     }
 
+    @Test
     public void testReadEmptyLine() throws Exception {
 
         String teststr = "\n\n\r\n\r\r\n\n\n\n\n\n";
@@ -96,52 +96,53 @@ public class BufferedLineReaderInputStreamTest extends TestCase {
         linebuf.clear();
         instream.readLine(linebuf);
         String s = new String(linebuf.toByteArray(), "US-ASCII");
-        assertEquals("\n", s);
+        Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
         s = new String(linebuf.toByteArray(), "US-ASCII");
-        assertEquals("\n", s);
+        Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
         s = new String(linebuf.toByteArray(), "US-ASCII");
-        assertEquals("\r\n", s);
+        Assert.assertEquals("\r\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
         s = new String(linebuf.toByteArray(), "US-ASCII");
-        assertEquals("\r\r\n", s);
+        Assert.assertEquals("\r\r\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
         s = new String(linebuf.toByteArray(), "US-ASCII");
-        assertEquals("\n", s);
+        Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
         s = new String(linebuf.toByteArray(), "US-ASCII");
-        assertEquals("\n", s);
+        Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
         s = new String(linebuf.toByteArray(), "US-ASCII");
-        assertEquals("\n", s);
+        Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
         s = new String(linebuf.toByteArray(), "US-ASCII");
-        assertEquals("\n", s);
+        Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
         s = new String(linebuf.toByteArray(), "US-ASCII");
-        assertEquals("\n", s);
+        Assert.assertEquals("\n", s);
 
-        assertEquals(-1, instream.readLine(linebuf));
-        assertEquals(-1, instream.readLine(linebuf));
+        Assert.assertEquals(-1, instream.readLine(linebuf));
+        Assert.assertEquals(-1, instream.readLine(linebuf));
     }
 
+    @Test
     public void testReadEmptyLineMaxLimit() throws Exception {
 
         String teststr = "1234567890\r\n";
@@ -158,7 +159,7 @@ public class BufferedLineReaderInputStreamTest extends TestCase {
         linebuf.clear();
         try {
             instream2.readLine(linebuf);
-            fail("MaxLineLimitException should have been thrown");
+            Assert.fail("MaxLineLimitException should have been thrown");
         } catch (MaxLineLimitException ex) {
         }
     }

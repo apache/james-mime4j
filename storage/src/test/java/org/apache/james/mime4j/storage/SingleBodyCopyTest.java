@@ -19,17 +19,18 @@
 
 package org.apache.james.mime4j.storage;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
-import junit.framework.TestCase;
-
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.util.CharsetUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class SingleBodyCopyTest extends TestCase {
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 
+public class SingleBodyCopyTest {
+
+    @Test
     public void testCopyStorageBinaryBody() throws Exception {
         Storage storage = new MemoryStorageProvider()
                 .store(new ByteArrayInputStream("test".getBytes()));
@@ -39,6 +40,7 @@ public class SingleBodyCopyTest extends TestCase {
         copyTest(body);
     }
 
+    @Test
     public void testCopyStorageTextBody() throws Exception {
         Storage storage = new MemoryStorageProvider()
                 .store(new ByteArrayInputStream("test".getBytes()));
@@ -49,11 +51,13 @@ public class SingleBodyCopyTest extends TestCase {
         copyTest(body);
     }
 
+    @Test
     public void testCopyStringTextBody() throws Exception {
         SingleBody body = new StringTextBody("test", CharsetUtil.US_ASCII);
         copyTest(body);
     }
 
+    @Test
     public void testDisposeStorageBinaryBody() throws Exception {
         Storage storage = new MemoryStorageProvider()
                 .store(new ByteArrayInputStream("test".getBytes()));
@@ -63,6 +67,7 @@ public class SingleBodyCopyTest extends TestCase {
         disposeTest(body, storage);
     }
 
+    @Test
     public void testDisposeStorageTextBody() throws Exception {
         Storage storage = new MemoryStorageProvider()
                 .store(new ByteArrayInputStream("test".getBytes()));
@@ -78,11 +83,11 @@ public class SingleBodyCopyTest extends TestCase {
         parent.setBody(body);
 
         SingleBody copy = body.copy();
-        assertNotNull(copy);
-        assertNotSame(body, copy);
+        Assert.assertNotNull(copy);
+        Assert.assertNotSame(body, copy);
 
-        assertSame(parent, body.getParent());
-        assertNull(copy.getParent());
+        Assert.assertSame(parent, body.getParent());
+        Assert.assertNull(copy.getParent());
 
         sameContentTest(body, copy);
     }
@@ -97,23 +102,23 @@ public class SingleBodyCopyTest extends TestCase {
         actualBody.writeTo(actBaos);
         byte[] actual = actBaos.toByteArray();
 
-        assertEquals(expected.length, actual.length);
+        Assert.assertEquals(expected.length, actual.length);
         for (int i = 0; i < expected.length; i++) {
-            assertEquals(expected[i], actual[i]);
+            Assert.assertEquals(expected[i], actual[i]);
         }
     }
 
     private void disposeTest(SingleBody body, Storage storage) throws Exception {
-        assertTrue(storageIsReadable(storage));
+        Assert.assertTrue(storageIsReadable(storage));
 
         SingleBody copy = body.copy();
-        assertTrue(storageIsReadable(storage));
+        Assert.assertTrue(storageIsReadable(storage));
 
         body.dispose();
-        assertTrue(storageIsReadable(storage));
+        Assert.assertTrue(storageIsReadable(storage));
 
         copy.dispose();
-        assertFalse(storageIsReadable(storage));
+        Assert.assertFalse(storageIsReadable(storage));
     }
 
     private boolean storageIsReadable(Storage storage) throws Exception {

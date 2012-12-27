@@ -19,40 +19,46 @@
 
 package org.apache.james.mime4j.util;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.nio.charset.Charset;
 
-import junit.framework.TestCase;
-
-public class CharsetUtilTest extends TestCase {
+public class CharsetUtilTest {
 
     private static final String SWISS_GERMAN_HELLO = "Gr\374ezi_z\344m\344";
     private static final String RUSSIAN_HELLO = "\u0412\u0441\u0435\u043C_\u043F\u0440\u0438\u0432\u0435\u0442";
 
+    @Test
     public void testAllASCII() {
         String s = "Like hello and stuff";
-        assertTrue(CharsetUtil.isASCII(s));
+        Assert.assertTrue(CharsetUtil.isASCII(s));
     }
 
+    @Test
     public void testNonASCII() {
-        assertFalse(CharsetUtil.isASCII(SWISS_GERMAN_HELLO));
-        assertFalse(CharsetUtil.isASCII(RUSSIAN_HELLO));
+        Assert.assertFalse(CharsetUtil.isASCII(SWISS_GERMAN_HELLO));
+        Assert.assertFalse(CharsetUtil.isASCII(RUSSIAN_HELLO));
     }
 
+    @Test
     public void testCharsetLookup() {
         Charset c1 = CharsetUtil.lookup("us-ascii");
         Charset c2 = CharsetUtil.lookup("ascii");
-        assertEquals(CharsetUtil.US_ASCII, c1);
-        assertEquals(CharsetUtil.US_ASCII, c2);
+        Assert.assertEquals(CharsetUtil.US_ASCII, c1);
+        Assert.assertEquals(CharsetUtil.US_ASCII, c2);
     }
 
+    @Test
     public void testCharsetLookupNullInput() {
         Charset c1 = CharsetUtil.lookup(null);
-        assertNull(c1);
+        Assert.assertNull(c1);
     }
 
+    @Test
     public void testCharsetLookupFailure() {
         Charset c1 = CharsetUtil.lookup("whatever");
-        assertNull(c1);
+        Assert.assertNull(c1);
     }
 
 }

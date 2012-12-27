@@ -25,10 +25,10 @@ import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
-import junit.framework.TestCase;
-
-public class LenientContentLocationFieldTest extends TestCase {
+public class LenientContentLocationFieldTest {
 
     static ContentLocationField parse(final String s) throws MimeException {
         ByteSequence raw = ContentUtil.encode(s);
@@ -36,28 +36,32 @@ public class LenientContentLocationFieldTest extends TestCase {
         return ContentLocationFieldLenientImpl.PARSER.parse(rawField, null);
     }
 
+    @Test
     public void testGetSimpleLocation() throws Exception {
         ContentLocationField f = parse("Content-Location: stuff");
         String location = f.getLocation();
-        assertEquals("stuff", location);
+        Assert.assertEquals("stuff", location);
     }
 
+    @Test
     public void testGetQuotedLocation() throws Exception {
         ContentLocationField f = parse("Content-Location: \" stuff \"");
         String location = f.getLocation();
-        assertEquals("stuff", location);
+        Assert.assertEquals("stuff", location);
     }
 
+    @Test
     public void testGetLocationWithBlanks() throws Exception {
         ContentLocationField f = parse("Content-Location: this / that \t/what not");
         String location = f.getLocation();
-        assertEquals("this/that/whatnot", location);
+        Assert.assertEquals("this/that/whatnot", location);
     }
 
+    @Test
     public void testGetLocationWithCommens() throws Exception {
         ContentLocationField f = parse("Content-Location: this(blah) / that (yada) /what not");
         String location = f.getLocation();
-        assertEquals("this/that/whatnot", location);
+        Assert.assertEquals("this/that/whatnot", location);
     }
 
 }

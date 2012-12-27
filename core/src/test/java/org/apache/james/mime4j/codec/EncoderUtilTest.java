@@ -19,151 +19,163 @@
 
 package org.apache.james.mime4j.codec;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
-
-import junit.framework.TestCase;
-
 import org.apache.james.mime4j.codec.EncoderUtil.Encoding;
 import org.apache.james.mime4j.codec.EncoderUtil.Usage;
 import org.apache.james.mime4j.util.CharsetUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class EncoderUtilTest extends TestCase {
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
+public class EncoderUtilTest {
+
+    @Test
     public void testEncodeAddressDisplayName() throws Exception {
-        assertEquals("\"\"", EncoderUtil.encodeAddressDisplayName(""));
-        assertEquals("test", EncoderUtil.encodeAddressDisplayName("test"));
-        assertEquals(" test ", EncoderUtil.encodeAddressDisplayName(" test "));
-        assertEquals(" test\ttest ", EncoderUtil
+        Assert.assertEquals("\"\"", EncoderUtil.encodeAddressDisplayName(""));
+        Assert.assertEquals("test", EncoderUtil.encodeAddressDisplayName("test"));
+        Assert.assertEquals(" test ", EncoderUtil.encodeAddressDisplayName(" test "));
+        Assert.assertEquals(" test\ttest ", EncoderUtil
                 .encodeAddressDisplayName(" test\ttest "));
-        assertEquals("\"test()\"", EncoderUtil
+        Assert.assertEquals("\"test()\"", EncoderUtil
                 .encodeAddressDisplayName("test()"));
-        assertEquals("\"John Q. Public\"", EncoderUtil
+        Assert.assertEquals("\"John Q. Public\"", EncoderUtil
                 .encodeAddressDisplayName("John Q. Public"));
-        assertEquals("\"Giant; \\\"Big\\\" Box\"", EncoderUtil
+        Assert.assertEquals("\"Giant; \\\"Big\\\" Box\"", EncoderUtil
                 .encodeAddressDisplayName("Giant; \"Big\" Box"));
-        assertEquals("=?ISO-8859-1?Q?Semmelbr=F6sel?=", EncoderUtil
+        Assert.assertEquals("=?ISO-8859-1?Q?Semmelbr=F6sel?=", EncoderUtil
                 .encodeAddressDisplayName("Semmelbr\366sel"));
         // dollar sign as to be encoded as =24 when used as a word in a phrase
-        assertEquals("=?UTF-8?Q?Dollar_=24_Euro_=E2=82=AC?=", EncoderUtil
+        Assert.assertEquals("=?UTF-8?Q?Dollar_=24_Euro_=E2=82=AC?=", EncoderUtil
                 .encodeAddressDisplayName("Dollar $ Euro \u20ac"));
     }
 
+    @Test
     public void testEncodeAddressLocalPart() throws Exception {
-        assertEquals("john.wayne", EncoderUtil
+        Assert.assertEquals("john.wayne", EncoderUtil
                 .encodeAddressLocalPart("john.wayne"));
-        assertEquals("\"clint eastwood\"", EncoderUtil
+        Assert.assertEquals("\"clint eastwood\"", EncoderUtil
                 .encodeAddressLocalPart("clint eastwood"));
     }
 
+    @Test
     public void testEncodeHeaderParameter() throws Exception {
-        assertEquals("p=test", EncoderUtil.encodeHeaderParameter("p", "test"));
-        assertEquals("p=\"test test\"", EncoderUtil.encodeHeaderParameter("p",
+        Assert.assertEquals("p=test", EncoderUtil.encodeHeaderParameter("p", "test"));
+        Assert.assertEquals("p=\"test test\"", EncoderUtil.encodeHeaderParameter("p",
                 "test test"));
-        assertEquals("p=\"=test\"", EncoderUtil.encodeHeaderParameter("p",
+        Assert.assertEquals("p=\"=test\"", EncoderUtil.encodeHeaderParameter("p",
                 "=test"));
-        assertEquals("p=\"\\\\test\"", EncoderUtil.encodeHeaderParameter("p",
+        Assert.assertEquals("p=\"\\\\test\"", EncoderUtil.encodeHeaderParameter("p",
                 "\\test"));
-        assertEquals("p=\"\\\"\\\\\\\"\"", EncoderUtil.encodeHeaderParameter(
+        Assert.assertEquals("p=\"\\\"\\\\\\\"\"", EncoderUtil.encodeHeaderParameter(
                 "p", "\"\\\""));
     }
 
+    @Test
     public void testHasToBeEncoded() throws Exception {
-        assertFalse(EncoderUtil.hasToBeEncoded("", 0));
-        assertFalse(EncoderUtil.hasToBeEncoded("only ascii characters", 0));
+        Assert.assertFalse(EncoderUtil.hasToBeEncoded("", 0));
+        Assert.assertFalse(EncoderUtil.hasToBeEncoded("only ascii characters", 0));
 
-        assertTrue(EncoderUtil.hasToBeEncoded("non-printable ascii: \010", 0));
-        assertTrue(EncoderUtil.hasToBeEncoded("non-ascii: \u20ac", 0));
+        Assert.assertTrue(EncoderUtil.hasToBeEncoded("non-printable ascii: \010", 0));
+        Assert.assertTrue(EncoderUtil.hasToBeEncoded("non-ascii: \u20ac", 0));
 
-        assertFalse(EncoderUtil.hasToBeEncoded("123456789012345678901234567",
+        Assert.assertFalse(EncoderUtil.hasToBeEncoded("123456789012345678901234567",
                 50));
-        assertTrue(EncoderUtil.hasToBeEncoded("1234567890123456789012345678",
+        Assert.assertTrue(EncoderUtil.hasToBeEncoded("1234567890123456789012345678",
                 50));
-        assertFalse(EncoderUtil.hasToBeEncoded(
+        Assert.assertFalse(EncoderUtil.hasToBeEncoded(
                 "\t12345678901234567890123456789", 50));
     }
 
+    @Test
     public void testEncodeEncodedWordDetectCharset() throws Exception {
-        assertTrue(EncoderUtil
+        Assert.assertTrue(EncoderUtil
                 .encodeEncodedWord("only ascii", Usage.TEXT_TOKEN).startsWith(
                         "=?US-ASCII?"));
-        assertTrue(EncoderUtil.encodeEncodedWord("latin 1: \344",
+        Assert.assertTrue(EncoderUtil.encodeEncodedWord("latin 1: \344",
                 Usage.TEXT_TOKEN).startsWith("=?ISO-8859-1?"));
-        assertTrue(EncoderUtil.encodeEncodedWord("unicode: \u20ac",
+        Assert.assertTrue(EncoderUtil.encodeEncodedWord("unicode: \u20ac",
                 Usage.TEXT_TOKEN).startsWith("=?UTF-8?"));
     }
 
+    @Test
     public void testEncodeEncodedWordForceCharset() throws Exception {
-        assertTrue(EncoderUtil.encodeEncodedWord("only ascii",
+        Assert.assertTrue(EncoderUtil.encodeEncodedWord("only ascii",
                 Usage.TEXT_TOKEN, 0, CharsetUtil.UTF_8, null).startsWith(
                 "=?UTF-8?"));
     }
 
+    @Test
     public void testEncodeEncodedWordDetectEncoding() throws Exception {
-        assertTrue(EncoderUtil
+        Assert.assertTrue(EncoderUtil
                 .encodeEncodedWord("only ascii", Usage.TEXT_TOKEN).startsWith(
                         "=?US-ASCII?Q?"));
-        assertTrue(EncoderUtil.encodeEncodedWord("\344\344\344\344\344",
+        Assert.assertTrue(EncoderUtil.encodeEncodedWord("\344\344\344\344\344",
                 Usage.TEXT_TOKEN).startsWith("=?ISO-8859-1?B?"));
     }
 
+    @Test
     public void testEncodeEncodedWordForceEncoding() throws Exception {
-        assertTrue(EncoderUtil.encodeEncodedWord("only ascii",
+        Assert.assertTrue(EncoderUtil.encodeEncodedWord("only ascii",
                 Usage.TEXT_TOKEN, 0, null, Encoding.B).startsWith(
                 "=?US-ASCII?B?"));
     }
 
+    @Test
     public void testEncodeEncodedWordSplit() throws Exception {
         String sixty = "123456789012345678901234567890123456789012345678901234567890";
 
         String expected = "=?US-ASCII?Q?" + sixty + "?=";
-        assertEquals(expected, EncoderUtil.encodeEncodedWord(sixty,
+        Assert.assertEquals(expected, EncoderUtil.encodeEncodedWord(sixty,
                 Usage.TEXT_TOKEN, 0, null, Encoding.Q));
-        assertEquals(75, expected.length());
+        Assert.assertEquals(75, expected.length());
 
         String sixtyOne = sixty + "1";
         String encodedSixtyOne = EncoderUtil.encodeEncodedWord(sixtyOne,
                 Usage.TEXT_TOKEN, 0, null, Encoding.Q);
-        assertTrue(encodedSixtyOne.contains("?= =?US-ASCII?Q?"));
+        Assert.assertTrue(encodedSixtyOne.contains("?= =?US-ASCII?Q?"));
     }
 
+    @Test
     public void testEncodeEncodedWord() throws Exception {
-        assertEquals("=?US-ASCII?Q??=", EncoderUtil.encodeEncodedWord("",
+        Assert.assertEquals("=?US-ASCII?Q??=", EncoderUtil.encodeEncodedWord("",
                 Usage.TEXT_TOKEN, 0, null, Encoding.Q));
 
-        assertEquals("=?US-ASCII?Q?testing_123?=", EncoderUtil
+        Assert.assertEquals("=?US-ASCII?Q?testing_123?=", EncoderUtil
                 .encodeEncodedWord("testing 123", Usage.TEXT_TOKEN, 0, null,
                         Encoding.Q));
 
-        assertEquals("=?US-ASCII?B?dGVzdGluZyAxMjM=?=", EncoderUtil
+        Assert.assertEquals("=?US-ASCII?B?dGVzdGluZyAxMjM=?=", EncoderUtil
                 .encodeEncodedWord("testing 123", Usage.TEXT_TOKEN, 0, null,
                         Encoding.B));
 
-        assertEquals("=?windows-1252?Q?100_=80?=", EncoderUtil
+        Assert.assertEquals("=?windows-1252?Q?100_=80?=", EncoderUtil
                 .encodeEncodedWord("100 \u20ac", Usage.TEXT_TOKEN, 0, Charset
                         .forName("Cp1252"), Encoding.Q));
 
-        assertEquals("=?windows-1252?B?MTAwIIA=?=", EncoderUtil
+        Assert.assertEquals("=?windows-1252?B?MTAwIIA=?=", EncoderUtil
                 .encodeEncodedWord("100 \u20ac", Usage.TEXT_TOKEN, 0, Charset
                         .forName("Cp1252"), Encoding.B));
     }
 
+    @Test
     public void testEncodeB() throws Exception {
-        assertEquals("", encodeB(""));
-        assertEquals("YQ==", encodeB("a"));
-        assertEquals("YWI=", encodeB("ab"));
-        assertEquals("YWJj", encodeB("abc"));
-        assertEquals("YWJjZA==", encodeB("abcd"));
-        assertEquals("YWJjZGU=", encodeB("abcde"));
-        assertEquals("YWJjZGVm", encodeB("abcdef"));
-        assertEquals("YWJjZGVmZw==", encodeB("abcdefg"));
-        assertEquals("YWJjZGVmZ2g=", encodeB("abcdefgh"));
-        assertEquals("YWJjZGVmZ2hp", encodeB("abcdefghi"));
-        assertEquals("DQoMCQ==", encodeB("\r\n\f\t"));
-        assertEquals("LT0/VGhhdCdzIGEgdGVzdD89LQ==",
+        Assert.assertEquals("", encodeB(""));
+        Assert.assertEquals("YQ==", encodeB("a"));
+        Assert.assertEquals("YWI=", encodeB("ab"));
+        Assert.assertEquals("YWJj", encodeB("abc"));
+        Assert.assertEquals("YWJjZA==", encodeB("abcd"));
+        Assert.assertEquals("YWJjZGU=", encodeB("abcde"));
+        Assert.assertEquals("YWJjZGVm", encodeB("abcdef"));
+        Assert.assertEquals("YWJjZGVmZw==", encodeB("abcdefg"));
+        Assert.assertEquals("YWJjZGVmZ2g=", encodeB("abcdefgh"));
+        Assert.assertEquals("YWJjZGVmZ2hp", encodeB("abcdefghi"));
+        Assert.assertEquals("DQoMCQ==", encodeB("\r\n\f\t"));
+        Assert.assertEquals("LT0/VGhhdCdzIGEgdGVzdD89LQ==",
                 encodeB("-=?That's a test?=-"));
     }
 
+    @Test
     public void testEncodeQRegular() throws Exception {
         byte[] b = new byte[132];
         for (int i = 0; i < 132; i++) {
@@ -174,9 +186,10 @@ public class EncoderUtilTest extends TestCase {
                 + "=10=11=12=13=14=15=16=17=18=19=1A=1B=1C=1D=1E=1F_!\"#$%&"
                 + "'()*+,-./0123456789:;<=3D>=3F@ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                 + "[\\]^=5F`abcdefghijklmnopqrstuvwxyz{|}~=7F=80=81=82=83";
-        assertEquals(expected, EncoderUtil.encodeQ(b, Usage.TEXT_TOKEN));
+        Assert.assertEquals(expected, EncoderUtil.encodeQ(b, Usage.TEXT_TOKEN));
     }
 
+    @Test
     public void testEncodeQRestricted() throws Exception {
         byte[] b = new byte[136];
         for (int i = 0; i < 136; i++) {
@@ -188,7 +201,7 @@ public class EncoderUtilTest extends TestCase {
                 + "=24=25=26=27=28=29*+=2C-=2E/0123456789=3A=3B=3C=3D=3E=3F"
                 + "=40ABCDEFGHIJKLMNOPQRSTUVWXYZ=5B=5C=5D=5E=5F=60abcdefghi"
                 + "jklmnopqrstuvwxyz=7B=7C=7D=7E=7F=80=81=82=83=84=85=86=87";
-        assertEquals(expected, EncoderUtil.encodeQ(b, Usage.WORD_ENTITY));
+        Assert.assertEquals(expected, EncoderUtil.encodeQ(b, Usage.WORD_ENTITY));
     }
 
     private String encodeB(String s) {

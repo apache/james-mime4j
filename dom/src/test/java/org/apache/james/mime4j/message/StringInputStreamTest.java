@@ -19,24 +19,26 @@
 
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.SecureRandom;
 
-import org.apache.james.mime4j.util.CharsetUtil;
-
-import junit.framework.TestCase;
-
-public class StringInputStreamTest extends TestCase {
+public class StringInputStreamTest {
 
     private static final String SWISS_GERMAN_HELLO = "Gr\374ezi_z\344m\344";
     private static final String RUSSIAN_HELLO = "\u0412\u0441\u0435\u043C_\u043F\u0440\u0438\u0432\u0435\u0442";
-    private static final String TEST_STRING = "Hello and stuff " + SWISS_GERMAN_HELLO + " " +  RUSSIAN_HELLO;
+    private static final String TEST_STRING = "Hello and stuff " + SWISS_GERMAN_HELLO + " " + RUSSIAN_HELLO;
     private static final String LARGE_TEST_STRING;
 
     static {
         StringBuilder buffer = new StringBuilder();
-        for (int i=0; i<100; i++) {
+        for (int i = 0; i < 100; i++) {
             buffer.append(TEST_STRING);
         }
         LARGE_TEST_STRING = buffer.toString();
@@ -49,7 +51,7 @@ public class StringInputStreamTest extends TestCase {
             int read = in.read();
             assertTrue(read >= 0);
             assertTrue(read <= 255);
-            assertEquals(b, (byte)read);
+            assertEquals(b, (byte) read);
         }
         assertEquals(-1, in.read());
     }
@@ -80,48 +82,55 @@ public class StringInputStreamTest extends TestCase {
         }
     }
 
+    @Test
     public void testSingleByteRead() throws IOException {
         singleByteReadTest(TEST_STRING);
     }
 
+    @Test
     public void testLargeSingleByteRead() throws IOException {
         singleByteReadTest(LARGE_TEST_STRING);
     }
 
+    @Test
     public void testBufferedRead() throws IOException {
         bufferedReadTest(TEST_STRING);
     }
 
+    @Test
     public void testLargeBufferedRead() throws IOException {
         bufferedReadTest(LARGE_TEST_STRING);
     }
 
+    @Test
     public void testReadZero() throws Exception {
         InputStream r = new StringInputStream("test", CharsetUtil.UTF_8);
         byte[] bytes = new byte[30];
-        assertEquals(0, r.read(bytes, 0, 0));
+        Assert.assertEquals(0, r.read(bytes, 0, 0));
     }
 
+    @Test
     public void testSkip() throws Exception {
         InputStream r = new StringInputStream("test", CharsetUtil.UTF_8);
         r.skip(1);
         r.skip(2);
-        assertEquals('t', r.read());
+        Assert.assertEquals('t', r.read());
         r.skip(100);
-        assertEquals(-1, r.read());
+        Assert.assertEquals(-1, r.read());
     }
 
+    @Test
     public void testMarkReset() throws Exception {
         InputStream r = new StringInputStream("test", CharsetUtil.UTF_8);
         r.skip(2);
         r.mark(0);
-        assertEquals('s', r.read());
-        assertEquals('t', r.read());
-        assertEquals(-1, r.read());
+        Assert.assertEquals('s', r.read());
+        Assert.assertEquals('t', r.read());
+        Assert.assertEquals(-1, r.read());
         r.reset();
-        assertEquals('s', r.read());
-        assertEquals('t', r.read());
-        assertEquals(-1, r.read());
+        Assert.assertEquals('s', r.read());
+        Assert.assertEquals('t', r.read());
+        Assert.assertEquals(-1, r.read());
         r.reset();
         r.reset();
     }

@@ -19,25 +19,16 @@
 
 package org.apache.james.mime4j.field.mimeversion;
 
-import java.io.StringReader;
-
-import junit.framework.TestCase;
-
 import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.mimeversion.parser.ParseException;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class MimeVersionParserTest extends TestCase {
+import java.io.StringReader;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
+public class MimeVersionParserTest {
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testPlainLine() throws Exception {
         check("2.4", 2, 4);
         check("25.344", 25, 344);
@@ -45,6 +36,7 @@ public class MimeVersionParserTest extends TestCase {
         check("123234234.0", 123234234, 0);
     }
 
+    @Test
     public void testLineWithComments() throws Exception {
         check("2(A comment).4", 2, 4);
         check("2(.8).4", 2, 4);
@@ -53,14 +45,16 @@ public class MimeVersionParserTest extends TestCase {
         check("2.(A comment)4", 2, 4);
     }
 
+    @Test
     public void testLineWithNestedComments() throws Exception {
         check("2(4.45 ( Another ()comment () blah (Wobble(mix)))Whatever).4", 2, 4);
     }
 
+    @Test
     public void testEmptyLine() throws Exception {
         try {
             parse("(This is just a comment)");
-            fail("Expected exception to be thrown");
+            Assert.fail("Expected exception to be thrown");
         } catch (ParseException e) {
             //expected
         }
@@ -68,8 +62,8 @@ public class MimeVersionParserTest extends TestCase {
 
     private void check(String input, int expectedMajorVersion, int expectedMinorVersion) throws Exception {
         MimeVersionParser parser = parse(input);
-        assertEquals("Major version number", expectedMajorVersion, parser.getMajorVersion());
-        assertEquals("Minor version number", expectedMinorVersion, parser.getMinorVersion());
+        Assert.assertEquals("Major version number", expectedMajorVersion, parser.getMajorVersion());
+        Assert.assertEquals("Minor version number", expectedMinorVersion, parser.getMinorVersion());
     }
 
     private MimeVersionParser parse(String input) throws ParseException {

@@ -19,41 +19,32 @@
 
 package org.apache.james.mime4j.codec;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import junit.framework.TestCase;
+public class QuotedPrintableEncodeTest {
 
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.util.CharsetUtil;
-
-public class QuotedPrintableEncodeTest extends TestCase {
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testEscapedSoftBreak() throws Exception {
         byte[] content = new byte[500];
-        Arrays.fill(content, (byte)0x20);
+        Arrays.fill(content, (byte) 0x20);
         byte[] expected = new byte[1557];
         int index = 0;
-        for (int l=0;l<20;l++) {
-            for (int i=0;i<25;i++) {
+        for (int l = 0; l < 20; l++) {
+            for (int i = 0; i < 25; i++) {
                 expected[index++] = '=';
                 expected[index++] = '2';
                 expected[index++] = '0';
             }
-            if (l<19) {
+            if (l < 19) {
                 expected[index++] = '=';
                 expected[index++] = '\r';
                 expected[index++] = '\n';
@@ -62,11 +53,12 @@ public class QuotedPrintableEncodeTest extends TestCase {
         check(content, expected);
     }
 
+    @Test
     public void testPlainAsciiSoftBreak() throws Exception {
         byte[] content = new byte[500];
-        Arrays.fill(content, (byte)0x29);
+        Arrays.fill(content, (byte) 0x29);
         byte[] expected = new byte[518];
-        Arrays.fill(expected, (byte)0x29);
+        Arrays.fill(expected, (byte) 0x29);
         expected[75] = '=';
         expected[76] = '\r';
         expected[77] = '\n';
@@ -88,6 +80,7 @@ public class QuotedPrintableEncodeTest extends TestCase {
         check(content, expected);
     }
 
+    @Test
     public void testPlainASCII() throws Exception {
         checkRoundtrip("Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage." +
                 "Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage." +
@@ -95,12 +88,14 @@ public class QuotedPrintableEncodeTest extends TestCase {
                 "Thisisaverysimplemessage.Thisisaverysimplemessage.Thisisaverysimplemessage.");
     }
 
+    @Test
     public void testEncodeSpace() throws Exception {
         checkRoundtrip("                 ");
     }
 
+    @Test
     public void testLetterEncoding() throws Exception {
-        for (byte b=0;b<Byte.MAX_VALUE;b++) {
+        for (byte b = 0; b < Byte.MAX_VALUE; b++) {
             byte[] content = {b};
             checkRoundtrip(content);
         }
@@ -133,9 +128,9 @@ public class QuotedPrintableEncodeTest extends TestCase {
     }
 
     private void assertEquals(byte[] expected, byte[] actual) {
-        assertEquals(expected.length, actual.length);
+        Assert.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
-            assertEquals("Mismatch@" + i, expected[i], actual[i]);
+            Assert.assertEquals("Mismatch@" + i, expected[i], actual[i]);
         }
     }
 }

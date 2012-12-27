@@ -19,17 +19,17 @@
 
 package org.apache.james.mime4j.io;
 
+import org.junit.Assert;
+import static org.junit.Assert.fail;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import org.apache.james.mime4j.io.EOLConvertingInputStream;
+public class EOLConvertingInputStreamTest {
 
-
-import junit.framework.TestCase;
-
-public class EOLConvertingInputStreamTest extends TestCase {
-
+    @Test
     public void testRead() throws IOException {
         testConvertBoth("Line 1\r\nLine 2\r\n", "Line 1\r\nLine 2\r\n");
         testConvertCR("Line 1\r\nLine 2\r\n", "Line 1\r\nLine 2\r\n");
@@ -69,10 +69,10 @@ public class EOLConvertingInputStreamTest extends TestCase {
 
         ByteArrayInputStream bais = new ByteArrayInputStream(fromString(s1));
         EOLConvertingInputStream in =
-            new EOLConvertingInputStream(bais,
+                new EOLConvertingInputStream(bais,
                         EOLConvertingInputStream.CONVERT_BOTH);
         int n = in.read(bytes);
-        assertEquals(s2, toString(bytes, n));
+        Assert.assertEquals(s2, toString(bytes, n));
     }
 
     private void testConvertCR(String s1, String s2) throws IOException {
@@ -80,10 +80,10 @@ public class EOLConvertingInputStreamTest extends TestCase {
 
         ByteArrayInputStream bais = new ByteArrayInputStream(fromString(s1));
         EOLConvertingInputStream in =
-            new EOLConvertingInputStream(bais,
+                new EOLConvertingInputStream(bais,
                         EOLConvertingInputStream.CONVERT_CR);
         int n = in.read(bytes);
-        assertEquals(s2, toString(bytes, n));
+        Assert.assertEquals(s2, toString(bytes, n));
     }
 
     private void testConvertLF(String s1, String s2) throws IOException {
@@ -91,10 +91,10 @@ public class EOLConvertingInputStreamTest extends TestCase {
 
         ByteArrayInputStream bais = new ByteArrayInputStream(fromString(s1));
         EOLConvertingInputStream in =
-            new EOLConvertingInputStream(bais,
+                new EOLConvertingInputStream(bais,
                         EOLConvertingInputStream.CONVERT_LF);
         int n = in.read(bytes);
-        assertEquals(s2, toString(bytes, n));
+        Assert.assertEquals(s2, toString(bytes, n));
     }
 
     private String toString(byte[] b, int len) {

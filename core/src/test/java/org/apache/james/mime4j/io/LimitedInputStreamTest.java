@@ -19,36 +19,38 @@
 
 package org.apache.james.mime4j.io;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import junit.framework.TestCase;
+public class LimitedInputStreamTest {
 
-public class LimitedInputStreamTest extends TestCase {
-
+    @Test
     public void testUpToLimitRead() throws IOException {
-        byte[] data = new byte[] {'0', '1', '2', '3', '4', '5', '6'};
+        byte[] data = new byte[]{'0', '1', '2', '3', '4', '5', '6'};
         ByteArrayInputStream instream = new ByteArrayInputStream(data);
         LimitedInputStream limitedStream = new LimitedInputStream(instream, 3);
-        assertEquals(0, limitedStream.getPosition());
-        assertTrue(limitedStream.read() != -1);
-        assertEquals(1, limitedStream.getPosition());
+        Assert.assertEquals(0, limitedStream.getPosition());
+        Assert.assertTrue(limitedStream.read() != -1);
+        Assert.assertEquals(1, limitedStream.getPosition());
         byte[] tmp = new byte[3];
-        assertEquals(2, limitedStream.read(tmp));
-        assertEquals(3, limitedStream.getPosition());
+        Assert.assertEquals(2, limitedStream.read(tmp));
+        Assert.assertEquals(3, limitedStream.getPosition());
         try {
             limitedStream.read();
-            fail("IOException should have been thrown");
+            Assert.fail("IOException should have been thrown");
         } catch (IOException ex) {
         }
         try {
             limitedStream.read(tmp);
-            fail("IOException should have been thrown");
+            Assert.fail("IOException should have been thrown");
         } catch (IOException ex) {
         }
         try {
             limitedStream.skip(2);
-            fail("IOException should have been thrown");
+            Assert.fail("IOException should have been thrown");
         } catch (IOException ex) {
         }
     }

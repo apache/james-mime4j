@@ -19,34 +19,38 @@
 
 package org.apache.james.mime4j.storage;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
+public class MultiReferenceStorageTest {
 
-public class MultiReferenceStorageTest extends TestCase {
-
+    @Test
     public void testForwardsGetInputStream() throws Exception {
         DummyStorage storage = new DummyStorage();
         MultiReferenceStorage multiReferenceStorage = new MultiReferenceStorage(
                 storage);
 
-        assertEquals(ByteArrayInputStream.class, multiReferenceStorage
+        Assert.assertEquals(ByteArrayInputStream.class, multiReferenceStorage
                 .getInputStream().getClass());
     }
 
+    @Test
     public void testSingleReference() throws Exception {
         DummyStorage storage = new DummyStorage();
         MultiReferenceStorage multiReferenceStorage = new MultiReferenceStorage(
                 storage);
 
-        assertFalse(storage.deleted);
+        Assert.assertFalse(storage.deleted);
 
         multiReferenceStorage.delete();
-        assertTrue(storage.deleted);
+        Assert.assertTrue(storage.deleted);
     }
 
+    @Test
     public void testMultiReference() throws Exception {
         DummyStorage storage = new DummyStorage();
         MultiReferenceStorage multiReferenceStorage = new MultiReferenceStorage(
@@ -55,12 +59,13 @@ public class MultiReferenceStorageTest extends TestCase {
         multiReferenceStorage.addReference();
 
         multiReferenceStorage.delete();
-        assertFalse(storage.deleted);
+        Assert.assertFalse(storage.deleted);
 
         multiReferenceStorage.delete();
-        assertTrue(storage.deleted);
+        Assert.assertTrue(storage.deleted);
     }
 
+    @Test
     public void testGetInputStreamOnDeleted() throws Exception {
         DummyStorage storage = new DummyStorage();
         MultiReferenceStorage multiReferenceStorage = new MultiReferenceStorage(
@@ -70,11 +75,12 @@ public class MultiReferenceStorageTest extends TestCase {
 
         try {
             multiReferenceStorage.getInputStream();
-            fail();
+            Assert.fail();
         } catch (IllegalStateException expected) {
         }
     }
 
+    @Test
     public void testAddReferenceOnDeleted() throws Exception {
         DummyStorage storage = new DummyStorage();
         MultiReferenceStorage multiReferenceStorage = new MultiReferenceStorage(
@@ -84,7 +90,7 @@ public class MultiReferenceStorageTest extends TestCase {
 
         try {
             multiReferenceStorage.addReference();
-            fail();
+            Assert.fail();
         } catch (IllegalStateException expected) {
         }
     }

@@ -19,28 +19,32 @@
 
 package org.apache.james.mime4j;
 
-import junit.framework.TestCase;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class MimeExceptionTest extends TestCase {
+public class MimeExceptionTest {
 
+    @Test
     public void testMimeExceptionString() {
         MimeException e = new MimeException("message");
-        assertEquals("message", e.getMessage());
-        assertNull(e.getCause());
+        Assert.assertEquals("message", e.getMessage());
+        Assert.assertNull(e.getCause());
     }
 
+    @Test
     public void testMimeExceptionThrowable() {
         NullPointerException npe = new NullPointerException("npe");
         MimeException e = new MimeException(npe);
-        assertSame(npe, e.getCause());
-        assertNotNull(e.getMessage());
+        Assert.assertSame(npe, e.getCause());
+        Assert.assertNotNull(e.getMessage());
     }
 
+    @Test
     public void testMimeExceptionStringThrowable() {
         NullPointerException npe = new NullPointerException("npe");
-        MimeException e = new MimeException("message",npe);
-        assertEquals("message", e.getMessage());
-        assertSame(npe, e.getCause());
+        MimeException e = new MimeException("message", npe);
+        Assert.assertEquals("message", e.getMessage());
+        Assert.assertSame(npe, e.getCause());
     }
 
 }

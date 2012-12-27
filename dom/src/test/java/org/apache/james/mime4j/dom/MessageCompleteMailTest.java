@@ -19,38 +19,29 @@
 
 package org.apache.james.mime4j.dom;
 
+import org.apache.james.mime4j.ExampleMail;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 
-import junit.framework.TestCase;
+public class MessageCompleteMailTest {
 
-import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.message.DefaultMessageBuilder;
-
-public class MessageCompleteMailTest extends TestCase {
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testMultipartAlternative() throws Exception {
         Message message = createMessage(ExampleMail.MIME_MULTIPART_ALTERNATIVE_BYTES);
-        assertTrue("Should be a multipart/alternative mail", message.isMultipart());
-        Multipart part = (Multipart)message.getBody();
-        assertEquals("alternative", part.getSubType());
+        Assert.assertTrue("Should be a multipart/alternative mail", message.isMultipart());
+        Multipart part = (Multipart) message.getBody();
+        Assert.assertEquals("alternative", part.getSubType());
     }
 
+    @Test
     public void testMultipartMixed() throws Exception {
         Message message = createMessage(ExampleMail.MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BYTES);
-        assertTrue("Should be a multipart/mixed mail", message.isMultipart());
-        Multipart part = (Multipart)message.getBody();
-        assertEquals("mixed", part.getSubType());
+        Assert.assertTrue("Should be a multipart/mixed mail", message.isMultipart());
+        Multipart part = (Multipart) message.getBody();
+        Assert.assertEquals("mixed", part.getSubType());
     }
 
     private Message createMessage(byte[] octets) throws Exception {

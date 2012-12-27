@@ -19,16 +19,17 @@
 
 package org.apache.james.mime4j.field.contentdisposition;
 
-import junit.framework.TestCase;
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class ContentDispositionTest extends TestCase {
+public class ContentDispositionTest {
 
+    @Test
     public void testExceptionTree() {
         // make sure that our ParseException extends MimeException.
-        assertTrue(MimeException.class.isAssignableFrom(ParseException.class));
+        Assert.assertTrue(MimeException.class.isAssignableFrom(ParseException.class));
     }
 
 }

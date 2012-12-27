@@ -19,6 +19,14 @@
 
 package org.apache.james.mime4j.dom;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
+import org.apache.james.mime4j.stream.MimeConfig;
+
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -31,16 +39,6 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.apache.james.mime4j.codec.CodecUtil;
-import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.message.DefaultMessageBuilder;
-import org.apache.james.mime4j.message.DefaultMessageWriter;
-import org.apache.james.mime4j.stream.MimeConfig;
 
 /**
  * Creates a TestSuite running the test for each .msg file in the test resouce folder.
@@ -76,7 +74,7 @@ public class ExampleMessagesRoundtripTest extends TestCase {
             CodecUtil.copy(msgout.openStream(), expectedstream);
             assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
         } catch (FileNotFoundException e) {
-            FileOutputStream fos = new FileOutputStream(msgout.getPath()+".expected");
+            FileOutputStream fos = new FileOutputStream(msgout.getPath() + ".expected");
             writer.writeMessage(inputMessage, fos);
             fos.close();
             fail("Expected file created");

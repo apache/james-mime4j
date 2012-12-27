@@ -20,26 +20,17 @@
 package org.apache.james.mime4j.codec;
 
 import org.apache.james.mime4j.ExampleMail;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
+public class CodecUtilTest {
 
-public class CodecUtilTest extends TestCase {
-
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
-    }
-
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
+    @Test
     public void testCopy() throws Exception {
         byte[] content = ExampleMail.MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES;
         ByteArrayInputStream in = new ByteArrayInputStream(content);
@@ -48,6 +39,7 @@ public class CodecUtilTest extends TestCase {
         assertEquals(content, out.toByteArray());
     }
 
+    @Test
     public void testEncodeQuotedPrintableLargeInput() throws Exception {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < 1024 * 5; i++) {
@@ -59,18 +51,20 @@ public class CodecUtilTest extends TestCase {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.encodeQuotedPrintableBinary(in, out);
         String actual = new String(out.toByteArray(), "US-ASCII");
-        assertEquals(expected, actual);
+        Assert.assertEquals(expected, actual);
     }
 
+    @Test
     public void testEncodeQuotedPrintableNonAsciiChars() throws Exception {
         String s = "7bit content with euro \u20AC symbol";
         InputStream in = new ByteArrayInputStream(s.getBytes("iso-8859-15"));
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.encodeQuotedPrintableBinary(in, out);
         String actual = new String(out.toByteArray(), "US-ASCII");
-        assertEquals("7bit=20content=20with=20euro=20=A4=20symbol", actual);
+        Assert.assertEquals("7bit=20content=20with=20euro=20=A4=20symbol", actual);
     }
 
+    @Test
     public void testBase64OutputStream() throws Exception {
         StringBuilder sb = new StringBuilder(2048);
         for (int i = 0; i < 128; i++) {
@@ -78,7 +72,7 @@ public class CodecUtilTest extends TestCase {
         }
         String input = sb.toString();
         String output = roundtripUsingOutputStream(input);
-        assertEquals(input, output);
+        Assert.assertEquals(input, output);
     }
 
     private String roundtripUsingOutputStream(String input) throws IOException {
@@ -98,6 +92,7 @@ public class CodecUtilTest extends TestCase {
     /**
      * This test is a proof for MIME4J-67
      */
+    @Test
     public void testBase64Encoder() throws Exception {
         StringBuilder sb = new StringBuilder(2048);
         for (int i = 0; i < 128; i++) {
@@ -105,7 +100,7 @@ public class CodecUtilTest extends TestCase {
         }
         String input = sb.toString();
         String output = roundtripUsingEncoder(input);
-        assertEquals(input, output);
+        Assert.assertEquals(input, output);
     }
 
     private String roundtripUsingEncoder(String input) throws IOException {
@@ -154,10 +149,10 @@ public class CodecUtilTest extends TestCase {
 
     private void assertEquals(byte[] expected, byte[] actual) {
         StringBuilder buffer = new StringBuilder(expected.length);
-        assertEquals(expected.length, actual.length);
+        Assert.assertEquals(expected.length, actual.length);
         for (int i = 0; i < actual.length; i++) {
-            buffer.append((char)actual[i]);
-            assertEquals("Mismatch@" + i, expected[i], actual[i]);
+            buffer.append((char) actual[i]);
+            Assert.assertEquals("Mismatch@" + i, expected[i], actual[i]);
         }
     }
 }

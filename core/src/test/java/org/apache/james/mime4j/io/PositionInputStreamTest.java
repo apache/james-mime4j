@@ -19,35 +19,37 @@
 
 package org.apache.james.mime4j.io;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import junit.framework.TestCase;
+public class PositionInputStreamTest {
 
-public class PositionInputStreamTest extends TestCase {
-
+    @Test
     public void testPositionCounting() throws IOException {
-        byte[] data = new byte[] {'0', '1', '2', '3', '4', '5', '6'};
+        byte[] data = new byte[]{'0', '1', '2', '3', '4', '5', '6'};
         ByteArrayInputStream instream = new ByteArrayInputStream(data);
         PositionInputStream countingStream = new PositionInputStream(instream);
-        assertEquals(0, countingStream.getPosition());
-        assertTrue(countingStream.read() != -1);
-        assertEquals(1, countingStream.getPosition());
+        Assert.assertEquals(0, countingStream.getPosition());
+        Assert.assertTrue(countingStream.read() != -1);
+        Assert.assertEquals(1, countingStream.getPosition());
         byte[] tmp = new byte[3];
-        assertEquals(3, countingStream.read(tmp));
-        assertEquals(4, countingStream.getPosition());
-        assertEquals(2, countingStream.skip(2));
-        assertEquals(6, countingStream.getPosition());
-        assertTrue(countingStream.read() != -1);
-        assertEquals(7, countingStream.getPosition());
-        assertTrue(countingStream.read() == -1);
-        assertEquals(7, countingStream.getPosition());
-        assertTrue(countingStream.read() == -1);
-        assertEquals(7, countingStream.getPosition());
-        assertTrue(countingStream.read(tmp) == -1);
-        assertEquals(7, countingStream.getPosition());
-        assertTrue(countingStream.read(tmp) == -1);
-        assertEquals(7, countingStream.getPosition());
+        Assert.assertEquals(3, countingStream.read(tmp));
+        Assert.assertEquals(4, countingStream.getPosition());
+        Assert.assertEquals(2, countingStream.skip(2));
+        Assert.assertEquals(6, countingStream.getPosition());
+        Assert.assertTrue(countingStream.read() != -1);
+        Assert.assertEquals(7, countingStream.getPosition());
+        Assert.assertTrue(countingStream.read() == -1);
+        Assert.assertEquals(7, countingStream.getPosition());
+        Assert.assertTrue(countingStream.read() == -1);
+        Assert.assertEquals(7, countingStream.getPosition());
+        Assert.assertTrue(countingStream.read(tmp) == -1);
+        Assert.assertEquals(7, countingStream.getPosition());
+        Assert.assertTrue(countingStream.read(tmp) == -1);
+        Assert.assertEquals(7, countingStream.getPosition());
     }
 
 }

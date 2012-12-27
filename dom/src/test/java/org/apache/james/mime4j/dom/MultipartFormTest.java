@@ -19,22 +19,21 @@
 
 package org.apache.james.mime4j.dom;
 
-import java.io.ByteArrayOutputStream;
-
-import junit.framework.TestCase;
-
-import org.apache.james.mime4j.dom.Header;
-import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.MultipartImpl;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class MultipartFormTest extends TestCase {
+import java.io.ByteArrayOutputStream;
 
+public class MultipartFormTest {
+
+    @Test
     public void testMultipartFormContent() throws Exception {
         BasicBodyFactory bodyFactory = new BasicBodyFactory();
 
@@ -72,20 +71,20 @@ public class MultipartFormTest extends TestCase {
         out.close();
 
         String expected = "--foo\r\n" +
-            "Content-Type: text/plain\r\n" +
-            "\r\n" +
-            "this stuff\r\n" +
-            "--foo\r\n" +
-            "Content-Type: text/plain\r\n" +
-            "\r\n" +
-            "that stuff\r\n" +
-            "--foo\r\n" +
-            "Content-Type: text/plain\r\n" +
-            "\r\n" +
-            "all kind of stuff\r\n" +
-            "--foo--\r\n";
+                "Content-Type: text/plain\r\n" +
+                "\r\n" +
+                "this stuff\r\n" +
+                "--foo\r\n" +
+                "Content-Type: text/plain\r\n" +
+                "\r\n" +
+                "that stuff\r\n" +
+                "--foo\r\n" +
+                "Content-Type: text/plain\r\n" +
+                "\r\n" +
+                "all kind of stuff\r\n" +
+                "--foo--\r\n";
         String s = out.toString("US-ASCII");
-        assertEquals(expected, s);
+        Assert.assertEquals(expected, s);
     }
 
 }

@@ -19,21 +19,19 @@
 
 package org.apache.james.mime4j.dom;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-
-import junit.framework.TestCase;
-
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.stream.MimeConfig;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class MessageHeadlessParserTest extends TestCase {
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 
+public class MessageHeadlessParserTest {
 
+    @Test
     public void testMalformedHeaderShouldEndHeader() throws Exception {
         String headlessContent = "Subject: my subject\r\n"
                 + "Hi, how are you?\r\n"
@@ -48,13 +46,14 @@ public class MessageHeadlessParserTest extends TestCase {
         builder.setMimeEntityConfig(config);
         Message message = builder.parseMessage(
                 new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
-        assertEquals("text/plain", message.getMimeType());
-        assertEquals(1, message.getHeader().getFields().size());
+        Assert.assertEquals("text/plain", message.getMimeType());
+        Assert.assertEquals(1, message.getHeader().getFields().size());
         BufferedReader reader = new BufferedReader(((TextBody) message.getBody()).getReader());
         String firstLine = reader.readLine();
-        assertEquals("Hi, how are you?", firstLine);
+        Assert.assertEquals("Hi, how are you?", firstLine);
     }
 
+    @Test
     public void testSimpleNonMimeTextHeadless() throws Exception {
         String headlessContent = "Hi, how are you?\r\n"
                 + "This is a simple message with no headers. While mime messages should start with\r\n"
@@ -68,13 +67,14 @@ public class MessageHeadlessParserTest extends TestCase {
         builder.setMimeEntityConfig(config);
         Message message = builder.parseMessage(
                 new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
-        assertEquals("text/plain", message.getMimeType());
-        assertEquals(0, message.getHeader().getFields().size());
+        Assert.assertEquals("text/plain", message.getMimeType());
+        Assert.assertEquals(0, message.getHeader().getFields().size());
         BufferedReader reader = new BufferedReader(((TextBody) message.getBody()).getReader());
         String firstLine = reader.readLine();
-        assertEquals("Hi, how are you?", firstLine);
+        Assert.assertEquals("Hi, how are you?", firstLine);
     }
 
+    @Test
     public void testMultipartFormContent() throws Exception {
         String contentType = "multipart/form-data; boundary=foo";
         String headlessContent = "\r\n"
@@ -98,12 +98,12 @@ public class MessageHeadlessParserTest extends TestCase {
 
         Message message = builder.parseMessage(
                 new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
-        assertEquals("multipart/form-data", message.getMimeType());
-        assertEquals(1, message.getHeader().getFields().size());
+        Assert.assertEquals("multipart/form-data", message.getMimeType());
+        Assert.assertEquals(1, message.getHeader().getFields().size());
         ContentTypeField contentTypeField = ((ContentTypeField) message
                 .getHeader().getField(FieldName.CONTENT_TYPE));
-        assertEquals("foo", contentTypeField.getBoundary());
+        Assert.assertEquals("foo", contentTypeField.getBoundary());
         Multipart multipart = (Multipart) message.getBody();
-        assertEquals(3, multipart.getCount());
+        Assert.assertEquals(3, multipart.getCount());
     }
 }

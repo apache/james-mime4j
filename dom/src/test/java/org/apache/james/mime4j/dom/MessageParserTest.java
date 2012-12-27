@@ -19,6 +19,16 @@
 
 package org.apache.james.mime4j.dom;
 
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestSuite;
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.field.FieldsTest;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.MimeConfig;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -32,22 +42,6 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.dom.BinaryBody;
-import org.apache.james.mime4j.dom.Body;
-import org.apache.james.mime4j.dom.Entity;
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.field.FieldsTest;
-import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.DefaultMessageBuilder;
-import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MimeConfig;
 
 public class MessageParserTest extends TestCase {
 
@@ -121,7 +115,7 @@ public class MessageParserTest extends TestCase {
             String expected = IOUtils.toString(xmlFileUrl.openStream(), "ISO8859-1");
             assertEquals(expected, result);
         } catch (FileNotFoundException ex) {
-            IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath()+".expected"), "ISO8859-1");
+            IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath() + ".expected"), "ISO8859-1");
             fail("Expected file created.");
         }
     }
@@ -154,7 +148,7 @@ public class MessageParserTest extends TestCase {
         if (e.getBody() instanceof Multipart) {
             sb.append("<multipart>\r\n");
 
-            Multipart multipart =(Multipart) e.getBody();
+            Multipart multipart = (Multipart) e.getBody();
             List<Entity> parts = multipart.getBodyParts();
 
             if (multipart.getPreamble() != null) {
@@ -181,7 +175,7 @@ public class MessageParserTest extends TestCase {
         } else {
             Body b = e.getBody();
             String s = prefix + "_decoded_" + id
-                            + (b instanceof TextBody ? ".txt" : ".bin");
+                    + (b instanceof TextBody ? ".txt" : ".bin");
             String tag = b instanceof TextBody ? "text-body" : "binary-body";
             File f = new File(s);
             sb.append("<" + tag + " name=\"" + f.getName() + "\"/>\r\n");
@@ -198,15 +192,15 @@ public class MessageParserTest extends TestCase {
                     String s1 = IOUtils.toString(expectedUrl.openStream(), charset);
                     assertEquals(f.getName(), s1, s2);
                 } catch (FileNotFoundException ex) {
-                    IOUtils.write(s2, new FileOutputStream(expectedUrl.getPath()+".expected"));
+                    IOUtils.write(s2, new FileOutputStream(expectedUrl.getPath() + ".expected"));
                     fail("Expected file created.");
                 }
             } else {
                 try {
                     assertEqualsBinary(f.getName(), expectedUrl.openStream(),
-                        ((BinaryBody) b).getInputStream());
+                            ((BinaryBody) b).getInputStream());
                 } catch (FileNotFoundException ex) {
-                    IOUtils.copy(((BinaryBody) b).getInputStream(), new FileOutputStream(expectedUrl.getPath()+".expected"));
+                    IOUtils.copy(((BinaryBody) b).getInputStream(), new FileOutputStream(expectedUrl.getPath() + ".expected"));
                     fail("Expected file created.");
                 }
             }

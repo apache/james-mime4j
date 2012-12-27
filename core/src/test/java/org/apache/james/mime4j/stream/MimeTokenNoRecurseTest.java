@@ -19,27 +19,29 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
-import junit.framework.TestCase;
-
-import org.apache.james.mime4j.util.CharsetUtil;
-
-public class MimeTokenNoRecurseTest extends TestCase {
+public class MimeTokenNoRecurseTest {
 
     private static final String INNER_MAIL = "From: Timothy Tayler <tim@example.org>\r\n" +
-                "To: Joshua Tetley <joshua@example.org>\r\n" +
-                "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
-                "Subject: Multipart Without RFC822 Part\r\n" +
-                "Content-Type: multipart/mixed;boundary=42\r\n\r\n" +
-                "--42\r\n" +
-                "Content-Type:text/plain; charset=US-ASCII\r\n\r\n" +
-                "First part of this mail\r\n" +
-                "--42\r\n" +
-                "Content-Type:text/plain; charset=US-ASCII\r\n\r\n" +
-                "Second part of this mail\r\n" +
-                "--42--\r\n";
+            "To: Joshua Tetley <joshua@example.org>\r\n" +
+            "Date: Tue, 12 Feb 2008 17:34:09 +0000 (GMT)\r\n" +
+            "Subject: Multipart Without RFC822 Part\r\n" +
+            "Content-Type: multipart/mixed;boundary=42\r\n\r\n" +
+            "--42\r\n" +
+            "Content-Type:text/plain; charset=US-ASCII\r\n\r\n" +
+            "First part of this mail\r\n" +
+            "--42\r\n" +
+            "Content-Type:text/plain; charset=US-ASCII\r\n\r\n" +
+            "Second part of this mail\r\n" +
+            "--42--\r\n";
 
     private static final String MAIL_WITH_RFC822_PART = "MIME-Version: 1.0\r\n" +
             "From: Timothy Tayler <tim@example.org>\r\n" +
@@ -64,20 +66,19 @@ public class MimeTokenNoRecurseTest extends TestCase {
 
     MimeTokenStream stream;
 
-    @Override
-    protected void setUp() throws Exception {
-        super.setUp();
+    @Before
+    public void setUp() throws Exception {
         stream = new MimeTokenStream();
         byte[] bytes = CharsetUtil.US_ASCII.encode(MAIL_WITH_RFC822_PART).array();
         InputStream in = new ByteArrayInputStream(bytes);
         stream.parse(in);
     }
 
-    @Override
-    protected void tearDown() throws Exception {
-        super.tearDown();
+    @After
+    public void tearDown() throws Exception {
     }
 
+    @Test
     public void testWhenRecurseShouldRecurseInnerMail() throws Exception {
         stream.setRecursionMode(RecursionMode.M_RECURSE);
         nextIs(EntityState.T_START_HEADER);
@@ -119,6 +120,7 @@ public class MimeTokenNoRecurseTest extends TestCase {
     }
 
 
+    @Test
     public void testWhenRecurseShouldTreatInnerMailAsAnyOtherPart() throws Exception {
         stream.setRecursionMode(RecursionMode.M_NO_RECURSE);
         nextIs(EntityState.T_START_HEADER);
@@ -141,6 +143,7 @@ public class MimeTokenNoRecurseTest extends TestCase {
         nextIs(EntityState.T_END_MULTIPART);
     }
 
+    @Test
     public void testWhenNoRecurseInputStreamShouldContainInnerMail() throws Exception {
         stream.setRecursionMode(RecursionMode.M_NO_RECURSE);
         nextIs(EntityState.T_START_HEADER);
@@ -164,14 +167,15 @@ public class MimeTokenNoRecurseTest extends TestCase {
         nextIs(EntityState.T_BODY);
         InputStream inputStream = stream.getInputStream();
         int next = inputStream.read();
-        int i=0;
+        int i = 0;
         while (next != -1) {
-            assertEquals("@" + i, INNER_MAIL.charAt(i++), (char) next);
+            Assert.assertEquals("@" + i, INNER_MAIL.charAt(i++), (char) next);
             next = inputStream.read();
         }
-        assertEquals(INNER_MAIL.length()-2, i);
+        Assert.assertEquals(INNER_MAIL.length() - 2, i);
     }
 
+    @Test
     public void testSetNoRecurseSoInputStreamShouldContainInnerMail() throws Exception {
         nextIs(EntityState.T_START_HEADER);
         nextIs(EntityState.T_FIELD);
@@ -195,12 +199,12 @@ public class MimeTokenNoRecurseTest extends TestCase {
         nextIs(EntityState.T_BODY);
         InputStream inputStream = stream.getInputStream();
         int next = inputStream.read();
-        int i=0;
+        int i = 0;
         while (next != -1) {
-            assertEquals("@" + i, INNER_MAIL.charAt(i++), (char) next);
+            Assert.assertEquals("@" + i, INNER_MAIL.charAt(i++), (char) next);
             next = inputStream.read();
         }
-        assertEquals(INNER_MAIL.length()-2, i);
+        Assert.assertEquals(INNER_MAIL.length() - 2, i);
     }
 
     private void nextShouldBeStandardPart(boolean withHeader) throws Exception {
@@ -215,6 +219,6 @@ public class MimeTokenNoRecurseTest extends TestCase {
     }
 
     private void nextIs(EntityState state) throws Exception {
-        assertEquals(MimeTokenStream.stateToString(state), MimeTokenStream.stateToString(stream.next()));
+        Assert.assertEquals(MimeTokenStream.stateToString(state), MimeTokenStream.stateToString(stream.next()));
     }
 }

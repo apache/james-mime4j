@@ -19,63 +19,64 @@
 
 package org.apache.james.mime4j.io;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.apache.james.mime4j.io.LineNumberInputStream;
-
-import junit.framework.TestCase;
-
-public class LineNumberInputStreamTest extends TestCase {
+public class LineNumberInputStreamTest {
     /**
      * Tests that reading single bytes updates the line number appropriately.
      */
+    @Test
     public void testReadSingleByte() throws IOException {
         String s = "Yada\r\nyada\r\nyada\r\n";
         LineNumberInputStream is = new LineNumberInputStream(
                 new ByteArrayInputStream(s.getBytes()));
 
         for (int i = 0; i < 6; i++) {
-            assertEquals(1, is.getLineNumber());
+            Assert.assertEquals(1, is.getLineNumber());
             is.read();
         }
 
         for (int i = 6; i < 12; i++) {
-            assertEquals(2, is.getLineNumber());
+            Assert.assertEquals(2, is.getLineNumber());
             is.read();
         }
 
         for (int i = 12; i < 18; i++) {
-            assertEquals(3, is.getLineNumber());
+            Assert.assertEquals(3, is.getLineNumber());
             is.read();
         }
 
-        assertEquals(4, is.getLineNumber());
-        assertEquals(-1, is.read());
+        Assert.assertEquals(4, is.getLineNumber());
+        Assert.assertEquals(-1, is.read());
     }
 
     /**
      * Tests that reading multiple bytes at once updates the line number
      * appropriately.
      */
+    @Test
     public void testReadManyBytes() throws IOException {
         String s = "Yada\r\nyada\r\nyada\r\n";
         LineNumberInputStream is = new LineNumberInputStream(
                 new ByteArrayInputStream(s.getBytes()));
 
         byte[] buf = new byte[4];
-        assertEquals(1, is.getLineNumber());
+        Assert.assertEquals(1, is.getLineNumber());
         is.read(buf);
-        assertEquals(1, is.getLineNumber());
+        Assert.assertEquals(1, is.getLineNumber());
         is.read(buf);
-        assertEquals(2, is.getLineNumber());
+        Assert.assertEquals(2, is.getLineNumber());
         is.read(buf);
-        assertEquals(3, is.getLineNumber());
+        Assert.assertEquals(3, is.getLineNumber());
         is.read(buf);
-        assertEquals(3, is.getLineNumber());
+        Assert.assertEquals(3, is.getLineNumber());
         is.read(buf);
-        assertEquals(4, is.getLineNumber());
+        Assert.assertEquals(4, is.getLineNumber());
 
-        assertEquals(-1, is.read());
+        Assert.assertEquals(-1, is.read());
     }
 }
