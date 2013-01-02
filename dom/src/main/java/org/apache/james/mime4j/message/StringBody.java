@@ -27,6 +27,7 @@ import java.nio.charset.Charset;
 
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 class StringBody extends TextBody {
 
@@ -41,7 +42,7 @@ class StringBody extends TextBody {
 
     @Override
     public String getMimeCharset() {
-        return this.charset.name();
+        return this.charset != null ? this.charset.name() : null;
     }
 
     @Override
@@ -51,7 +52,8 @@ class StringBody extends TextBody {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return new StringInputStream(this.content, this.charset, 2048);
+        return new StringInputStream(this.content,
+                this.charset != null ? this.charset : CharsetUtil.DEFAULT_CHARSET, 2048);
     }
 
     @Override

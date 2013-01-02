@@ -24,16 +24,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
 
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 class BasicTextBody extends TextBody {
 
     private final byte[] content;
-    private final String charset;
+    private final Charset charset;
 
-    BasicTextBody(final byte[] content, final String charset) {
+    BasicTextBody(final byte[] content, final Charset charset) {
         super();
         this.content = content;
         this.charset = charset;
@@ -41,12 +43,13 @@ class BasicTextBody extends TextBody {
 
     @Override
     public String getMimeCharset() {
-        return this.charset;
+        return this.charset != null ? this.charset.name() : null;
     }
 
     @Override
     public Reader getReader() throws IOException {
-        return new InputStreamReader(getInputStream(), this.charset);
+        return new InputStreamReader(getInputStream(),
+                this.charset != null ? this.charset : CharsetUtil.DEFAULT_CHARSET);
     }
 
     @Override
