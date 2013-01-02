@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.TextBody;
@@ -38,8 +39,12 @@ public class BasicBodyFactory implements BodyFactory {
         return new BasicBinaryBody(bufferContent(is));
     }
 
-    protected Charset resolveCharset(final String mimeCharset) {
-        return mimeCharset != null ? Charset.forName(mimeCharset) : null;
+    protected Charset resolveCharset(final String mimeCharset) throws UnsupportedEncodingException {
+        try {
+            return mimeCharset != null ? Charset.forName(mimeCharset) : null;
+        } catch (UnsupportedCharsetException ex) {
+            throw new UnsupportedEncodingException(mimeCharset);
+        }
     }
 
     public TextBody textBody(final InputStream is, final String mimeCharset) throws IOException {
