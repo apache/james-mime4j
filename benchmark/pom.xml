@@ -31,7 +31,7 @@
     <artifactId>apache-mime4j-benchmark</artifactId>
     <packaging>bundle</packaging>
 
-    <name>Apache JAMES Mime4j (Benchmarks)</name>
+    <name>Apache James :: Mime4j :: Benchmarks</name>
     <description>Benchmarks for MIME4J stream based MIME message parser</description>
 
     <dependencies>

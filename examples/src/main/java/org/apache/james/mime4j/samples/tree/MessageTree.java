@@ -312,9 +312,8 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                 AddressListField field = (AddressListField) o;
                 MailboxList list = field.getAddressList().flatten();
                 StringBuilder sb = new StringBuilder();
-                for (Object aList : list) {
-                    Mailbox mb = aList;
-                    sb.append(AddressFormatter.DEFAULT.format(mb, false)).append("\n");
+                for (Mailbox mailbox : list) {
+                    sb.append(AddressFormatter.DEFAULT.format(mailbox, false)).append("\n");
                 }
                 textView.setText(sb.toString());
 

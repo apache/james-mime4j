@@ -21,7 +21,7 @@ package org.apache.james.mime4j.codec;
 
 import org.apache.james.mime4j.ExampleMail;
 import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertArrayEquals;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -37,7 +37,7 @@ public class CodecUtilTest {
         ByteArrayInputStream in = new ByteArrayInputStream(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.copy(in, out);
-        assertEquals(content, out.toByteArray());
+        assertArrayEquals(content, out.toByteArray());
     }
 
     @Test
