@@ -19,10 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Stack;
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
@@ -32,9 +28,12 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Stack;
 
 /**
  * A <code>ContentHandler</code> for building an <code>Entity</code> to be
@@ -43,6 +42,7 @@ import org.apache.james.mime4j.util.ByteSequence;
 class EntityBuilder implements ContentHandler {
 
     private final Entity entity;
+    private MessageImplFactory messageImplFactory;
     private final BodyFactory bodyFactory;
     private final Stack<Object> stack;
 
@@ -50,6 +50,17 @@ class EntityBuilder implements ContentHandler {
             final Entity entity,
             final BodyFactory bodyFactory) {
         this.entity = entity;
+        this.messageImplFactory = new DefaultMessageImplFactory();
+        this.bodyFactory = bodyFactory;
+        this.stack = new Stack<Object>();
+    }
+
+    EntityBuilder(
+            final Entity entity,
+            final MessageImplFactory messageImplFactory,
+            final BodyFactory bodyFactory) {
+        this.entity = entity;
+        this.messageImplFactory = messageImplFactory;
         this.bodyFactory = bodyFactory;
         this.stack = new Stack<Object>();
     }
@@ -62,45 +73,36 @@ class EntityBuilder implements ContentHandler {
         }
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#startMessage()
-     */
+    @Override
     public void startMessage() throws MimeException {
         if (stack.isEmpty()) {
             stack.push(this.entity);
         } else {
             expect(Entity.class);
-            Message m = new MessageImpl();
+            Message m = messageImplFactory.messageImpl();
             ((Entity) stack.peek()).setBody(m);
             stack.push(m);
         }
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#endMessage()
-     */
+    @Override
     public void endMessage() throws MimeException {
         expect(Message.class);
         stack.pop();
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#startHeader()
-     */
+    @Override
     public void startHeader() throws MimeException {
         stack.push(new HeaderImpl());
     }
 
-    /**
-     */
+    @Override
     public void field(Field field) throws MimeException {
         expect(Header.class);
         ((Header) stack.peek()).addField(field);
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#endHeader()
-     */
+    @Override
     public void endHeader() throws MimeException {
         expect(Header.class);
         Header h = (Header) stack.pop();
@@ -108,9 +110,7 @@ class EntityBuilder implements ContentHandler {
         ((Entity) stack.peek()).setHeader(h);
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#startMultipart(org.apache.james.mime4j.stream.BodyDescriptor)
-     */
+    @Override
     public void startMultipart(final BodyDescriptor bd) throws MimeException {
         expect(Entity.class);
 
@@ -121,9 +121,7 @@ class EntityBuilder implements ContentHandler {
         stack.push(multiPart);
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#body(org.apache.james.mime4j.stream.BodyDescriptor, java.io.InputStream)
-     */
+    @Override
     public void body(BodyDescriptor bd, final InputStream is) throws MimeException, IOException {
         expect(Entity.class);
 
@@ -156,16 +154,12 @@ class EntityBuilder implements ContentHandler {
         entity.setBody(body);
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#endMultipart()
-     */
+    @Override
     public void endMultipart() throws MimeException {
         stack.pop();
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#startBodyPart()
-     */
+    @Override
     public void startBodyPart() throws MimeException {
         expect(Multipart.class);
 
@@ -174,26 +168,20 @@ class EntityBuilder implements ContentHandler {
         stack.push(bodyPart);
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#endBodyPart()
-     */
+    @Override
     public void endBodyPart() throws MimeException {
         expect(BodyPart.class);
         stack.pop();
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#epilogue(java.io.InputStream)
-     */
+    @Override
     public void epilogue(InputStream is) throws MimeException, IOException {
         expect(MultipartImpl.class);
         ByteSequence bytes = loadStream(is);
         ((MultipartImpl) stack.peek()).setEpilogueRaw(bytes);
     }
 
-    /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#preamble(java.io.InputStream)
-     */
+    @Override
     public void preamble(InputStream is) throws MimeException, IOException {
         expect(MultipartImpl.class);
         ByteSequence bytes = loadStream(is);
@@ -202,8 +190,11 @@ class EntityBuilder implements ContentHandler {
 
     /**
      * Unsupported.
-     * @see org.apache.james.mime4j.parser.ContentHandler#raw(java.io.InputStream)
+     *
+     * @param is the raw contents of the entity.
+     * @throws UnsupportedOperationException
      */
+    @Override
     public void raw(InputStream is) throws MimeException, IOException {
         throw new UnsupportedOperationException("Not supported");
     }

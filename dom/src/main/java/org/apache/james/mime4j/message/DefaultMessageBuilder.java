@@ -49,6 +49,7 @@ import org.apache.james.mime4j.stream.MimeConfig;
 public class DefaultMessageBuilder implements MessageBuilder {
 
     private FieldParser<? extends ParsedField> fieldParser = null;
+    private MessageImplFactory messageImplFactory = null;
     private BodyFactory bodyFactory = null;
     private MimeConfig config = null;
     private BodyDescriptorBuilder bodyDescBuilder = null;
@@ -62,6 +63,10 @@ public class DefaultMessageBuilder implements MessageBuilder {
 
     public void setFieldParser(final FieldParser<? extends ParsedField> fieldParser) {
         this.fieldParser = fieldParser;
+    }
+
+    public void setMessageImplFactory(final MessageImplFactory messageImplFactory) {
+        this.messageImplFactory = messageImplFactory;
     }
 
     public void setBodyFactory(final BodyFactory bodyFactory) {
@@ -220,7 +225,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
      *             {@link SingleBody}.
      */
     public Message copy(Message other) {
-        MessageImpl copy = new MessageImpl();
+        MessageImpl copy = newMessageImpl();
         if (other.getHeader() != null) {
             copy.setHeader(copy(other.getHeader()));
         }
@@ -280,7 +285,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
     }
 
     public Message newMessage() {
-        return new MessageImpl();
+        return newMessageImpl();
     }
 
     public Message newMessage(final Message source) {
@@ -289,7 +294,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
 
     public Message parseMessage(final InputStream is) throws IOException, MimeIOException {
         try {
-            MessageImpl message = new MessageImpl();
+            MessageImpl message = newMessageImpl();
             MimeConfig cfg = config != null ? config : new MimeConfig();
             boolean strict = cfg.isStrictParsing();
             DecodeMonitor mon = monitor != null ? monitor :
@@ -313,6 +318,11 @@ public class DefaultMessageBuilder implements MessageBuilder {
         } catch (MimeException e) {
             throw new MimeIOException(e);
         }
+    }
+
+    private MessageImpl newMessageImpl() {
+        MessageImplFactory mif = messageImplFactory != null ? messageImplFactory : new DefaultMessageImplFactory();
+        return mif.messageImpl();
     }
 
 }
