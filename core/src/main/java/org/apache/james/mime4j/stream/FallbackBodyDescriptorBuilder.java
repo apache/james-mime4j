@@ -63,8 +63,6 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
     /**
      * Creates a new <code>BodyDescriptor</code> instance.
      *
-     * @param parent the descriptor of the parent or <code>null</code> if this
-     *        is the root descriptor.
      */
     public FallbackBodyDescriptorBuilder(final String parentMimeType, final DecodeMonitor monitor) {
         super();

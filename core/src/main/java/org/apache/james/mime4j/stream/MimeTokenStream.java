@@ -383,7 +383,7 @@ public class MimeTokenStream {
      * @param state
      * @return rendered as string, not null
      */
-    public static final String stateToString(EntityState state) {
+    public static String stateToString(EntityState state) {
         return MimeEntity.stateToString(state);
     }
 

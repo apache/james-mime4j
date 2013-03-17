@@ -32,8 +32,8 @@ public class Base64OutputStreamTest {
 
     @Test
     public void testEncode() throws IOException {
-        ByteArrayOutputStream bos = null;
-        Base64OutputStream encoder = null;
+        ByteArrayOutputStream bos;
+        Base64OutputStream encoder;
 
         /*
          * Simple initial test.
@@ -47,8 +47,8 @@ public class Base64OutputStreamTest {
 
     @Test
     public void testEncodeUnderlyingStreamStaysOpen() throws IOException {
-        ByteArrayOutputStream bos = null;
-        Base64OutputStream encoder = null;
+        ByteArrayOutputStream bos;
+        Base64OutputStream encoder;
 
         bos = new ByteArrayOutputStream();
         encoder = new Base64OutputStream(bos);

@@ -29,30 +29,27 @@
     </parent>
 
     <artifactId>apache-mime4j-examples</artifactId>
+    <packaging>bundle</packaging>
 
-    <name>Apache JAMES Mime4j (Code Examples)</name>
+    <name>Apache James :: Mime4j :: Code Examples</name>
     <description>Examples for Mime4J stream based MIME message parser</description>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.james</groupId>
             <artifactId>apache-mime4j-dom</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.james</groupId>
             <artifactId>apache-mime4j-mbox-iterator</artifactId>
-            <version>0.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.james</groupId>
             <artifactId>apache-mime4j-storage</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

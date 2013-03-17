@@ -38,7 +38,7 @@ import org.apache.james.mime4j.dom.address.MailboxList;
  */
 class Builder {
 
-    private static Builder singleton = new Builder();
+    private static final Builder singleton = new Builder();
 
     public static Builder getInstance() {
         return singleton;
@@ -203,9 +203,9 @@ class Builder {
 
     private static class ChildNodeIterator implements Iterator<Node> {
 
-        private SimpleNode simpleNode;
+        private final SimpleNode simpleNode;
         private int index;
-        private int len;
+        private final int len;
 
         public ChildNodeIterator(SimpleNode simpleNode) {
             this.simpleNode = simpleNode;

@@ -52,7 +52,7 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
     private boolean parsed = false;
 
     private String dispositionType = "";
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private final Map<String, String> parameters = new HashMap<String, String>();
 
     private boolean creationDateParsed;
     private Date creationDate;

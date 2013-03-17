@@ -652,24 +652,24 @@ public class ExampleMail {
     public static final byte[] MAIL_WITH_RFC822_PART_BYTES = ascii(MAIL_WITH_RFC822_PART);
     public static final byte[] MIME_MULTIPART_EMBEDDED_MESSAGES_BYTES = ascii(MIME_MULTIPART_EMBEDDED_MESSAGES);
 
-    public static final byte[] ascii(String text) {
+    public static byte[] ascii(String text) {
 
         return US_ASCII.encode(text).array();
     }
 
-    public static final byte[] latin1(String text) {
+    public static byte[] latin1(String text) {
 
         return LATIN1.encode(text).array();
     }
 
-    public static final byte[] join(byte[] one, byte[] two) {
+    public static byte[] join(byte[] one, byte[] two) {
         byte[] results = new byte[one.length + two.length];
         System.arraycopy(one, 0, results, 0, one.length);
         System.arraycopy(two, 0, results, one.length, two.length);
         return results;
     }
 
-    public static final byte[] join(byte[][] byteArrays) {
+    public static byte[] join(byte[][] byteArrays) {
         int length = 0;
         for (byte[] bytes : byteArrays) {
             length += bytes.length;
@@ -699,7 +699,6 @@ public class ExampleMail {
             buffer.insert(count, '=');
             count += 79;
         }
-        final String result = buffer.toString();
-        return result;
+        return buffer.toString();
     }
 }

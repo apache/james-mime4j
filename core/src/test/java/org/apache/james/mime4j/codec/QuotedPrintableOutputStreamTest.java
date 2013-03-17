@@ -31,8 +31,8 @@ public class QuotedPrintableOutputStreamTest {
 
     @Test
     public void testEncode() throws IOException {
-        ByteArrayOutputStream bos = null;
-        QuotedPrintableOutputStream encoder = null;
+        ByteArrayOutputStream bos;
+        QuotedPrintableOutputStream encoder;
 
         /*
          * Simple initial test.
@@ -47,8 +47,8 @@ public class QuotedPrintableOutputStreamTest {
 
     @Test
     public void testEncodeUnderlyingStreamStaysOpen() throws IOException {
-        ByteArrayOutputStream bos = null;
-        QuotedPrintableOutputStream encoder = null;
+        ByteArrayOutputStream bos;
+        QuotedPrintableOutputStream encoder;
 
         bos = new ByteArrayOutputStream();
         encoder = new QuotedPrintableOutputStream(bos, false);
@@ -71,8 +71,8 @@ public class QuotedPrintableOutputStreamTest {
 
     @Test
     public void testEncodeSpecials() throws IOException {
-        ByteArrayOutputStream bos = null;
-        QuotedPrintableOutputStream encoder = null;
+        ByteArrayOutputStream bos;
+        QuotedPrintableOutputStream encoder;
 
         bos = new ByteArrayOutputStream();
         encoder = new QuotedPrintableOutputStream(bos, false);
@@ -84,8 +84,8 @@ public class QuotedPrintableOutputStreamTest {
 
     @Test
     public void testEncodeWrapping() throws IOException {
-        ByteArrayOutputStream bos = null;
-        QuotedPrintableOutputStream encoder = null;
+        ByteArrayOutputStream bos;
+        QuotedPrintableOutputStream encoder;
 
         bos = new ByteArrayOutputStream();
         encoder = new QuotedPrintableOutputStream(bos, false);

@@ -33,7 +33,7 @@ import org.apache.james.mime4j.dom.TextBody;
 class StorageTextBody extends TextBody {
 
     private MultiReferenceStorage storage;
-    private Charset charset;
+    private final Charset charset;
 
     public StorageTextBody(MultiReferenceStorage storage, Charset charset) {
         this.storage = storage;

@@ -44,7 +44,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements Conten
     private boolean parsed = false;
 
     private String dispositionType = "";
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private final Map<String, String> parameters = new HashMap<String, String>();
     private ParseException parseException;
 
     private boolean creationDateParsed;

@@ -44,7 +44,7 @@ import java.util.jar.JarFile;
  */
 public class MimeStreamParserExampleMessagesTest extends TestCase {
 
-    private URL url;
+    private final URL url;
 
     public MimeStreamParserExampleMessagesTest(String name, URL url) {
         super(name);
@@ -53,8 +53,8 @@ public class MimeStreamParserExampleMessagesTest extends TestCase {
 
     @Override
     protected void runTest() throws Throwable {
-        MimeStreamParser parser = null;
-        TestHandler handler = null;
+        MimeStreamParser parser;
+        TestHandler handler;
         MimeConfig config = new MimeConfig();
         if (getName().startsWith("malformedHeaderStartsBody")) {
             config.setMalformedHeaderStartsBody(true);

@@ -143,7 +143,7 @@ public class AddressTest {
         Assert.assertFalse(m1.equals(m2));
         Assert.assertTrue(m1.equals(m3));
         Assert.assertFalse(m1.equals(m4));
-        Assert.assertFalse(m1.equals(null));
+        Assert.assertFalse(m1 == null);
     }
 
     @Test

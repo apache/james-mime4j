@@ -52,7 +52,7 @@ public class DecoderUtil {
             QuotedPrintableInputStream is = new QuotedPrintableInputStream(
                                                new ByteArrayInputStream(bytes), monitor);
 
-            int b = 0;
+            int b;
             while ((b = is.read()) != -1) {
                 baos.write(b);
             }
@@ -80,7 +80,7 @@ public class DecoderUtil {
             Base64InputStream is = new Base64InputStream(
                                         new ByteArrayInputStream(bytes), monitor);
 
-            int b = 0;
+            int b;
             while ((b = is.read()) != -1) {
                 baos.write(b);
             }
@@ -185,7 +185,7 @@ public class DecoderUtil {
             String encoding = matcher.group(3);
             String encodedText = matcher.group(4);
 
-            String decoded = null;
+            String decoded;
             decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText, monitor, fallback);
             if (decoded == null) {
                 sb.append(matcher.group(0));

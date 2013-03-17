@@ -120,11 +120,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
 
     @Override
     public boolean unread(ByteArrayBuffer buf) {
-        if (bis != null) {
-            return bis.unread(buf);
-        } else {
-            return false;
-        }
+        return bis != null && bis.unread(buf);
     }
 
     @Override

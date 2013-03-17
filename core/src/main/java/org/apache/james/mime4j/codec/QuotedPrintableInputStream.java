@@ -141,7 +141,7 @@ public class QuotedPrintableInputStream extends InputStream {
             blanks.clear();
         } else if (blanks.length() > 0 && !keepblanks) {
             StringBuilder sb = new StringBuilder(blanks.length() * 3);
-            for (int i = 0; i < blanks.length(); i++) sb.append(" "+blanks.byteAt(i));
+            for (int i = 0; i < blanks.length(); i++) sb.append(" ").append(blanks.byteAt(i));
             if (monitor.warn("ignored blanks", sb.toString()))
                 throw new IOException("ignored blanks");
         }
@@ -157,7 +157,6 @@ public class QuotedPrintableInputStream extends InputStream {
 
     private int read0(final byte[] buffer, final int off, final int len) throws IOException {
         boolean eof = false;
-        int from = off;
         int to = off + len;
         int index = off;
 
@@ -178,7 +177,7 @@ public class QuotedPrintableInputStream extends InputStream {
 
             // end of stream?
             if (limit - pos == 0 && eof) {
-                return index == from ? -1 : index - from;
+                return index == off ? -1 : index - off;
             }
 
             boolean lastWasCR = false;
@@ -258,11 +257,11 @@ public class QuotedPrintableInputStream extends InputStream {
                 } else if (Character.isWhitespace(b)) {
                     blanks.append(b);
                 } else {
-                    index = transfer((int) b & 0xFF, buffer, index, to, true);
+                    index = transfer(b & 0xFF, buffer, index, to, true);
                 }
             }
         }
-        return to - from;
+        return to - off;
     }
 
     /**

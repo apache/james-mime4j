@@ -133,7 +133,6 @@ public class Base64InputStream extends InputStream {
     }
 
     private int read0(final byte[] buffer, final int off, final int len) throws IOException {
-        int from = off;
         int to = off + len;
         int index = off;
 
@@ -148,7 +147,7 @@ public class Base64InputStream extends InputStream {
         // eof or pad reached?
 
         if (eof)
-            return index == from ? EOF : index - from;
+            return index == off ? EOF : index - off;
 
         // decode into given buffer
 
@@ -168,7 +167,7 @@ public class Base64InputStream extends InputStream {
                         handleUnexpectedEof(sextets);
                     }
 
-                    return index == from ? EOF : index - from;
+                    return index == off ? EOF : index - off;
                 } else if (n > 0) {
                     position = 0;
                     size = n;
@@ -184,7 +183,7 @@ public class Base64InputStream extends InputStream {
 
                 if (value == BASE64_PAD) {
                     index = decodePad(data, sextets, buffer, index, to);
-                    return index - from;
+                    return index - off;
                 }
 
                 int decoded = BASE64_DECODE[value];
@@ -226,7 +225,7 @@ public class Base64InputStream extends InputStream {
                         }
 
                         assert index == to;
-                        return to - from;
+                        return to - off;
                     }
                 }
             }
@@ -234,7 +233,7 @@ public class Base64InputStream extends InputStream {
 
         assert sextets == 0;
         assert index == to;
-        return to - from;
+        return to - off;
     }
 
     private int decodePad(int data, int sextets, final byte[] buffer,

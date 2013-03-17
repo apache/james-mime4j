@@ -43,7 +43,7 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     private boolean lastPart;
     private boolean completed;
 
-    private BufferedLineReaderInputStream buffer;
+    private final BufferedLineReaderInputStream buffer;
 
     /**
      * Store the first buffer length.

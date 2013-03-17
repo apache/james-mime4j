@@ -35,9 +35,9 @@ public class Base64InputStreamTest {
 
     @Test
     public void testDecode() throws IOException {
-        ByteArrayInputStream bis = null;
-        Base64InputStream decoder = null;
-        byte[] bytes = null;
+        ByteArrayInputStream bis;
+        Base64InputStream decoder;
+        byte[] bytes;
 
         /*
          * Simple initial test.
@@ -130,8 +130,8 @@ public class Base64InputStreamTest {
 
     @Test
     public void testDecodePrematureClose() throws IOException {
-        ByteArrayInputStream bis = null;
-        Base64InputStream decoder = null;
+        ByteArrayInputStream bis;
+        Base64InputStream decoder;
 
         bis = new ByteArrayInputStream(
                 fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ=="));

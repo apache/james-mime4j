@@ -21,6 +21,7 @@ package org.apache.james.mime4j.codec;
 
 import org.apache.james.mime4j.ExampleMail;
 import org.junit.Assert;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -85,8 +86,7 @@ public class CodecUtilTest {
         InputStream is = new Base64InputStream(new ByteArrayInputStream(out2.toByteArray()));
         ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
         CodecUtil.copy(is, outRoundtrip);
-        String output = new String(outRoundtrip.toByteArray());
-        return output;
+        return new String(outRoundtrip.toByteArray());
     }
 
     /**
@@ -110,8 +110,7 @@ public class CodecUtilTest {
         InputStream is = new Base64InputStream(new ByteArrayInputStream(out.toByteArray()));
         ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
         CodecUtil.copy(is, outRoundtrip);
-        String output = new String(outRoundtrip.toByteArray());
-        return output;
+        return new String(outRoundtrip.toByteArray());
     }
 
     /* performance test, not a unit test */
@@ -146,13 +145,4 @@ public class CodecUtilTest {
         System.out.println("Stream 1st: "+totalStream1);
     }
     */
-
-    private void assertEquals(byte[] expected, byte[] actual) {
-        StringBuilder buffer = new StringBuilder(expected.length);
-        Assert.assertEquals(expected.length, actual.length);
-        for (int i = 0; i < actual.length; i++) {
-            buffer.append((char) actual[i]);
-            Assert.assertEquals("Mismatch@" + i, expected[i], actual[i]);
-        }
-    }
 }

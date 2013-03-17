@@ -116,7 +116,6 @@ public class LenientAddressBuilder {
             current = (char) (buf.byteAt(pos) & 0xff);
             if (current == COMMA) {
                 cursor.updatePos(pos + 1);
-                continue;
             } else if (current == COLON) {
                 cursor.updatePos(pos + 1);
                 break;
@@ -209,9 +208,8 @@ public class LenientAddressBuilder {
         } else if (current == AT) {
             // localPart @ domain form
             cursor.updatePos(pos + 1);
-            String localPart = openingText;
             String domain = parseDomain(buf, cursor, delimiters);
-            return new Mailbox(null, null, localPart, domain);
+            return new Mailbox(null, null, openingText, domain);
         } else {
             return createMailbox(openingText);
         }
@@ -285,13 +283,11 @@ public class LenientAddressBuilder {
         } else if (current == AT) {
             // localPart @ domain form
             cursor.updatePos(pos + 1);
-            String localPart = openingText;
             String domain = parseDomain(buf, cursor, delimiters);
-            return new Mailbox(null, null, localPart, domain);
+            return new Mailbox(null, null, openingText, domain);
         } else if (current == COLON) {
             // group-name: localPart @ domain, name <localPart @ domain>; form
             cursor.updatePos(pos + 1);
-            String name = openingText;
             List<Mailbox> mboxes = parseMailboxes(buf, cursor, SEMICOLON_ONLY);
             if (!cursor.atEnd()) {
                 pos = cursor.getPos();
@@ -300,7 +296,7 @@ public class LenientAddressBuilder {
                     cursor.updatePos(pos + 1);
                 }
             }
-            return new Group(name, mboxes);
+            return new Group(openingText, mboxes);
         } else {
             return createMailbox(openingText);
         }

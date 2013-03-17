@@ -71,9 +71,8 @@ import org.apache.james.mime4j.stream.Field;
 public class MessageTree extends JPanel implements TreeSelectionListener {
     private static final long serialVersionUID = 1L;
 
-    private JPanel contentPane;
-    private JTextArea textView;
-    private JTree tree;
+    private final JTextArea textView;
+    private final JTree tree;
 
     /**
      * Wraps an Object and associates it with a text. All message parts
@@ -118,7 +117,7 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
 
         JScrollPane treeView = new JScrollPane(tree);
 
-        contentPane = new JPanel(new GridLayout(1,0));
+        JPanel contentPane = new JPanel(new GridLayout(1, 0));
         JScrollPane contentView = new JScrollPane(contentPane);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
@@ -143,7 +142,6 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
      * Create a node given a Multipart body.
      * Add the Preamble, all Body parts and the Epilogue to the node.
      *
-     * @param multipart the Multipart.
      * @return the root node of the tree.
      */
     private DefaultMutableTreeNode createNode(Header header) {
@@ -301,9 +299,9 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                  */
                 ContentTypeField field = (ContentTypeField) o;
                 StringBuilder sb = new StringBuilder();
-                sb.append("MIME type: " + field.getMimeType() + "\n");
+                sb.append("MIME type: ").append(field.getMimeType()).append("\n");
                 for (Map.Entry<String, String> entry : field.getParameters().entrySet()) {
-                    sb.append(entry.getKey() + " = " + entry.getValue() + "\n");
+                    sb.append(entry.getKey()).append(" = ").append(entry.getValue()).append("\n");
                 }
                 textView.setText(sb.toString());
 
@@ -314,9 +312,9 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
                 AddressListField field = (AddressListField) o;
                 MailboxList list = field.getAddressList().flatten();
                 StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < list.size(); i++) {
-                    Mailbox mb = list.get(i);
-                    sb.append(AddressFormatter.DEFAULT.format(mb, false) + "\n");
+                for (Object aList : list) {
+                    Mailbox mb = aList;
+                    sb.append(AddressFormatter.DEFAULT.format(mb, false)).append("\n");
                 }
                 textView.setText(sb.toString());
 

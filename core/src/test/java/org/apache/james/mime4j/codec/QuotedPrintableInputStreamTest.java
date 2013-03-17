@@ -167,8 +167,8 @@ public class QuotedPrintableInputStreamTest {
 
     @Test
     public void testDecodePrematureClose() throws IOException, UnsupportedEncodingException {
-        ByteArrayInputStream bis = null;
-        QuotedPrintableInputStream decoder = null;
+        ByteArrayInputStream bis;
+        QuotedPrintableInputStream decoder;
 
         bis = new ByteArrayInputStream("=e1=e2=E3=E4\r\n".getBytes("US-ASCII"));
         decoder = new QuotedPrintableInputStream(bis);

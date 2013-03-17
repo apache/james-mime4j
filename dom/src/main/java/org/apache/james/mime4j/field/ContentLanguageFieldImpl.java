@@ -46,7 +46,7 @@ public class ContentLanguageFieldImpl extends AbstractField implements ContentLa
 
     private void parse() {
         parsed = true;
-        languages = Collections.<String>emptyList();
+        languages = Collections.emptyList();
         String body = getBody();
         if (body != null) {
             ContentLanguageParser parser = new ContentLanguageParser(new StringReader(body));

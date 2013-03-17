@@ -608,10 +608,8 @@ public class Fields {
     }
 
     private static boolean isValidDispositionType(String dispositionType) {
-        if (dispositionType == null)
-            return false;
+        return dispositionType != null && EncoderUtil.isToken(dispositionType);
 
-        return EncoderUtil.isToken(dispositionType);
     }
 
     private static <F extends ParsedField> F parse(FieldParser<F> parser,

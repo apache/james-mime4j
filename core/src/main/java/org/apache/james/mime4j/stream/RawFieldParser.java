@@ -38,8 +38,8 @@ public class RawFieldParser {
 
     public static BitSet INIT_BITSET(int ... b) {
         BitSet bitset = new BitSet(b.length);
-        for (int i = 0; i < b.length; i++) {
-            bitset.set(b[i]);
+        for (int aB : b) {
+            bitset.set(aB);
         }
         return bitset;
     }

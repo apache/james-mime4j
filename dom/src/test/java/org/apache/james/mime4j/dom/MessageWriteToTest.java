@@ -22,9 +22,7 @@ package org.apache.james.mime4j.dom;
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -85,7 +83,6 @@ public class MessageWriteToTest {
     private Message createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
-        Message message = builder.parseMessage(in);
-        return message;
+        return builder.parseMessage(in);
     }
 }

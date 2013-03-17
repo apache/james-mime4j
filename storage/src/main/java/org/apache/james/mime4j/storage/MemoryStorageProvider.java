@@ -49,7 +49,7 @@ public class MemoryStorageProvider extends AbstractStorageProvider {
 
     private static final class MemoryStorageOutputStream extends
             StorageOutputStream {
-        ByteArrayBuffer bab = new ByteArrayBuffer(1024);
+        final ByteArrayBuffer bab = new ByteArrayBuffer(1024);
 
         @Override
         protected void write0(byte[] buffer, int offset, int length)

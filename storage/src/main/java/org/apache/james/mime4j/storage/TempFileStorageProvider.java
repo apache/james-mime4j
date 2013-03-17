@@ -109,7 +109,7 @@ public class TempFileStorageProvider extends AbstractStorageProvider {
 
     private static final class TempFileStorageOutputStream extends
             StorageOutputStream {
-        private File file;
+        private final File file;
         private OutputStream out;
 
         public TempFileStorageOutputStream(File file) throws IOException {

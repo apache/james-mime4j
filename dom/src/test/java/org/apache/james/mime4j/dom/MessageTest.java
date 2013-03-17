@@ -74,8 +74,8 @@ public class MessageTest {
 
     @Test
     public void testGetMimeType() {
-        MessageImpl parent = null;
-        MessageImpl child = null;
+        MessageImpl parent;
+        MessageImpl child;
 
         parent = new MessageImpl();
         child = new MessageImpl();
@@ -146,7 +146,7 @@ public class MessageTest {
 
         InputStream output = new ByteArrayInputStream(out.toByteArray());
 
-        int b = -1;
+        int b;
         int i = 0;
         while ((b = output.read()) != -1) {
             Assert.assertEquals("same byte", b, inputByte[i]);

@@ -156,9 +156,7 @@ public class DateTime {
             return false;
         if (timeZone != other.timeZone)
             return false;
-        if (year != other.year)
-            return false;
-        return true;
+        return year == other.year;
     }
 
 

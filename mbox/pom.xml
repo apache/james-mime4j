@@ -29,20 +29,15 @@
     </parent>
 
     <artifactId>apache-mime4j-mbox-iterator</artifactId>
-    <packaging>jar</packaging>
+    <packaging>bundle</packaging>
 
-    <name>Apache JAMES Mime4j (Mbox Iterator)</name>
+    <name>Apache James :: Mime4j :: Mbox Iterator</name>
     <description>Provides a fast iterator like interface for Mbox files using NIO.</description>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
 
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 

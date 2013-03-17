@@ -31,7 +31,7 @@ import org.apache.james.mime4j.util.ContentUtil;
  * Helper class to run comparison of parsed results
  */
 class TestHandler implements ContentHandler {
-    StringBuilder sb = new StringBuilder();
+    final StringBuilder sb = new StringBuilder();
 
     private String escape(char c) {
         if (c == '&') {
@@ -55,7 +55,7 @@ class TestHandler implements ContentHandler {
 
     public void epilogue(InputStream is) throws IOException {
         sb.append("<epilogue>\r\n");
-        int b = 0;
+        int b;
         while ((b = is.read()) != -1) {
             sb.append(escape((char) b));
         }
@@ -63,7 +63,7 @@ class TestHandler implements ContentHandler {
     }
     public void preamble(InputStream is) throws IOException {
         sb.append("<preamble>\r\n");
-        int b = 0;
+        int b;
         while ((b = is.read()) != -1) {
             sb.append(escape((char) b));
         }
@@ -74,7 +74,7 @@ class TestHandler implements ContentHandler {
     }
     public void body(BodyDescriptor bd, InputStream is) throws IOException {
         sb.append("<body>\r\n");
-        int b = 0;
+        int b;
         while ((b = is.read()) != -1) {
             sb.append(escape((char) b));
         }
@@ -93,9 +93,7 @@ class TestHandler implements ContentHandler {
         sb.append("<header>\r\n");
     }
     public void field(Field field) {
-        sb.append("<field>\r\n"
-                + escape(ContentUtil.decode(field.getRaw()))
-                + "</field>\r\n");
+        sb.append("<field>\r\n").append(escape(ContentUtil.decode(field.getRaw()))).append("</field>\r\n");
     }
     public void endHeader() {
         sb.append("</header>\r\n");

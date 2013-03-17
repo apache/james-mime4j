@@ -28,6 +28,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -55,9 +56,7 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         if (dateParsers != null) {
             this.datePatterns.addAll(dateParsers);
         } else {
-            for (String pattern : DEFAULT_DATE_FORMATS) {
-                this.datePatterns.add(pattern);
-            }
+            Collections.addAll(this.datePatterns, DEFAULT_DATE_FORMATS);
         }
     }
 

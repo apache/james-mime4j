@@ -42,7 +42,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
     private String mimeType = null;
     private String mediaType = null;
     private String subType = null;
-    private Map<String, String> parameters = new HashMap<String, String>();
+    private final Map<String, String> parameters = new HashMap<String, String>();
     private ParseException parseException;
 
     ContentTypeFieldImpl(Field rawField, DecodeMonitor monitor) {

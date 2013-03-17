@@ -61,7 +61,6 @@ public class ContentTypeFieldTest {
     @Test
     public void testGetMimeTypeStatic() throws Exception {
         ContentTypeField child = parse("Content-Type: child/type");
-        ;
         ContentTypeField parent = parse("Content-Type: parent/type");
 
         Assert.assertEquals("child/type", ContentTypeFieldImpl.getMimeType(child, parent));

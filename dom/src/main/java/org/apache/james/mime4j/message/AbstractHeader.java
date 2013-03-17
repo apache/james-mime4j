@@ -34,8 +34,8 @@ import org.apache.james.mime4j.stream.Field;
  */
 public abstract class AbstractHeader implements Header {
 
-    private List<Field> fields = new LinkedList<Field>();
-    private Map<String, List<Field>> fieldMap = new HashMap<String, List<Field>>();
+    private final List<Field> fields = new LinkedList<Field>();
+    private final Map<String, List<Field>> fieldMap = new HashMap<String, List<Field>>();
 
     /**
      * Creates a new empty <code>Header</code>.

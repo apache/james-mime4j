@@ -45,7 +45,7 @@ import java.util.jar.JarFile;
 
 public class MessageParserTest extends TestCase {
 
-    private URL url;
+    private final URL url;
 
     public MessageParserTest(String name, URL url) {
         super(name);
@@ -139,9 +139,7 @@ public class MessageParserTest extends TestCase {
 
         sb.append("<header>\r\n");
         for (Field field : e.getHeader().getFields()) {
-            sb.append("<field>\r\n"
-                    + escape(FieldsTest.decode(field))
-                    + "</field>\r\n");
+            sb.append("<field>\r\n").append(escape(FieldsTest.decode(field))).append("</field>\r\n");
         }
         sb.append("</header>\r\n");
 
@@ -178,7 +176,7 @@ public class MessageParserTest extends TestCase {
                     + (b instanceof TextBody ? ".txt" : ".bin");
             String tag = b instanceof TextBody ? "text-body" : "binary-body";
             File f = new File(s);
-            sb.append("<" + tag + " name=\"" + f.getName() + "\"/>\r\n");
+            sb.append("<").append(tag).append(" name=\"").append(f.getName()).append("\"/>\r\n");
             URL expectedUrl = new URL(s);
 
             if (b instanceof TextBody) {

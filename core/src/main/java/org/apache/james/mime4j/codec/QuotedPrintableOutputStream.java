@@ -58,7 +58,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
 
     private boolean closed = false;
 
-    private byte[] singleByte = new byte[1];
+    private final byte[] singleByte = new byte[1];
 
     public QuotedPrintableOutputStream(int bufsize, OutputStream out, boolean binary) {
         super(out);

@@ -33,7 +33,7 @@ public class MboxIteratorTest {
     @Rule
     public final TestName name = new TestName();
     public static final String MBOX_PATH = "src/test/resources/test-1/mbox.rlug";
-    private int DEFAULT_MESSAGE_SIZE = 10 * 1024;
+    private final int DEFAULT_MESSAGE_SIZE = 10 * 1024;
     // number of chars oin our largest test message
     private static final int CHARS_IN_MAX_MSG = 3500;
     private static final int MORE_THAN_FILE_SIZE = 13291;

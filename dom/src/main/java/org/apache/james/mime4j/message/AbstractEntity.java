@@ -528,9 +528,7 @@ public abstract class AbstractEntity implements Entity {
         if (header == null)
             return null;
 
-        @SuppressWarnings("unchecked")
-        F field = (F) header.getField(fieldName);
-        return field;
+        return (F) header.getField(fieldName);
     }
 
     protected abstract String newUniqueBoundary();

@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 
 public final class LoggingMonitor extends DecodeMonitor {
-    private static Log log = LogFactory.getLog(LoggingMonitor.class);
+    private static final Log log = LogFactory.getLog(LoggingMonitor.class);
 
     public static DecodeMonitor MONITOR = new LoggingMonitor();
 

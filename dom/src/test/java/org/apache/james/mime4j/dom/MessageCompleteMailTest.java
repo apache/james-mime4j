@@ -47,7 +47,6 @@ public class MessageCompleteMailTest {
     private Message createMessage(byte[] octets) throws Exception {
         ByteArrayInputStream in = new ByteArrayInputStream(octets);
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
-        Message message = builder.parseMessage(in);
-        return message;
+        return builder.parseMessage(in);
     }
 }

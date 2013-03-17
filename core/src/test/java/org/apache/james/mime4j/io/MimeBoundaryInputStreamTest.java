@@ -161,7 +161,7 @@ public class MimeBoundaryInputStreamTest {
 
     private String readByOneByte(InputStream is) throws IOException {
         StringBuilder sb = new StringBuilder();
-        int b = 0;
+        int b;
         while ((b = is.read()) != -1) {
             sb.append((char) b);
         }

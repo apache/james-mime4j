@@ -27,7 +27,7 @@ public class UnstructuredFieldTest {
 
     @Test
     public void testGetBody() throws Exception {
-        UnstructuredField f = null;
+        UnstructuredField f;
 
         f = (UnstructuredField) DefaultFieldParser.parse("Subject: Yada\r\n yada yada\r\n");
         Assert.assertEquals("Testing folding value 1", "Yada yada yada", f.getValue());

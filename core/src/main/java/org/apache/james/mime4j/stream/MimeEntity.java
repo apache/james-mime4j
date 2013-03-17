@@ -416,8 +416,7 @@ class MimeEntity implements EntityStateMachine {
 
     private EntityStateMachine nextMimeEntity(EntityState startState, EntityState endState, InputStream instream) {
         if (recursionMode == RecursionMode.M_RAW) {
-            RawEntity message = new RawEntity(instream);
-            return message;
+            return new RawEntity(instream);
         } else {
             MimeEntity mimeentity = new MimeEntity(
                     lineSource,
@@ -514,7 +513,7 @@ class MimeEntity implements EntityStateMachine {
      * @param state
      * @return rendered as string, not null
      */
-    public static final String stateToString(EntityState state) {
+    public static String stateToString(EntityState state) {
         final String result;
         switch (state) {
             case T_END_OF_STREAM:

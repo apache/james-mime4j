@@ -46,8 +46,8 @@ public class MessageServiceFactoryImpl extends MessageServiceFactory {
         if (bodyFactory != null) m.setBodyFactory(bodyFactory);
         if (mimeEntityConfig != null) m.setMimeEntityConfig(mimeEntityConfig);
         if (bodyDescriptorBuilder != null) m.setBodyDescriptorBuilder(bodyDescriptorBuilder);
-        if (flatMode != null) m.setFlatMode(flatMode.booleanValue());
-        if (contentDecoding != null) m.setContentDecoding(contentDecoding.booleanValue());
+        if (flatMode != null) m.setFlatMode(flatMode);
+        if (contentDecoding != null) m.setContentDecoding(contentDecoding);
         if (decodeMonitor != null) m.setDecodeMonitor(decodeMonitor);
         return m;
     }

@@ -46,7 +46,7 @@ import java.util.jar.JarFile;
  */
 public class ExampleMessagesRoundtripTest extends TestCase {
 
-    private URL url;
+    private final URL url;
 
     public ExampleMessagesRoundtripTest(String name, URL url) {
         super(name);

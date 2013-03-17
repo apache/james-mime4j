@@ -85,9 +85,9 @@ public class MimeStreamParserTest {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
         expected.add("From: foo@abr.com");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
         expected.add("Subject: A subject");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
 
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
@@ -112,7 +112,7 @@ public class MimeStreamParserTest {
         final LinkedList<String> expected = new LinkedList<String>();
         expected.add("The-field: This field\r\rcontains CR:s\r\r"
                 + "not\r\n\tfollowed by LF");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
 
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
@@ -135,9 +135,9 @@ public class MimeStreamParserTest {
                 + "\tfrom mail.cs.tu-berlin.de with smtp\r\n"
                 + "\tid &lt;m0uWPrO-0004wpC&gt;;"
                 + " Wed, 19 Jun 96 18:12 MES");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
         expected.add("Subject: A folded subject\r\n Line 2\r\n\tLine 3");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
 
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
@@ -197,9 +197,9 @@ public class MimeStreamParserTest {
         final LinkedList<String> expected = new LinkedList<String>();
         sb.append("From - foo@abr.com\r\n");
         expected.add("From: some@one.com");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
         expected.add("Subject: A subject");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
         sb.append("A line which should be ignored\r\n");
 
         MimeStreamParser parser = new MimeStreamParser();
@@ -325,9 +325,9 @@ public class MimeStreamParserTest {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
         expected.add("From: some@one.com");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
         expected.add("Subject: A subject");
-        sb.append(expected.getLast() + "\r\n\r\n");
+        sb.append(expected.getLast()).append("\r\n\r\n");
 
         MimeStreamParser parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {
@@ -355,7 +355,7 @@ public class MimeStreamParserTest {
         StringBuilder sb = new StringBuilder();
         final LinkedList<String> expected = new LinkedList<String>();
         expected.add("From: some@one.com");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
         expected.add("Subject: A subject");
         sb.append(expected.getLast());
 
@@ -374,9 +374,9 @@ public class MimeStreamParserTest {
         sb = new StringBuilder();
         expected.clear();
         expected.add("From: some@one.com");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
         expected.add("Subject: A subject");
-        sb.append(expected.getLast() + "\r\n");
+        sb.append(expected.getLast()).append("\r\n");
 
         parser = new MimeStreamParser();
         parser.setContentHandler(new AbstractContentHandler() {

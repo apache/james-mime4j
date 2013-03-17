@@ -382,8 +382,8 @@ public class EncoderUtil {
         StringBuilder sb = new StringBuilder();
 
         final int end = bytes.length;
-        for (int idx = 0; idx < end; idx++) {
-            int v = bytes[idx] & 0xff;
+        for (byte aByte : bytes) {
+            int v = aByte & 0xff;
             if (v == 32) {
                 sb.append('_');
             } else if (!qChars.get(v)) {
@@ -540,8 +540,8 @@ public class EncoderUtil {
 
         int count = 0;
 
-        for (int idx = 0; idx < bytes.length; idx++) {
-            int v = bytes[idx] & 0xff;
+        for (byte aByte : bytes) {
+            int v = aByte & 0xff;
             if (v == 32) {
                 count++;
             } else if (!qChars.get(v)) {
@@ -586,8 +586,8 @@ public class EncoderUtil {
                 : Q_RESTRICTED_CHARS;
 
         int qEncoded = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            int v = bytes[i] & 0xff;
+        for (byte aByte : bytes) {
+            int v = aByte & 0xff;
             if (v != 32 && !qChars.get(v)) {
                 qEncoded++;
             }

@@ -52,13 +52,20 @@ public class CharBufferWrapper {
     }
 
     @Override
-    public int hashCode() {
-        return messageBuffer.hashCode();
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CharBufferWrapper)) return false;
+
+        CharBufferWrapper that = (CharBufferWrapper) o;
+
+        if (!messageBuffer.equals(that.messageBuffer)) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        return messageBuffer.equals(obj);
+    public int hashCode() {
+        return messageBuffer.hashCode();
     }
 
     /**

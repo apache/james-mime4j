@@ -92,7 +92,6 @@ class EntityBuilder implements ContentHandler {
     }
 
     /**
-     * @see org.apache.james.mime4j.parser.ContentHandler#field(RawField)
      */
     public void field(Field field) throws MimeException {
         expect(Header.class);

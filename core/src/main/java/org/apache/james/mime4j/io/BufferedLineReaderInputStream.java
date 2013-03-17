@@ -137,7 +137,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     @Override
     public int read() throws IOException {
         if (!readAllowed()) return -1;
-        int noRead = 0;
+        int noRead;
         while (!hasBufferedData()) {
             noRead = fillBuffer();
             if (noRead == -1) {
@@ -153,7 +153,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         if (b == null) {
             return 0;
         }
-        int noRead = 0;
+        int noRead;
         while (!hasBufferedData()) {
             noRead = fillBuffer();
             if (noRead == -1) {

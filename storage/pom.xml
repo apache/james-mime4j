@@ -17,7 +17,8 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -28,23 +29,19 @@
     </parent>
 
     <artifactId>apache-mime4j-storage</artifactId>
+    <packaging>bundle</packaging>
 
-    <name>Apache JAMES Mime4j (Storage)</name>
+    <name>Apache James :: Mime4j :: Storage</name>
     <description>Java MIME Document Object Model Storage</description>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.james</groupId>
             <artifactId>apache-mime4j-dom</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <type>jar</type>
-            <!-- Removed as a workaround for an unidentified M2 bug -->
-            <scope>test</scope>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 
