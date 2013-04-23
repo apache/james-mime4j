@@ -279,6 +279,19 @@ public class DefaultAddressBuilderTest {
     }
 
     @Test
+    public void testParseAddressWithQuotedEmailAddressInName() throws Exception {
+        Address address = parser.parseAddress("\"test@test.com\" <test@test.com>");
+        Assert.assertTrue(address instanceof Mailbox);
+        Assert.assertEquals("test@test.com", ((Mailbox) address).getName());
+        Assert.assertEquals("test@test.com", ((Mailbox) address).getAddress());
+    }
+
+    @Test(expected=ParseException.class)
+    public void testParseAddressWithUnquotedEmailAddressInName() throws Exception {
+        parser.parseAddress("test@test.com <test@test.com>");
+    }
+
+    @Test
     public void testParseInvalidAddress() throws Exception {
         try {
             parser.parseGroup("john.doe@acme.org, jane.doe@acme.org");

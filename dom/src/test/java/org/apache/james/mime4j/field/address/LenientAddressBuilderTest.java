@@ -314,6 +314,21 @@ public class LenientAddressBuilderTest {
     }
 
     @Test
+    public void testParseAddressWithQuotedEmailAddressInName() throws Exception {
+        Address address = parser.parseAddress("\"test@test.com\" <test@test.com>");
+        Assert.assertTrue(address instanceof Mailbox);
+        Assert.assertEquals("test@test.com", ((Mailbox) address).getName());
+        Assert.assertEquals("test@test.com", ((Mailbox) address).getAddress());
+    }
+
+    @Test
+    public void testParseAddressWithUnquotedEmailAddressInName() throws Exception {
+        Address address = parser.parseAddress("test@test.com <test@test.com>");
+        Assert.assertTrue(address instanceof Mailbox);
+        Assert.assertEquals("test@test.com<test@test.com>", ((Mailbox) address).getAddress());
+    }
+
+    @Test
     public void testParseAddressList() throws Exception {
         AddressList addrList1 = parser.parseAddressList("John Doe <jdoe@machine(comment).  example>");
         Assert.assertEquals(1, addrList1.size());
