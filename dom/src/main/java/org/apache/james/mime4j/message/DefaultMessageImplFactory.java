@@ -24,7 +24,6 @@ package org.apache.james.mime4j.message;
  */
 public class DefaultMessageImplFactory implements MessageImplFactory {
 
-    @Override
     public MessageImpl messageImpl() {
         return new MessageImpl();
     }

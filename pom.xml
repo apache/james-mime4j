@@ -64,11 +64,12 @@
     </distributionManagement>
 
     <properties>
-        <target.jdk>1.6</target.jdk>
+        <target.jdk>1.5</target.jdk>
         <commons-logging.version>1.1.1</commons-logging.version>
         <log4j.version>1.2.14</log4j.version>
         <junit.version>4.10</junit.version>
-        <commons-io.version>2.4</commons-io.version>
+        <!-- Version 2.2 is required for Java 1.5 compatibility -->
+        <commons-io.version>2.2</commons-io.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

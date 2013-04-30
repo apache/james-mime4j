@@ -73,7 +73,6 @@ class EntityBuilder implements ContentHandler {
         }
     }
 
-    @Override
     public void startMessage() throws MimeException {
         if (stack.isEmpty()) {
             stack.push(this.entity);
@@ -85,24 +84,20 @@ class EntityBuilder implements ContentHandler {
         }
     }
 
-    @Override
     public void endMessage() throws MimeException {
         expect(Message.class);
         stack.pop();
     }
 
-    @Override
     public void startHeader() throws MimeException {
         stack.push(new HeaderImpl());
     }
 
-    @Override
     public void field(Field field) throws MimeException {
         expect(Header.class);
         ((Header) stack.peek()).addField(field);
     }
 
-    @Override
     public void endHeader() throws MimeException {
         expect(Header.class);
         Header h = (Header) stack.pop();
@@ -110,7 +105,6 @@ class EntityBuilder implements ContentHandler {
         ((Entity) stack.peek()).setHeader(h);
     }
 
-    @Override
     public void startMultipart(final BodyDescriptor bd) throws MimeException {
         expect(Entity.class);
 
@@ -121,7 +115,6 @@ class EntityBuilder implements ContentHandler {
         stack.push(multiPart);
     }
 
-    @Override
     public void body(BodyDescriptor bd, final InputStream is) throws MimeException, IOException {
         expect(Entity.class);
 
@@ -154,12 +147,10 @@ class EntityBuilder implements ContentHandler {
         entity.setBody(body);
     }
 
-    @Override
     public void endMultipart() throws MimeException {
         stack.pop();
     }
 
-    @Override
     public void startBodyPart() throws MimeException {
         expect(Multipart.class);
 
@@ -168,20 +159,17 @@ class EntityBuilder implements ContentHandler {
         stack.push(bodyPart);
     }
 
-    @Override
     public void endBodyPart() throws MimeException {
         expect(BodyPart.class);
         stack.pop();
     }
 
-    @Override
     public void epilogue(InputStream is) throws MimeException, IOException {
         expect(MultipartImpl.class);
         ByteSequence bytes = loadStream(is);
         ((MultipartImpl) stack.peek()).setEpilogueRaw(bytes);
     }
 
-    @Override
     public void preamble(InputStream is) throws MimeException, IOException {
         expect(MultipartImpl.class);
         ByteSequence bytes = loadStream(is);
@@ -194,7 +182,6 @@ class EntityBuilder implements ContentHandler {
      * @param is the raw contents of the entity.
      * @throws UnsupportedOperationException
      */
-    @Override
     public void raw(InputStream is) throws MimeException, IOException {
         throw new UnsupportedOperationException("Not supported");
     }

@@ -253,8 +253,6 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
                 .append("\nlimit:\t").append(buffer.limit())
                 .append("\nremaining:\t").append(buffer.remaining())
                 .append("\nposition:\t").append(buffer.position())
-                .append("\nis direct:\t").append(buffer.isDirect())
-                .append("\nhas array:\t").append(buffer.hasArray())
                 .append("\nbuffer:\t").append(buffer.isReadOnly())
                 .append("\nclass:\t").append(buffer.getClass());
         return sb.toString();
