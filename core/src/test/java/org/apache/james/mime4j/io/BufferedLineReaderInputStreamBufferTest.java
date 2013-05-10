@@ -19,21 +19,26 @@
 
 package org.apache.james.mime4j.io;
 
+import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-
 public class BufferedLineReaderInputStreamBufferTest {
+
+    private static BufferedLineReaderInputStream create(final String s) {
+        return new BufferedLineReaderInputStream(InputStreams.createAscii(s), 4096);
+    }
+
+    private static BufferedLineReaderInputStream create(final byte[] b) {
+        return new BufferedLineReaderInputStream(InputStreams.create(b), 4096);
+    }
 
     @Test
     public void testInvalidInput() throws Exception {
         String text = "blah blah yada yada";
-        byte[] b1 = text.getBytes("US-ASCII");
         String pattern = "blah";
-        byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        byte[] b2 = ContentUtil.toAsciiByteArray(pattern);
+        BufferedLineReaderInputStream inbuffer = create(text);
         inbuffer.fillBuffer();
 
         Assert.assertEquals('b', inbuffer.read());
@@ -97,9 +102,7 @@ public class BufferedLineReaderInputStreamBufferTest {
     @Test
     public void testBasicOperations() throws Exception {
         String text = "bla bla yada yada haha haha";
-        byte[] b1 = text.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = create(text);
         inbuffer.fillBuffer();
         Assert.assertEquals(0, inbuffer.pos());
         Assert.assertEquals(27, inbuffer.limit());
@@ -138,10 +141,8 @@ public class BufferedLineReaderInputStreamBufferTest {
     public void testPatternMatching1() throws Exception {
         String text = "blabla d is the word";
         String pattern = "d";
-        byte[] b1 = text.getBytes("US-ASCII");
-        byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        byte[] b2 = ContentUtil.toAsciiByteArray(pattern);
+        BufferedLineReaderInputStream inbuffer = create(text);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(7, i);
@@ -153,10 +154,8 @@ public class BufferedLineReaderInputStreamBufferTest {
     public void testPatternMatching2() throws Exception {
         String text = "disddisdissdsidsidsiid";
         String pattern = "siid";
-        byte[] b1 = text.getBytes("US-ASCII");
-        byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        byte[] b2 = ContentUtil.toAsciiByteArray(pattern);
+        BufferedLineReaderInputStream inbuffer = create(text);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(18, i);
@@ -168,10 +167,8 @@ public class BufferedLineReaderInputStreamBufferTest {
     public void testPatternMatching3() throws Exception {
         String text = "bla bla yada yada haha haha";
         String pattern = "blah";
-        byte[] b1 = text.getBytes("US-ASCII");
-        byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        byte[] b2 = ContentUtil.toAsciiByteArray(pattern);
+        BufferedLineReaderInputStream inbuffer = create(text);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(-1, i);
@@ -183,10 +180,8 @@ public class BufferedLineReaderInputStreamBufferTest {
     public void testPatternMatching4() throws Exception {
         String text = "bla bla yada yada haha haha";
         String pattern = "bla";
-        byte[] b1 = text.getBytes("US-ASCII");
-        byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        byte[] b2 = ContentUtil.toAsciiByteArray(pattern);
+        BufferedLineReaderInputStream inbuffer = create(text);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(0, i);
@@ -198,10 +193,8 @@ public class BufferedLineReaderInputStreamBufferTest {
     public void testPatternOutOfBound() throws Exception {
         String text = "bla bla yada yada haha haha";
         String pattern1 = "bla bla";
-        byte[] b1 = text.getBytes("US-ASCII");
-        byte[] b2 = pattern1.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        byte[] b2 = ContentUtil.toAsciiByteArray(pattern1);
+        BufferedLineReaderInputStream inbuffer = create(text);
         inbuffer.fillBuffer();
         byte[] tmp = new byte[3];
         inbuffer.read(tmp);
@@ -216,9 +209,7 @@ public class BufferedLineReaderInputStreamBufferTest {
     @Test
     public void testCharOutOfBound() throws Exception {
         String text = "zzz blah blah blah ggg";
-        byte[] b1 = text.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = create(text);
         inbuffer.fillBuffer();
         byte[] tmp = new byte[3];
         inbuffer.read(tmp);
@@ -234,8 +225,7 @@ public class BufferedLineReaderInputStreamBufferTest {
     public void test0xFFInBinaryStream() throws Exception {
         byte[] b1 = new byte[]{1, 2, 3, (byte) 0xff, 10, 1, 2, 3};
         byte[] b2 = new byte[]{10};
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = create(b1);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(4, i);

@@ -22,7 +22,6 @@ package org.apache.james.mime4j.io;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 public class LineNumberInputStreamTest {
@@ -32,8 +31,7 @@ public class LineNumberInputStreamTest {
     @Test
     public void testReadSingleByte() throws IOException {
         String s = "Yada\r\nyada\r\nyada\r\n";
-        LineNumberInputStream is = new LineNumberInputStream(
-                new ByteArrayInputStream(s.getBytes()));
+        LineNumberInputStream is = new LineNumberInputStream(InputStreams.createAscii(s));
 
         for (int i = 0; i < 6; i++) {
             Assert.assertEquals(1, is.getLineNumber());
@@ -63,8 +61,7 @@ public class LineNumberInputStreamTest {
     @Test
     public void testReadManyBytes() throws IOException {
         String s = "Yada\r\nyada\r\nyada\r\n";
-        LineNumberInputStream is = new LineNumberInputStream(
-                new ByteArrayInputStream(s.getBytes()));
+        LineNumberInputStream is = new LineNumberInputStream(InputStreams.createAscii(s));
 
         byte[] buf = new byte[4];
         Assert.assertEquals(1, is.getLineNumber());

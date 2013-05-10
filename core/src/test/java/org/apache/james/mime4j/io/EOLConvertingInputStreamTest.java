@@ -19,13 +19,11 @@
 
 package org.apache.james.mime4j.io;
 
-import org.junit.Assert;
-import static org.junit.Assert.fail;
-import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+
+import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class EOLConvertingInputStreamTest {
 
@@ -67,12 +65,11 @@ public class EOLConvertingInputStreamTest {
     private void testConvertBoth(String s1, String s2) throws IOException {
         byte[] bytes = new byte[1024];
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(fromString(s1));
         EOLConvertingInputStream in =
-                new EOLConvertingInputStream(bais,
+                new EOLConvertingInputStream(InputStreams.createAscii(s1),
                         EOLConvertingInputStream.CONVERT_BOTH);
         int n = in.read(bytes);
-        Assert.assertEquals(s2, toString(bytes, n));
+        Assert.assertEquals(s2, ContentUtil.toAsciiString(bytes, 0, n > 0 ? n : 0));
 
         in.close();
     }
@@ -80,12 +77,11 @@ public class EOLConvertingInputStreamTest {
     private void testConvertCR(String s1, String s2) throws IOException {
         byte[] bytes = new byte[1024];
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(fromString(s1));
         EOLConvertingInputStream in =
-                new EOLConvertingInputStream(bais,
+                new EOLConvertingInputStream(InputStreams.createAscii(s1),
                         EOLConvertingInputStream.CONVERT_CR);
         int n = in.read(bytes);
-        Assert.assertEquals(s2, toString(bytes, n));
+        Assert.assertEquals(s2, ContentUtil.toAsciiString(bytes, 0, n > 0 ? n : 0));
 
         in.close();
     }
@@ -93,34 +89,13 @@ public class EOLConvertingInputStreamTest {
     private void testConvertLF(String s1, String s2) throws IOException {
         byte[] bytes = new byte[1024];
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(fromString(s1));
         EOLConvertingInputStream in =
-                new EOLConvertingInputStream(bais,
+                new EOLConvertingInputStream(InputStreams.createAscii(s1),
                         EOLConvertingInputStream.CONVERT_LF);
         int n = in.read(bytes);
-        Assert.assertEquals(s2, toString(bytes, n));
+        Assert.assertEquals(s2, ContentUtil.toAsciiString(bytes, 0, n > 0 ? n : 0));
 
         in.close();
     }
 
-    private String toString(byte[] b, int len) {
-        try {
-            if (len == -1) {
-                return "";
-            }
-            return new String(b, 0, len, "US-ASCII");
-        } catch (UnsupportedEncodingException e) {
-            fail(e.getMessage());
-            return null;
-        }
-    }
-
-    private byte[] fromString(String s) {
-        try {
-            return s.getBytes("US-ASCII");
-        } catch (UnsupportedEncodingException e) {
-            fail(e.getMessage());
-            return null;
-        }
-    }
 }

@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.util;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -160,6 +161,54 @@ public class ContentUtil {
             int length) {
         return charset.decode(ByteBuffer.wrap(buffer, offset, length))
                 .toString();
+    }
+
+    public static byte[] toAsciiByteArray(final String s) {
+        if (s == null) {
+            return null;
+        }
+        try {
+            return s.getBytes(CharsetUtil.US_ASCII.name());
+        } catch (UnsupportedEncodingException ex) {
+            // Should never happen
+            throw new Error(ex);
+        }
+    }
+
+    public static String toAsciiString(final byte[] b) {
+        if (b == null) {
+            return null;
+        }
+        try {
+            return new String(b, CharsetUtil.US_ASCII.name());
+        } catch (UnsupportedEncodingException ex) {
+            // Should never happen
+            throw new Error(ex);
+        }
+    }
+
+    public static String toAsciiString(final byte[] b, int off, int len) {
+        if (b == null) {
+            return null;
+        }
+        try {
+            return new String(b, off, len, CharsetUtil.US_ASCII.name());
+        } catch (UnsupportedEncodingException ex) {
+            // Should never happen
+            throw new Error(ex);
+        }
+    }
+
+    public static String toAsciiString(final ByteArrayBuffer b) {
+        if (b == null) {
+            return null;
+        }
+        try {
+            return new String(b.buffer(), 0, b.length(), CharsetUtil.US_ASCII.name());
+        } catch (UnsupportedEncodingException ex) {
+            // Should never happen
+            throw new Error(ex);
+        }
     }
 
 }

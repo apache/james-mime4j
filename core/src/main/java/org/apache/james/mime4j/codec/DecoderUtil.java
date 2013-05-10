@@ -19,14 +19,14 @@
 
 package org.apache.james.mime4j.codec;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
@@ -44,24 +44,23 @@ public class DecoderUtil {
      * @return the decoded bytes.
      */
     private static byte[] decodeQuotedPrintable(String s, DecodeMonitor monitor) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
         try {
-            byte[] bytes = s.getBytes("US-ASCII");
-
             QuotedPrintableInputStream is = new QuotedPrintableInputStream(
-                                               new ByteArrayInputStream(bytes), monitor);
-
-            int b;
-            while ((b = is.read()) != -1) {
-                baos.write(b);
+                    InputStreams.createAscii(s), monitor);
+            try {
+                ByteArrayBuffer buf = new ByteArrayBuffer(s.length());
+                int b;
+                while ((b = is.read()) != -1) {
+                    buf.append(b);
+                }
+                return buf.toByteArray();
+            } finally {
+                is.close();
             }
-        } catch (IOException e) {
+        } catch (IOException ex) {
             // This should never happen!
-            throw new IllegalStateException(e);
+            throw new Error(ex);
         }
-
-        return baos.toByteArray();
     }
 
     /**
@@ -72,24 +71,23 @@ public class DecoderUtil {
      * @return the decoded bytes.
      */
     private static byte[] decodeBase64(String s, DecodeMonitor monitor) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
         try {
-            byte[] bytes = s.getBytes("US-ASCII");
-
             Base64InputStream is = new Base64InputStream(
-                                        new ByteArrayInputStream(bytes), monitor);
-
-            int b;
-            while ((b = is.read()) != -1) {
-                baos.write(b);
+                    InputStreams.createAscii(s), monitor);
+            try {
+                ByteArrayBuffer buf = new ByteArrayBuffer(s.length());
+                int b;
+                while ((b = is.read()) != -1) {
+                    buf.append(b);
+                }
+                return buf.toByteArray();
+            } finally {
+                is.close();
             }
-        } catch (IOException e) {
+        } catch (IOException ex) {
             // This should never happen!
-            throw new IllegalStateException(e);
+            throw new Error(ex);
         }
-
-        return baos.toByteArray();
     }
 
     /**

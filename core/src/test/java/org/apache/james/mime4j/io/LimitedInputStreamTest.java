@@ -22,7 +22,6 @@ package org.apache.james.mime4j.io;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 public class LimitedInputStreamTest {
@@ -30,8 +29,7 @@ public class LimitedInputStreamTest {
     @Test
     public void testUpToLimitRead() throws IOException {
         byte[] data = new byte[]{'0', '1', '2', '3', '4', '5', '6'};
-        ByteArrayInputStream instream = new ByteArrayInputStream(data);
-        LimitedInputStream limitedStream = new LimitedInputStream(instream, 3);
+        LimitedInputStream limitedStream = new LimitedInputStream(InputStreams.create(data), 3);
         Assert.assertEquals(0, limitedStream.getPosition());
         Assert.assertTrue(limitedStream.read() != -1);
         Assert.assertEquals(1, limitedStream.getPosition());

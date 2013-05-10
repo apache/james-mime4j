@@ -20,20 +20,28 @@
 package org.apache.james.mime4j.io;
 
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-
 public class BufferedLineReaderInputStreamTest {
+
+    private static BufferedLineReaderInputStream create(final String s, int bufSize) {
+        return new BufferedLineReaderInputStream(InputStreams.createAscii(s), bufSize);
+    }
+
+    private static BufferedLineReaderInputStream create(final byte[] b, int bufSize) {
+        return new BufferedLineReaderInputStream(InputStreams.create(b), bufSize);
+    }
+
+    private static BufferedLineReaderInputStream create(final byte[] b, int bufSize, int maxLen) {
+        return new BufferedLineReaderInputStream(InputStreams.create(b), bufSize, maxLen);
+    }
 
     @Test
     public void testBasicOperations() throws Exception {
         String text = "ah blahblah";
-        byte[] b1 = text.getBytes("US-ASCII");
-        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream instream = create(text, 32);
 
         Assert.assertEquals((byte) 'a', instream.read());
         Assert.assertEquals((byte) 'h', instream.read());
@@ -67,21 +75,21 @@ public class BufferedLineReaderInputStreamTest {
         teststrs[3] = "\r\n";
         teststrs[4] = "And goodbye\r\n";
 
-        ByteArrayOutputStream outstream = new ByteArrayOutputStream();
+        ByteArrayBuffer buf = new ByteArrayBuffer(128);
 
         for (String teststr : teststrs) {
-            outstream.write(teststr.getBytes("US-ASCII"));
+            byte[] b = ContentUtil.toAsciiByteArray(teststr);
+            buf.append(b, 0, b.length);
         }
-        byte[] raw = outstream.toByteArray();
+        byte[] raw = buf.toByteArray();
 
-        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(raw), 16);
+        BufferedLineReaderInputStream instream = create(raw, 16);
 
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8);
         for (String teststr : teststrs) {
             linebuf.clear();
             instream.readLine(linebuf);
-            String s = new String(linebuf.toByteArray(), "US-ASCII");
+            String s = ContentUtil.toAsciiString(linebuf);
             Assert.assertEquals(teststr, s);
         }
         Assert.assertEquals(-1, instream.readLine(linebuf));
@@ -94,55 +102,54 @@ public class BufferedLineReaderInputStreamTest {
     public void testReadEmptyLine() throws Exception {
 
         String teststr = "\n\n\r\n\r\r\n\n\n\n\n\n";
-        byte[] raw = teststr.getBytes("US-ASCII");
+        byte[] raw = ContentUtil.toAsciiByteArray(teststr);
 
-        LineReaderInputStream instream = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(raw), 4);
+        BufferedLineReaderInputStream instream = create(raw, 4);
 
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8);
         linebuf.clear();
         instream.readLine(linebuf);
-        String s = new String(linebuf.toByteArray(), "US-ASCII");
+        String s = ContentUtil.toAsciiString(linebuf);
         Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
-        s = new String(linebuf.toByteArray(), "US-ASCII");
+        s = ContentUtil.toAsciiString(linebuf);
         Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
-        s = new String(linebuf.toByteArray(), "US-ASCII");
+        s = ContentUtil.toAsciiString(linebuf);
         Assert.assertEquals("\r\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
-        s = new String(linebuf.toByteArray(), "US-ASCII");
+        s = ContentUtil.toAsciiString(linebuf);
         Assert.assertEquals("\r\r\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
-        s = new String(linebuf.toByteArray(), "US-ASCII");
+        s = ContentUtil.toAsciiString(linebuf);
         Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
-        s = new String(linebuf.toByteArray(), "US-ASCII");
+        s = ContentUtil.toAsciiString(linebuf);
         Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
-        s = new String(linebuf.toByteArray(), "US-ASCII");
+        s = ContentUtil.toAsciiString(linebuf);
         Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
-        s = new String(linebuf.toByteArray(), "US-ASCII");
+        s = ContentUtil.toAsciiString(linebuf);
         Assert.assertEquals("\n", s);
 
         linebuf.clear();
         instream.readLine(linebuf);
-        s = new String(linebuf.toByteArray(), "US-ASCII");
+        s = ContentUtil.toAsciiString(linebuf);
         Assert.assertEquals("\n", s);
 
         Assert.assertEquals(-1, instream.readLine(linebuf));
@@ -155,17 +162,15 @@ public class BufferedLineReaderInputStreamTest {
     public void testReadEmptyLineMaxLimit() throws Exception {
 
         String teststr = "1234567890\r\n";
-        byte[] raw = teststr.getBytes("US-ASCII");
+        byte[] raw = ContentUtil.toAsciiByteArray(teststr);
 
-        LineReaderInputStream instream1 = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(raw), 1024, 13);
+        LineReaderInputStream instream1 = create(raw, 1024, 13);
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8);
         linebuf.clear();
         instream1.readLine(linebuf);
         instream1.close();
 
-        LineReaderInputStream instream2 = new BufferedLineReaderInputStream(
-                new ByteArrayInputStream(raw), 1024, 12);
+        LineReaderInputStream instream2 = create(raw, 1024, 12);
         linebuf.clear();
         try {
             instream2.readLine(linebuf);

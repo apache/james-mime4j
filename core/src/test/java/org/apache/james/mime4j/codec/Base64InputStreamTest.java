@@ -19,61 +19,69 @@
 
 package org.apache.james.mime4j.codec;
 
-import org.apache.commons.io.output.NullOutputStream;
-import org.junit.Assert;
-import static org.junit.Assert.fail;
-import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.Random;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
+import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class Base64InputStreamTest {
 
+    private static Base64InputStream create(final String s) {
+        return new Base64InputStream(InputStreams.createAscii(s));
+    }
+
+    private static Base64InputStream createStrict(final String s) {
+        return new Base64InputStream(InputStreams.createAscii(s), true);
+    }
+
+    private static Base64InputStream create(final byte[] b) {
+        return new Base64InputStream(InputStreams.create(b));
+    }
+
+    private static byte[] readBin(final InputStream is) throws IOException {
+        return IOUtils.toByteArray(is);
+    }
+
+    private static String readText(final InputStream is) throws IOException {
+        return ContentUtil.toAsciiString(IOUtils.toByteArray(is));
+    }
+
     @Test
     public void testDecode() throws IOException {
-        ByteArrayInputStream bis;
         Base64InputStream decoder;
-        byte[] bytes;
 
         /*
          * Simple initial test.
          */
-        bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ=="));
-        decoder = new Base64InputStream(bis);
-        Assert.assertEquals("This is the plain text message!", toString(read(decoder)));
+        decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==");
+        Assert.assertEquals("This is the plain text message!", readText(decoder));
 
         /*
          * Test encoded text padded once, twice and not at all.
          */
-        bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyBhIHRleHQgd2hpY2ggaGFzIHRvIGJl"
+        decoder = create(("VGhpcyBpcyBhIHRleHQgd2hpY2ggaGFzIHRvIGJl"
                         + "IHBhZGRlZCBvbmNlLi4="));
-        decoder = new Base64InputStream(bis);
-        Assert.assertEquals("This is a text which has to be padded once..", toString(read(decoder)));
-        bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyBhIHRleHQgd2hpY2ggaGFzIHRvIGJl"
+        Assert.assertEquals("This is a text which has to be padded once..", readText(decoder));
+        decoder = create(("VGhpcyBpcyBhIHRleHQgd2hpY2ggaGFzIHRvIGJl"
                         + "IHBhZGRlZCB0d2ljZQ=="));
-        decoder = new Base64InputStream(bis);
-        Assert.assertEquals("This is a text which has to be padded twice", toString(read(decoder)));
-        bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyBhIHRleHQgd2hpY2ggd2lsbCBub3Qg"
+        Assert.assertEquals("This is a text which has to be padded twice", readText(decoder));
+        decoder = create(("VGhpcyBpcyBhIHRleHQgd2hpY2ggd2lsbCBub3Qg"
                         + "YmUgcGFkZGVk"));
-        decoder = new Base64InputStream(bis);
-        Assert.assertEquals("This is a text which will not be padded", toString(read(decoder)));
+        Assert.assertEquals("This is a text which will not be padded", readText(decoder));
 
         /*
          * Test that non base64 characters are ignored.
          */
-        bis = new ByteArrayInputStream(
-                fromString(" &% VGhp\r\ncyBp\r\ncyB0aGUgcGxhaW4g "
+        decoder = create((" &% VGhp\r\ncyBp\r\ncyB0aGUgcGxhaW4g "
                         + " \tdGV4dCBtZ?!XNzY*WdlIQ=="));
-        decoder = new Base64InputStream(bis);
-        Assert.assertEquals("This is the plain text message!", toString(read(decoder)));
+        Assert.assertEquals("This is the plain text message!", readText(decoder));
 
         /*
          * Test that the bytes 0-255 shifted 0, 1 and 2 positions are
@@ -103,25 +111,24 @@ public class Base64InputStreamTest {
                 + "BwsPExcbHyMnKy8zNzs/Q0dLT1NXW19jZ2tvc3d7f4OHi4+Tl5u"
                 + "fo6err7O3u7/Dx8vP09fb3+Pn6+/z9/v8AAQ==";
 
-        bis = new ByteArrayInputStream(fromString(s1));
-        decoder = new Base64InputStream(bis);
-        bytes = read(decoder);
+        byte[] bytes;
+
+        decoder = create(s1);
+        bytes = readBin(decoder);
 
         for (int i = 0; i < bytes.length; i++) {
             Assert.assertEquals("Position " + i, bytes[i], (byte) i);
         }
 
-        bis = new ByteArrayInputStream(fromString(s2));
-        decoder = new Base64InputStream(bis);
-        bytes = read(decoder);
+        decoder = create(s2);
+        bytes = readBin(decoder);
 
         for (int i = 0; i < bytes.length; i++) {
             Assert.assertEquals("Position " + i, bytes[i], (byte) (i + 1));
         }
 
-        bis = new ByteArrayInputStream(fromString(s3));
-        decoder = new Base64InputStream(bis);
-        bytes = read(decoder);
+        decoder = create(s3);
+        bytes = readBin(decoder);
 
         for (int i = 0; i < bytes.length; i++) {
             Assert.assertEquals("Position " + i, bytes[i], (byte) (i + 2));
@@ -130,12 +137,7 @@ public class Base64InputStreamTest {
 
     @Test
     public void testDecodePrematureClose() throws IOException {
-        ByteArrayInputStream bis;
-        Base64InputStream decoder;
-
-        bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ=="));
-        decoder = new Base64InputStream(bis);
+        Base64InputStream decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==");
         Assert.assertEquals('T', decoder.read());
         Assert.assertEquals('h', decoder.read());
         decoder.close();
@@ -153,12 +155,11 @@ public class Base64InputStreamTest {
         new Random(0).nextBytes(data);
 
         ByteArrayOutputStream eOut = new ByteArrayOutputStream();
-        CodecUtil.encodeBase64(new ByteArrayInputStream(data), eOut);
+        CodecUtil.encodeBase64(InputStreams.create(data), eOut);
         byte[] encoded = eOut.toByteArray();
 
         for (int bufferSize = 1; bufferSize <= 1009; bufferSize++) {
-            ByteArrayInputStream bis = new ByteArrayInputStream(encoded);
-            Base64InputStream decoder = new Base64InputStream(bis);
+            Base64InputStream decoder = create(encoded);
             ByteArrayOutputStream dOut = new ByteArrayOutputStream();
 
             final byte[] buffer = new byte[bufferSize];
@@ -182,9 +183,7 @@ public class Base64InputStreamTest {
      */
     @Test
     public void testReadInt() throws Exception {
-        ByteArrayInputStream bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ=="));
-        Base64InputStream decoder = new Base64InputStream(bis);
+        Base64InputStream decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         while (true) {
@@ -195,8 +194,8 @@ public class Base64InputStreamTest {
         }
         decoder.close();
 
-        Assert.assertEquals("This is the plain text message!", toString(out
-                .toByteArray()));
+        Assert.assertEquals("This is the plain text message!",
+                ContentUtil.toAsciiString(out.toByteArray()));
     }
 
     /**
@@ -204,10 +203,7 @@ public class Base64InputStreamTest {
      */
     @Test
     public void testReadOffset() throws Exception {
-        ByteArrayInputStream bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ=="));
-        Base64InputStream decoder = new Base64InputStream(bis);
-
+        Base64InputStream decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlIQ==");
         byte[] data = new byte[36];
         for (int i = 0; ; ) {
             int bytes = decoder.read(data, i, 5);
@@ -218,14 +214,12 @@ public class Base64InputStreamTest {
         decoder.close();
 
         Assert.assertEquals("This is the plain text message!\0\0\0\0\0",
-                toString(data));
+                ContentUtil.toAsciiString(data));
     }
 
     @Test
     public void testStrictUnexpectedEof() throws Exception {
-        ByteArrayInputStream bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI"));
-        Base64InputStream decoder = new Base64InputStream(bis, true);
+        Base64InputStream decoder = createStrict("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI");
         try {
             CodecUtil.copy(decoder, new NullOutputStream());
             Assert.fail();
@@ -237,20 +231,16 @@ public class Base64InputStreamTest {
 
     @Test
     public void testLenientUnexpectedEof() throws Exception {
-        ByteArrayInputStream bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI"));
-        Base64InputStream decoder = new Base64InputStream(bis, false);
+        Base64InputStream decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.copy(decoder, out);
-        Assert.assertEquals("This is the plain text message", toString(out
-                .toByteArray()));
+        Assert.assertEquals("This is the plain text message", ContentUtil.toAsciiString(
+                out.toByteArray()));
     }
 
     @Test
     public void testStrictUnexpectedPad() throws Exception {
-        ByteArrayInputStream bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI="));
-        Base64InputStream decoder = new Base64InputStream(bis, true);
+        Base64InputStream decoder = createStrict("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI=");
         try {
             CodecUtil.copy(decoder, new NullOutputStream());
             Assert.fail();
@@ -261,39 +251,11 @@ public class Base64InputStreamTest {
 
     @Test
     public void testLenientUnexpectedPad() throws Exception {
-        ByteArrayInputStream bis = new ByteArrayInputStream(
-                fromString("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI="));
-        Base64InputStream decoder = new Base64InputStream(bis, false);
+        Base64InputStream decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI=");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.copy(decoder, out);
-        Assert.assertEquals("This is the plain text message", toString(out
-                .toByteArray()));
+        Assert.assertEquals("This is the plain text message", ContentUtil.toAsciiString(
+                out.toByteArray()));
     }
 
-    private byte[] read(InputStream is) throws IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        int b;
-        while ((b = is.read()) != -1) {
-            bos.write(b);
-        }
-        return bos.toByteArray();
-    }
-
-    private byte[] fromString(String s) {
-        try {
-            return s.getBytes("US-ASCII");
-        } catch (UnsupportedEncodingException e) {
-            fail(e.getMessage());
-            return null;
-        }
-    }
-
-    private String toString(byte[] b) {
-        try {
-            return new String(b, "US-ASCII");
-        } catch (UnsupportedEncodingException e) {
-            fail(e.getMessage());
-            return null;
-        }
-    }
 }

@@ -20,11 +20,11 @@
 package org.apache.james.mime4j.codec;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
@@ -153,11 +153,11 @@ public class QuotedPrintableTextEncodeTest {
     }
 
     private void checkRoundtrip(byte[] content) throws Exception {
-        InputStream in = new ByteArrayInputStream(content);
+        InputStream in = InputStreams.create(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.encodeQuotedPrintable(in, out);
         // read back through decoder
-        in = new QuotedPrintableInputStream(new ByteArrayInputStream(out.toByteArray()));
+        in = new QuotedPrintableInputStream(InputStreams.create(out.toByteArray()));
         out = new ByteArrayOutputStream();
         IOUtils.copy(in, out);
         assertEquals(content, out.toByteArray());
@@ -170,7 +170,7 @@ public class QuotedPrintableTextEncodeTest {
 
 
     private void check(byte[] content, byte[] expected) throws Exception {
-        ByteArrayInputStream in = new ByteArrayInputStream(content);
+        InputStream in = InputStreams.create(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         CodecUtil.encodeQuotedPrintable(in, out);
         assertEquals(expected, out.toByteArray());

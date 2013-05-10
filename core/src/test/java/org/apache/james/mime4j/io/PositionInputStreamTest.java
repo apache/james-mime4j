@@ -22,7 +22,6 @@ package org.apache.james.mime4j.io;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 public class PositionInputStreamTest {
@@ -30,8 +29,7 @@ public class PositionInputStreamTest {
     @Test
     public void testPositionCounting() throws IOException {
         byte[] data = new byte[]{'0', '1', '2', '3', '4', '5', '6'};
-        ByteArrayInputStream instream = new ByteArrayInputStream(data);
-        PositionInputStream countingStream = new PositionInputStream(instream);
+        PositionInputStream countingStream = new PositionInputStream(InputStreams.create(data));
         Assert.assertEquals(0, countingStream.getPosition());
         Assert.assertTrue(countingStream.read() != -1);
         Assert.assertEquals(1, countingStream.getPosition());
