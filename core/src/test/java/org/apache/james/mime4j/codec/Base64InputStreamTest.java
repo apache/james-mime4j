@@ -173,6 +173,7 @@ public class Base64InputStreamTest {
             for (int i = 0; i < data.length; i++) {
                 Assert.assertEquals(data[i], decoded[i]);
             }
+            decoder.close();
         }
     }
 
@@ -192,6 +193,7 @@ public class Base64InputStreamTest {
                 break;
             out.write(x);
         }
+        decoder.close();
 
         Assert.assertEquals("This is the plain text message!", toString(out
                 .toByteArray()));
@@ -213,6 +215,7 @@ public class Base64InputStreamTest {
                 break;
             i += bytes;
         }
+        decoder.close();
 
         Assert.assertEquals("This is the plain text message!\0\0\0\0\0",
                 toString(data));

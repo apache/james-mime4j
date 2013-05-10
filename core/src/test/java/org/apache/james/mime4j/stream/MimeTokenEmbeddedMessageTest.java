@@ -20,7 +20,6 @@
 package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.ExampleMail;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

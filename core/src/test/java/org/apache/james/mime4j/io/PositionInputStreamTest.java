@@ -50,6 +50,7 @@ public class PositionInputStreamTest {
         Assert.assertEquals(7, countingStream.getPosition());
         Assert.assertTrue(countingStream.read(tmp) == -1);
         Assert.assertEquals(7, countingStream.getPosition());
+        countingStream.close();
     }
 
 }

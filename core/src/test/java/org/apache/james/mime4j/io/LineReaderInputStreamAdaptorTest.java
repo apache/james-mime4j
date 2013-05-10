@@ -48,6 +48,8 @@ public class LineReaderInputStreamAdaptorTest {
         Assert.assertEquals(-1, instream.read(tmp1));
         Assert.assertEquals(-1, instream.read());
         Assert.assertEquals(-1, instream.read());
+
+        instream.close();
     }
 
     @Test
@@ -85,6 +87,8 @@ public class LineReaderInputStreamAdaptorTest {
         }
         Assert.assertEquals(-1, instream.readLine(linebuf));
         Assert.assertEquals(-1, instream.readLine(linebuf));
+
+        instream.close();
     }
 
     @Test
@@ -144,6 +148,8 @@ public class LineReaderInputStreamAdaptorTest {
 
         Assert.assertEquals(-1, instream.readLine(linebuf));
         Assert.assertEquals(-1, instream.readLine(linebuf));
+
+        instream.close();
     }
 
     @Test
@@ -158,6 +164,8 @@ public class LineReaderInputStreamAdaptorTest {
         linebuf.clear();
         instream1.readLine(linebuf);
 
+        instream1.close();
+
         LineReaderInputStreamAdaptor instream2 = new LineReaderInputStreamAdaptor(
                 new ByteArrayInputStream(raw), 12);
         linebuf.clear();
@@ -166,6 +174,8 @@ public class LineReaderInputStreamAdaptorTest {
             Assert.fail("MaxLineLimitException should have been thrown");
         } catch (MaxLineLimitException ex) {
         }
+
+        instream2.close();
     }
 
 }

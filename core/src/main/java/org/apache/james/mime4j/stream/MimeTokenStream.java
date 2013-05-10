@@ -29,7 +29,6 @@ import java.util.LinkedList;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineNumberInputStream;
-import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
@@ -178,22 +177,28 @@ public class MimeTokenStream {
     }
 
     private void doParse(InputStream stream, EntityState start) {
-        LineNumberSource lineSource = null;
         if (config.isCountLineNumbers()) {
-            LineNumberInputStream lineInput = new LineNumberInputStream(stream);
-            lineSource = lineInput;
-            stream = lineInput;
+            LineNumberInputStream lnstream = new LineNumberInputStream(stream);
+            rootentity = new MimeEntity(
+                    lnstream,
+                    lnstream,
+                    config,
+                    start,
+                    EntityState.T_END_MESSAGE,
+                    monitor,
+                    fieldBuilder,
+                    bodyDescBuilder);
+        } else {
+            rootentity = new MimeEntity(
+                    null,
+                    stream,
+                    config,
+                    start,
+                    EntityState.T_END_MESSAGE,
+                    monitor,
+                    fieldBuilder,
+                    bodyDescBuilder);
         }
-
-        rootentity = new MimeEntity(
-                lineSource,
-                stream,
-                config,
-                start,
-                EntityState.T_END_MESSAGE,
-                monitor,
-                fieldBuilder,
-                bodyDescBuilder);
 
         rootentity.setRecursionMode(recursionMode);
         currentStateMachine = rootentity;

@@ -52,6 +52,8 @@ public class LineNumberInputStreamTest {
 
         Assert.assertEquals(4, is.getLineNumber());
         Assert.assertEquals(-1, is.read());
+
+        is.close();
     }
 
     /**
@@ -78,5 +80,7 @@ public class LineNumberInputStreamTest {
         Assert.assertEquals(4, is.getLineNumber());
 
         Assert.assertEquals(-1, is.read());
+
+        is.close();
     }
 }

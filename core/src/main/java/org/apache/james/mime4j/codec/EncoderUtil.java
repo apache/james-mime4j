@@ -380,8 +380,6 @@ public class EncoderUtil {
                 : Q_RESTRICTED_CHARS;
 
         StringBuilder sb = new StringBuilder();
-
-        final int end = bytes.length;
         for (byte aByte : bytes) {
             int v = aByte & 0xff;
             if (v == 32) {

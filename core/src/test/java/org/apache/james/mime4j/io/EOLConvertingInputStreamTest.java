@@ -73,6 +73,8 @@ public class EOLConvertingInputStreamTest {
                         EOLConvertingInputStream.CONVERT_BOTH);
         int n = in.read(bytes);
         Assert.assertEquals(s2, toString(bytes, n));
+
+        in.close();
     }
 
     private void testConvertCR(String s1, String s2) throws IOException {
@@ -84,6 +86,8 @@ public class EOLConvertingInputStreamTest {
                         EOLConvertingInputStream.CONVERT_CR);
         int n = in.read(bytes);
         Assert.assertEquals(s2, toString(bytes, n));
+
+        in.close();
     }
 
     private void testConvertLF(String s1, String s2) throws IOException {
@@ -95,6 +99,8 @@ public class EOLConvertingInputStreamTest {
                         EOLConvertingInputStream.CONVERT_LF);
         int n = in.read(bytes);
         Assert.assertEquals(s2, toString(bytes, n));
+
+        in.close();
     }
 
     private String toString(byte[] b, int len) {

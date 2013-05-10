@@ -53,6 +53,8 @@ public class LimitedInputStreamTest {
             Assert.fail("IOException should have been thrown");
         } catch (IOException ex) {
         }
+
+        limitedStream.close();
     }
 
 }

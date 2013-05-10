@@ -32,7 +32,8 @@ public class BufferedLineReaderInputStreamTest {
     public void testBasicOperations() throws Exception {
         String text = "ah blahblah";
         byte[] b1 = text.getBytes("US-ASCII");
-        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
 
         Assert.assertEquals((byte) 'a', instream.read());
         Assert.assertEquals((byte) 'h', instream.read());
@@ -46,6 +47,8 @@ public class BufferedLineReaderInputStreamTest {
         Assert.assertEquals(-1, instream.read(tmp1));
         Assert.assertEquals(-1, instream.read());
         Assert.assertEquals(-1, instream.read());
+
+        instream.close();
     }
 
     @Test
@@ -71,7 +74,8 @@ public class BufferedLineReaderInputStreamTest {
         }
         byte[] raw = outstream.toByteArray();
 
-        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(raw), 16);
+        BufferedLineReaderInputStream instream = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(raw), 16);
 
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8);
         for (String teststr : teststrs) {
@@ -82,6 +86,8 @@ public class BufferedLineReaderInputStreamTest {
         }
         Assert.assertEquals(-1, instream.readLine(linebuf));
         Assert.assertEquals(-1, instream.readLine(linebuf));
+
+        instream.close();
     }
 
     @Test
@@ -90,7 +96,8 @@ public class BufferedLineReaderInputStreamTest {
         String teststr = "\n\n\r\n\r\r\n\n\n\n\n\n";
         byte[] raw = teststr.getBytes("US-ASCII");
 
-        LineReaderInputStream instream = new BufferedLineReaderInputStream(new ByteArrayInputStream(raw), 4);
+        LineReaderInputStream instream = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(raw), 4);
 
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8);
         linebuf.clear();
@@ -140,6 +147,8 @@ public class BufferedLineReaderInputStreamTest {
 
         Assert.assertEquals(-1, instream.readLine(linebuf));
         Assert.assertEquals(-1, instream.readLine(linebuf));
+
+        instream.close();
     }
 
     @Test
@@ -153,6 +162,7 @@ public class BufferedLineReaderInputStreamTest {
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8);
         linebuf.clear();
         instream1.readLine(linebuf);
+        instream1.close();
 
         LineReaderInputStream instream2 = new BufferedLineReaderInputStream(
                 new ByteArrayInputStream(raw), 1024, 12);
@@ -162,6 +172,8 @@ public class BufferedLineReaderInputStreamTest {
             Assert.fail("MaxLineLimitException should have been thrown");
         } catch (MaxLineLimitException ex) {
         }
+
+        instream2.close();
     }
 
 }

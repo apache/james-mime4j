@@ -32,7 +32,8 @@ public class BufferedLineReaderInputStreamBufferTest {
         byte[] b1 = text.getBytes("US-ASCII");
         String pattern = "blah";
         byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
 
         Assert.assertEquals('b', inbuffer.read());
@@ -90,13 +91,15 @@ public class BufferedLineReaderInputStreamBufferTest {
         } catch (IndexOutOfBoundsException expected) {
         }
         Assert.assertEquals(10, inbuffer.indexOf((byte) 'y', 2, 17));
+        inbuffer.close();
     }
 
     @Test
     public void testBasicOperations() throws Exception {
         String text = "bla bla yada yada haha haha";
         byte[] b1 = text.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         Assert.assertEquals(0, inbuffer.pos());
         Assert.assertEquals(27, inbuffer.limit());
@@ -127,6 +130,8 @@ public class BufferedLineReaderInputStreamBufferTest {
         Assert.assertEquals(-1, inbuffer.read(tmp1));
         Assert.assertEquals(-1, inbuffer.read());
         Assert.assertEquals(-1, inbuffer.read());
+
+        inbuffer.close();
     }
 
     @Test
@@ -135,10 +140,13 @@ public class BufferedLineReaderInputStreamBufferTest {
         String pattern = "d";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(7, i);
+
+        inbuffer.close();
     }
 
     @Test
@@ -147,10 +155,13 @@ public class BufferedLineReaderInputStreamBufferTest {
         String pattern = "siid";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(18, i);
+
+        inbuffer.close();
     }
 
     @Test
@@ -159,10 +170,13 @@ public class BufferedLineReaderInputStreamBufferTest {
         String pattern = "blah";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(-1, i);
+
+        inbuffer.close();
     }
 
     @Test
@@ -171,10 +185,13 @@ public class BufferedLineReaderInputStreamBufferTest {
         String pattern = "bla";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(0, i);
+
+        inbuffer.close();
     }
 
     @Test
@@ -183,7 +200,8 @@ public class BufferedLineReaderInputStreamBufferTest {
         String pattern1 = "bla bla";
         byte[] b1 = text.getBytes("US-ASCII");
         byte[] b2 = pattern1.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         byte[] tmp = new byte[3];
         inbuffer.read(tmp);
@@ -191,13 +209,16 @@ public class BufferedLineReaderInputStreamBufferTest {
         Assert.assertEquals(-1, i);
         i = inbuffer.indexOf(b2, inbuffer.pos(), inbuffer.length() - 1);
         Assert.assertEquals(-1, i);
+
+        inbuffer.close();
     }
 
     @Test
     public void testCharOutOfBound() throws Exception {
         String text = "zzz blah blah blah ggg";
         byte[] b1 = text.getBytes("US-ASCII");
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         byte[] tmp = new byte[3];
         inbuffer.read(tmp);
@@ -205,15 +226,20 @@ public class BufferedLineReaderInputStreamBufferTest {
         Assert.assertEquals(-1, i);
         i = inbuffer.indexOf((byte) 'g', inbuffer.pos(), inbuffer.length() - 3);
         Assert.assertEquals(-1, i);
+
+        inbuffer.close();
     }
 
     @Test
     public void test0xFFInBinaryStream() throws Exception {
         byte[] b1 = new byte[]{1, 2, 3, (byte) 0xff, 10, 1, 2, 3};
         byte[] b2 = new byte[]{10};
-        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(new ByteArrayInputStream(b1), 4096);
+        BufferedLineReaderInputStream inbuffer = new BufferedLineReaderInputStream(
+                new ByteArrayInputStream(b1), 4096);
         inbuffer.fillBuffer();
         int i = inbuffer.indexOf(b2);
         Assert.assertEquals(4, i);
+
+        inbuffer.close();
     }
 }
