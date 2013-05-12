@@ -163,12 +163,28 @@ public class ContentUtil {
                 .toString();
     }
 
-    public static byte[] toAsciiByteArray(final String s) {
+    public static byte[] toByteArray(final String s, final Charset charset) {
         if (s == null) {
             return null;
         }
         try {
-            return s.getBytes(CharsetUtil.US_ASCII.name());
+            return s.getBytes((charset != null ? charset : CharsetUtil.DEFAULT_CHARSET).name());
+        } catch (UnsupportedEncodingException ex) {
+            // Should never happen
+            throw new Error(ex);
+        }
+    }
+
+    public static byte[] toAsciiByteArray(final String s) {
+        return toByteArray(s, CharsetUtil.US_ASCII);
+    }
+
+    public static String toString(final byte[] b, final Charset charset) {
+        if (b == null) {
+            return null;
+        }
+        try {
+            return new String(b, (charset != null ? charset : CharsetUtil.DEFAULT_CHARSET).name());
         } catch (UnsupportedEncodingException ex) {
             // Should never happen
             throw new Error(ex);
@@ -176,11 +192,16 @@ public class ContentUtil {
     }
 
     public static String toAsciiString(final byte[] b) {
+        return toString(b, CharsetUtil.US_ASCII);
+    }
+
+    public static String toString(final byte[] b, int off, int len, final Charset charset) {
         if (b == null) {
             return null;
         }
         try {
-            return new String(b, CharsetUtil.US_ASCII.name());
+            return new String(b, off, len,
+                    (charset != null ? charset : CharsetUtil.DEFAULT_CHARSET).name());
         } catch (UnsupportedEncodingException ex) {
             // Should never happen
             throw new Error(ex);
@@ -188,11 +209,16 @@ public class ContentUtil {
     }
 
     public static String toAsciiString(final byte[] b, int off, int len) {
+        return toString(b, off, len, CharsetUtil.US_ASCII);
+    }
+
+    public static String toString(final ByteArrayBuffer b, final Charset charset) {
         if (b == null) {
             return null;
         }
         try {
-            return new String(b, off, len, CharsetUtil.US_ASCII.name());
+            return new String(b.buffer(), 0, b.length(),
+                    (charset != null ? charset : CharsetUtil.DEFAULT_CHARSET).name());
         } catch (UnsupportedEncodingException ex) {
             // Should never happen
             throw new Error(ex);
@@ -200,15 +226,7 @@ public class ContentUtil {
     }
 
     public static String toAsciiString(final ByteArrayBuffer b) {
-        if (b == null) {
-            return null;
-        }
-        try {
-            return new String(b.buffer(), 0, b.length(), CharsetUtil.US_ASCII.name());
-        } catch (UnsupportedEncodingException ex) {
-            // Should never happen
-            throw new Error(ex);
-        }
+        return toString(b, CharsetUtil.US_ASCII);
     }
 
 }

@@ -19,10 +19,11 @@
 
 package org.apache.james.mime4j;
 
-import org.apache.james.mime4j.util.CharsetUtil;
-
-import java.nio.charset.Charset;
 import java.util.Locale;
+
+import org.apache.james.mime4j.codec.EncoderUtil;
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.ContentUtil;
 
 public class ExampleMail {
 
@@ -119,8 +120,6 @@ public class ExampleMail {
     public static final String MD5_CONTENT = "Q2hlY2sgSW50ZWdyaXR5IQ==";
     public static final String CONTENT_DESCRIPTION = "Blah blah blah";
     public static final String CONTENT_ID = "<f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>";
-    public static final Charset US_ASCII = CharsetUtil.US_ASCII;
-    public static final Charset LATIN1 = CharsetUtil.ISO_8859_1;
 
     public static final String MIME_MULTIPART_EMBEDDED_MESSAGES =
             "From: Timothy Tayler <timothy@example.org>\r\n" +
@@ -353,7 +352,8 @@ public class ExampleMail {
             "  You still shall live,--such virtue hath my pen,--\r\n" +
             "  Where breath most breathes, even in the mouths of men.\r\n";
 
-    private static final byte[] ONE_PART_MIME_BASE64_LATIN1_ENCODED = EncodeUtils.toBase64(latin1(ONE_PART_MIME_BASE64_LATIN1_BODY));
+    private static final byte[] ONE_PART_MIME_BASE64_LATIN1_ENCODED = ascii(EncoderUtil.encodeB(
+            latin1(ONE_PART_MIME_BASE64_LATIN1_BODY)));
 
     public static final String ONE_PART_MIME_BASE64_ASCII_BODY = "Hello, World!\r\n";
 
@@ -372,7 +372,8 @@ public class ExampleMail {
                     "\r\n" +
                     ONE_PART_MIME_ASCII_BODY;
 
-    private static final byte[] ONE_PART_MIME_BASE64_ASCII_ENCODED = EncodeUtils.toBase64(ascii(ONE_PART_MIME_BASE64_ASCII_BODY));
+    private static final byte[] ONE_PART_MIME_BASE64_ASCII_ENCODED = ascii(EncoderUtil.encodeB(
+            ascii(ONE_PART_MIME_BASE64_ASCII_BODY)));
 
     public static final String ONE_PART_MIME_ASCII = "Received: by 10.114.126.16 with HTTP; Thu, 6 Mar 2008 10:02:03 -0800 (PST)\r\n" +
             "Message-ID: <f470f68e0803061002n22bc4124he14015a4b6d6327f@mail.gmail.com>\r\n" +
@@ -628,7 +629,7 @@ public class ExampleMail {
             ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_TWO),
             ascii(breakLines(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_QUOTED_PRINTABLE.replaceAll("\r\n", "=0D=0A"))),
             ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_THREE),
-            EncodeUtils.toBase64(ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BASE64)),
+            ascii(EncoderUtil.encodeB(ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_BASE64))),
             ascii(MIME_MIXED_MULTIPART_VARIOUS_ENCODINGS_END),
     };
 
@@ -641,25 +642,31 @@ public class ExampleMail {
     public static final byte[] ONE_PART_MIME_BASE64_LATIN1_UPPERCASE_BYTES = join(ascii(ONE_PART_MIME_BASE64_LATIN1_HEADERS.toUpperCase(Locale.UK)), ONE_PART_MIME_BASE64_LATIN1_ENCODED);
     public static final byte[] ONE_PART_MIME_BASE64_LATIN1_BYTES = join(ascii(ONE_PART_MIME_BASE64_LATIN1_HEADERS), ONE_PART_MIME_BASE64_LATIN1_ENCODED);
     public static final byte[] ONE_PART_MIME_BASE64_ASCII_BYTES = join(ascii(ONE_PART_MIME_BASE64_ASCII_HEADERS), ONE_PART_MIME_BASE64_ASCII_ENCODED);
-    public static final byte[] RFC822_SIMPLE_BYTES = US_ASCII.encode(RFC_SIMPLE).array();
-    public static final byte[] ONE_PART_MIME_ASCII_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII).array();
-    public static final byte[] ONE_PART_MIME_8859_BYTES = LATIN1.encode(ONE_PART_MIME_8859).array();
-    public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES = US_ASCII.encode(MULTIPART_WITH_BINARY_ATTACHMENTS).array();
-    public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES = US_ASCII.encode(MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE).array();
-    public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES = US_ASCII.encode(MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE).array();
-    public static final byte[] ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION).array();
-    public static final byte[] ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES_BYTES = US_ASCII.encode(ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES).array();
+    public static final byte[] RFC822_SIMPLE_BYTES = ascii(RFC_SIMPLE);
+    public static final byte[] ONE_PART_MIME_ASCII_BYTES = ascii(ONE_PART_MIME_ASCII);
+    public static final byte[] ONE_PART_MIME_8859_BYTES = latin1(ONE_PART_MIME_8859);
+    public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_BYTES = ascii(MULTIPART_WITH_BINARY_ATTACHMENTS);
+    public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE_BYTES = ascii(MULTIPART_WITH_BINARY_ATTACHMENTS_NOPREAMBLE);
+    public static final byte[] MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE_BYTES = ascii(MULTIPART_WITH_BINARY_ATTACHMENTS_PREAMBLE_EPILOGUE);
+    public static final byte[] ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION_BYTES = ascii(ONE_PART_MIME_ASCII_COMMENT_IN_MIME_VERSION);
+    public static final byte[] ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES_BYTES = ascii(ONE_PART_MIME_ASCII_MIME_VERSION_SPANS_TWO_LINES);
     public static final byte[] MAIL_WITH_RFC822_PART_BYTES = ascii(MAIL_WITH_RFC822_PART);
     public static final byte[] MIME_MULTIPART_EMBEDDED_MESSAGES_BYTES = ascii(MIME_MULTIPART_EMBEDDED_MESSAGES);
 
-    public static byte[] ascii(String text) {
-
-        return US_ASCII.encode(text).array();
+    public static byte[] ascii(final String text) {
+        return  ContentUtil.toAsciiByteArray(text);
     }
 
-    public static byte[] latin1(String text) {
+    public static byte[] latin1(final String text) {
+        return ContentUtil.toByteArray(text, CharsetUtil.ISO_8859_1);
+    }
 
-        return LATIN1.encode(text).array();
+    public static String ascii(final byte[] b) {
+        return  ContentUtil.toAsciiString(b);
+    }
+
+    public static String latin1(final byte[] b) {
+        return ContentUtil.toString(b, CharsetUtil.ISO_8859_1);
     }
 
     public static byte[] join(byte[] one, byte[] two) {

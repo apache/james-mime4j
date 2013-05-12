@@ -26,6 +26,7 @@ import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
 
 /**
  * Helper class to run comparison of parsed results
@@ -106,6 +107,6 @@ class TestHandler implements ContentHandler {
     }
 
     public void raw(InputStream is) throws IOException {
-        MimeStreamParserExampleMessagesTest.fail("raw should never be called");
+        Assert.fail("raw should never be called");
     }
 }
