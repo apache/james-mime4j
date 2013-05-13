@@ -19,30 +19,29 @@
 
 package org.apache.james.mime4j.dom;
 
-import org.apache.james.mime4j.dom.Body;
-import org.apache.james.mime4j.dom.Entity;
-import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.HeaderImpl;
+import org.junit.Assert;
+import org.junit.Test;
 
-import junit.framework.TestCase;
+public class EntityTest {
 
-public class EntityTest extends TestCase {
-
+    @Test
     public void testSetBody() throws Exception {
         Entity entity = new BodyPart();
-        assertNull(entity.getBody());
+        Assert.assertNull(entity.getBody());
 
         Body body = new BasicBodyFactory().textBody("test");
-        assertNull(body.getParent());
+        Assert.assertNull(body.getParent());
 
         entity.setBody(body);
-        assertSame(body, entity.getBody());
-        assertSame(entity, body.getParent());
+        Assert.assertSame(body, entity.getBody());
+        Assert.assertSame(entity, body.getParent());
     }
 
+    @Test
     public void testSetBodyTwice() throws Exception {
         Entity entity = new BodyPart();
 
@@ -52,77 +51,83 @@ public class EntityTest extends TestCase {
         entity.setBody(b1);
         try {
             entity.setBody(b2);
-            fail();
+            Assert.fail("IllegalStateException expected");
         } catch (IllegalStateException expected) {
         }
     }
 
+    @Test
     public void testRemoveBody() throws Exception {
         Entity entity = new BodyPart();
         Body body = new BasicBodyFactory().textBody("test");
         entity.setBody(body);
 
         Body removed = entity.removeBody();
-        assertSame(body, removed);
+        Assert.assertSame(body, removed);
 
-        assertNull(entity.getBody());
-        assertNull(removed.getParent());
+        Assert.assertNull(entity.getBody());
+        Assert.assertNull(removed.getParent());
     }
 
+    @Test
     public void testGetDispositionType() throws Exception {
         BodyPart entity = new BodyPart();
 
-        assertNull(entity.getDispositionType());
+        Assert.assertNull(entity.getDispositionType());
 
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Content-Disposition: inline"));
         entity.setHeader(header);
 
-        assertEquals("inline", entity.getDispositionType());
+        Assert.assertEquals("inline", entity.getDispositionType());
     }
 
+    @Test
     public void testSetContentDispositionType() throws Exception {
         BodyPart entity = new BodyPart();
 
         entity.setContentDisposition("attachment");
 
-        assertEquals("attachment", entity.getHeader().getField(
+        Assert.assertEquals("attachment", entity.getHeader().getField(
                 "Content-Disposition").getBody());
     }
 
+    @Test
     public void testSetContentDispositionTypeFilename() throws Exception {
         BodyPart entity = new BodyPart();
 
         entity.setContentDisposition("attachment", "some file.dat");
 
-        assertEquals("attachment; filename=\"some file.dat\"", entity
+        Assert.assertEquals("attachment; filename=\"some file.dat\"", entity
                 .getHeader().getField("Content-Disposition").getBody());
     }
 
+    @Test
     public void testGetFilename() throws Exception {
         BodyPart entity = new BodyPart();
 
-        assertNull(entity.getFilename());
+        Assert.assertNull(entity.getFilename());
 
         Header header = new HeaderImpl();
         header.setField(DefaultFieldParser.parse("Content-Disposition: attachment; "
                 + "filename=\"some file.dat\""));
         entity.setHeader(header);
 
-        assertEquals("some file.dat", entity.getFilename());
+        Assert.assertEquals("some file.dat", entity.getFilename());
     }
 
+    @Test
     public void testSetFilename() throws Exception {
         BodyPart entity = new BodyPart();
 
         entity.setFilename("file name.ext");
 
-        assertEquals("attachment; filename=\"file name.ext\"", entity
+        Assert.assertEquals("attachment; filename=\"file name.ext\"", entity
                 .getHeader().getField("Content-Disposition").getBody());
 
         entity.setFilename(null);
 
-        assertEquals("attachment", entity.getHeader().getField(
+        Assert.assertEquals("attachment", entity.getHeader().getField(
                 "Content-Disposition").getBody());
     }
 

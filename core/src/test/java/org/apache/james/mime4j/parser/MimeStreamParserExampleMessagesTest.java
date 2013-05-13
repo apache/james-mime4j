@@ -19,108 +19,85 @@
 
 package org.apache.james.mime4j.parser;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.stream.MimeConfig;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.JarURLConnection;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+
+import junit.framework.TestSuite;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.ExampleMessageTestCase;
+import org.apache.james.mime4j.ExampleMessageTestCaseFactory;
+import org.apache.james.mime4j.ExampleMessageTestSuiteBuilder;
+import org.apache.james.mime4j.stream.MimeConfig;
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.junit.Assert;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
 
 /**
- * Creates a TestSuite running the test for each .msg file in the test resouce folder.
- * Allow running of a single test from Unit testing GUIs
+ * Test parsing of all sample messages
  */
-public class MimeStreamParserExampleMessagesTest extends TestCase {
+@RunWith(AllTests.class)
+public class MimeStreamParserExampleMessagesTest extends ExampleMessageTestCase {
 
-    private final URL url;
+    public static TestSuite suite() throws IOException {
+        ExampleMessageTestSuiteBuilder testSuiteBuilder = new ExampleMessageTestSuiteBuilder(
+                new ExampleMessageTestCaseFactory() {
 
-    public MimeStreamParserExampleMessagesTest(String name, URL url) {
-        super(name);
-        this.url = url;
+                    public ExampleMessageTestCase create(final File file, final URL resource) throws IOException {
+                        return new MimeStreamParserExampleMessagesTest(file, resource);
+                    }
+
+                });
+        return testSuiteBuilder.build();
+    }
+
+    public MimeStreamParserExampleMessagesTest(final File file, final URL resource) {
+        super(file, resource);
     }
 
     @Override
-    protected void runTest() throws Throwable {
-        MimeStreamParser parser;
-        TestHandler handler;
-        MimeConfig config = new MimeConfig();
-        if (getName().startsWith("malformedHeaderStartsBody")) {
-            config.setMalformedHeaderStartsBody(true);
-        }
-        config.setMaxLineLen(-1);
-        parser = new MimeStreamParser(config);
-        handler = new TestHandler();
+    public void runTest() throws Exception {
+        MimeConfig config = getConfig();
 
-        parser.setContentHandler(handler);
-        parser.parse(url.openStream());
+        TestHandler handler = new TestHandler();
+        InputStream msgstream = getResource().openStream();
+        try {
+            MimeStreamParser parser = new MimeStreamParser(config);
+            parser.setContentHandler(handler);
+            parser.parse(msgstream);
+
+        } finally {
+            msgstream.close();
+        }
 
         String result = handler.sb.toString();
 
-        String s = url.toString();
-        String prefix = s.substring(0, s.lastIndexOf('.'));
-        URL xmlFileUrl = new URL(prefix + ".xml");
+        URL xmlFileUrl = new URL(getResourceBase() + ".xml");
         try {
-            InputStream openStream = xmlFileUrl.openStream();
-            String expected = IOUtils.toString(openStream, "ISO8859-1");
-            assertEquals(expected, result);
-        } catch (FileNotFoundException e) {
-            IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath() + ".expected"));
-            fail("Expected file created.");
-        }
-    }
-
-    public static Test suite() throws IOException, URISyntaxException {
-        return new MimeStreamParserExampleMessagesTestSuite();
-    }
-
-    static class MimeStreamParserExampleMessagesTestSuite extends TestSuite {
-
-        public MimeStreamParserExampleMessagesTestSuite() throws IOException, URISyntaxException {
-            addTests("/testmsgs");
-            addTests("/mimetools-testmsgs");
-        }
-
-        private void addTests(String testsFolder) throws URISyntaxException,
-                MalformedURLException, IOException {
-            URL resource = MimeStreamParserExampleMessagesTestSuite.class.getResource(testsFolder);
-            if (resource != null) {
-                if (resource.getProtocol().equalsIgnoreCase("file")) {
-                    File dir = new File(resource.toURI());
-                    File[] files = dir.listFiles();
-
-                    for (File f : files) {
-                        if (f.getName().endsWith(".msg")) {
-                            addTest(new MimeStreamParserExampleMessagesTest(f.getName(),
-                                    f.toURI().toURL()));
-                        }
-                    }
-                } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
-                    JarURLConnection conn = (JarURLConnection) resource.openConnection();
-                    JarFile jar = conn.getJarFile();
-                    for (Enumeration<JarEntry> it = jar.entries(); it.hasMoreElements(); ) {
-                        JarEntry entry = it.nextElement();
-                        String s = "/" + entry.toString();
-                        File f = new File(s);
-                        if (s.startsWith(testsFolder) && s.endsWith(".msg")) {
-                            addTest(new MimeStreamParserExampleMessagesTest(f.getName(),
-                                    new URL("jar:file:" + jar.getName() + "!" + s)));
-                        }
-                    }
-                }
+            String expected;
+            InputStream contentstream = xmlFileUrl.openStream();
+            try {
+                expected = IOUtils.toString(contentstream, CharsetUtil.ISO_8859_1.name());
+            } finally {
+                contentstream.close();
             }
+            Assert.assertEquals(expected, result);
+        } catch (FileNotFoundException ex) {
+            // Create expected content template to the current directory
+            File expectedFileTemplate = new File(getFilenameBase() + ".xml.expected");
+            FileOutputStream outstream = new FileOutputStream(expectedFileTemplate);
+            try {
+                IOUtils.write(result, outstream, CharsetUtil.ISO_8859_1.name());
+            } finally {
+                outstream.close();
+            }
+            Assert.fail("Expected file created.");
         }
-
     }
+
 }

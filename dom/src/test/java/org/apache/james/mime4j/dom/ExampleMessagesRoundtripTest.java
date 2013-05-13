@@ -1,5 +1,5 @@
 /****************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one   *
+((TextBody) b).getInputStream()((TextBody) b).getInputStream()((TextBody) b).getInputStream()((TextBody) b).getInputStream()((TextBody) b).getInputStream()((TextBody) b).getInputStream()((TextBody) b).getInputStream() * Licensed to the Apache Software Foundation (ASF) under one   *
  * or more contributor license agreements.  See the NOTICE file *
  * distributed with this work for additional information        *
  * regarding copyright ownership.  The ASF licenses this file   *
@@ -19,110 +19,92 @@
 
 package org.apache.james.mime4j.dom;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.apache.james.mime4j.codec.CodecUtil;
-import org.apache.james.mime4j.message.DefaultMessageBuilder;
-import org.apache.james.mime4j.message.DefaultMessageWriter;
-import org.apache.james.mime4j.stream.MimeConfig;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.JarURLConnection;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
+import java.io.InputStream;
 import java.net.URL;
-import java.util.Enumeration;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
+
+import junit.framework.TestSuite;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.ExampleMessageTestCase;
+import org.apache.james.mime4j.ExampleMessageTestCaseFactory;
+import org.apache.james.mime4j.ExampleMessageTestSuiteBuilder;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
+import org.apache.james.mime4j.stream.MimeConfig;
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.junit.Assert;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
 
 /**
- * Creates a TestSuite running the test for each .msg file in the test resouce folder.
- * Allow running of a single test from Unit testing GUIs
+ * Test round-trip of all sample messages
  */
-public class ExampleMessagesRoundtripTest extends TestCase {
+@RunWith(AllTests.class)
+public class ExampleMessagesRoundtripTest extends ExampleMessageTestCase {
 
-    private final URL url;
+    public static TestSuite suite() throws IOException {
+        ExampleMessageTestSuiteBuilder testSuiteBuilder = new ExampleMessageTestSuiteBuilder(
+                new ExampleMessageTestCaseFactory() {
 
-    public ExampleMessagesRoundtripTest(String name, URL url) {
-        super(name);
-        this.url = url;
+                    public ExampleMessageTestCase create(final File file, final URL resource) throws IOException {
+                        return new ExampleMessagesRoundtripTest(file, resource);
+                    }
+
+                });
+        return testSuiteBuilder.build();
+    }
+
+    public ExampleMessagesRoundtripTest(final File file, final URL resource) {
+        super(file, resource);
     }
 
     @Override
-    protected void runTest() throws Throwable {
-        MimeConfig config = new MimeConfig();
-        if (getName().startsWith("malformedHeaderStartsBody")) {
-            config.setMalformedHeaderStartsBody(true);
-        }
-        config.setMaxLineLen(-1);
-        DefaultMessageBuilder builder = new DefaultMessageBuilder();
-        DefaultMessageWriter writer = new DefaultMessageWriter();
-        builder.setMimeEntityConfig(config);
-        Message inputMessage = builder.parseMessage(url.openStream());
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        writer.writeMessage(inputMessage, out);
+    protected void runTest() throws Exception {
+        MimeConfig config = getConfig();
 
-        String s = url.toString();
-        URL msgout = new URL(s.substring(0, s.lastIndexOf('.')) + ".out");
+        Message inputMessage;
+        InputStream msgstream = getResource().openStream();
         try {
-            ByteArrayOutputStream expectedstream = new ByteArrayOutputStream();
-            CodecUtil.copy(msgout.openStream(), expectedstream);
-            assertEquals("Wrong Expected result", new String(expectedstream.toByteArray()), new String(out.toByteArray()));
-        } catch (FileNotFoundException e) {
-            FileOutputStream fos = new FileOutputStream(msgout.getPath() + ".expected");
-            writer.writeMessage(inputMessage, fos);
-            fos.close();
-            fail("Expected file created");
-        }
-    }
-
-    public static Test suite() throws IOException, URISyntaxException {
-        return new ExampleMessagesRountripTestSuite();
-    }
-
-
-    static class ExampleMessagesRountripTestSuite extends TestSuite {
-
-        public ExampleMessagesRountripTestSuite() throws IOException, URISyntaxException {
-            super();
-            addTests("/testmsgs");
-            addTests("/mimetools-testmsgs");
+            DefaultMessageBuilder msgbuilder = new DefaultMessageBuilder();
+            msgbuilder.setMimeEntityConfig(config);
+            inputMessage = msgbuilder.parseMessage(msgstream);
+        } finally {
+            msgstream.close();
         }
 
-        private void addTests(String testsFolder) throws URISyntaxException,
-                MalformedURLException, IOException {
-            URL resource = ExampleMessagesRountripTestSuite.class.getResource(testsFolder);
-            if (resource != null) {
-                if (resource.getProtocol().equalsIgnoreCase("file")) {
-                    File dir = new File(resource.toURI());
-                    File[] files = dir.listFiles();
+        DefaultMessageWriter msgwriter = new DefaultMessageWriter();
 
-                    for (File f : files) {
-                        if (f.getName().endsWith(".msg")) {
-                            addTest(new ExampleMessagesRoundtripTest(f.getName(),
-                                    f.toURI().toURL()));
-                        }
-                    }
-                } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
-                    JarURLConnection conn = (JarURLConnection) resource.openConnection();
-                    JarFile jar = conn.getJarFile();
-                    for (Enumeration<JarEntry> it = jar.entries(); it.hasMoreElements(); ) {
-                        JarEntry entry = it.nextElement();
-                        String s = "/" + entry.toString();
-                        File f = new File(s);
-                        if (s.startsWith(testsFolder) && s.endsWith(".msg")) {
-                            addTest(new ExampleMessagesRoundtripTest(f.getName(),
-                                    new URL("jar:file:" + jar.getName() + "!" + s)));
-                        }
-                    }
-                }
+        ByteArrayOutputStream outstream = new ByteArrayOutputStream();
+        msgwriter.writeMessage(inputMessage, outstream);
+
+        String result = new String(outstream.toByteArray(), CharsetUtil.ISO_8859_1.name());
+
+        URL outFile = new URL(getResourceBase() + ".out");
+        try {
+            String expected;
+            InputStream contentstream = outFile.openStream();
+            try {
+                expected = IOUtils.toString(contentstream, CharsetUtil.ISO_8859_1.name());
+            } finally {
+                contentstream.close();
             }
+            assertEquals(expected, result);
+        } catch (FileNotFoundException e) {
+            // Create expected content template to the current directory
+            File expectedFileTemplate = new File(getFilenameBase() + ".out.expected");
+            FileOutputStream templatestream = new FileOutputStream(expectedFileTemplate);
+            try {
+                IOUtils.write(result, templatestream, CharsetUtil.ISO_8859_1.name());
+            } finally {
+                templatestream.close();
+            }
+            Assert.fail("Expected file created.");
         }
-
     }
+
 }

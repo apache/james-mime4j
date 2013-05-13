@@ -19,104 +19,89 @@
 
 package org.apache.james.mime4j.dom;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.field.FieldsTest;
-import org.apache.james.mime4j.message.DefaultMessageBuilder;
-import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MimeConfig;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.JarURLConnection;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarFile;
 
-public class MessageParserTest extends TestCase {
+import junit.framework.TestSuite;
 
-    private final URL url;
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.ExampleMessageTestCase;
+import org.apache.james.mime4j.ExampleMessageTestCaseFactory;
+import org.apache.james.mime4j.ExampleMessageTestSuiteBuilder;
+import org.apache.james.mime4j.field.FieldsTest;
+import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.MimeConfig;
+import org.apache.james.mime4j.util.CharsetUtil;
+import org.junit.Assert;
+import org.junit.runner.RunWith;
+import org.junit.runners.AllTests;
 
-    public MessageParserTest(String name, URL url) {
-        super(name);
-        this.url = url;
+/**
+ * Test parsing into DOM of all sample messages
+ */
+@RunWith(AllTests.class)
+public class MessageParserTest extends ExampleMessageTestCase {
+
+    public static TestSuite suite() throws IOException {
+        ExampleMessageTestSuiteBuilder testSuiteBuilder = new ExampleMessageTestSuiteBuilder(
+                new ExampleMessageTestCaseFactory() {
+
+                    public ExampleMessageTestCase create(final File file, final URL resource) throws IOException {
+                        return new MessageParserTest(file, resource);
+                    }
+
+                });
+        return testSuiteBuilder.build();
     }
 
-    public static Test suite() throws IOException, URISyntaxException {
-        return new MessageParserTestSuite();
-    }
-
-    static class MessageParserTestSuite extends TestSuite {
-
-        public MessageParserTestSuite() throws IOException, URISyntaxException {
-            addTests("/testmsgs");
-            addTests("/mimetools-testmsgs");
-        }
-
-        private void addTests(String testsFolder) throws URISyntaxException,
-                MalformedURLException, IOException {
-            URL resource = MessageParserTestSuite.class.getResource(testsFolder);
-            if (resource != null) {
-                if (resource.getProtocol().equalsIgnoreCase("file")) {
-                    File dir = new File(resource.toURI());
-                    File[] files = dir.listFiles();
-
-                    for (File f : files) {
-                        if (f.getName().endsWith(".msg")) {
-                            addTest(new MessageParserTest(f.getName(),
-                                    f.toURI().toURL()));
-                        }
-                    }
-                } else if (resource.getProtocol().equalsIgnoreCase("jar")) {
-                    JarURLConnection conn = (JarURLConnection) resource.openConnection();
-                    JarFile jar = conn.getJarFile();
-                    for (Enumeration<JarEntry> it = jar.entries(); it.hasMoreElements(); ) {
-                        JarEntry entry = it.nextElement();
-                        String s = "/" + entry.toString();
-                        File f = new File(s);
-                        if (s.startsWith(testsFolder) && s.endsWith(".msg")) {
-                            addTest(new MessageParserTest(f.getName(),
-                                    new URL("jar:file:" + jar.getName() + "!" + s)));
-                        }
-                    }
-                }
-            }
-        }
-
+    public MessageParserTest(final File file, final URL resource) {
+        super(file, resource);
     }
 
     @Override
     protected void runTest() throws IOException {
-        MimeConfig config = new MimeConfig();
-        if (getName().startsWith("malformedHeaderStartsBody")) {
-            config.setMalformedHeaderStartsBody(true);
-        }
-        config.setMaxLineLen(-1);
-        DefaultMessageBuilder builder = new DefaultMessageBuilder();
-        builder.setMimeEntityConfig(config);
-        Message m = builder.parseMessage(url.openStream());
+        MimeConfig config = getConfig();
 
-        String s = url.toString();
-        String prefix = s.substring(0, s.lastIndexOf('.'));
-        URL xmlFileUrl = new URL(prefix + "_decoded.xml");
-
-        String result = getStructure(m, prefix, "1");
+        Message inputMessage;
+        InputStream msgstream = getResource().openStream();
         try {
-            String expected = IOUtils.toString(xmlFileUrl.openStream(), "ISO8859-1");
-            assertEquals(expected, result);
+            DefaultMessageBuilder msgbuilder = new DefaultMessageBuilder();
+            msgbuilder.setMimeEntityConfig(config);
+            inputMessage = msgbuilder.parseMessage(msgstream);
+        } finally {
+            msgstream.close();
+        }
+
+        String resourceBase = getResourceBase();
+        URL decodedFile = new URL(resourceBase + "_decoded.xml");
+
+        String result = getStructure(inputMessage, resourceBase, "1");
+        try {
+            String expected;
+            InputStream contentstream = decodedFile.openStream();
+            try {
+                expected = IOUtils.toString(contentstream, CharsetUtil.ISO_8859_1.name());
+            } finally {
+                contentstream.close();
+            }
+            Assert.assertEquals(expected, result);
         } catch (FileNotFoundException ex) {
-            IOUtils.write(result, new FileOutputStream(xmlFileUrl.getPath() + ".expected"), "ISO8859-1");
-            fail("Expected file created.");
+            // Create expected content template to the current directory
+            File expectedFileTemplate = new File(getFilenameBase() + "_decoded.xml.expected");
+            FileOutputStream templatestream = new FileOutputStream(expectedFileTemplate);
+            try {
+                IOUtils.write(result, templatestream, CharsetUtil.ISO_8859_1.name());
+            } finally {
+                templatestream.close();
+            }
+            Assert.fail("Expected file created.");
         }
     }
 
@@ -126,8 +111,8 @@ public class MessageParserTest extends TestCase {
         return s.replaceAll(">", "&gt;");
     }
 
-    private String getStructure(Entity e, String prefix, String id)
-            throws IOException {
+    private String getStructure(
+            final Entity e, final String resourceBase, final String id) throws IOException {
 
         StringBuilder sb = new StringBuilder();
 
@@ -157,7 +142,7 @@ public class MessageParserTest extends TestCase {
 
             int i = 1;
             for (Entity bodyPart : parts) {
-                sb.append(getStructure(bodyPart, prefix, id + "_" + (i++)));
+                sb.append(getStructure(bodyPart, resourceBase, id + "_" + (i++)));
             }
 
             if (multipart.getEpilogue() != null) {
@@ -169,37 +154,62 @@ public class MessageParserTest extends TestCase {
             sb.append("</multipart>\r\n");
 
         } else if (e.getBody() instanceof MessageImpl) {
-            sb.append(getStructure((MessageImpl) e.getBody(), prefix, id + "_1"));
+            sb.append(getStructure((MessageImpl) e.getBody(), resourceBase, id + "_1"));
         } else {
             Body b = e.getBody();
-            String s = prefix + "_decoded_" + id
-                    + (b instanceof TextBody ? ".txt" : ".bin");
+            String suffix = "_decoded_" + id + (b instanceof TextBody ? ".txt" : ".bin");
+            String filename = getFilenameBase() + suffix;
+
             String tag = b instanceof TextBody ? "text-body" : "binary-body";
-            File f = new File(s);
-            sb.append("<").append(tag).append(" name=\"").append(f.getName()).append("\"/>\r\n");
-            URL expectedUrl = new URL(s);
+            sb.append("<").append(tag).append(" name=\"").append(filename).append("\"/>\r\n");
+            URL expectedUrl = new URL(getResourceBase() + suffix);
 
             if (b instanceof TextBody) {
                 String charset = e.getCharset();
                 if (charset == null) {
-                    charset = "ISO8859-1";
+                    charset = CharsetUtil.ISO_8859_1.name();
                 }
 
-                String s2 = IOUtils.toString(((TextBody) b).getReader());
+                String result = IOUtils.toString(((TextBody) b).getReader());
                 try {
-                    String s1 = IOUtils.toString(expectedUrl.openStream(), charset);
-                    assertEquals(f.getName(), s1, s2);
+                    String expected;
+                    InputStream contentstream = expectedUrl.openStream();
+                    try {
+                        expected = IOUtils.toString(contentstream, charset);
+                    } finally {
+                        contentstream.close();
+                    }
+                    Assert.assertEquals(filename, expected, result);
                 } catch (FileNotFoundException ex) {
-                    IOUtils.write(s2, new FileOutputStream(expectedUrl.getPath() + ".expected"));
-                    fail("Expected file created.");
+                    // Create expected content template to the current directory
+                    File expectedFileTemplate = new File(filename + ".expected");
+                    FileOutputStream templatestream = new FileOutputStream(expectedFileTemplate);
+                    try {
+                        IOUtils.copy(((TextBody) b).getInputStream(), templatestream);
+                    } finally {
+                        templatestream.close();
+                    }
+                    Assert.fail("Expected file created.");
                 }
             } else {
                 try {
-                    assertEqualsBinary(f.getName(), expectedUrl.openStream(),
-                            ((BinaryBody) b).getInputStream());
+                    InputStream contentstream = expectedUrl.openStream();
+                    try {
+                        assertEqualsBinary(filename, contentstream,
+                                ((BinaryBody) b).getInputStream());
+                    } finally {
+                        contentstream.close();
+                    }
                 } catch (FileNotFoundException ex) {
-                    IOUtils.copy(((BinaryBody) b).getInputStream(), new FileOutputStream(expectedUrl.getPath() + ".expected"));
-                    fail("Expected file created.");
+                    // Create expected content template to the current directory
+                    File expectedFileTemplate = new File(filename + ".expected");
+                    FileOutputStream templatestream = new FileOutputStream(expectedFileTemplate);
+                    try {
+                        IOUtils.copy(((BinaryBody) b).getInputStream(), templatestream);
+                    } finally {
+                        templatestream.close();
+                    }
+                    Assert.fail("Expected file created.");
                 }
             }
         }
@@ -220,7 +230,7 @@ public class MessageParserTest extends TestCase {
         while (true) {
             int b1 = a.read();
             int b2 = b.read();
-            assertEquals(msg + " (Position " + (++pos) + ")", b1, b2);
+            Assert.assertEquals(msg + " (Position " + (++pos) + ")", b1, b2);
 
             if (b1 == -1 || b2 == -1) {
                 break;

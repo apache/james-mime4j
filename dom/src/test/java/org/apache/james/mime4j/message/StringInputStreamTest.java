@@ -53,6 +53,7 @@ public class StringInputStreamTest {
             assertTrue(read <= 255);
             assertEquals(b, (byte) read);
         }
+        in.close();
         assertEquals(-1, in.read());
     }
 
@@ -80,6 +81,7 @@ public class StringInputStreamTest {
                 }
             }
         }
+        in.close();
     }
 
     @Test
@@ -107,6 +109,7 @@ public class StringInputStreamTest {
         InputStream r = new StringInputStream("test", CharsetUtil.UTF_8);
         byte[] bytes = new byte[30];
         Assert.assertEquals(0, r.read(bytes, 0, 0));
+        r.close();
     }
 
     @Test
@@ -117,6 +120,7 @@ public class StringInputStreamTest {
         Assert.assertEquals('t', r.read());
         r.skip(100);
         Assert.assertEquals(-1, r.read());
+        r.close();
     }
 
     @Test
@@ -133,6 +137,7 @@ public class StringInputStreamTest {
         Assert.assertEquals(-1, r.read());
         r.reset();
         r.reset();
+        r.close();
     }
 
 }
