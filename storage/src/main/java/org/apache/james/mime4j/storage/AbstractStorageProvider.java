@@ -22,7 +22,7 @@ package org.apache.james.mime4j.storage;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.util.ContentUtil;
 
 /**
  * Abstract implementation of {@link StorageProvider} that implements
@@ -54,7 +54,7 @@ public abstract class AbstractStorageProvider implements StorageProvider {
      */
     public final Storage store(InputStream in) throws IOException {
         StorageOutputStream out = createStorageOutputStream();
-        CodecUtil.copy(in, out);
+        ContentUtil.copy(in, out);
         return out.toStorage();
     }
 

@@ -19,13 +19,13 @@
 
 package org.apache.james.mime4j.storage;
 
-import org.apache.james.mime4j.codec.CodecUtil;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import org.apache.james.mime4j.util.ContentUtil;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class StorageProviderTest {
 
@@ -98,7 +98,7 @@ public class StorageProviderTest {
         Storage storage = provider.store(new ByteArrayInputStream(data));
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CodecUtil.copy(storage.getInputStream(), baos);
+        ContentUtil.copy(storage.getInputStream(), baos);
         verifyData(data, baos.toByteArray());
     }
 
@@ -108,11 +108,11 @@ public class StorageProviderTest {
         Assert.assertEquals(size, data.length);
 
         StorageOutputStream out = provider.createStorageOutputStream();
-        CodecUtil.copy(new ByteArrayInputStream(data), out);
+        ContentUtil.copy(new ByteArrayInputStream(data), out);
         Storage storage = out.toStorage();
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        CodecUtil.copy(storage.getInputStream(), baos);
+        ContentUtil.copy(storage.getInputStream(), baos);
         verifyData(data, baos.toByteArray());
     }
 

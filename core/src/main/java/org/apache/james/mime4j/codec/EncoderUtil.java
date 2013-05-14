@@ -19,6 +19,9 @@
 
 package org.apache.james.mime4j.codec;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.BitSet;
@@ -26,6 +29,7 @@ import java.util.Locale;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.ContentUtil;
 
 /**
  * Static methods for encoding header field values. This includes encoded-words
@@ -395,6 +399,47 @@ public class EncoderUtil {
         }
 
         return sb.toString();
+    }
+
+    /**
+     * Encodes the given stream using Quoted-Printable.
+     * This assumes that stream is binary and therefore escapes
+     * all line endings.
+     * @param in not null
+     * @param out not null
+     * @throws IOException
+     */
+    public static void encodeQBinary(final InputStream in, final OutputStream out) throws IOException {
+        QuotedPrintableOutputStream qpOut = new QuotedPrintableOutputStream(out, true);
+        ContentUtil.copy(in, qpOut);
+        qpOut.close();
+    }
+
+    /**
+     * Encodes the given stream using Quoted-Printable.
+     * This assumes that stream is text and therefore does not escape
+     * all line endings.
+     * @param in not null
+     * @param out not null
+     * @throws IOException
+     */
+    public static void encodeQ(final InputStream in, final OutputStream out) throws IOException {
+        QuotedPrintableOutputStream qpOut = new QuotedPrintableOutputStream(out, false);
+        ContentUtil.copy(in, qpOut);
+        qpOut.close();
+    }
+
+    /**
+     * Encodes the given stream using base64.
+     *
+     * @param in not null
+     * @param out not null
+     * @throws IOException if an I/O error occurs
+     */
+    public static void encodeB(final InputStream in, final OutputStream out) throws IOException {
+        Base64OutputStream b64Out = new Base64OutputStream(out);
+        ContentUtil.copy(in, b64Out);
+        b64Out.close();
     }
 
     /**

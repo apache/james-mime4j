@@ -19,12 +19,17 @@
 
 package org.apache.james.mime4j.codec;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.codec.EncoderUtil.Encoding;
 import org.apache.james.mime4j.codec.EncoderUtil.Usage;
+import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -210,6 +215,79 @@ public class EncoderUtilTest {
         } catch (UnsupportedEncodingException e) {
             throw new Error(e);
         }
+    }
+
+    @Test
+    public void testEncodeQuotedPrintableLargeInput() throws Exception {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 1024 * 5; i++) {
+            sb.append((char) ('0' + (i % 10)));
+        }
+        String expected = sb.toString().replaceAll("(\\d{75})", "$1=\r\n");
+
+        InputStream in = InputStreams.createAscii(sb.toString());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        EncoderUtil.encodeQBinary(in, out);
+        String actual = ContentUtil.toAsciiString(out.toByteArray());
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testEncodeQuotedPrintableNonAsciiChars() throws Exception {
+        String s = "7bit content with euro \u20AC symbol";
+        InputStream in = InputStreams.create(s, Charset.forName("iso-8859-15"));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        EncoderUtil.encodeQBinary(in, out);
+        String actual = new String(out.toByteArray(), "US-ASCII");
+        Assert.assertEquals("7bit=20content=20with=20euro=20=A4=20symbol", actual);
+    }
+
+    @Test
+    public void testBase64OutputStream() throws Exception {
+        StringBuilder sb = new StringBuilder(2048);
+        for (int i = 0; i < 128; i++) {
+            sb.append("0123456789ABCDEF");
+        }
+        String input = sb.toString();
+        String output = roundtripUsingOutputStream(input);
+        Assert.assertEquals(input, output);
+    }
+
+    private String roundtripUsingOutputStream(String input) throws IOException {
+        ByteArrayOutputStream out2 = new ByteArrayOutputStream();
+        Base64OutputStream outb64 = new Base64OutputStream(out2, 76);
+        ContentUtil.copy(InputStreams.create(input, Charsets.ISO_8859_1), outb64);
+        outb64.flush();
+        outb64.close();
+
+        InputStream is = new Base64InputStream(InputStreams.create(out2.toByteArray()));
+        ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
+        ContentUtil.copy(is, outRoundtrip);
+        return new String(outRoundtrip.toByteArray());
+    }
+
+    /**
+     * This test is a proof for MIME4J-67
+     */
+    @Test
+    public void testBase64Encoder() throws Exception {
+        StringBuilder sb = new StringBuilder(2048);
+        for (int i = 0; i < 128; i++) {
+            sb.append("0123456789ABCDEF");
+        }
+        String input = sb.toString();
+        String output = roundtripUsingEncoder(input);
+        Assert.assertEquals(input, output);
+    }
+
+    private String roundtripUsingEncoder(String input) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        EncoderUtil.encodeB(InputStreams.createAscii(input), out);
+
+        InputStream is = new Base64InputStream(InputStreams.create(out.toByteArray()));
+        ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
+        ContentUtil.copy(is, outRoundtrip);
+        return new String(outRoundtrip.toByteArray());
     }
 
 }

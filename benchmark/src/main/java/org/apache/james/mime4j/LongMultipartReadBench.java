@@ -24,7 +24,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
@@ -37,6 +36,7 @@ import org.apache.james.mime4j.storage.MemoryStorageProvider;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.MimeTokenStream;
+import org.apache.james.mime4j.util.ContentUtil;
 
 public class LongMultipartReadBench {
 
@@ -107,7 +107,7 @@ public class LongMultipartReadBench {
             return null;
         }
         try {
-            CodecUtil.copy(instream, outstream);
+            ContentUtil.copy(instream, outstream);
         } finally {
             instream.close();
         }

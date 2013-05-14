@@ -27,8 +27,9 @@ import java.io.OutputStream;
 import java.util.Random;
 
 import org.apache.commons.io.output.NullOutputStream;
-import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.codec.EncoderUtil;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
+import org.apache.james.mime4j.util.ContentUtil;
 
 public class QuotedPrintableInputStreamBench {
 
@@ -47,7 +48,7 @@ public class QuotedPrintableInputStreamBench {
         for (int i = 0; i < 5; i++) {
             ByteArrayInputStream ed = new ByteArrayInputStream(encoded);
             InputStream in = new QuotedPrintableInputStream(ed);
-            CodecUtil.copy(in, nullOut);
+            ContentUtil.copy(in, nullOut);
         }
         Thread.sleep(100);
 
@@ -59,7 +60,7 @@ public class QuotedPrintableInputStreamBench {
         for (int i = 0; i < repetitions; i++) {
             ByteArrayInputStream ed = new ByteArrayInputStream(encoded);
             InputStream in = new QuotedPrintableInputStream(ed);
-            CodecUtil.copy(in, nullOut);
+            ContentUtil.copy(in, nullOut);
         }
 
         long dt = System.currentTimeMillis() - t0;
@@ -82,7 +83,7 @@ public class QuotedPrintableInputStreamBench {
     private static byte[] encode(byte[] data) throws IOException {
         InputStream in = new ByteArrayInputStream(data);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.encodeQuotedPrintableBinary(in, out);
+        EncoderUtil.encodeQBinary(in, out);
         return out.toByteArray();
     }
 
@@ -91,7 +92,7 @@ public class QuotedPrintableInputStreamBench {
         ByteArrayInputStream ed = new ByteArrayInputStream(encoded);
         InputStream in = new QuotedPrintableInputStream(ed);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.copy(in, out);
+        ContentUtil.copy(in, out);
 
         compare(data, out.toByteArray());
     }

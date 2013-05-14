@@ -22,7 +22,8 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.codec.Base64OutputStream;
+import org.apache.james.mime4j.codec.QuotedPrintableOutputStream;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
@@ -221,9 +222,9 @@ public class DefaultMessageWriter implements MessageWriter {
     protected OutputStream encodeStream(OutputStream out, String encoding,
             boolean binaryBody) throws IOException {
         if (MimeUtil.isBase64Encoding(encoding)) {
-            return CodecUtil.wrapBase64(out);
+            return new Base64OutputStream(out);
         } else if (MimeUtil.isQuotedPrintableEncoded(encoding)) {
-            return CodecUtil.wrapQuotedPrintable(out, binaryBody);
+            return new QuotedPrintableOutputStream(out, binaryBody);
         } else {
             return out;
         }

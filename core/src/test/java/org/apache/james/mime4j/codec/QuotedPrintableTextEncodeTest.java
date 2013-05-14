@@ -156,7 +156,7 @@ public class QuotedPrintableTextEncodeTest {
     private void checkRoundtrip(byte[] content) throws Exception {
         InputStream in = InputStreams.create(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.encodeQuotedPrintable(in, out);
+        EncoderUtil.encodeQ(in, out);
         // read back through decoder
         in = new QuotedPrintableInputStream(InputStreams.create(out.toByteArray()));
         out = new ByteArrayOutputStream();
@@ -171,7 +171,7 @@ public class QuotedPrintableTextEncodeTest {
     private void check(byte[] content, byte[] expected) throws Exception {
         InputStream in = InputStreams.create(content);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.encodeQuotedPrintable(in, out);
+        EncoderUtil.encodeQ(in, out);
         assertEquals(expected, out.toByteArray());
     }
 

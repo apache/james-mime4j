@@ -28,7 +28,8 @@ import java.util.Random;
 
 import org.apache.commons.io.output.NullOutputStream;
 import org.apache.james.mime4j.codec.Base64InputStream;
-import org.apache.james.mime4j.codec.CodecUtil;
+import org.apache.james.mime4j.codec.EncoderUtil;
+import org.apache.james.mime4j.util.ContentUtil;
 
 public class Base64InputStreamBench {
 
@@ -47,7 +48,7 @@ public class Base64InputStreamBench {
         for (int i = 0; i < 5; i++) {
             ByteArrayInputStream ed = new ByteArrayInputStream(encoded);
             InputStream in = new Base64InputStream(ed);
-            CodecUtil.copy(in, nullOut);
+            ContentUtil.copy(in, nullOut);
         }
         Thread.sleep(100);
 
@@ -59,7 +60,7 @@ public class Base64InputStreamBench {
         for (int i = 0; i < repetitions; i++) {
             ByteArrayInputStream ed = new ByteArrayInputStream(encoded);
             InputStream in = new Base64InputStream(ed);
-            CodecUtil.copy(in, nullOut);
+            ContentUtil.copy(in, nullOut);
         }
 
         long dt = System.currentTimeMillis() - t0;
@@ -82,7 +83,7 @@ public class Base64InputStreamBench {
     private static byte[] encode(byte[] data) throws IOException {
         InputStream in = new ByteArrayInputStream(data);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.encodeBase64(in, out);
+        EncoderUtil.encodeB(in, out);
         return out.toByteArray();
     }
 
@@ -91,7 +92,7 @@ public class Base64InputStreamBench {
         ByteArrayInputStream ed = new ByteArrayInputStream(encoded);
         InputStream in = new Base64InputStream(ed);
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.copy(in, out);
+        ContentUtil.copy(in, out);
 
         compare(data, out.toByteArray());
     }

@@ -23,8 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.apache.james.mime4j.codec.CodecUtil;
 import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.util.ContentUtil;
+;
 
 /**
  * Binary body backed by a
@@ -49,7 +50,7 @@ class StorageBinaryBody extends BinaryBody {
             throw new IllegalArgumentException();
 
         InputStream in = storage.getInputStream();
-        CodecUtil.copy(in, out);
+        ContentUtil.copy(in, out);
         in.close();
     }
 

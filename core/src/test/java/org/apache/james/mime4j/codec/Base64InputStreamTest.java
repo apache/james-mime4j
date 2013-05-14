@@ -155,7 +155,7 @@ public class Base64InputStreamTest {
         new Random(0).nextBytes(data);
 
         ByteArrayOutputStream eOut = new ByteArrayOutputStream();
-        CodecUtil.encodeBase64(InputStreams.create(data), eOut);
+        EncoderUtil.encodeB(InputStreams.create(data), eOut);
         byte[] encoded = eOut.toByteArray();
 
         for (int bufferSize = 1; bufferSize <= 1009; bufferSize++) {
@@ -221,7 +221,7 @@ public class Base64InputStreamTest {
     public void testStrictUnexpectedEof() throws Exception {
         Base64InputStream decoder = createStrict("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI");
         try {
-            CodecUtil.copy(decoder, new NullOutputStream());
+            ContentUtil.copy(decoder, new NullOutputStream());
             Assert.fail();
         } catch (IOException expected) {
             Assert.assertTrue(expected.getMessage().toLowerCase().contains(
@@ -233,7 +233,7 @@ public class Base64InputStreamTest {
     public void testLenientUnexpectedEof() throws Exception {
         Base64InputStream decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.copy(decoder, out);
+        ContentUtil.copy(decoder, out);
         Assert.assertEquals("This is the plain text message", ContentUtil.toAsciiString(
                 out.toByteArray()));
     }
@@ -242,7 +242,7 @@ public class Base64InputStreamTest {
     public void testStrictUnexpectedPad() throws Exception {
         Base64InputStream decoder = createStrict("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI=");
         try {
-            CodecUtil.copy(decoder, new NullOutputStream());
+            ContentUtil.copy(decoder, new NullOutputStream());
             Assert.fail();
         } catch (IOException expected) {
             Assert.assertTrue(expected.getMessage().toLowerCase().contains("pad"));
@@ -253,7 +253,7 @@ public class Base64InputStreamTest {
     public void testLenientUnexpectedPad() throws Exception {
         Base64InputStream decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI=");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        CodecUtil.copy(decoder, out);
+        ContentUtil.copy(decoder, out);
         Assert.assertEquals("This is the plain text message", ContentUtil.toAsciiString(
                 out.toByteArray()));
     }
