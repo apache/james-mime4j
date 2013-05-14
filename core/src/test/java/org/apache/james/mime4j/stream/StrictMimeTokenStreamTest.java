@@ -36,9 +36,7 @@ public class StrictMimeTokenStreamTest {
 
     @Before
     public void setUp() throws Exception {
-        MimeConfig config = new MimeConfig();
-        config.setStrictParsing(true);
-        parser = new MimeTokenStream(config);
+        parser = new MimeTokenStream(MimeConfig.STRICT);
     }
 
     @Test

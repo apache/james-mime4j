@@ -69,7 +69,7 @@ public class MimeStreamParser {
             final MimeConfig config,
             final DecodeMonitor monitor,
             final BodyDescriptorBuilder bodyDescBuilder) {
-        this(new MimeTokenStream(config != null ? config.clone() : new MimeConfig(),
+        this(new MimeTokenStream(config != null ? config : MimeConfig.DEFAULT,
                 monitor, bodyDescBuilder));
     }
 
@@ -78,7 +78,7 @@ public class MimeStreamParser {
     }
 
     public MimeStreamParser() {
-        this(new MimeTokenStream(new MimeConfig(), null, null));
+        this(new MimeTokenStream(MimeConfig.DEFAULT, null, null));
     }
 
     /**

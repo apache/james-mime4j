@@ -43,9 +43,7 @@ public class MaximalBodyDescriptorTest {
 
     @Before
     public void setUp() throws Exception {
-        MimeConfig config = new MimeConfig();
-        config.setStrictParsing(true);
-        parser = new MimeTokenStream(config, new DefaultBodyDescriptorBuilder(null));
+        parser = new MimeTokenStream(MimeConfig.STRICT, new DefaultBodyDescriptorBuilder(null));
     }
 
     @Test

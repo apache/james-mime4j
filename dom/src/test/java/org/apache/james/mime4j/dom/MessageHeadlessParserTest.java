@@ -19,8 +19,10 @@
 
 package org.apache.james.mime4j.dom;
 
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.stream.MimeConfig;
 import org.junit.Assert;
@@ -40,8 +42,9 @@ public class MessageHeadlessParserTest {
                 + "\r\n"
                 + "Instead this should be better parsed as a text/plain body\r\n";
 
-        MimeConfig config = new MimeConfig();
-        config.setMalformedHeaderStartsBody(true);
+        MimeConfig config = MimeConfig.custom()
+                .setMalformedHeaderStartsBody(true)
+                .build();
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
         Message message = builder.parseMessage(
@@ -61,8 +64,9 @@ public class MessageHeadlessParserTest {
                 + "\r\n"
                 + "Instead this should be better parsed as a text/plain body\r\n";
 
-        MimeConfig config = new MimeConfig();
-        config.setMalformedHeaderStartsBody(true);
+        MimeConfig config = MimeConfig.custom()
+                .setMalformedHeaderStartsBody(true)
+                .build();
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
         Message message = builder.parseMessage(
@@ -91,13 +95,13 @@ public class MessageHeadlessParserTest {
                 + "Content-Type: image/jpeg\r\n" + "\r\n"
                 + "all kind of stuff\r\n" + "--foo--\r\n";
 
-        MimeConfig config = new MimeConfig();
-        config.setHeadlessParsing(contentType);
+        MimeConfig config = MimeConfig.custom()
+                .setHeadlessParsing(contentType)
+                .build();
         DefaultMessageBuilder builder = new DefaultMessageBuilder();
         builder.setMimeEntityConfig(config);
 
-        Message message = builder.parseMessage(
-                new ByteArrayInputStream(headlessContent.getBytes("UTF-8")));
+        Message message = builder.parseMessage(InputStreams.create(headlessContent, Charsets.UTF_8));
         Assert.assertEquals("multipart/form-data", message.getMimeType());
         Assert.assertEquals(1, message.getHeader().getFields().size());
         ContentTypeField contentTypeField = ((ContentTypeField) message

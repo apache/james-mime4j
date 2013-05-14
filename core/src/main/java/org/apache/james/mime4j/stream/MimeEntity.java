@@ -123,7 +123,7 @@ class MimeEntity implements EntityStateMachine {
             InputStream instream,
             FieldBuilder fieldBuilder,
             BodyDescriptorBuilder bodyDescBuilder) {
-        this(lineSource, instream, new MimeConfig(),
+        this(lineSource, instream, MimeConfig.DEFAULT,
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
                 fieldBuilder,
@@ -134,7 +134,7 @@ class MimeEntity implements EntityStateMachine {
             LineNumberSource lineSource,
             InputStream instream,
             BodyDescriptorBuilder bodyDescBuilder) {
-        this(lineSource, instream, new MimeConfig(),
+        this(lineSource, instream, MimeConfig.DEFAULT,
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 DecodeMonitor.SILENT,
                 new DefaultFieldBuilder(-1),

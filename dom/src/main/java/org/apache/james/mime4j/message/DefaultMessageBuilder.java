@@ -252,7 +252,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
     }
 
     public Header parseHeader(final InputStream is) throws IOException, MimeIOException {
-        final MimeConfig cfg = config != null ? config : new MimeConfig();
+        final MimeConfig cfg = config != null ? config : MimeConfig.DEFAULT;
         boolean strict = cfg.isStrictParsing();
         final DecodeMonitor mon = monitor != null ? monitor :
             strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;
@@ -295,7 +295,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
     public Message parseMessage(final InputStream is) throws IOException, MimeIOException {
         try {
             MessageImpl message = newMessageImpl();
-            MimeConfig cfg = config != null ? config : new MimeConfig();
+            MimeConfig cfg = config != null ? config : MimeConfig.DEFAULT;
             boolean strict = cfg.isStrictParsing();
             DecodeMonitor mon = monitor != null ? monitor :
                 strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;

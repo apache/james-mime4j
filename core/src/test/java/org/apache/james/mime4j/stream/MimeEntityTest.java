@@ -395,8 +395,9 @@ public class MimeEntityTest extends TestCase {
     }
 
     public void testMaxLineLimitCheck() throws Exception {
-        MimeConfig config = new MimeConfig();
-        config.setMaxLineLen(50);
+        MimeConfig config = MimeConfig.custom()
+                .setMaxLineLen(50)
+                .build();
 
         String message =
             "To: Road Runner <runner@example.org>\r\n" +
@@ -461,9 +462,11 @@ public class MimeEntityTest extends TestCase {
         LineNumberInputStream lineInput = new LineNumberInputStream(instream);
         BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
 
-        MimeConfig config = new MimeConfig();
-        config.setMaxLineLen(100);
-        config.setMaxHeaderLen(200);
+        MimeConfig config = MimeConfig.custom()
+                .setMaxLineLen(100)
+                .setMaxHeaderLen(200)
+                .build();
+
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
@@ -489,9 +492,10 @@ public class MimeEntityTest extends TestCase {
     }
 
     public void testMaxHeaderLengthMayExceedMaxLineLength() throws Exception {
-        MimeConfig config = new MimeConfig();
-        config.setMaxLineLen(50);
-        config.setMaxHeaderLen(130);
+        MimeConfig config = MimeConfig.custom()
+                .setMaxLineLen(50)
+                .setMaxHeaderLen(130)
+                .build();
 
         String message =
             "To: Road Runner <runner@example.org>\r\n" +
@@ -557,8 +561,9 @@ public class MimeEntityTest extends TestCase {
         LineNumberInputStream lineInput = new LineNumberInputStream(instream);
         BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
 
-        MimeConfig config = new MimeConfig();
-        config.setMaxHeaderCount(20);
+        MimeConfig config = MimeConfig.custom()
+                .setMaxHeaderCount(20)
+                .build();
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,
@@ -603,8 +608,9 @@ public class MimeEntityTest extends TestCase {
         LineNumberInputStream lineInput = new LineNumberInputStream(instream);
         BufferedLineReaderInputStream rawstream = new BufferedLineReaderInputStream(lineInput, 12);
 
-        MimeConfig config = new MimeConfig();
-        config.setMaxContentLen(100);
+        MimeConfig config = MimeConfig.custom()
+                .setMaxContentLen(100)
+                .build();
         MimeEntity entity = new MimeEntity(
                 lineInput,
                 rawstream,

@@ -66,12 +66,12 @@ public abstract class ExampleMessageTestCase extends TestCase {
     }
 
     public MimeConfig getConfig() {
-        MimeConfig config = new MimeConfig();
+        MimeConfig.Builder b = MimeConfig.custom();
         if (file.getName().startsWith("malformedHeaderStartsBody")) {
-            config.setMalformedHeaderStartsBody(true);
+            b.setMalformedHeaderStartsBody(true);
         }
-        config.setMaxLineLen(-1);
-        return config;
+        b.setMaxLineLen(-1);
+        return b.build();
     }
 
 }

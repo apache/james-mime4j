@@ -124,7 +124,7 @@ public class MimeTokenStream {
             final FieldBuilder fieldBuilder,
             final BodyDescriptorBuilder bodyDescBuilder) {
         super();
-        this.config = config != null ? config : new MimeConfig();
+        this.config = config != null ? config : MimeConfig.DEFAULT;
         this.fieldBuilder = fieldBuilder != null ? fieldBuilder :
             new DefaultFieldBuilder(this.config.getMaxHeaderLen());
         this.monitor = monitor != null ? monitor :
