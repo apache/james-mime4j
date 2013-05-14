@@ -261,9 +261,8 @@ public class EncoderUtilTest {
         outb64.close();
 
         InputStream is = new Base64InputStream(InputStreams.create(out2.toByteArray()));
-        ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
-        ContentUtil.copy(is, outRoundtrip);
-        return new String(outRoundtrip.toByteArray());
+        byte[] buf = ContentUtil.buffer(is);
+        return ContentUtil.toAsciiString(buf);
     }
 
     /**
@@ -285,9 +284,8 @@ public class EncoderUtilTest {
         EncoderUtil.encodeB(InputStreams.createAscii(input), out);
 
         InputStream is = new Base64InputStream(InputStreams.create(out.toByteArray()));
-        ByteArrayOutputStream outRoundtrip = new ByteArrayOutputStream();
-        ContentUtil.copy(is, outRoundtrip);
-        return new String(outRoundtrip.toByteArray());
+        byte[] buf = ContentUtil.buffer(is);
+        return ContentUtil.toAsciiString(buf);
     }
 
 }

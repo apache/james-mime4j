@@ -232,10 +232,8 @@ public class Base64InputStreamTest {
     @Test
     public void testLenientUnexpectedEof() throws Exception {
         Base64InputStream decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI");
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ContentUtil.copy(decoder, out);
-        Assert.assertEquals("This is the plain text message", ContentUtil.toAsciiString(
-                out.toByteArray()));
+        byte[] buf = ContentUtil.buffer(decoder);
+        Assert.assertEquals("This is the plain text message", ContentUtil.toAsciiString(buf));
     }
 
     @Test
@@ -252,10 +250,8 @@ public class Base64InputStreamTest {
     @Test
     public void testLenientUnexpectedPad() throws Exception {
         Base64InputStream decoder = create("VGhpcyBpcyB0aGUgcGxhaW4gdGV4dCBtZXNzYWdlI=");
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ContentUtil.copy(decoder, out);
-        Assert.assertEquals("This is the plain text message", ContentUtil.toAsciiString(
-                out.toByteArray()));
+        byte[] buf = ContentUtil.buffer(decoder);
+        Assert.assertEquals("This is the plain text message", ContentUtil.toAsciiString(buf));
     }
 
 }

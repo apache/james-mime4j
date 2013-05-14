@@ -24,9 +24,9 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -115,9 +115,8 @@ public class QuotedPrintableEncodeTest {
         EncoderUtil.encodeQBinary(in, out);
         // read back through decoder
         in = new QuotedPrintableInputStream(InputStreams.create(out.toByteArray()));
-        out = new ByteArrayOutputStream();
-        IOUtils.copy(in, out);
-        assertEquals(content, out.toByteArray());
+        byte[] buf = ContentUtil.buffer(in);
+        assertEquals(content, buf);
     }
 
     private void check(byte[] content, byte[] expected) throws Exception {

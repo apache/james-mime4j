@@ -19,10 +19,14 @@
 
 package org.apache.james.mime4j.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -51,6 +55,38 @@ public class ContentUtil {
         while (-1 != (inputLength = in.read(buffer))) {
             out.write(buffer, 0, inputLength);
         }
+    }
+
+    /**
+     * Copies the contents of one stream to the other.
+     * @param in not null
+     * @param out not null
+     * @throws IOException
+     */
+    public static void copy(final Reader in, final Writer out) throws IOException {
+        final char[] buffer = new char[DEFAULT_COPY_BUFFER_SIZE];
+        int inputLength;
+        while (-1 != (inputLength = in.read(buffer))) {
+            out.write(buffer, 0, inputLength);
+        }
+    }
+
+    public static byte[] buffer(final InputStream in) throws IOException {
+        if (in == null) {
+            throw new IllegalArgumentException("Input stream may not be null");
+        }
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        copy(in, buf);
+        return buf.toByteArray();
+    }
+
+    public static String buffer(final Reader in) throws IOException {
+        if (in == null) {
+            throw new IllegalArgumentException("Reader may not be null");
+        }
+        StringWriter buf = new StringWriter();
+        copy(in, buf);
+        return buf.toString();
     }
 
     /**

@@ -19,7 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -36,7 +35,9 @@ import org.apache.james.mime4j.dom.TextBody;
 public class BasicBodyFactory implements BodyFactory {
 
     public BinaryBody binaryBody(final InputStream is) throws IOException {
-        return new BasicBinaryBody(bufferContent(is));
+        return BodyBuilder.create()
+                .readFrom(is).
+                buildBinary();
     }
 
     protected Charset resolveCharset(final String mimeCharset) throws UnsupportedEncodingException {
@@ -48,34 +49,30 @@ public class BasicBodyFactory implements BodyFactory {
     }
 
     public TextBody textBody(final InputStream is, final String mimeCharset) throws IOException {
-        return new BasicTextBody(bufferContent(is), resolveCharset(mimeCharset));
-    }
-
-    private static byte[] bufferContent(final InputStream is) throws IOException {
-        if (is == null) {
-            throw new IllegalArgumentException("Input stream may not be null");
-        }
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        byte[] tmp = new byte[2048];
-        int l;
-        while ((l = is.read(tmp)) != -1) {
-            buf.write(tmp, 0, l);
-        }
-        return buf.toByteArray();
+        return BodyBuilder.create()
+                .readFrom(is)
+                .setCharset(resolveCharset(mimeCharset))
+                .buildText();
     }
 
     public TextBody textBody(final String text, final String mimeCharset) throws UnsupportedEncodingException {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
         }
-        return new StringBody(text, resolveCharset(mimeCharset));
+        return BodyBuilder.create()
+                .setText(text)
+                .setCharset(resolveCharset(mimeCharset))
+                .buildText();
     }
 
     public TextBody textBody(final String text, final Charset charset) {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
         }
-        return new StringBody(text, charset);
+        return BodyBuilder.create()
+                .setText(text)
+                .setCharset(charset)
+                .buildText();
     }
 
     public TextBody textBody(final String text) {
@@ -83,7 +80,9 @@ public class BasicBodyFactory implements BodyFactory {
     }
 
     public BinaryBody binaryBody(final byte[] buf) {
-        return new BasicBinaryBody(buf);
+        return BodyBuilder.create()
+                .setByteArray(buf)
+                .buildBinary();
     }
 
 }
