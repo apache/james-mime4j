@@ -19,14 +19,14 @@
 
 package org.apache.james.mime4j.stream;
 
-import org.apache.james.mime4j.util.CharsetUtil;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 
 public class MimeTokenNoRecurseTest {
 
@@ -69,7 +69,7 @@ public class MimeTokenNoRecurseTest {
     @Before
     public void setUp() throws Exception {
         stream = new MimeTokenStream();
-        byte[] bytes = CharsetUtil.US_ASCII.encode(MAIL_WITH_RFC822_PART).array();
+        byte[] bytes = ContentUtil.toAsciiByteArray(MAIL_WITH_RFC822_PART);
         InputStream in = new ByteArrayInputStream(bytes);
         stream.parse(in);
     }

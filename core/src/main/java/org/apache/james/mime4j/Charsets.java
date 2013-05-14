@@ -17,48 +17,16 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.Charset;
 
-import org.apache.james.mime4j.Charsets;
-import org.apache.james.mime4j.dom.SingleBody;
-import org.apache.james.mime4j.dom.TextBody;
+public final class Charsets {
 
-class StringBody extends TextBody {
+    public static final Charset US_ASCII = Charset.forName("US-ASCII");
+    public static final Charset ISO_8859_1 = Charset.forName("ISO-8859-1");
+    public static final Charset UTF_8 = Charset.forName("UTF-8");
 
-    private final String content;
-    private final Charset charset;
-
-    StringBody(final String content, final Charset charset) {
-        super();
-        this.content = content;
-        this.charset = charset;
-    }
-
-    @Override
-    public String getMimeCharset() {
-        return this.charset != null ? this.charset.name() : null;
-    }
-
-    @Override
-    public Reader getReader() throws IOException {
-        return new StringReader(this.content);
-    }
-
-    @Override
-    public InputStream getInputStream() throws IOException {
-        return new StringInputStream(this.content,
-                this.charset != null ? this.charset : Charsets.DEFAULT_CHARSET, 2048);
-    }
-
-    @Override
-    public SingleBody copy() {
-        return new StringBody(this.content, this.charset);
-    }
+    public static final Charset DEFAULT_CHARSET = US_ASCII;
 
 }

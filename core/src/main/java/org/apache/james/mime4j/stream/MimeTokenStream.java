@@ -24,12 +24,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 import java.util.LinkedList;
 
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineNumberInputStream;
-import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * <p>
@@ -319,7 +321,7 @@ public class MimeTokenStream {
         final String mimeCharset = bodyDescriptor.getCharset();
         final Charset charset;
         if (mimeCharset == null || "".equals(mimeCharset)) {
-            charset = CharsetUtil.US_ASCII;
+            charset = Charsets.US_ASCII;
         } else {
             charset = Charset.forName(mimeCharset);
         }

@@ -19,10 +19,11 @@
 
 package org.apache.james.mime4j.util;
 
+import java.nio.charset.Charset;
+
+import org.apache.james.mime4j.Charsets;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.nio.charset.Charset;
 
 public class CharsetUtilTest {
 
@@ -45,8 +46,8 @@ public class CharsetUtilTest {
     public void testCharsetLookup() {
         Charset c1 = CharsetUtil.lookup("us-ascii");
         Charset c2 = CharsetUtil.lookup("ascii");
-        Assert.assertEquals(CharsetUtil.US_ASCII, c1);
-        Assert.assertEquals(CharsetUtil.US_ASCII, c2);
+        Assert.assertEquals(Charsets.US_ASCII, c1);
+        Assert.assertEquals(Charsets.US_ASCII, c2);
     }
 
     @Test

@@ -29,11 +29,11 @@ import java.net.URL;
 import junit.framework.TestSuite;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.ExampleMessageTestCase;
 import org.apache.james.mime4j.ExampleMessageTestCaseFactory;
 import org.apache.james.mime4j.ExampleMessageTestSuiteBuilder;
 import org.apache.james.mime4j.stream.MimeConfig;
-import org.apache.james.mime4j.util.CharsetUtil;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
@@ -82,7 +82,7 @@ public class MimeStreamParserExampleMessagesTest extends ExampleMessageTestCase 
             String expected;
             InputStream contentstream = xmlFileUrl.openStream();
             try {
-                expected = IOUtils.toString(contentstream, CharsetUtil.ISO_8859_1.name());
+                expected = IOUtils.toString(contentstream, Charsets.ISO_8859_1.name());
             } finally {
                 contentstream.close();
             }
@@ -92,7 +92,7 @@ public class MimeStreamParserExampleMessagesTest extends ExampleMessageTestCase 
             File expectedFileTemplate = new File(getFilenameBase() + ".xml.expected");
             FileOutputStream outstream = new FileOutputStream(expectedFileTemplate);
             try {
-                IOUtils.write(result, outstream, CharsetUtil.ISO_8859_1.name());
+                IOUtils.write(result, outstream, Charsets.ISO_8859_1.name());
             } finally {
                 outstream.close();
             }

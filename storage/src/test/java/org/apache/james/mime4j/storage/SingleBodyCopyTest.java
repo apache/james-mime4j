@@ -19,14 +19,14 @@
 
 package org.apache.james.mime4j.storage;
 
-import org.apache.james.mime4j.dom.SingleBody;
-import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.util.CharsetUtil;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+
+import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.dom.SingleBody;
+import org.apache.james.mime4j.message.MessageImpl;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class SingleBodyCopyTest {
 
@@ -46,14 +46,13 @@ public class SingleBodyCopyTest {
                 .store(new ByteArrayInputStream("test".getBytes()));
         MultiReferenceStorage multiReferenceStorage = new MultiReferenceStorage(
                 storage);
-        SingleBody body = new StorageTextBody(multiReferenceStorage,
-                CharsetUtil.US_ASCII);
+        SingleBody body = new StorageTextBody(multiReferenceStorage, Charsets.US_ASCII);
         copyTest(body);
     }
 
     @Test
     public void testCopyStringTextBody() throws Exception {
-        SingleBody body = new StringTextBody("test", CharsetUtil.US_ASCII);
+        SingleBody body = new StringTextBody("test", Charsets.US_ASCII);
         copyTest(body);
     }
 
@@ -73,8 +72,7 @@ public class SingleBodyCopyTest {
                 .store(new ByteArrayInputStream("test".getBytes()));
         MultiReferenceStorage multiReferenceStorage = new MultiReferenceStorage(
                 storage);
-        SingleBody body = new StorageTextBody(multiReferenceStorage,
-                CharsetUtil.US_ASCII);
+        SingleBody body = new StorageTextBody(multiReferenceStorage, Charsets.US_ASCII);
         disposeTest(body, storage);
     }
 

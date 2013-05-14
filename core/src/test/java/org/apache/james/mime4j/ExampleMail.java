@@ -22,7 +22,6 @@ package org.apache.james.mime4j;
 import java.util.Locale;
 
 import org.apache.james.mime4j.codec.EncoderUtil;
-import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 
 public class ExampleMail {
@@ -658,7 +657,7 @@ public class ExampleMail {
     }
 
     public static byte[] latin1(final String text) {
-        return ContentUtil.toByteArray(text, CharsetUtil.ISO_8859_1);
+        return ContentUtil.toByteArray(text, Charsets.ISO_8859_1);
     }
 
     public static String ascii(final byte[] b) {
@@ -666,7 +665,7 @@ public class ExampleMail {
     }
 
     public static String latin1(final byte[] b) {
-        return ContentUtil.toString(b, CharsetUtil.ISO_8859_1);
+        return ContentUtil.toString(b, Charsets.ISO_8859_1);
     }
 
     public static byte[] join(byte[] one, byte[] two) {

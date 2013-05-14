@@ -30,13 +30,14 @@ import java.net.URL;
 import junit.framework.TestSuite;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.ExampleMessageTestCase;
 import org.apache.james.mime4j.ExampleMessageTestCaseFactory;
 import org.apache.james.mime4j.ExampleMessageTestSuiteBuilder;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.stream.MimeConfig;
-import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
@@ -82,14 +83,14 @@ public class ExampleMessagesRoundtripTest extends ExampleMessageTestCase {
         ByteArrayOutputStream outstream = new ByteArrayOutputStream();
         msgwriter.writeMessage(inputMessage, outstream);
 
-        String result = new String(outstream.toByteArray(), CharsetUtil.ISO_8859_1.name());
+        String result = ContentUtil.toString(outstream.toByteArray(), Charsets.ISO_8859_1);
 
         URL outFile = new URL(getResourceBase() + ".out");
         try {
             String expected;
             InputStream contentstream = outFile.openStream();
             try {
-                expected = IOUtils.toString(contentstream, CharsetUtil.ISO_8859_1.name());
+                expected = IOUtils.toString(contentstream, Charsets.ISO_8859_1.name());
             } finally {
                 contentstream.close();
             }
@@ -99,7 +100,7 @@ public class ExampleMessagesRoundtripTest extends ExampleMessageTestCase {
             File expectedFileTemplate = new File(getFilenameBase() + ".out.expected");
             FileOutputStream templatestream = new FileOutputStream(expectedFileTemplate);
             try {
-                IOUtils.write(result, templatestream, CharsetUtil.ISO_8859_1.name());
+                IOUtils.write(result, templatestream, Charsets.ISO_8859_1.name());
             } finally {
                 templatestream.close();
             }

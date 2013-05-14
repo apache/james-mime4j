@@ -24,6 +24,7 @@ import java.nio.charset.Charset;
 import java.util.BitSet;
 import java.util.Locale;
 
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
@@ -567,13 +568,13 @@ public class EncoderUtil {
         for (int index = 0; index < len; index++) {
             char ch = text.charAt(index);
             if (ch > 0xff) {
-                return CharsetUtil.UTF_8;
+                return Charsets.UTF_8;
             }
             if (ch > 0x7f) {
                 ascii = false;
             }
         }
-        return ascii ? CharsetUtil.US_ASCII : CharsetUtil.ISO_8859_1;
+        return ascii ? Charsets.US_ASCII : Charsets.ISO_8859_1;
     }
 
     private static Encoding determineEncoding(byte[] bytes, Usage usage) {

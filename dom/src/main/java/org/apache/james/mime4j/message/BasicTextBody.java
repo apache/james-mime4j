@@ -26,9 +26,9 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.Charset;
 
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.util.CharsetUtil;
 
 class BasicTextBody extends TextBody {
 
@@ -49,7 +49,7 @@ class BasicTextBody extends TextBody {
     @Override
     public Reader getReader() throws IOException {
         return new InputStreamReader(getInputStream(),
-                this.charset != null ? this.charset : CharsetUtil.DEFAULT_CHARSET);
+                this.charset != null ? this.charset : Charsets.DEFAULT_CHARSET);
     }
 
     @Override

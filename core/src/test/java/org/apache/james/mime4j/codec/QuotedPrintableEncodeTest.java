@@ -19,16 +19,16 @@
 
 package org.apache.james.mime4j.codec;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.io.InputStreams;
-import org.apache.james.mime4j.util.CharsetUtil;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.io.InputStreams;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class QuotedPrintableEncodeTest {
 
@@ -102,7 +102,7 @@ public class QuotedPrintableEncodeTest {
     }
 
     private void checkRoundtrip(String content) throws Exception {
-        checkRoundtrip(content, CharsetUtil.US_ASCII);
+        checkRoundtrip(content, Charsets.US_ASCII);
     }
 
     private void checkRoundtrip(String content, Charset charset) throws Exception {

@@ -30,6 +30,7 @@ import java.util.List;
 import junit.framework.TestSuite;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.ExampleMessageTestCase;
 import org.apache.james.mime4j.ExampleMessageTestCaseFactory;
 import org.apache.james.mime4j.ExampleMessageTestSuiteBuilder;
@@ -38,7 +39,6 @@ import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.MimeConfig;
-import org.apache.james.mime4j.util.CharsetUtil;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
@@ -87,7 +87,7 @@ public class MessageParserTest extends ExampleMessageTestCase {
             String expected;
             InputStream contentstream = decodedFile.openStream();
             try {
-                expected = IOUtils.toString(contentstream, CharsetUtil.ISO_8859_1.name());
+                expected = IOUtils.toString(contentstream, Charsets.ISO_8859_1.name());
             } finally {
                 contentstream.close();
             }
@@ -97,7 +97,7 @@ public class MessageParserTest extends ExampleMessageTestCase {
             File expectedFileTemplate = new File(getFilenameBase() + "_decoded.xml.expected");
             FileOutputStream templatestream = new FileOutputStream(expectedFileTemplate);
             try {
-                IOUtils.write(result, templatestream, CharsetUtil.ISO_8859_1.name());
+                IOUtils.write(result, templatestream, Charsets.ISO_8859_1.name());
             } finally {
                 templatestream.close();
             }
@@ -167,7 +167,7 @@ public class MessageParserTest extends ExampleMessageTestCase {
             if (b instanceof TextBody) {
                 String charset = e.getCharset();
                 if (charset == null) {
-                    charset = CharsetUtil.ISO_8859_1.name();
+                    charset = Charsets.ISO_8859_1.name();
                 }
 
                 String result = IOUtils.toString(((TextBody) b).getReader());

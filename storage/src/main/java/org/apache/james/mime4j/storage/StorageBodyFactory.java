@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Disposable;
@@ -36,7 +37,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
  */
 public class StorageBodyFactory implements BodyFactory {
 
-    private static final Charset FALLBACK_CHARSET = CharsetUtil.DEFAULT_CHARSET;
+    private static final Charset FALLBACK_CHARSET = Charsets.DEFAULT_CHARSET;
 
     private final StorageProvider storageProvider;
     private final DecodeMonitor monitor;
@@ -136,8 +137,7 @@ public class StorageBodyFactory implements BodyFactory {
             throw new IllegalArgumentException();
 
         Storage storage = storageProvider.store(is);
-        return new StorageTextBody(new MultiReferenceStorage(storage),
-                CharsetUtil.DEFAULT_CHARSET);
+        return new StorageTextBody(new MultiReferenceStorage(storage), Charsets.DEFAULT_CHARSET);
     }
 
     /**
@@ -194,8 +194,7 @@ public class StorageBodyFactory implements BodyFactory {
         if (storage == null)
             throw new IllegalArgumentException();
 
-        return new StorageTextBody(new MultiReferenceStorage(storage),
-                CharsetUtil.DEFAULT_CHARSET);
+        return new StorageTextBody(new MultiReferenceStorage(storage), Charsets.DEFAULT_CHARSET);
     }
 
     /**
@@ -250,7 +249,7 @@ public class StorageBodyFactory implements BodyFactory {
         if (text == null)
             throw new IllegalArgumentException();
 
-        return new StringTextBody(text, CharsetUtil.DEFAULT_CHARSET);
+        return new StringTextBody(text, Charsets.DEFAULT_CHARSET);
     }
 
     /**

@@ -19,14 +19,14 @@
 
 package org.apache.james.mime4j.codec;
 
-import org.apache.james.mime4j.codec.EncoderUtil.Encoding;
-import org.apache.james.mime4j.codec.EncoderUtil.Usage;
-import org.apache.james.mime4j.util.CharsetUtil;
-import org.junit.Assert;
-import org.junit.Test;
-
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+
+import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.codec.EncoderUtil.Encoding;
+import org.apache.james.mime4j.codec.EncoderUtil.Usage;
+import org.junit.Assert;
+import org.junit.Test;
 
 public class EncoderUtilTest {
 
@@ -101,7 +101,7 @@ public class EncoderUtilTest {
     @Test
     public void testEncodeEncodedWordForceCharset() throws Exception {
         Assert.assertTrue(EncoderUtil.encodeEncodedWord("only ascii",
-                Usage.TEXT_TOKEN, 0, CharsetUtil.UTF_8, null).startsWith(
+                Usage.TEXT_TOKEN, 0, Charsets.UTF_8, null).startsWith(
                 "=?UTF-8?"));
     }
 

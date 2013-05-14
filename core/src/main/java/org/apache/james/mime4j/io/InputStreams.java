@@ -23,8 +23,8 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
-import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * Factory methods for {@link InputStream} instances backed by binary or textual data that attempt
@@ -67,14 +67,14 @@ public final class InputStreams {
         if (s == null) {
             throw new IllegalArgumentException("String may not be null");
         }
-        return new TextInputStream(s, CharsetUtil.US_ASCII, 1024);
+        return new TextInputStream(s, Charsets.US_ASCII, 1024);
     }
 
     public static InputStream create(final String s, final Charset charset) {
         if (s == null) {
             throw new IllegalArgumentException("String may not be null");
         }
-        return new TextInputStream(s, charset != null ? charset : CharsetUtil.DEFAULT_CHARSET, 1024);
+        return new TextInputStream(s, charset != null ? charset : Charsets.DEFAULT_CHARSET, 1024);
     }
 
 }

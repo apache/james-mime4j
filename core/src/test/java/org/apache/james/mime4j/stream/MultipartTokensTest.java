@@ -19,21 +19,18 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.io.IOException;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.io.InputStreams;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-
 public class MultipartTokensTest {
-
-    private static final Charset US_ASCII = CharsetUtil.US_ASCII;
 
     private static final String BODY = "A Preamble\r\n" +
             "--1729\r\n\r\n" +
@@ -108,7 +105,7 @@ public class MultipartTokensTest {
 
     @Test
     public void testShouldParseSimpleMessage() throws Exception {
-        parser.parse(new ByteArrayInputStream(US_ASCII.encode(MESSAGE).array()));
+        parser.parse(InputStreams.create(MESSAGE, Charsets.US_ASCII));
         checkState(EntityState.T_START_HEADER);
         checkState(EntityState.T_FIELD);
         checkState(EntityState.T_FIELD);
@@ -152,7 +149,7 @@ public class MultipartTokensTest {
                         "foo\r\n" +
                         "--outer-boundary--\r\n";
 
-        parser.parse(new ByteArrayInputStream(US_ASCII.encode(message).array()));
+        parser.parse(InputStreams.create(message, Charsets.US_ASCII));
         checkState(EntityState.T_START_HEADER);
         checkState(EntityState.T_FIELD);
         checkState(EntityState.T_END_HEADER);
@@ -178,7 +175,7 @@ public class MultipartTokensTest {
 
     @Test
     public void testShouldParseMessageWithEmbeddedMessage() throws Exception {
-        parser.parse(new ByteArrayInputStream(US_ASCII.encode(COMPLEX_MESSAGE).array()));
+        parser.parse(InputStreams.create(COMPLEX_MESSAGE, Charsets.US_ASCII));
         checkState(EntityState.T_START_HEADER);
         checkState(EntityState.T_FIELD);
         checkState(EntityState.T_FIELD);
@@ -236,7 +233,7 @@ public class MultipartTokensTest {
 
     @Test
     public void testShouldParseMessagesWithEmbeddedQuotedPrintableEncodedMessage() throws Exception {
-        parser.parse(new ByteArrayInputStream(US_ASCII.encode(COMPLEX_QP_MESSAGE).array()));
+        parser.parse(InputStreams.create(COMPLEX_QP_MESSAGE, Charsets.US_ASCII));
         checkState(EntityState.T_START_HEADER);
         checkState(EntityState.T_FIELD);
         checkState(EntityState.T_FIELD);
@@ -277,7 +274,7 @@ public class MultipartTokensTest {
 
     @Test
     public void testMultipartMessageWithoutHeader() throws Exception {
-        parser.parseHeadless(new ByteArrayInputStream(US_ASCII.encode(BODY).array()),
+        parser.parseHeadless(InputStreams.create(BODY, Charsets.US_ASCII),
                 "multipart/mixed;boundary=1729");
         // see https://issues.apache.org/jira/browse/MIME4J-153
         // checkState(EntityStates.T_END_HEADER);

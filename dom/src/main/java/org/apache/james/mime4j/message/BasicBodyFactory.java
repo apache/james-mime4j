@@ -26,9 +26,9 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * Factory for creating message bodies.
@@ -79,7 +79,7 @@ public class BasicBodyFactory implements BodyFactory {
     }
 
     public TextBody textBody(final String text) {
-        return textBody(text, CharsetUtil.DEFAULT_CHARSET);
+        return textBody(text, Charsets.DEFAULT_CHARSET);
     }
 
     public BinaryBody binaryBody(final byte[] buf) {

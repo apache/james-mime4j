@@ -24,15 +24,15 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.io.InputStreams;
-import org.apache.james.mime4j.util.CharsetUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class QuotedPrintableInputStreamTest {
 
     private static String readText(final InputStream is) throws IOException {
-        return new String(IOUtils.toByteArray(is), CharsetUtil.ISO_8859_1.name());
+        return IOUtils.toString(is, Charsets.ISO_8859_1.name());
     }
 
     @Test

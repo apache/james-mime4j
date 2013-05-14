@@ -24,6 +24,8 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
+import org.apache.james.mime4j.Charsets;
+
 /**
  * Utility methods for converting textual content of a message.
  */
@@ -168,7 +170,7 @@ public class ContentUtil {
             return null;
         }
         try {
-            return s.getBytes((charset != null ? charset : CharsetUtil.DEFAULT_CHARSET).name());
+            return s.getBytes((charset != null ? charset : Charsets.DEFAULT_CHARSET).name());
         } catch (UnsupportedEncodingException ex) {
             // Should never happen
             throw new Error(ex);
@@ -176,7 +178,7 @@ public class ContentUtil {
     }
 
     public static byte[] toAsciiByteArray(final String s) {
-        return toByteArray(s, CharsetUtil.US_ASCII);
+        return toByteArray(s, Charsets.US_ASCII);
     }
 
     public static String toString(final byte[] b, final Charset charset) {
@@ -184,7 +186,7 @@ public class ContentUtil {
             return null;
         }
         try {
-            return new String(b, (charset != null ? charset : CharsetUtil.DEFAULT_CHARSET).name());
+            return new String(b, (charset != null ? charset : Charsets.DEFAULT_CHARSET).name());
         } catch (UnsupportedEncodingException ex) {
             // Should never happen
             throw new Error(ex);
@@ -192,7 +194,7 @@ public class ContentUtil {
     }
 
     public static String toAsciiString(final byte[] b) {
-        return toString(b, CharsetUtil.US_ASCII);
+        return toString(b, Charsets.US_ASCII);
     }
 
     public static String toString(final byte[] b, int off, int len, final Charset charset) {
@@ -201,7 +203,7 @@ public class ContentUtil {
         }
         try {
             return new String(b, off, len,
-                    (charset != null ? charset : CharsetUtil.DEFAULT_CHARSET).name());
+                    (charset != null ? charset : Charsets.DEFAULT_CHARSET).name());
         } catch (UnsupportedEncodingException ex) {
             // Should never happen
             throw new Error(ex);
@@ -209,7 +211,7 @@ public class ContentUtil {
     }
 
     public static String toAsciiString(final byte[] b, int off, int len) {
-        return toString(b, off, len, CharsetUtil.US_ASCII);
+        return toString(b, off, len, Charsets.US_ASCII);
     }
 
     public static String toString(final ByteArrayBuffer b, final Charset charset) {
@@ -218,7 +220,7 @@ public class ContentUtil {
         }
         try {
             return new String(b.buffer(), 0, b.length(),
-                    (charset != null ? charset : CharsetUtil.DEFAULT_CHARSET).name());
+                    (charset != null ? charset : Charsets.DEFAULT_CHARSET).name());
         } catch (UnsupportedEncodingException ex) {
             // Should never happen
             throw new Error(ex);
@@ -226,7 +228,7 @@ public class ContentUtil {
     }
 
     public static String toAsciiString(final ByteArrayBuffer b) {
-        return toString(b, CharsetUtil.US_ASCII);
+        return toString(b, Charsets.US_ASCII);
     }
 
 }

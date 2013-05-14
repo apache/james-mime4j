@@ -26,9 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.ExampleMail;
 import org.apache.james.mime4j.io.InputStreams;
-import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.Test;
@@ -82,7 +82,7 @@ public class CodecUtilTest {
     private String roundtripUsingOutputStream(String input) throws IOException {
         ByteArrayOutputStream out2 = new ByteArrayOutputStream();
         Base64OutputStream outb64 = new Base64OutputStream(out2, 76);
-        CodecUtil.copy(InputStreams.create(input, CharsetUtil.ISO_8859_1), outb64);
+        CodecUtil.copy(InputStreams.create(input, Charsets.ISO_8859_1), outb64);
         outb64.flush();
         outb64.close();
 

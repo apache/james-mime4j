@@ -19,22 +19,19 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.io.IOException;
+import java.io.InputStream;
+
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.io.InputStreams;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
-
 public class MultipartStreamTest {
-
-    private static final Charset US_ASCII = CharsetUtil.US_ASCII;
 
     private static final String BODY = "A Preamble\r\n" +
             "--1729\r\n\r\n" +
@@ -82,7 +79,7 @@ public class MultipartStreamTest {
 
     @Test
     public void testShouldSupplyInputStreamForSimpleBody() throws Exception {
-        parser.parse(new ByteArrayInputStream(US_ASCII.encode(MESSAGE).array()));
+        parser.parse(InputStreams.create(MESSAGE, Charsets.US_ASCII));
         checkState(EntityState.T_START_HEADER);
         checkState(EntityState.T_FIELD);
         checkState(EntityState.T_FIELD);
@@ -98,7 +95,7 @@ public class MultipartStreamTest {
 
     @Test
     public void testInputStreamShouldReadOnlyMessage() throws Exception {
-        parser.parse(new ByteArrayInputStream(US_ASCII.encode(COMPLEX_MESSAGE).array()));
+        parser.parse(InputStreams.create(COMPLEX_MESSAGE, Charsets.US_ASCII));
         checkState(EntityState.T_START_HEADER);
         checkState(EntityState.T_FIELD);
         checkState(EntityState.T_FIELD);
