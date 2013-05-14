@@ -23,15 +23,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import java.util.LinkedList;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineNumberInputStream;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * <p>
@@ -311,19 +311,20 @@ public class MimeTokenStream {
      * @see #getInputStream
      * @throws IllegalStateException {@link #getState()} returns an
      *   invalid value
-     * @throws UnsupportedCharsetException if there is no JVM support
+     * @throws UnsupportedEncodingException if there is no JVM support
      * for decoding the charset
-     * @throws IllegalCharsetNameException if the charset name specified
-     * in the mime type is illegal
      */
-    public Reader getReader() {
+    public Reader getReader() throws UnsupportedEncodingException {
         final BodyDescriptor bodyDescriptor = getBodyDescriptor();
         final String mimeCharset = bodyDescriptor.getCharset();
         final Charset charset;
         if (mimeCharset == null || "".equals(mimeCharset)) {
             charset = Charsets.US_ASCII;
         } else {
-            charset = Charset.forName(mimeCharset);
+            charset = CharsetUtil.lookup(mimeCharset);
+            if (charset == null) {
+                throw new UnsupportedEncodingException(mimeCharset);
+            }
         }
         final InputStream instream = getDecodedInputStream();
         return new InputStreamReader(instream, charset);
