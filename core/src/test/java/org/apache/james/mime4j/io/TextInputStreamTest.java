@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.io;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -31,7 +31,7 @@ import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class StringInputStreamTest {
+public class TextInputStreamTest {
 
     private static final String SWISS_GERMAN_HELLO = "Gr\374ezi_z\344m\344";
     private static final String RUSSIAN_HELLO = "\u0412\u0441\u0435\u043C_\u043F\u0440\u0438\u0432\u0435\u0442";
@@ -48,7 +48,7 @@ public class StringInputStreamTest {
 
     private static void singleByteReadTest(final String testString) throws IOException {
         byte[] bytes = ContentUtil.toByteArray(testString, Charsets.UTF_8);
-        InputStream in = new StringInputStream(testString, Charsets.UTF_8);
+        InputStream in = new TextInputStream(testString, Charsets.UTF_8, 1024);
         for (byte b : bytes) {
             int read = in.read();
             assertTrue(read >= 0);
@@ -62,7 +62,7 @@ public class StringInputStreamTest {
     private static void bufferedReadTest(final String testString) throws IOException {
         SecureRandom rnd = new SecureRandom();
         byte[] expected = ContentUtil.toByteArray(testString, Charsets.UTF_8);
-        InputStream in = new StringInputStream(testString, Charsets.UTF_8);
+        InputStream in = new TextInputStream(testString, Charsets.UTF_8, 1024);
         byte[] buffer = new byte[128];
         int offset = 0;
         while (true) {
@@ -108,7 +108,7 @@ public class StringInputStreamTest {
 
     @Test
     public void testReadZero() throws Exception {
-        InputStream r = new StringInputStream("test", Charsets.UTF_8);
+        InputStream r = new TextInputStream("test", Charsets.UTF_8, 1024);
         byte[] bytes = new byte[30];
         Assert.assertEquals(0, r.read(bytes, 0, 0));
         r.close();
@@ -116,7 +116,7 @@ public class StringInputStreamTest {
 
     @Test
     public void testSkip() throws Exception {
-        InputStream r = new StringInputStream("test", Charsets.UTF_8);
+        InputStream r = new TextInputStream("test", Charsets.UTF_8, 1024);
         r.skip(1);
         r.skip(2);
         Assert.assertEquals('t', r.read());
@@ -127,7 +127,7 @@ public class StringInputStreamTest {
 
     @Test
     public void testMarkReset() throws Exception {
-        InputStream r = new StringInputStream("test", Charsets.UTF_8);
+        InputStream r = new TextInputStream("test", Charsets.UTF_8, 1024);
         r.skip(2);
         r.mark(0);
         Assert.assertEquals('s', r.read());

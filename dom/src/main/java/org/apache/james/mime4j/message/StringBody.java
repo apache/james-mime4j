@@ -28,6 +28,7 @@ import java.nio.charset.Charset;
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.io.InputStreams;
 
 class StringBody extends TextBody {
 
@@ -52,8 +53,8 @@ class StringBody extends TextBody {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        return new StringInputStream(this.content,
-                this.charset != null ? this.charset : Charsets.DEFAULT_CHARSET, 2048);
+        return InputStreams.create(this.content,
+                this.charset != null ? this.charset : Charsets.DEFAULT_CHARSET);
     }
 
     @Override

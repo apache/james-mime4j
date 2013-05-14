@@ -38,6 +38,8 @@ class TextInputStream extends InputStream {
     private final CharBuffer cbuf;
     private final ByteBuffer bbuf;
 
+    private int mark = -1;
+
     TextInputStream(final CharSequence s, final Charset charset, int bufferSize) {
         super();
         this.encoder = charset.newEncoder()
@@ -122,6 +124,24 @@ class TextInputStream extends InputStream {
     @Override
     public int available() throws IOException {
         return this.cbuf.remaining();
+    }
+
+    @Override
+    public void mark(int readlimit) {
+        this.mark = this.cbuf.position();
+    }
+
+    @Override
+    public void reset() throws IOException {
+        if (this.mark != -1) {
+            this.cbuf.position(this.mark);
+            this.mark = -1;
+        }
+    }
+
+    @Override
+    public boolean markSupported() {
+        return true;
     }
 
     @Override
