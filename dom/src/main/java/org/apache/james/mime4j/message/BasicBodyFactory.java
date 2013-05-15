@@ -36,8 +36,8 @@ public class BasicBodyFactory implements BodyFactory {
 
     public BinaryBody binaryBody(final InputStream is) throws IOException {
         return BodyBuilder.create()
-                .readFrom(is).
-                buildBinary();
+                .readFrom(is)
+                .buildBinary();
     }
 
     protected Charset resolveCharset(final String mimeCharset) throws UnsupportedEncodingException {
