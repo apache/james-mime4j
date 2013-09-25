@@ -19,6 +19,11 @@
 
 package org.apache.james.mime4j.field;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.FieldParser;
+import org.apache.james.mime4j.dom.field.DateTimeField;
+import org.apache.james.mime4j.stream.Field;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,19 +33,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.dom.FieldParser;
-import org.apache.james.mime4j.dom.field.DateTimeField;
-import org.apache.james.mime4j.stream.Field;
-
 /**
  * Date-time field such as <code>Date</code> or <code>Resent-Date</code>.
  */
 public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeField {
 
-    private static final String[] DEFAULT_DATE_FORMATS =  { 
-        "EEE, dd MMM yyyy HH:mm:ss ZZZZ", 
-        "dd MMM yyyy HH:mm:ss ZZZZ"};
+    private static final String[] DEFAULT_DATE_FORMATS = {
+            "EEE, dd MMM yyyy HH:mm:ss ZZZZ",
+            "dd MMM yyyy HH:mm:ss ZZZZ",
+            "EEE, dd MMM yyyy HH:mm:ss.SSS 0000"};
 
     private final List<String> datePatterns;
 
@@ -48,13 +49,13 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
     private Date date;
 
     DateTimeFieldLenientImpl(final Field rawField,
-            final Collection<String> dateParsers, final DecodeMonitor monitor) {
+                             final Collection<String> dateParsers, final DecodeMonitor monitor) {
         super(rawField, monitor);
         this.datePatterns = new ArrayList<String>();
         if (dateParsers != null) {
             this.datePatterns.addAll(dateParsers);
         } else {
-            for (String pattern: DEFAULT_DATE_FORMATS) {
+            for (String pattern : DEFAULT_DATE_FORMATS) {
                 this.datePatterns.add(pattern);
             }
         }
@@ -71,7 +72,7 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         parsed = true;
         date = null;
         String body = getBody();
-        for (String datePattern: datePatterns) {
+        for (String datePattern : datePatterns) {
             try {
                 SimpleDateFormat parser = new SimpleDateFormat(datePattern, Locale.US);
                 parser.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -90,9 +91,9 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
 
     };
-    
+
     public static FieldParser<DateTimeField> createParser(final Collection<String> dateParsers) {
-        
+
         return new FieldParser<DateTimeField>() {
 
             public DateTimeField parse(final Field rawField, final DecodeMonitor monitor) {
@@ -100,7 +101,7 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             }
 
         };
-        
+
     }
-    
+
 }
