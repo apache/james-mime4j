@@ -142,6 +142,38 @@ public class DecoderUtil {
      * @throws IllegalArgumentException only if the DecodeMonitor strategy throws it (Strict parsing)
      */
     public static String decodeEncodedWords(String body, DecodeMonitor monitor) throws IllegalArgumentException {
+        return decodeEncodedWords(body, monitor, null);
+    }
+
+    /**
+     * Decodes a string containing encoded words as defined by RFC 2047. Encoded
+     * words have the form =?charset?enc?encoded-text?= where enc is either 'Q'
+     * or 'q' for quoted-printable and 'B' or 'b' for base64. Using fallback
+     * charset if charset in encoded words is invalid.
+     *
+     * @param body the string to decode
+     * @param fallback the fallback Charset to be used.
+     * @return the decoded string.
+     * @throws IllegalArgumentException only if the DecodeMonitor strategy throws it (Strict parsing)
+     */
+    public static String decodeEncodedWords(String body, Charset fallback) throws IllegalArgumentException {
+        return decodeEncodedWords(body, null, fallback);
+    }
+
+    /**
+     * Decodes a string containing encoded words as defined by RFC 2047. Encoded
+     * words have the form =?charset?enc?encoded-text?= where enc is either 'Q'
+     * or 'q' for quoted-printable and 'B' or 'b' for base64. Using fallback
+     * charset if charset in encoded words is invalid.
+     *
+     * @param body the string to decode
+     * @param monitor the DecodeMonitor to be used.
+     * @param fallback the fallback Charset to be used.
+     * @return the decoded string.
+     * @throws IllegalArgumentException only if the DecodeMonitor strategy throws it (Strict parsing)
+     */
+    public static String decodeEncodedWords(String body, DecodeMonitor monitor, Charset fallback)
+            throws IllegalArgumentException {
         int tailIndex = 0;
         boolean lastMatchValid = false;
 
@@ -154,7 +186,7 @@ public class DecoderUtil {
             String encodedText = matcher.group(4);
 
             String decoded = null;
-            decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText, monitor);
+            decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText, monitor, fallback);
             if (decoded == null) {
                 sb.append(matcher.group(0));
             } else {
@@ -178,12 +210,16 @@ public class DecoderUtil {
 
     // return null on error
     private static String tryDecodeEncodedWord(final String mimeCharset,
-            final String encoding, final String encodedText, final DecodeMonitor monitor) {
+            final String encoding, final String encodedText, final DecodeMonitor monitor, final Charset fallback) {
         Charset charset = CharsetUtil.lookup(mimeCharset);
         if (charset == null) {
-            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
-                    "Mime charser '", mimeCharset, "' doesn't have a corresponding Java charset");
-            return null;
+            if(fallback == null) {
+                monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
+                        "Mime charser '", mimeCharset, "' doesn't have a corresponding Java charset");
+                return null;
+            } else {
+                charset = fallback;
+            }
         }
 
         if (encodedText.length() == 0) {

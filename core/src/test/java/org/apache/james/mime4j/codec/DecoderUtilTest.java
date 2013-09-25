@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.codec;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import junit.framework.TestCase;
 
@@ -63,6 +64,18 @@ public class DecoderUtilTest extends TestCase {
                  + "=?ISO-2022-JP?B?GyRCSEcbKEobJEIkRxsoShskQiQ5GyhKGyRCISobKEo=?=";
 
         String dec = DecoderUtil.decodeEncodedWords(enc);
+        assertEquals("\u672A\u627F\u8AFE\u5E83\u544A\u203B\u30B5\u30A4\u30C9\u30D3"
+                + "\u30B8\u30CD\u30B9\u306E\u6C7A\u5B9A\u7248\u3067\u3059\uFF01", dec);
+    }
+
+    public void testDecodeJapaneseEncodedWordsWithFallback(){
+        String enc = "=?random?B?GyRCTCQbKEobJEI+NRsoShskQkJ6GyhKGyRCOS0bKEo=?= "
+                + "=?garbage?B?GyRCOXAbKEobJEIiKBsoShskQiU1GyhKGyRCJSQbKEo=?= "
+                + "=?charset?B?GyRCJUkbKEobJEIlUxsoShskQiU4GyhKGyRCJU0bKEo=?= "
+                + "=?name?B?GyRCJTkbKEobJEIkThsoShskQjdoGyhKGyRCRGobKEo=?= "
+                + "=?trash?B?GyRCSEcbKEobJEIkRxsoShskQiQ5GyhKGyRCISobKEo=?=";
+
+        String dec = DecoderUtil.decodeEncodedWords(enc, Charset.forName("ISO-2022-JP"));
         assertEquals("\u672A\u627F\u8AFE\u5E83\u544A\u203B\u30B5\u30A4\u30C9\u30D3"
                 + "\u30B8\u30CD\u30B9\u306E\u6C7A\u5B9A\u7248\u3067\u3059\uFF01", dec);
     }
