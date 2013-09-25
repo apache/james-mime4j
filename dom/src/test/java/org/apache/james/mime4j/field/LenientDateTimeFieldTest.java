@@ -62,4 +62,10 @@ public class LenientDateTimeFieldTest {
         Assert.assertEquals(1342563815882L, f.getDate().getTime());
     }
 
+    @Test
+    public void testDateWithExtraLeadingWhiteSpace() throws Exception {
+        DateTimeField f = parse("Date:  Wed, 28 Mar 2007 13:32:39 +1000");
+        Assert.assertEquals(1175052759000L, f.getDate().getTime());
+    }
+
 }

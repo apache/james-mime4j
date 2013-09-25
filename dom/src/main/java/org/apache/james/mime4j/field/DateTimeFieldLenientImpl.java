@@ -71,6 +71,9 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         parsed = true;
         date = null;
         String body = getBody();
+        if (body != null) {
+            body = body.trim();
+        }
         for (String datePattern : datePatterns) {
             try {
                 SimpleDateFormat parser = new SimpleDateFormat(datePattern, Locale.US);
