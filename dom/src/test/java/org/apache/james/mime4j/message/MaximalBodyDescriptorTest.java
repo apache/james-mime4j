@@ -177,6 +177,14 @@ public class MaximalBodyDescriptorTest {
     }
 
     @Test
+    public void testMultipartNoBoundary() throws Exception {
+        BodyDescriptorBuilder builder = new DefaultBodyDescriptorBuilder();
+        builder.addField(new RawField("Content-Type", "multipart/yada; "));
+        BodyDescriptor bd = builder.build();
+        assertEquals("text/plain", bd.getMimeType());
+    }
+
+    @Test
     public void testDoDefaultToUsAsciiWhenUntyped() throws Exception {
         BodyDescriptorBuilder builder = new DefaultBodyDescriptorBuilder();
         builder.addField(new RawField("To", "me@example.org"));

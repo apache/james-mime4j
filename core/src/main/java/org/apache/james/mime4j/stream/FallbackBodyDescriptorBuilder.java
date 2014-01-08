@@ -184,9 +184,8 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
         }
         String b = params.get("boundary");
 
-        if (main != null
-                && ((main.startsWith("multipart/") && b != null)
-                        || !main.startsWith("multipart/"))) {
+        boolean multipart = main != null && main.startsWith("multipart/");
+        if (multipart && b != null || !multipart) {
             mimeType = main;
             mediaType = type;
             subType = subtype;

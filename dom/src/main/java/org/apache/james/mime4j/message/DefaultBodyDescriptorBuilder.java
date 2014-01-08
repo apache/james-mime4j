@@ -108,6 +108,13 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
             actualSubType = contentTypeField.getSubType();
             actualCharset = contentTypeField.getCharset();
             actualBoundary = contentTypeField.getBoundary();
+
+            boolean multipart = actualMediaType != null && actualMediaType.equalsIgnoreCase("multipart");
+            if (multipart && actualBoundary == null) {
+                actualMimeType = null;
+                actualMediaType = null;
+                actualSubType = null;
+            }
         }
         if (actualMimeType == null) {
             if (MimeUtil.isSameMimeType("multipart/digest", parentMimeType)) {
