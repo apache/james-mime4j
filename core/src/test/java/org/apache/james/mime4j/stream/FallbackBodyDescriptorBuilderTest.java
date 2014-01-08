@@ -134,6 +134,13 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
 
     }
 
+    public void testMultipartNoBoundary() throws Exception {
+        BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
+        builder.addField(new RawField("Content-Type", "multipart/yada; "));
+        BodyDescriptor bd = builder.build();
+        assertEquals("text/plain", bd.getMimeType());
+    }
+
     public void testGetContentLength() throws Exception {
         BodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
         BodyDescriptor bd = builder.build();

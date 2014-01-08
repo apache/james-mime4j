@@ -362,6 +362,9 @@ class MimeEntity implements EntityStateMachine {
 
     private void createMimePartStream() throws MimeException, IOException {
         String boundary = body.getBoundary();
+        if (boundary == null) {
+            throw new MimeException("Multipart body does not have a valid boundary");
+        }
         try {
             currentMimePartStream = new MimeBoundaryInputStream(inbuffer, boundary,
                     config.isStrictParsing());
