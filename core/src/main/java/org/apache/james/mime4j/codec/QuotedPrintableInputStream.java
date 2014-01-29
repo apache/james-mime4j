@@ -186,12 +186,14 @@ public class QuotedPrintableInputStream extends InputStream {
                 int b = encoded[pos++] & 0xFF;
 
                 if (lastWasCR && b != LF) {
-                    if (monitor.warn("Found CR without LF", "Leaving it as is"))
+                    if (monitor.warn("Found CR without LF", "Leaving it as is")) {
                         throw new IOException("Found CR without LF");
+                    }
                     index = transfer(CR, buffer, index, to, false);
                 } else if (!lastWasCR && b == LF) {
-                    if (monitor.warn("Found LF without CR", "Translating to CRLF"))
+                    if (monitor.warn("Found LF without CR", "Translating to CRLF")) {
                         throw new IOException("Found LF without CR");
+                    }
                 }
 
                 if (b == CR) {
@@ -236,6 +238,15 @@ public class QuotedPrintableInputStream extends InputStream {
                         }
                     } else if (Character.isWhitespace((char) b2)) {
                         // soft line break
+                        int b3 = peek(0);
+                        if (!(b2 == CR && b3 == LF)) {
+                            if (monitor.warn("Found non-standard soft line break", "Translating to soft line break")) {
+                                throw new IOException("Non-standard soft line break");
+                            }
+                        }
+                        if (b3 == LF) {
+                            lastWasCR = b2 == CR;
+                        }
                         index = transfer(-1, buffer, index, to, true);
                         if (b2 != LF) {
                             blanks.append(b);

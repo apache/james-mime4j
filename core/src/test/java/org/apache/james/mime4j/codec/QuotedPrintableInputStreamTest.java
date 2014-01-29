@@ -61,11 +61,32 @@ public class QuotedPrintableInputStreamTest extends TestCase {
         assertEquals("Soft line   Hard line\r\n", new String(read(decoder), "ISO8859-1"));
     }
 
-    public void testInvalidCR() throws IOException, UnsupportedEncodingException {
+    public void testSoftBreakStrictMode() throws IOException {
+        String input = "<?xml version=3D\"1.0\" standalone=3D\"no\"?>\r\n" +
+                "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/=\r\n" +
+                "SVG/1.1/DTD/svg11.dtd\" >\r\n";
+        String expected = "<?xml version=\"1.0\" standalone=\"no\"?>\r\n" +
+                "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/" +
+                "SVG/1.1/DTD/svg11.dtd\" >\r\n";
+        ByteArrayInputStream bis = new ByteArrayInputStream(input.getBytes("US-ASCII"));
+        QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis, DecodeMonitor.STRICT);
+        assertEquals(expected, new String(read(decoder), "ISO8859-1"));
+    }
+
+    public void testInvalidCR() throws IOException {
         ByteArrayInputStream bis = new ByteArrayInputStream("Invalid=\rCR\rHard line   \r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
-        // TODO is this what we really expect from decoding a stream including CR with no LF?
         assertEquals("Invalid=\rCR\rHard line\r\n", new String(read(decoder), "ISO8859-1"));
+    }
+
+    public void testInvalidCRStrictMode() throws IOException {
+        ByteArrayInputStream bis = new ByteArrayInputStream("Invalid=\rCR\rHard line   \r\n".getBytes("US-ASCII"));
+        QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis, DecodeMonitor.STRICT);
+        try {
+            read(decoder);
+            fail("IOException should have been thrown");
+        } catch (IOException expected) {
+        }
     }
 
     public void testSoftBreakLoneLFDecode() throws IOException, UnsupportedEncodingException {
