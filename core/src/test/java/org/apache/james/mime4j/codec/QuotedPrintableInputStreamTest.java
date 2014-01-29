@@ -72,11 +72,35 @@ public class QuotedPrintableInputStreamTest {
     }
 
     @Test
+    public void testSoftBreakStrictMode() throws IOException {
+        String input = "<?xml version=3D\"1.0\" standalone=3D\"no\"?>\r\n" +
+                "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/=\r\n" +
+                "SVG/1.1/DTD/svg11.dtd\" >\r\n";
+        String expected = "<?xml version=\"1.0\" standalone=\"no\"?>\r\n" +
+                "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 1.1//EN\" \"http://www.w3.org/Graphics/" +
+                "SVG/1.1/DTD/svg11.dtd\" >\r\n";
+        InputStream bis = InputStreams.createAscii(input);
+        QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis, DecodeMonitor.STRICT);
+        Assert.assertEquals(expected, readText(decoder));
+    }
+
+    @Test
     public void testInvalidCR() throws IOException, UnsupportedEncodingException {
         InputStream bis = InputStreams.createAscii("Invalid=\rCR\rHard line   \r\n");
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
         // TODO is this what we really expect from decoding a stream including CR with no LF?
         Assert.assertEquals("Invalid=\rCR\rHard line\r\n", readText(decoder));
+    }
+
+    @Test
+    public void testInvalidCRStrictMode() throws IOException {
+        InputStream bis = InputStreams.createAscii("Invalid=\rCR\rHard line   \r\n");
+        QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis, DecodeMonitor.STRICT);
+        try {
+            readText(decoder);
+            Assert.fail("IOException should have been thrown");
+        } catch (IOException expected) {
+        }
     }
 
     @Test
