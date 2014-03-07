@@ -163,6 +163,15 @@ public class RawFieldParserTest {
     }
 
     @Test
+    public void testTokenParsingMixedValuesAndQuotedValues2() throws Exception {
+        String s = "stuff\"more\"stuff;";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+        String result = parser.parseValue(raw, cursor, RawFieldParser.INIT_BITSET(';'));
+        Assert.assertEquals("stuffmorestuff", result);
+    }
+
+    @Test
     public void testTokenParsingQuotedValuesWithComments() throws Exception {
         String s = " (blah blah)  \"(stuff)(and)(some)(more)(stuff)\" (yada yada) ";
         ByteSequence raw = ContentUtil.encode(s);

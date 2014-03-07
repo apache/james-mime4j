@@ -95,6 +95,20 @@ public class LenientAddressBuilderTest {
     }
 
     @Test
+    public void testEmbeddedQuotes() throws Exception {
+        String s = "=?utf-8?Q?\"Dupont,_Gr=C3=A9goire\" <greg@gmail.com>";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        Address address = parser.parseAddress(raw, cursor, RawFieldParser.INIT_BITSET(','));
+        Assert.assertNotNull(address);
+        Assert.assertTrue(address instanceof Mailbox);
+        Mailbox mailbox = (Mailbox) address;
+        Assert.assertEquals("greg@gmail.com", mailbox.getAddress());
+        Assert.assertEquals("=?utf-8?Q?Dupont,_Gr=C3=A9goire", mailbox.getName());
+    }
+
+    @Test
     public void testParseAddressTruncated() throws Exception {
         String s = "<  some  one  ";
         ByteSequence raw = ContentUtil.encode(s);
