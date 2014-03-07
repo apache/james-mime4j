@@ -21,6 +21,7 @@ package org.apache.james.mime4j.field.address;
 
 import java.util.List;
 
+import junit.framework.Assert;
 import junit.framework.TestCase;
 
 import org.apache.james.mime4j.dom.address.Address;
@@ -86,6 +87,19 @@ public class LenientAddressBuilderTest extends TestCase {
 
         Mailbox mailbox = parser.parseMailboxAddress(null, raw, cursor);
         assertEquals("some  one@somehost.somewhere.com", mailbox.getAddress());
+    }
+
+    public void testEmbeddedQuotes() throws Exception {
+        String s = "=?utf-8?Q?\"Dupont,_Gr=C3=A9goire\" <greg@gmail.com>";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        Address address = parser.parseAddress(raw, cursor, RawFieldParser.INIT_BITSET(','));
+        Assert.assertNotNull(address);
+        Assert.assertTrue(address instanceof Mailbox);
+        Mailbox mailbox = (Mailbox) address;
+        Assert.assertEquals("greg@gmail.com", mailbox.getAddress());
+        Assert.assertEquals("=?utf-8?Q?Dupont,_Gr=C3=A9goire", mailbox.getName());
     }
 
     public void testParseAddressTruncated() throws Exception {

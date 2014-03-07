@@ -209,7 +209,7 @@ public class RawFieldParser {
                 if (dst.length() > 0 && whitespace) {
                     dst.append(' ');
                 }
-                copyContent(buf, cursor, delimiters, dst);
+                copyUnquotedContent(buf, cursor, delimiters, dst);
                 whitespace = false;
             }
         }
@@ -323,6 +323,34 @@ public class RawFieldParser {
             char current = (char) (buf.byteAt(i) & 0xff);
             if ((delimiters != null && delimiters.get(current))
                     || CharsetUtil.isWhitespace(current) || current == '(') {
+                break;
+            } else {
+                pos++;
+                dst.append(current);
+            }
+        }
+        cursor.updatePos(pos);
+    }
+
+    /**
+     * Transfers content into the destination buffer until a whitespace character, a comment,
+     * a quote, or any of the given delimiters is encountered.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     * @param delimiters set of delimiting characters. Can be <code>null</code> if the value
+     *  is delimited by a whitespace, a quote or a comment only.
+     * @param dst destination buffer
+     */
+    public void copyUnquotedContent(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+                            final StringBuilder dst) {
+        int pos = cursor.getPos();
+        int indexFrom = cursor.getPos();
+        int indexTo = cursor.getUpperBound();
+        for (int i = indexFrom; i < indexTo; i++) {
+            char current = (char) (buf.byteAt(i) & 0xff);
+            if ((delimiters != null && delimiters.get(current))
+                    || CharsetUtil.isWhitespace(current) || current == '(' || current == '\"') {
                 break;
             } else {
                 pos++;

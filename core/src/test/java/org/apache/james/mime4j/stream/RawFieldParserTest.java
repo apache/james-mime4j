@@ -154,6 +154,14 @@ public class RawFieldParserTest extends TestCase {
         Assert.assertEquals("stuff and  some more  stuff  ;", result);
     }
 
+    public void testTokenParsingMixedValuesAndQuotedValues2() throws Exception {
+        String s = "stuff\"more\"stuff;";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+        String result = parser.parseValue(raw, cursor, RawFieldParser.INIT_BITSET(';'));
+        Assert.assertEquals("stuffmorestuff", result);
+    }
+
     public void testTokenParsingQuotedValuesWithComments() throws Exception {
         String s = " (blah blah)  \"(stuff)(and)(some)(more)(stuff)\" (yada yada) ";
         ByteSequence raw = ContentUtil.encode(s);
