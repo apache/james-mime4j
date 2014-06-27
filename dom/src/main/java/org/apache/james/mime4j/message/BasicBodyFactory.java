@@ -35,7 +35,7 @@ import org.apache.james.mime4j.dom.TextBody;
 public class BasicBodyFactory implements BodyFactory {
 
     public BinaryBody binaryBody(final InputStream is) throws IOException {
-        return BodyBuilder.create()
+        return SingleBodyBuilder.create()
                 .readFrom(is)
                 .buildBinary();
     }
@@ -49,7 +49,7 @@ public class BasicBodyFactory implements BodyFactory {
     }
 
     public TextBody textBody(final InputStream is, final String mimeCharset) throws IOException {
-        return BodyBuilder.create()
+        return SingleBodyBuilder.create()
                 .readFrom(is)
                 .setCharset(resolveCharset(mimeCharset))
                 .buildText();
@@ -59,7 +59,7 @@ public class BasicBodyFactory implements BodyFactory {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
         }
-        return BodyBuilder.create()
+        return SingleBodyBuilder.create()
                 .setText(text)
                 .setCharset(resolveCharset(mimeCharset))
                 .buildText();
@@ -69,7 +69,7 @@ public class BasicBodyFactory implements BodyFactory {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
         }
-        return BodyBuilder.create()
+        return SingleBodyBuilder.create()
                 .setText(text)
                 .setCharset(charset)
                 .buildText();
@@ -80,7 +80,7 @@ public class BasicBodyFactory implements BodyFactory {
     }
 
     public BinaryBody binaryBody(final byte[] buf) {
-        return BodyBuilder.create()
+        return SingleBodyBuilder.create()
                 .setByteArray(buf)
                 .buildBinary();
     }

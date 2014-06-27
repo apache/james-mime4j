@@ -40,10 +40,12 @@ import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
+import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.address.AddressFormatter;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -56,6 +58,10 @@ public class Fields {
             .compile("[\\x21-\\x39\\x3b-\\x7e]+");
 
     private Fields() {
+    }
+
+    public static MimeVersionField version(String ver) {
+        return parse(MimeVersionFieldLenientImpl.PARSER, FieldName.MIME_VERSION, ver);
     }
 
     /**
@@ -103,6 +109,53 @@ public class Fields {
             String contentType = sb.toString();
             return contentType(contentType);
         }
+    }
+
+    /**
+     * Creates a <i>Content-Type</i> field from the specified MIME type and
+     * parameters.
+     *
+     * @param mimeType
+     *            a MIME type (such as <code>&quot;text/plain&quot;</code> or
+     *            <code>&quot;application/octet-stream&quot;</code>).
+     * @param parameters
+     *            list of content-type parameter name/value pairs.
+     * @return the newly created <i>Content-Type</i> field.
+     */
+    public static ContentTypeField contentType(String mimeType,
+                                               Iterable<NameValuePair> parameters) {
+        if (!isValidMimeType(mimeType))
+            throw new IllegalArgumentException();
+
+        if (parameters == null) {
+            return parse(ContentTypeFieldImpl.PARSER, FieldName.CONTENT_TYPE,
+                    mimeType);
+        } else {
+            StringBuilder sb = new StringBuilder(mimeType);
+            for (NameValuePair param : parameters) {
+                sb.append("; ");
+                String name = param.getName();
+                String value = param.getValue();
+                sb.append(EncoderUtil.encodeHeaderParameter(name, value != null ? value : ""));
+            }
+            String contentType = sb.toString();
+            return contentType(contentType);
+        }
+    }
+
+    /**
+     * Creates a <i>Content-Type</i> field from the specified MIME type and
+     * parameters.
+     *
+     * @param mimeType
+     *            a MIME type (such as <code>&quot;text/plain&quot;</code> or
+     *            <code>&quot;application/octet-stream&quot;</code>).
+     * @param parameters
+     *            array of content-type parameter name/value pairs.
+     * @return the newly created <i>Content-Type</i> field.
+     */
+    public static ContentTypeField contentType(String mimeType, NameValuePair... parameters) {
+        return contentType(mimeType, parameters != null || parameters.length == 0 ? Arrays.asList(parameters) : null);
     }
 
     /**
@@ -162,6 +215,38 @@ public class Fields {
                 sb.append("; ");
                 sb.append(EncoderUtil.encodeHeaderParameter(entry.getKey(),
                         entry.getValue()));
+            }
+            String contentDisposition = sb.toString();
+            return contentDisposition(contentDisposition);
+        }
+    }
+
+    /**
+     * Creates a <i>Content-Disposition</i> field from the specified
+     * disposition type and parameters.
+     *
+     * @param dispositionType
+     *            a disposition type (usually <code>&quot;inline&quot;</code>
+     *            or <code>&quot;attachment&quot;</code>).
+     * @param parameters
+     *            list of disposition parameter name/value pairs.
+     * @return the newly created <i>Content-Disposition</i> field.
+     */
+    public static ContentDispositionField contentDisposition(
+            String dispositionType, Iterable<NameValuePair> parameters) {
+        if (!isValidDispositionType(dispositionType))
+            throw new IllegalArgumentException();
+
+        if (parameters == null) {
+            return parse(ContentDispositionFieldImpl.PARSER,
+                    FieldName.CONTENT_DISPOSITION, dispositionType);
+        } else {
+            StringBuilder sb = new StringBuilder(dispositionType);
+            for (NameValuePair param : parameters) {
+                sb.append("; ");
+                String name = param.getName();
+                String value = param.getValue();
+                sb.append(EncoderUtil.encodeHeaderParameter(name, value != null ? value : ""));
             }
             String contentDisposition = sb.toString();
             return contentDisposition(contentDisposition);
@@ -309,9 +394,19 @@ public class Fields {
      *            <code>null</code> if no host name should be included.
      * @return the newly created <i>Message-ID</i> field.
      */
-    public static UnstructuredField messageId(String hostname) {
+    public static UnstructuredField generateMessageId(String hostname) {
         String fieldValue = MimeUtil.createUniqueMessageId(hostname);
         return parse(UnstructuredFieldImpl.PARSER, FieldName.MESSAGE_ID, fieldValue);
+    }
+
+    /**
+     * Creates a <i>Message-ID</i> field with the given message ID.
+     *
+     * @param message ID
+     *            message ID value.
+     */
+    public static UnstructuredField messageId(String messageId) {
+        return parse(UnstructuredFieldImpl.PARSER, FieldName.MESSAGE_ID, messageId);
     }
 
     /**

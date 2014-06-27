@@ -19,6 +19,13 @@
 
 package org.apache.james.mime4j.field;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
+
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.AddressListField;
@@ -35,13 +42,6 @@ import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.junit.Assert;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
 
 public class FieldsTest {
 
@@ -88,7 +88,7 @@ public class FieldsTest {
 
     @Test
     public void testContentTypeStringNullParameters() throws Exception {
-        ContentTypeField field = Fields.contentType("text/plain", null);
+        ContentTypeField field = Fields.contentType("text/plain", (Map<String, String>) null);
         Assert.assertTrue(field.isValidField());
 
         String expectedRaw = "Content-Type: text/plain";
@@ -232,7 +232,7 @@ public class FieldsTest {
 
     @Test
     public void testMessageId() throws Exception {
-        Field messageId = Fields.messageId("acme.org");
+        Field messageId = Fields.generateMessageId("acme.org");
 
         String raw = decode(messageId);
         Assert.assertTrue(raw.startsWith("Message-ID: <Mime4j."));

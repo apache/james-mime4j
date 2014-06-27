@@ -67,7 +67,7 @@ public class MessageImpl extends AbstractMessage {
 
     @Override
     protected UnstructuredField newMessageId(String hostname) {
-        return Fields.messageId(hostname);
+        return Fields.generateMessageId(hostname);
     }
 
     @Override

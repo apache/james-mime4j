@@ -19,56 +19,40 @@
 
 package org.apache.james.mime4j.samples.dom;
 
-import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Date;
 
+import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageWriter;
-import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.field.address.AddressBuilder;
-import org.apache.james.mime4j.field.address.ParseException;
-import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
-import org.apache.james.mime4j.storage.StorageBodyFactory;
+import org.apache.james.mime4j.message.MessageBuilder;
 
 /**
  * This example generates a message very similar to the one from RFC 5322
  * Appendix A.1.1.
  */
 public class TextPlainMessage {
-    public static void main(String[] args) throws IOException, ParseException {
+    public static void main(String[] args) throws Exception {
         // 1) start with an empty message
-
-        MessageImpl message = new MessageImpl();
-
+        final Message message = MessageBuilder.create()
         // 2) set header fields
-
-        // Date and From are required fields
-        message.setDate(new Date());
-        message.setFrom(AddressBuilder.DEFAULT.parseMailbox("John Doe <jdoe@machine.example>"));
-
-        // Message-ID should be present
-        message.createMessageId("machine.example");
-
-        // set some optional fields
-        message.setTo(AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>"));
-        message.setSubject("Saying Hello");
-
-        // 3) set a text body
-
-        StorageBodyFactory bodyFactory = new StorageBodyFactory();
-        TextBody body = bodyFactory.textBody("This is a message just to "
-                + "say hello.\r\nSo, \"Hello\".");
-
-        // note that setText also sets the Content-Type header field
-        message.setText(body);
-
+        //    Date and From are required fields
+        //    Message-ID should be present
+                .setFrom("John Doe <jdoe@machine.example>")
+                .setTo("Mary Smith <mary@example.net>")
+                .setSubject("Saying Hello")
+                .setDate(new Date())
+                .generateMessageId(InetAddress.getLocalHost().getCanonicalHostName())
+                .setBody("This is a message just to say hello.\r\nSo, \"Hello\".", Charsets.ISO_8859_1)
+                .build();
+        try {
         // 4) print message to standard output
-
-        MessageWriter writer = new DefaultMessageWriter();
-        writer.writeMessage(message, System.out);
-
+            MessageWriter writer = new DefaultMessageWriter();
+            writer.writeMessage(message, System.out);
+        } finally {
         // 5) message is no longer needed and should be disposed of
-
-        message.dispose();
+            message.dispose();
+        }
     }
 }
