@@ -238,8 +238,9 @@ public class MessageBuilder {
     /**
      * Sets transfer encoding of this message.
      *
-     * @param MIME type of this message
+     * @param mimeType MIME type of this message
      *            the MIME type to use.
+     * @param parameters content type parameters to use.
      */
     public void setContentType(String mimeType, NameValuePair... parameters) {
         if (mimeType == null) {
@@ -461,11 +462,10 @@ public class MessageBuilder {
     }
 
     /**
-     * Generates and sets message ID for this message.
+     * Sets message ID for this message.
      *
-     * @param hostname
-     *            host name to be included in the identifier or
-     *            <code>null</code> if no host name should be included.
+     * @param messageId
+     *            the message ID.
      */
     public MessageBuilder setMessageId(final String messageId) {
         if (messageId == null) {
@@ -975,27 +975,69 @@ public class MessageBuilder {
     }
 
     /**
-     * Sets body of this message.
+     * Sets body of this message.  Also sets the content type based on properties of
+     * the given {@link Body}.
      *
      * @param body
      *            the body.
      */
     public MessageBuilder setBody(Body body) {
         this.body = body;
+        if (!containsField(FieldName.CONTENT_TYPE) && body != null) {
+            if (body instanceof Message) {
+                setField(Fields.contentType("message/rfc822"));
+            } else if (body instanceof Multipart) {
+                Multipart multipart = (Multipart) body;
+                setField(Fields.contentType("multipart/" + multipart.getSubType(),
+                        new NameValuePair("boundary", MimeUtil.createUniqueBoundary())));
+            } else if (body instanceof TextBody) {
+                TextBody textBody = (TextBody) body;
+                String mimeCharset = textBody.getMimeCharset();
+                if ("us-ascii".equalsIgnoreCase(mimeCharset)) {
+                    mimeCharset = null;
+                }
+                if (mimeCharset != null) {
+                    setField(Fields.contentType("text/plain", new NameValuePair("charset", mimeCharset)));
+                } else {
+                    setField(Fields.contentType("text/plain"));
+                }
+            }
+        }
         return this;
     }
 
     /**
-     * Sets body of this message.
+     * Sets text of this message with the charset.
      *
-     * @param body
-     *            the body.
+     * @param text
+     *            the text.
+     * @param charset
+     *            the charset of the text.
      */
-    public MessageBuilder setBody(String body, Charset charset) {
-        return setBody(SingleBodyBuilder.create()
-                .setText(body)
-                .setCharset(charset)
-                .build());
+    public MessageBuilder setBody(String text, Charset charset) {
+        return setBody(text, null, charset);
+    }
+
+    /**
+     * Sets text of this message with the given MIME subtype and charset.
+     *
+     * @param text
+     *            the text.
+     * @param charset
+     *            the charset of the text.
+     * @param subtype
+     *            the text subtype (e.g. &quot;plain&quot;, &quot;html&quot; or
+     *            &quot;xml&quot;).
+     */
+    public MessageBuilder setBody(String text, String subtype, Charset charset) {
+        if (subtype != null) {
+            if (charset != null) {
+                setField(Fields.contentType("text/" + subtype, new NameValuePair("charset", charset.name())));
+            } else {
+                setField(Fields.contentType("text/" + subtype));
+            }
+        }
+        return setBody(BasicBodyFactory.INSTANCE.textBody(text, charset));
     }
 
     public Message build() {
@@ -1007,28 +1049,6 @@ public class MessageBuilder {
         for (final Field field : fields) {
             header.addField(field);
         }
-
-        if (!containsField(FieldName.CONTENT_TYPE) && body != null) {
-            if (body instanceof Message) {
-                header.setField(Fields.contentType("message/rfc822"));
-            } else if (body instanceof Multipart) {
-                Multipart multipart = (Multipart) body;
-                header.setField(Fields.contentType("multipart/" + multipart.getSubType(),
-                        new NameValuePair("boundary", MimeUtil.createUniqueBoundary())));
-            } else if (body instanceof TextBody) {
-                TextBody textBody = (TextBody) body;
-                String mimeCharset = textBody.getMimeCharset();
-                if ("us-ascii".equalsIgnoreCase(mimeCharset)) {
-                    mimeCharset = null;
-                }
-                if (mimeCharset != null) {
-                    header.setField(Fields.contentType("text/plain", new NameValuePair("charset", mimeCharset)));
-                } else {
-                    header.setField(Fields.contentType("text/plain"));
-                }
-            }
-        }
-
         if (!containsField(FieldName.DATE)) {
             header.setField(Fields.date(new Date()));
         }

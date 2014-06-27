@@ -21,26 +21,28 @@ package org.apache.james.mime4j.message;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.ContentUtil;
 
 /**
  * Factory for creating message bodies.
  */
 public class BasicBodyFactory implements BodyFactory {
 
-    public BinaryBody binaryBody(final InputStream is) throws IOException {
-        return SingleBodyBuilder.create()
-                .readFrom(is)
-                .buildBinary();
-    }
+    public static final BasicBodyFactory INSTANCE = new BasicBodyFactory();
 
-    protected Charset resolveCharset(final String mimeCharset) throws UnsupportedEncodingException {
+    private static Charset resolveCharset(final String mimeCharset) throws UnsupportedEncodingException {
         try {
             return mimeCharset != null ? Charset.forName(mimeCharset) : null;
         } catch (UnsupportedCharsetException ex) {
@@ -48,41 +50,179 @@ public class BasicBodyFactory implements BodyFactory {
         }
     }
 
-    public TextBody textBody(final InputStream is, final String mimeCharset) throws IOException {
-        return SingleBodyBuilder.create()
-                .readFrom(is)
-                .setCharset(resolveCharset(mimeCharset))
-                .buildText();
-    }
-
     public TextBody textBody(final String text, final String mimeCharset) throws UnsupportedEncodingException {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
         }
-        return SingleBodyBuilder.create()
-                .setText(text)
-                .setCharset(resolveCharset(mimeCharset))
-                .buildText();
+        return new StringBody1(text, resolveCharset(mimeCharset));
+    }
+
+    public TextBody textBody(final byte[] content, final Charset charset) {
+        if (content == null) {
+            throw new IllegalArgumentException("Content may not be null");
+        }
+        return new StringBody2(content, charset);
+    }
+
+    public TextBody textBody(final InputStream content, final String mimeCharset) throws IOException {
+        if (content == null) {
+            throw new IllegalArgumentException("Input stream may not be null");
+        }
+        return new StringBody2(ContentUtil.buffer(content), resolveCharset(mimeCharset));
     }
 
     public TextBody textBody(final String text, final Charset charset) {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
         }
-        return SingleBodyBuilder.create()
-                .setText(text)
-                .setCharset(charset)
-                .buildText();
+        return new StringBody1(text, charset);
     }
 
     public TextBody textBody(final String text) {
         return textBody(text, Charsets.DEFAULT_CHARSET);
     }
 
+    public BinaryBody binaryBody(final String content, final Charset charset) {
+        if (content == null) {
+            throw new IllegalArgumentException("Content may not be null");
+        }
+        return new BinaryBody2(content, charset);
+    }
+
+    public BinaryBody binaryBody(final InputStream is) throws IOException {
+        return new BinaryBody1(ContentUtil.buffer(is));
+    }
+
     public BinaryBody binaryBody(final byte[] buf) {
-        return SingleBodyBuilder.create()
-                .setByteArray(buf)
-                .buildBinary();
+        return new BinaryBody1(buf);
+    }
+
+    static class StringBody1 extends TextBody {
+
+        private final String content;
+        private final Charset charset;
+
+        StringBody1(final String content, final Charset charset) {
+            super();
+            this.content = content;
+            this.charset = charset;
+        }
+
+        @Override
+        public String getMimeCharset() {
+            return this.charset != null ? this.charset.name() : null;
+        }
+
+        @Override
+        public Reader getReader() throws IOException {
+            return new StringReader(this.content);
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return InputStreams.create(this.content,
+                    this.charset != null ? this.charset : Charsets.DEFAULT_CHARSET);
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public SingleBody copy() {
+            return new StringBody1(this.content, this.charset);
+        }
+
+    }
+
+    static class StringBody2 extends TextBody {
+
+        private final byte[] content;
+        private final Charset charset;
+
+        StringBody2(final byte[] content, final Charset charset) {
+            super();
+            this.content = content;
+            this.charset = charset;
+        }
+
+        @Override
+        public String getMimeCharset() {
+            return this.charset != null ? this.charset.name() : null;
+        }
+
+        @Override
+        public Reader getReader() throws IOException {
+            return new InputStreamReader(InputStreams.create(this.content), this.charset);
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return InputStreams.create(this.content);
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public SingleBody copy() {
+            return new StringBody2(this.content, this.charset);
+        }
+
+    }
+
+    static class BinaryBody1 extends BinaryBody {
+
+        private final byte[] content;
+
+        BinaryBody1(final byte[] content) {
+            super();
+            this.content = content;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return InputStreams.create(this.content);
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public SingleBody copy() {
+            return new BinaryBody1(this.content);
+        }
+
+    }
+
+    static class BinaryBody2 extends BinaryBody {
+
+        private final String content;
+        private final Charset charset;
+
+        BinaryBody2(final String content, final Charset charset) {
+            super();
+            this.content = content;
+            this.charset = charset;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return InputStreams.create(this.content,
+                    this.charset != null ? this.charset : Charsets.DEFAULT_CHARSET);
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public SingleBody copy() {
+            return new BinaryBody2(this.content, this.charset);
+        }
+
     }
 
 }
