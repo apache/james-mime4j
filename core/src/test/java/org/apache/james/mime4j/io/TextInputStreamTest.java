@@ -115,6 +115,18 @@ public class TextInputStreamTest {
     }
 
     @Test
+    public void testReadZero2() throws Exception {
+        InputStream r = new TextInputStream("test", Charsets.US_ASCII, 1024);
+        byte[] bytes = new byte[30];
+        assertEquals(2, r.read(bytes, 0, 2));
+        assertEquals(0, r.read(bytes, 2, 0));
+        assertEquals(0, r.read(bytes, 2, 0));
+        assertEquals(2, r.read(bytes, 2, 2));
+        assertEquals(-1, r.read(bytes, 4, 0));
+        assertEquals(-1, r.read(bytes, 4, 2));
+    }
+
+    @Test
     public void testSkip() throws Exception {
         InputStream r = new TextInputStream("test", Charsets.UTF_8, 1024);
         r.skip(1);

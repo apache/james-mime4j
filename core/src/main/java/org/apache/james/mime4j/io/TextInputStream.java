@@ -67,9 +67,6 @@ class TextInputStream extends InputStream {
         if (off < 0 || len < 0 || off + len > b.length) {
             throw new IndexOutOfBoundsException();
         }
-        if (len == 0) {
-            return 0;
-        }
         if (!this.bbuf.hasRemaining() && !this.cbuf.hasRemaining()) {
             return -1;
         }
@@ -88,7 +85,15 @@ class TextInputStream extends InputStream {
                 }
             }
         }
-        return bytesRead == 0 && !this.cbuf.hasRemaining() ? -1 : bytesRead;
+        if (bytesRead > 0) {
+            return bytesRead;
+        } else {
+            if (!this.bbuf.hasRemaining() && !this.cbuf.hasRemaining()) {
+                return -1;
+            } else {
+                return bytesRead;
+            }
+        }
     }
 
     @Override
