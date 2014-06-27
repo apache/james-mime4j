@@ -102,6 +102,17 @@ public class StringInputStreamTest extends TestCase {
         assertEquals(0, r.read(bytes, 0, 0));
     }
 
+    public void testReadZero2() throws Exception {
+        InputStream r = new StringInputStream("test", CharsetUtil.UTF_8);
+        byte[] bytes = new byte[30];
+        assertEquals(2, r.read(bytes, 0, 2));
+        assertEquals(0, r.read(bytes, 2, 0));
+        assertEquals(0, r.read(bytes, 2, 0));
+        assertEquals(2, r.read(bytes, 2, 2));
+        assertEquals(-1, r.read(bytes, 4, 0));
+        assertEquals(-1, r.read(bytes, 4, 2));
+    }
+
     public void testSkip() throws Exception {
         InputStream r = new StringInputStream("test", CharsetUtil.UTF_8);
         r.skip(1);
