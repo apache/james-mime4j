@@ -35,7 +35,7 @@ import org.apache.james.mime4j.message.MessageBuilder;
 public class TextPlainMessage {
     public static void main(String[] args) throws Exception {
         // 1) start with an empty message
-        final Message message = MessageBuilder.create()
+        Message message = MessageBuilder.create()
         // 2) set header fields
         //    Date and From are required fields
         //    Message-ID should be present

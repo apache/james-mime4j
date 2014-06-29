@@ -19,25 +19,22 @@
 
 package org.apache.james.mime4j.samples.dom;
 
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
 
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.BinaryBody;
+import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageWriter;
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.field.address.AddressBuilder;
-import org.apache.james.mime4j.message.BodyPart;
-import org.apache.james.mime4j.message.MessageImpl;
+import org.apache.james.mime4j.message.BodyPartBuilder;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
-import org.apache.james.mime4j.message.MultipartImpl;
+import org.apache.james.mime4j.message.MessageBuilder;
+import org.apache.james.mime4j.message.MultipartBuilder;
 import org.apache.james.mime4j.storage.Storage;
 import org.apache.james.mime4j.storage.StorageBodyFactory;
 import org.apache.james.mime4j.storage.StorageOutputStream;
@@ -52,87 +49,57 @@ public class MultipartMessage {
 
     public static void main(String[] args) throws Exception {
         // 1) start with an empty message
-
-        MessageImpl message = new MessageImpl();
-
-        // 2) set header fields
-
-        // Date and From are required fields
-        message.setDate(new Date());
-        message.setFrom(AddressBuilder.DEFAULT.parseMailbox("John Doe <jdoe@machine.example>"));
-
-        // Message-ID should be present
-        message.createMessageId("machine.example");
-
-        // set some optional fields
-        message.setTo(AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>"));
-        message.setSubject("An image for you");
-
-        // 3) set a multipart body
-
-        Multipart multipart = new MultipartImpl("mixed");
-
-        // a multipart may have a preamble
-        multipart.setPreamble("This is a multi-part message in MIME format.");
-
-        // first part is text/plain
         StorageBodyFactory bodyFactory = new StorageBodyFactory();
-        BodyPart textPart = createTextPart(bodyFactory, "Why so serious?");
-        multipart.addBodyPart(textPart);
-
-        // second part is image/png (image is created on the fly)
-        BufferedImage image = renderSampleImage();
-        BodyPart imagePart = createImagePart(bodyFactory, image);
-        multipart.addBodyPart(imagePart);
-
-        // setMultipart also sets the Content-Type header field
-        message.setMultipart(multipart);
-
+        Message message = MessageBuilder.create()
+        // 2) set header fields
+        //    Date and From are required fields
+        //    Message-ID should be present
+                .setFrom("John Doe <jdoe@machine.example>")
+                .setTo("Mary Smith <mary@example.net>")
+                .setSubject("An image for you")
+                .setDate(new Date())
+                .generateMessageId(InetAddress.getLocalHost().getCanonicalHostName())
+        // 3) set a multipart body
+                .setBody(MultipartBuilder.create("mixed")
+                        // a multipart may have a preamble
+                        .setPreamble("This is a multi-part message in MIME format.")
+                        // first part is text/plain
+                        .addBodyPart(BodyPartBuilder.create()
+                                .use(bodyFactory)
+                                .setBody("Why so serious?", Charsets.UTF_8)
+                                .setContentTransferEncoding("quoted-printable")
+                                .build())
+                        // second part is image/png (image is created on the fly)
+                        .addBodyPart(BodyPartBuilder.create()
+                                .setBody(createImageBody(bodyFactory, renderSampleImage()))
+                                .setContentType("image/png")
+                                .setContentTransferEncoding("base64")
+                        // Specify a filename in the Content-Disposition header (implicitly sets
+                        // the disposition type to "attachment")
+                                .setContentDisposition("attachment", "smiley.png")
+                                .build())
+                        .build())
+        // setBody also sets the Content-Type header field
+                .build();
+        try {
         // 4) print message to standard output
-
-        MessageWriter writer = new DefaultMessageWriter();
-        writer.writeMessage(message, System.out);
-
+            MessageWriter writer = new DefaultMessageWriter();
+            writer.writeMessage(message, System.out);
+        } finally {
         // 5) message is no longer needed and should be disposed of
-
-        message.dispose();
-    }
-
-    /**
-     * Creates a text part from the specified string.
-     */
-    private static BodyPart createTextPart(StorageBodyFactory bodyFactory, String text) {
-        // Use UTF-8 to encode the specified text
-        TextBody body = bodyFactory.textBody(text, "UTF-8");
-
-        // Create a text/plain body part
-        BodyPart bodyPart = new BodyPart();
-        bodyPart.setText(body);
-        bodyPart.setContentTransferEncoding("quoted-printable");
-
-        return bodyPart;
+            message.dispose();
+        }
     }
 
     /**
      * Creates a binary part from the specified image.
      */
-    private static BodyPart createImagePart(StorageBodyFactory bodyFactory,
+    private static BinaryBody createImageBody(StorageBodyFactory bodyFactory,
             BufferedImage image) throws IOException {
         // Create a binary message body from the image
         StorageProvider storageProvider = bodyFactory.getStorageProvider();
         Storage storage = storeImage(storageProvider, image, "png");
-        BinaryBody body = bodyFactory.binaryBody(storage);
-
-        // Create a body part with the correct MIME-type and transfer encoding
-        BodyPart bodyPart = new BodyPart();
-        bodyPart.setBody(body, "image/png");
-        bodyPart.setContentTransferEncoding("base64");
-
-        // Specify a filename in the Content-Disposition header (implicitly sets
-        // the disposition type to "attachment")
-        bodyPart.setFilename("smiley.png");
-
-        return bodyPart;
+        return bodyFactory.binaryBody(storage);
     }
 
     /**
