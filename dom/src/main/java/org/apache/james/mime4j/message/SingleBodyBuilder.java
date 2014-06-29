@@ -50,7 +50,7 @@ public class SingleBodyBuilder {
         super();
     }
 
-    public SingleBodyBuilder withFactory(final BodyFactory bodyFactory) {
+    public SingleBodyBuilder use(final BodyFactory bodyFactory) {
         this.bodyFactory = bodyFactory;
         return this;
     }

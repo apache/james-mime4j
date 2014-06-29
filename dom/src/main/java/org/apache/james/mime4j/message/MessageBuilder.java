@@ -19,419 +19,121 @@
 
 package org.apache.james.mime4j.message;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
 import org.apache.james.mime4j.dom.field.AddressListField;
-import org.apache.james.mime4j.dom.field.ContentDispositionField;
-import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
-import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.ParseException;
-import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
-import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * {@link org.apache.james.mime4j.dom.Message} builder.
  */
-public class MessageBuilder {
-
-    private final List<Field> fields;
-    private final Map<String, List<Field>> fieldMap;
-
-    private Body body;
+public class MessageBuilder extends AbstractEntityBuilder {
 
     public static MessageBuilder create() {
         return new MessageBuilder();
     }
 
-    private MessageBuilder() {
-        this.fields = new LinkedList<Field>();
-        this.fieldMap = new HashMap<String, List<Field>>();
-    }
-
-    /**
-     * Adds a field to the end of the list of fields.
-     *
-     * @param field the field to add.
-     */
-    public MessageBuilder addField(Field field) {
-        List<Field> values = fieldMap.get(field.getName().toLowerCase());
-        if (values == null) {
-            values = new LinkedList<Field>();
-            fieldMap.put(field.getName().toLowerCase(), values);
-        }
-        values.add(field);
-        fields.add(field);
-        return this;
-    }
-
-    /**
-     * Gets the fields of this header. The returned list will not be
-     * modifiable.
-     *
-     * @return the list of <code>Field</code> objects.
-     */
-    public List<Field> getFields() {
-        return Collections.unmodifiableList(fields);
-    }
-
-    /**
-     * Gets a <code>Field</code> given a field name. If there are multiple
-     * such fields defined in this header the first one will be returned.
-     *
-     * @param name the field name (e.g. From, Subject).
-     * @return the field or <code>null</code> if none found.
-     */
-    public Field getField(String name) {
-        List<Field> l = fieldMap.get(name.toLowerCase());
-        if (l != null && !l.isEmpty()) {
-            return l.get(0);
-        }
-        return null;
-    }
-
-    /**
-     * Returns <code>true<code/> if there is at least one explicitly
-     * set field with the given name.
-     *
-     * @param name the field name (e.g. From, Subject).
-     * @return <code>true<code/> if there is at least one explicitly
-     * set field with the given name, <code>false<code/> otherwise.
-     */
-    public boolean containsField(String name) {
-        List<Field> l = fieldMap.get(name.toLowerCase());
-        return l != null && !l.isEmpty();
-    }
-
-    /**
-     * Gets all <code>Field</code>s having the specified field name.
-     *
-     * @param name the field name (e.g. From, Subject).
-     * @return the list of fields.
-     */
-    public List<Field> getFields(final String name) {
-        final String lowerCaseName = name.toLowerCase();
-        final List<Field> l = fieldMap.get(lowerCaseName);
-        final List<Field> results;
-        if (l == null || l.isEmpty()) {
-            results = Collections.emptyList();
-        } else {
-            results = Collections.unmodifiableList(l);
-        }
-        return results;
-    }
-
-    /**
-     * Removes all <code>Field</code>s having the specified field name.
-     *
-     * @param name
-     *            the field name (e.g. From, Subject).
-     */
-    public MessageBuilder removeFields(String name) {
-        final String lowerCaseName = name.toLowerCase();
-        List<Field> removed = fieldMap.remove(lowerCaseName);
-        if (removed == null || removed.isEmpty()) {
-            return this;
-        }
-        for (Iterator<Field> iterator = fields.iterator(); iterator.hasNext();) {
-            Field field = iterator.next();
-            if (field.getName().equalsIgnoreCase(name)) {
-                iterator.remove();
-            }
-        }
-        return this;
-    }
-
-    /**
-     * Sets or replaces a field. This method is useful for header fields such as
-     * Subject or Message-ID that should not occur more than once in a message.
-     *
-     * If this builder does not already contain a header field of
-     * the same name as the given field then it is added to the end of the list
-     * of fields (same behavior as {@link #addField(Field)}). Otherwise the
-     * first occurrence of a field with the same name is replaced by the given
-     * field and all further occurrences are removed.
-     *
-     * @param field the field to set.
-     */
+    @Override
     public MessageBuilder setField(Field field) {
-        final String lowerCaseName = field.getName().toLowerCase();
-        List<Field> l = fieldMap.get(lowerCaseName);
-        if (l == null || l.isEmpty()) {
-            addField(field);
-            return this;
-        }
-
-        l.clear();
-        l.add(field);
-
-        int firstOccurrence = -1;
-        int index = 0;
-        for (Iterator<Field> iterator = fields.iterator(); iterator.hasNext(); index++) {
-            Field f = iterator.next();
-            if (f.getName().equalsIgnoreCase(field.getName())) {
-                iterator.remove();
-                if (firstOccurrence == -1) {
-                    firstOccurrence = index;
-                }
-            }
-        }
-        fields.add(firstOccurrence, field);
+        super.setField(field);
         return this;
     }
 
-    @SuppressWarnings("unchecked")
-    private <F extends ParsedField> F obtainField(String fieldName) {
-        return (F) getField(fieldName);
+    @Override
+    public AbstractEntityBuilder addField(Field field) {
+        super.addField(field);
+        return this;
     }
 
-    /**
-     * Returns MIME type of this message.
-     *
-     * @return the MIME type or <code>null</code> if no MIME
-     *         type has been set.
-     */
-    public String getMimeType() {
-        ContentTypeField field = obtainField(FieldName.CONTENT_TYPE);
-        return field != null ? field.getMimeType() : null;
+    @Override
+    public AbstractEntityBuilder removeFields(String name) {
+        super.removeFields(name);
+        return this;
     }
 
-    /**
-     * Returns MIME character set encoding of this message.
-     *
-     * @return the MIME character set encoding or <code>null</code> if no charset
-     *         type has been set.
-     */
-    public String getCharset() {
-        ContentTypeField field = obtainField(FieldName.CONTENT_TYPE);
-        return field != null ? field.getCharset() : null;
+    @Override
+    public MessageBuilder setContentTransferEncoding(String contentTransferEncoding) {
+        super.setContentTransferEncoding(contentTransferEncoding);
+        return this;
     }
 
-    /**
-     * Sets transfer encoding of this message.
-     *
-     * @param mimeType MIME type of this message
-     *            the MIME type to use.
-     * @param parameters content type parameters to use.
-     */
-    public void setContentType(String mimeType, NameValuePair... parameters) {
-        if (mimeType == null) {
-            removeFields(FieldName.CONTENT_TYPE);
-        } else {
-            setField(Fields.contentType(mimeType, parameters));
-        }
+    @Override
+    public MessageBuilder setContentType(String mimeType, NameValuePair... parameters) {
+        super.setContentType(mimeType, parameters);
+        return this;
     }
 
-    /**
-     * Returns transfer encoding of this message.
-     *
-     * @return the transfer encoding.
-     */
-    public String getContentTransferEncoding() {
-        ContentTransferEncodingField field = obtainField(FieldName.CONTENT_TRANSFER_ENCODING);
-        return field != null ? field.getEncoding() : null;
+    @Override
+    public MessageBuilder setContentDisposition(String dispositionType) {
+        super.setContentDisposition(dispositionType);
+        return this;
     }
 
-    /**
-     * Sets transfer encoding of this message.
-     *
-     * @param contentTransferEncoding
-     *            transfer encoding to use.
-     */
-    public void setContentTransferEncoding(String contentTransferEncoding) {
-        if (contentTransferEncoding == null) {
-            removeFields(FieldName.CONTENT_TRANSFER_ENCODING);
-        } else {
-            setField(Fields.contentTransferEncoding(contentTransferEncoding));
-        }
+    @Override
+    public MessageBuilder setContentDisposition(String dispositionType, String filename) {
+        super.setContentDisposition(dispositionType, filename);
+        return this;
     }
 
-    /**
-     * Return disposition type of this message.
-     *
-     * @return the disposition type or <code>null</code> if no disposition
-     *         type has been set.
-     */
-    public String getDispositionType() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
-        return field != null ? field.getDispositionType() : null;
+    @Override
+    public MessageBuilder setContentDisposition(String dispositionType, String filename, long size) {
+        super.setContentDisposition(dispositionType, filename, size);
+        return this;
     }
 
-    /**
-     * Sets content disposition of this message to the
-     * specified disposition type. No filename, size or date parameters
-     * are included in the content disposition.
-     *
-     * @param dispositionType
-     *            disposition type value (usually <code>inline</code> or
-     *            <code>attachment</code>).
-     */
-    public void setContentDisposition(String dispositionType) {
-        if (dispositionType == null) {
-            removeFields(FieldName.CONTENT_DISPOSITION);
-        } else {
-            setField(Fields.contentDisposition(dispositionType));
-        }
+    @Override
+    public MessageBuilder setContentDisposition(String dispositionType, String filename, long size,
+                                                Date creationDate, Date modificationDate, Date readDate) {
+        super.setContentDisposition(dispositionType, filename, size, creationDate, modificationDate, readDate);
+        return this;
     }
 
-    /**
-     * Sets content disposition of this message to the
-     * specified disposition type and filename. No size or date parameters are
-     * included in the content disposition.
-     *
-     * @param dispositionType
-     *            disposition type value (usually <code>inline</code> or
-     *            <code>attachment</code>).
-     * @param filename
-     *            filename parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     */
-    public void setContentDisposition(String dispositionType, String filename) {
-        if (dispositionType == null) {
-            removeFields(FieldName.CONTENT_DISPOSITION);
-        } else {
-            setField(Fields.contentDisposition(dispositionType, filename));
-        }
+    @Override
+    public MessageBuilder setBody(Body body) {
+        super.setBody(body);
+        return this;
     }
 
-    /**
-     * Sets content disposition of this message to the
-     * specified values. No date parameters are included in the content
-     * disposition.
-     *
-     * @param dispositionType
-     *            disposition type value (usually <code>inline</code> or
-     *            <code>attachment</code>).
-     * @param filename
-     *            filename parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     * @param size
-     *            size parameter value or <code>-1</code> if the parameter
-     *            should not be included.
-     */
-    public void setContentDisposition(String dispositionType, String filename,
-                                      long size) {
-        if (dispositionType == null) {
-            removeFields(FieldName.CONTENT_DISPOSITION);
-        } else {
-            setField(Fields.contentDisposition(dispositionType, filename, size));
-        }
+    @Override
+    public MessageBuilder use(final BodyFactory bodyFactory) {
+        super.use(bodyFactory);
+        return this;
     }
 
-    /**
-     * Sets content disposition of this message to the
-     * specified values.
-     *
-     * @param dispositionType
-     *            disposition type value (usually <code>inline</code> or
-     *            <code>attachment</code>).
-     * @param filename
-     *            filename parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     * @param size
-     *            size parameter value or <code>-1</code> if the parameter
-     *            should not be included.
-     * @param creationDate
-     *            creation-date parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     * @param modificationDate
-     *            modification-date parameter value or <code>null</code> if
-     *            the parameter should not be included.
-     * @param readDate
-     *            read-date parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     */
-    public void setContentDisposition(String dispositionType, String filename,
-                                      long size, Date creationDate, Date modificationDate, Date readDate) {
-        if (dispositionType == null) {
-            removeFields(FieldName.CONTENT_DISPOSITION);
-        } else {
-            setField(Fields.contentDisposition(dispositionType, filename, size,
-                    creationDate, modificationDate, readDate));
-        }
+    @Override
+    public MessageBuilder setBody(String text, Charset charset) throws IOException {
+        super.setBody(text, charset);
+        return this;
     }
 
-    /**
-     * Returns filename of the content disposition of this message.
-     *
-     * @return the filename parameter of the content disposition or
-     *         <code>null</code> if the filename has not been set.
-     */
-    public String getFilename() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
-        return field != null ? field.getFilename() : null;
-    }
-
-    /**
-     * Returns size of the content disposition of this message.
-     *
-     * @return the size parameter of the content disposition or
-     *         <code>-1</code> if the filename has not been set.
-     */
-    public long getSize() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
-        return field != null ? field.getSize() : -1;
-    }
-
-    /**
-     * Returns creation date of the content disposition of this message.
-     *
-     * @return the creation date parameter of the content disposition or
-     *         <code>null</code> if the filename has not been set.
-     */
-    public Date getCreationDate() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
-        return field != null ? field.getCreationDate() : null;
-    }
-
-    /**
-     * Returns modification date of the content disposition of this message.
-     *
-     * @return the modification date parameter of the content disposition or
-     *         <code>null</code> if the filename has not been set.
-     */
-    public Date getModificationDate() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
-        return field != null ? field.getModificationDate() : null;
-    }
-
-    /**
-     * Returns read date of the content disposition of this message.
-     *
-     * @return the read date parameter of the content disposition or
-     *         <code>null</code> if the filename has not been set.
-     */
-    public Date getReadDate() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
-        return field != null ? field.getReadDate() : null;
+    @Override
+    public MessageBuilder setBody(String text, String subtype, Charset charset) throws IOException {
+        super.setBody(text, subtype, charset);
+        return this;
     }
 
     /**
@@ -452,7 +154,7 @@ public class MessageBuilder {
      *            host name to be included in the identifier or
      *            <code>null</code> if no host name should be included.
      */
-    public MessageBuilder generateMessageId(final String hostname) {
+    public MessageBuilder generateMessageId(String hostname) {
         if (hostname == null) {
             removeFields(FieldName.MESSAGE_ID);
         } else {
@@ -467,7 +169,7 @@ public class MessageBuilder {
      * @param messageId
      *            the message ID.
      */
-    public MessageBuilder setMessageId(final String messageId) {
+    public MessageBuilder setMessageId(String messageId) {
         if (messageId == null) {
             removeFields(FieldName.MESSAGE_ID);
         } else {
@@ -496,7 +198,7 @@ public class MessageBuilder {
      *            subject to set or <code>null</code> to remove the subject
      *            header field.
      */
-    public MessageBuilder setSubject(final String subject) {
+    public MessageBuilder setSubject(String subject) {
         if (subject == null) {
             removeFields(FieldName.SUBJECT);
         } else {
@@ -974,86 +676,20 @@ public class MessageBuilder {
         return this;
     }
 
-    /**
-     * Sets body of this message.  Also sets the content type based on properties of
-     * the given {@link Body}.
-     *
-     * @param body
-     *            the body.
-     */
-    public MessageBuilder setBody(Body body) {
-        this.body = body;
-        if (!containsField(FieldName.CONTENT_TYPE) && body != null) {
-            if (body instanceof Message) {
-                setField(Fields.contentType("message/rfc822"));
-            } else if (body instanceof Multipart) {
-                Multipart multipart = (Multipart) body;
-                setField(Fields.contentType("multipart/" + multipart.getSubType(),
-                        new NameValuePair("boundary", MimeUtil.createUniqueBoundary())));
-            } else if (body instanceof TextBody) {
-                TextBody textBody = (TextBody) body;
-                String mimeCharset = textBody.getMimeCharset();
-                if ("us-ascii".equalsIgnoreCase(mimeCharset)) {
-                    mimeCharset = null;
-                }
-                if (mimeCharset != null) {
-                    setField(Fields.contentType("text/plain", new NameValuePair("charset", mimeCharset)));
-                } else {
-                    setField(Fields.contentType("text/plain"));
-                }
-            }
-        }
-        return this;
-    }
-
-    /**
-     * Sets text of this message with the charset.
-     *
-     * @param text
-     *            the text.
-     * @param charset
-     *            the charset of the text.
-     */
-    public MessageBuilder setBody(String text, Charset charset) {
-        return setBody(text, null, charset);
-    }
-
-    /**
-     * Sets text of this message with the given MIME subtype and charset.
-     *
-     * @param text
-     *            the text.
-     * @param charset
-     *            the charset of the text.
-     * @param subtype
-     *            the text subtype (e.g. &quot;plain&quot;, &quot;html&quot; or
-     *            &quot;xml&quot;).
-     */
-    public MessageBuilder setBody(String text, String subtype, Charset charset) {
-        if (subtype != null) {
-            if (charset != null) {
-                setField(Fields.contentType("text/" + subtype, new NameValuePair("charset", charset.name())));
-            } else {
-                setField(Fields.contentType("text/" + subtype));
-            }
-        }
-        return setBody(BasicBodyFactory.INSTANCE.textBody(text, charset));
-    }
-
     public Message build() {
-        Message message = new MessageImpl();
-        final Header header = message.getHeader();
+        MessageImpl message = new MessageImpl();
+        Header header = message.getHeader();
         if (!containsField(FieldName.MIME_VERSION)) {
             header.setField(Fields.version("1.0"));
         }
-        for (final Field field : fields) {
+        for (Field field : getFields()) {
             header.addField(field);
         }
         if (!containsField(FieldName.DATE)) {
             header.setField(Fields.date(new Date()));
         }
 
-        message.setBody(body);
+        message.setBody(getBody());
 
         return message;
     }
