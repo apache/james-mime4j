@@ -19,12 +19,22 @@
 
 package org.apache.james.mime4j.message;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
+import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.SingleBody;
+import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.stream.Field;
 
 /**
  * {@link org.apache.james.mime4j.dom.Multipart} builder.
@@ -36,8 +46,14 @@ public class MultipartBuilder {
     private String preamble;
     private String epilogue;
 
+    private BodyFactory bodyFactory;
+
     public static MultipartBuilder create(String subType) {
         return new MultipartBuilder().setSubType(subType);
+    }
+
+    public static MultipartBuilder createCopy(Multipart other) {
+        return new MultipartBuilder().copy(other);
     }
 
     public static MultipartBuilder create() {
@@ -46,6 +62,11 @@ public class MultipartBuilder {
 
     private MultipartBuilder() {
         this.bodyParts = new LinkedList<Entity>();
+    }
+
+    public MultipartBuilder use(final BodyFactory bodyFactory) {
+        this.bodyFactory = bodyFactory;
+        return this;
     }
 
     /**
@@ -191,6 +212,53 @@ public class MultipartBuilder {
      */
     public MultipartBuilder setEpilogue(String epilogue) {
         this.epilogue = epilogue;
+        return this;
+    }
+
+    public MultipartBuilder addTextPart(String text, Charset charset) throws IOException {
+        Charset cs = charset != null ? charset : Charsets.ISO_8859_1;
+        TextBody body = bodyFactory != null ? bodyFactory.textBody(
+                InputStreams.create(text, cs), cs.name()) : BasicBodyFactory.INSTANCE.textBody(text, cs);
+        BodyPart bodyPart = new BodyPart();
+        bodyPart.setText(body);
+        bodyPart.setContentTransferEncoding("quoted-printable");
+
+        return addBodyPart(bodyPart);
+    }
+
+    public MultipartBuilder copy(Multipart other) {
+        if (other == null) {
+            return this;
+        }
+        subType = other.getSubType();
+        bodyParts.clear();
+        final List<Entity> otherParts = other.getBodyParts();
+        for (Entity otherPart: otherParts) {
+            BodyPart bodyPart = new BodyPart();
+            Header otherHeader = otherPart.getHeader();
+            if (otherHeader != null) {
+                HeaderImpl header = new HeaderImpl();
+                for (Field otherField : otherHeader.getFields()) {
+                    header.addField(otherField);
+                }
+                bodyPart.setHeader(header);
+            }
+            final Body otherBody = otherPart.getBody();
+            if (otherBody != null) {
+                Body body = null;
+                if (otherBody instanceof Message) {
+                    body = MessageBuilder.createCopy((Message) otherBody).build();
+                } else if (otherBody instanceof Multipart) {
+                    body = MultipartBuilder.createCopy((Multipart) otherBody).build();
+                } else if (otherBody instanceof SingleBody) {
+                    body = ((SingleBody) otherBody).copy();
+                }
+                bodyPart.setBody(body);
+            }
+            bodyParts.add(bodyPart);
+        }
+        preamble = other.getPreamble();
+        epilogue = other.getEpilogue();
         return this;
     }
 

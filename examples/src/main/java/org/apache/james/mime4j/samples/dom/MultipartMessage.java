@@ -61,21 +61,23 @@ public class MultipartMessage {
                 .generateMessageId(InetAddress.getLocalHost().getCanonicalHostName())
         // 3) set a multipart body
                 .setBody(MultipartBuilder.create("mixed")
-                        // a multipart may have a preamble
+                        .use(bodyFactory)
+                                // a multipart may have a preamble
                         .setPreamble("This is a multi-part message in MIME format.")
-                        // first part is text/plain
+                                // first part is text/plain
                         .addBodyPart(BodyPartBuilder.create()
                                 .use(bodyFactory)
                                 .setBody("Why so serious?", Charsets.UTF_8)
                                 .setContentTransferEncoding("quoted-printable")
                                 .build())
-                        // second part is image/png (image is created on the fly)
+                                // second part is image/png (image is created on the fly)
                         .addBodyPart(BodyPartBuilder.create()
+                                .use(bodyFactory)
                                 .setBody(createImageBody(bodyFactory, renderSampleImage()))
                                 .setContentType("image/png")
                                 .setContentTransferEncoding("base64")
-                        // Specify a filename in the Content-Disposition header (implicitly sets
-                        // the disposition type to "attachment")
+                                        // Specify a filename in the Content-Disposition header (implicitly sets
+                                        // the disposition type to "attachment")
                                 .setContentDisposition("attachment", "smiley.png")
                                 .build())
                         .build())

@@ -22,13 +22,17 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
@@ -40,11 +44,15 @@ public class SingleBodyBuilder {
         return new SingleBodyBuilder();
     }
 
-    private BodyFactory bodyFactory;
+    public static SingleBodyBuilder createCopy(final SingleBody other) throws IOException {
+        return new SingleBodyBuilder().copy(other);
+    }
 
     private String text;
     private byte[] bin;
     private Charset charset;
+
+    private BodyFactory bodyFactory;
 
     SingleBodyBuilder() {
         super();
@@ -81,6 +89,26 @@ public class SingleBodyBuilder {
     public SingleBodyBuilder readFrom(final Reader in) throws IOException {
         this.text = ContentUtil.buffer(in);
         this.bin = null;
+        return this;
+    }
+
+    public SingleBodyBuilder copy(final SingleBody other) throws IOException {
+        if (other == null) {
+            return this;
+        }
+        if (other instanceof TextBody) {
+            String charsetName = ((TextBody) other).getMimeCharset();
+            if (charsetName != null) {
+                try {
+                    this.charset = Charset.forName(charsetName);
+                } catch (IllegalCharsetNameException ex) {
+                    throw new UnsupportedEncodingException(charsetName);
+                } catch (UnsupportedCharsetException ex) {
+                    throw new UnsupportedEncodingException(charsetName);
+                }
+            }
+        }
+        this.bin = ContentUtil.buffer(other.getInputStream());
         return this;
     }
 

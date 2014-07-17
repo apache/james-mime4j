@@ -19,26 +19,21 @@
 
 package org.apache.james.mime4j.samples.transform;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Random;
 
-import org.apache.james.mime4j.dom.Body;
+import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageWriter;
 import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.TextBody;
-import org.apache.james.mime4j.dom.field.ParseException;
-import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
-import org.apache.james.mime4j.message.MessageImpl;
-import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.BodyPartBuilder;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
-import org.apache.james.mime4j.message.MultipartImpl;
-import org.apache.james.mime4j.storage.DefaultStorageProvider;
+import org.apache.james.mime4j.message.MessageBuilder;
+import org.apache.james.mime4j.message.MultipartBuilder;
 import org.apache.james.mime4j.storage.StorageBodyFactory;
 import org.apache.james.mime4j.storage.StorageProvider;
 import org.apache.james.mime4j.storage.TempFileStorageProvider;
@@ -56,15 +51,68 @@ public class TransformMessage {
         // Explicitly set a strategy for storing body parts. Usually not
         // necessary; for most applications the default setting is appropriate.
         StorageProvider storageProvider = new TempFileStorageProvider();
-        DefaultStorageProvider.setInstance(storageProvider);
+        StorageBodyFactory bodyFactory = new StorageBodyFactory(storageProvider, DecodeMonitor.SILENT);
 
         // Create a template message. It would be possible to load a message
         // from an input stream but for this example a message object is created
         // from scratch for demonstration purposes.
-        Message template = createTemplate();
+        Message template = MessageBuilder.create()
+                .setBody(MultipartBuilder.create("mixed")
+                        .addBodyPart(BodyPartBuilder.create()
+                                .use(bodyFactory)
+                                .setBody("This is the first part of the template..", Charsets.UTF_8)
+                                .setContentTransferEncoding("quoted-printable")
+                                .build())
+                        .addBodyPart(BodyPartBuilder.create()
+                                .use(bodyFactory)
+                                .setBody(createRandomBinary(200), "application/octet-stream")
+                                .setContentTransferEncoding("base64")
+                                .build())
+                        .addBodyPart(BodyPartBuilder.create()
+                                .use(bodyFactory)
+                                .setBody(createRandomBinary(300), "application/octet-stream")
+                                .setContentTransferEncoding("base64")
+                                .build())
+                        .build())
+                .setSubject("Template message")
+                .build();
 
         // Create a new message by transforming the template.
-        Message transformed = transform(template);
+        // Create a copy of the template. The copy can be modified without
+        // affecting the original.
+        final MessageBuilder messageBuilder = MessageBuilder.createCopy(template);
+        // In this example we know we have a multipart message. Use
+        // Message#isMultipart() if uncertain.
+        Multipart multipart = (Multipart) messageBuilder.getBody();
+
+        // Insert a new text/plain body part after every body part of the
+        // template.
+        final int count = multipart.getCount();
+        for (int i = 0; i < count; i++) {
+            String text = "Text inserted after part " + (i + 1);
+            BodyPart bodyPart = BodyPartBuilder.create()
+                    .use(bodyFactory)
+                    .setBody(text, Charsets.UTF_8)
+                    .setContentTransferEncoding("quoted-printable")
+                    .build();
+            multipart.addBodyPart(bodyPart, 2 * i + 1);
+        }
+
+        // For no particular reason remove the second binary body part (now
+        // at index four).
+        Entity removed = multipart.removeBodyPart(4);
+
+        // The removed body part no longer has a parent entity it belongs to so
+        // it should be disposed of.
+        removed.dispose();
+
+        // Set some headers on the transformed message
+        messageBuilder.generateMessageId(HOSTNAME);
+        messageBuilder.setSubject("Transformed message");
+        messageBuilder.setDate(new Date());
+        messageBuilder.setFrom("John Doe <jdoe@machine.example>");
+
+        Message transformed = messageBuilder.build();
 
         MessageWriter writer = new DefaultMessageWriter();
 
@@ -89,99 +137,11 @@ public class TransformMessage {
         // messages and body parts have been disposed of properly.
     }
 
-    /**
-     * Copies the given message and makes some arbitrary changes to the copy.
-     * @throws ParseException on bad arguments
-     */
-    private static Message transform(Message original) throws IOException, ParseException {
-        // Create a copy of the template. The copy can be modified without
-        // affecting the original.
-        MessageBuilder builder = new DefaultMessageBuilder();
-        Message message = builder.newMessage(original);
-
-        // In this example we know we have a multipart message. Use
-        // Message#isMultipart() if uncertain.
-        Multipart multipart = (Multipart) message.getBody();
-
-        // Insert a new text/plain body part after every body part of the
-        // template.
-        final int count = multipart.getCount();
-        for (int i = 0; i < count; i++) {
-            String text = "Text inserted after part " + (i + 1);
-            BodyPart bodyPart = createTextPart(text);
-            multipart.addBodyPart(bodyPart, 2 * i + 1);
-        }
-
-        // For no particular reason remove the second binary body part (now
-        // at index four).
-        Entity removed = multipart.removeBodyPart(4);
-
-        // The removed body part no longer has a parent entity it belongs to so
-        // it should be disposed of.
-        removed.dispose();
-
-        // Set some headers on the transformed message
-        message.createMessageId(HOSTNAME);
-        message.setSubject("Transformed message");
-        message.setDate(new Date());
-        message.setFrom(AddressBuilder.DEFAULT.parseMailbox("John Doe <jdoe@machine.example>"));
-
-        return message;
-    }
-
-    /**
-     * Creates a multipart/mixed message that consists of three parts (one text,
-     * two binary).
-     */
-    private static Message createTemplate() throws IOException {
-        Multipart multipart = new MultipartImpl("mixed");
-
-        BodyPart part1 = createTextPart("This is the first part of the template..");
-        multipart.addBodyPart(part1);
-
-        BodyPart part2 = createRandomBinaryPart(200);
-        multipart.addBodyPart(part2);
-
-        BodyPart part3 = createRandomBinaryPart(300);
-        multipart.addBodyPart(part3);
-
-        MessageImpl message = new MessageImpl();
-        message.setMultipart(multipart);
-
-        message.setSubject("Template message");
-
-        return message;
-    }
-
-    /**
-     * Creates a text part from the specified string.
-     */
-    private static BodyPart createTextPart(String text) {
-        TextBody body = new StorageBodyFactory().textBody(text, "UTF-8");
-
-        BodyPart bodyPart = new BodyPart();
-        bodyPart.setText(body);
-        bodyPart.setContentTransferEncoding("quoted-printable");
-
-        return bodyPart;
-    }
-
-    /**
-     * Creates a binary part with random content.
-     */
-    private static BodyPart createRandomBinaryPart(int numberOfBytes)
+    private static byte[] createRandomBinary(int numberOfBytes)
             throws IOException {
         byte[] data = new byte[numberOfBytes];
         new Random().nextBytes(data);
-
-        Body body = new StorageBodyFactory()
-                .binaryBody(new ByteArrayInputStream(data));
-
-        BodyPart bodyPart = new BodyPart();
-        bodyPart.setBody(body, "application/octet-stream");
-        bodyPart.setContentTransferEncoding("base64");
-
-        return bodyPart;
+        return data;
     }
 
 }

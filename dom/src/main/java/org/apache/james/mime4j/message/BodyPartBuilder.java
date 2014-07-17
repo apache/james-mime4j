@@ -23,8 +23,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Date;
 
+import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
-import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
 
@@ -33,8 +36,21 @@ import org.apache.james.mime4j.stream.NameValuePair;
  */
 public class BodyPartBuilder extends AbstractEntityBuilder {
 
+    private BodyFactory bodyFactory;
+
     public static BodyPartBuilder create() {
         return new BodyPartBuilder();
+    }
+
+    /**
+     * Sets {@link org.apache.james.mime4j.message.BodyFactory} that will be
+     * used to generate message body.
+     *
+     * @param bodyFactory body factory.
+     */
+    public BodyPartBuilder use(BodyFactory bodyFactory) {
+        this.bodyFactory = bodyFactory;
+        return this;
     }
 
     @Override
@@ -102,22 +118,68 @@ public class BodyPartBuilder extends AbstractEntityBuilder {
         return this;
     }
 
-    @Override
-    public BodyPartBuilder use(final BodyFactory bodyFactory) {
-        super.use(bodyFactory);
-        return this;
-    }
-
-    @Override
+    /**
+     * Sets text of this message with the charset.
+     *
+     * @param text
+     *            the text.
+     * @param charset
+     *            the charset of the text.
+     */
     public BodyPartBuilder setBody(String text, Charset charset) throws IOException {
-        super.setBody(text, charset);
-        return this;
+        return setBody(text, null, charset);
     }
 
-    @Override
+    /**
+     * Sets text of this message with the given MIME subtype and charset.
+     *
+     * @param text
+     *            the text.
+     * @param charset
+     *            the charset of the text.
+     * @param subtype
+     *            the text subtype (e.g. &quot;plain&quot;, &quot;html&quot; or
+     *            &quot;xml&quot;).
+     */
     public BodyPartBuilder setBody(String text, String subtype, Charset charset) throws IOException {
-        super.setBody(text, subtype, charset);
-        return this;
+        if (subtype != null) {
+            if (charset != null) {
+                setField(Fields.contentType("text/" + subtype, new NameValuePair("charset", charset.name())));
+            } else {
+                setField(Fields.contentType("text/" + subtype));
+            }
+        }
+        TextBody textBody;
+        if (bodyFactory != null) {
+            textBody = bodyFactory.textBody(
+                    InputStreams.create(text, charset),
+                    charset != null ? charset.name() : null);
+        } else {
+            textBody = BasicBodyFactory.INSTANCE.textBody(text, charset);
+        }
+        return setBody(textBody);
+    }
+
+    /**
+     * Sets binary content of this message with the given MIME type.
+     *
+     * @param body
+     *            the body.
+     * @param mimeType
+     *            the MIME media type of the specified body
+     *            (&quot;type/subtype&quot;).
+     */
+    public BodyPartBuilder setBody(byte[] bin, String mimeType) throws IOException {
+        if (mimeType != null) {
+            setField(Fields.contentType(mimeType));
+        }
+        BinaryBody binBody;
+        if (bodyFactory != null) {
+            binBody = bodyFactory.binaryBody(InputStreams.create(bin));
+        } else {
+            binBody = BasicBodyFactory.INSTANCE.binaryBody(bin);
+        }
+        return setBody(binBody);
     }
 
     public BodyPart build() {

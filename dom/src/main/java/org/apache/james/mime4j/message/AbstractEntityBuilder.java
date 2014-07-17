@@ -19,8 +19,6 @@
 
 package org.apache.james.mime4j.message;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,7 +37,6 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.Fields;
-import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -50,8 +47,6 @@ abstract class AbstractEntityBuilder {
     private final Map<String, List<Field>> fieldMap;
 
     private Body body;
-
-    private BodyFactory bodyFactory;
 
     AbstractEntityBuilder() {
         this.fields = new LinkedList<Field>();
@@ -186,6 +181,15 @@ abstract class AbstractEntityBuilder {
             }
         }
         fields.add(firstOccurrence, field);
+        return this;
+    }
+
+    /**
+     * Clears all fields.
+     */
+    public AbstractEntityBuilder clearFields() {
+        fields.clear();
+        fieldMap.clear();
         return this;
     }
 
@@ -451,59 +455,6 @@ abstract class AbstractEntityBuilder {
             }
         }
         return this;
-    }
-
-    /**
-     * Sets {@link org.apache.james.mime4j.message.BodyFactory} that will be
-     * used to generate message body.
-     *
-     * @param bodyFactory body factory.
-     */
-    public AbstractEntityBuilder use(final BodyFactory bodyFactory) {
-        this.bodyFactory = bodyFactory;
-        return this;
-    }
-
-    /**
-     * Sets text of this message with the charset.
-     *
-     * @param text
-     *            the text.
-     * @param charset
-     *            the charset of the text.
-     */
-    public AbstractEntityBuilder setBody(String text, Charset charset) throws IOException {
-        return setBody(text, null, charset);
-    }
-
-    /**
-     * Sets text of this message with the given MIME subtype and charset.
-     *
-     * @param text
-     *            the text.
-     * @param charset
-     *            the charset of the text.
-     * @param subtype
-     *            the text subtype (e.g. &quot;plain&quot;, &quot;html&quot; or
-     *            &quot;xml&quot;).
-     */
-    public AbstractEntityBuilder setBody(String text, String subtype, Charset charset) throws IOException {
-        if (subtype != null) {
-            if (charset != null) {
-                setField(Fields.contentType("text/" + subtype, new NameValuePair("charset", charset.name())));
-            } else {
-                setField(Fields.contentType("text/" + subtype));
-            }
-        }
-        TextBody textBody;
-        if (bodyFactory != null) {
-            textBody = bodyFactory.textBody(
-                    InputStreams.create(text, charset),
-                    charset != null ? charset.name() : null);
-        } else {
-            textBody = BasicBodyFactory.INSTANCE.textBody(text, charset);
-        }
-        return setBody(textBody);
     }
 
     /**

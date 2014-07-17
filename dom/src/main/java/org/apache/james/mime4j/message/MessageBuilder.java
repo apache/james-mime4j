@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,9 +30,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
+import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.SingleBody;
+import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Mailbox;
@@ -43,9 +52,15 @@ import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.ParseException;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
+import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.field.address.AddressBuilder;
+import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.NameValuePair;
 
 /**
@@ -53,8 +68,110 @@ import org.apache.james.mime4j.stream.NameValuePair;
  */
 public class MessageBuilder extends AbstractEntityBuilder {
 
+    private MimeConfig config;
+    private DecodeMonitor monitor;
+    private BodyDescriptorBuilder bodyDescBuilder;
+    private FieldParser<?> fieldParser;
+    private BodyFactory bodyFactory;
+    private boolean flatMode;
+    private boolean rawContent;
+
     public static MessageBuilder create() {
         return new MessageBuilder();
+    }
+
+    public static MessageBuilder createCopy(Message other) {
+        return new MessageBuilder().copy(other);
+    }
+
+    public static MessageBuilder read(final InputStream is) throws IOException {
+        return new MessageBuilder().parse(is);
+    }
+
+    /**
+     * Sets MIME configuration.
+     *
+     * @param config the configuration.
+     */
+    public MessageBuilder use(MimeConfig config) {
+        this.config = config;
+        return this;
+    }
+
+    /**
+     * Sets {@link org.apache.james.mime4j.codec.DecodeMonitor} that will be
+     * used to handle malformed data when executing {@link #parse(java.io.InputStream)}.
+     *
+     * @param monitor the decoder monitor.
+     */
+    public MessageBuilder use(DecodeMonitor monitor) {
+        this.monitor = monitor;
+        return this;
+    }
+
+    /**
+     * Sets {@link org.apache.james.mime4j.stream.BodyDescriptorBuilder} that will be
+     * used to generate body descriptors when executing {@link #parse(java.io.InputStream)}.
+     *
+     * @param bodyDescBuilder the body descriptor builder.
+     */
+    public MessageBuilder use(BodyDescriptorBuilder bodyDescBuilder) {
+        this.bodyDescBuilder = bodyDescBuilder;
+        return this;
+    }
+
+    /**
+     * Sets {@link org.apache.james.mime4j.dom.FieldParser} that will be
+     * used to generate parse message fields when executing {@link #parse(java.io.InputStream)}.
+     *
+     * @param fieldParser the field parser.
+     */
+    public MessageBuilder use(FieldParser<?> fieldParser) {
+        this.fieldParser = fieldParser;
+        return this;
+    }
+
+    /**
+     * Sets {@link org.apache.james.mime4j.message.BodyFactory} that will be
+     * used to generate message body.
+     *
+     * @param bodyFactory the body factory.
+     */
+    public MessageBuilder use(BodyFactory bodyFactory) {
+        this.bodyFactory = bodyFactory;
+        return this;
+    }
+
+    /**
+     * Enables flat parsing mode for {@link #parse(java.io.InputStream)} operation.
+     */
+    public MessageBuilder enableFlatMode() {
+        this.flatMode = true;
+        return this;
+    }
+
+    /**
+     * Disables flat parsing mode for {@link #parse(java.io.InputStream)} operation.
+     */
+    public MessageBuilder disableFlatMode() {
+        this.flatMode = false;
+        return this;
+    }
+
+    /**
+     * Enables automatic content decoding for {@link #parse(java.io.InputStream)} operation.
+     */
+    public MessageBuilder enableContentDecoding() {
+        this.rawContent = false;
+        return this;
+    }
+
+    /**
+     * Enables disable content decoding for {@link #parse(java.io.InputStream)} operation.
+     */
+    public MessageBuilder disableContentDecoding() {
+        this.rawContent = true;
+        return this;
     }
 
     @Override
@@ -72,6 +189,12 @@ public class MessageBuilder extends AbstractEntityBuilder {
     @Override
     public AbstractEntityBuilder removeFields(String name) {
         super.removeFields(name);
+        return this;
+    }
+
+    @Override
+    public AbstractEntityBuilder clearFields() {
+        super.clearFields();
         return this;
     }
 
@@ -118,22 +241,68 @@ public class MessageBuilder extends AbstractEntityBuilder {
         return this;
     }
 
-    @Override
-    public MessageBuilder use(final BodyFactory bodyFactory) {
-        super.use(bodyFactory);
-        return this;
-    }
-
-    @Override
+    /**
+     * Sets text of this message with the charset.
+     *
+     * @param text
+     *            the text.
+     * @param charset
+     *            the charset of the text.
+     */
     public MessageBuilder setBody(String text, Charset charset) throws IOException {
-        super.setBody(text, charset);
-        return this;
+        return setBody(text, null, charset);
     }
 
-    @Override
+    /**
+     * Sets text of this message with the given MIME subtype and charset.
+     *
+     * @param text
+     *            the text.
+     * @param charset
+     *            the charset of the text.
+     * @param subtype
+     *            the text subtype (e.g. &quot;plain&quot;, &quot;html&quot; or
+     *            &quot;xml&quot;).
+     */
     public MessageBuilder setBody(String text, String subtype, Charset charset) throws IOException {
-        super.setBody(text, subtype, charset);
-        return this;
+        if (subtype != null) {
+            if (charset != null) {
+                setField(Fields.contentType("text/" + subtype, new NameValuePair("charset", charset.name())));
+            } else {
+                setField(Fields.contentType("text/" + subtype));
+            }
+        }
+        TextBody textBody;
+        if (bodyFactory != null) {
+            textBody = bodyFactory.textBody(
+                    InputStreams.create(text, charset),
+                    charset != null ? charset.name() : null);
+        } else {
+            textBody = BasicBodyFactory.INSTANCE.textBody(text, charset);
+        }
+        return setBody(textBody);
+    }
+
+    /**
+     * Sets binary content of this message with the given MIME type.
+     *
+     * @param body
+     *            the body.
+     * @param mimeType
+     *            the MIME media type of the specified body
+     *            (&quot;type/subtype&quot;).
+     */
+    public MessageBuilder setBody(byte[] bin, String mimeType) throws IOException {
+        if (mimeType != null) {
+            setField(Fields.contentType(mimeType));
+        }
+        BinaryBody binBody;
+        if (bodyFactory != null) {
+            binBody = bodyFactory.binaryBody(InputStreams.create(bin));
+        } else {
+            binBody = BasicBodyFactory.INSTANCE.binaryBody(bin);
+        }
+        return setBody(binBody);
     }
 
     /**
@@ -676,9 +845,65 @@ public class MessageBuilder extends AbstractEntityBuilder {
         return this;
     }
 
+    public MessageBuilder copy(Message other) {
+        if (other == null) {
+            return this;
+        }
+        clearFields();
+        final Header otherHeader = other.getHeader();
+        if (otherHeader != null) {
+            final List<Field> otherFields = otherHeader.getFields();
+            for (Field field: otherFields) {
+                addField(field);
+            }
+        }
+        Body body = null;
+        Body otherBody = other.getBody();
+        if (otherBody instanceof Message) {
+            body = MessageBuilder.createCopy((Message) otherBody).build();
+        } else if (otherBody instanceof Multipart) {
+            body = MultipartBuilder.createCopy((Multipart) otherBody).build();
+        } else if (otherBody instanceof SingleBody) {
+            body = ((SingleBody) otherBody).copy();
+        }
+        setBody(body);
+        return this;
+    }
+
+    public MessageBuilder parse(final InputStream is) throws IOException {
+        MimeConfig currentConfig = config != null ? config : MimeConfig.DEFAULT;
+        boolean strict = currentConfig.isStrictParsing();
+        DecodeMonitor currentMonitor = monitor != null ? monitor : strict ? DecodeMonitor.STRICT : DecodeMonitor.SILENT;
+        BodyDescriptorBuilder currentBodyDescBuilder = bodyDescBuilder != null ? bodyDescBuilder :
+                new DefaultBodyDescriptorBuilder(null, fieldParser != null ? fieldParser :
+                        strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser(), currentMonitor);
+        BodyFactory currentBodyFactory = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
+        MimeStreamParser parser = new MimeStreamParser(currentConfig, currentMonitor, currentBodyDescBuilder);
+
+        Message message = new MessageImpl();
+        parser.setContentHandler(new EntityBuilder(message, currentBodyFactory));
+        parser.setContentDecoding(!rawContent);
+        if (flatMode) {
+            parser.setFlat();
+        }
+        try {
+            parser.parse(is);
+        } catch (MimeException e) {
+            throw new MimeIOException(e);
+        }
+        clearFields();
+        final List<Field> fields = message.getHeader().getFields();
+        for (Field field: fields) {
+            addField(field);
+        }
+        setBody(message.getBody());
+        return this;
+    }
+
     public Message build() {
         MessageImpl message = new MessageImpl();
-        Header header = message.getHeader();
+        HeaderImpl header = new HeaderImpl();
+        message.setHeader(header);
         if (!containsField(FieldName.MIME_VERSION)) {
             header.setField(Fields.version("1.0"));
         }
