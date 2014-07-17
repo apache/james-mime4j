@@ -39,14 +39,14 @@ import java.util.Stack;
  * A <code>ContentHandler</code> for building an <code>Entity</code> to be
  * used in conjunction with a {@link org.apache.james.mime4j.parser.MimeStreamParser}.
  */
-class EntityBuilder implements ContentHandler {
+class ParserStreamContentHandler implements ContentHandler {
 
     private final Entity entity;
-    private MessageImplFactory messageImplFactory;
+    private final MessageImplFactory messageImplFactory;
     private final BodyFactory bodyFactory;
     private final Stack<Object> stack;
 
-    EntityBuilder(
+    ParserStreamContentHandler(
             final Entity entity,
             final BodyFactory bodyFactory) {
         this.entity = entity;
@@ -55,7 +55,7 @@ class EntityBuilder implements ContentHandler {
         this.stack = new Stack<Object>();
     }
 
-    EntityBuilder(
+    ParserStreamContentHandler(
             final Entity entity,
             final MessageImplFactory messageImplFactory,
             final BodyFactory bodyFactory) {
@@ -118,25 +118,7 @@ class EntityBuilder implements ContentHandler {
     public void body(BodyDescriptor bd, final InputStream is) throws MimeException, IOException {
         expect(Entity.class);
 
-        // NO NEED TO MANUALLY RUN DECODING.
-        // The parser has a "setContentDecoding" method. We should
-        // simply instantiate the MimeStreamParser with that method.
-
-        // final String enc = bd.getTransferEncoding();
-
         final Body body;
-
-        /*
-        final InputStream decodedStream;
-        if (MimeUtil.ENC_BASE64.equals(enc)) {
-            decodedStream = new Base64InputStream(is);
-        } else if (MimeUtil.ENC_QUOTED_PRINTABLE.equals(enc)) {
-            decodedStream = new QuotedPrintableInputStream(is);
-        } else {
-            decodedStream = is;
-        }
-        */
-
         if (bd.getMimeType().startsWith("text/")) {
             body = bodyFactory.textBody(is, bd.getCharset());
         } else {

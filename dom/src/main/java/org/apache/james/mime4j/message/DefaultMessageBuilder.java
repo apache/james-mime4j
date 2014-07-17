@@ -304,9 +304,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
                     strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser(), mon);
             BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
             MimeStreamParser parser = new MimeStreamParser(cfg, mon, bdb);
-            // EntityBuilder expect the parser will send ParserFields for the well known fields
-            // It will throw exceptions, otherwise.
-            parser.setContentHandler(new EntityBuilder(message, bf));
+            parser.setContentHandler(new ParserStreamContentHandler(message, bf));
             parser.setContentDecoding(contentDecoding);
             if (flatMode) {
                 parser.setFlat();

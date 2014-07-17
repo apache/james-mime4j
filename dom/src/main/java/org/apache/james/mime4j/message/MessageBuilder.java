@@ -881,7 +881,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
         MimeStreamParser parser = new MimeStreamParser(currentConfig, currentMonitor, currentBodyDescBuilder);
 
         Message message = new MessageImpl();
-        parser.setContentHandler(new EntityBuilder(message, currentBodyFactory));
+        parser.setContentHandler(new ParserStreamContentHandler(message, currentBodyFactory));
         parser.setContentDecoding(!rawContent);
         if (flatMode) {
             parser.setFlat();
