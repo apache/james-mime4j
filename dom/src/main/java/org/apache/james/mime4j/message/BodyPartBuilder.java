@@ -25,6 +25,8 @@ import java.util.Date;
 
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
+import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.io.InputStreams;
@@ -118,6 +120,30 @@ public class BodyPartBuilder extends AbstractEntityBuilder {
         return this;
     }
 
+    @Override
+    public BodyPartBuilder setBody(TextBody textBody) {
+        super.setBody(textBody);
+        return this;
+    }
+
+    @Override
+    public BodyPartBuilder setBody(BinaryBody binaryBody) {
+        super.setBody(binaryBody);
+        return this;
+    }
+
+    @Override
+    public BodyPartBuilder setBody(Multipart multipart) {
+        super.setBody(multipart);
+        return this;
+    }
+
+    @Override
+    public BodyPartBuilder setBody(Message message) {
+        super.setBody(message);
+        return this;
+    }
+
     /**
      * Sets text of this message with the charset.
      *
@@ -142,14 +168,13 @@ public class BodyPartBuilder extends AbstractEntityBuilder {
      *            &quot;xml&quot;).
      */
     public BodyPartBuilder setBody(String text, String subtype, Charset charset) throws IOException {
-        if (subtype != null) {
-            if (charset != null) {
-                setField(Fields.contentType("text/" + subtype, new NameValuePair("charset", charset.name())));
-            } else {
-                setField(Fields.contentType("text/" + subtype));
-            }
+        String mimeType = "text/" + (subtype != null ? subtype : "plain");
+        if (charset != null) {
+            setField(Fields.contentType(mimeType, new NameValuePair("charset", charset.name())));
+        } else {
+            setField(Fields.contentType(mimeType));
         }
-        TextBody textBody;
+        Body textBody;
         if (bodyFactory != null) {
             textBody = bodyFactory.textBody(
                     InputStreams.create(text, charset),
@@ -170,10 +195,8 @@ public class BodyPartBuilder extends AbstractEntityBuilder {
      *            (&quot;type/subtype&quot;).
      */
     public BodyPartBuilder setBody(byte[] bin, String mimeType) throws IOException {
-        if (mimeType != null) {
-            setField(Fields.contentType(mimeType));
-        }
-        BinaryBody binBody;
+        setField(Fields.contentType(mimeType != null ? mimeType : "application/octet-stream"));
+        Body binBody;
         if (bodyFactory != null) {
             binBody = bodyFactory.binaryBody(InputStreams.create(bin));
         } else {

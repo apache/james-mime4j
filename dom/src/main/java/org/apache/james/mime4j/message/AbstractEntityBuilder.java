@@ -25,8 +25,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
@@ -59,10 +61,10 @@ abstract class AbstractEntityBuilder {
      * @param field the field to add.
      */
     public AbstractEntityBuilder addField(Field field) {
-        List<Field> values = fieldMap.get(field.getName().toLowerCase());
+        List<Field> values = fieldMap.get(field.getName().toLowerCase(Locale.US));
         if (values == null) {
             values = new LinkedList<Field>();
-            fieldMap.put(field.getName().toLowerCase(), values);
+            fieldMap.put(field.getName().toLowerCase(Locale.US), values);
         }
         values.add(field);
         fields.add(field);
@@ -87,7 +89,7 @@ abstract class AbstractEntityBuilder {
      * @return the field or <code>null</code> if none found.
      */
     public Field getField(String name) {
-        List<Field> l = fieldMap.get(name.toLowerCase());
+        List<Field> l = fieldMap.get(name.toLowerCase(Locale.US));
         if (l != null && !l.isEmpty()) {
             return l.get(0);
         }
@@ -103,7 +105,7 @@ abstract class AbstractEntityBuilder {
      * set field with the given name, <code>false<code/> otherwise.
      */
     public boolean containsField(String name) {
-        List<Field> l = fieldMap.get(name.toLowerCase());
+        List<Field> l = fieldMap.get(name.toLowerCase(Locale.US));
         return l != null && !l.isEmpty();
     }
 
@@ -114,7 +116,7 @@ abstract class AbstractEntityBuilder {
      * @return the list of fields.
      */
     public List<Field> getFields(final String name) {
-        final String lowerCaseName = name.toLowerCase();
+        final String lowerCaseName = name.toLowerCase(Locale.US);
         final List<Field> l = fieldMap.get(lowerCaseName);
         final List<Field> results;
         if (l == null || l.isEmpty()) {
@@ -132,7 +134,7 @@ abstract class AbstractEntityBuilder {
      *            the field name (e.g. From, Subject).
      */
     public AbstractEntityBuilder removeFields(String name) {
-        final String lowerCaseName = name.toLowerCase();
+        final String lowerCaseName = name.toLowerCase(Locale.US);
         List<Field> removed = fieldMap.remove(lowerCaseName);
         if (removed == null || removed.isEmpty()) {
             return this;
@@ -159,7 +161,7 @@ abstract class AbstractEntityBuilder {
      * @param field the field to set.
      */
     public AbstractEntityBuilder setField(Field field) {
-        final String lowerCaseName = field.getName().toLowerCase();
+        final String lowerCaseName = field.getName().toLowerCase(Locale.US);
         List<Field> l = fieldMap.get(lowerCaseName);
         if (l == null || l.isEmpty()) {
             addField(field);
@@ -434,25 +436,85 @@ abstract class AbstractEntityBuilder {
      */
     public AbstractEntityBuilder setBody(Body body) {
         this.body = body;
-        if (!containsField(FieldName.CONTENT_TYPE) && body != null) {
-            if (body instanceof Message) {
-                setField(Fields.contentType("message/rfc822"));
-            } else if (body instanceof Multipart) {
-                Multipart multipart = (Multipart) body;
+        if (body == null) {
+            removeFields(FieldName.CONTENT_TYPE);
+        }
+        return this;
+    }
+
+    /**
+     * Sets body of this message.  Also sets the content type based on properties of
+     * the given {@link org.apache.james.mime4j.dom.Body}.
+     *
+     * @param body
+     *            the body.
+     */
+    public AbstractEntityBuilder setBody(TextBody textBody) {
+        this.body = textBody;
+        if (textBody != null) {
+            String mimeCharset = textBody.getMimeCharset();
+            if ("us-ascii".equalsIgnoreCase(mimeCharset)) {
+                mimeCharset = null;
+            }
+            if (mimeCharset != null) {
+                setField(Fields.contentType("text/plain", new NameValuePair("charset", mimeCharset)));
+            } else {
+                setField(Fields.contentType("text/plain"));
+            }
+        } else {
+            removeFields(FieldName.CONTENT_TYPE);
+        }
+        return this;
+    }
+
+    /**
+     * Sets binaryBody of this message.  Also sets the content type based on properties of
+     * the given {@link org.apache.james.mime4j.dom.Body}.
+     *
+     * @param binaryBody
+     *            the binaryBody.
+     */
+    public AbstractEntityBuilder setBody(BinaryBody binaryBody) {
+        this.body = binaryBody;
+        if (binaryBody != null) {
+            setField(Fields.contentType("application/octet-stream"));
+        } else {
+            removeFields(FieldName.CONTENT_TYPE);
+        }
+        return this;
+    }
+
+    /**
+     * Sets body of this message.  Also sets the content type based on properties of
+     * the given {@link org.apache.james.mime4j.dom.Body}.
+     *
+     * @param body
+     *            the body.
+     */
+    public AbstractEntityBuilder setBody(Message message) {
+        this.body = message;
+        if (message != null) {
+            setField(Fields.contentType("message/rfc822"));
+        } else {
+            removeFields(FieldName.CONTENT_TYPE);
+        }
+        return this;
+    }
+
+    /**
+     * Sets body of this message.  Also sets the content type based on properties of
+     * the given {@link org.apache.james.mime4j.dom.Body}.
+     *
+     * @param body
+     *            the body.
+     */
+    public AbstractEntityBuilder setBody(Multipart multipart) {
+        this.body = multipart;
+        if (multipart != null) {
                 setField(Fields.contentType("multipart/" + multipart.getSubType(),
                         new NameValuePair("boundary", MimeUtil.createUniqueBoundary())));
-            } else if (body instanceof TextBody) {
-                TextBody textBody = (TextBody) body;
-                String mimeCharset = textBody.getMimeCharset();
-                if ("us-ascii".equalsIgnoreCase(mimeCharset)) {
-                    mimeCharset = null;
-                }
-                if (mimeCharset != null) {
-                    setField(Fields.contentType("text/plain", new NameValuePair("charset", mimeCharset)));
-                } else {
-                    setField(Fields.contentType("text/plain"));
-                }
-            }
+        } else {
+            removeFields(FieldName.CONTENT_TYPE);
         }
         return this;
     }

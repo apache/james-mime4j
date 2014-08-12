@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
@@ -35,6 +36,7 @@ import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.NameValuePair;
 
 /**
  * {@link org.apache.james.mime4j.dom.Multipart} builder.
@@ -219,10 +221,22 @@ public class MultipartBuilder {
         Charset cs = charset != null ? charset : Charsets.ISO_8859_1;
         TextBody body = bodyFactory != null ? bodyFactory.textBody(
                 InputStreams.create(text, cs), cs.name()) : BasicBodyFactory.INSTANCE.textBody(text, cs);
-        BodyPart bodyPart = new BodyPart();
-        bodyPart.setText(body);
-        bodyPart.setContentTransferEncoding("quoted-printable");
+        BodyPart bodyPart = BodyPartBuilder.create()
+                .setBody(body)
+                .setContentType("text/plain", new NameValuePair("charset", cs.name()))
+                .setContentTransferEncoding("quoted-printable")
+                .build();
+        return addBodyPart(bodyPart);
+    }
 
+    public MultipartBuilder addBinaryPart(byte[] bin, String mimeType) throws IOException {
+        BinaryBody body = bodyFactory != null ? bodyFactory.binaryBody(InputStreams.create(bin)) :
+                BasicBodyFactory.INSTANCE.binaryBody(bin);
+        BodyPart bodyPart = BodyPartBuilder.create()
+                .setBody(body)
+                .setContentType(mimeType)
+                .setContentTransferEncoding("base64")
+                .build();
         return addBodyPart(bodyPart);
     }
 

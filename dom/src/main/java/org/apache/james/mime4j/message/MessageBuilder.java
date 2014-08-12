@@ -241,6 +241,30 @@ public class MessageBuilder extends AbstractEntityBuilder {
         return this;
     }
 
+    @Override
+    public MessageBuilder setBody(TextBody textBody) {
+        super.setBody(textBody);
+        return this;
+    }
+
+    @Override
+    public MessageBuilder setBody(BinaryBody binaryBody) {
+        super.setBody(binaryBody);
+        return this;
+    }
+
+    @Override
+    public MessageBuilder setBody(Multipart multipart) {
+        super.setBody(multipart);
+        return this;
+    }
+
+    @Override
+    public MessageBuilder setBody(Message message) {
+        super.setBody(message);
+        return this;
+    }
+
     /**
      * Sets text of this message with the charset.
      *
@@ -265,14 +289,13 @@ public class MessageBuilder extends AbstractEntityBuilder {
      *            &quot;xml&quot;).
      */
     public MessageBuilder setBody(String text, String subtype, Charset charset) throws IOException {
-        if (subtype != null) {
-            if (charset != null) {
-                setField(Fields.contentType("text/" + subtype, new NameValuePair("charset", charset.name())));
-            } else {
-                setField(Fields.contentType("text/" + subtype));
-            }
+        String mimeType = "text/" + (subtype != null ? subtype : "plain");
+        if (charset != null) {
+            setField(Fields.contentType(mimeType, new NameValuePair("charset", charset.name())));
+        } else {
+            setField(Fields.contentType(mimeType));
         }
-        TextBody textBody;
+        Body textBody;
         if (bodyFactory != null) {
             textBody = bodyFactory.textBody(
                     InputStreams.create(text, charset),
@@ -293,10 +316,8 @@ public class MessageBuilder extends AbstractEntityBuilder {
      *            (&quot;type/subtype&quot;).
      */
     public MessageBuilder setBody(byte[] bin, String mimeType) throws IOException {
-        if (mimeType != null) {
-            setField(Fields.contentType(mimeType));
-        }
-        BinaryBody binBody;
+        setField(Fields.contentType(mimeType != null ? mimeType : "application/octet-stream"));
+        Body binBody;
         if (bodyFactory != null) {
             binBody = bodyFactory.binaryBody(InputStreams.create(bin));
         } else {
