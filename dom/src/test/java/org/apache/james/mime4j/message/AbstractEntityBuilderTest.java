@@ -29,6 +29,7 @@ import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
@@ -85,20 +86,27 @@ public class AbstractEntityBuilderTest {
         builder.addField(field3);
 
         Assert.assertSame(field2, builder.getField("Content-Transfer-Encoding"));
+        Assert.assertSame(field2, builder.getField("Content-Transfer-Encoding", ContentTransferEncodingField.class));
         List<Field> fields5 = builder.getFields("Content-Transfer-Encoding");
         Assert.assertNotNull(fields5);
         Assert.assertEquals(2, fields5.size());
         Assert.assertSame(field2, fields5.get(0));
         Assert.assertSame(field3, fields5.get(1));
 
+        List<ContentTransferEncodingField> fields6 = builder.getFields("Content-Transfer-Encoding", ContentTransferEncodingField.class);
+        Assert.assertNotNull(fields6);
+        Assert.assertEquals(2, fields6.size());
+        Assert.assertSame(field2, fields6.get(0));
+        Assert.assertSame(field3, fields6.get(1));
+
         builder.clearFields();
 
         Assert.assertFalse(builder.containsField("Content-Type"));
         Assert.assertFalse(builder.containsField("Content-Transfer-Encoding"));
 
-        List<Field> fields6 = builder.getFields();
-        Assert.assertNotNull(fields6);
-        Assert.assertEquals(0, fields6.size());
+        List<Field> fields7 = builder.getFields();
+        Assert.assertNotNull(fields7);
+        Assert.assertEquals(0, fields7.size());
     }
 
     @Test

@@ -54,12 +54,33 @@ public interface Header extends Iterable<Field> {
     Field getField(String name);
 
     /**
+     * Gets a <code>Field</code> given a field name and of the given type.
+     * If there are multiple such fields defined in this header the first
+     * one will be returned.
+     *
+     * @param name the field name (e.g. From, Subject).
+     * @param clazz the field class.
+     * @return the field or <code>null</code> if none found.
+     */
+    <F extends Field> F getField(String name, Class<F> clazz);
+
+    /**
      * Gets all <code>Field</code>s having the specified field name.
      *
      * @param name the field name (e.g. From, Subject).
      * @return the list of fields.
      */
     List<Field> getFields(final String name);
+
+    /**
+     * Gets all <code>Field</code>s having the specified field name
+     * and of the given type.
+     *
+     * @param name the field name (e.g. From, Subject).
+     * @param clazz the field class.
+     * @return the list of fields.
+     */
+    <F extends Field> List<F> getFields(final String name, Class<F> clazz);
 
     /**
      * Returns an iterator over the list of fields of this header.

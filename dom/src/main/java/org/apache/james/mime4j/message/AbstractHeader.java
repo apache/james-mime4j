@@ -19,11 +19,13 @@
 
 package org.apache.james.mime4j.message;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.james.mime4j.dom.Header;
@@ -65,10 +67,10 @@ public abstract class AbstractHeader implements Header {
      * @param field the field to add.
      */
     public void addField(Field field) {
-        List<Field> values = fieldMap.get(field.getName().toLowerCase());
+        List<Field> values = fieldMap.get(field.getName().toLowerCase(Locale.US));
         if (values == null) {
             values = new LinkedList<Field>();
-            fieldMap.put(field.getName().toLowerCase(), values);
+            fieldMap.put(field.getName().toLowerCase(Locale.US), values);
         }
         values.add(field);
         fields.add(field);
@@ -92,9 +94,29 @@ public abstract class AbstractHeader implements Header {
      * @return the field or <code>null</code> if none found.
      */
     public Field getField(String name) {
-        List<Field> l = fieldMap.get(name.toLowerCase());
+        List<Field> l = fieldMap.get(name.toLowerCase(Locale.US));
         if (l != null && !l.isEmpty()) {
             return l.get(0);
+        }
+        return null;
+    }
+
+    /**
+     * Gets a <code>Field</code> given a field name and of the given type.
+     * If there are multiple such fields defined in this header the first
+     * one will be returned.
+     *
+     * @param name the field name (e.g. From, Subject).
+     * @param clazz the field class.
+     * @return the field or <code>null</code> if none found.
+     */
+    public <F extends Field> F getField(final String name, final Class<F> clazz) {
+        List<Field> l = fieldMap.get(name.toLowerCase(Locale.US));
+        for (int i = 0; i < l.size(); i++) {
+            Field field = l.get(i);
+            if (clazz.isInstance(field)) {
+                return clazz.cast(field);
+            }
         }
         return null;
     }
@@ -106,13 +128,37 @@ public abstract class AbstractHeader implements Header {
      * @return the list of fields.
      */
     public List<Field> getFields(final String name) {
-        final String lowerCaseName = name.toLowerCase();
+        final String lowerCaseName = name.toLowerCase(Locale.US);
         final List<Field> l = fieldMap.get(lowerCaseName);
         final List<Field> results;
         if (l == null || l.isEmpty()) {
             results = Collections.emptyList();
         } else {
             results = Collections.unmodifiableList(l);
+        }
+        return results;
+    }
+
+    /**
+     * Gets all <code>Field</code>s having the specified field name
+     * and of the given type.
+     *
+     * @param name the field name (e.g. From, Subject).
+     * @param clazz the field class.
+     * @return the list of fields.
+     */
+    public <F extends Field> List<F> getFields(final String name, final Class<F> clazz) {
+        final String lowerCaseName = name.toLowerCase(Locale.US);
+        final List<Field> l = fieldMap.get(lowerCaseName);
+        if (l == null) {
+            return Collections.emptyList();
+        }
+        final List<F> results = new ArrayList<F>();
+        for (int i = 0; i < l.size(); i++) {
+            Field field = l.get(i);
+            if (clazz.isInstance(field)) {
+                results.add(clazz.cast(field));
+            }
         }
         return results;
     }
@@ -134,7 +180,7 @@ public abstract class AbstractHeader implements Header {
      * @return number of fields removed.
      */
     public int removeFields(String name) {
-        final String lowerCaseName = name.toLowerCase();
+        final String lowerCaseName = name.toLowerCase(Locale.US);
         List<Field> removed = fieldMap.remove(lowerCaseName);
         if (removed == null || removed.isEmpty())
             return 0;
@@ -161,7 +207,7 @@ public abstract class AbstractHeader implements Header {
      * @param field the field to set.
      */
     public void setField(Field field) {
-        final String lowerCaseName = field.getName().toLowerCase();
+        final String lowerCaseName = field.getName().toLowerCase(Locale.US);
         List<Field> l = fieldMap.get(lowerCaseName);
         if (l == null || l.isEmpty()) {
             addField(field);

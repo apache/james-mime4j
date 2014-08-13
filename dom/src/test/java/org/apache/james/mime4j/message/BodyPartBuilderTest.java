@@ -69,7 +69,7 @@ public class BodyPartBuilderTest {
         Assert.assertNotNull(bodyPart);
         Body body = bodyPart.getBody();
         Assert.assertSame(bodyPart, body.getParent());
-        ContentTypeField field = (ContentTypeField) bodyPart.getHeader().getField("Content-Type");
+        ContentTypeField field = bodyPart.getHeader().getField("Content-Type", ContentTypeField.class);
         Assert.assertEquals("text/stuff", field.getMimeType());
         Assert.assertEquals(null, field.getCharset());
 
@@ -99,7 +99,7 @@ public class BodyPartBuilderTest {
         Assert.assertNotNull(bodyPart);
         Body body = bodyPart.getBody();
         Assert.assertSame(bodyPart, body.getParent());
-        ContentTypeField field = (ContentTypeField) bodyPart.getHeader().getField("Content-Type");
+        ContentTypeField field = bodyPart.getHeader().getField("Content-Type", ContentTypeField.class);
         Assert.assertEquals("application/octet-stream", field.getMimeType());
         Assert.assertEquals(null, field.getCharset());
 
