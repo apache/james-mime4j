@@ -19,18 +19,10 @@
 
 package org.apache.james.mime4j.message;
 
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Disposable;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
-import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.dom.Multipart;
-import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
@@ -131,145 +123,11 @@ public abstract class AbstractEntity implements Entity {
         return body;
     }
 
-    /**
-     * Sets the specified message as body of this entity and the content type to
-     * &quot;message/rfc822&quot;. A <code>Header</code> is created if this
-     * entity does not already have one.
-     *
-     * @param message
-     *            the message to set as body.
-     */
-    public void setMessage(Message message) {
-        setBody(message, "message/rfc822", null);
-    }
-
-    /**
-     * Sets the specified multipart as body of this entity. Also sets the
-     * content type accordingly and creates a message boundary string. A
-     * <code>Header</code> is created if this entity does not already have
-     * one.
-     *
-     * @param multipart
-     *            the multipart to set as body.
-     */
-    public void setMultipart(Multipart multipart) {
-        String mimeType = "multipart/" + multipart.getSubType();
-        Map<String, String> parameters = Collections.singletonMap("boundary",
-                newUniqueBoundary());
-
-        setBody(multipart, mimeType, parameters);
-    }
-
-    /**
-     * Sets the specified multipart as body of this entity. Also sets the
-     * content type accordingly and creates a message boundary string. A
-     * <code>Header</code> is created if this entity does not already have
-     * one.
-     *
-     * @param multipart
-     *            the multipart to set as body.
-     * @param parameters
-     *            additional parameters for the Content-Type header field.
-     */
-    public void setMultipart(Multipart multipart, Map<String, String> parameters) {
-        String mimeType = "multipart/" + multipart.getSubType();
-        if (!parameters.containsKey("boundary")) {
-            parameters = new HashMap<String, String>(parameters);
-            parameters.put("boundary", newUniqueBoundary());
-        }
-
-        setBody(multipart, mimeType, parameters);
-    }
-
-    /**
-     * Sets the specified <code>TextBody</code> as body of this entity and the
-     * content type to &quot;text/plain&quot;. A <code>Header</code> is
-     * created if this entity does not already have one.
-     *
-     * @param textBody
-     *            the <code>TextBody</code> to set as body.
-     * @see org.apache.james.mime4j.message.BodyFactory#textBody(java.io.InputStream, String)
-     */
-    public void setText(TextBody textBody) {
-        setText(textBody, "plain");
-    }
-
-    /**
-     * Sets the specified <code>TextBody</code> as body of this entity. Also
-     * sets the content type according to the specified sub-type. A
-     * <code>Header</code> is created if this entity does not already have
-     * one.
-     *
-     * @param textBody
-     *            the <code>TextBody</code> to set as body.
-     * @param subtype
-     *            the text subtype (e.g. &quot;plain&quot;, &quot;html&quot; or
-     *            &quot;xml&quot;).
-     */
-    public void setText(TextBody textBody, String subtype) {
-        String mimeType = "text/" + subtype;
-
-        Map<String, String> parameters = null;
-        String mimeCharset = textBody.getMimeCharset();
-        if (mimeCharset != null && !mimeCharset.equalsIgnoreCase("us-ascii")) {
-            parameters = Collections.singletonMap("charset", mimeCharset);
-        }
-
-        setBody(textBody, mimeType, parameters);
-    }
-
-    /**
-     * Sets the body of this entity and sets the content-type to the specified
-     * value. A <code>Header</code> is created if this entity does not already
-     * have one.
-     *
-     * @param body
-     *            the body.
-     * @param mimeType
-     *            the MIME media type of the specified body
-     *            (&quot;type/subtype&quot;).
-     */
-    public void setBody(Body body, String mimeType) {
-        setBody(body, mimeType, null);
-    }
-
-    /**
-     * Sets the body of this entity and sets the content-type to the specified
-     * value. A <code>Header</code> is created if this entity does not already
-     * have one.
-     *
-     * @param body
-     *            the body.
-     * @param mimeType
-     *            the MIME media type of the specified body
-     *            (&quot;type/subtype&quot;).
-     * @param parameters
-     *            additional parameters for the Content-Type header field.
-     */
-    public void setBody(Body body, String mimeType,
-            Map<String, String> parameters) {
-        setBody(body);
-
-        Header header = obtainHeader();
-        header.setField(newContentType(mimeType, parameters));
-    }
-
-    /**
-     * Determines the MIME type of this <code>Entity</code>. The MIME type
-     * is derived by looking at the parent's Content-Type field if no
-     * Content-Type field is set for this <code>Entity</code>.
-     *
-     * @return the MIME type.
-     */
     public String getMimeType() {
-        ContentTypeField child =
-            getContentTypeField();
-        ContentTypeField parent = getParent() != null
-            ? (ContentTypeField) getParent().getHeader().
-                                                getField(FieldName.CONTENT_TYPE)
-            : null;
-
-        return calcMimeType(child, parent);
+        ContentTypeField childType = getContentTypeField();
+        Entity parent = getParent();
+        ContentTypeField parentType = parent != null ? (ContentTypeField) (parent).getHeader().getField(FieldName.CONTENT_TYPE) : null;
+        return calcMimeType(childType, parentType);
     }
 
     private ContentTypeField getContentTypeField() {
@@ -298,18 +156,6 @@ public abstract class AbstractEntity implements Entity {
     }
 
     /**
-     * Sets the transfer encoding of this <code>Entity</code> to the specified
-     * value.
-     *
-     * @param contentTransferEncoding
-     *            transfer encoding to use.
-     */
-    public void setContentTransferEncoding(String contentTransferEncoding) {
-        Header header = obtainHeader();
-        header.setField(newContentTransferEncoding(contentTransferEncoding));
-    }
-
-    /**
      * Return the disposition type of the content disposition of this
      * <code>Entity</code>.
      *
@@ -325,91 +171,6 @@ public abstract class AbstractEntity implements Entity {
     }
 
     /**
-     * Sets the content disposition of this <code>Entity</code> to the
-     * specified disposition type. No filename, size or date parameters
-     * are included in the content disposition.
-     *
-     * @param dispositionType
-     *            disposition type value (usually <code>inline</code> or
-     *            <code>attachment</code>).
-     */
-    public void setContentDisposition(String dispositionType) {
-        Header header = obtainHeader();
-        header.setField(newContentDisposition(dispositionType, null, -1, null,
-                null, null));
-    }
-
-    /**
-     * Sets the content disposition of this <code>Entity</code> to the
-     * specified disposition type and filename. No size or date parameters are
-     * included in the content disposition.
-     *
-     * @param dispositionType
-     *            disposition type value (usually <code>inline</code> or
-     *            <code>attachment</code>).
-     * @param filename
-     *            filename parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     */
-    public void setContentDisposition(String dispositionType, String filename) {
-        Header header = obtainHeader();
-        header.setField(newContentDisposition(dispositionType, filename, -1,
-                null, null, null));
-    }
-
-    /**
-     * Sets the content disposition of this <code>Entity</code> to the
-     * specified values. No date parameters are included in the content
-     * disposition.
-     *
-     * @param dispositionType
-     *            disposition type value (usually <code>inline</code> or
-     *            <code>attachment</code>).
-     * @param filename
-     *            filename parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     * @param size
-     *            size parameter value or <code>-1</code> if the parameter
-     *            should not be included.
-     */
-    public void setContentDisposition(String dispositionType, String filename,
-            long size) {
-        Header header = obtainHeader();
-        header.setField(newContentDisposition(dispositionType, filename, size,
-                null, null, null));
-    }
-
-    /**
-     * Sets the content disposition of this <code>Entity</code> to the
-     * specified values.
-     *
-     * @param dispositionType
-     *            disposition type value (usually <code>inline</code> or
-     *            <code>attachment</code>).
-     * @param filename
-     *            filename parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     * @param size
-     *            size parameter value or <code>-1</code> if the parameter
-     *            should not be included.
-     * @param creationDate
-     *            creation-date parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     * @param modificationDate
-     *            modification-date parameter value or <code>null</code> if
-     *            the parameter should not be included.
-     * @param readDate
-     *            read-date parameter value or <code>null</code> if the
-     *            parameter should not be included.
-     */
-    public void setContentDisposition(String dispositionType, String filename,
-            long size, Date creationDate, Date modificationDate, Date readDate) {
-        Header header = obtainHeader();
-        header.setField(newContentDisposition(dispositionType, filename, size,
-                creationDate, modificationDate, readDate));
-    }
-
-    /**
      * Returns the filename parameter of the content disposition of this
      * <code>Entity</code>.
      *
@@ -422,51 +183,6 @@ public abstract class AbstractEntity implements Entity {
             return null;
 
         return field.getFilename();
-    }
-
-    /**
-     * Sets the filename parameter of the content disposition of this
-     * <code>Entity</code> to the specified value. If this entity does not
-     * have a content disposition header field a new one with disposition type
-     * <code>attachment</code> is created.
-     *
-     * @param filename
-     *            filename parameter value or <code>null</code> if the
-     *            parameter should be removed.
-     */
-    public void setFilename(String filename) {
-        Header header = obtainHeader();
-        ContentDispositionField field = (ContentDispositionField) header
-                .getField(FieldName.CONTENT_DISPOSITION);
-        if (field == null) {
-            if (filename != null) {
-                header.setField(newContentDisposition(
-                        ContentDispositionField.DISPOSITION_TYPE_ATTACHMENT,
-                        filename, -1, null, null, null));
-            }
-        } else {
-            String dispositionType = field.getDispositionType();
-            Map<String, String> parameters = new HashMap<String, String>(field
-                    .getParameters());
-            if (filename == null) {
-                parameters.remove(ContentDispositionField.PARAM_FILENAME);
-            } else {
-                parameters
-                        .put(ContentDispositionField.PARAM_FILENAME, filename);
-            }
-            header.setField(newContentDisposition(dispositionType, parameters));
-        }
-    }
-
-    /**
-     * Determines if the MIME type of this <code>Entity</code> matches the
-     * given one. MIME types are case-insensitive.
-     *
-     * @param type the MIME type to match against.
-     * @return <code>true</code> on match, <code>false</code> otherwise.
-     */
-    public boolean isMimeType(String type) {
-        return getMimeType().equalsIgnoreCase(type);
     }
 
     /**
@@ -530,21 +246,6 @@ public abstract class AbstractEntity implements Entity {
 
         return (F) header.getField(fieldName);
     }
-
-    protected abstract String newUniqueBoundary();
-
-    protected abstract ContentDispositionField newContentDisposition(
-            String dispositionType, String filename, long size,
-            Date creationDate, Date modificationDate, Date readDate);
-
-    protected abstract ContentDispositionField newContentDisposition(
-            String dispositionType, Map<String, String> parameters);
-
-    protected abstract ContentTypeField newContentType(String mimeType,
-            Map<String, String> parameters);
-
-    protected abstract ContentTransferEncodingField newContentTransferEncoding(
-            String contentTransferEncoding);
 
     protected abstract String calcMimeType(ContentTypeField child, ContentTypeField parent);
 

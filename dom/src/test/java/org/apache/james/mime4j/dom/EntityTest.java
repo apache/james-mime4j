@@ -83,26 +83,6 @@ public class EntityTest {
     }
 
     @Test
-    public void testSetContentDispositionType() throws Exception {
-        BodyPart entity = new BodyPart();
-
-        entity.setContentDisposition("attachment");
-
-        Assert.assertEquals("attachment", entity.getHeader().getField(
-                "Content-Disposition").getBody());
-    }
-
-    @Test
-    public void testSetContentDispositionTypeFilename() throws Exception {
-        BodyPart entity = new BodyPart();
-
-        entity.setContentDisposition("attachment", "some file.dat");
-
-        Assert.assertEquals("attachment; filename=\"some file.dat\"", entity
-                .getHeader().getField("Content-Disposition").getBody());
-    }
-
-    @Test
     public void testGetFilename() throws Exception {
         BodyPart entity = new BodyPart();
 
@@ -114,21 +94,6 @@ public class EntityTest {
         entity.setHeader(header);
 
         Assert.assertEquals("some file.dat", entity.getFilename());
-    }
-
-    @Test
-    public void testSetFilename() throws Exception {
-        BodyPart entity = new BodyPart();
-
-        entity.setFilename("file name.ext");
-
-        Assert.assertEquals("attachment; filename=\"file name.ext\"", entity
-                .getHeader().getField("Content-Disposition").getBody());
-
-        entity.setFilename(null);
-
-        Assert.assertEquals("attachment", entity.getHeader().getField(
-                "Content-Disposition").getBody());
     }
 
 }

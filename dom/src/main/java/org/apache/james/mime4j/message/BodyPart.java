@@ -19,16 +19,10 @@
 
 package org.apache.james.mime4j.message;
 
-import java.util.Date;
-import java.util.Map;
-
-import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.field.ContentTransferEncodingFieldImpl;
 import org.apache.james.mime4j.field.ContentTypeFieldImpl;
-import org.apache.james.mime4j.field.Fields;
-import org.apache.james.mime4j.util.MimeUtil;
 
 /**
  * A MIME body part (as defined in RFC 2045).
@@ -39,37 +33,6 @@ public class BodyPart extends AbstractEntity {
      * Creates a new empty <code>BodyPart</code>.
      */
     public BodyPart() {
-    }
-
-    @Override
-    protected String newUniqueBoundary() {
-        return MimeUtil.createUniqueBoundary();
-    }
-
-    @Override
-    protected ContentDispositionField newContentDisposition(
-            String dispositionType, String filename, long size,
-            Date creationDate, Date modificationDate, Date readDate) {
-        return Fields.contentDisposition(dispositionType, filename, size,
-                creationDate, modificationDate, readDate);
-    }
-
-    @Override
-    protected ContentDispositionField newContentDisposition(
-            String dispositionType, Map<String, String> parameters) {
-        return Fields.contentDisposition(dispositionType, parameters);
-    }
-
-    @Override
-    protected ContentTypeField newContentType(String mimeType,
-            Map<String, String> parameters) {
-        return Fields.contentType(mimeType, parameters);
-    }
-
-    @Override
-    protected ContentTransferEncodingField newContentTransferEncoding(
-            String contentTransferEncoding) {
-        return Fields.contentTransferEncoding(contentTransferEncoding);
     }
 
     @Override

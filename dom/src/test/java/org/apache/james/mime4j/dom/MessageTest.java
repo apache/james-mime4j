@@ -1,31 +1,38 @@
 /****************************************************************
- * Licensed to the Apache Software Foundation (ASF) under one   *
- * or more contributor license agreements.  See the NOTICE file *
- * distributed with this work for additional information        *
- * regarding copyright ownership.  The ASF licenses this file   *
- * to you under the Apache License, Version 2.0 (the            *
- * "License"); you may not use this file except in compliance   *
- * with the License.  You may obtain a copy of the License at   *
- *                                                              *
- *   http://www.apache.org/licenses/LICENSE-2.0                 *
- *                                                              *
- * Unless required by applicable law or agreed to in writing,   *
- * software distributed under the License is distributed on an  *
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY       *
- * KIND, either express or implied.  See the License for the    *
- * specific language governing permissions and limitations      *
- * under the License.                                           *
- ****************************************************************/
+* Licensed to the Apache Software Foundation (ASF) under one   *
+* or more contributor license agreements.  See the NOTICE file *
+* distributed with this work for additional information        *
+* regarding copyright ownership.  The ASF licenses this file   *
+* to you under the Apache License, Version 2.0 (the            *
+* "License"); you may not use this file except in compliance   *
+* with the License.  You may obtain a copy of the License at   *
+*                                                              *
+*   http://www.apache.org/licenses/LICENSE-2.0                 *
+*                                                              *
+* Unless required by applicable law or agreed to in writing,   *
+* software distributed under the License is distributed on an  *
+* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY       *
+* KIND, either express or implied.  See the License for the    *
+* specific language governing permissions and limitations      *
+* under the License.                                           *
+****************************************************************/
 
 package org.apache.james.mime4j.dom;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
-import org.apache.james.mime4j.field.address.AddressBuilder;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
@@ -35,17 +42,6 @@ import org.apache.james.mime4j.message.MultipartImpl;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
 
 public class MessageTest {
     private Header headerTextPlain = null;
@@ -203,17 +199,6 @@ public class MessageTest {
     }
 
     @Test
-    public void testCreateMessageId() throws Exception {
-        MessageImpl m = new MessageImpl();
-        m.createMessageId("hostname");
-
-        String id = m.getMessageId();
-        Assert.assertNotNull(id);
-        Assert.assertTrue(id.startsWith("<Mime4j."));
-        Assert.assertTrue(id.endsWith("@hostname>"));
-    }
-
-    @Test
     public void testGetSubject() throws Exception {
         MessageImpl m = new MessageImpl();
         Assert.assertNull(m.getSubject());
@@ -229,19 +214,6 @@ public class MessageTest {
     }
 
     @Test
-    public void testSetSubject() throws Exception {
-        MessageImpl m = new MessageImpl();
-
-        m.setSubject("Semmelbr\366sel");
-        Assert.assertEquals("Semmelbr\366sel", m.getSubject());
-        Assert.assertEquals("=?ISO-8859-1?Q?Semmelbr=F6sel?=", m.getHeader().getField(
-                "Subject").getBody());
-
-        m.setSubject(null);
-        Assert.assertNull(m.getHeader().getField("Subject"));
-    }
-
-    @Test
     public void testGetDate() throws Exception {
         MessageImpl m = new MessageImpl();
         Assert.assertNull(m.getDate());
@@ -251,19 +223,6 @@ public class MessageTest {
         m.setHeader(header);
 
         Assert.assertEquals(new Date(0), m.getDate());
-    }
-
-    @Test
-    public void testSetDate() throws Exception {
-        MessageImpl m = new MessageImpl();
-
-        m.setDate(new Date(86400000), TimeZone.getTimeZone("GMT"));
-        Assert.assertEquals(new Date(86400000), m.getDate());
-        Assert.assertEquals("Fri, 2 Jan 1970 00:00:00 +0000", m.getHeader().getField(
-                "Date").getBody());
-
-        m.setDate(null);
-        Assert.assertNull(m.getHeader().getField("Date"));
     }
 
     @Test
@@ -279,18 +238,6 @@ public class MessageTest {
     }
 
     @Test
-    public void testSetSender() throws Exception {
-        MessageImpl m = new MessageImpl();
-
-        m.setSender(AddressBuilder.DEFAULT.parseMailbox("john.doe@example.net"));
-        Assert.assertEquals("john.doe@example.net", m.getHeader().getField("Sender")
-                .getBody());
-
-        m.setSender(null);
-        Assert.assertNull(m.getHeader().getField("Sender"));
-    }
-
-    @Test
     public void testGetFrom() throws Exception {
         MessageImpl m = new MessageImpl();
         Assert.assertNull(m.getFrom());
@@ -300,29 +247,6 @@ public class MessageTest {
         m.setHeader(header);
 
         Assert.assertEquals("john.doe@example.net", m.getFrom().get(0).getAddress());
-    }
-
-    @Test
-    public void testSetFrom() throws Exception {
-        MessageImpl m = new MessageImpl();
-
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
-
-        m.setFrom(mailbox1);
-        Assert.assertEquals("john.doe@example.net", m.getHeader().getField("From")
-                .getBody());
-
-        m.setFrom(mailbox1, mailbox2);
-        Assert.assertEquals("john.doe@example.net, jane.doe@example.net", m
-                .getHeader().getField("From").getBody());
-
-        m.setFrom(Arrays.asList(mailbox1, mailbox2));
-        Assert.assertEquals("john.doe@example.net, jane.doe@example.net", m
-                .getHeader().getField("From").getBody());
-
-        m.setFrom((Mailbox) null);
-        Assert.assertNull(m.getHeader().getField("From"));
     }
 
     @Test
@@ -339,33 +263,6 @@ public class MessageTest {
     }
 
     @Test
-    public void testSetTo() throws Exception {
-        MessageImpl m = new MessageImpl();
-
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
-        Group group = new Group("Does", mailbox1, mailbox2);
-        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
-
-        m.setTo(group);
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
-                .getHeader().getField("To").getBody());
-
-        m.setTo(group, mailbox3);
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
-                + "Mary Smith <mary@example.net>", m.getHeader().getField("To")
-                .getBody());
-
-        m.setTo(Arrays.asList(group, mailbox3));
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
-                + "Mary Smith <mary@example.net>", m.getHeader().getField("To")
-                .getBody());
-
-        m.setTo((Mailbox) null);
-        Assert.assertNull(m.getHeader().getField("To"));
-    }
-
-    @Test
     public void testGetCc() throws Exception {
         MessageImpl m = new MessageImpl();
         Assert.assertNull(m.getCc());
@@ -376,33 +273,6 @@ public class MessageTest {
 
         Assert.assertEquals("john.doe@example.net", ((Mailbox) m.getCc().get(0))
                 .getAddress());
-    }
-
-    @Test
-    public void testSetCc() throws Exception {
-        MessageImpl m = new MessageImpl();
-
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
-        Group group = new Group("Does", mailbox1, mailbox2);
-        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
-
-        m.setCc(group);
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
-                .getHeader().getField("Cc").getBody());
-
-        m.setCc(group, mailbox3);
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
-                + "Mary Smith <mary@example.net>", m.getHeader().getField("Cc")
-                .getBody());
-
-        m.setCc(Arrays.asList(group, mailbox3));
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
-                + "Mary Smith <mary@example.net>", m.getHeader().getField("Cc")
-                .getBody());
-
-        m.setCc((Mailbox) null);
-        Assert.assertNull(m.getHeader().getField("Cc"));
     }
 
     @Test
@@ -419,33 +289,6 @@ public class MessageTest {
     }
 
     @Test
-    public void testSetBcc() throws Exception {
-        MessageImpl m = new MessageImpl();
-
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
-        Group group = new Group("Does", mailbox1, mailbox2);
-        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
-
-        m.setBcc(group);
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
-                .getHeader().getField("Bcc").getBody());
-
-        m.setBcc(group, mailbox3);
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
-                + "Mary Smith <mary@example.net>", m.getHeader()
-                .getField("Bcc").getBody());
-
-        m.setBcc(Arrays.asList(group, mailbox3));
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
-                + "Mary Smith <mary@example.net>", m.getHeader()
-                .getField("Bcc").getBody());
-
-        m.setBcc((Mailbox) null);
-        Assert.assertNull(m.getHeader().getField("Bcc"));
-    }
-
-    @Test
     public void testGetReplyTo() throws Exception {
         MessageImpl m = new MessageImpl();
         Assert.assertNull(m.getReplyTo());
@@ -456,33 +299,6 @@ public class MessageTest {
 
         Assert.assertEquals("john.doe@example.net", ((Mailbox) m.getReplyTo().get(0))
                 .getAddress());
-    }
-
-    @Test
-    public void testSetReplyTo() throws Exception {
-        MessageImpl m = new MessageImpl();
-
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
-        Group group = new Group("Does", mailbox1, mailbox2);
-        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
-
-        m.setReplyTo(group);
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;", m
-                .getHeader().getField("Reply-To").getBody());
-
-        m.setReplyTo(group, mailbox3);
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
-                + "Mary Smith <mary@example.net>", m.getHeader().getField(
-                "Reply-To").getBody());
-
-        m.setReplyTo(Arrays.asList(group, mailbox3));
-        Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;, "
-                + "Mary Smith <mary@example.net>", m.getHeader().getField(
-                "Reply-To").getBody());
-
-        m.setReplyTo((Mailbox) null);
-        Assert.assertNull(m.getHeader().getField("Reply-To"));
     }
 
     @Test
