@@ -17,9 +17,10 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.dom;
+package org.apache.james.mime4j.message;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.HeaderImpl;
@@ -29,7 +30,7 @@ import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class HeaderTest {
+public class HeaderImplTest {
 
     public static final String SUBJECT = "Subject: test";
 

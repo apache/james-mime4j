@@ -17,8 +17,11 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.dom;
+package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.dom.Body;
+import org.apache.james.mime4j.dom.Entity;
+import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
@@ -26,7 +29,7 @@ import org.apache.james.mime4j.message.HeaderImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class EntityTest {
+public class EntityImplTest {
 
     @Test
     public void testSetBody() throws Exception {

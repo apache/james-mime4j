@@ -17,7 +17,7 @@
 * under the License.                                           *
 ****************************************************************/
 
-package org.apache.james.mime4j.dom;
+package org.apache.james.mime4j.message;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -29,6 +29,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
@@ -43,7 +47,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class MessageTest {
+public class MessageImplTest {
     private Header headerTextPlain = null;
     private Header headerMessageRFC822 = null;
     private Header headerEmpty = null;
