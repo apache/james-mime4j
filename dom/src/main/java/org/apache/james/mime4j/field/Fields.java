@@ -124,9 +124,9 @@ public class Fields {
      */
     public static ContentTypeField contentType(String mimeType,
                                                Iterable<NameValuePair> parameters) {
-        if (!isValidMimeType(mimeType))
-            throw new IllegalArgumentException();
-
+        if (!isValidMimeType(mimeType)) {
+            throw new IllegalArgumentException(mimeType + " is not a valid MIME type");
+        }
         if (parameters == null) {
             return parse(ContentTypeFieldImpl.PARSER, FieldName.CONTENT_TYPE,
                     mimeType);

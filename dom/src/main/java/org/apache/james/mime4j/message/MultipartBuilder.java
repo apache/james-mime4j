@@ -224,7 +224,7 @@ public class MultipartBuilder {
         BodyPart bodyPart = BodyPartBuilder.create()
                 .setBody(body)
                 .setContentType("text/plain", new NameValuePair("charset", cs.name()))
-                .setContentTransferEncoding("quoted-printable")
+                .setContentTransferEncoding(Charsets.US_ASCII.equals(cs) ? "7bit" : "quoted-printable")
                 .build();
         return addBodyPart(bodyPart);
     }
@@ -234,7 +234,7 @@ public class MultipartBuilder {
                 BasicBodyFactory.INSTANCE.binaryBody(bin);
         BodyPart bodyPart = BodyPartBuilder.create()
                 .setBody(body)
-                .setContentType(mimeType)
+                .setContentType(mimeType != null ? mimeType : "application/octet-stream")
                 .setContentTransferEncoding("base64")
                 .build();
         return addBodyPart(bodyPart);

@@ -181,19 +181,19 @@ public class MessageBuilder extends AbstractEntityBuilder {
     }
 
     @Override
-    public AbstractEntityBuilder addField(Field field) {
+    public MessageBuilder addField(Field field) {
         super.addField(field);
         return this;
     }
 
     @Override
-    public AbstractEntityBuilder removeFields(String name) {
+    public MessageBuilder removeFields(String name) {
         super.removeFields(name);
         return this;
     }
 
     @Override
-    public AbstractEntityBuilder clearFields() {
+    public MessageBuilder clearFields() {
         super.clearFields();
         return this;
     }
@@ -834,7 +834,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
     }
 
     private MessageBuilder setAddressList(String fieldName, String address) throws ParseException {
-        return setAddressList(fieldName, address == null ? null :AddressBuilder.DEFAULT.parseMailbox(address));
+        return setAddressList(fieldName, address == null ? null : AddressBuilder.DEFAULT.parseMailbox(address));
     }
 
     private MessageBuilder setAddressList(String fieldName, Address... addresses) {

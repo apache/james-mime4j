@@ -59,7 +59,7 @@ public class AddressTest {
 
     @Test
     public void testEmptyDomainList() {
-        DomainList dl = new DomainList(null);
+        DomainList dl = new DomainList(null, false);
         Assert.assertEquals(0, dl.size());
 
         try {

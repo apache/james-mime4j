@@ -22,6 +22,7 @@ package org.apache.james.mime4j.dom.address;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,12 +37,39 @@ public final class DomainList extends AbstractList<String> implements Serializab
     private final List<String> domains;
 
     /**
-     * @param domains  A List that contains only String objects.
+     * @param domains
+     *            A List that contains only String objects.
+     * @param dontCopy
+     *            true iff it is not possible for the addresses list to be
+     *            modified by someone else.
      */
-    public DomainList(List<String> domains) {
-        this.domains = (domains == null) ? Collections.<String>emptyList():new ArrayList<String>(domains);
+    public DomainList(List<String> domains, boolean dontCopy) {
+        if (domains != null) {
+            this.domains = dontCopy ? domains : new ArrayList<String>(domains);
+        } else {
+            this.domains = Collections.emptyList();
+        }
     }
 
+    /**
+     * @param domains
+     *            A List that contains only String objects.
+     */
+    public DomainList(List<String> domains) {
+        this(domains, false);
+    }
+
+    /**
+     * @param domains
+     *            A List that contains only String objects.
+     */
+    public DomainList(String... domains) {
+        if (domains != null) {
+            this.domains = Arrays.asList(domains);
+        } else {
+            this.domains = Collections.emptyList();
+        }
+    }
     /**
      * The number of elements in this list.
      */

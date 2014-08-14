@@ -22,6 +22,7 @@ package org.apache.james.mime4j.dom.address;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,11 +43,31 @@ public class AddressList extends AbstractList<Address> implements Serializable {
      *            modified by someone else.
      */
     public AddressList(List<? extends Address> addresses, boolean dontCopy) {
-        if (addresses != null)
-            this.addresses = dontCopy ? addresses : new ArrayList<Address>(
-                    addresses);
-        else
+        if (addresses != null) {
+            this.addresses = dontCopy ? addresses : new ArrayList<Address>(addresses);
+        } else {
             this.addresses = Collections.emptyList();
+        }
+    }
+
+    /**
+     * @param addresses
+     *            A List that contains only Address objects.
+     */
+    public AddressList(List<? extends Address> addresses) {
+        this(addresses, false);
+    }
+
+    /**
+     * @param addresses
+     *            A List that contains only Address objects.
+     */
+    public AddressList(Address... addresses) {
+        if (addresses != null) {
+            this.addresses = Arrays.asList(addresses);
+        } else {
+            this.addresses = Collections.emptyList();
+        }
     }
 
     /**

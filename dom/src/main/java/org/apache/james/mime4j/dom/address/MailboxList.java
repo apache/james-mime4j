@@ -22,6 +22,7 @@ package org.apache.james.mime4j.dom.address;
 import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,11 +43,31 @@ public class MailboxList extends AbstractList<Mailbox> implements Serializable {
      *            modified by someone else.
      */
     public MailboxList(List<Mailbox> mailboxes, boolean dontCopy) {
-        if (mailboxes != null)
-            this.mailboxes = dontCopy ? mailboxes : new ArrayList<Mailbox>(
-                    mailboxes);
-        else
+        if (mailboxes != null) {
+            this.mailboxes = dontCopy ? mailboxes : new ArrayList<Mailbox>(mailboxes);
+        } else {
             this.mailboxes = Collections.emptyList();
+        }
+    }
+
+    /**
+     * @param mailboxes
+     *            A List that contains only Mailbox objects.
+     */
+    public MailboxList(List<Mailbox> mailboxes) {
+        this(mailboxes, false);
+    }
+
+    /**
+     * @param mailboxes
+     *            A List that contains only Mailbox objects.
+     */
+    public MailboxList(Mailbox... mailboxes) {
+        if (mailboxes != null) {
+            this.mailboxes = Arrays.asList(mailboxes);
+        } else {
+            this.mailboxes = Collections.emptyList();
+        }
     }
 
     /**
