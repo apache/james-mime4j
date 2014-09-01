@@ -18,7 +18,12 @@
  ****************************************************************/
 package org.apache.james.mime4j.mboxiterator;
 
-import java.io.*;
+import java.io.CharConversionException;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
@@ -46,7 +51,7 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
 
     private final FileInputStream theFile;
     private final CharBuffer mboxCharBuffer;
-    private Matcher fromLineMathcer;
+    private Matcher fromLineMatcher;
     private boolean fromLineFound;
     private final MappedByteBuffer byteBuffer;
     private final CharsetDecoder DECODER;
@@ -58,6 +63,7 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
     private final Pattern MESSAGE_START;
     private int findStart = -1;
     private int findEnd = -1;
+    private final File mbox;
 
     private MboxIterator(final File mbox,
                          final Charset charset,
@@ -70,19 +76,30 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         this.MESSAGE_START = Pattern.compile(regexpPattern, regexpFlags);
         this.DECODER = charset.newDecoder();
         this.mboxCharBuffer = CharBuffer.allocate(MAX_MESSAGE_SIZE);
+        this.mbox = mbox;
         this.theFile = new FileInputStream(mbox);
         this.byteBuffer = theFile.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, theFile.getChannel().size());
         initMboxIterator();
     }
 
-    private void initMboxIterator() throws IOException, CharConversionException {
+    /**
+     * initialize the Mailbox iterator
+     *
+     * @throws IOException
+     * @throws CharConversionException
+     */
+    protected void initMboxIterator() throws IOException {
         decodeNextCharBuffer();
-        fromLineMathcer = MESSAGE_START.matcher(mboxCharBuffer);
-        fromLineFound = fromLineMathcer.find();
+        fromLineMatcher = MESSAGE_START.matcher(mboxCharBuffer);
+        fromLineFound = fromLineMatcher.find();
         if (fromLineFound) {
-            saveFindPositions(fromLineMathcer);
-        } else if (fromLineMathcer.hitEnd()) {
-            throw new IllegalArgumentException("File does not contain From_ lines! Maybe not be a vaild Mbox.");
+            saveFindPositions(fromLineMatcher);
+        } else if (fromLineMatcher.hitEnd()) {
+            String path = "";
+            if (mbox != null)
+                path = mbox.getPath();
+            throw new IllegalArgumentException("File " + path + " does not contain From_ lines that match the pattern '"
+                    + MESSAGE_START.pattern() + "'! Maybe not be a valid Mbox or wrong matcher.");
         }
     }
 
@@ -139,12 +156,12 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
          */
         public CharBufferWrapper next() {
             final CharBuffer message;
-            fromLineFound = fromLineMathcer.find();
+            fromLineFound = fromLineMatcher.find();
             if (fromLineFound) {
                 message = mboxCharBuffer.slice();
                 message.position(findEnd + 1);
-                saveFindPositions(fromLineMathcer);
-                message.limit(fromLineMathcer.start());
+                saveFindPositions(fromLineMatcher);
+                message.limit(fromLineMatcher.start());
             } else {
                 /* We didn't find other From_ lines this means either:
                  *  - we reached end of mbox and no more messages
@@ -163,17 +180,17 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
                     } catch (CharConversionException ex) {
                         throw new RuntimeException(ex);
                     }
-                    fromLineMathcer = MESSAGE_START.matcher(mboxCharBuffer);
-                    fromLineFound = fromLineMathcer.find();
+                    fromLineMatcher = MESSAGE_START.matcher(mboxCharBuffer);
+                    fromLineFound = fromLineMatcher.find();
                     if (fromLineFound) {
-                        saveFindPositions(fromLineMathcer);
+                        saveFindPositions(fromLineMatcher);
                     }
                     message = mboxCharBuffer.slice();
-                    message.position(fromLineMathcer.end() + 1);
-                    fromLineFound = fromLineMathcer.find();
+                    message.position(fromLineMatcher.end() + 1);
+                    fromLineFound = fromLineMatcher.find();
                     if (fromLineFound) {
-                        saveFindPositions(fromLineMathcer);
-                        message.limit(fromLineMathcer.start());
+                        saveFindPositions(fromLineMatcher);
+                        message.limit(fromLineMatcher.start());
                     }
                 } else {
                     message = mboxCharBuffer.slice();
