@@ -41,7 +41,7 @@ import org.apache.james.mime4j.util.ContentUtil;
  * Lenient (tolerant to non-critical format violations) builder for {@link Address}
  * and its subclasses.
  */
-public class LenientAddressBuilder {
+public class LenientAddressBuilder implements AddressBuilder {
 
     private static final int AT                = '@';
     private static final int OPENING_BRACKET   = '<';

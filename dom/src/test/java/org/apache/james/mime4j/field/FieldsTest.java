@@ -35,7 +35,7 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
-import org.apache.james.mime4j.field.address.AddressBuilder;
+import org.apache.james.mime4j.field.address.DefaultAddressBuilder;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -258,15 +258,15 @@ public class FieldsTest {
 
     @Test
     public void testSender() throws Exception {
-        MailboxField field = Fields.sender(AddressBuilder.DEFAULT
+        MailboxField field = Fields.sender(DefaultAddressBuilder.DEFAULT
                 .parseMailbox("JD <john.doe@acme.org>"));
         Assert.assertEquals("Sender: JD <john.doe@acme.org>", decode(field));
     }
 
     @Test
     public void testFrom() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
 
         MailboxListField field = Fields.from(mailbox1);
         Assert.assertEquals("From: JD <john.doe@acme.org>", decode(field));
@@ -282,9 +282,9 @@ public class FieldsTest {
 
     @Test
     public void testTo() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.to(group);
@@ -304,9 +304,9 @@ public class FieldsTest {
 
     @Test
     public void testCc() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.cc(group);
@@ -326,9 +326,9 @@ public class FieldsTest {
 
     @Test
     public void testBcc() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.bcc(group);
@@ -348,9 +348,9 @@ public class FieldsTest {
 
     @Test
     public void testReplyTo() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.replyTo(group);
@@ -370,15 +370,15 @@ public class FieldsTest {
 
     @Test
     public void testMailbox() throws Exception {
-        MailboxField field = Fields.mailbox("Resent-Sender", AddressBuilder.DEFAULT
+        MailboxField field = Fields.mailbox("Resent-Sender", DefaultAddressBuilder.DEFAULT
                 .parseMailbox("JD <john.doe@acme.org>"));
         Assert.assertEquals("Resent-Sender: JD <john.doe@acme.org>", decode(field));
     }
 
     @Test
     public void testMailboxList() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
 
         MailboxListField field = Fields.mailboxList("Resent-From", Arrays
                 .asList(mailbox1, mailbox2));
@@ -388,9 +388,9 @@ public class FieldsTest {
 
     @Test
     public void testAddressList() throws Exception {
-        Mailbox mailbox1 = AddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
-        Mailbox mailbox2 = AddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
-        Mailbox mailbox3 = AddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("JD <john.doe@acme.org>");
+        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.org");
+        Mailbox mailbox3 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
         Group group = new Group("The Does", mailbox1, mailbox2);
 
         AddressListField field = Fields.addressList("Resent-To", Arrays.asList(
