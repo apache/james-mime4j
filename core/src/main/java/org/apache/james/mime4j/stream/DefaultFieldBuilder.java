@@ -60,7 +60,7 @@ public class DefaultFieldBuilder implements FieldBuilder {
         }
         int len = line.length();
         if (this.maxlen > 0 && this.buf.length() + len >= this.maxlen) {
-            throw new MaxHeaderLengthLimitException("Maximum header length limit exceeded");
+            throw new MaxHeaderLengthLimitException("Maximum header length limit (" + this.maxlen + ") exceeded");
         }
         this.buf.append(line.buffer(), 0, line.length());
     }

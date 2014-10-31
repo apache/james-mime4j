@@ -302,7 +302,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
             BodyDescriptorBuilder bdb = bodyDescBuilder != null ? bodyDescBuilder :
                 new DefaultBodyDescriptorBuilder(null, fieldParser != null ? fieldParser :
                     strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser(), mon);
-            BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
+            BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory(!strict);
             MimeStreamParser parser = new MimeStreamParser(cfg, mon, bdb);
             parser.setContentHandler(new ParserStreamContentHandler(message, bf));
             parser.setContentDecoding(contentDecoding);

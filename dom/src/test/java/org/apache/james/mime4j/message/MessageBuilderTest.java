@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.james.mime4j.Charsets;
@@ -39,7 +38,6 @@ import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.address.AddressBuilder;
-import org.apache.james.mime4j.stream.Field;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;

@@ -309,7 +309,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
     /**
      * Sets binary content of this message with the given MIME type.
      *
-     * @param body
+     * @param bin
      *            the body.
      * @param mimeType
      *            the MIME media type of the specified body
@@ -898,7 +898,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
         BodyDescriptorBuilder currentBodyDescBuilder = bodyDescBuilder != null ? bodyDescBuilder :
                 new DefaultBodyDescriptorBuilder(null, fieldParser != null ? fieldParser :
                         strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser(), currentMonitor);
-        BodyFactory currentBodyFactory = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
+        BodyFactory currentBodyFactory = bodyFactory != null ? bodyFactory : new BasicBodyFactory(!strict);
         MimeStreamParser parser = new MimeStreamParser(currentConfig, currentMonitor, currentBodyDescBuilder);
 
         Message message = new MessageImpl();

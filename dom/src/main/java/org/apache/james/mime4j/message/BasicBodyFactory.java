@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 
 import org.apache.james.mime4j.Charsets;
@@ -42,12 +43,44 @@ public class BasicBodyFactory implements BodyFactory {
 
     public static final BasicBodyFactory INSTANCE = new BasicBodyFactory();
 
-    private static Charset resolveCharset(final String mimeCharset) throws UnsupportedEncodingException {
-        try {
-            return mimeCharset != null ? Charset.forName(mimeCharset) : null;
-        } catch (UnsupportedCharsetException ex) {
-            throw new UnsupportedEncodingException(mimeCharset);
+    private final boolean lenient;
+
+    public BasicBodyFactory() {
+        this(true);
+    }
+
+    public BasicBodyFactory(final boolean lenient) {
+        this.lenient = lenient;
+    }
+
+    /**
+     * select the Charset for the given mimeCharset string
+     * 
+     *  if you need support for non standard or invalid mimeCharset specifications
+     *  you might want to create your own derived BodyFactory extending BasicBodyFactory and
+     *  overriding this method as suggested by:
+     *    https://issues.apache.org/jira/browse/MIME4J-218
+     *  
+     *  the default behavior is lenient, invalid mimeCharset specifications will return the defaultCharset
+     * 
+     *  @param mimeCharset - the string specification for a Charset e.g. "UTF-8"
+     *  @throws UnsupportedEncodingException if the mimeCharset is invalid
+     */ 
+    protected Charset resolveCharset(final String mimeCharset) throws UnsupportedEncodingException {
+        if (mimeCharset != null) {
+            try {
+                return Charset.forName(mimeCharset);
+            } catch (UnsupportedCharsetException ex) {
+                if (!lenient) {
+                    throw new UnsupportedEncodingException(mimeCharset);
+                }
+            } catch (IllegalCharsetNameException ex) {
+                if (!lenient) {
+                    throw new UnsupportedEncodingException(mimeCharset);
+                }
+            }
         }
+        return Charset.defaultCharset();
     }
 
     public TextBody textBody(final String text, final String mimeCharset) throws UnsupportedEncodingException {

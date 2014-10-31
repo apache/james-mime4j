@@ -20,13 +20,10 @@
 package org.apache.james.mime4j.message;
 
 import java.io.InputStream;
-import java.util.List;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.Body;
-import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
-import org.apache.james.mime4j.stream.Field;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
