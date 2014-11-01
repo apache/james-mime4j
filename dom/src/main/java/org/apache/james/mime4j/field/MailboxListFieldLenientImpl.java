@@ -26,7 +26,7 @@ import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
 import org.apache.james.mime4j.dom.field.MailboxListField;
-import org.apache.james.mime4j.field.address.LenientAddressBuilder;
+import org.apache.james.mime4j.field.address.LenientAddressParser;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.ParserCursor;
 import org.apache.james.mime4j.stream.RawField;
@@ -68,7 +68,7 @@ public class MailboxListFieldLenientImpl extends AbstractField implements Mailbo
             pos = 0;
         }
         ParserCursor cursor = new ParserCursor(pos, buf.length());
-        mailboxList = LenientAddressBuilder.DEFAULT.parseAddressList(buf, cursor).flatten();
+        mailboxList = LenientAddressParser.DEFAULT.parseAddressList(buf, cursor).flatten();
     }
 
     public static final FieldParser<MailboxListField> PARSER = new FieldParser<MailboxListField>() {

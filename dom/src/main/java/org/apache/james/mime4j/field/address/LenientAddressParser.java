@@ -41,7 +41,7 @@ import org.apache.james.mime4j.util.ContentUtil;
  * Lenient (tolerant to non-critical format violations) builder for {@link Address}
  * and its subclasses.
  */
-public class LenientAddressBuilder {
+public class LenientAddressParser implements AddressParser {
 
     private static final int AT                = '@';
     private static final int OPENING_BRACKET   = '<';
@@ -56,12 +56,12 @@ public class LenientAddressBuilder {
     private static final BitSet COLON_ONLY             = RawFieldParser.INIT_BITSET(COLON);
     private static final BitSet SEMICOLON_ONLY         = RawFieldParser.INIT_BITSET(SEMICOLON);
 
-    public static final LenientAddressBuilder DEFAULT = new LenientAddressBuilder(DecodeMonitor.SILENT);
+    public static final LenientAddressParser DEFAULT = new LenientAddressParser(DecodeMonitor.SILENT);
 
     private final DecodeMonitor monitor;
     private final RawFieldParser parser;
 
-    protected LenientAddressBuilder(final DecodeMonitor monitor) {
+    protected LenientAddressParser(final DecodeMonitor monitor) {
         super();
         this.monitor = monitor;
         this.parser = new RawFieldParser();
@@ -215,7 +215,7 @@ public class LenientAddressBuilder {
         }
     }
 
-    public Mailbox parseMailbox(final String text) {
+    public Mailbox parseMailbox(final CharSequence text) {
         ByteSequence raw = ContentUtil.encode(text);
         ParserCursor cursor = new ParserCursor(0, text.length());
         return parseMailbox(raw, cursor, null);
@@ -259,7 +259,7 @@ public class LenientAddressBuilder {
         return new Group(name, mboxes);
     }
 
-    public Group parseGroup(final String text) {
+    public Group parseGroup(final CharSequence text) {
         ByteSequence raw = ContentUtil.encode(text);
         ParserCursor cursor = new ParserCursor(0, text.length());
         return parseGroup(raw, cursor);
@@ -302,7 +302,7 @@ public class LenientAddressBuilder {
         }
     }
 
-    public Address parseAddress(final String text) {
+    public Address parseAddress(final CharSequence text) {
         ByteSequence raw = ContentUtil.encode(text);
         ParserCursor cursor = new ParserCursor(0, text.length());
         return parseAddress(raw, cursor, null);
@@ -325,7 +325,7 @@ public class LenientAddressBuilder {
         return new AddressList(addresses, false);
     }
 
-    public AddressList parseAddressList(final String text) {
+    public AddressList parseAddressList(final CharSequence text) {
         ByteSequence raw = ContentUtil.encode(text);
         ParserCursor cursor = new ParserCursor(0, text.length());
         return parseAddressList(raw, cursor);

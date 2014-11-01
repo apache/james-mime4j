@@ -97,7 +97,7 @@ public class ContentUtil {
      *            string to encode.
      * @return encoded string as an immutable sequence of bytes.
      */
-    public static ByteSequence encode(String string) {
+    public static ByteSequence encode(CharSequence string) {
         if (string == null) {
             return null;
         }
@@ -118,7 +118,7 @@ public class ContentUtil {
      *            string to encode.
      * @return encoded string as an immutable sequence of bytes.
      */
-    public static ByteSequence encode(Charset charset, String string) {
+    public static ByteSequence encode(Charset charset, CharSequence string) {
         if (string == null) {
             return null;
         }

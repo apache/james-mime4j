@@ -19,42 +19,41 @@
 
 package org.apache.james.mime4j.field.address;
 
-import java.io.StringReader;
-
+import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.io.InputStreams;
 
 /**
  * Default (strict) builder for {@link Address} and its subclasses.
  */
-public class AddressBuilder {
+public class DefaultAddressParser implements AddressParser {
 
-    public static final AddressBuilder DEFAULT = new AddressBuilder();
+    public static final DefaultAddressParser DEFAULT = new DefaultAddressParser();
 
-    protected AddressBuilder() {
+    protected DefaultAddressParser() {
         super();
     }
 
     /**
      * Parses the specified raw string into an address.
      *
-     * @param rawAddressString
+     * @param text
      *            string to parse.
      * @param monitor the DecodeMonitor to be used while parsing/decoding
      * @return an <code>Address</code> object for the specified string.
      * @throws ParseException if the raw string does not represent a single address.
      */
-    public Address parseAddress(String rawAddressString, DecodeMonitor monitor) throws ParseException {
-        AddressListParser parser = new AddressListParser(new StringReader(
-                rawAddressString));
+    public Address parseAddress(CharSequence text, DecodeMonitor monitor) throws ParseException {
+        AddressListParser parser = new AddressListParser(InputStreams.create(text, Charsets.UTF_8));
         return Builder.getInstance().buildAddress(parser.parseAddress(), monitor);
     }
 
-    public Address parseAddress(String rawAddressString) throws ParseException {
-        return parseAddress(rawAddressString, DecodeMonitor.STRICT);
+    public Address parseAddress(CharSequence text) throws ParseException {
+        return parseAddress(text, DecodeMonitor.STRICT);
     }
 
     /**
@@ -64,21 +63,20 @@ public class AddressBuilder {
      * The string MUST be unfolded already.
      * @param monitor the DecodeMonitor to be used while parsing/decoding
      */
-    public AddressList parseAddressList(String rawAddressList, DecodeMonitor monitor)
+    public AddressList parseAddressList(CharSequence text, DecodeMonitor monitor)
             throws ParseException {
-        AddressListParser parser = new AddressListParser(new StringReader(
-                rawAddressList));
+        AddressListParser parser = new AddressListParser(InputStreams.create(text, Charsets.UTF_8));
         return Builder.getInstance().buildAddressList(parser.parseAddressList(), monitor);
     }
 
-    public AddressList parseAddressList(String rawAddressList) throws ParseException {
-        return parseAddressList(rawAddressList, DecodeMonitor.STRICT);
+    public AddressList parseAddressList(CharSequence text) throws ParseException {
+        return parseAddressList(text, DecodeMonitor.STRICT);
     }
 
     /**
      * Parses the specified raw string into a mailbox address.
      *
-     * @param rawMailboxString
+     * @param text
      *            string to parse.
      * @param monitor the DecodeMonitor to be used while parsing/decoding.
      * @return a <code>Mailbox</code> object for the specified string.
@@ -86,35 +84,34 @@ public class AddressBuilder {
      *             if the raw string does not represent a single mailbox
      *             address.
      */
-    public Mailbox parseMailbox(String rawMailboxString, DecodeMonitor monitor) throws ParseException {
-        AddressListParser parser = new AddressListParser(new StringReader(
-                rawMailboxString));
+    public Mailbox parseMailbox(CharSequence text, DecodeMonitor monitor) throws ParseException {
+        AddressListParser parser = new AddressListParser(InputStreams.create(text, Charsets.UTF_8));
         return Builder.getInstance().buildMailbox(parser.parseMailbox(), monitor);
     }
 
-    public Mailbox parseMailbox(String rawMailboxString) throws ParseException {
-        return parseMailbox(rawMailboxString, DecodeMonitor.STRICT);
+    public Mailbox parseMailbox(CharSequence text) throws ParseException {
+        return parseMailbox(text, DecodeMonitor.STRICT);
     }
 
     /**
      * Parses the specified raw string into a group address.
      *
-     * @param rawGroupString
+     * @param text
      *            string to parse.
      * @return a <code>Group</code> object for the specified string.
      * @throws ParseException
      *             if the raw string does not represent a single group address.
      */
-    public Group parseGroup(String rawGroupString, DecodeMonitor monitor) throws ParseException {
-        Address address = parseAddress(rawGroupString, monitor);
+    public Group parseGroup(CharSequence text, DecodeMonitor monitor) throws ParseException {
+        Address address = parseAddress(text, monitor);
         if (!(address instanceof Group))
             throw new ParseException("Not a group address");
 
         return (Group) address;
     }
 
-    public Group parseGroup(String rawGroupString) throws ParseException {
-        return parseGroup(rawGroupString, DecodeMonitor.STRICT);
+    public Group parseGroup(CharSequence text) throws ParseException {
+        return parseGroup(text, DecodeMonitor.STRICT);
     }
 
 }

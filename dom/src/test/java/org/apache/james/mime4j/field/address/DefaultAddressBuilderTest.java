@@ -34,11 +34,11 @@ import java.util.List;
 
 public class DefaultAddressBuilderTest {
 
-    private AddressBuilder parser;
+    private DefaultAddressParser parser;
 
     @Before
     public void setUp() throws Exception {
-        parser = AddressBuilder.DEFAULT;
+        parser = DefaultAddressParser.DEFAULT;
     }
 
     @Test

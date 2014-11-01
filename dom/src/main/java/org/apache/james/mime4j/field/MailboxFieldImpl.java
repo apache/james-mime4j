@@ -23,7 +23,7 @@ import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.MailboxField;
-import org.apache.james.mime4j.field.address.AddressBuilder;
+import org.apache.james.mime4j.field.address.DefaultAddressParser;
 import org.apache.james.mime4j.field.address.ParseException;
 import org.apache.james.mime4j.stream.Field;
 
@@ -65,7 +65,7 @@ public class MailboxFieldImpl extends AbstractField implements MailboxField {
         String body = getBody();
 
         try {
-            mailbox = AddressBuilder.DEFAULT.parseMailbox(body, monitor);
+            mailbox = DefaultAddressParser.DEFAULT.parseMailbox(body, monitor);
         } catch (ParseException e) {
             parseException = e;
         }

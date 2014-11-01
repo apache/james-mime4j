@@ -37,11 +37,11 @@ import java.util.List;
 
 public class LenientAddressBuilderTest {
 
-    private LenientAddressBuilder parser;
+    private LenientAddressParser parser;
 
     @Before
     public void setUp() throws Exception {
-        parser = LenientAddressBuilder.DEFAULT;
+        parser = LenientAddressParser.DEFAULT;
     }
 
     @Test

@@ -63,16 +63,16 @@ public final class InputStreams {
         return new BinaryInputStream(b);
     }
 
-    public static InputStream createAscii(final String s) {
+    public static InputStream createAscii(final CharSequence s) {
         if (s == null) {
-            throw new IllegalArgumentException("String may not be null");
+            throw new IllegalArgumentException("CharSequence may not be null");
         }
         return new TextInputStream(s, Charsets.US_ASCII, 1024);
     }
 
-    public static InputStream create(final String s, final Charset charset) {
+    public static InputStream create(final CharSequence s, final Charset charset) {
         if (s == null) {
-            throw new IllegalArgumentException("String may not be null");
+            throw new IllegalArgumentException("CharSequence may not be null");
         }
         return new TextInputStream(s, charset != null ? charset : Charsets.DEFAULT_CHARSET, 1024);
     }
