@@ -30,11 +30,11 @@ import org.apache.james.mime4j.dom.address.Mailbox;
 /**
  * Default (strict) builder for {@link Address} and its subclasses.
  */
-public class AddressBuilder implements SharedAddressBuilder {
+public class DefaultAddressBuilder implements AddressBuilder {
 
-    public static final AddressBuilder DEFAULT = new AddressBuilder();
+    public static final DefaultAddressBuilder DEFAULT = new DefaultAddressBuilder();
 
-    protected AddressBuilder() {
+    protected DefaultAddressBuilder() {
         super();
     }
 

@@ -25,10 +25,10 @@ import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 
 /**
- * Either a lenient {@link LenientAddressBuilder} or strict {@link AddressBuilder} builder for {@link Address} and its subclasses.
+ * Either a lenient {@link LenientAddressBuilder} or strict {@link DefaultAddressBuilder} builder for {@link Address} and its subclasses.
  * 
  */
-public interface SharedAddressBuilder {
+public interface AddressBuilder {
 
     /**
      * Parses the specified raw string into an address.
@@ -38,7 +38,7 @@ public interface SharedAddressBuilder {
      * @return an <code>Address</code> object for the specified string.
      * @throws ParseException if the raw string does not represent a single address.
      */
-    public abstract Address parseAddress(String rawAddressString) throws ParseException;
+    Address parseAddress(String rawAddressString) throws ParseException;
 
     /**
      * Parse the address list string, such as the value of a From, To, Cc, Bcc,
@@ -48,7 +48,7 @@ public interface SharedAddressBuilder {
      * @param rawAddressList
      *            string to parse.
      */
-    public abstract AddressList parseAddressList(String rawAddressList) throws ParseException;
+    AddressList parseAddressList(String rawAddressList) throws ParseException;
 
     /**
      * Parses the specified raw string into a mailbox address.
@@ -60,7 +60,7 @@ public interface SharedAddressBuilder {
      *             if the raw string does not represent a single mailbox
      *             address.
      */
-    public abstract Mailbox parseMailbox(String rawMailboxString) throws ParseException;
+    Mailbox parseMailbox(String rawMailboxString) throws ParseException;
 
     /**
      * Parses the specified raw string into a group address.
@@ -71,6 +71,6 @@ public interface SharedAddressBuilder {
      * @throws ParseException
      *             if the raw string does not represent a single group address.
      */
-    public abstract Group parseGroup(String rawGroupString) throws ParseException;
+    Group parseGroup(String rawGroupString) throws ParseException;
 
 }
