@@ -68,7 +68,7 @@ public class AddressListFieldLenientImpl extends AbstractField implements Addres
             pos = 0;
         }
         ParserCursor cursor = new ParserCursor(pos, buf.length());
-        addressList = LenientAddressBuilder.DEFAULT.parseAddressList(buf, cursor);
+        addressList = LenientAddressBuilder.BUILDER.parseAddressList(buf, cursor);
     }
 
     public static final FieldParser<AddressListField> PARSER = new FieldParser<AddressListField>() {

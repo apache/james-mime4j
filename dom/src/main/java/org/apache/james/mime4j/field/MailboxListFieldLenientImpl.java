@@ -68,7 +68,7 @@ public class MailboxListFieldLenientImpl extends AbstractField implements Mailbo
             pos = 0;
         }
         ParserCursor cursor = new ParserCursor(pos, buf.length());
-        mailboxList = LenientAddressBuilder.DEFAULT.parseAddressList(buf, cursor).flatten();
+        mailboxList = LenientAddressBuilder.BUILDER.parseAddressList(buf, cursor).flatten();
     }
 
     public static final FieldParser<MailboxListField> PARSER = new FieldParser<MailboxListField>() {

@@ -41,7 +41,7 @@ public class LenientAddressBuilderTest {
 
     @Before
     public void setUp() throws Exception {
-        parser = LenientAddressBuilder.DEFAULT;
+        parser = LenientAddressBuilder.BUILDER;
     }
 
     @Test

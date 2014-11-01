@@ -65,7 +65,7 @@ public class MailboxListFieldImpl extends AbstractField implements MailboxListFi
         String body = getBody();
 
         try {
-            mailboxList = DefaultAddressBuilder.DEFAULT.parseAddressList(body, monitor).flatten();
+            mailboxList = DefaultAddressBuilder.BUILDER.parseAddressList(body, monitor).flatten();
         } catch (ParseException e) {
             parseException = e;
         }

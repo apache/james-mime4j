@@ -56,7 +56,7 @@ public class LenientAddressBuilder implements AddressBuilder {
     private static final BitSet COLON_ONLY             = RawFieldParser.INIT_BITSET(COLON);
     private static final BitSet SEMICOLON_ONLY         = RawFieldParser.INIT_BITSET(SEMICOLON);
 
-    public static final LenientAddressBuilder DEFAULT = new LenientAddressBuilder(DecodeMonitor.SILENT);
+    public static final LenientAddressBuilder BUILDER = new LenientAddressBuilder(DecodeMonitor.SILENT);
 
     private final DecodeMonitor monitor;
     private final RawFieldParser parser;

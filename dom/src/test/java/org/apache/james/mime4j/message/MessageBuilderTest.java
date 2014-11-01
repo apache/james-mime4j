@@ -194,8 +194,8 @@ public class MessageBuilderTest {
     public void testSetFrom() throws Exception {
         MessageBuilder builder = MessageBuilder.create();
 
-        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
+        Mailbox mailbox1 = DefaultAddressBuilder.BUILDER.parseMailbox("john.doe@example.net");
+        Mailbox mailbox2 = DefaultAddressBuilder.BUILDER.parseMailbox("jane.doe@example.net");
 
         builder.setFrom(mailbox1);
         Assert.assertEquals("john.doe@example.net", builder.getField("From")
@@ -228,10 +228,10 @@ public class MessageBuilderTest {
     public void testSetTo() throws Exception {
         MessageBuilder builder = MessageBuilder.create();
 
-        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
+        Mailbox mailbox1 = DefaultAddressBuilder.BUILDER.parseMailbox("john.doe@example.net");
+        Mailbox mailbox2 = DefaultAddressBuilder.BUILDER.parseMailbox("jane.doe@example.net");
         Group group = new Group("Does", mailbox1, mailbox2);
-        Mailbox mailbox3 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox3 = DefaultAddressBuilder.BUILDER.parseMailbox("Mary Smith <mary@example.net>");
 
         builder.setTo(group);
         Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;",
@@ -266,10 +266,10 @@ public class MessageBuilderTest {
     public void testSetCc() throws Exception {
         MessageBuilder builder = MessageBuilder.create();
 
-        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
+        Mailbox mailbox1 = DefaultAddressBuilder.BUILDER.parseMailbox("john.doe@example.net");
+        Mailbox mailbox2 = DefaultAddressBuilder.BUILDER.parseMailbox("jane.doe@example.net");
         Group group = new Group("Does", mailbox1, mailbox2);
-        Mailbox mailbox3 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox3 = DefaultAddressBuilder.BUILDER.parseMailbox("Mary Smith <mary@example.net>");
 
         builder.setCc(group);
         Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;",
@@ -304,10 +304,10 @@ public class MessageBuilderTest {
     public void testSetBcc() throws Exception {
         MessageBuilder builder = MessageBuilder.create();
 
-        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
+        Mailbox mailbox1 = DefaultAddressBuilder.BUILDER.parseMailbox("john.doe@example.net");
+        Mailbox mailbox2 = DefaultAddressBuilder.BUILDER.parseMailbox("jane.doe@example.net");
         Group group = new Group("Does", mailbox1, mailbox2);
-        Mailbox mailbox3 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox3 = DefaultAddressBuilder.BUILDER.parseMailbox("Mary Smith <mary@example.net>");
 
         builder.setBcc(group);
         Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;",
@@ -342,10 +342,10 @@ public class MessageBuilderTest {
     public void testSetReplyTo() throws Exception {
         MessageBuilder builder = MessageBuilder.create();
 
-        Mailbox mailbox1 = DefaultAddressBuilder.DEFAULT.parseMailbox("john.doe@example.net");
-        Mailbox mailbox2 = DefaultAddressBuilder.DEFAULT.parseMailbox("jane.doe@example.net");
+        Mailbox mailbox1 = DefaultAddressBuilder.BUILDER.parseMailbox("john.doe@example.net");
+        Mailbox mailbox2 = DefaultAddressBuilder.BUILDER.parseMailbox("jane.doe@example.net");
         Group group = new Group("Does", mailbox1, mailbox2);
-        Mailbox mailbox3 = DefaultAddressBuilder.DEFAULT.parseMailbox("Mary Smith <mary@example.net>");
+        Mailbox mailbox3 = DefaultAddressBuilder.BUILDER.parseMailbox("Mary Smith <mary@example.net>");
 
         builder.setReplyTo(group);
         Assert.assertEquals("Does: john.doe@example.net, jane.doe@example.net;",

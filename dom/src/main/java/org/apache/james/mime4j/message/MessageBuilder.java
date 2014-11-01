@@ -777,7 +777,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
         if (mailbox == null) {
             removeFields(fieldName);
         } else {
-            setField(Fields.mailbox(fieldName, DefaultAddressBuilder.DEFAULT.parseMailbox(mailbox)));
+            setField(Fields.mailbox(fieldName, DefaultAddressBuilder.BUILDER.parseMailbox(mailbox)));
         }
         return this;
     }
@@ -792,7 +792,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
     }
 
     private MessageBuilder setMailboxList(String fieldName, String mailbox) throws ParseException {
-        return setMailboxList(fieldName, mailbox == null ? null : DefaultAddressBuilder.DEFAULT.parseMailbox(mailbox));
+        return setMailboxList(fieldName, mailbox == null ? null : DefaultAddressBuilder.BUILDER.parseMailbox(mailbox));
     }
 
     private MessageBuilder setMailboxList(String fieldName, Mailbox... mailboxes) {
@@ -805,7 +805,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
         } else {
             List<Mailbox> list = new ArrayList<Mailbox>();
             for (String mailbox: mailboxes) {
-                list.add(DefaultAddressBuilder.DEFAULT.parseMailbox(mailbox));
+                list.add(DefaultAddressBuilder.BUILDER.parseMailbox(mailbox));
             }
             return list;
         }
@@ -834,7 +834,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
     }
 
     private MessageBuilder setAddressList(String fieldName, String address) throws ParseException {
-        return setAddressList(fieldName, address == null ? null : DefaultAddressBuilder.DEFAULT.parseMailbox(address));
+        return setAddressList(fieldName, address == null ? null : DefaultAddressBuilder.BUILDER.parseMailbox(address));
     }
 
     private MessageBuilder setAddressList(String fieldName, Address... addresses) {
@@ -847,7 +847,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
         } else {
             List<Address> list = new ArrayList<Address>();
             for (String address: addresses) {
-                list.add(DefaultAddressBuilder.DEFAULT.parseAddress(address));
+                list.add(DefaultAddressBuilder.BUILDER.parseAddress(address));
             }
             return list;
         }

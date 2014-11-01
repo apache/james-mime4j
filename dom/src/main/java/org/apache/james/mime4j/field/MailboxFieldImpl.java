@@ -65,7 +65,7 @@ public class MailboxFieldImpl extends AbstractField implements MailboxField {
         String body = getBody();
 
         try {
-            mailbox = DefaultAddressBuilder.DEFAULT.parseMailbox(body, monitor);
+            mailbox = DefaultAddressBuilder.BUILDER.parseMailbox(body, monitor);
         } catch (ParseException e) {
             parseException = e;
         }

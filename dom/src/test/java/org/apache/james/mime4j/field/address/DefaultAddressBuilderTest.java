@@ -38,7 +38,7 @@ public class DefaultAddressBuilderTest {
 
     @Before
     public void setUp() throws Exception {
-        parser = DefaultAddressBuilder.DEFAULT;
+        parser = DefaultAddressBuilder.BUILDER;
     }
 
     @Test

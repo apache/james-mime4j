@@ -32,7 +32,7 @@ import org.apache.james.mime4j.dom.address.Mailbox;
  */
 public class DefaultAddressBuilder implements AddressBuilder {
 
-    public static final DefaultAddressBuilder DEFAULT = new DefaultAddressBuilder();
+    public static final DefaultAddressBuilder BUILDER = new DefaultAddressBuilder();
 
     protected DefaultAddressBuilder() {
         super();
