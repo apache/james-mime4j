@@ -215,7 +215,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
                 total += chunk;
             }
             if (this.maxLineLen > 0 && dst.length() >= this.maxLineLen) {
-                throw new MaxLineLimitException("Maximum line length limit exceeded");
+                throw new MaxLineLimitException("Maximum line length limit (" + this.maxLineLen +") exceeded");
             }
         }
         if (total == 0 && bytesRead == -1) {

@@ -92,7 +92,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
             dst.append(ch);
             total++;
             if (this.maxLineLen > 0 && dst.length() >= this.maxLineLen) {
-                throw new MaxLineLimitException("Maximum line length limit exceeded");
+                throw new MaxLineLimitException("Maximum line length limit ( "+ this.maxLineLen +") exceeded");
             }
             if (ch == '\n') {
                 break;

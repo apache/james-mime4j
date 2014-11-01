@@ -898,7 +898,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
         BodyDescriptorBuilder currentBodyDescBuilder = bodyDescBuilder != null ? bodyDescBuilder :
                 new DefaultBodyDescriptorBuilder(null, fieldParser != null ? fieldParser :
                         strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser(), currentMonitor);
-        BodyFactory currentBodyFactory = bodyFactory != null ? bodyFactory : new BasicBodyFactory(!strict);
+        BodyFactory currentBodyFactory = bodyFactory != null ? bodyFactory : new BasicBodyFactory();
         MimeStreamParser parser = new MimeStreamParser(currentConfig, currentMonitor, currentBodyDescBuilder);
 
         Message message = new MessageImpl();
