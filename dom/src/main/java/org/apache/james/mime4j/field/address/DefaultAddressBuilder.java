@@ -19,48 +19,82 @@
 
 package org.apache.james.mime4j.field.address;
 
+import java.io.StringReader;
+
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 
 /**
- * Either a lenient {@link LenientAddressBuilder} or strict {@link AddressBuilder} builder for {@link Address} and its subclasses.
- * 
+ * Default (strict) builder for {@link Address} and its subclasses.
  */
-public interface SharedAddressBuilder {
+public class AddressBuilder implements SharedAddressBuilder {
+
+    public static final AddressBuilder DEFAULT = new AddressBuilder();
+
+    protected AddressBuilder() {
+        super();
+    }
 
     /**
      * Parses the specified raw string into an address.
      *
      * @param rawAddressString
      *            string to parse.
+     * @param monitor the DecodeMonitor to be used while parsing/decoding
      * @return an <code>Address</code> object for the specified string.
      * @throws ParseException if the raw string does not represent a single address.
      */
-    public abstract Address parseAddress(String rawAddressString) throws ParseException;
+    public Address parseAddress(String rawAddressString, DecodeMonitor monitor) throws ParseException {
+        AddressListParser parser = new AddressListParser(new StringReader(
+                rawAddressString));
+        return Builder.getInstance().buildAddress(parser.parseAddress(), monitor);
+    }
+
+    public Address parseAddress(String rawAddressString) throws ParseException {
+        return parseAddress(rawAddressString, DecodeMonitor.STRICT);
+    }
 
     /**
      * Parse the address list string, such as the value of a From, To, Cc, Bcc,
      * Sender, or Reply-To header.
      *
      * The string MUST be unfolded already.
-     * @param rawAddressList
-     *            string to parse.
+     * @param monitor the DecodeMonitor to be used while parsing/decoding
      */
-    public abstract AddressList parseAddressList(String rawAddressList) throws ParseException;
+    public AddressList parseAddressList(String rawAddressList, DecodeMonitor monitor)
+            throws ParseException {
+        AddressListParser parser = new AddressListParser(new StringReader(
+                rawAddressList));
+        return Builder.getInstance().buildAddressList(parser.parseAddressList(), monitor);
+    }
+
+    public AddressList parseAddressList(String rawAddressList) throws ParseException {
+        return parseAddressList(rawAddressList, DecodeMonitor.STRICT);
+    }
 
     /**
      * Parses the specified raw string into a mailbox address.
      *
      * @param rawMailboxString
      *            string to parse.
+     * @param monitor the DecodeMonitor to be used while parsing/decoding.
      * @return a <code>Mailbox</code> object for the specified string.
      * @throws ParseException
      *             if the raw string does not represent a single mailbox
      *             address.
      */
-    public abstract Mailbox parseMailbox(String rawMailboxString) throws ParseException;
+    public Mailbox parseMailbox(String rawMailboxString, DecodeMonitor monitor) throws ParseException {
+        AddressListParser parser = new AddressListParser(new StringReader(
+                rawMailboxString));
+        return Builder.getInstance().buildMailbox(parser.parseMailbox(), monitor);
+    }
+
+    public Mailbox parseMailbox(String rawMailboxString) throws ParseException {
+        return parseMailbox(rawMailboxString, DecodeMonitor.STRICT);
+    }
 
     /**
      * Parses the specified raw string into a group address.
@@ -71,6 +105,16 @@ public interface SharedAddressBuilder {
      * @throws ParseException
      *             if the raw string does not represent a single group address.
      */
-    public abstract Group parseGroup(String rawGroupString) throws ParseException;
+    public Group parseGroup(String rawGroupString, DecodeMonitor monitor) throws ParseException {
+        Address address = parseAddress(rawGroupString, monitor);
+        if (!(address instanceof Group))
+            throw new ParseException("Not a group address");
+
+        return (Group) address;
+    }
+
+    public Group parseGroup(String rawGroupString) throws ParseException {
+        return parseGroup(rawGroupString, DecodeMonitor.STRICT);
+    }
 
 }
