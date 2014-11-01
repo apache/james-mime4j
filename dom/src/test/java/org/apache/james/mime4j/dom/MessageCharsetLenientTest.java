@@ -99,7 +99,7 @@ public class MessageCharsetLenientTest {
 		// test in bosh states
 		for (boolean lenient : lenientstates) {
 			// set how lenient we are
-			BasicBodyFactory basicBodyFactory = new BasicBodyFactory(lenient );
+			BasicBodyFactory basicBodyFactory = new BasicBodyFactory(lenient);
             builder.setBodyFactory(basicBodyFactory);
 			// check the list of invalid Charsets
 			for (String invalidCharset : invalidCharsets) {
