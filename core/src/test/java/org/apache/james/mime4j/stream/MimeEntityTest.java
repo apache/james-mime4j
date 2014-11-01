@@ -433,6 +433,8 @@ public class MimeEntityTest extends TestCase {
             fail("MimeException caused by MaxLineLimitException should have been thrown");
         } catch (MimeException expected) {
             assertTrue(expected.getCause() instanceof MaxLineLimitException);
+            // make sure the exception contains the information about the current maxlinelen setting
+            assertTrue(expected.getMessage().contains(""+config.getMaxLineLen()));
         }
     }
 
@@ -488,6 +490,8 @@ public class MimeEntityTest extends TestCase {
             entity.advance();
             fail("MimeException caused by MaxLineLimitException should have been thrown");
         } catch (MaxHeaderLengthLimitException expected) {
+        	// make sure the message contains the current setting of maxheaderlen
+        	assertTrue(expected.getMessage().contains(""+config.getMaxHeaderLen()));
         }
     }
 
@@ -582,6 +586,8 @@ public class MimeEntityTest extends TestCase {
             entity.advance();
             fail("MaxHeaderLimitException should have been thrown");
         } catch (MaxHeaderLimitException expected) {
+        	// make sure the message contains the current setting of maxheadercount
+        	assertTrue(expected.getMessage().contains(""+config.getMaxHeaderCount()));
         }
     }
 

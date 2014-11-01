@@ -251,7 +251,7 @@ class MimeEntity implements EntityStateMachine {
                 return false;
             }
             if (maxHeaderCount > 0 && headerCount >= maxHeaderCount) {
-                throw new MaxHeaderLimitException("Maximum header limit exceeded");
+                throw new MaxHeaderLimitException("Maximum header limit (" + maxHeaderCount + ") exceeded");
             }
             headerCount++;
             fieldBuilder.reset();
