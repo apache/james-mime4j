@@ -21,6 +21,8 @@ package org.apache.james.mime4j.codec;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.IOUtils;
@@ -33,6 +35,16 @@ public class QuotedPrintableInputStreamTest {
 
     private static String readText(final InputStream is) throws IOException {
         return IOUtils.toString(is, Charsets.ISO_8859_1.name());
+    }
+
+    private static String readTextByOne(final InputStream is) throws IOException {
+        StringBuilder buf = new StringBuilder();
+        Reader reader = new InputStreamReader(is, Charsets.ISO_8859_1.name());
+        int ch;
+        while ((ch = reader.read()) != -1) {
+            buf.append((char) ch);
+        }
+        return buf.toString();
     }
 
     @Test
@@ -108,6 +120,13 @@ public class QuotedPrintableInputStreamTest {
         InputStream bis = InputStreams.createAscii("Soft line   =\nHard line   \r\n");
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
         Assert.assertEquals("Soft line   Hard line\r\n", readText(decoder));
+    }
+
+    @Test
+    public void testSpaceBeforeSoftBreakStrictMode() throws IOException, UnsupportedEncodingException {
+        InputStream bis = InputStreams.createAscii("text before eq sign =\r\n text after LF");
+        QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis,DecodeMonitor.STRICT);
+        Assert.assertEquals("text before eq sign  text after LF", readTextByOne(decoder));
     }
 
     @Test

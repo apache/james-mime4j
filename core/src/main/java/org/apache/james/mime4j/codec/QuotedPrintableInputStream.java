@@ -45,6 +45,7 @@ public class QuotedPrintableInputStream extends InputStream {
     private int pos = 0; // current index into encoded buffer
     private int limit = 0; // current size of encoded buffer
 
+    private boolean lastWasCR = false;
     private boolean closed;
 
     private final DecodeMonitor monitor;
@@ -180,7 +181,6 @@ public class QuotedPrintableInputStream extends InputStream {
                 return index == off ? -1 : index - off;
             }
 
-            boolean lastWasCR = false;
             while (pos < limit && index < to) {
                 int b = encoded[pos++] & 0xFF;
 
