@@ -95,6 +95,12 @@ public class QuotedPrintableInputStreamTest extends TestCase {
         assertEquals("Soft line   Hard line\r\n", new String(read(decoder), "ISO8859-1"));
     }
 
+    public void testSpaceBeforeSoftBreakStrictMode() throws IOException, UnsupportedEncodingException {
+        ByteArrayInputStream bis = new ByteArrayInputStream("text before eq sign =\r\n text after LF".getBytes("US-ASCII"));
+        QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis,DecodeMonitor.STRICT);
+        assertEquals("text before eq sign  text after LF", new String(read(decoder), "ISO8859-1"));
+    }
+    
     public void testSoftBreakTrailingBalnksDecode() throws IOException, UnsupportedEncodingException {
         ByteArrayInputStream bis = new ByteArrayInputStream("Soft line   = \t \r\nHard line   \r\n".getBytes("US-ASCII"));
         QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(bis);
