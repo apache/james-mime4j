@@ -24,8 +24,7 @@
     <parent>
         <artifactId>james-project</artifactId>
         <groupId>org.apache.james</groupId>
-        <version>1.8.2</version>
-        <relativePath/>
+        <version>1.8.3-SNAPSHOT</version>
     </parent>
 
     <artifactId>apache-mime4j-project</artifactId>
