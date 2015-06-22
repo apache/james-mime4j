@@ -69,7 +69,7 @@
         <junit.version>4.10</junit.version>
         <mockito.version>1.9.5</mockito.version>
         <!-- Version 2.2 is required for Java 1.5 compatibility -->
-        <commons-io.version>2.2</commons-io.version>
+        <commons-io.version>2.4</commons-io.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

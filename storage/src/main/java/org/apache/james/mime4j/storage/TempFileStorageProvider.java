@@ -30,6 +30,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.commons.io.FileUtils;
+
 /**
  * A {@link StorageProvider} that stores the data in temporary files. The files
  * are stored either in a user-specified directory or the default temporary-file
@@ -91,9 +93,13 @@ public class TempFileStorageProvider extends AbstractStorageProvider {
         if (prefix == null || prefix.length() < 3)
             throw new IllegalArgumentException("invalid prefix");
 
-        if (directory != null && !directory.isDirectory()
-                && !directory.mkdirs())
-            throw new IllegalArgumentException("invalid directory");
+        if (directory != null) {
+            try {
+                FileUtils.forceMkdir(directory);
+            } catch (IOException e) {
+                throw new IllegalArgumentException("invalid directory");
+            }
+        }
 
         this.prefix = prefix;
         this.suffix = suffix;
@@ -163,9 +169,10 @@ public class TempFileStorageProvider extends AbstractStorageProvider {
 
                 for (Iterator<File> iterator = filesToDelete.iterator(); iterator
                         .hasNext();) {
-                    File file = iterator.next();
-                    if (file.delete()) {
+                    try {
+                        FileUtils.forceDelete(iterator.next());
                         iterator.remove();
+                    } catch (IOException e) {
                     }
                 }
             }
