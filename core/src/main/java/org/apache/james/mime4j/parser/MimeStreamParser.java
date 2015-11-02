@@ -216,6 +216,14 @@ public class MimeStreamParser {
     }
 
     /**
+     * Disables recursive mode. In this mode rfc822 parts are not
+     * recursively parsed.
+     */
+    public void setNoRecurse() {
+        mimeTokenStream.setRecursionMode(RecursionMode.M_NO_RECURSE);
+    }
+
+    /**
      * Finishes the parsing and stops reading lines.
      * NOTE: No more lines will be parsed but the parser
      * will still call
