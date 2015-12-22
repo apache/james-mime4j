@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations      *
  * under the License.                                           *
  ****************************************************************/
-
 package org.apache.james.mime4j.utils.search;
 
 import com.google.common.collect.ImmutableList;
@@ -40,57 +39,64 @@ import java.util.List;
 /**
  * Searches an email for content.
  */
-public class MessageSearcher {
+public class MessageMatcher {
 
-    public static class MessageSearcherBuilder {
+    public static class MessageMatcherBuilder {
 
         private List<CharSequence> searchContents;
         private List<String> contentTypes;
         private boolean isCaseInsensitive;
         private boolean includeHeaders;
+        private boolean ignoringMime;
         private Logger logger;
 
-        public MessageSearcherBuilder() {
+        public MessageMatcherBuilder() {
             this.searchContents = ImmutableList.of();
             this.contentTypes = ImmutableList.of();
             this.isCaseInsensitive = false;
             this.includeHeaders = false;
-            this.logger = LoggerFactory.getLogger(MessageSearcher.class);
+            this.ignoringMime = false;
+            this.logger = LoggerFactory.getLogger(MessageMatcher.class);
         }
 
-        public MessageSearcherBuilder searchContents(List<CharSequence> searchContents) {
+        public MessageMatcherBuilder searchContents(List<CharSequence> searchContents) {
             this.searchContents = searchContents;
             return this;
         }
 
-        public MessageSearcherBuilder contentTypes(List<String> contentTypes) {
+        public MessageMatcherBuilder contentTypes(List<String> contentTypes) {
             this.contentTypes = contentTypes;
             return this;
         }
 
-        public MessageSearcherBuilder caseInsensitive(boolean isCaseInsensitive) {
+        public MessageMatcherBuilder caseInsensitive(boolean isCaseInsensitive) {
             this.isCaseInsensitive = isCaseInsensitive;
             return this;
         }
 
-        public MessageSearcherBuilder includeHeaders(boolean includeHeaders) {
+        public MessageMatcherBuilder includeHeaders(boolean includeHeaders) {
             this.includeHeaders = includeHeaders;
             return this;
         }
 
-        public MessageSearcherBuilder logger(Logger logger) {
+        public MessageMatcherBuilder logger(Logger logger) {
             this.logger = logger;
             return this;
         }
 
-        public MessageSearcher build() {
-            return new MessageSearcher(searchContents, isCaseInsensitive, includeHeaders, contentTypes, logger);
+        public MessageMatcherBuilder ignoringMime(boolean ignoringMime) {
+            this.ignoringMime = ignoringMime;
+            return this;
+        }
+
+        public MessageMatcher build() {
+            return new MessageMatcher(searchContents, isCaseInsensitive, includeHeaders, ignoringMime, contentTypes, logger);
         }
 
     }
 
-    public static MessageSearcherBuilder builder() {
-        return new MessageSearcherBuilder();
+    public static MessageMatcherBuilder builder() {
+        return new MessageMatcherBuilder();
     }
 
     private final Logger logger;
@@ -98,12 +104,15 @@ public class MessageSearcher {
     private final List<String> contentTypes;
     private final boolean isCaseInsensitive;
     private final boolean includeHeaders;
+    private final boolean ignoringMime;
 
-    private MessageSearcher(List<CharSequence> searchContents, boolean isCaseInsensitive, boolean includeHeaders, List<String> contentTypes, Logger logger) {
+    private MessageMatcher(List<CharSequence> searchContents, boolean isCaseInsensitive, boolean includeHeaders,
+                           boolean ignoringMime, List<String> contentTypes, Logger logger) {
         this.contentTypes = ImmutableList.copyOf(contentTypes);
         this.searchContents = ImmutableList.copyOf(searchContents);
         this.isCaseInsensitive = isCaseInsensitive;
         this.includeHeaders = includeHeaders;
+        this.ignoringMime = ignoringMime;
         this.logger = logger;
     }
 
@@ -117,33 +126,18 @@ public class MessageSearcher {
      * @throws IOException
      * @throws MimeException
      */
-    public boolean isFoundIn(final InputStream input) throws IOException, MimeException {
+    public boolean messageMatches(final InputStream input) throws IOException, MimeException {
         for (CharSequence charSequence : searchContents) {
             if (charSequence != null) {
                 final CharBuffer buffer = createBuffer(charSequence);
-                if (! matchBufferInMailBeingMimeAware(input, buffer)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Is the search contents found in the given input?
-     *
-     * @param input <code>InputStream</code> containing an email
-     * @return true if the content exists and the stream contains the content,
-     *         false otherwise
-     * @throws IOException
-     * @throws MimeException
-     */
-    public boolean isFoundInIgnoringMime(final InputStream input) throws IOException, MimeException {
-        for (CharSequence charSequence : searchContents) {
-            if (charSequence != null && ! charSequence.equals("")) {
-                final CharBuffer buffer = createBuffer(charSequence);
-                if (! isFoundIn(new InputStreamReader(input), buffer)) {
-                    return false;
+                if (ignoringMime) {
+                    if (! isFoundIn(new InputStreamReader(input), buffer)) {
+                        return false;
+                    }
+                } else {
+                    if (!matchBufferInMailBeingMimeAware(input, buffer)) {
+                        return false;
+                    }
                 }
             }
         }
