@@ -44,6 +44,7 @@
         <module>examples</module>
         <module>assemble</module>
         <module>mbox</module>
+        <module>james-utils</module>
     </modules>
 
     <scm>
