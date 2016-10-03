@@ -22,9 +22,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>james-project</artifactId>
-        <groupId>org.apache.james</groupId>
-        <version>1.8.3-SNAPSHOT</version>
+        <groupId>org.apache</groupId>
+        <artifactId>apache</artifactId>
+        <version>14</version>
+        <relativePath/>
     </parent>
 
     <artifactId>apache-mime4j-project</artifactId>
