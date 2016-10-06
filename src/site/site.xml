@@ -19,6 +19,12 @@
 -->
 <project name="Apache James Mime4J">
 
+    <skin>
+        <groupId>org.apache.james</groupId>
+        <artifactId>james-skin</artifactId>
+        <version>${james-skin.version}</version>
+    </skin>
+
     <bannerLeft>
         <name>JAMES Mime4J</name>
         <src>images/james-logo.png</src>
@@ -26,26 +32,117 @@
         <alt>james-logo.png</alt>
     </bannerLeft>
 
-  <body>
-    <menu name="Documentation">
-      <item name="Overview" href="/index.html"/>
-      <item name="Status" href="/status.html"/>
-      <item name="Example" href="/samples.html"/>
-      <item name="Usage" href="/usage.html"/>
-    </menu>
-    
-    <menu name="Developers Corner">
-      <item name="Download" href="/start/download.html" />
-      <item name="Build" href="/start/build.html" />
-    </menu>
-    
-    <menu name="References">
-      <item name="Javadoc" href="/apidocs/index.html" />
-      <item name="Issue Tracker" href="http://issues.apache.org/jira/browse/MIME4J/" />
-    </menu>
+    <bannerRight>
+        <name>The Apache Software Foundation</name>
+        <src>images/logos/asf_logo_small.png</src>
+        <href>http://www.apache.org/index.html</href>
+    </bannerRight>
 
-    <menu name="Related Projects">
-    	<item name="httpmime" href="http://hc.apache.org/httpcomponents-client/httpmime/index.html" />
-    </menu>
-  </body>
+
+    <body>
+        <links>
+            <item
+                    name="Home"
+                    href="http://james.apache.org/index.html" />
+            <item
+                    name="Server"
+                    href="http://james.apache.org/server/index.html" />
+            <item
+                    name="Hupa"
+                    href="http://james.apache.org/hupa/index.html" />
+            <item
+                    name="Protocols"
+                    href="http://james.apache.org/protocols/index.html" />
+            <item
+                    name="Mailets"
+                    href="http://james.apache.org/mailet/index.html" />
+            <item
+                    name="Mailbox"
+                    href="http://james.apache.org/mailbox/index.html" />
+            <item
+                    name="Mime4J"
+                    href="http://james.apache.org/mime4j/index.html" />
+            <item
+                    name="jSieve"
+                    href="http://james.apache.org/jsieve/index.html" />
+            <item
+                    name="jSPF"
+                    href="http://james.apache.org/jspf/index.html" />
+            <item
+                    name="jDKIM"
+                    href="http://james.apache.org/jdkim/index.html" />
+            <item
+                    name="MPT"
+                    href="http://james.apache.org/mpt/index.html" />
+            <item
+                    name="Postage"
+                    href="http://james.apache.org/postage/index.html" />
+        </links>
+
+
+        <menu name="Documentation">
+            <item name="Overview" href="/index.html"/>
+            <item name="Status" href="/status.html"/>
+            <item name="Example" href="/samples.html"/>
+            <item name="Usage" href="/usage.html"/>
+        </menu>
+
+        <menu name="Developers Corner">
+            <item name="Download" href="/start/download.html" />
+            <item name="Build" href="/start/build.html" />
+        </menu>
+
+        <menu name="References">
+            <item name="Javadoc" href="/apidocs/index.html" />
+            <item name="Issue Tracker" href="http://issues.apache.org/jira/browse/MIME4J/" />
+        </menu>
+
+        <menu name="Related Projects">
+            <item name="httpmime" href="http://hc.apache.org/httpcomponents-client/httpmime/index.html" />
+        </menu>
+
+        <menu
+                name="About James"
+                inherit="bottom">
+            <item
+                    name="Overview"
+                    href="/index.html" />
+            <item
+                    name="News"
+                    href="/newsarchive.html" />
+            <item
+                    name="Mailing Lists"
+                    href="/mail.html" />
+            <item
+                    name="Contributing"
+                    href="/contribute.html" />
+            <item
+                    name="Guidelines"
+                    href="/guidelines.html" />
+            <item
+                    name="Wiki"
+                    href="http://wiki.apache.org/james" />
+            <item
+                    name="Who We Are"
+                    href="/team-list.html" />
+            <item
+                    name="License"
+                    href="/license.html" />
+            <item
+                    name="Thanks"
+                    href="/thanks.html" />
+            <item
+                    name="Professional support"
+                    href="/support.html" />
+        </menu>
+
+        <menu
+                name="Download"
+                inherit="bottom">
+            <item
+                    name="Releases"
+                    href="http://james.apache.org/download.cgi" />
+        </menu>
+
+    </body>
 </project>

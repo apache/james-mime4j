@@ -66,6 +66,8 @@
     </distributionManagement>
 
     <properties>
+        <james-skin.version>1.8</james-skin.version>
+
         <target.jdk>1.5</target.jdk>
         <commons-logging.version>1.1.1</commons-logging.version>
         <log4j.version>1.2.14</log4j.version>
