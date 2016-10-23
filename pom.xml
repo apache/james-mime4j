@@ -55,10 +55,14 @@
     </issueManagement>
 
     <distributionManagement>
-        <site>
-            <id>mime4j-website</id>
-            <url>scpexe://people.apache.org/www/james.apache.org/mime4j/</url>
-        </site>
+		<repository>
+			<id>bm_releases</id>
+			<url>http://forge.bluemind.net/nexus/content/repositories/releases</url>
+		</repository>
+		<snapshotRepository>
+			<id>bm_snapshots</id>
+			<url>http://forge.bluemind.net/nexus/content/repositories/snapshots</url>
+		</snapshotRepository>
     </distributionManagement>
 
     <properties>
