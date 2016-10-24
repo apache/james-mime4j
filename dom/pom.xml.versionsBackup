@@ -27,11 +27,25 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>apache-mime4j-core</artifactId>
+    <artifactId>apache-mime4j-dom</artifactId>
 
-    <name>Apache JAMES Mime4j (Core)</name>
+    <name>Apache JAMES Mime4j (DOM)</name>
+    <description>Java MIME Document Object Model</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-mime4j-core</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.james</groupId>
+            <artifactId>apache-mime4j-core</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -47,21 +61,35 @@
             <optional>true</optional>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.javamail</groupId>
-            <artifactId>geronimo-javamail_1.4_mail</artifactId>
-            <version>1.8.3</version>
+            <groupId>javax.mail</groupId>
+            <artifactId>javax.mail-api</artifactId>
+            <version>1.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
+            <version>1.5.2</version>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>javacc-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>generate-jjtree</id>
+                        <phase>generate-sources</phase>
                         <goals>
-                            <goal>test-jar</goal>
+                            <goal>jjtree-javacc</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>generate-javacc</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>javacc</goal>
                         </goals>
                     </execution>
                 </executions>
