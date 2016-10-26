@@ -40,45 +40,30 @@
 
 
     <body>
+
         <links>
             <item
-                    name="Home"
-                    href="http://james.apache.org/index.html" />
+                name="Home"
+                href="http://james.apache.org/index.html" />
             <item
-                    name="Server"
-                    href="http://james.apache.org/server/index.html" />
+                name="James"
+                href="http://james.apache.org/index.html" />
             <item
-                    name="Hupa"
-                    href="http://james.apache.org/hupa/index.html" />
+                name="Mime4J"
+                href="http://james.apache.org/mime4j/index.html" />
             <item
-                    name="Protocols"
-                    href="http://james.apache.org/protocols/index.html" />
+                name="jSieve"
+                href="http://james.apache.org/jsieve/index.html" />
             <item
-                    name="Mailets"
-                    href="http://james.apache.org/mailet/index.html" />
+                name="jSPF"
+                href="http://james.apache.org/jspf/index.html" />
             <item
-                    name="Mailbox"
-                    href="http://james.apache.org/mailbox/index.html" />
+                name="jDKIM"
+                href="http://james.apache.org/jdkim/index.html" />
             <item
-                    name="Mime4J"
-                    href="http://james.apache.org/mime4j/index.html" />
-            <item
-                    name="jSieve"
-                    href="http://james.apache.org/jsieve/index.html" />
-            <item
-                    name="jSPF"
-                    href="http://james.apache.org/jspf/index.html" />
-            <item
-                    name="jDKIM"
-                    href="http://james.apache.org/jdkim/index.html" />
-            <item
-                    name="MPT"
-                    href="http://james.apache.org/mpt/index.html" />
-            <item
-                    name="Postage"
-                    href="http://james.apache.org/postage/index.html" />
+                name="Hupa"
+                href="http://james.apache.org/hupa/index.html" />
         </links>
-
 
         <menu name="Documentation">
             <item name="Overview" href="/index.html"/>
