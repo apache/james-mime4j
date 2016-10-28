@@ -65,7 +65,7 @@
                 href="http://james.apache.org/hupa/index.html" />
         </links>
 
-        <menu name="Documentation">
+        <menu name="MIME4J">
             <item name="Overview" href="/index.html"/>
             <item name="Status" href="/status.html"/>
             <item name="Example" href="/samples.html"/>
@@ -76,6 +76,7 @@
             <item name="Developper corner" href="/start/download.html" collapse="true" >
                 <item name="Build" href="/start/build.html" />
             </item>
+            <item ref="reports"/>
             <item name="Download Releases" href="http://james.apache.org/download.cgi#Apache_Mime4J" />
         </menu>
     </body>
