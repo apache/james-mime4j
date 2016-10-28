@@ -70,6 +70,7 @@
             <item name="Status" href="/status.html"/>
             <item name="Example" href="/samples.html"/>
             <item name="Usage" href="/usage.html"/>
+            <item name="Mailing List" href="http://james.apache.org/mail.html#Mime4j" />
             <item name="Javadoc" href="/apidocs/index.html" />
             <item name="Issue Tracker" href="http://issues.apache.org/jira/browse/MIME4J/" />
             <item name="Developper corner" href="/start/download.html" collapse="true" >
