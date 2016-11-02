@@ -65,69 +65,19 @@
                 href="http://james.apache.org/hupa/index.html" />
         </links>
 
-        <menu name="Documentation">
+        <menu name="MIME4J">
             <item name="Overview" href="/index.html"/>
             <item name="Status" href="/status.html"/>
             <item name="Example" href="/samples.html"/>
             <item name="Usage" href="/usage.html"/>
-        </menu>
-
-        <menu name="Developers Corner">
-            <item name="Download" href="/start/download.html" />
-            <item name="Build" href="/start/build.html" />
-        </menu>
-
-        <menu name="References">
+            <item name="Mailing List" href="http://james.apache.org/mail.html#Mime4j" />
             <item name="Javadoc" href="/apidocs/index.html" />
             <item name="Issue Tracker" href="http://issues.apache.org/jira/browse/MIME4J/" />
+            <item name="Developper corner" href="/start/download.html" collapse="true" >
+                <item name="Build" href="/start/build.html" />
+            </item>
+            <item ref="reports"/>
+            <item name="Download Releases" href="http://james.apache.org/download.cgi#Apache_Mime4J" />
         </menu>
-
-        <menu name="Related Projects">
-            <item name="httpmime" href="http://hc.apache.org/httpcomponents-client/httpmime/index.html" />
-        </menu>
-
-        <menu
-                name="About James"
-                inherit="bottom">
-            <item
-                    name="Overview"
-                    href="/index.html" />
-            <item
-                    name="News"
-                    href="/newsarchive.html" />
-            <item
-                    name="Mailing Lists"
-                    href="/mail.html" />
-            <item
-                    name="Contributing"
-                    href="/contribute.html" />
-            <item
-                    name="Guidelines"
-                    href="/guidelines.html" />
-            <item
-                    name="Wiki"
-                    href="http://wiki.apache.org/james" />
-            <item
-                    name="Who We Are"
-                    href="/team-list.html" />
-            <item
-                    name="License"
-                    href="/license.html" />
-            <item
-                    name="Thanks"
-                    href="/thanks.html" />
-            <item
-                    name="Professional support"
-                    href="/support.html" />
-        </menu>
-
-        <menu
-                name="Download"
-                inherit="bottom">
-            <item
-                    name="Releases"
-                    href="http://james.apache.org/download.cgi" />
-        </menu>
-
     </body>
 </project>
