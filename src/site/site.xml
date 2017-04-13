@@ -46,11 +46,8 @@
                 name="Home"
                 href="http://james.apache.org/index.html" />
             <item
-                name="James"
-                href="http://james.apache.org/index.html" />
-            <item
-                name="Mime4J"
-                href="http://james.apache.org/mime4j/index.html" />
+                name="Server"
+                href="http://james.apache.org/server/documentation.html" />
             <item
                 name="jSieve"
                 href="http://james.apache.org/jsieve/index.html" />
