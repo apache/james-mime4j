@@ -28,6 +28,9 @@ import java.util.Locale;
 import java.util.Random;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.codec.DecoderUtil;
+
 /**
  * A utility class, which provides some MIME related application logic.
  */
@@ -241,6 +244,15 @@ public final class MimeUtil {
         }
 
         return s;
+    }
+
+    /**
+    Unfold and decode header value
+     */
+    public static String unscrambleHeaderValue(String headerValue) {
+        return DecoderUtil.decodeEncodedWords(
+            MimeUtil.unfold(headerValue),
+            DecodeMonitor.SILENT);
     }
 
     private static String unfold0(String s, int crlfIdx) {
