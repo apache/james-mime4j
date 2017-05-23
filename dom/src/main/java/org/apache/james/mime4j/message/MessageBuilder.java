@@ -75,15 +75,68 @@ public class MessageBuilder extends AbstractEntityBuilder {
     private BodyFactory bodyFactory;
     private boolean flatMode;
     private boolean rawContent;
+    private final boolean ensureDateNotNull;
 
-    public static MessageBuilder create() {
-        return new MessageBuilder();
+    /**
+     * Deprecated: please use {@link #of() of} instead
+     * Building a builder using this method will result in a buggy builder which
+     * will create message that do not respect the <code>Message.getDate()</code> contract regarding
+     * the return value when the message do not have a Date header
+     * See <a href="https://issues.apache.org/jira/browse/MIME4J-262">MIME4J-262</a>
+     */
+    @Deprecated
+    public MessageBuilder() {
+        this(true);
     }
 
+    private MessageBuilder(boolean ensureDateNotNull) {
+        this.ensureDateNotNull = ensureDateNotNull;
+    }
+
+    public static MessageBuilder of() {
+        return new MessageBuilder(false);
+    }
+
+    /**
+     * Deprecated: please use {@link #of() of} instead
+     * Building a builder using this method will result in a buggy builder which
+     * will create message that do not respect the <code>Message.getDate()</code> contract regarding
+     * the return value when the message do not have a Date header
+     * See <a href="https://issues.apache.org/jira/browse/MIME4J-262">MIME4J-262</a>
+     */
+    @Deprecated
+    public static MessageBuilder create() {
+        return new MessageBuilder(true);
+    }
+
+    public static MessageBuilder of(Message other) {
+        return new MessageBuilder(false).copy(other);
+    }
+
+    /**
+     * Deprecated: please use {@link #of(Message) of} instead
+     * Building a builder using this method will result in a buggy builder which
+     * will create message that do not respect the <code>Message.getDate()</code> contract regarding
+     * the return value when the message do not have a Date header
+     * See <a href="https://issues.apache.org/jira/browse/MIME4J-262">MIME4J-262</a>
+     */
+    @Deprecated
     public static MessageBuilder createCopy(Message other) {
         return new MessageBuilder().copy(other);
     }
 
+    public static MessageBuilder of(final InputStream is) throws IOException {
+        return new MessageBuilder(false).parse(is);
+    }
+
+    /**
+     * Deprecated: please use {@link #of(InputStream) of} instead
+     * Building a builder using this method will result in a buggy builder which
+     * will create message that do not respect the <code>Message.getDate()</code> contract regarding
+     * the return value when the message do not have a Date header
+     * See <a href="https://issues.apache.org/jira/browse/MIME4J-262">MIME4J-262</a>
+     */
+    @Deprecated
     public static MessageBuilder read(final InputStream is) throws IOException {
         return new MessageBuilder().parse(is);
     }
@@ -931,7 +984,7 @@ public class MessageBuilder extends AbstractEntityBuilder {
         for (Field field : getFields()) {
             header.addField(field);
         }
-        if (!containsField(FieldName.DATE)) {
+        if (ensureDateNotNull && !containsField(FieldName.DATE)) {
             header.setField(Fields.date(new Date()));
         }
 

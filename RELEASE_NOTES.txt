@@ -1,3 +1,22 @@
+Release 0.9.0
+-------------------
+
+Fix MIME4J-262 without breaking compatibility with old code by deprecating:
+ * MessageBuilder#MessageBuilder()
+ * MessageBuilder#create()
+ * MessageBuilder#createCopy(Message)
+ * MessageBuilder#read(InputStream)
+
+and adding:
+ * MessageBuilder#of()
+ * MessageBuilder#of(Message)
+ * MessageBuilder#of(InputStream)
+
+MessageBuilder constructed by of methods produce message for which the getDate method return null if and only if the
+message do not have a "Date" header. Whereas MessageBuilder constructed by deprecated method produce message for which
+the getDate method never return null: if the message has no "Date" header the returned value is "new Date()" result when
+the message has been instantiated
+
 Release 0.7.2
 -------------------
 
