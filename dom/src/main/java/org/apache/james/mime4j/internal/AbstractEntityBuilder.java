@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.internal;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,14 +44,14 @@ import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.util.MimeUtil;
 
-abstract class AbstractEntityBuilder {
+public abstract class AbstractEntityBuilder {
 
     private final List<Field> fields;
     private final Map<String, List<Field>> fieldMap;
 
     private Body body;
 
-    AbstractEntityBuilder() {
+    public AbstractEntityBuilder() {
         this.fields = new LinkedList<Field>();
         this.fieldMap = new HashMap<String, List<Field>>();
     }
@@ -241,7 +241,7 @@ abstract class AbstractEntityBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    <F extends ParsedField> F obtainField(String fieldName) {
+    public <F extends ParsedField> F obtainField(String fieldName) {
         return (F) getField(fieldName);
     }
 

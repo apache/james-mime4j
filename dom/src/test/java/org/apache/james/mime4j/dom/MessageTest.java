@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.dom;
 
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -26,9 +26,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import org.apache.james.mime4j.Charsets;
-import org.apache.james.mime4j.dom.BinaryBody;
-import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
@@ -38,16 +35,17 @@ import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.address.DefaultAddressParser;
+import org.apache.james.mime4j.message.BasicBodyFactory;
+import org.apache.james.mime4j.message.BodyFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-@SuppressWarnings("deprecation")
-public class MessageBuilderTest {
+public class MessageTest {
 
     @Test
     public void testSetCustomBody() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         BodyFactory bodyFactory = Mockito.spy(new BasicBodyFactory());
         builder.use(bodyFactory);
@@ -91,7 +89,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testSetMessageId() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         String id = "<msg17@localhost>";
         builder.setMessageId(id);
@@ -100,7 +98,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testCreateMessageId() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
         builder.generateMessageId("hostname");
 
         String id = builder.getMessageId();
@@ -111,7 +109,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testGetSubject() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
         Assert.assertNull(builder.getSubject());
 
         String subject = "testing 1 2";
@@ -124,7 +122,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testSetSubject() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         builder.setSubject("Semmelbr\366sel");
         Assert.assertEquals("Semmelbr\366sel", builder.getSubject());
@@ -137,7 +135,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testGetDate() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
         Assert.assertNull(builder.getDate());
 
         builder.setField(DefaultFieldParser.parse("Date: Thu, 1 Jan 1970 05:30:00 +0530"));
@@ -147,7 +145,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testSetDate() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         builder.setDate(new Date(86400000), TimeZone.getTimeZone("GMT"));
         Assert.assertEquals(new Date(86400000), builder.getDate());
@@ -160,7 +158,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testGetSender() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
         Assert.assertNull(builder.getSender());
 
         builder.setField(DefaultFieldParser.parse("Sender: john.doe@example.net"));
@@ -170,7 +168,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testSetSender() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         builder.setSender("john.doe@example.net");
         Assert.assertEquals("john.doe@example.net", builder.getField("Sender").getBody());
@@ -181,7 +179,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testGetFrom() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
         Assert.assertNull(builder.getFrom());
 
         builder.setField(DefaultFieldParser.parse("From: john.doe@example.net"));
@@ -191,7 +189,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testSetFrom() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         Mailbox mailbox1 = DefaultAddressParser.DEFAULT.parseMailbox("john.doe@example.net");
         Mailbox mailbox2 = DefaultAddressParser.DEFAULT.parseMailbox("jane.doe@example.net");
@@ -214,7 +212,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testGetTo() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
         Assert.assertNull(builder.getTo());
 
         builder.setField(DefaultFieldParser.parse("To: john.doe@example.net"));
@@ -225,7 +223,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testSetTo() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         Mailbox mailbox1 = DefaultAddressParser.DEFAULT.parseMailbox("john.doe@example.net");
         Mailbox mailbox2 = DefaultAddressParser.DEFAULT.parseMailbox("jane.doe@example.net");
@@ -252,7 +250,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testGetCc() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
         Assert.assertNull(builder.getCc());
 
         builder.setField(DefaultFieldParser.parse("Cc: john.doe@example.net"));
@@ -263,7 +261,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testSetCc() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         Mailbox mailbox1 = DefaultAddressParser.DEFAULT.parseMailbox("john.doe@example.net");
         Mailbox mailbox2 = DefaultAddressParser.DEFAULT.parseMailbox("jane.doe@example.net");
@@ -290,7 +288,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testGetBcc() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
         Assert.assertNull(builder.getBcc());
 
         builder.setField(DefaultFieldParser.parse("Bcc: john.doe@example.net"));
@@ -301,7 +299,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testSetBcc() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         Mailbox mailbox1 = DefaultAddressParser.DEFAULT.parseMailbox("john.doe@example.net");
         Mailbox mailbox2 = DefaultAddressParser.DEFAULT.parseMailbox("jane.doe@example.net");
@@ -328,7 +326,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testGetReplyTo() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
         Assert.assertNull(builder.getReplyTo());
 
         builder.setField(DefaultFieldParser.parse("Reply-To: john.doe@example.net"));
@@ -339,7 +337,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testSetReplyTo() throws Exception {
-        MessageBuilder builder = MessageBuilder.create();
+        Message.Builder builder = Message.Builder.of();
 
         Mailbox mailbox1 = DefaultAddressParser.DEFAULT.parseMailbox("john.doe@example.net");
         Mailbox mailbox2 = DefaultAddressParser.DEFAULT.parseMailbox("jane.doe@example.net");
@@ -366,7 +364,7 @@ public class MessageBuilderTest {
 
     @Test
     public void testBuildWithDefaults() throws Exception {
-        Message message = MessageBuilder.create()
+        Message message = Message.Builder.of()
                 .generateMessageId("hostname")
                 .setSubject("testing ...")
                 .setFrom("batman@localhost", "superman@localhost")
@@ -376,7 +374,7 @@ public class MessageBuilderTest {
 
         Assert.assertEquals("text/plain", message.getMimeType());
         Assert.assertNotNull(message.getMessageId());
-        Assert.assertNotNull(message.getDate());
+        Assert.assertNull(message.getDate());
         Assert.assertEquals("1.0", message.getHeader().getField(FieldName.MIME_VERSION).getBody());
         Assert.assertEquals("testing ...", message.getSubject());
         Assert.assertEquals(new MailboxList(
@@ -394,7 +392,7 @@ public class MessageBuilderTest {
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
         Date date = dateFormat.parse("2014-08-01 12:00");
 
-        Message message = MessageBuilder.create()
+        Message message = Message.Builder.of()
                 .setMessageId("blah@hostname")
                 .setDate(date)
                 .addField(Fields.version("1.0.1"))
@@ -419,8 +417,8 @@ public class MessageBuilderTest {
     }
 
     @Test
-    public void testCopy() throws Exception {
-        Message original = MessageBuilder.create()
+    public void testOfOnBuilder() throws Exception {
+        Message original = Message.Builder.of()
                 .generateMessageId("hostname")
                 .setSubject("testing ...")
                 .setFrom("batman@localhost", "superman@localhost")
@@ -428,7 +426,7 @@ public class MessageBuilderTest {
                 .setBody("Yo, big momma!", Charsets.UTF_8)
                 .build();
 
-        MessageBuilder builder = MessageBuilder.createCopy(original);
+        Message.Builder builder = Message.Builder.of(original);
         Assert.assertEquals(original.getHeader().getFields(), builder.getFields());
         Assert.assertNotSame(original.getBody(), builder.getBody());
         Assert.assertSame(original.getBody().getClass(), builder.getBody().getClass());

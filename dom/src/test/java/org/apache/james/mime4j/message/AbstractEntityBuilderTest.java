@@ -33,6 +33,7 @@ import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
+import org.apache.james.mime4j.internal.AbstractEntityBuilder;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
 import org.junit.Assert;

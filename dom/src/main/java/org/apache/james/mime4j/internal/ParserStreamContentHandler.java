@@ -17,7 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.message;
+package org.apache.james.mime4j.internal;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Body;
@@ -25,6 +25,12 @@ import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.message.BodyFactory;
+import org.apache.james.mime4j.message.BodyPart;
+import org.apache.james.mime4j.message.DefaultMessageImplFactory;
+import org.apache.james.mime4j.message.HeaderImpl;
+import org.apache.james.mime4j.message.MessageImplFactory;
+import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
@@ -39,14 +45,14 @@ import java.util.Stack;
  * A <code>ContentHandler</code> for building an <code>Entity</code> to be
  * used in conjunction with a {@link org.apache.james.mime4j.parser.MimeStreamParser}.
  */
-class ParserStreamContentHandler implements ContentHandler {
+public class ParserStreamContentHandler implements ContentHandler {
 
     private final Entity entity;
     private final MessageImplFactory messageImplFactory;
     private final BodyFactory bodyFactory;
     private final Stack<Object> stack;
 
-    ParserStreamContentHandler(
+    public ParserStreamContentHandler(
             final Entity entity,
             final BodyFactory bodyFactory) {
         this.entity = entity;
@@ -55,7 +61,7 @@ class ParserStreamContentHandler implements ContentHandler {
         this.stack = new Stack<Object>();
     }
 
-    ParserStreamContentHandler(
+    public ParserStreamContentHandler(
             final Entity entity,
             final MessageImplFactory messageImplFactory,
             final BodyFactory bodyFactory) {

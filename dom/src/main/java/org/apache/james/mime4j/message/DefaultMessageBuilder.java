@@ -37,6 +37,7 @@ import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.LenientFieldParser;
+import org.apache.james.mime4j.internal.ParserStreamContentHandler;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
