@@ -225,7 +225,15 @@ int month() :
 String year() :
 {Token t;}
 {
-    t=<DIGITS> { return t.image; }
+    t=<DIGITS> 
+    {
+      String year = (String) t.image;
+      if (year.length() == 2) 
+      {
+        return "20" + year;
+      }
+      return year;
+    }
 }
 
 Time time() :
