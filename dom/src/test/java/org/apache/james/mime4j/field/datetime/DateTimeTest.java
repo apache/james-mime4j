@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.field.datetime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
 import org.apache.james.mime4j.field.datetime.parser.ParseException;
@@ -101,10 +103,11 @@ public class DateTimeTest {
 
     private void ensureAllEqual(String[] dateStrings) throws ParseException {
         for (int i = 0; i < dateStrings.length - 1; i++) {
-            Assert.assertEquals(
-                    new DateTimeParser(new StringReader(dateStrings[i])).parseAll().getDate().getTime(),
-                    new DateTimeParser(new StringReader(dateStrings[i + 1])).parseAll().getDate().getTime()
-            );
+            long date1 = new DateTimeParser(new StringReader(dateStrings[i])).parseAll().getDate().getTime();
+            long date2 = new DateTimeParser(new StringReader(dateStrings[i + 1])).parseAll().getDate().getTime();
+            assertThat(date1)
+                .as(dateStrings[i] + " == " + dateStrings[i + 1])
+                .isEqualTo(date2);
         }
     }
 
