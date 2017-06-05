@@ -45,6 +45,19 @@ public class LenientDateTimeFieldTest {
     }
 
     @Test
+    public void parseShouldSupportPartialYears() throws Exception {
+        DateTimeField f = parse("Date: Wed, 16 Jul 08 17:12:33 +0200");
+        Assert.assertEquals(new Date(1216221153000L), f.getDate());
+    }
+
+    @Test
+    public void parseShouldSupportPartialYearsFromLastCentury() throws Exception {
+        DateTimeField field1 = parse("Date: 16 Jul 99 17:12:33 +0200");
+        DateTimeField field2 = parse("Date: 16 Jul 1999 17:12:33 +0200");
+        Assert.assertEquals(field2.getDate(), field1.getDate());
+    }
+
+    @Test
     public void testDateDSTNoDayOfWeek() throws Exception {
         DateTimeField f = parse("Date: 16 Jul 2008 17:12:33 +0200");
         Assert.assertEquals(new Date(1216221153000L), f.getDate());
