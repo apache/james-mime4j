@@ -60,6 +60,12 @@ public class DateTimeFieldImplTest {
     }
 
     @Test
+    public void parseShouldAddPreviousCenturyWhen2DigitsAndMoreThan70s() throws Exception {
+        DateTimeField field = parse("Date: Wed, 13 May 87 14:18:52Z");
+        assertEquals("Wed May 13 14:18:52 UTC 1987", field.getDate().toString());
+    }
+
+    @Test
     public void dayIsDependentFromTheDateNotFromTheGivenDay() throws Exception {
         DateTimeField field = parse("Date: Mon, 13 May 17 14:18:52Z");
         assertEquals("Sat May 13 14:18:52 UTC 2017", field.getDate().toString());

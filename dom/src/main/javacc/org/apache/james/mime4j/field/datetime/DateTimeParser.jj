@@ -230,6 +230,10 @@ String year() :
       String year = (String) t.image;
       if (year.length() == 2) 
       {
+        if (year.charAt(0) > '6')
+        {
+          return "19" + year;
+        }
         return "20" + year;
       }
       return year;
