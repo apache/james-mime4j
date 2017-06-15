@@ -38,7 +38,7 @@
                 <p>
                     Issue the following commands in a shell:
                     <blockquote>
-                        <code>svn checkout http://svn.apache.org/repos/asf/james/mime4j/trunk james-mime4j</code><br/>
+                        <code>git clone git://git.apache.org/james-mime4j.git</code><br/>
                     </blockquote>
                 </p>
             </subsection>
