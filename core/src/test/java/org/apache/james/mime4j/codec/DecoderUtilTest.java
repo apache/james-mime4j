@@ -99,8 +99,10 @@ public class DecoderUtilTest {
     @Test
     public void testEmptyEncodedTextIsIgnored() {
         // encoded-text requires at least one character according to rfc 2047
-        Assert.assertEquals("=?ISO-8859-1?Q??=", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q??="));
-        Assert.assertEquals("=?ISO-8859-1?B??=", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?B??="));
+        // meanwhile in real life there's emails in real world that contain 0
+        // characters in encoded-text part. Probably makes sense to decode them anyway
+        Assert.assertEquals("", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q??="));
+        Assert.assertEquals("", DecoderUtil.decodeEncodedWords("=?ISO-8859-1?B??="));
     }
 
     // see MIME4J-104
