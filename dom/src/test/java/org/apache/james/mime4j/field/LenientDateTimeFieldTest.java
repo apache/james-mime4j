@@ -81,4 +81,10 @@ public class LenientDateTimeFieldTest {
         Assert.assertEquals(1175052759000L, f.getDate().getTime());
     }
 
+    @Test
+    public void testDateWhenGeneralTimezone() throws Exception {
+        DateTimeField f = parse("Date: Fri, 05 Jan 2018 16:18:28 Z");
+        Assert.assertEquals(1515169108000L, f.getDate().getTime());
+    }
+
 }
