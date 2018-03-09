@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.message;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -47,6 +48,13 @@ public class DefaultMessageWriter implements MessageWriter {
 
     private static final byte[] CRLF = { '\r', '\n' };
     private static final byte[] DASHES = { '-', '-' };
+
+    public static byte[] asBytes(Message message) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+        DefaultMessageWriter writer = new DefaultMessageWriter();
+        writer.writeMessage(message, buffer);
+        return buffer.toByteArray();
+    }
 
     /**
      * Protected constructor prevents direct instantiation.
