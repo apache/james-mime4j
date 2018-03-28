@@ -21,6 +21,8 @@ package org.apache.james.mime4j.dom;
 
 import java.util.List;
 
+import org.apache.james.mime4j.stream.NameValuePair;
+
 /**
  * A MIME multipart body (as defined in RFC 2045). A multipart body has a ordered list of
  * body parts. The multipart body also has a preamble and epilogue. The preamble consists of
@@ -139,4 +141,5 @@ public interface Multipart extends Body {
      */
     void setEpilogue(String epilogue);
 
+    List<NameValuePair> getContentTypeParameters();
 }

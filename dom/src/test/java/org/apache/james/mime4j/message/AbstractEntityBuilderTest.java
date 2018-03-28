@@ -20,6 +20,8 @@
 package org.apache.james.mime4j.message;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -263,7 +265,8 @@ public class AbstractEntityBuilderTest {
     public void testSetMultipartBody() throws Exception {
         AbstractEntityBuilder builder = new AbstractEntityBuilderImpl();
 
-        Multipart multipart = new MultipartImpl("stuff");
+        Multipart multipart = new MultipartImpl("stuff",
+            Collections.singletonList(new NameValuePair("report-type", "disposition-notification")));
         builder.setBody(multipart);
 
         Assert.assertSame(multipart, builder.getBody());
@@ -273,6 +276,7 @@ public class AbstractEntityBuilderTest {
 
         final ContentTypeField field = (ContentTypeField) builder.getField("Content-Type");
         Assert.assertNotNull(field.getBoundary());
+        Assert.assertEquals("disposition-notification", field.getParameter("report-type"));
 
         builder.setBody((Message) null);
         Assert.assertFalse(builder.containsField("Content-Type"));

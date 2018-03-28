@@ -556,8 +556,11 @@ public abstract class AbstractEntityBuilder {
     public AbstractEntityBuilder setBody(Multipart multipart) {
         this.body = multipart;
         if (multipart != null) {
-                setField(Fields.contentType("multipart/" + multipart.getSubType(),
-                        new NameValuePair("boundary", MimeUtil.createUniqueBoundary())));
+            List<NameValuePair> parameters =
+                new ArrayList<NameValuePair>(multipart.getContentTypeParameters());
+            parameters.add(new NameValuePair("boundary", MimeUtil.createUniqueBoundary()));
+            setField(Fields.contentType("multipart/" + multipart.getSubType(),
+                        parameters.toArray(new NameValuePair[0])));
         } else {
             removeFields(FieldName.CONTENT_TYPE);
         }

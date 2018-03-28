@@ -49,6 +49,7 @@ public class MultipartBuilder {
     private String epilogue;
 
     private BodyFactory bodyFactory;
+    private List<NameValuePair> parameters;
 
     public static MultipartBuilder create(String subType) {
         return new MultipartBuilder().setSubType(subType);
@@ -64,6 +65,7 @@ public class MultipartBuilder {
 
     private MultipartBuilder() {
         this.bodyParts = new LinkedList<Entity>();
+        this.parameters = new LinkedList<NameValuePair>();
     }
 
     public MultipartBuilder use(final BodyFactory bodyFactory) {
@@ -217,6 +219,11 @@ public class MultipartBuilder {
         return this;
     }
 
+    public MultipartBuilder addContentTypeParameter(NameValuePair parameter) {
+        this.parameters.add(parameter);
+        return this;
+    }
+
     public MultipartBuilder addTextPart(String text, Charset charset) throws IOException {
         Charset cs = charset != null ? charset : Charsets.ISO_8859_1;
         TextBody body = bodyFactory != null ? bodyFactory.textBody(
@@ -277,7 +284,7 @@ public class MultipartBuilder {
     }
 
     public Multipart build() {
-        MultipartImpl multipart = new MultipartImpl(subType);
+        MultipartImpl multipart = new MultipartImpl(subType, parameters);
         for (Entity part : bodyParts) {
             multipart.addBodyPart(part);
         }

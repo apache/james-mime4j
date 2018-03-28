@@ -19,7 +19,11 @@
 
 package org.apache.james.mime4j.message;
 
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 
@@ -35,11 +39,15 @@ public class MultipartImpl extends AbstractMultipart {
     private transient String epilogueStrCache;
     private transient boolean epilogueComputed = false;
 
+    public MultipartImpl(String subType) {
+        this(subType, Collections.<NameValuePair>emptyList());
+    }
+
     /**
      * Creates a new empty <code>Multipart</code> instance.
      */
-    public MultipartImpl(String subType) {
-        super(subType);
+    public MultipartImpl(String subType, List<NameValuePair> parameters) {
+        super(subType, parameters);
         preamble = null;
         preambleStrCache = null;
         preambleComputed = true;

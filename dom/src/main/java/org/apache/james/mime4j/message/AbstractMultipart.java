@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.stream.NameValuePair;
 
 /**
  * Abstract MIME multipart body.
@@ -35,12 +36,14 @@ public abstract class AbstractMultipart implements Multipart {
     private Entity parent = null;
 
     private String subType;
+    private final List<NameValuePair> contentTypeParameters;
 
     /**
      * Creates a new empty <code>Multipart</code> instance.
      */
-    public AbstractMultipart(String subType) {
+    public AbstractMultipart(String subType, List<NameValuePair> contentTypeParameters) {
         this.subType = subType;
+        this.contentTypeParameters = contentTypeParameters;
     }
 
     /**
@@ -221,6 +224,11 @@ public abstract class AbstractMultipart implements Multipart {
      *            the epilogue.
      */
     public abstract void setEpilogue(String epilogue);
+
+    @Override
+    public List<NameValuePair> getContentTypeParameters() {
+        return contentTypeParameters;
+    }
 
     /**
      * Disposes of the BodyParts of this Multipart. Note that the dispose call
