@@ -330,4 +330,11 @@ public class DefaultMessageBuilder implements MessageBuilder {
         return mif.messageImpl();
     }
 
+    public Multipart newMultipart(MultipartBuilder source) {
+        return newMultipart(source.build());
+    }
+
+    public Message newMessage(Message.Builder source) {
+        return newMessage(source.build());
+    }
 }

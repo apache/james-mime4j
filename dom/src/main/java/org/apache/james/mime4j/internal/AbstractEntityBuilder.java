@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.internal;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -40,6 +41,9 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.message.BodyPartBuilder;
+import org.apache.james.mime4j.message.MultipartBuilder;
+import org.apache.james.mime4j.message.SingleBodyBuilder;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -487,6 +491,10 @@ public abstract class AbstractEntityBuilder {
         return this;
     }
 
+    public AbstractEntityBuilder setBody(SingleBodyBuilder body) throws IOException {
+        return this.setBody(body.build());
+    }
+
     /**
      * Sets body of this message.  Also sets the content type based on properties of
      * the given {@link org.apache.james.mime4j.dom.Body}.
@@ -546,6 +554,10 @@ public abstract class AbstractEntityBuilder {
         return this;
     }
 
+    public AbstractEntityBuilder setBody(Message.Builder message) {
+        return this.setBody(message.build());
+    }
+
     /**
      * Sets body of this message.  Also sets the content type based on properties of
      * the given {@link org.apache.james.mime4j.dom.Body}.
@@ -565,6 +577,10 @@ public abstract class AbstractEntityBuilder {
             removeFields(FieldName.CONTENT_TYPE);
         }
         return this;
+    }
+
+    public AbstractEntityBuilder setBody(MultipartBuilder multipart) {
+        return this.setBody(multipart.build());
     }
 
     /**

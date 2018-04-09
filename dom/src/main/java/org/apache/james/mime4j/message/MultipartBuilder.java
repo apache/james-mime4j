@@ -129,6 +129,10 @@ public class MultipartBuilder {
         return this;
     }
 
+    public MultipartBuilder addBodyPart(BodyPartBuilder bodyPart) {
+        return this.addBodyPart(bodyPart.build());
+    }
+
     /**
      * Inserts a body part at the specified position in the list of body parts.
      *

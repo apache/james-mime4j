@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.message.MultipartBuilder;
 
 /**
  * An interface to build instances of {@link Message} and other DOM elements either without
@@ -39,9 +40,13 @@ public interface MessageBuilder {
 
     Multipart newMultipart(Multipart source);
 
+    Multipart newMultipart(MultipartBuilder source);
+
     Message newMessage();
 
     Message newMessage(Message source);
+
+    Message newMessage(Message.Builder source);
 
     Header parseHeader(InputStream source) throws MimeException, IOException;
 
