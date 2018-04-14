@@ -140,6 +140,20 @@ public class EncoderUtilTest {
                 Usage.TEXT_TOKEN, 0, null, Encoding.Q);
         Assert.assertTrue(encodedSixtyOne.contains("?= =?US-ASCII?Q?"));
     }
+    
+    @Test
+    public void testEncodeEncodedWordSplitForUnicode() throws Exception {
+        StringBuilder sb = new StringBuilder("z");
+        for (int i = 0; i < 10; i++) {
+            // Append unicode character 𝕫 10 times.
+            sb.append("\uD835\uDD6b");
+        }
+
+        String expected = "=?UTF-8?B?evCdlavwnZWr8J2Vq/Cdlas=?= " +
+                "=?UTF-8?B?8J2Vq/CdlavwnZWr8J2Vq/CdlavwnZWr?=";
+        Assert.assertEquals(expected, EncoderUtil.encodeEncodedWord(sb.toString(),
+                Usage.TEXT_TOKEN, 0, null, Encoding.B));
+    }
 
     @Test
     public void testEncodeEncodedWord() throws Exception {
