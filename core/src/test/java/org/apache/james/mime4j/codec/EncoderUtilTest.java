@@ -152,7 +152,7 @@ public class EncoderUtilTest {
         String expected = "=?UTF-8?B?evCdlavwnZWr8J2Vq/Cdlas=?= " +
                 "=?UTF-8?B?8J2Vq/CdlavwnZWr8J2Vq/CdlavwnZWr?=";
         Assert.assertEquals(expected, EncoderUtil.encodeEncodedWord(sb.toString(),
-                Usage.TEXT_TOKEN, 0, null, Encoding.B));
+                Usage.TEXT_TOKEN, 10, null, Encoding.B));
     }
 
     @Test
