@@ -142,7 +142,7 @@ public class EncoderUtilTest {
     }
     
     @Test
-    public void testEncodeEncodedWordSplitForUnicode() throws Exception {
+    public void testEncodeBEncodedWordSplitForUnicode() throws Exception {
         StringBuilder sb = new StringBuilder("z");
         for (int i = 0; i < 10; i++) {
             // Append unicode character 𝕫 10 times.
@@ -153,6 +153,20 @@ public class EncoderUtilTest {
                 "=?UTF-8?B?8J2Vq/CdlavwnZWr8J2Vq/CdlavwnZWr?=";
         Assert.assertEquals(expected, EncoderUtil.encodeEncodedWord(sb.toString(),
                 Usage.TEXT_TOKEN, 10, null, Encoding.B));
+    }
+
+    @Test
+    public void testEncodeQEncodedWordSplitForUnicode() throws Exception {
+        StringBuilder sb = new StringBuilder("z");
+        for (int i = 0; i < 6; i++) {
+            // Append unicode character 𝕫 6 times.
+            sb.append("\uD835\uDD6b");
+        }
+
+        String expected = "=?UTF-8?Q?z=F0=9D=95=AB=F0=9D=95=AB?= " +
+                "=?UTF-8?Q?=F0=9D=95=AB=F0=9D=95=AB=F0=9D=95=AB=F0=9D=95=AB?="
+        Assert.assertEquals(expected, EncoderUtil.encodeEncodedWord(sb.toString(),
+                Usage.TEXT_TOKEN, 10, null, Encoding.Q));
     }
 
     @Test
