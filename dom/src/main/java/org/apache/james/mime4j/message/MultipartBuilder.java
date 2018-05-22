@@ -66,6 +66,7 @@ public class MultipartBuilder {
     private MultipartBuilder() {
         this.bodyParts = new LinkedList<Entity>();
         this.parameters = new LinkedList<NameValuePair>();
+        this.subType = "alternative"; // the default value; see getSubType() JavaDoc
     }
 
     public MultipartBuilder use(final BodyFactory bodyFactory) {
