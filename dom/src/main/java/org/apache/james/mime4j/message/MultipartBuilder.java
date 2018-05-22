@@ -76,8 +76,8 @@ public class MultipartBuilder {
 
     /**
      * Gets the multipart sub-type. E.g. <code>alternative</code> (the
-     * default) or <code>parallel</code>. See RFC 2045 for common sub-types
-     * and their meaning.
+     * default) or <code>parallel</code>. See <a href="https://tools.ietf.org/html/rfc2046#section-5.1.3">RFC 2046</a>
+     * for common sub-types and their meaning.
      *
      * @return the multipart sub-type.
      */
@@ -87,8 +87,8 @@ public class MultipartBuilder {
 
     /**
      * Sets the multipart sub-type. E.g. <code>alternative</code> or
-     * <code>parallel</code>. See RFC 2045 for common sub-types and their
-     * meaning.
+     * <code>parallel</code>. See <a href="https://tools.ietf.org/html/rfc2046#section-5.1.3">RFC 2046</a>
+     * for common sub-types and their meaning.
      *
      * @param subType
      *            the sub-type.
