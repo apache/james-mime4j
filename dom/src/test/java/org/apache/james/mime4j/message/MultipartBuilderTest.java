@@ -39,7 +39,17 @@ import org.mockito.Mockito;
 public class MultipartBuilderTest {
 
     @Test
-    public void testBasis() throws Exception {
+    public void testDefaults() {
+        MultipartBuilder builder = MultipartBuilder.create();
+
+        Assert.assertEquals("alternative", builder.getSubType());
+        Assert.assertNull(builder.getPreamble());
+        Assert.assertNull(builder.getEpilogue());
+        Assert.assertEquals(0, builder.getCount());
+    }
+
+    @Test
+    public void testBasis() {
         MultipartBuilder builder = MultipartBuilder.create("stuff");
         builder.setPreamble("Hello");
         builder.setEpilogue("Bye");
