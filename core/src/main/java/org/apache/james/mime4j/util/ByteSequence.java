@@ -43,7 +43,7 @@ public interface ByteSequence {
      *            the index of the <code>byte</code> value to be returned.
      * @return the corresponding <code>byte</code> value
      * @throws IndexOutOfBoundsException
-     *             if <code>index < 0 || index >= length()</code>.
+     *             if <code>index &lt; 0 || index &gt;= length()</code>.
      */
     byte byteAt(int index);
 

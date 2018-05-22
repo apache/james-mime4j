@@ -42,6 +42,7 @@ import java.io.InputStream;
  * <p>
  * Events will be generated in the order the corresponding elements occur in
  * the message stream parsed by the parser. E.g.:
+ * </p>
  * <pre>
  *      startMessage()
  *          startHeader()
@@ -71,6 +72,7 @@ import java.io.InputStream;
  *          endMultipart()
  *      endMessage()
  * </pre>
+ * <p>
  * The above shows an example of a MIME message consisting of a multipart
  * body containing two body parts.
  * </p>

@@ -402,7 +402,7 @@ public class Fields {
     /**
      * Creates a <i>Message-ID</i> field with the given message ID.
      *
-     * @param message ID
+     * @param messageId
      *            message ID value.
      */
     public static UnstructuredField messageId(String messageId) {

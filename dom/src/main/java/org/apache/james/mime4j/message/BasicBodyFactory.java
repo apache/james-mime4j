@@ -65,14 +65,18 @@ public class BasicBodyFactory implements BodyFactory {
     }
 
     /**
-     * select the Charset for the given mimeCharset string
-     * <p/>
-     * if you need support for non standard or invalid mimeCharset specifications you might want to
-     * create your own derived BodyFactory extending BasicBodyFactory and overriding this method as
-     * suggested by: https://issues.apache.org/jira/browse/MIME4J-218
-     * <p/>
-     * the default behavior is lenient, invalid mimeCharset specifications will return the
-     * defaultCharset
+     * <p>
+     * Select the Charset for the given <code>mimeCharset</code> string.
+     * </p>
+     * <p>
+     * If you need support for non standard or invalid <code>mimeCharset</code> specifications you might want to
+     * create your own derived {@link BodyFactory} extending {@link BasicBodyFactory} and overriding this method as
+     * suggested by <a href="https://issues.apache.org/jira/browse/MIME4J-218">MIME4J-218</a>
+     * </p>
+     * <p>
+     * The default behavior is lenient, invalid <code>mimeCharset</code> specifications will return the
+     * <code>defaultCharset</code>.
+     * </p>
      *
      * @param mimeCharset - the string specification for a Charset e.g. "UTF-8"
      * @throws UnsupportedEncodingException if the mimeCharset is invalid

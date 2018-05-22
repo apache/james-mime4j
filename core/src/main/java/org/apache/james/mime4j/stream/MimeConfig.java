@@ -67,7 +67,7 @@ public final class MimeConfig {
     }
 
     /**
-     * @see #setMalformedHeaderStartsBody(boolean)
+     * @see Builder#setMalformedHeaderStartsBody(boolean)
      *
      * @return true if malformed header should "end" the headers and be part of
      *         the body
@@ -79,7 +79,7 @@ public final class MimeConfig {
     /**
      * Returns the value of the strict parsing mode
      *
-     * @see #setStrictParsing(boolean)
+     * @see Builder#setStrictParsing(boolean)
      *
      * @return value of the strict parsing mode
      */
@@ -90,7 +90,7 @@ public final class MimeConfig {
     /**
      * Returns the maximum line length limit
      *
-     * @see #setMaxLineLen(int)
+     * @see Builder#setMaxLineLen(int)
      *
      * @return value of the the maximum line length limit
      */
@@ -101,7 +101,7 @@ public final class MimeConfig {
     /**
      * Returns the maximum header limit
      *
-     * @see #setMaxHeaderCount(int)
+     * @see Builder#setMaxHeaderCount(int)
      *
      * @return value of the the maximum header limit
      */
@@ -112,7 +112,7 @@ public final class MimeConfig {
     /**
      * Returns the maximum header length limit
      *
-     * @see #setMaxHeaderLen(int)
+     * @see Builder#setMaxHeaderLen(int)
      *
      * @return value of the maximum header length limit
      */
@@ -123,7 +123,7 @@ public final class MimeConfig {
     /**
      * Returns the maximum content length limit
      *
-     * @see #setMaxContentLen(long)
+     * @see Builder#setMaxContentLen(long)
      *
      * @return value of the the maximum content length limit
      */

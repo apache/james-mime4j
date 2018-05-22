@@ -175,7 +175,7 @@ public class EncoderUtil {
      *            whether the encoded-word is to be used to replace a text token
      *            or a word entity (see RFC 822).
      * @param usedCharacters
-     *            number of characters already used up (<code>0 <= usedCharacters <= 50</code>).
+     *            number of characters already used up (<code>0 &lt;= usedCharacters &lt;= 50</code>).
      * @return the specified text if encoding is not necessary or an encoded
      *         word or a sequence of encoded words otherwise.
      */
@@ -197,7 +197,7 @@ public class EncoderUtil {
      * @param text
      *            text to analyze.
      * @param usedCharacters
-     *            number of characters already used up (<code>0 <= usedCharacters <= 50</code>).
+     *            number of characters already used up (<code>0 &lt;= usedCharacters &lt;= 50</code>).
      * @return <code>true</code> if the specified text has to be encoded into
      *         an encoded-word, <code>false</code> otherwise.
      */
@@ -271,7 +271,7 @@ public class EncoderUtil {
      *            whether the encoded-word is to be used to replace a text token
      *            or a word entity (see RFC 822).
      * @param usedCharacters
-     *            number of characters already used up (<code>0 <= usedCharacters <= 50</code>).
+     *            number of characters already used up (<code>0 &lt;= usedCharacters &lt;= 50</code>).
      * @return the encoded word (or sequence of encoded words if the given text
      *         does not fit in a single encoded word).
      * @see #hasToBeEncoded(String, int)
@@ -292,7 +292,7 @@ public class EncoderUtil {
      *            whether the encoded-word is to be used to replace a text token
      *            or a word entity (see RFC 822).
      * @param usedCharacters
-     *            number of characters already used up (<code>0 <= usedCharacters <= 50</code>).
+     *            number of characters already used up (<code>0 &lt;= usedCharacters &lt;= 50</code>).
      * @param charset
      *            the Java charset that should be used to encode the specified
      *            string into a byte array. A suitable charset is detected

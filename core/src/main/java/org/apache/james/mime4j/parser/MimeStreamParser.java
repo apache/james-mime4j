@@ -38,7 +38,7 @@ import org.apache.james.mime4j.stream.RecursionMode;
  * parsing events to a {@link ContentHandler} instance.
  * </p>
  * <p>
- * Typical usage:<br/>
+ * Typical usage:<br>
  * <pre>
  *      ContentHandler handler = new MyHandler();
  *      MimeConfig config = new MimeConfig();

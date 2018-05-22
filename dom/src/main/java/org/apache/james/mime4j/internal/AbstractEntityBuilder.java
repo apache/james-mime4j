@@ -122,12 +122,12 @@ public abstract class AbstractEntityBuilder {
     }
 
     /**
-     * Returns <code>true<code/> if there is at least one explicitly
+     * Returns <code>true</code> if there is at least one explicitly
      * set field with the given name.
      *
      * @param name the field name (e.g. From, Subject).
-     * @return <code>true<code/> if there is at least one explicitly
-     * set field with the given name, <code>false<code/> otherwise.
+     * @return <code>true</code> if there is at least one explicitly
+     * set field with the given name, <code>false</code> otherwise.
      */
     public boolean containsField(String name) {
         List<Field> l = fieldMap.get(name.toLowerCase(Locale.US));
@@ -499,7 +499,7 @@ public abstract class AbstractEntityBuilder {
      * Sets body of this message.  Also sets the content type based on properties of
      * the given {@link org.apache.james.mime4j.dom.Body}.
      *
-     * @param body
+     * @param textBody
      *            the body.
      */
     public AbstractEntityBuilder setBody(TextBody textBody) {
@@ -539,9 +539,9 @@ public abstract class AbstractEntityBuilder {
 
     /**
      * Sets body of this message.  Also sets the content type based on properties of
-     * the given {@link org.apache.james.mime4j.dom.Body}.
+     * the given {@link org.apache.james.mime4j.dom.Message}.
      *
-     * @param body
+     * @param message
      *            the body.
      */
     public AbstractEntityBuilder setBody(Message message) {
@@ -560,9 +560,9 @@ public abstract class AbstractEntityBuilder {
 
     /**
      * Sets body of this message.  Also sets the content type based on properties of
-     * the given {@link org.apache.james.mime4j.dom.Body}.
+     * the given {@link org.apache.james.mime4j.dom.Multipart}.
      *
-     * @param body
+     * @param multipart
      *            the body.
      */
     public AbstractEntityBuilder setBody(Multipart multipart) {

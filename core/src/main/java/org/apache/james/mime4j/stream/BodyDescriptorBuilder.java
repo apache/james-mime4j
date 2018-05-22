@@ -22,14 +22,18 @@ package org.apache.james.mime4j.stream;
 import org.apache.james.mime4j.MimeException;
 
 /**
+ * <p>
  * Body descriptor builders are intended to construct {@link BodyDescriptor} instances from
  * multiple unstructured {@link RawField}s.
- * <p/>
+ * </p>
+ * <p>
  * Body descriptor builders are stateful and modal as they have to store intermediate results
  * between method invocations and also rely on a particular sequence of method invocations
  * (the mode of operation).
- * <p/>
+ * </p>
+ * <p>
  * Consumers are expected to interact with body descriptor builders in the following way:
+ * </p>
  * <ul>
  * <li>Invoke {@link #reset()} method in order to reset builder's internal state and make it
  *   ready to start the process of building a new {@link BodyDescriptor}.</li>
@@ -42,7 +46,7 @@ import org.apache.james.mime4j.MimeException;
  * <li>Optionally invoke {@link #newChild()} for each embedded body of content. Please note that
  *   the resultant {@link BodyDescriptorBuilder}} child instance can inherit some its parent
  *   properties such as MIME type.</li>
- * <li>Invoke {@link #build()()} method in order to generate a {@link BodyDescriptor}} instance
+ * <li>Invoke {@link #build()} method in order to generate a {@link BodyDescriptor}} instance
  *   based on the internal state of the builder.</li>
  * </ul>
  */
