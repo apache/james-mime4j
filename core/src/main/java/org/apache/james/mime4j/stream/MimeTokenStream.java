@@ -92,7 +92,7 @@ public class MimeTokenStream {
     /**
      * Constructs a standard (lax) stream.
      * Optional validation events will be logged only.
-     * Use {@link MimeConfig#setStrictParsing(boolean)} to turn on strict
+     * Use {@link MimeConfig.Builder#setStrictParsing(boolean)} to turn on strict
      * parsing mode and pass the config object to
      * {@link MimeTokenStream#MimeTokenStream(MimeConfig)} to create
      * a stream that strictly validates the input.
@@ -269,11 +269,14 @@ public class MimeTokenStream {
     }
 
     /**
+     * <p>
      * This method returns the raw entity, preamble, or epilogue contents.
-     * <p/>
+     * </p>
+     * <p>
      * This method is valid, if {@link #getState()} returns either of
      * {@link EntityState#T_RAW_ENTITY}, {@link EntityState#T_PREAMBLE}, or
      * {@link EntityState#T_EPILOGUE}.
+     * </p>
      *
      * @return Data stream, depending on the current state.
      * @throws IllegalStateException {@link #getState()} returns an
@@ -284,12 +287,15 @@ public class MimeTokenStream {
     }
 
     /**
+     * <p>
      * This method returns a transfer decoded stream based on the MIME
      * fields with the standard defaults.
-     * <p/>
+     * </p>
+     * <p>
      * This method is valid, if {@link #getState()} returns either of
      * {@link EntityState#T_RAW_ENTITY}, {@link EntityState#T_PREAMBLE}, or
      * {@link EntityState#T_EPILOGUE}.
+     * </p>
      *
      * @return Data stream, depending on the current state.
      * @throws IllegalStateException {@link #getState()} returns an

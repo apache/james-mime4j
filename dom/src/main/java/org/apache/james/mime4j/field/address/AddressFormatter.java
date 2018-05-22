@@ -36,20 +36,23 @@ public class AddressFormatter {
     }
 
     /**
+     * <p>
      * Formats the address as a human readable string, not including the route.
      * The resulting string is intended for display purposes only and cannot be
      * used for transport purposes.
-     *
+     * </p>
+     * <p>
      * For example, if the unparsed address was
-     *
-     * <"Joe Cheng"@joecheng.com>
-     *
+     * <br>
+     * <code>&lt;"Joe Cheng"@joecheng.com&gt;</code>
+     * <br>
      * this method would return
-     *
-     * <Joe Cheng@joecheng.com>
-     *
+     * <br>
+     * <code>&lt;Joe Cheng@joecheng.com&gt;</code>
+     * <br>
      * which is not valid for transport; the local part would need to be
      * re-quoted.
+     * </p>
      *
      * @param includeRoute
      *            <code>true</code> if the route should be included if it

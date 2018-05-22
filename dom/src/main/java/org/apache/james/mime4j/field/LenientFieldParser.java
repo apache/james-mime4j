@@ -99,10 +99,11 @@ public class LenientFieldParser extends DelegatingFieldParser {
     }
 
     /**
+     * <p>
      * Parses the given string and returns an instance of the {@link ParsedField} class. 
      * The type of the class returned depends on the field name:
-     * <p>
-     * <table>
+     * </p>
+     * <table summary="Field names and corresponding classes">
      *   <tr><th>Class returned</th><th>Field names</th></tr>
      *   <tr><td>{@link ContentTypeField}</td><td>Content-Type</td></tr>
      *   <tr><td>{@link ContentLengthField}</td><td>Content-Length</td></tr>

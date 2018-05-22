@@ -23,14 +23,18 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 
 /**
+ * <p>
  * Field builders are intended to construct {@link RawField} instances from multiple lines
  * contained in {@link ByteArrayBuffer}s.
- * <p/>
+ * </p>
+ * <p>
  * Field builders are stateful and modal as they have to store intermediate results between
  * method invocations and also rely on a particular sequence of method invocations
  * (the mode of operation).
- * <p/>
+ * </p>
+ * <p>
  * Consumers are expected to interact with field builder in the following way:
+ * </p>
  * <ul>
  * <li>Invoke {@link #reset()} method in order to reset builder's internal state and make it
  *   ready to start the process of building a new {@link RawField}.</li>

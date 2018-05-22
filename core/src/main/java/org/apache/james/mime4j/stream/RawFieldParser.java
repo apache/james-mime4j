@@ -29,10 +29,13 @@ import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
+ * <p>
  * Low level parser for header field elements. The parsing routines of this class are designed
  * to produce near zero intermediate garbage and make no intermediate copies of input data.
- * <p/>
+ * </p>
+ * <p>
  * This class is immutable and thread safe.
+ * </p>
  */
 public class RawFieldParser {
 

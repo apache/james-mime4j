@@ -40,7 +40,6 @@ import java.util.regex.Pattern;
  * Class that provides an iterator over email messages inside an mbox file. An mbox file is a sequence of
  * email messages separated by From_ lines.
  * </p>
- * <p/>
  * <p>Description ot the file format:</p>
  * <ul>
  * <li>http://tools.ietf.org/html/rfc4155</li>

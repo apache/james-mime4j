@@ -20,13 +20,16 @@
 package org.apache.james.mime4j.stream;
 
 /**
+ * <p>
  * This class represents a context of a parsing operation:
+ * </p>
  * <ul>
  *  <li>the current position the parsing operation is expected to start at</li>
  *  <li>the bounds limiting the scope of the parsing operation</li>
  * </ul>
- * <p/>
+ * <p>
  * Copied from Apache HttpCore project
+ * </p>
  */
 public class ParserCursor {
 

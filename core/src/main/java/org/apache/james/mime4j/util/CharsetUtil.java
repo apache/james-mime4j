@@ -114,13 +114,16 @@ public class CharsetUtil {
     }
 
     /**
+     * <p>
      * Returns a {@link Charset} instance if character set with the given name
      * is recognized and supported by Java runtime. Returns <code>null</code>
      * otherwise.
-     * <p/>
+     * </p>
+     * <p>
      * This method is a wrapper around {@link Charset#forName(String)} method
      * that catches {@link IllegalCharsetNameException} and
      *  {@link UnsupportedCharsetException} and returns <code>null</code>.
+     * </p>
      */
     public static Charset lookup(final String name) {
         if (name == null) {

@@ -25,10 +25,13 @@ import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
+ * <p>
  * Raw (unstructured) MIME field. The field's body is unparsed and possibly encoded.
- * <p/>
- *  Instances of this class can be created by using
+ * </p>
+ * <p>
+ * Instances of this class can be created by using
  * {@link RawFieldParser#parseField(ByteSequence)} method.
+ * </p>
  */
 public final class RawField implements Field {
 
