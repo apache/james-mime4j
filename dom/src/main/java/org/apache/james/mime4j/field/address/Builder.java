@@ -70,16 +70,16 @@ class Builder {
                 try {
                     name = DecoderUtil.decodeEncodedWords(name, monitor);
                 } catch (IllegalArgumentException e) {
-                    throw new ParseException(e.getMessage());
+                    throw new ParseException(e);
                 }
                 Mailbox mb = buildAngleAddr((ASTangle_addr) n2);
                 return new Mailbox(name, mb.getRoute(), mb.getLocalPart(),
                         mb.getDomain());
             } else {
-                throw new ParseException();
+                throw new ParseException("Address \"group_body\" or \"angle_addr\" is expected but got \"" + n + "\"");
             }
         } else {
-            throw new ParseException();
+            throw new ParseException("Address \"phrase\" is expected but got \"" + n + "\"");
         }
     }
 
@@ -91,7 +91,7 @@ class Builder {
             if (n instanceof ASTmailbox)
                 results.add(buildMailbox((ASTmailbox) n, monitor));
             else
-                throw new ParseException();
+                throw new ParseException("Address \"mailbox\" is expected but got \"" + n + "\"");
         }
         return new MailboxList(results, true);
     }
@@ -106,7 +106,7 @@ class Builder {
         } else if (n instanceof ASTname_addr) {
             return buildNameAddr((ASTname_addr) n, monitor);
         } else {
-            throw new ParseException();
+            throw new ParseException("Address \"addr_spec\" or \"angle_addr\" or \"name_addr\" is expected but got \"" + n + "\"");
         }
     }
 
@@ -117,7 +117,7 @@ class Builder {
         if (n instanceof ASTphrase) {
             name = buildString((ASTphrase) n, false);
         } else {
-            throw new ParseException();
+            throw new ParseException("Address \"phrase\" is expected but got \"" + n + "\"");
         }
 
         n = it.next();
@@ -125,13 +125,13 @@ class Builder {
             try {
                 name = DecoderUtil.decodeEncodedWords(name, monitor);
             } catch (IllegalArgumentException e) {
-                throw new ParseException(e.getMessage());
+                throw new ParseException(e);
             }
             Mailbox mb = buildAngleAddr((ASTangle_addr) n);
             return new Mailbox(name, mb.getRoute(), mb.getLocalPart(),
                     mb.getDomain());
         } else {
-            throw new ParseException();
+            throw new ParseException("Address \"angle_addr\" is expected but got \"" + n + "\"");
         }
     }
 
@@ -146,12 +146,12 @@ class Builder {
             // do nothing
         }
         else
-            throw new ParseException();
+            throw new ParseException("Address \"route\" or \"addr_spec\" is expected but got \"" + n + "\"");
 
         if (n instanceof ASTaddr_spec)
             return buildAddrSpec(route, (ASTaddr_spec) n);
         else
-            throw new ParseException();
+            throw new ParseException("Address \"addr_spec\" is expected but got \"" + n + "\"");
     }
 
     private DomainList buildRoute(ASTroute node) throws ParseException {
@@ -162,7 +162,7 @@ class Builder {
             if (n instanceof ASTdomain)
                 results.add(buildString((ASTdomain) n, true));
             else
-                throw new ParseException();
+                throw new ParseException("Address \"domain\" is expected but got \"" + n + "\"");
         }
         return new DomainList(results);
     }

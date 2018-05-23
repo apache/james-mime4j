@@ -224,7 +224,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements Conten
         } catch (ParseException e) {
             parseException = e;
         } catch (TokenMgrError e) {
-            parseException = new ParseException(e.getMessage());
+            parseException = new ParseException(e);
         }
 
         final String dispositionType = parser.getDispositionType();
