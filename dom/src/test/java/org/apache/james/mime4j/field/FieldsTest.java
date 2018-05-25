@@ -251,8 +251,8 @@ public class FieldsTest {
                 seventyEight)));
 
         String seventyNine = seventyEight + "9";
-        String expected = "Subject: =?US-ASCII?Q?1234567890123456789012345678901234?="
-                + "\r\n =?US-ASCII?Q?56789012345678901234567890123456789?=";
+        String expected = "Subject: =?US-ASCII?Q?123456789012345678901234567890123?="
+                + "\r\n =?US-ASCII?Q?456789012345678901234567890123456789?=";
         Assert.assertEquals(expected, decode(Fields.subject(seventyNine)));
     }
 

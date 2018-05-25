@@ -164,7 +164,7 @@ public class EncoderUtilTest {
         }
 
         String expected = "=?UTF-8?Q?z=F0=9D=95=AB=F0=9D=95=AB?= " +
-                "=?UTF-8?Q?=F0=9D=95=AB=F0=9D=95=AB=F0=9D=95=AB=F0=9D=95=AB?="
+                "=?UTF-8?Q?=F0=9D=95=AB=F0=9D=95=AB=F0=9D=95=AB=F0=9D=95=AB?=";
         Assert.assertEquals(expected, EncoderUtil.encodeEncodedWord(sb.toString(),
                 Usage.TEXT_TOKEN, 10, null, Encoding.Q));
     }
