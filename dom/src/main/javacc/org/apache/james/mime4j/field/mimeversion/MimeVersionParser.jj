@@ -84,7 +84,7 @@ void parse() :
 			this.major = Integer.parseInt(major.image);
 			this.minor = Integer.parseInt(minor.image);
 		} catch (NumberFormatException e) {
-			throw new ParseException(e.getMessage());
+			throw new ParseException(e);
 		}
 	}
 }

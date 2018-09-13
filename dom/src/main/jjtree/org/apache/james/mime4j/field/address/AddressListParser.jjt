@@ -77,7 +77,7 @@ public class AddressListParser {
             parseAddressList0();
             return (ASTaddress_list) jjtree.rootNode();
         } catch (TokenMgrError tme) {
-            throw new ParseException(tme.getMessage());
+            throw new ParseException(tme);
         }
     }
 
@@ -86,7 +86,7 @@ public class AddressListParser {
             parseAddress0();
             return (ASTaddress) jjtree.rootNode();
         } catch (TokenMgrError tme) {
-            throw new ParseException(tme.getMessage());
+            throw new ParseException(tme);
         }
     }
 
@@ -95,7 +95,7 @@ public class AddressListParser {
             parseMailbox0();
             return (ASTmailbox) jjtree.rootNode();
         } catch (TokenMgrError tme) {
-            throw new ParseException(tme.getMessage());
+            throw new ParseException(tme);
         }
     }
 

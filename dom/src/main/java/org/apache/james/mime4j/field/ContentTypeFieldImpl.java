@@ -197,7 +197,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
         } catch (ParseException e) {
             parseException = e;
         } catch (TokenMgrError e) {
-            parseException = new ParseException(e.getMessage());
+            parseException = new ParseException(e);
         }
 
         mediaType = parser.getType();

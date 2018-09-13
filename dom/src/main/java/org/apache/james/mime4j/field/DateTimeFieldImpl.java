@@ -73,7 +73,7 @@ public class DateTimeFieldImpl extends AbstractField implements DateTimeField {
         } catch (ParseException e) {
             parseException = e;
         } catch (TokenMgrError e) {
-            parseException = new ParseException(e.getMessage());
+            parseException = new ParseException(e);
         }
 
         parsed = true;
