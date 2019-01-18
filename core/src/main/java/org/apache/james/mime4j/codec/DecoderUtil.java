@@ -35,7 +35,7 @@ import org.apache.james.mime4j.util.CharsetUtil;
 public class DecoderUtil {
 
     private static final Pattern PATTERN_ENCODED_WORD = Pattern.compile(
-            "(.*?)=\\?(.+?)\\?(\\w)\\?(.*?)\\?=", Pattern.DOTALL);
+            "=\\?(.+?)\\?(\\w)\\?(.*?)\\?=", Pattern.DOTALL);
 
     /**
      * Decodes a string containing quoted-printable encoded data.
@@ -178,17 +178,18 @@ public class DecoderUtil {
         StringBuilder sb = new StringBuilder();
 
         for (Matcher matcher = PATTERN_ENCODED_WORD.matcher(body); matcher.find();) {
-            String separator = matcher.group(1);
-            String mimeCharset = matcher.group(2);
-            String encoding = matcher.group(3);
-            String encodedText = matcher.group(4);
+            String separator = body.substring(tailIndex, matcher.start());
+            String mimeCharset = matcher.group(1);
+            String encoding = matcher.group(2);
+            String encodedText = matcher.group(3);
 
-            if ("".equals(encodedText))
+            if (encodedText.isEmpty())
                 return "";
 
             String decoded;
             decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText, monitor, fallback);
             if (decoded == null) {
+                sb.append(separator);
                 sb.append(matcher.group(0));
             } else {
                 if (!lastMatchValid || !CharsetUtil.isWhitespace(separator)) {
