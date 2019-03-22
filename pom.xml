@@ -161,6 +161,7 @@
                         </goals>
                         <configuration>
                             <excludes>
+                                <exclude>CHANGELOG.*</exclude>
                                 <exclude>NOTICE.*</exclude>
                                 <exclude>LICENSE.*</exclude>
                                 <exclude>**/README.*</exclude>
