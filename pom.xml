@@ -68,12 +68,11 @@
     <properties>
         <james-skin.version>1.8</james-skin.version>
 
-        <target.jdk>1.5</target.jdk>
+        <target.jdk>1.8</target.jdk>
         <commons-logging.version>1.1.1</commons-logging.version>
         <log4j.version>1.2.14</log4j.version>
         <junit.version>4.10</junit.version>
         <mockito.version>1.9.5</mockito.version>
-        <!-- Version 2.2 is required for Java 1.5 compatibility -->
         <commons-io.version>2.4</commons-io.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
