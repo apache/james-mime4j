@@ -70,7 +70,7 @@
 
         <target.jdk>1.8</target.jdk>
         <commons-logging.version>1.2</commons-logging.version>
-        <log4j.version>1.2.14</log4j.version>
+        <log4j.version>1.2.17</log4j.version>
         <junit.version>4.12</junit.version>
         <mockito.version>1.9.5</mockito.version>
         <commons-io.version>2.6</commons-io.version>
