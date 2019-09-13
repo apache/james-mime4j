@@ -31,7 +31,7 @@ import org.apache.james.mime4j.dom.address.MailboxList;
 /**
  * An MIME message (as defined in RFC 2045).
  */
-public interface Message extends Entity, Body {
+public interface Message extends Entity, Body, AutoCloseable {
 
     /**
      * Returns the value of the <i>Message-ID</i> header field of this message

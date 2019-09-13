@@ -138,4 +138,8 @@ public class MessageImpl extends AbstractMessage {
         return ContentTypeFieldImpl.getCharset(contentType);
     }
 
+	public void close() throws Exception {
+		super.dispose();
+	}
+
 }
