@@ -19,8 +19,8 @@
 
 package org.apache.james.mime4j.parser;
 
-import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
@@ -65,7 +65,7 @@ public class MimeStreamParserTest {
 
         final StringBuilder actual = new StringBuilder();
 
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void epilogue(InputStream is) throws IOException {
@@ -89,7 +89,7 @@ public class MimeStreamParserTest {
         expected.add("Subject: A subject");
         sb.append(expected.getLast()).append("\r\n");
 
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
@@ -114,7 +114,7 @@ public class MimeStreamParserTest {
                 + "not\r\n\tfollowed by LF");
         sb.append(expected.getLast()).append("\r\n");
 
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
@@ -139,7 +139,7 @@ public class MimeStreamParserTest {
         expected.add("Subject: A folded subject\r\n Line 2\r\n\tLine 3");
         sb.append(expected.getLast()).append("\r\n");
 
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
@@ -154,7 +154,7 @@ public class MimeStreamParserTest {
 
     @Test
     public void testStop() throws Exception {
-        final MimeStreamParser parser = new MimeStreamParser();
+        final MimeStreamParserImpl parser = new MimeStreamParserImpl();
         TestHandler handler = new TestHandler() {
             @Override
             public void endHeader() {
@@ -202,7 +202,7 @@ public class MimeStreamParserTest {
         sb.append(expected.getLast()).append("\r\n");
         sb.append("A line which should be ignored\r\n");
 
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
@@ -227,7 +227,7 @@ public class MimeStreamParserTest {
         expected.add("body");
         expected.add("endMessage");
 
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void body(BodyDescriptor bd, InputStream is) {
@@ -296,7 +296,7 @@ public class MimeStreamParserTest {
 
         final StringBuilder body = new StringBuilder();
 
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
@@ -329,7 +329,7 @@ public class MimeStreamParserTest {
         expected.add("Subject: A subject");
         sb.append(expected.getLast()).append("\r\n\r\n");
 
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
@@ -359,7 +359,7 @@ public class MimeStreamParserTest {
         expected.add("Subject: A subject");
         sb.append(expected.getLast());
 
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
@@ -378,7 +378,7 @@ public class MimeStreamParserTest {
         expected.add("Subject: A subject");
         sb.append(expected.getLast()).append("\r\n");
 
-        parser = new MimeStreamParser();
+        parser = new MimeStreamParserImpl();
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void field(Field field) {
@@ -393,7 +393,7 @@ public class MimeStreamParserTest {
 
     @Test
     public void testAutomaticContentDecoding() throws Exception {
-        MimeStreamParser parser = new MimeStreamParser();
+        MimeStreamParserImpl parser = new MimeStreamParserImpl();
         parser.setContentDecoding(true);
         TestHandler handler = new TestHandler();
         parser.setContentHandler(handler);

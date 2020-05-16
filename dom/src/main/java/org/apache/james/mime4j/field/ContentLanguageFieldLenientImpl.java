@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentLanguageField;
-import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.ParserCursor;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;

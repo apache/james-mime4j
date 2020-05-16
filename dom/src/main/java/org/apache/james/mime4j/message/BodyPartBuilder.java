@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.Date;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Message;
@@ -31,7 +32,6 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.internal.AbstractEntityBuilder;
 import org.apache.james.mime4j.io.InputStreams;
-import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
 
 /**

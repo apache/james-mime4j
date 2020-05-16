@@ -21,12 +21,12 @@ package org.apache.james.mime4j.field;
 
 import java.io.StringReader;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentLocationField;
 import org.apache.james.mime4j.field.structured.parser.ParseException;
 import org.apache.james.mime4j.field.structured.parser.StructuredFieldParser;
-import org.apache.james.mime4j.stream.Field;
 
 /**
  * Represents a <code>Content-Location</code> field.

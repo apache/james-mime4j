@@ -34,6 +34,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.Field;
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -57,11 +59,9 @@ import org.apache.james.mime4j.message.DefaultBodyDescriptorBuilder;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MultipartBuilder;
+import org.apache.james.mime4j.parser.MimeStreamParserImpl;
 import org.apache.james.mime4j.internal.ParserStreamContentHandler;
-import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
-import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.NameValuePair;
 
 /**
@@ -876,7 +876,7 @@ public interface Message extends Entity, Body {
                 new DefaultBodyDescriptorBuilder(null, fieldParser != null ? fieldParser :
                     strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser(), currentMonitor);
             BodyFactory currentBodyFactory = bodyFactory != null ? bodyFactory : new BasicBodyFactory(!strict);
-            MimeStreamParser parser = new MimeStreamParser(currentConfig, currentMonitor, currentBodyDescBuilder);
+            MimeStreamParserImpl parser = new MimeStreamParserImpl(currentConfig, currentMonitor, currentBodyDescBuilder);
 
             Message message = new MessageImpl();
             parser.setContentHandler(new ParserStreamContentHandler(message, currentBodyFactory));

@@ -27,7 +27,10 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.LinkedList;
 
+import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.Field;
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineNumberInputStream;

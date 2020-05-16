@@ -19,10 +19,10 @@
 
 package org.apache.james.mime4j.field;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ParseException;
 import org.apache.james.mime4j.dom.field.ParsedField;
-import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteSequence;
 

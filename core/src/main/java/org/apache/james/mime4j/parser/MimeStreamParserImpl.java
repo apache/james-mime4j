@@ -22,13 +22,15 @@ package org.apache.james.mime4j.parser;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.ContentHandler;
+import org.apache.james.mime4j.Field;
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeStreamParser;
 import org.apache.james.mime4j.codec.DecodeMonitor;
-import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.EntityState;
-import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.stream.RecursionMode;
 
@@ -52,20 +54,20 @@ import org.apache.james.mime4j.stream.RecursionMode;
  *      }
  * </pre>
  */
-public class MimeStreamParser {
+public class MimeStreamParserImpl implements MimeStreamParser {
 
     private ContentHandler handler = null;
     private boolean contentDecoding;
 
     private final MimeTokenStream mimeTokenStream;
 
-    public MimeStreamParser(MimeTokenStream tokenStream) {
+    public MimeStreamParserImpl(MimeTokenStream tokenStream) {
         super();
         this.mimeTokenStream = tokenStream;
         this.contentDecoding = false;
     }
 
-    public MimeStreamParser(
+    public MimeStreamParserImpl(
             final MimeConfig config,
             final DecodeMonitor monitor,
             final BodyDescriptorBuilder bodyDescBuilder) {
@@ -73,11 +75,11 @@ public class MimeStreamParser {
                 monitor, bodyDescBuilder));
     }
 
-    public MimeStreamParser(final MimeConfig config) {
+    public MimeStreamParserImpl(final MimeConfig config) {
         this(config, null, null);
     }
 
-    public MimeStreamParser() {
+    public MimeStreamParserImpl() {
         this(new MimeTokenStream(MimeConfig.DEFAULT, null, null));
     }
 

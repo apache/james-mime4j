@@ -22,7 +22,7 @@ package org.apache.james.mime4j.dom;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.Field;
 
 /**
  * An interface to write out content of {@link Message} and other DOM elements to

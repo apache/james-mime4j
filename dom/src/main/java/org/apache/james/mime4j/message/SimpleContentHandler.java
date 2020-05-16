@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
@@ -26,7 +27,6 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
-import org.apache.james.mime4j.stream.Field;
 
 /**
  * Abstract implementation of ContentHandler that automates common

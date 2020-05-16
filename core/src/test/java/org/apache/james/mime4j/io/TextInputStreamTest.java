@@ -116,14 +116,20 @@ public class TextInputStreamTest {
 
     @Test
     public void testReadZero2() throws Exception {
-        InputStream r = new TextInputStream("test", Charsets.US_ASCII, 1024);
-        byte[] bytes = new byte[30];
-        assertEquals(2, r.read(bytes, 0, 2));
-        assertEquals(0, r.read(bytes, 2, 0));
-        assertEquals(0, r.read(bytes, 2, 0));
-        assertEquals(2, r.read(bytes, 2, 2));
-        assertEquals(-1, r.read(bytes, 4, 0));
-        assertEquals(-1, r.read(bytes, 4, 2));
+        InputStream r = null;
+        try {
+            r = new TextInputStream("test", Charsets.US_ASCII, 1024);
+            byte[] bytes = new byte[30];
+            assertEquals(2, r.read(bytes, 0, 2));
+            assertEquals(0, r.read(bytes, 2, 0));
+            assertEquals(0, r.read(bytes, 2, 0));
+            assertEquals(2, r.read(bytes, 2, 2));
+            assertEquals(-1, r.read(bytes, 4, 0));
+            assertEquals(-1, r.read(bytes, 4, 2));
+        } finally {
+            if (r != null)
+                r.close();
+        }
     }
 
     @Test

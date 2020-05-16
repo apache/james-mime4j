@@ -19,10 +19,10 @@
 
 package org.apache.james.mime4j.field;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentIdField;
-import org.apache.james.mime4j.stream.Field;
 
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.

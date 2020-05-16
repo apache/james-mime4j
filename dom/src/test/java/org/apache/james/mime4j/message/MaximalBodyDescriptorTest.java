@@ -19,11 +19,11 @@
 
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.ExampleMail;
-import org.apache.james.mime4j.stream.BodyDescriptor;
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.EntityState;
-import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.stream.RawField;
 import org.junit.Assert;

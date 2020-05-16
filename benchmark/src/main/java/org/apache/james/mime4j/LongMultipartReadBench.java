@@ -29,11 +29,9 @@ import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.SimpleContentHandler;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
-import org.apache.james.mime4j.parser.ContentHandler;
-import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.parser.MimeStreamParserImpl;
 import org.apache.james.mime4j.storage.DefaultStorageProvider;
 import org.apache.james.mime4j.storage.MemoryStorageProvider;
-import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -137,7 +135,7 @@ public class LongMultipartReadBench {
             };
 
             for (int i = 0; i < repetitions; i++) {
-                MimeStreamParser parser = new MimeStreamParser();
+                MimeStreamParserImpl parser = new MimeStreamParserImpl();
                 parser.setContentHandler(contentHandler);
                 parser.parse(new ByteArrayInputStream(content));
             }
@@ -160,7 +158,7 @@ public class LongMultipartReadBench {
             };
 
             for (int i = 0; i < repetitions; i++) {
-                MimeStreamParser parser = new MimeStreamParser();
+                MimeStreamParserImpl parser = new MimeStreamParserImpl();
                 parser.setContentDecoding(true);
                 parser.setContentHandler(contentHandler);
                 parser.parse(new ByteArrayInputStream(content));

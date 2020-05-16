@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;

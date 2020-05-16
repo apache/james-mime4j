@@ -24,12 +24,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentLanguageField;
 import org.apache.james.mime4j.field.language.parser.ContentLanguageParser;
 import org.apache.james.mime4j.field.language.parser.ParseException;
-import org.apache.james.mime4j.stream.Field;
 
 /**
  * Represents a <code>Content-Transfer-Encoding</code> field.

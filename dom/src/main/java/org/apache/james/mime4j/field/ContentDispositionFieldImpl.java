@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
@@ -34,7 +35,6 @@ import org.apache.james.mime4j.field.contentdisposition.parser.ContentDispositio
 import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
 import org.apache.james.mime4j.field.contentdisposition.parser.TokenMgrError;
 import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
-import org.apache.james.mime4j.stream.Field;
 
 /**
  * Represents a <code>Content-Disposition</code> field.

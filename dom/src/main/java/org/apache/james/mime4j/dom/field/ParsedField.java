@@ -19,7 +19,7 @@
 
 package org.apache.james.mime4j.dom.field;
 
-import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.Field;
 
 /**
  * A structured field that has been processed by a parsing routine.

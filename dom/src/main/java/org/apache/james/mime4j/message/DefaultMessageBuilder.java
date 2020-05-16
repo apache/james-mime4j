@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
+import org.apache.james.mime4j.Field;
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -40,10 +42,8 @@ import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.internal.ParserStreamContentHandler;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
-import org.apache.james.mime4j.parser.MimeStreamParser;
+import org.apache.james.mime4j.parser.MimeStreamParserImpl;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
-import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.NameValuePair;
 
 /**
@@ -266,7 +266,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
         final FieldParser<? extends ParsedField> fp = fieldParser != null ? fieldParser :
             strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser();
         final HeaderImpl header = new HeaderImpl();
-        final MimeStreamParser parser = new MimeStreamParser(cfg, mon, null);
+        final MimeStreamParserImpl parser = new MimeStreamParserImpl(cfg, mon, null);
         parser.setContentHandler(new AbstractContentHandler() {
             @Override
             public void endHeader() {
@@ -310,7 +310,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
                 new DefaultBodyDescriptorBuilder(null, fieldParser != null ? fieldParser :
                     strict ? DefaultFieldParser.getParser() : LenientFieldParser.getParser(), mon);
             BodyFactory bf = bodyFactory != null ? bodyFactory : new BasicBodyFactory(!strict);
-            MimeStreamParser parser = new MimeStreamParser(cfg, mon, bdb);
+            MimeStreamParserImpl parser = new MimeStreamParserImpl(cfg, mon, bdb);
             parser.setContentHandler(new ParserStreamContentHandler(message, bf));
             parser.setContentDecoding(contentDecoding);
             if (flatMode) {

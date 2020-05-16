@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.BodyDescriptor;
+
 class BasicBodyDescriptor implements BodyDescriptor {
 
     private final String mimeType;

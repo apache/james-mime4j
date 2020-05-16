@@ -20,11 +20,11 @@
 package org.apache.james.mime4j.dom;
 
 import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
-import org.apache.james.mime4j.stream.MimeConfig;
 import org.junit.Assert;
 import org.junit.Test;
 

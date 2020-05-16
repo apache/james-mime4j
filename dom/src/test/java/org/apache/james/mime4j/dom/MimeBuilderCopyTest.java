@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.dom;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.BodyPart;
@@ -26,7 +27,6 @@ import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImpl;
 import org.apache.james.mime4j.message.MultipartImpl;
-import org.apache.james.mime4j.stream.Field;
 import org.junit.Assert;
 import org.junit.Test;
 

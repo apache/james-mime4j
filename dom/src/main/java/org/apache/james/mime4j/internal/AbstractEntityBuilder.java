@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Message;
@@ -44,7 +45,6 @@ import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.message.BodyPartBuilder;
 import org.apache.james.mime4j.message.MultipartBuilder;
 import org.apache.james.mime4j.message.SingleBodyBuilder;
-import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.util.MimeUtil;
 
@@ -203,7 +203,7 @@ public abstract class AbstractEntityBuilder {
      *
      * If this builder does not already contain a header field of
      * the same name as the given field then it is added to the end of the list
-     * of fields (same behavior as {@link #addField(org.apache.james.mime4j.stream.Field)}). Otherwise the
+     * of fields (same behavior as {@link #addField(org.apache.james.mime4j.Field)}). Otherwise the
      * first occurrence of a field with the same name is replaced by the given
      * field and all further occurrences are removed.
      *

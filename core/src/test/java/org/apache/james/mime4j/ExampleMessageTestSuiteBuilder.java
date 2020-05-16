@@ -65,7 +65,7 @@ public class ExampleMessageTestSuiteBuilder {
                 for (File f : files) {
                     if (f.getName().endsWith(".msg")) {
                         testSuite.addTest(this.testFactory.create(
-                                f, f.toURL()));
+                                f, f.toURI().toURL()));
                     }
                 }
             } else if (resource.getProtocol().equalsIgnoreCase("jar")) {

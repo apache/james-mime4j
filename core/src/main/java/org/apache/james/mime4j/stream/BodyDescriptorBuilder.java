@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.MimeException;
 
 /**

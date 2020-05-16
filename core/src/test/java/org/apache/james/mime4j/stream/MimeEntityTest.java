@@ -26,6 +26,7 @@ import java.util.Locale;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
 import org.apache.james.mime4j.io.LineNumberInputStream;

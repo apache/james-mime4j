@@ -19,9 +19,9 @@
 
 package org.apache.james.mime4j.dom;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ParsedField;
-import org.apache.james.mime4j.stream.Field;
 
 /**
  * A parser or transformation process intended to convert raw (unstructured) {@link Field}s into

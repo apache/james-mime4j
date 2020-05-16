@@ -17,9 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
-
-import org.apache.james.mime4j.MimeException;
+package org.apache.james.mime4j;
 
 /**
  * Properties used to configure the behavior of MIME stream parsers.
@@ -145,7 +143,7 @@ public final class MimeConfig {
      * that the parsing should be headless.
      *
      * @return default content type when parsing headless, null otherwise
-     * @see org.apache.james.mime4j.parser.MimeStreamParser#parse(java.io.InputStream)
+     * @see org.apache.james.mime4j.parser.MimeStreamParserImpl#parse(java.io.InputStream)
      */
     public String getHeadlessParsing() {
         return headlessParsing;
@@ -332,7 +330,7 @@ public final class MimeConfig {
          * @param contentType
          *            value of the default content type when parsing headless, null
          *            otherwise
-         * @see org.apache.james.mime4j.parser.MimeStreamParser#parse(java.io.InputStream)
+         * @see org.apache.james.mime4j.parser.MimeStreamParserImpl#parse(java.io.InputStream)
          */
         public Builder setHeadlessParsing(String contentType) {
             this.headlessParsing = contentType;

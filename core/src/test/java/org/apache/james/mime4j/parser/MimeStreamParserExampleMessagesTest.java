@@ -33,7 +33,7 @@ import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.ExampleMessageTestCase;
 import org.apache.james.mime4j.ExampleMessageTestCaseFactory;
 import org.apache.james.mime4j.ExampleMessageTestSuiteBuilder;
-import org.apache.james.mime4j.stream.MimeConfig;
+import org.apache.james.mime4j.MimeConfig;
 import org.junit.Assert;
 import org.junit.runner.RunWith;
 import org.junit.runners.AllTests;
@@ -67,7 +67,7 @@ public class MimeStreamParserExampleMessagesTest extends ExampleMessageTestCase 
         TestHandler handler = new TestHandler();
         InputStream msgstream = getResource().openStream();
         try {
-            MimeStreamParser parser = new MimeStreamParser(config);
+            MimeStreamParserImpl parser = new MimeStreamParserImpl(config);
             parser.setContentHandler(handler);
             parser.parse(msgstream);
 

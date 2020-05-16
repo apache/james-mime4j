@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.dom.Header;
-import org.apache.james.mime4j.stream.Field;
 
 /**
  * Abstract MIME header.

@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
@@ -36,7 +37,6 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.internal.AbstractEntityBuilder;
-import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
 import org.junit.Assert;
 import org.junit.Test;

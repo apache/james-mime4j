@@ -18,12 +18,12 @@
  ****************************************************************/
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.dom.MessageServiceFactory;
 import org.apache.james.mime4j.dom.MessageWriter;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
-import org.apache.james.mime4j.stream.MimeConfig;
 
 /**
  * The default MessageBuilderFactory bundled with Mime4j.

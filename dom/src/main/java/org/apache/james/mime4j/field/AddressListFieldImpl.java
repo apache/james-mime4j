@@ -19,13 +19,13 @@
 
 package org.apache.james.mime4j.field;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.field.AddressListField;
 import org.apache.james.mime4j.field.address.DefaultAddressParser;
 import org.apache.james.mime4j.field.address.ParseException;
-import org.apache.james.mime4j.stream.Field;
 
 /**
  * Address list field such as <code>To</code> or <code>Reply-To</code>.

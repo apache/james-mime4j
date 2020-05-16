@@ -19,6 +19,9 @@
 
 package org.apache.james.mime4j.internal;
 
+import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.ContentHandler;
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.Body;
 import org.apache.james.mime4j.dom.Entity;
@@ -31,9 +34,6 @@ import org.apache.james.mime4j.message.DefaultMessageImplFactory;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.message.MessageImplFactory;
 import org.apache.james.mime4j.message.MultipartImpl;
-import org.apache.james.mime4j.parser.ContentHandler;
-import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 
@@ -43,7 +43,7 @@ import java.util.Stack;
 
 /**
  * A <code>ContentHandler</code> for building an <code>Entity</code> to be
- * used in conjunction with a {@link org.apache.james.mime4j.parser.MimeStreamParser}.
+ * used in conjunction with a {@link org.apache.james.mime4j.parser.MimeStreamParserImpl}.
  */
 public class ParserStreamContentHandler implements ContentHandler {
 

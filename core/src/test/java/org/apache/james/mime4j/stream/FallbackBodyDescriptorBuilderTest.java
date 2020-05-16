@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.BodyDescriptor;
+
 import junit.framework.TestCase;
 
 public class FallbackBodyDescriptorBuilderTest extends TestCase {

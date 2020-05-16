@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.util.MimeUtil;

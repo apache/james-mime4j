@@ -22,7 +22,7 @@ package org.apache.james.mime4j.dom;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.Field;
 
 /**
  * A header of an MIME entity (as defined in RFC 2045).

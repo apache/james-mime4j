@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.ExampleMail;
 import org.junit.Assert;
 import org.junit.Before;

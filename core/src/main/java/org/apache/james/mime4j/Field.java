@@ -17,18 +17,39 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.stream;
+package org.apache.james.mime4j;
+
+import org.apache.james.mime4j.util.ByteSequence;
 
 /**
- * A descriptor containing common MIME content body properties.
+ * <p>
+ * This interface represents an abstract MIME field. A MIME field must have a non <code>null</code>
+ * name and a content body (unfolded but unparsed and possibly encoded). Optionally implementing
+ * classes may also retain the original (raw) representation in a form of {@link ByteSequence}.
+ * </p>
+ * <p>
+ * Specific implementations of this interface may also use a richer model to represent the field
+ * if its body can be parsed into a set of constituent elements.
+ * </p>
  */
-public interface BodyDescriptor extends ContentDescriptor {
+public interface Field {
 
     /**
-     * Returns the body descriptors boundary.
-     * @return Boundary string, if known, or null. The latter may be the
-     *   case, in particular, if the body is no multipart entity.
+     * Returns the name of the field.
      */
-    String getBoundary();
+    String getName();
+
+    /**
+     * Gets the unparsed and possibly encoded (see RFC 2047) field body string.
+     *
+     * @return the unparsed field body string.
+     */
+    String getBody();
+
+    /**
+     * Gets original (raw) representation of the field, if available,
+     * <code>null</code> otherwise.
+     */
+    ByteSequence getRaw();
 
 }

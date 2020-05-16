@@ -17,11 +17,7 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.parser;
-
-import org.apache.james.mime4j.MimeException;
-import org.apache.james.mime4j.stream.BodyDescriptor;
-import org.apache.james.mime4j.stream.Field;
+package org.apache.james.mime4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,7 +27,7 @@ import java.io.InputStream;
  * Receives notifications of the content of a plain RFC822 or MIME message.
  * Implement this interface and register an instance of that implementation
  * with a <code>MimeStreamParser</code> instance using its
- * {@link org.apache.james.mime4j.parser.MimeStreamParser#setContentHandler(ContentHandler)}
+ * {@link org.apache.james.mime4j.parser.MimeStreamParserImpl#setContentHandler(ContentHandler)}
  * method. The parser uses the <code>ContentHandler</code> instance to report
  * basic message-related events like the start and end of the body of a
  * part in a multipart MIME entity.
@@ -197,7 +193,7 @@ public interface ContentHandler {
      * @param is the raw contents of the entity.
      * @throws MimeException on processing errors
      * @throws IOException should be thrown on I/O errors.
-     * @see org.apache.james.mime4j.parser.MimeStreamParser#setRaw()
+     * @see org.apache.james.mime4j.parser.MimeStreamParserImpl#setRaw()
      */
     void raw(InputStream is) throws MimeException, IOException;
 

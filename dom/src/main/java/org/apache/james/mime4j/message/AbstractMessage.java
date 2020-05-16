@@ -21,6 +21,7 @@ package org.apache.james.mime4j.message;
 
 import java.util.Date;
 
+import org.apache.james.mime4j.Field;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.Mailbox;
@@ -31,7 +32,6 @@ import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
-import org.apache.james.mime4j.stream.Field;
 
 /**
  * Abstract MIME message.

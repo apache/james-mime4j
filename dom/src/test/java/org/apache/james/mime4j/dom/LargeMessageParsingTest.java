@@ -22,8 +22,8 @@ package org.apache.james.mime4j.dom;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
-import org.apache.james.mime4j.stream.MimeConfig;
 import org.junit.Test;
 
 public class LargeMessageParsingTest {

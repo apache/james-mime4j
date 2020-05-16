@@ -22,7 +22,7 @@ package org.apache.james.mime4j;
 /**
  * MIME processing exception.
  * <p>
- * A <code>MimeException</code> may be thrown by a {@link org.apache.james.mime4j.parser.ContentHandler} to
+ * A <code>MimeException</code> may be thrown by a {@link org.apache.james.mime4j.ContentHandler} to
  * indicate that it has failed to process a message event and that no further
  * events should be generated.
  * <p>

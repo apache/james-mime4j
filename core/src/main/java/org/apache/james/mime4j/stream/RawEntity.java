@@ -22,6 +22,8 @@ package org.apache.james.mime4j.stream;
 
 import java.io.InputStream;
 
+import org.apache.james.mime4j.BodyDescriptor;
+
 /**
  * Raw MIME entity. Such entities will not be parsed into elements
  * by the parser. They are meant to be consumed as a raw data stream

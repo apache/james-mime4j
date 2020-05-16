@@ -19,9 +19,10 @@
 package org.apache.james.mime4j.utils.search;
 
 import com.google.common.collect.ImmutableList;
+
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.stream.EntityState;
-import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

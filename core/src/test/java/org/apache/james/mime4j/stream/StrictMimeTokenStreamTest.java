@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.MimeIOException;
 import org.junit.Assert;
 import org.junit.Before;

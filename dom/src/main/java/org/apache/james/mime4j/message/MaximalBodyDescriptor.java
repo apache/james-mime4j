@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.james.mime4j.BodyDescriptor;
 import org.apache.james.mime4j.dom.field.ContentDescriptionField;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentIdField;
@@ -39,7 +40,6 @@ import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.field.MimeVersionFieldImpl;
-import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**

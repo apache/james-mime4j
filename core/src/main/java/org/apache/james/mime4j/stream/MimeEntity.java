@@ -22,6 +22,9 @@ package org.apache.james.mime4j.stream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.james.mime4j.BodyDescriptor;
+import org.apache.james.mime4j.Field;
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -395,10 +398,13 @@ class MimeEntity implements EntityStateMachine {
         }
     }
 
+    @SuppressWarnings( "resource" )
     private EntityStateMachine nextMessage() {
         // optimize nesting of streams returning the "lower" stream instead of
         // always return dataStream (that would add a LineReaderInputStreamAdaptor in the chain)
         InputStream instream = currentMimePartStream != null ? currentMimePartStream : inbuffer;
+        // instream is not closed here, so supress the warning.
+        // TODO: is that really intended??
         instream = decodedStream(instream);
         return nextMimeEntity(EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE, instream);
     }

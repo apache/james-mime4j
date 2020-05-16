@@ -22,8 +22,6 @@ package org.apache.james.mime4j;
 import java.io.File;
 import java.net.URL;
 
-import org.apache.james.mime4j.stream.MimeConfig;
-
 import junit.framework.TestCase;
 
 public abstract class ExampleMessageTestCase extends TestCase {

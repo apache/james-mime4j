@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.message;
 
+import org.apache.james.mime4j.Field;
+import org.apache.james.mime4j.MimeConfig;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Body;
@@ -33,8 +35,6 @@ import org.apache.james.mime4j.dom.address.MailboxList;
 import org.apache.james.mime4j.dom.field.ParseException;
 import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
-import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.NameValuePair;
 
 import java.io.IOException;
