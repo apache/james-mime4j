@@ -36,7 +36,7 @@ public class LimitedInputStream extends PositionInputStream {
 
     private void enforceLimit() throws IOException {
         if (position >= limit) {
-            throw new IOException("Input stream limit exceeded");
+            throw new IOException("Input stream limit exceeded. Limit was " + limit + " and position " + position);
         }
     }
 
