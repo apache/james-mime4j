@@ -92,8 +92,11 @@ public class CharBufferWrapper {
             if (!buf.hasRemaining()) {
                 return -1;
             }
-            buf.get(bytes, off, Math.min(len, buf.remaining()));
-            return len;
+
+            int actualAmount = Math.min(len, buf.remaining());
+            buf.get(bytes, off, actualAmount);
+
+            return actualAmount;
         }
 
     }
