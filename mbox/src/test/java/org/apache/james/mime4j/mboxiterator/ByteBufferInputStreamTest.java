@@ -48,4 +48,24 @@ public class ByteBufferInputStreamTest {
             Assert.assertArrayEquals(new byte[]{ 0x44, 0x45, (byte) 0xC2, (byte) 0xA7, (byte) - 1 }, byteArr);
         }
     }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullArray() throws IOException {
+        createTestUtf8Stream().read(null, 0, 12);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testNegativeOffset() throws IOException {
+        createTestUtf8Stream().read(new byte[12], -12, 0);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testNegativeLength() throws IOException {
+        createTestUtf8Stream().read(new byte[12], 0, -12);
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void testLongLength() throws IOException {
+        createTestUtf8Stream().read(new byte[12], 4, 13);
+    }
 }
