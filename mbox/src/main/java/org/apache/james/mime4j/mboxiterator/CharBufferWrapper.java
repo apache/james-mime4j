@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.util.Objects;
 
 /**
  * Wraps a CharBuffer and exposes some convenience methods to easy parse with Mime4j.
@@ -89,11 +90,29 @@ public class CharBufferWrapper {
 
         @Override
         public int read(byte[] bytes, int off, int len) throws IOException {
+            if (bytes == null) throw new NullPointerException("bytes is null");
+            if (off < 0) throw new IndexOutOfBoundsException("read index negative: " + off);
+            if (len < 0) throw new IndexOutOfBoundsException("read length negative: " + len);
+
+            if (len > (bytes.length - off)) {
+                throw new IndexOutOfBoundsException(
+                        "read would write invalid array index: array size: " +
+                                bytes.length +
+                                ", array index: " +
+                                off +
+                                ", requested size: " +
+                                len
+                );
+            }
+
             if (!buf.hasRemaining()) {
                 return -1;
             }
-            buf.get(bytes, off, Math.min(len, buf.remaining()));
-            return len;
+
+            int actualAmount = Math.min(len, buf.remaining());
+            buf.get(bytes, off, actualAmount);
+
+            return actualAmount;
         }
 
     }
