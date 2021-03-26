@@ -24,6 +24,7 @@ import org.junit.Test;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 
 public class DecoderUtilTest {
 
@@ -156,5 +157,13 @@ public class DecoderUtilTest {
     public void testFunnyInputDoesNotRaiseOutOfMemoryError() {
         // Bug detected on June 7, 2005. Decoding the following string caused OutOfMemoryError.
         Assert.assertEquals("=3?!!\\=?\"!g6P\"!Xp:\"!", DecoderUtil.decodeEncodedWords("=3?!!\\=?\"!g6P\"!Xp:\"!"));
+    }
+
+    @Test
+    public void testAllowsForOverriddingCharsets() {
+        HashMap<Charset, Charset> overrides = new HashMap<Charset, Charset>();
+        overrides.put(Charset.forName("ISO-8859-1"), Charset.forName("WINDOWS-1252"));
+        String decoded = DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?You=92re_a_winner?=", DecodeMonitor.SILENT, null, overrides);
+        Assert.assertEquals("You’re a winner", decoded);
     }
 }

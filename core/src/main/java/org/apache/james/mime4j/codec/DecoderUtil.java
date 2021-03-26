@@ -22,6 +22,7 @@ package org.apache.james.mime4j.codec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -140,7 +141,7 @@ public class DecoderUtil {
      * @throws IllegalArgumentException only if the DecodeMonitor strategy throws it (Strict parsing)
      */
     public static String decodeEncodedWords(String body, DecodeMonitor monitor) throws IllegalArgumentException {
-        return decodeEncodedWords(body, monitor, null);
+        return decodeEncodedWords(body, monitor, null, null);
     }
 
     /**
@@ -155,7 +156,7 @@ public class DecoderUtil {
      * @throws IllegalArgumentException only if the DecodeMonitor strategy throws it (Strict parsing)
      */
     public static String decodeEncodedWords(String body, Charset fallback) throws IllegalArgumentException {
-        return decodeEncodedWords(body, null, fallback);
+        return decodeEncodedWords(body, null, fallback, null);
     }
 
     /**
@@ -172,6 +173,26 @@ public class DecoderUtil {
      */
     public static String decodeEncodedWords(String body, DecodeMonitor monitor, Charset fallback)
             throws IllegalArgumentException {
+        return decodeEncodedWords(body, monitor, fallback, null);
+    }
+
+    /**
+     * Decodes a string containing encoded words as defined by RFC 2047. Encoded
+     * words have the form =?charset?enc?encoded-text?= where enc is either 'Q'
+     * or 'q' for quoted-printable and 'B' or 'b' for base64. Using fallback
+     * charset if charset in encoded words is invalid. Additionally, the found charset
+     * will be overridden if a corresponding mapping is found.
+     *
+     * @param body the string to decode
+     * @param monitor the DecodeMonitor to be used.
+     * @param fallback the fallback Charset to be used.
+     * @param charsetOverrides the Charsets to override and their replacements.
+     * @return the decoded string.
+     * @throws IllegalArgumentException only if the DecodeMonitor strategy throws it (Strict parsing)
+     */
+    public static String decodeEncodedWords(String body, DecodeMonitor monitor, Charset fallback,
+            Map<Charset, Charset> charsetOverrides)
+            throws IllegalArgumentException {
         int tailIndex = 0;
         boolean lastMatchValid = false;
 
@@ -187,7 +208,7 @@ public class DecoderUtil {
                 return "";
 
             String decoded;
-            decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText, monitor, fallback);
+            decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText, monitor, fallback, charsetOverrides);
             if (decoded == null) {
                 sb.append(separator);
                 sb.append(matcher.group(0));
@@ -211,9 +232,20 @@ public class DecoderUtil {
     }
 
     // return null on error
-    private static String tryDecodeEncodedWord(final String mimeCharset,
-            final String encoding, final String encodedText, final DecodeMonitor monitor, final Charset fallback) {
+    private static String tryDecodeEncodedWord(
+            final String mimeCharset,
+            final String encoding,
+            final String encodedText,
+            final DecodeMonitor monitor,
+            final Charset fallback,
+            final Map<Charset, Charset> charsetOverrides) {
         Charset charset = CharsetUtil.lookup(mimeCharset);
+        if (charset != null && charsetOverrides != null) {
+            Charset override = charsetOverrides.get(charset);
+            if (override != null) {
+                charset = override;
+            }
+        }
         if (charset == null) {
             if(fallback == null) {
                 monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
