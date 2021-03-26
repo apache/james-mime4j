@@ -20,7 +20,6 @@ package org.apache.james.mime4j.dom;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
