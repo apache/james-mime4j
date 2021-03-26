@@ -20,6 +20,7 @@ package org.apache.james.mime4j.dom;
 
 import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import org.apache.james.mime4j.message.BasicBodyFactory;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
@@ -78,7 +79,6 @@ public class MessageCharsetLenientTest {
 				"iso-8589-0",
 				"iso-8814-4",
 				"iso-8859-1 name=FAQ.htm",
-				"iso-8859-16",
 				"iso-8859-1?",
 				"iso-8859-8-i",
 				"iso-9284-4",

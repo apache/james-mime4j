@@ -19,7 +19,7 @@
 package org.apache.james.mime4j.utils.search;
 
 import com.google.common.collect.Lists;
-import com.sun.org.apache.bcel.internal.util.ClassLoader;
+import java.io.InputStream;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -33,7 +33,7 @@ public class MessageMatcherTest {
             .caseInsensitive(true)
             .includeHeaders(false)
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isTrue();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isTrue();
     }
 
     @Test
@@ -43,7 +43,7 @@ public class MessageMatcherTest {
             .caseInsensitive(true)
             .includeHeaders(false)
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isFalse();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isFalse();
     }
 
     @Test
@@ -53,7 +53,7 @@ public class MessageMatcherTest {
             .caseInsensitive(true)
             .includeHeaders(false)
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isFalse();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isFalse();
     }
 
     @Test
@@ -64,7 +64,7 @@ public class MessageMatcherTest {
             .includeHeaders(false)
             .contentTypes(Lists.newArrayList("invalid"))
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isFalse();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isFalse();
     }
 
     @Test
@@ -75,7 +75,7 @@ public class MessageMatcherTest {
             .includeHeaders(false)
             .contentTypes(Lists.newArrayList("text/plain"))
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isTrue();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isTrue();
     }
 
     @Test
@@ -86,7 +86,7 @@ public class MessageMatcherTest {
             .includeHeaders(false)
             .contentTypes(Lists.newArrayList("text/plain"))
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isTrue();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isTrue();
     }
 
     @Test
@@ -97,7 +97,7 @@ public class MessageMatcherTest {
             .includeHeaders(false)
             .contentTypes(Lists.newArrayList("text/plain", "invalid"))
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isTrue();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isTrue();
     }
 
     @Test
@@ -108,7 +108,7 @@ public class MessageMatcherTest {
             .includeHeaders(false)
             .contentTypes(Lists.newArrayList("text/plain", "invalid"))
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isTrue();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isTrue();
     }
 
     @Test
@@ -119,7 +119,7 @@ public class MessageMatcherTest {
             .includeHeaders(false)
             .contentTypes(Lists.newArrayList("text/plain", "invalid"))
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isFalse();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isFalse();
     }
 
     @Test
@@ -130,7 +130,7 @@ public class MessageMatcherTest {
             .includeHeaders(true)
             .contentTypes(Lists.<String>newArrayList())
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isTrue();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isTrue();
     }
 
     @Test
@@ -139,7 +139,7 @@ public class MessageMatcherTest {
             .searchContents(Lists.<CharSequence>newArrayList("message/rfc822"))
             .ignoringMime(true)
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isTrue();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isTrue();
     }
 
     @Test
@@ -148,7 +148,7 @@ public class MessageMatcherTest {
             .searchContents(Lists.<CharSequence>newArrayList("ail signature )\n\n--------------0004"))
             .ignoringMime(true)
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isTrue();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isTrue();
     }
 
     @Test
@@ -157,7 +157,11 @@ public class MessageMatcherTest {
             .searchContents(Lists.<CharSequence>newArrayList("invalid"))
             .ignoringMime(true)
             .build();
-        assertThat(messageMatcher.messageMatches(ClassLoader.getSystemResourceAsStream("sampleMail.msg"))).isFalse();
+        assertThat(messageMatcher.messageMatches(getResourceStream("sampleMail.msg"))).isFalse();
+    }
+
+    private InputStream getResourceStream(String resourceName) {
+        return ClassLoader.getSystemClassLoader().getResourceAsStream(resourceName);
     }
 
 }
