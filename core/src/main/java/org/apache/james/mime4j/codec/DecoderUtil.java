@@ -22,6 +22,7 @@ package org.apache.james.mime4j.codec;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -141,7 +142,7 @@ public class DecoderUtil {
      * @throws IllegalArgumentException only if the DecodeMonitor strategy throws it (Strict parsing)
      */
     public static String decodeEncodedWords(String body, DecodeMonitor monitor) throws IllegalArgumentException {
-        return decodeEncodedWords(body, monitor, null, null);
+        return decodeEncodedWords(body, monitor, null, Collections.emptyMap());
     }
 
     /**
@@ -156,7 +157,7 @@ public class DecoderUtil {
      * @throws IllegalArgumentException only if the DecodeMonitor strategy throws it (Strict parsing)
      */
     public static String decodeEncodedWords(String body, Charset fallback) throws IllegalArgumentException {
-        return decodeEncodedWords(body, null, fallback, null);
+        return decodeEncodedWords(body, null, fallback, Collections.emptyMap());
     }
 
     /**
@@ -173,7 +174,7 @@ public class DecoderUtil {
      */
     public static String decodeEncodedWords(String body, DecodeMonitor monitor, Charset fallback)
             throws IllegalArgumentException {
-        return decodeEncodedWords(body, monitor, fallback, null);
+        return decodeEncodedWords(body, monitor, fallback, Collections.emptyMap());
     }
 
     /**
@@ -186,7 +187,7 @@ public class DecoderUtil {
      * @param body the string to decode
      * @param monitor the DecodeMonitor to be used.
      * @param fallback the fallback Charset to be used.
-     * @param charsetOverrides the Charsets to override and their replacements.
+     * @param charsetOverrides the Charsets to override and their replacements. Must not be null.
      * @return the decoded string.
      * @throws IllegalArgumentException only if the DecodeMonitor strategy throws it (Strict parsing)
      */
@@ -239,21 +240,11 @@ public class DecoderUtil {
             final DecodeMonitor monitor,
             final Charset fallback,
             final Map<Charset, Charset> charsetOverrides) {
-        Charset charset = CharsetUtil.lookup(mimeCharset);
-        if (charset != null && charsetOverrides != null) {
-            Charset override = charsetOverrides.get(charset);
-            if (override != null) {
-                charset = override;
-            }
-        }
+        Charset charset = lookupCharset(mimeCharset, fallback, charsetOverrides);
         if (charset == null) {
-            if(fallback == null) {
-                monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
-                        "Mime charser '", mimeCharset, "' doesn't have a corresponding Java charset");
-                return null;
-            } else {
-                charset = fallback;
-            }
+            monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
+                    "Mime charser '", mimeCharset, "' doesn't have a corresponding Java charset");
+            return null;
         }
 
         if (encodedText.length() == 0) {
@@ -282,6 +273,22 @@ public class DecoderUtil {
                     "Could not decode (", e.getMessage(), ") encoded word");
             return null;
         }
+    }
+
+    private static Charset lookupCharset(
+            final String mimeCharset,
+            final Charset fallback,
+            final Map<Charset, Charset> charsetOverrides) {
+        Charset charset = CharsetUtil.lookup(mimeCharset);
+        if (charset != null) {
+            Charset override = charsetOverrides.get(charset);
+            if (override != null) {
+                charset = override;
+            }
+        } else {
+            charset = fallback;
+        }
+        return charset;
     }
 
     private static void monitor(DecodeMonitor monitor, String mimeCharset, String encoding,
