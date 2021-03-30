@@ -78,7 +78,6 @@ public class MessageCharsetLenientTest {
 				"iso-8589-0",
 				"iso-8814-4",
 				"iso-8859-1 name=FAQ.htm",
-				"iso-8859-16",
 				"iso-8859-1?",
 				"iso-8859-8-i",
 				"iso-9284-4",
