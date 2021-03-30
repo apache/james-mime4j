@@ -25,12 +25,16 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.Buffer;
+import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetDecoder;
 import java.nio.charset.CoderResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,12 +51,10 @@ import java.util.regex.Pattern;
  * </ul>
  */
 public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
-
-    private final FileInputStream theFile;
     private final CharBuffer mboxCharBuffer;
     private Matcher fromLineMatcher;
     private boolean fromLineFound;
-    private final MappedByteBuffer byteBuffer;
+    private final ByteBuffer byteBuffer;
     private final CharsetDecoder DECODER;
     /**
      * Flag to signal end of input to {@link java.nio.charset.CharsetDecoder#decode(java.nio.ByteBuffer)} .
@@ -62,9 +64,9 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
     private final Pattern MESSAGE_START;
     private int findStart = -1;
     private int findEnd = -1;
-    private final File mbox;
+    private final Path mbox;
 
-    private MboxIterator(final File mbox,
+    private MboxIterator(final Path mbox,
                          final Charset charset,
                          final String regexpPattern,
                          final int regexpFlags,
@@ -76,8 +78,12 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         this.DECODER = charset.newDecoder();
         this.mboxCharBuffer = CharBuffer.allocate(MAX_MESSAGE_SIZE);
         this.mbox = mbox;
-        this.theFile = new FileInputStream(mbox);
-        this.byteBuffer = theFile.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, theFile.getChannel().size());
+
+        try (FileChannel channel = FileChannel.open(mbox, StandardOpenOption.READ)) {
+            // Safe to keep buffer around because it does not depend on the channel.
+            this.byteBuffer = channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size());
+        }
+
         initMboxIterator();
     }
 
@@ -96,7 +102,7 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         } else if (fromLineMatcher.hitEnd()) {
             String path = "";
             if (mbox != null)
-                path = mbox.getPath();
+                path = mbox.toString();
             throw new IllegalArgumentException("File " + path + " does not contain From_ lines that match the pattern '"
                     + MESSAGE_START.pattern() + "'! Maybe not be a valid Mbox or wrong matcher.");
         }
@@ -130,9 +136,7 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         return new MessageIterator();
     }
 
-    public void close() throws IOException {
-        theFile.close();
-    }
+    public void close() throws IOException {}
 
     private class MessageIterator implements Iterator<CharBufferWrapper> {
 
@@ -205,17 +209,20 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         }
     }
 
-    public static Builder fromFile(File filePath) {
+    public static Builder fromFile(Path filePath) {
         return new Builder(filePath);
     }
 
+    public static Builder fromFile(File filePath) {
+        return fromFile(filePath.toPath());
+    }
+
     public static Builder fromFile(String file) {
-        return new Builder(file);
+        return fromFile(new File(file));
     }
 
     public static class Builder {
-
-        private final File file;
+        private final Path path;
         private Charset charset = Charset.forName("UTF-8");
         private String regexpPattern = FromLinePatterns.DEFAULT;
         private int flags = Pattern.MULTILINE;
@@ -225,12 +232,8 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
          */
         private int maxMessageSize = 10 * 1024 * 1024;
 
-        private Builder(String filePath) {
-            this(new File(filePath));
-        }
-
-        private Builder(File file) {
-            this.file = file;
+        private Builder(Path path) {
+            this.path = path;
         }
 
         public Builder charset(Charset charset) {
@@ -254,7 +257,7 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         }
 
         public MboxIterator build() throws FileNotFoundException, IOException {
-            return new MboxIterator(file, charset, regexpPattern, flags, maxMessageSize);
+            return new MboxIterator(path, charset, regexpPattern, flags, maxMessageSize);
         }
     }
 
