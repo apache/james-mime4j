@@ -280,15 +280,11 @@ public class DecoderUtil {
             final Charset fallback,
             final Map<Charset, Charset> charsetOverrides) {
         Charset charset = CharsetUtil.lookup(mimeCharset);
-        if (charset != null) {
-            Charset override = charsetOverrides.get(charset);
-            if (override != null) {
-                charset = override;
-            }
-        } else {
-            charset = fallback;
+        if (charset == null) {
+            return fallback;
         }
-        return charset;
+        Charset override = charsetOverrides.get(charset);
+        return override != null ? override : charset;
     }
 
     private static void monitor(DecodeMonitor monitor, String mimeCharset, String encoding,
