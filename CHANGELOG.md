@@ -5,7 +5,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
-Changes includes in this release:
+## [0.8.4] - 2021-04-21
+
+Changes included in this release:
 
  - MIME4J-233 bad parsing of mbox files using MboxIterator
  - MIME4J-273 Update EncoderUtil#encodeB encoding string splitting point
@@ -19,7 +21,7 @@ More information on the [JIRA](https://issues.apache.org/jira/browse/MIME4J-297?
 
 ## [0.8.3] - 2019-03-21
 
-Changes includes in this release:
+Changes included in this release:
 
  - MIME4J-270: Using "alternative" as default subtype
  - MIME4J-263: decoding encoded words with empty encoded-text
