@@ -218,7 +218,7 @@ public final class MimeUtil {
             int nextWspIdx = indexOfWsp(s, wspIdx + 1);
 
             if (nextWspIdx - lastLineBreak > maxCharacters) {
-                sb.append(s.substring(Math.max(0, lastLineBreak), wspIdx));
+                sb.append(s, Math.max(0, lastLineBreak), wspIdx);
                 sb.append("\r\n");
                 lastLineBreak = wspIdx;
             }
@@ -260,7 +260,7 @@ public final class MimeUtil {
         StringBuilder sb = new StringBuilder(length);
 
         if (crlfIdx > 0) {
-            sb.append(s.substring(0, crlfIdx));
+            sb.append(s, 0, crlfIdx);
         }
 
         for (int idx = crlfIdx + 1; idx < length; idx++) {
