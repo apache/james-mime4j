@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.field;
 
 import java.io.StringReader;
+import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
@@ -32,6 +33,7 @@ import org.apache.james.mime4j.stream.Field;
  * Represents a <code>Content-Location</code> field.
  */
 public class ContentLocationFieldImpl extends AbstractField implements ContentLocationField {
+    private static final Pattern PATTERN = Pattern.compile("\\s");
 
     private boolean parsed = false;
     private String location;
@@ -56,7 +58,7 @@ public class ContentLocationFieldImpl extends AbstractField implements ContentLo
                  * remaining material is the URL string.
                  * Read more: http://www.faqs.org/rfcs/rfc2017.html#ixzz0aufO9nRL
                  */
-                location = parser.parse().replaceAll("\\s", "");
+                location = PATTERN.matcher(parser.parse()).replaceAll("");
             } catch (ParseException ex) {
                 parseException = ex;
             }
