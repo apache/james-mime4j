@@ -66,10 +66,11 @@ public abstract class AbstractEntityBuilder {
      * @param field the field to add.
      */
     public AbstractEntityBuilder addField(Field field) {
-        List<Field> values = fieldMap.get(field.getName().toLowerCase(Locale.US));
+        String lowerCasedFieldName = field.getName().toLowerCase(Locale.US);
+        List<Field> values = fieldMap.get(lowerCasedFieldName);
         if (values == null) {
             values = new LinkedList<Field>();
-            fieldMap.put(field.getName().toLowerCase(Locale.US), values);
+            fieldMap.put(lowerCasedFieldName, values);
         }
         values.add(field);
         fields.add(field);
