@@ -67,10 +67,11 @@ public abstract class AbstractHeader implements Header {
      * @param field the field to add.
      */
     public void addField(Field field) {
-        List<Field> values = fieldMap.get(field.getName().toLowerCase(Locale.US));
+        String lowerCaseFieldName = field.getName().toLowerCase(Locale.US);
+        List<Field> values = fieldMap.get(lowerCaseFieldName);
         if (values == null) {
             values = new LinkedList<Field>();
-            fieldMap.put(field.getName().toLowerCase(Locale.US), values);
+            fieldMap.put(lowerCaseFieldName, values);
         }
         values.add(field);
         fields.add(field);
