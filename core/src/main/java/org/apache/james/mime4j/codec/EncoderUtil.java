@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.util.BitSet;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.util.CharsetUtil;
@@ -54,6 +55,8 @@ public class EncoderUtil {
     private static final BitSet TOKEN_CHARS = initChars("()<>@,;:\\\"/[]?=");
 
     private static final BitSet ATEXT_CHARS = initChars("()<>@.,;:\\\"[]");
+
+    private static final Pattern QUOTE = Pattern.compile("[\\\\\"]");
 
     private static BitSet initChars(String specials) {
         BitSet bs = new BitSet(128);
@@ -526,8 +529,7 @@ public class EncoderUtil {
         // VCHAR = %x21-7E
         // DQUOTE = %x22
 
-        String escaped = str.replaceAll("[\\\\\"]", "\\\\$0");
-        return "\"" + escaped + "\"";
+        return '"' + QUOTE.matcher(str).replaceAll("\\\\$0") + '"';
     }
 
     private static String encodeB(String prefix, String text,
