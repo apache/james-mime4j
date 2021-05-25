@@ -21,6 +21,7 @@ package org.apache.james.mime4j.dom;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.james.mime4j.stream.Field;
 
@@ -43,6 +44,14 @@ public interface Header extends Iterable<Field> {
      * @return the list of <code>Field</code> objects.
      */
     List<Field> getFields();
+
+    /**
+     * Gets the fields of this header. The returned map will not be
+     * modifiable.
+     *
+     * @return the map of <code>Field</code> objects indexed by names.
+     */
+    Map<String, List<Field>> getFieldsAsMap();
 
     /**
      * Gets a <code>Field</code> given a field name. If there are multiple
