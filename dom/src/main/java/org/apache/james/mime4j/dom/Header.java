@@ -47,7 +47,8 @@ public interface Header extends Iterable<Field> {
 
     /**
      * Gets the fields of this header. The returned map will not be
-     * modifiable.
+     * modifiable. For each header name, values are ordered by which
+     * they appear in the underlying entity.
      *
      * @return the map of <code>Field</code> objects indexed by names.
      */
