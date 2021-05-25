@@ -88,6 +88,18 @@ public abstract class AbstractHeader implements Header {
     }
 
     /**
+     * Gets the fields of this header. The returned map will not be
+     * modifiable. For each header name, values are ordered by which
+     * they appear in the underlying entity.
+     *
+     * @return the map of <code>Field</code> objects indexed by names.
+     */
+    @Override
+    public Map<String, List<Field>> getFieldsAsMap() {
+        return Collections.unmodifiableMap(fieldMap);
+    }
+
+    /**
      * Gets a <code>Field</code> given a field name. If there are multiple
      * such fields defined in this header the first one will be returned.
      *
