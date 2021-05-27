@@ -69,7 +69,7 @@ public class EOLConvertingInputStreamTest {
                 new EOLConvertingInputStream(InputStreams.createAscii(s1),
                         EOLConvertingInputStream.CONVERT_BOTH);
         int n = in.read(bytes);
-        Assert.assertEquals(s2, ContentUtil.toAsciiString(bytes, 0, n > 0 ? n : 0));
+        Assert.assertEquals(s2, ContentUtil.toAsciiString(bytes, 0, Math.max(n, 0)));
 
         in.close();
     }
@@ -81,7 +81,7 @@ public class EOLConvertingInputStreamTest {
                 new EOLConvertingInputStream(InputStreams.createAscii(s1),
                         EOLConvertingInputStream.CONVERT_CR);
         int n = in.read(bytes);
-        Assert.assertEquals(s2, ContentUtil.toAsciiString(bytes, 0, n > 0 ? n : 0));
+        Assert.assertEquals(s2, ContentUtil.toAsciiString(bytes, 0, Math.max(n, 0)));
 
         in.close();
     }
@@ -93,7 +93,7 @@ public class EOLConvertingInputStreamTest {
                 new EOLConvertingInputStream(InputStreams.createAscii(s1),
                         EOLConvertingInputStream.CONVERT_LF);
         int n = in.read(bytes);
-        Assert.assertEquals(s2, ContentUtil.toAsciiString(bytes, 0, n > 0 ? n : 0));
+        Assert.assertEquals(s2, ContentUtil.toAsciiString(bytes, 0, Math.max(n, 0)));
 
         in.close();
     }
