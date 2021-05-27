@@ -86,9 +86,7 @@ public class Group extends Address {
 
     @Override
     protected void doAddMailboxesTo(List<Mailbox> results) {
-        for (Mailbox mailbox : mailboxList) {
-            results.add(mailbox);
-        }
+        results.addAll(mailboxList);
     }
 
     @Override
