@@ -267,7 +267,7 @@ public class MessageBuilder {
     }
 
     public Date getReadDate() {
-        return getReadDate();
+        return builder.getReadDate();
     }
 
     public String getMessageId() {
