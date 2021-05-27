@@ -52,7 +52,7 @@ public interface Multipart extends Body {
      *
      * @return the list of <code>Entity</code> objects.
      */
-    public List<Entity> getBodyParts();
+    List<Entity> getBodyParts();
 
     /**
      * Sets the list of body parts.

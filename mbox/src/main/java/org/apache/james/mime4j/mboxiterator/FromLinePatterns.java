@@ -28,13 +28,13 @@ public interface FromLinePatterns {
     /**
      * Match a line like: From ieugen@apache.org Fri Sep 09 14:04:52 2011
      */
-    static final String DEFAULT = "^From \\S+@\\S.*\\d{4}$";
+    String DEFAULT = "^From \\S+@\\S.*\\d{4}$";
     /**
      * Matches other type of From_ line (without @):
      * From MAILER-DAEMON Wed Oct 05 21:54:09 2011
      * Thunderbird mbox content: From - Wed Apr 02 06:51:08 2014
      */
-    static final String DEFAULT2 = "^From \\S+.*\\d{4}$";
+    String DEFAULT2 = "^From \\S+.*\\d{4}$";
 
 
 }

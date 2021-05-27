@@ -24,17 +24,17 @@ import java.util.Map;
 public interface ContentTypeField extends ParsedField {
 
     /** The prefix of all <code>multipart</code> MIME types. */
-    public static final String TYPE_MULTIPART_PREFIX = "multipart/";
+    String TYPE_MULTIPART_PREFIX = "multipart/";
     /** The <code>multipart/digest</code> MIME type. */
-    public static final String TYPE_MULTIPART_DIGEST = "multipart/digest";
+    String TYPE_MULTIPART_DIGEST = "multipart/digest";
     /** The <code>text/plain</code> MIME type. */
-    public static final String TYPE_TEXT_PLAIN = "text/plain";
+    String TYPE_TEXT_PLAIN = "text/plain";
     /** The <code>message/rfc822</code> MIME type. */
-    public static final String TYPE_MESSAGE_RFC822 = "message/rfc822";
+    String TYPE_MESSAGE_RFC822 = "message/rfc822";
     /** The name of the <code>boundary</code> parameter. */
-    public static final String PARAM_BOUNDARY = "boundary";
+    String PARAM_BOUNDARY = "boundary";
     /** The name of the <code>charset</code> parameter. */
-    public static final String PARAM_CHARSET = "charset";
+    String PARAM_CHARSET = "charset";
 
     /**
      * Gets the MIME type defined in this Content-Type field.
