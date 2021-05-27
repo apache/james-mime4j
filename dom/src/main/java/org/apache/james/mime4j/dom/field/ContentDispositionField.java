@@ -25,19 +25,19 @@ import java.util.Map;
 public interface ContentDispositionField extends ParsedField {
 
     /** The <code>inline</code> disposition type. */
-    public static final String DISPOSITION_TYPE_INLINE = "inline";
+    String DISPOSITION_TYPE_INLINE = "inline";
     /** The <code>attachment</code> disposition type. */
-    public static final String DISPOSITION_TYPE_ATTACHMENT = "attachment";
+    String DISPOSITION_TYPE_ATTACHMENT = "attachment";
     /** The name of the <code>filename</code> parameter. */
-    public static final String PARAM_FILENAME = "filename";
+    String PARAM_FILENAME = "filename";
     /** The name of the <code>creation-date</code> parameter. */
-    public static final String PARAM_CREATION_DATE = "creation-date";
+    String PARAM_CREATION_DATE = "creation-date";
     /** The name of the <code>modification-date</code> parameter. */
-    public static final String PARAM_MODIFICATION_DATE = "modification-date";
+    String PARAM_MODIFICATION_DATE = "modification-date";
     /** The name of the <code>read-date</code> parameter. */
-    public static final String PARAM_READ_DATE = "read-date";
+    String PARAM_READ_DATE = "read-date";
     /** The name of the <code>size</code> parameter. */
-    public static final String PARAM_SIZE = "size";
+    String PARAM_SIZE = "size";
 
     /**
      * Gets the disposition type defined in this Content-Disposition field.
