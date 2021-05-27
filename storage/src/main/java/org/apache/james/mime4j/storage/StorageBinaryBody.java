@@ -25,7 +25,6 @@ import java.io.OutputStream;
 
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.util.ContentUtil;
-;
 
 /**
  * Binary body backed by a

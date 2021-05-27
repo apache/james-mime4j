@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
-import java.util.Objects;
 
 /**
  * Wraps a CharBuffer and exposes some convenience methods to easy parse with Mime4j.
