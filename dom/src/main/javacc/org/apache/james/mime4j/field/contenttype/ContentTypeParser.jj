@@ -108,7 +108,7 @@ void parse() :
 		this.type = type.image;
 		this.subtype = subtype.image;
 	}
-	( ";" parameter() )*
+	( ";" (parameter())? )*
 }
 
 void parameter() :
