@@ -44,6 +44,14 @@ public class ContentTypeFieldTest {
     }
 
     @Test
+    public void extraSemicolonShouldNotAbortParameterParsing() throws Exception {
+        ContentTypeField f = parse("Content-Type: text/html;; charset=utf-8");
+        Assert.assertEquals("text/html", f.getMimeType());
+        Assert.assertEquals("utf-8", f.getCharset());
+        Assert.assertNull(f.getParseException());
+    }
+
+    @Test
     public void testGetMimeType() throws Exception {
         ContentTypeField f = parse("Content-Type: text/PLAIN");
         Assert.assertEquals("text/plain", f.getMimeType());
