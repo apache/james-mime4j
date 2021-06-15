@@ -40,6 +40,7 @@ public class ContentTypeFieldTest {
     public void testMimeTypeWithSemiColonNoParams() throws Exception {
         ContentTypeField f = parse("Content-Type: text/html;");
         Assert.assertEquals("text/html", f.getMimeType());
+        Assert.assertNull(f.getParseException());
     }
 
     @Test
