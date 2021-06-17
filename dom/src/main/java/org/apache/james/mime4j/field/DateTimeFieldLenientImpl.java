@@ -25,6 +25,7 @@ import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoField.MILLI_OF_SECOND;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
 import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
+import static java.time.temporal.ChronoField.OFFSET_SECONDS;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.time.temporal.ChronoField.YEAR;
 
@@ -33,10 +34,13 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalField;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -85,12 +89,11 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             .appendLiteral(' ')
             .appendPattern("0000")
         .optionalEnd()
-        .optionalStart()
-            .appendLiteral(' ')
-            .appendPattern("(zzz)")
-        .optionalEnd()
         .toFormatter()
-        .withZone(ZoneId.of("GMT"));
+        .withZone(ZoneId.of("GMT"))
+        .withResolverStyle(ResolverStyle.LENIENT)
+        .withResolverFields(DAY_OF_MONTH, MONTH_OF_YEAR, YEAR, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, MILLI_OF_SECOND, OFFSET_SECONDS)
+        .withLocale(Locale.US);
 
     private static Map<Long, String> monthOfYear() {
         HashMap<Long, String> result = new HashMap<>();
