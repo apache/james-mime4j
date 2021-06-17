@@ -28,11 +28,13 @@ import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.time.temporal.ChronoField.YEAR;
 
+import java.text.ParsePosition;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.SignStyle;
+import java.time.temporal.TemporalField;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -140,7 +142,11 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         if (body != null) {
             body = body.trim();
         }
-        date = Date.from(Instant.from(RFC_5322.parse(body)));
+        try {
+            date = Date.from(Instant.from(RFC_5322.parse(body, new ParsePosition(0))));
+        } catch (Exception e) {
+            // Ignore
+        }
     }
 
     public static final FieldParser<DateTimeField> PARSER = new FieldParser<DateTimeField>() {

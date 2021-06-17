@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
+import java.util.Date;
+
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.stream.RawField;
@@ -26,10 +28,7 @@ import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
-
-import java.util.Date;
 
 public class LenientDateTimeFieldTest {
 
@@ -51,7 +50,6 @@ public class LenientDateTimeFieldTest {
         Assert.assertEquals(new Date(1216221153000L), f.getDate());
     }
 
-    @Ignore("java.time.format.DateTimeParseException: Text 'Thu, 4 Oct 2001 20:12:26 -0700 (PDT),Thu, 4 Oct 2001 20:12:26 -0...' could not be parsed at index 36")
     @Test
     public void extraCharsShouldBeTolerated() throws Exception {
         DateTimeField f = parse("Date: Thu, 4 Oct 2001 20:12:26 -0700 (PDT),Thu, 4 Oct 2001 20:12:26 -0700");
