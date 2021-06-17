@@ -117,7 +117,7 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
      * @param field the MIME field.
      */
     public Field addField(RawField field) throws MimeException {
-        String name = field.getName().toLowerCase(Locale.US);
+        String name = field.getNameLowerCase();
 
         if (name.equals("content-transfer-encoding") && transferEncoding == null) {
             String value = field.getBody();

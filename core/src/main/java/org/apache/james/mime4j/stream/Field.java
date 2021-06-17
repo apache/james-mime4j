@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.util.Locale;
+
 import org.apache.james.mime4j.util.ByteSequence;
 
 /**
@@ -38,6 +40,13 @@ public interface Field {
      * Returns the name of the field.
      */
     String getName();
+
+    /**
+     * Returns the name of the field in lower case.
+     */
+    default String getNameLowerCase() {
+        return getName().toLowerCase(Locale.US);
+    }
 
     /**
      * Gets the unparsed and possibly encoded (see RFC 2047) field body string.

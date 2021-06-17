@@ -49,6 +49,18 @@ public abstract class AbstractField implements ParsedField {
         return rawField.getName();
     }
 
+
+    /**
+     * Gets the name of the field in lower case (<code>subject</code>,
+     * <code>from</code>, etc).
+     *
+     * @return the field name.
+     */
+    @Override
+    public String getNameLowerCase() {
+        return rawField.getNameLowerCase();
+    }
+
     /**
      * Gets the unfolded, unparsed and possibly encoded (see RFC 2047) field
      * body string.

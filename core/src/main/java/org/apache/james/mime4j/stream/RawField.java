@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.util.Locale;
+
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -39,6 +41,7 @@ public final class RawField implements Field {
     private final int delimiterIdx;
     private final String name;
     private final String body;
+    private String nameLowerCase;
 
     RawField(ByteSequence raw, int delimiterIdx, String name, String body) {
         if (name == null) {
@@ -60,6 +63,14 @@ public final class RawField implements Field {
 
     public String getName() {
         return name;
+    }
+
+    @Override
+    public String getNameLowerCase() {
+        if (nameLowerCase == null) {
+            nameLowerCase = name.toLowerCase(Locale.US);
+        }
+        return nameLowerCase;
     }
 
     public String getBody() {

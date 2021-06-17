@@ -67,7 +67,7 @@ public abstract class AbstractHeader implements Header {
      * @param field the field to add.
      */
     public void addField(Field field) {
-        String lowerCaseFieldName = field.getName().toLowerCase(Locale.US);
+        String lowerCaseFieldName = field.getNameLowerCase();
         List<Field> values = fieldMap.get(lowerCaseFieldName);
         if (values == null) {
             values = new LinkedList<Field>();
@@ -220,7 +220,7 @@ public abstract class AbstractHeader implements Header {
      * @param field the field to set.
      */
     public void setField(Field field) {
-        final String lowerCaseName = field.getName().toLowerCase(Locale.US);
+        final String lowerCaseName = field.getNameLowerCase();
         List<Field> l = fieldMap.get(lowerCaseName);
         if (l == null || l.isEmpty()) {
             addField(field);
