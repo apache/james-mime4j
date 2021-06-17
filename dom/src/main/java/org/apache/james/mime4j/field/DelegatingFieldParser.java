@@ -55,8 +55,16 @@ public class DelegatingFieldParser implements FieldParser<ParsedField> {
         return field;
     }
 
+    private FieldParser<? extends ParsedField> getParser(final Field rawField) {
+        final FieldParser<? extends ParsedField> field = parsers.get(rawField.getNameLowerCase());
+        if (field == null) {
+            return defaultParser;
+        }
+        return field;
+    }
+
     public ParsedField parse(final Field rawField, final DecodeMonitor monitor) {
-        final FieldParser<? extends ParsedField> parser = getParser(rawField.getName());
+        final FieldParser<? extends ParsedField> parser = getParser(rawField);
         return parser.parse(rawField, monitor);
     }
 }
