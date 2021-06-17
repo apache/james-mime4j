@@ -83,6 +83,10 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             .appendLiteral(' ')
             .appendPattern("0000")
         .optionalEnd()
+        .optionalStart()
+            .appendLiteral(' ')
+            .appendPattern("(zzz)")
+        .optionalEnd()
         .toFormatter()
         .withZone(ZoneId.of("GMT"));
 

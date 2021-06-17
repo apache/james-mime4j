@@ -26,6 +26,7 @@ import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Date;
@@ -42,6 +43,19 @@ public class LenientDateTimeFieldTest {
     public void testDateDST() throws Exception {
         DateTimeField f = parse("Date: Wed, 16 Jul 2008 17:12:33 +0200");
         Assert.assertEquals(new Date(1216221153000L), f.getDate());
+    }
+
+    @Test
+    public void extraPDTShouldBeTolerated() throws Exception {
+        DateTimeField f = parse("Date: Wed, 16 Jul 2008 17:12:33 +0200 (PDT)");
+        Assert.assertEquals(new Date(1216221153000L), f.getDate());
+    }
+
+    @Ignore("java.time.format.DateTimeParseException: Text 'Thu, 4 Oct 2001 20:12:26 -0700 (PDT),Thu, 4 Oct 2001 20:12:26 -0...' could not be parsed at index 36")
+    @Test
+    public void extraCharsShouldBeTolerated() throws Exception {
+        DateTimeField f = parse("Date: Thu, 4 Oct 2001 20:12:26 -0700 (PDT),Thu, 4 Oct 2001 20:12:26 -0700");
+        Assert.assertEquals(new Date(1002251546000L), f.getDate());
     }
 
     @Test
