@@ -82,6 +82,13 @@ public class LenientDateTimeFieldTest {
     }
 
     @Test
+    public void parseShouldAcceptWrongDayOfWeek() throws Exception {
+        // Should be Thu
+        DateTimeField f = parse("Date: Fri, 01 Jan 1970 12:00:00 +0000");
+        Assert.assertEquals(43200000L, f.getDate().getTime());
+    }
+
+    @Test
     public void testMime4j219() throws Exception {
         DateTimeField f = parse("Date: Tue, 17 Jul 2012 22:23:35.882 0000");
         Assert.assertEquals(1342563815882L, f.getDate().getTime());
