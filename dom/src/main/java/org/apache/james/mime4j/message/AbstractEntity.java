@@ -126,12 +126,12 @@ public abstract class AbstractEntity implements Entity {
     public String getMimeType() {
         ContentTypeField childType = getContentTypeField();
         Entity parent = getParent();
-        ContentTypeField parentType = parent != null ? (ContentTypeField) (parent).getHeader().getField(FieldName.CONTENT_TYPE) : null;
+        ContentTypeField parentType = parent != null ? (ContentTypeField) (parent).getHeader().getField(FieldName.CONTENT_TYPE_LOWERCASE) : null;
         return calcMimeType(childType, parentType);
     }
 
     private ContentTypeField getContentTypeField() {
-        return (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE);
+        return (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE_LOWERCASE);
     }
 
     /**
@@ -140,7 +140,7 @@ public abstract class AbstractEntity implements Entity {
      * @return the MIME character set encoding.
      */
     public String getCharset() {
-        return calcCharset((ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE));
+        return calcCharset((ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE_LOWERCASE));
     }
 
     /**

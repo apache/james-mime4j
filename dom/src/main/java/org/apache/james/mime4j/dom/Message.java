@@ -442,7 +442,7 @@ public interface Message extends Entity, Body {
          * @return the identifier of this message.
          */
         public String getMessageId() {
-            Field field = obtainField(FieldName.MESSAGE_ID);
+            Field field = obtainField(FieldName.MESSAGE_ID_LOWERCASE);
             return field != null ? field.getBody() : null;
         }
 
@@ -484,7 +484,7 @@ public interface Message extends Entity, Body {
          * @return the subject of this message.
          */
         public String getSubject() {
-            UnstructuredField field = obtainField(FieldName.SUBJECT);
+            UnstructuredField field = obtainField(FieldName.SUBJECT_LOWERCASE);
             return field != null ? field.getValue() : null;
         }
 
@@ -513,7 +513,7 @@ public interface Message extends Entity, Body {
          * @return the date of this message.
          */
         public Date getDate() {
-            DateTimeField field = obtainField(FieldName.DATE);
+            DateTimeField field = obtainField(FieldName.DATE_LOWERCASE);
             return field != null ? field.getDate() : null;
         }
 
@@ -558,7 +558,7 @@ public interface Message extends Entity, Body {
          * @return the sender of this message.
          */
         public Mailbox getSender() {
-            return getMailbox(FieldName.SENDER);
+            return getMailbox(FieldName.SENDER_LOWERCASE);
         }
 
         /**
@@ -593,7 +593,7 @@ public interface Message extends Entity, Body {
          * @return value of the from field of this message.
          */
         public MailboxList getFrom() {
-            return getMailboxList(FieldName.FROM);
+            return getMailboxList(FieldName.FROM_LOWERCASE);
         }
 
         /**
@@ -664,7 +664,7 @@ public interface Message extends Entity, Body {
          * @return value of the to field of this message.
          */
         public AddressList getTo() {
-            return getAddressList(FieldName.TO);
+            return getAddressList(FieldName.TO_LOWERCASE);
         }
 
         /**
@@ -735,7 +735,7 @@ public interface Message extends Entity, Body {
          * @return value of the cc field of this message.
          */
         public AddressList getCc() {
-            return getAddressList(FieldName.CC);
+            return getAddressList(FieldName.CC_LOWERCASE);
         }
 
         /**
@@ -782,7 +782,7 @@ public interface Message extends Entity, Body {
          * @return value of the bcc field of this message.
          */
         public AddressList getBcc() {
-            return getAddressList(FieldName.BCC);
+            return getAddressList(FieldName.BCC_LOWERCASE);
         }
 
         /**
@@ -829,7 +829,7 @@ public interface Message extends Entity, Body {
          * @return value of the reply to field of this message.
          */
         public AddressList getReplyTo() {
-            return getAddressList(FieldName.REPLY_TO);
+            return getAddressList(FieldName.REPLY_TO_LOWERCASE);
         }
 
         /**
@@ -902,7 +902,7 @@ public interface Message extends Entity, Body {
             MessageImpl message = new MessageImpl();
             HeaderImpl header = new HeaderImpl();
             message.setHeader(header);
-            if (!containsField(FieldName.MIME_VERSION)) {
+            if (!containsField(FieldName.MIME_VERSION_LOWERCASE)) {
                 header.setField(Fields.version("1.0"));
             }
             for (Field field : getFields()) {

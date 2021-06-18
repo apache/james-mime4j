@@ -256,7 +256,7 @@ public abstract class AbstractEntityBuilder {
      *         type has been set.
      */
     public String getMimeType() {
-        ContentTypeField field = obtainField(FieldName.CONTENT_TYPE);
+        ContentTypeField field = obtainField(FieldName.CONTENT_TYPE_LOWERCASE);
         return field != null ? field.getMimeType() : null;
     }
 
@@ -267,7 +267,7 @@ public abstract class AbstractEntityBuilder {
      *         type has been set.
      */
     public String getCharset() {
-        ContentTypeField field = obtainField(FieldName.CONTENT_TYPE);
+        ContentTypeField field = obtainField(FieldName.CONTENT_TYPE_LOWERCASE);
         return field != null ? field.getCharset() : null;
     }
 
@@ -293,7 +293,7 @@ public abstract class AbstractEntityBuilder {
      * @return the transfer encoding.
      */
     public String getContentTransferEncoding() {
-        ContentTransferEncodingField field = obtainField(FieldName.CONTENT_TRANSFER_ENCODING);
+        ContentTransferEncodingField field = obtainField(FieldName.CONTENT_TRANSFER_ENCODING_LOWERCASE);
         return field != null ? field.getEncoding() : null;
     }
 
@@ -319,7 +319,7 @@ public abstract class AbstractEntityBuilder {
      *         type has been set.
      */
     public String getDispositionType() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
+        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION_LOWERCASE);
         return field != null ? field.getDispositionType() : null;
     }
 
@@ -428,7 +428,7 @@ public abstract class AbstractEntityBuilder {
      *         <code>null</code> if the filename has not been set.
      */
     public String getFilename() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
+        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION_LOWERCASE);
         return field != null ? field.getFilename() : null;
     }
 
@@ -439,7 +439,7 @@ public abstract class AbstractEntityBuilder {
      *         <code>-1</code> if the filename has not been set.
      */
     public long getSize() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
+        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION_LOWERCASE);
         return field != null ? field.getSize() : -1;
     }
 
@@ -450,7 +450,7 @@ public abstract class AbstractEntityBuilder {
      *         <code>null</code> if the filename has not been set.
      */
     public Date getCreationDate() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
+        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION_LOWERCASE);
         return field != null ? field.getCreationDate() : null;
     }
 
@@ -461,7 +461,7 @@ public abstract class AbstractEntityBuilder {
      *         <code>null</code> if the filename has not been set.
      */
     public Date getModificationDate() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
+        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION_LOWERCASE);
         return field != null ? field.getModificationDate() : null;
     }
 
@@ -472,7 +472,7 @@ public abstract class AbstractEntityBuilder {
      *         <code>null</code> if the filename has not been set.
      */
     public Date getReadDate() {
-        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION);
+        ContentDispositionField field = obtainField(FieldName.CONTENT_DISPOSITION_LOWERCASE);
         return field != null ? field.getReadDate() : null;
     }
 
