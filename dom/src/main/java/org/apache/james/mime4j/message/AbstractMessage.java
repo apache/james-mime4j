@@ -45,7 +45,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      * @return the identifier of this message.
      */
     public String getMessageId() {
-        Field field = obtainField(FieldName.MESSAGE_ID);
+        Field field = obtainField(FieldName.MESSAGE_ID_LOWERCASE);
         if (field == null)
             return null;
 
@@ -59,7 +59,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      * @return the subject of this message.
      */
     public String getSubject() {
-        UnstructuredField field = obtainField(FieldName.SUBJECT);
+        UnstructuredField field = obtainField(FieldName.SUBJECT_LOWERCASE);
         if (field == null)
             return null;
 
@@ -73,7 +73,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      * @return the date of this message.
      */
     public Date getDate() {
-        DateTimeField dateField = obtainField(FieldName.DATE);
+        DateTimeField dateField = obtainField(FieldName.DATE_LOWERCASE);
         if (dateField == null)
             return null;
 
@@ -88,7 +88,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      * @return the sender of this message.
      */
     public Mailbox getSender() {
-        return getMailbox(FieldName.SENDER);
+        return getMailbox(FieldName.SENDER_LOWERCASE);
     }
 
     /**
@@ -99,7 +99,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      * @return value of the from field of this message.
      */
     public MailboxList getFrom() {
-        return getMailboxList(FieldName.FROM);
+        return getMailboxList(FieldName.FROM_LOWERCASE);
     }
 
     /**
@@ -110,7 +110,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      * @return value of the to field of this message.
      */
     public AddressList getTo() {
-        return getAddressList(FieldName.TO);
+        return getAddressList(FieldName.TO_LOWERCASE);
     }
 
     /**
@@ -121,7 +121,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      * @return value of the cc field of this message.
      */
     public AddressList getCc() {
-        return getAddressList(FieldName.CC);
+        return getAddressList(FieldName.CC_LOWERCASE);
     }
 
     /**
@@ -132,7 +132,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      * @return value of the bcc field of this message.
      */
     public AddressList getBcc() {
-        return getAddressList(FieldName.BCC);
+        return getAddressList(FieldName.BCC_LOWERCASE);
     }
 
     /**
@@ -143,7 +143,7 @@ public abstract class AbstractMessage extends AbstractEntity implements Message 
      * @return value of the reply to field of this message.
      */
     public AddressList getReplyTo() {
-        return getAddressList(FieldName.REPLY_TO);
+        return getAddressList(FieldName.REPLY_TO_LOWERCASE);
     }
 
     private Mailbox getMailbox(String fieldName) {

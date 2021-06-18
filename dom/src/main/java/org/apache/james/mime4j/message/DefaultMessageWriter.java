@@ -250,7 +250,7 @@ public class DefaultMessageWriter implements MessageWriter {
                     "Missing header in parent entity");
 
         ContentTypeField contentType = (ContentTypeField) header
-                .getField(FieldName.CONTENT_TYPE);
+                .getField(FieldName.CONTENT_TYPE_LOWERCASE);
         if (contentType == null)
             throw new IllegalArgumentException(
                     "Content-Type field not specified");
