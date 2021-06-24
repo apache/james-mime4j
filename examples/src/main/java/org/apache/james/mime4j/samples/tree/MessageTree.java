@@ -362,9 +362,10 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
     }
 
     public static void main(String[] args) {
+        final String fileName = retrieveFileName(args);
         try {
             final MessageBuilder builder = new DefaultMessageBuilder();
-            final Message message = builder.parseMessage(new FileInputStream(args[0]));
+            final Message message = builder.parseMessage(new FileInputStream(fileName));
 
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -377,12 +378,19 @@ public class MessageTree extends JPanel implements TreeSelectionListener {
             System.err.println("Usage: org.mime4j.samples.tree.MessageTree"
                              + " path/to/message");
         } catch (FileNotFoundException e) {
-            System.err.println("The file '" + args[0] + "' could not be found.");
+            System.err.println("The file '" + fileName + "' could not be found.");
         } catch (IOException e) {
-            System.err.println("The file '" + args[0] + "' could not be read.");
+            System.err.println("The file '" + fileName + "' could not be read.");
         } catch (MimeException e) {
-            System.err.println("The file '" + args[0] + "' is invalid.");
+            System.err.println("The file '" + fileName + "' is invalid.");
         }
+    }
+
+    private static String retrieveFileName(String[] args) {
+        if (args.length < 1) {
+            return ClassLoader.getSystemResource("mime-example.msg").getFile();
+        }
+        return args[0];
     }
 
 }
