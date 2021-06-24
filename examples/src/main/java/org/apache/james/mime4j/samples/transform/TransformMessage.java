@@ -19,7 +19,6 @@
 
 package org.apache.james.mime4j.samples.transform;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Random;
 
@@ -32,7 +31,6 @@ import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.message.BodyPart;
 import org.apache.james.mime4j.message.BodyPartBuilder;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
-import org.apache.james.mime4j.message.MessageBuilder;
 import org.apache.james.mime4j.message.MultipartBuilder;
 import org.apache.james.mime4j.storage.StorageBodyFactory;
 import org.apache.james.mime4j.storage.StorageProvider;
@@ -56,7 +54,7 @@ public class TransformMessage {
         // Create a template message. It would be possible to load a message
         // from an input stream but for this example a message object is created
         // from scratch for demonstration purposes.
-        Message template = MessageBuilder.create()
+        Message template = Message.Builder.of()
                 .setBody(MultipartBuilder.create("mixed")
                         .addBodyPart(BodyPartBuilder.create()
                                 .use(bodyFactory)
@@ -80,7 +78,7 @@ public class TransformMessage {
         // Create a new message by transforming the template.
         // Create a copy of the template. The copy can be modified without
         // affecting the original.
-        final MessageBuilder messageBuilder = MessageBuilder.createCopy(template);
+        final Message.Builder messageBuilder = Message.Builder.of(template);
         // In this example we know we have a multipart message. Use
         // Message#isMultipart() if uncertain.
         Multipart multipart = (Multipart) messageBuilder.getBody();
@@ -137,8 +135,7 @@ public class TransformMessage {
         // messages and body parts have been disposed of properly.
     }
 
-    private static byte[] createRandomBinary(int numberOfBytes)
-            throws IOException {
+    private static byte[] createRandomBinary(int numberOfBytes) {
         byte[] data = new byte[numberOfBytes];
         new Random().nextBytes(data);
         return data;
