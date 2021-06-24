@@ -50,7 +50,7 @@ public class MultipartMessage {
     public static void main(String[] args) throws Exception {
         // 1) start with an empty message
         StorageBodyFactory bodyFactory = new StorageBodyFactory();
-        Message message = MessageBuilder.create()
+        Message message = Message.Builder.of()
         // 2) set header fields
         //    Date and From are required fields
         //    Message-ID should be present
