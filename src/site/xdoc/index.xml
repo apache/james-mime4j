@@ -66,5 +66,15 @@
                 representation constructed by the JavaMail API:s but is more
                 tolerant to messages violating the standards. </p>
         </section>
+        <section name="Examples">
+            <p>
+                As part of our git repository we provide a couple of
+                <a href="https://github.com/apache/james-mime4j/tree/master/examples">
+                examples</a> to ease the use of MIME4J.
+            </p>
+            <p>
+                Read the following <a href="samples.html">page</a>.
+            </p>
+        </section>
     </body>
 </document>
