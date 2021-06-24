@@ -34,6 +34,7 @@ import java.nio.CharBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Simple example of how to use Apache Mime4j Mbox Iterator. We split one mbox file file into
@@ -41,15 +42,13 @@ import java.nio.charset.CharsetEncoder;
  */
 public class IterateOverMbox {
 
-    private final static CharsetEncoder ENCODER = Charset.forName("UTF-8").newEncoder();
+    private final static CharsetEncoder ENCODER = StandardCharsets.UTF_8.newEncoder();
 
     // simple example of how to split an mbox into individual files
     public static void main(String[] args) throws Exception {
-        if (args.length != 1) {
-            System.out.println("Please supply a path to an mbox file to parse");
-        }
-
-        final File mbox = new File(args[0]);
+        final String fileName = retrieveMBoxFileName(args);
+        System.out.println(fileName);
+        final File mbox = new File(fileName);
         long start = System.currentTimeMillis();
         int count = 0;
 
@@ -61,6 +60,13 @@ public class IterateOverMbox {
         System.out.println("Found " + count + " messages");
         long end = System.currentTimeMillis();
         System.out.println("Done in: " + (end - start) + " milis");
+    }
+
+    private static String retrieveMBoxFileName(String[] args) {
+        if (args.length < 1) {
+            return ClassLoader.getSystemResource("test-1/mbox.rlug").getFile();
+        }
+        return args[0];
     }
 
     private static void saveMessageToFile(int count, CharBuffer buf) throws IOException {
@@ -77,8 +83,6 @@ public class IterateOverMbox {
      *
      * @param messageBytes the message as {@link java.io.InputStream}
      * @return String
-     * @throws IOException
-     * @throws MimeException
      */
     private static String messageSummary(InputStream messageBytes) throws IOException, MimeException {
         MessageBuilder builder = new DefaultMessageBuilder();
