@@ -5,6 +5,40 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [Unreleased]
 
+Changes included in this release:
+
+Performance enhancements:
+
+ - MIME4J-303 Base64OutputStream should be based on faster Java8 iplementation
+ - MIME4J-298 Convert DateTimeFieldLenientImpl to DateTimeFormatter
+ - MIME4J-301 ContentTypeFieldImpl do fill a stacktrace when ended by a semicolon
+ - MIME4J-302 Reduce calls to toLowerCase upon parsing
+ - Pre-compile ContentLocationFieldImpl REGEX
+ - Pre-compile EncoderUtil::quote REGEX
+ - Remove redundant string operations
+ 
+Fixes:
+ 
+ - MessageBuilder::getReadDate infinitely recurse
+ 
+Changes:
+
+ - MIME4J-300 Set up an automated build for Apache MIME4J
+ - Various small refactorings including:
+   - Remove unnecessary toString calls
+   - Group: iterations can be replaced by Collection::addAll
+   - Manual calls to Math.max
+   - Unneeded array boxing
+   - Remove unneeded redundant interface qualifiers
+   - Remove unused import
+ 
+Additions:
+
+ - MIME4J-299 Access to the Header map
+ - MIME4J-255 Add method to allow setting of "no recurse" mode to underlying mime token stream
+
+More information on the [JIRA](https://issues.apache.org/jira/browse/MIME4J-297?jql=project%20%3D%20MIME4J%20AND%20fixVersion%20%3D%200.8.5)
+
 ## [0.8.4] - 2021-04-21
 
 Changes included in this release:
