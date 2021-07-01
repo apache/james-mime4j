@@ -29,7 +29,7 @@
 
     <groupId>org.apache.james</groupId>
     <artifactId>apache-mime4j-project</artifactId>
-    <version>0.8.5-SNAPSHOT</version>
+    <version>0.8.5</version>
     <packaging>pom</packaging>
 
     <name>Apache James :: Mime4j :: Project</name>
@@ -52,7 +52,7 @@
         <connection>scm:git:http://git-wip-us.apache.org/repos/asf/james-mime4j.git</connection>
         <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/james-mime4j.git</developerConnection>
         <url>https://git-wip-us.apache.org/repos/asf/james-mime4j.git</url>
-      <tag>HEAD</tag>
+      <tag>apache-mime4j-project-0.8.5</tag>
   </scm>
     <issueManagement>
         <url>http://issues.apache.org/jira/browse/MIME4J</url>
