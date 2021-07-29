@@ -24,8 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
@@ -35,9 +33,6 @@ import org.apache.james.mime4j.util.CharsetUtil;
  * Static methods for decoding strings, byte arrays and encoded words.
  */
 public class DecoderUtil {
-
-    private static final Pattern PATTERN_ENCODED_WORD = Pattern.compile(
-            "=\\?(.+?)\\?(\\w)\\?(.*?)\\?=", Pattern.DOTALL);
 
     /**
      * Decodes a string containing quoted-printable encoded data.
