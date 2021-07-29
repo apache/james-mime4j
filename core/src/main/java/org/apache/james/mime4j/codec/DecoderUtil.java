@@ -204,7 +204,7 @@ public class DecoderUtil {
                 if (position == 0) {
                     return body;
                 }
-                sb.append(body.substring(position));
+                sb.append(body, position, body.length());
                 break;
             }
 
