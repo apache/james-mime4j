@@ -8,7 +8,7 @@
   "License"); you may not use this file except in compliance
   with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+    https://www.apache.org/licenses/LICENSE-2.0
 
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
@@ -28,14 +28,14 @@
     <bannerLeft>
         <name>JAMES Mime4J</name>
         <src>images/james-logo.png</src>
-        <href>http://james.apache.org/</href>
+        <href>https://james.apache.org/</href>
         <alt>james-logo.png</alt>
     </bannerLeft>
 
     <bannerRight>
         <name>The Apache Software Foundation</name>
         <src>images/logos/asf_logo_small.png</src>
-        <href>http://www.apache.org/index.html</href>
+        <href>https://www.apache.org/index.html</href>
     </bannerRight>
 
 
@@ -44,25 +44,25 @@
         <links>
             <item
                 name="Home"
-                href="http://james.apache.org/index.html" />
+                href="https://james.apache.org/index.html" />
             <item
                 name="Server"
-                href="http://james.apache.org/documentation.html" />
+                href="https://james.apache.org/documentation.html" />
           <item
                 name="Mime4J"
-                href="http://james.apache.org/mime4j/index.html" />
+                href="https://james.apache.org/mime4j/index.html" />
             <item
                 name="jSieve"
-                href="http://james.apache.org/jsieve/index.html" />
+                href="https://james.apache.org/jsieve/index.html" />
             <item
                 name="jSPF"
-                href="http://james.apache.org/jspf/index.html" />
+                href="https://james.apache.org/jspf/index.html" />
             <item
                 name="jDKIM"
-                href="http://james.apache.org/jdkim/index.html" />
+                href="https://james.apache.org/jdkim/index.html" />
             <item
                 name="Hupa"
-                href="http://james.apache.org/hupa/index.html" />
+                href="https://james.apache.org/hupa/index.html" />
         </links>
 
         <menu name="MIME4J">
@@ -70,14 +70,14 @@
             <item name="Status" href="/status.html"/>
             <item name="Examples" href="/samples.html"/>
             <item name="Usage" href="/usage.html"/>
-            <item name="Mailing List" href="http://james.apache.org/mail.html#Mime4j" />
+            <item name="Mailing List" href="https://james.apache.org/mail.html#Mime4j" />
             <item name="Javadoc" href="/apidocs/index.html" />
-            <item name="Issue Tracker" href="http://issues.apache.org/jira/browse/MIME4J/" />
+            <item name="Issue Tracker" href="https://issues.apache.org/jira/browse/MIME4J/" />
             <item name="Developper corner" href="/start/download.html" collapse="true" >
                 <item name="Build" href="/start/build.html" />
             </item>
             <item ref="reports"/>
-            <item name="Download Releases" href="http://james.apache.org/download.cgi#Apache_Mime4J" />
+            <item name="Download Releases" href="https://james.apache.org/download.cgi#Apache_Mime4J" />
         </menu>
     </body>
 </project>
