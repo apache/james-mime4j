@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
 import org.apache.james.mime4j.util.ByteSequence;
@@ -83,7 +84,7 @@ public final class RawField implements Field {
             if (len > off + 1 && (CharsetUtil.isWhitespace((char) (raw.byteAt(off) & 0xff)))) {
                 off++;
             }
-            return MimeUtil.unfold(ContentUtil.decode(raw, off, len - off));
+            return MimeUtil.unfold(ContentUtil.decode(raw, off, len - off, StandardCharsets.UTF_8));
         }
         return null;
     }

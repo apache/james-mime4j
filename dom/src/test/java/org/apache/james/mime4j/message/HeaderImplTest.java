@@ -19,7 +19,10 @@
 
 package org.apache.james.mime4j.message;
 
+import java.nio.charset.StandardCharsets;
+
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
@@ -55,7 +58,9 @@ public class HeaderImplTest {
     public void testWriteSpecialCharacters() throws Exception {
         String hello = SWISS_GERMAN_HELLO;
         Header header = new HeaderImpl();
-        header.addField(DefaultFieldParser.parse("Hello: " + hello));
+        byte[] utf8bytes = ("Hello: " + hello).getBytes(StandardCharsets.UTF_8);
+        ByteArrayBuffer raw = new ByteArrayBuffer(utf8bytes, true);
+        header.addField(DefaultFieldParser.parse(raw, DecodeMonitor.SILENT));
 
         Field field = header.getField("Hello");
         Assert.assertNotNull(field);
@@ -70,7 +75,7 @@ public class HeaderImplTest {
         byte[] b = outstream.toByteArray();
         ByteArrayBuffer buf = new ByteArrayBuffer(b.length);
         buf.append(b, 0, b.length);
-        String s = ContentUtil.decode(buf);
+        String s = ContentUtil.decode(StandardCharsets.UTF_8, buf);
 
         Assert.assertEquals("Hello: " + SWISS_GERMAN_HELLO + "\r\n\r\n", s);
     }

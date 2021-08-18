@@ -185,6 +185,37 @@ public class ContentUtil {
 
     /**
      * Decodes a sub-sequence of the specified sequence of bytes into a string
+     * using the US-ASCII charset with falling back to {@link #decode(Charset, ByteSequence, int, int)} 
+     * on a first non US-ASCII character.
+     * 
+     * @param byteSequence
+     *            sequence of bytes to decode.
+     * @param offset
+     *            offset into the byte sequence.
+     * @param length
+     *            number of bytes.
+     * @param charset
+     *            fallback charset.
+     * @return decoded string.
+     */
+    public static String decode(ByteSequence byteSequence, int offset, int length, Charset charset) {
+        if (byteSequence == null) {
+            return null;
+        }
+
+        StringBuilder buf = new StringBuilder(length);
+        for (int i = offset; i < offset + length; i++) {
+            char ch = (char) (byteSequence.byteAt(i) & 0xff);
+            if (!CharsetUtil.isASCII(ch)) {
+                return decode(charset, byteSequence, offset, length);
+            }
+            buf.append(ch);
+        }
+        return buf.toString();
+    }
+
+    /**
+     * Decodes a sub-sequence of the specified sequence of bytes into a string
      * using the specified charset.
      *
      * @param charset
