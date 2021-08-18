@@ -19,7 +19,11 @@
 
 package org.apache.james.mime4j.field;
 
+import java.nio.charset.StandardCharsets;
+
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,6 +41,16 @@ public class UnstructuredFieldTest {
 
         f = (UnstructuredField) DefaultFieldParser.parse("Subject:yada");
         Assert.assertEquals("Testing value without a leading ' '", "yada", f.getValue());
+    }
+
+    @Test
+    public void testGetBodyUtf8() throws Exception {
+        UnstructuredField f;
+
+        byte[] data = "Subject: Счет для ООО \"СТАНЦИЯ ВИРТУАЛЬНАЯ\" от ООО \"Цифровые системы\"".getBytes(StandardCharsets.UTF_8);
+
+        f = (UnstructuredField) DefaultFieldParser.parse(new ByteArrayBuffer(data, true), DecodeMonitor.SILENT);
+        Assert.assertEquals("Testing UTF8 value 1", "Счет для ООО \"СТАНЦИЯ ВИРТУАЛЬНАЯ\" от ООО \"Цифровые системы\"", f.getValue());
     }
 
 }
