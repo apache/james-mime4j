@@ -19,11 +19,15 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.codec.DecoderUtil;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -191,6 +195,12 @@ public class RawFieldParser {
      *  is not delimited by any character.
      */
     public String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
+        if (!CharsetUtil.isASCII(buf)) {
+            String value = parseUtf8Filename(buf);
+            if (value != null)
+                return value;
+        }
+
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
@@ -217,6 +227,25 @@ public class RawFieldParser {
             }
         }
         return dst.toString();
+    }
+
+    /**
+     * Special case for parsing {@code filename} attribute in nonstandard encoding like:
+     * {@code Content-Disposition: attachment; filename="УПД ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "СТАНЦИЯ ВИРТУАЛЬНАЯ" 01-05-21.pdf"}
+     * 
+     * @param buf field raw.
+     * @return filename value or {@code null}.
+     */
+    private String parseUtf8Filename(ByteSequence buf) {
+        final String value = new String(buf.toByteArray(), StandardCharsets.UTF_8);
+
+        final String prefix = "filename=\"";
+        final int pos = value.indexOf(prefix);
+        if (pos > 0) {
+            return value.substring(pos + prefix.length(), value.length() - 1);
+        }
+        
+        return null;
     }
 
     /**
@@ -384,14 +413,17 @@ public class RawFieldParser {
         }
         pos++;
         indexFrom++;
+
+        ByteArrayBuffer dstRaw = new ByteArrayBuffer(200);
+
         boolean escaped = false;
         for (int i = indexFrom; i < indexTo; i++, pos++) {
             current = (char) (buf.byteAt(i) & 0xff);
             if (escaped) {
                 if (current != '\"' && current != '\\') {
-                    dst.append('\\');
+                    dstRaw.append('\\');
                 }
-                dst.append(current);
+                dstRaw.append(current);
                 escaped = false;
             } else {
                 if (current == '\"') {
@@ -401,10 +433,18 @@ public class RawFieldParser {
                 if (current == '\\') {
                     escaped = true;
                 } else if (current != '\r' && current != '\n') {
-                    dst.append(current);
+                    dstRaw.append(current);
                 }
             }
         }
+
+        String decoded = ContentUtil.decode(dstRaw);
+        if (decoded.startsWith("=?")) {
+            decoded = DecoderUtil.decodeEncodedWords(decoded, DecodeMonitor.STRICT);
+        }
+
+        dst.append(decoded);
+
         cursor.updatePos(pos);
     }
 
