@@ -57,6 +57,23 @@ public class CharsetUtil {
     }
 
     /**
+     * Returns <code>true</code> if the specified byte array consists entirely of
+     * US ASCII characters.
+     *
+     * @param raw
+     *            byte array to test.
+     * @return <code>true</code> if the specified string consists entirely of
+     *         US ASCII characters, <code>false</code> otherwise.
+     */
+    public static boolean isASCII(ByteSequence raw) {
+        for (int i = 0; i < raw.length(); i++) {
+            if (!isASCII((char) (raw.byteAt(i) & 0xff)))
+                return false;
+        }
+        return true;
+    }
+
+    /**
      * Returns <code>true</code> if the specified string consists entirely of
      * US ASCII characters.
      *
