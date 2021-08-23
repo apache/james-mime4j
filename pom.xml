@@ -217,11 +217,53 @@
                     <target>${target.jdk}</target>
                 </configuration>
             </plugin>
+        </plugins>
+    </build>
+    <reporting>
+        <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.3.0</version>
+                <reportSets>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>default</id>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+                <configuration>
+                    <linksource>true</linksource>
+                    <maxmemory>1g</maxmemory>
+                    <minmemory>256m</minmemory>
+                    <source>${target.jdk}</source>
+                    <tags>
+                        <tag>
+                            <name>note</name>
+                            <placement>a</placement>
+                            <head>NOTE</head>
+                        </tag>
+                        <tag>
+                            <name>todo</name>
+                            <placement>a</placement>
+                            <head>TODO</head>
+                        </tag>
+                        <tag>
+                            <name>warning</name>
+                            <placement>a</placement>
+                            <head>WARNING</head>
+                        </tag>
+                    </tags>
+                </configuration>
             </plugin>
         </plugins>
-    </build>
+    </reporting>
 </project>
