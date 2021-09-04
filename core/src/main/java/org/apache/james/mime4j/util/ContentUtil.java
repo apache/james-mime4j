@@ -176,11 +176,11 @@ public class ContentUtil {
         if (byteSequence == null) {
             return null;
         }
-        StringBuilder buf = new StringBuilder(length);
+        char[] underlying = new char[length];
         for (int i = offset; i < offset + length; i++) {
-            buf.append((char) (byteSequence.byteAt(i) & 0xff));
+            underlying[i - offset] = (char) (byteSequence.byteAt(i) & 0xff);
         }
-        return buf.toString();
+        return new String(underlying);
     }
 
     /**
