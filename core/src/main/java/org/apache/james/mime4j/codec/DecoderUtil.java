@@ -24,8 +24,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
@@ -35,9 +33,6 @@ import org.apache.james.mime4j.util.CharsetUtil;
  * Static methods for decoding strings, byte arrays and encoded words.
  */
 public class DecoderUtil {
-
-    private static final Pattern PATTERN_ENCODED_WORD = Pattern.compile(
-            "=\\?(.+?)\\?(\\w)\\?(.*?)\\?=", Pattern.DOTALL);
 
     /**
      * Decodes a string containing quoted-printable encoded data.
@@ -194,42 +189,57 @@ public class DecoderUtil {
     public static String decodeEncodedWords(String body, DecodeMonitor monitor, Charset fallback,
             Map<Charset, Charset> charsetOverrides)
             throws IllegalArgumentException {
-        int tailIndex = 0;
-        boolean lastMatchValid = false;
 
         StringBuilder sb = new StringBuilder();
+        int position = 0;
 
-        for (Matcher matcher = PATTERN_ENCODED_WORD.matcher(body); matcher.find();) {
-            String separator = body.substring(tailIndex, matcher.start());
-            String mimeCharset = matcher.group(1);
-            String encoding = matcher.group(2);
-            String encodedText = matcher.group(3);
-
-            if (encodedText.isEmpty())
-                return "";
-
-            String decoded;
-            decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText, monitor, fallback, charsetOverrides);
-            if (decoded == null) {
-                sb.append(separator);
-                sb.append(matcher.group(0));
-            } else {
-                if (!lastMatchValid || !CharsetUtil.isWhitespace(separator)) {
-                    sb.append(separator);
+        while (position < body.length()) {
+            int startPattern = body.indexOf("=?", position);
+            if (startPattern < 0) {
+                if (position == 0) {
+                    return body;
                 }
-                sb.append(decoded);
+                sb.append(body, position, body.length());
+                break;
             }
 
-            tailIndex = matcher.end();
-            lastMatchValid = decoded != null;
-        }
+            int charsetEnd = body.indexOf('?', startPattern + 2);
+            int encodingEnd = body.indexOf('?', charsetEnd + 1);
+            int encodedTextEnd = body.indexOf("?=", encodingEnd + 1);
 
-        if (tailIndex == 0) {
-            return body;
-        } else {
-            sb.append(body.substring(tailIndex));
-            return sb.toString();
+            if (charsetEnd < 0 || encodingEnd < 0 || encodedTextEnd < 0) {
+                // Invalid pattern
+                sb.append(body, position, startPattern + 2);
+                position = startPattern + 2;
+            } else if (encodingEnd == encodedTextEnd) {
+                sb.append(body, position, Math.min(encodedTextEnd + 2, body.length()));
+                position = encodedTextEnd +2;
+            } else {
+                String separator = body.substring(position, startPattern);
+                if ((!CharsetUtil.isWhitespace(separator) || position == 0) && !separator.isEmpty()) {
+                    sb.append(separator);
+                }
+                String mimeCharset = body.substring(startPattern + 2, charsetEnd);
+                String encoding = body.substring(charsetEnd + 1, encodingEnd);
+                String encodedText = body.substring(encodingEnd + 1, encodedTextEnd);
+
+                if (encodedText.isEmpty()) {
+                    position = encodedTextEnd + 2;
+                    continue;
+                }
+                String decoded;
+                decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText, monitor, fallback, charsetOverrides);
+                if (decoded != null) {
+                    if (!CharsetUtil.isWhitespace(decoded) && !decoded.isEmpty()) {
+                        sb.append(decoded);
+                    }
+                } else {
+                    sb.append(body, startPattern, encodedTextEnd + 2);
+                }
+                position = encodedTextEnd + 2;
+            }
         }
+        return sb.toString();
     }
 
     // return null on error
