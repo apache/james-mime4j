@@ -263,11 +263,18 @@ public final class MimeUtil {
             sb.append(s, 0, crlfIdx);
         }
 
+        int lastLineBreak = crlfIdx;
         for (int idx = crlfIdx + 1; idx < length; idx++) {
             char c = s.charAt(idx);
-            if (c != '\r' && c != '\n') {
-                sb.append(c);
+            if (c == '\r' || c == '\n') {
+                if (idx > lastLineBreak + 1) {
+                    sb.append(s, lastLineBreak + 1, idx);
+                }
+                lastLineBreak = idx;
             }
+        }
+        if (lastLineBreak < s.length() - 1 && s.length() > 0) {
+            sb.append(s, lastLineBreak + 1, s.length());
         }
 
         return sb.toString();
