@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [UNRELEASED]
 
+## [0.8.6] - 2021-09-24
+
+Changes included in this release:
+
+Performance enhancements:
+
+ - MIME4J-306 MimeUtil::unfold should group char appends (#52)
+ - MIME4J-305 ContentUtil::decode can avoid using StringBuilder (#51)
+ - MIME4J-304 DecoderUtil::decodeEncodedWords without REGEXP (#50)
+
+Various changes:
+
+ - Add maven-javadoc-plugin (#54)
+
 ## [0.8.5] - 2021-07-01
 
 Changes included in this release:
