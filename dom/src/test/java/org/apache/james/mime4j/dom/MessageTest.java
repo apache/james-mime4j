@@ -32,6 +32,7 @@ import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.address.MailboxList;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
+import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.address.DefaultAddressParser;
@@ -430,6 +431,19 @@ public class MessageTest {
         Assert.assertEquals(original.getHeader().getFields(), builder.getFields());
         Assert.assertNotSame(original.getBody(), builder.getBody());
         Assert.assertSame(original.getBody().getClass(), builder.getBody().getClass());
+    }
+
+    @Test
+    public void getFieldShouldReturnNullOnMissingHeader() throws Exception {
+        Message original = Message.Builder.of()
+                .generateMessageId("hostname")
+                .setSubject("testing ...")
+                .setFrom("batman@localhost", "superman@localhost")
+                .setTo("\"Big momma\" <big_momma@localhost>")
+                .setBody("Yo, big momma!", Charsets.UTF_8)
+                .build();
+
+        Assert.assertNull(original.getHeader().getField("Sender", MailboxField.class));
     }
 
 }

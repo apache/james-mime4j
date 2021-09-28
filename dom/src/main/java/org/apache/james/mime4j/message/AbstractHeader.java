@@ -125,6 +125,9 @@ public abstract class AbstractHeader implements Header {
      */
     public <F extends Field> F getField(final String name, final Class<F> clazz) {
         List<Field> l = fieldMap.get(name.toLowerCase(Locale.US));
+        if (l == null) {
+            return null;
+        }
         for (int i = 0; i < l.size(); i++) {
             Field field = l.get(i);
             if (clazz.isInstance(field)) {
