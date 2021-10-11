@@ -59,7 +59,7 @@
                 <version>3.1.1</version>
                 <configuration>
                     <descriptorSourceDirectory>${basedir}/src/assemble/</descriptorSourceDirectory>
-                    <tarLongFileMode>gnu</tarLongFileMode>
+                    <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
                 <executions>
                     <execution>
