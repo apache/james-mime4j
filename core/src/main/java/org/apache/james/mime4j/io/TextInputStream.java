@@ -21,6 +21,7 @@ package org.apache.james.mime4j.io;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -46,7 +47,9 @@ class TextInputStream extends InputStream {
             .onMalformedInput(CodingErrorAction.REPLACE)
             .onUnmappableCharacter(CodingErrorAction.REPLACE);
         this.bbuf = ByteBuffer.allocate(bufferSize);
-        this.bbuf.flip();
+        // Compatibility Java 8 cf MIME4J-310
+        // https://stackoverflow.com/questions/61267495/exception-in-thread-main-java-lang-nosuchmethoderror-java-nio-bytebuffer-flip
+        ((Buffer) this.bbuf).flip();
         this.cbuf = CharBuffer.wrap(s);
     }
 
@@ -56,7 +59,9 @@ class TextInputStream extends InputStream {
         if (result.isError()) {
             result.throwException();
         }
-        this.bbuf.flip();
+        // Compatibility Java 8 cf MIME4J-310
+        // https://stackoverflow.com/questions/61267495/exception-in-thread-main-java-lang-nosuchmethoderror-java-nio-bytebuffer-flip
+        ((Buffer) this.bbuf).flip();
     }
 
     @Override
