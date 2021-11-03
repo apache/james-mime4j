@@ -184,7 +184,7 @@ public class LenientAddressParser implements AddressParser {
 
     private Mailbox createMailbox(final String localPart) {
         if (localPart != null && localPart.length() > 0) {
-            return new Mailbox(null, null, localPart, null);
+            return new Mailbox(null, null, DecoderUtil.decodeEncodedWords(localPart, this.monitor), null);
         } else {
             return null;
         }

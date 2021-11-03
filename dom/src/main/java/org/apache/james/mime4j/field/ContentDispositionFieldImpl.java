@@ -231,20 +231,8 @@ public class ContentDispositionFieldImpl extends AbstractField implements Conten
 
         if (dispositionType != null) {
             this.dispositionType = dispositionType.toLowerCase(Locale.US);
-
-            List<String> paramNames = parser.getParamNames();
-            List<String> paramValues = parser.getParamValues();
-
-            if (paramNames != null && paramValues != null) {
-                final int len = Math.min(paramNames.size(), paramValues.size());
-                for (int i = 0; i < len; i++) {
-                    String paramName = paramNames.get(i).toLowerCase(Locale.US);
-                    String paramValue = paramValues.get(i);
-                    parameters.put(paramName, paramValue);
-                }
-            }
+            this.parameters.putAll(parser.getParameters());
         }
-
         parsed = true;
     }
 
