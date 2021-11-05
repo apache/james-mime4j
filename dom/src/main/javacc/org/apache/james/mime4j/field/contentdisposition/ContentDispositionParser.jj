@@ -52,23 +52,21 @@ PARSER_BEGIN(ContentDispositionParser)
  ****************************************************************/
 package org.apache.james.mime4j.field.contentdisposition.parser;
 
-import org.apache.james.mime4j.internal.ParameterHelper;
+import org.apache.james.mime4j.util.MimeParameterMapping;
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
 
 public class ContentDispositionParser {
 
     private String dispositionType;
 
-    private final ParameterHelper parameters = new ParameterHelper();
+    private final MimeParameterMapping mapping = new MimeParameterMapping();
 
     public String getDispositionType() {
         return dispositionType;
     }
 
     public Map<String, String> getParameters() {
-        return parameters.getParameters();
+        return mapping.getParameters();
     }
 
     public static void main(String args[]) throws ParseException {
@@ -119,7 +117,7 @@ void parameter() :
 {
 	attrib=<ATOKEN> "=" val=value()
 	{
-        parameters.addParameterValue(attrib.image, val);
+        mapping.addParameter(attrib.image, val);
 	}
 }
 

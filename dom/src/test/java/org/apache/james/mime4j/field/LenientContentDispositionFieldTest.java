@@ -174,4 +174,16 @@ public class LenientContentDispositionFieldTest {
         Assert.assertEquals(12, f.getSize());
     }
 
+    @Test
+    public void testMultipartFileName() throws Exception {
+        ContentDispositionField f = parse("Content-Disposition: attachment;\n" +
+                " filename*0=\"looooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\";\n" +
+                " filename*1=\"oooooooooooooooooooooooooooooooooooooong_fiiiiiiiiiiiiiiiiii\";\n" +
+                " filename*2=\"iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiileeeeeeeeeeeeeeeeeee\";\n" +
+                " filename*3=\"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.txt\"");
+        Assert.assertEquals("loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo" +
+                "ooooooooooooooong_fiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiileeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.txt", f.getFilename());
+    }
+
 }

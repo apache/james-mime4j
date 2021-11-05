@@ -17,18 +17,17 @@
  * under the License.                                           *
  ****************************************************************/
 
-package org.apache.james.mime4j.internal;
+package org.apache.james.mime4j.util;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.james.mime4j.util.MimeUtil;
 
-public class ParameterHelper {
+public class MimeParameterMapping {
 
     private final Map<String, String> parameters = new HashMap<>();
 
-    public Map<String,String> getParameters() {
+    public Map<String, String> getParameters() {
         Map<String,String> result = new HashMap<>();
         for (Map.Entry<String, String > entry : parameters.entrySet()) {
             result.put(entry.getKey(), decodeParameterValue(entry.getValue()) );
@@ -36,7 +35,7 @@ public class ParameterHelper {
         return result;
     }
 
-    public void addParameterValue(String name, String value) {
+    public void addParameter(String name, String value) {
         String key = removeSectionFromName(name).toLowerCase();
         if (parameters.containsKey(key)) {
             parameters.put(key, parameters.get(key) + value);
@@ -45,7 +44,7 @@ public class ParameterHelper {
         }
     }
 
-    private static String decodeParameterValue(String value) {
+    private String decodeParameterValue(String value) {
         int charsetEnd = value.indexOf("'");
         int languageEnd = value.indexOf("'", charsetEnd + 1);
         if (charsetEnd < 0 || languageEnd < 0) {
@@ -61,7 +60,7 @@ public class ParameterHelper {
         return MimeUtil.unscrambleHeaderValue(value);
     }
 
-    private static String removeSectionFromName(String parameterName) {
+    private String removeSectionFromName(String parameterName) {
         int position = parameterName.indexOf('*');
         return parameterName.substring(0, position < 0 ? parameterName.length() : position);
     }
