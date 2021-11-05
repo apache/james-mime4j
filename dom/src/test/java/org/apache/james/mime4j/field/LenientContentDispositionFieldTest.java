@@ -185,5 +185,16 @@ public class LenientContentDispositionFieldTest {
                 "ooooooooooooooong_fiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiileeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
                 "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.txt", f.getFilename());
     }
+    
+    public void testNonAsciiFilename() throws MimeException {
+         ContentDispositionField f = parse("Content-Disposition: attachment;"
+                        + "\nfilename*0=\"=?UTF-8?Q?3-2_FORPROSJEKT_2-Sheet_-_XXX_A_2_40_?="
+                        + "\n=?UTF-8?Q?\";"
+                        + "\nfilename*1=\"201_-_Fasader_nord=C3=B8st_og_nordvest.dwg?=\"");
+
+        assertEquals(getMessage(f),
+                "3-2 FORPROSJEKT 2-Sheet - XXX A 2 40 201 - Fasader nordøst og nordvest.dwg",
+                f.getFilename());
+    }
 
 }
