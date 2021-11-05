@@ -192,8 +192,7 @@ public class LenientContentDispositionFieldTest {
                         + "\n=?UTF-8?Q?\";"
                         + "\nfilename*1=\"201_-_Fasader_nord=C3=B8st_og_nordvest.dwg?=\"");
 
-        assertEquals(getMessage(f),
-                "3-2 FORPROSJEKT 2-Sheet - XXX A 2 40 201 - Fasader nordøst og nordvest.dwg",
+        Assert.assertEquals("3-2 FORPROSJEKT 2-Sheet - XXX A 2 40 201 - Fasader nordøst og nordvest.dwg",
                 f.getFilename());
     }
 
