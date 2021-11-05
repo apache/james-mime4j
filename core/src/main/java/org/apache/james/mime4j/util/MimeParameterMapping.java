@@ -45,6 +45,9 @@ public class MimeParameterMapping {
     }
 
     private String decodeParameterValue(String value) {
+        if (value == null) {
+            return null;
+        }
         int charsetEnd = value.indexOf("'");
         int languageEnd = value.indexOf("'", charsetEnd + 1);
         if (charsetEnd < 0 || languageEnd < 0) {
