@@ -185,7 +185,8 @@ public class LenientContentDispositionFieldTest {
                 "ooooooooooooooong_fiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiileeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
                 "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.txt", f.getFilename());
     }
-    
+
+    @Test
     public void testNonAsciiFilename() throws MimeException {
          ContentDispositionField f = parse("Content-Disposition: attachment;"
                         + "\nfilename*0=\"=?UTF-8?Q?3-2_FORPROSJEKT_2-Sheet_-_XXX_A_2_40_?="
