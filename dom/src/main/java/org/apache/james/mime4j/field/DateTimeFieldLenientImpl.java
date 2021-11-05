@@ -29,17 +29,23 @@ import static java.time.temporal.ChronoField.OFFSET_SECONDS;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.time.temporal.ChronoField.YEAR;
 
+import java.text.ParseException;
 import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
@@ -50,6 +56,28 @@ import org.apache.james.mime4j.stream.Field;
  * Date-time field such as <code>Date</code> or <code>Resent-Date</code>.
  */
 public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeField {
+    private static final boolean JAVA_8_COMPATIBILITY_MODE = System.getProperty("java.version").startsWith("1.8");
+
+    private static final String[] DEFAULT_DATE_FORMATS = {
+        "EEE, dd MMM yy HH:mm:ss ZZZZ",
+        "dd MMM yy HH:mm:ss ZZZZ",
+        "EEE, dd MMM yy HH:mm:ss.SSS 0000",
+        "EEE, dd MMM yy HH:mm:ss 0000",
+        "EEE, dd MMM yyyy HH:mm:ss ZZZZ",
+        "dd MMM yyyy HH:mm:ss ZZZZ",
+        "EEE, dd MMM yyyy HH:mm:ss.SSS 0000",
+        "EEE, dd MMM yyyy HH:mm:ss 0000",
+        "EEE, dd MMM yy HH:mm:ss X",
+        "dd MMM yy HH:mm:ss X",
+        "EEE, dd MMM yy HH:mm:ss.SSS X",
+        "EEE, dd MMM yy HH:mm:ss X",
+        "EEE, dd MMM yyyy HH:mm:ss X",
+        "dd MMM yyyy HH:mm:ss X",
+        "EEE, dd MMM yyyy HH:mm:ss.SSS X",
+        "EEE, dd MMM yyyy HH:mm:ss X",
+    };
+    public static final List<String> DATE_PATTERNS_FOR_JAVA_8 = Collections.unmodifiableList(Arrays.asList(DEFAULT_DATE_FORMATS));
+
     private static final int INITIAL_YEAR = 1970;
     public static final DateTimeFormatter RFC_5322 = new DateTimeFormatterBuilder()
         .parseCaseInsensitive()
@@ -140,9 +168,26 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             body = body.trim();
         }
         try {
-            date = Date.from(Instant.from(RFC_5322.parse(body, new ParsePosition(0))));
+            if (JAVA_8_COMPATIBILITY_MODE) {
+                date = Date.from(Instant.from(RFC_5322.parse(body, new ParsePosition(0))));
+            } else {
+                compatibilityWithJava8(body);
+            }
         } catch (Exception e) {
             // Ignore
+        }
+    }
+
+    private void compatibilityWithJava8(String body) {
+        for (String datePattern : DATE_PATTERNS_FOR_JAVA_8) {
+            try {
+                SimpleDateFormat parser = new SimpleDateFormat(datePattern, Locale.US);
+                parser.setTimeZone(TimeZone.getTimeZone("GMT"));
+                parser.setLenient(true);
+                date = parser.parse(body);
+                break;
+            } catch (ParseException ignore) {
+            }
         }
     }
 
