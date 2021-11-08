@@ -169,9 +169,9 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
         try {
             if (JAVA_8_COMPATIBILITY_MODE) {
-                date = Date.from(Instant.from(RFC_5322.parse(body, new ParsePosition(0))));
-            } else {
                 compatibilityWithJava8(body);
+            } else {
+                date = Date.from(Instant.from(RFC_5322.parse(body, new ParsePosition(0))));
             }
         } catch (Exception e) {
             // Ignore
