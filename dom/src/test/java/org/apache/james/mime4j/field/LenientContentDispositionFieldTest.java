@@ -174,4 +174,27 @@ public class LenientContentDispositionFieldTest {
         Assert.assertEquals(12, f.getSize());
     }
 
+    @Test
+    public void testMultipartFileName() throws Exception {
+        ContentDispositionField f = parse("Content-Disposition: attachment;\n" +
+                " filename*0=\"looooooooooooooooooooooooooooooooooooooooooooooooooooooooooo\";\n" +
+                " filename*1=\"oooooooooooooooooooooooooooooooooooooong_fiiiiiiiiiiiiiiiiii\";\n" +
+                " filename*2=\"iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiileeeeeeeeeeeeeeeeeee\";\n" +
+                " filename*3=\"eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.txt\"");
+        Assert.assertEquals("loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo" +
+                "ooooooooooooooong_fiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiileeeeeeeeeeeeeeeeeeeeeeeeeeeeee" +
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee.txt", f.getFilename());
+    }
+
+    @Test
+    public void testNonAsciiFilename() throws MimeException {
+         ContentDispositionField f = parse("Content-Disposition: attachment;"
+                        + "\nfilename*0=\"=?UTF-8?Q?3-2_FORPROSJEKT_2-Sheet_-_XXX_A_2_40_?="
+                        + "\n=?UTF-8?Q?\";"
+                        + "\nfilename*1=\"201_-_Fasader_nord=C3=B8st_og_nordvest.dwg?=\"");
+
+        Assert.assertEquals("3-2 FORPROSJEKT 2-Sheet - XXX A 2 40 201 - Fasader nordøst og nordvest.dwg",
+                f.getFilename());
+    }
+
 }

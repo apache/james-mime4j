@@ -39,6 +39,7 @@ import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.stream.RawBody;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
+import org.apache.james.mime4j.util.MimeParameterMapping;
 
 /**
  * Represents a <code>Content-Disposition</code> field.
@@ -168,9 +169,12 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
             dispositionType = null;
         }
         parameters.clear();
-        for (NameValuePair nmp: body.getParams()) {
-            String name = nmp.getName().toLowerCase(Locale.US);
-            parameters.put(name, nmp.getValue());
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        for (NameValuePair pair : body.getParams()) {
+            mapping.addParameter(pair.getName(), pair.getValue());
+        }
+        for (Map.Entry<String, String> entry : mapping.getParameters().entrySet()) {
+            parameters.put(entry.getKey(), entry.getValue());
         }
     }
 
