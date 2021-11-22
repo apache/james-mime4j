@@ -216,6 +216,12 @@ public class LenientAddressBuilderTest {
     }
 
     @Test
+    public void testParseMailboxEncodedLocalPart() throws ParseException {
+        Mailbox mailbox1 = parser.parseMailbox("=?utf-8?B?IkvDpXJlIFPDpnRyZSIgPGtzQGRvbWFpbi5jb20+?=");
+        Assert.assertEquals("\"Kåre Sætre\" <ks@domain.com>", mailbox1.getLocalPart());
+    }
+
+    @Test
     public void testParseMailboxNonASCII() throws Exception {
         Mailbox mailbox1 = parser.parseMailbox(
                 "Hans M\374ller <hans.mueller@acme.org>");
