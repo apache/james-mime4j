@@ -5,6 +5,19 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [UNRELEASED]
 
+## [0.8.7] - 2022-04-01
+
+Bug fixes:
+
+ - Support for JRE 8 plateform
+ - MIME4J-307 AbstractHeader::getField (with cast) should handle missing header (#59)
+ - MIME4J-109 use correct character encoding when parsing of MIME parameter value (#66)
+ - MIME4J-253 fix parsing encoded local part (#65)
+
+Enhancements:
+
+ - MIME4J-309 MimeUtil::date0 should use DateTimeFormatter (#61)
+
 ## [0.8.6] - 2021-09-24
 
 Changes included in this release:
