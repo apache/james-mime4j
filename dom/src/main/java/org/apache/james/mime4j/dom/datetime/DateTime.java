@@ -19,12 +19,20 @@
 
 package org.apache.james.mime4j.dom.datetime;
 
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.field.datetime.parser.DateTimeParser;
+import org.apache.james.mime4j.field.datetime.parser.ParseException;
+
 public class DateTime {
+    public static DateTime parse(InputStream inputStream) throws ParseException {
+        return new DateTimeParser(inputStream).parseAll();
+    }
+
     private final Date date;
     private final int year;
     private final int month;
