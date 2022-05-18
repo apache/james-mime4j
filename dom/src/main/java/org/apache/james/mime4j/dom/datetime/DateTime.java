@@ -74,6 +74,10 @@ public class DateTime {
         return c.getTime();
     }
 
+    public Date asDate() {
+        return DateTime.convertToDate(year, month, day, hour, minute, second, timeZone);
+    }
+
     public Date getDate() {
         return date;
     }
