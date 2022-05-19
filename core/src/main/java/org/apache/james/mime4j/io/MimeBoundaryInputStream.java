@@ -244,11 +244,14 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
                     // Make sure the boundary is terminated with EOS
                     break;
                 } else {
-                    // or with a whitespace or '-' char
+                    // or with a whitespace or '--' 
                     char ch = (char)(buffer.byteAt(pos));
-                    if (CharsetUtil.isWhitespace(ch) || ch == '-') {
+                    if (CharsetUtil.isWhitespace(ch)) {
                         break;
                     }
+                    if (ch == '-' && remaining > 1 && (char)(buffer.byteAt(pos+1)) == '-') {
+                        break;
+                    } 
                 }
             }
             off = i + boundary.length;
