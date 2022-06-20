@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.SimpleContentHandler;
@@ -60,9 +61,9 @@ public class JMHLongMultipartReadBench {
             .addProfiler(GCProfiler.class)
             .timeUnit(TimeUnit.MICROSECONDS)
             .warmupTime(TimeValue.seconds(5))
-            .warmupIterations(2)
+            .warmupIterations(5)
             .measurementTime(TimeValue.seconds(5))
-            .measurementIterations(5)
+            .measurementIterations(10)
             .threads(1)
             .forks(1)
             .shouldFailOnError(true)
@@ -139,6 +140,7 @@ public class JMHLongMultipartReadBench {
     @Benchmark
     public void benchmark4(Blackhole bh) throws Exception{
         MessageBuilder builder = new DefaultMessageBuilder();
-        builder.parseMessage(new ByteArrayInputStream(CONTENT));
+        Message message = builder.parseMessage(new ByteArrayInputStream(CONTENT));
+        message.dispose();
     }
 }

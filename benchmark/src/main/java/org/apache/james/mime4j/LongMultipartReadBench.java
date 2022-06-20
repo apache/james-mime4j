@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.SimpleContentHandler;
@@ -177,7 +178,8 @@ public class LongMultipartReadBench {
             MessageBuilder builder = new DefaultMessageBuilder();
 
             for (int i = 0; i < repetitions; i++) {
-                builder.parseMessage(new ByteArrayInputStream(content));
+                Message message = builder.parseMessage(new ByteArrayInputStream(content));
+                message.dispose();
             }
         }
     }
