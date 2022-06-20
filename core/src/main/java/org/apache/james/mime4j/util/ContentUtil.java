@@ -26,6 +26,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
@@ -37,11 +38,24 @@ import org.apache.james.mime4j.Charsets;
  * Utility methods for converting textual content of a message.
  */
 public class ContentUtil {
+    protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal<>();
+
+    public static BufferRecycler getBufferRecycler() {
+        SoftReference<BufferRecycler> ref = _recyclerRef.get();
+        BufferRecycler br = (ref == null) ? null : ref.get();
+
+        if (br == null) {
+            br = new BufferRecycler();
+            ref = new SoftReference<>(br);
+            _recyclerRef.set(ref);
+        }
+        return br;
+    }
 
     private ContentUtil() {
     }
 
-    static final int DEFAULT_COPY_BUFFER_SIZE = 1024;
+    static final int DEFAULT_COPY_BUFFER_SIZE = 4096;
 
     /**
      * Copies the contents of one stream to the other.
@@ -50,11 +64,13 @@ public class ContentUtil {
      * @throws IOException
      */
     public static void copy(final InputStream in, final OutputStream out) throws IOException {
-        final byte[] buffer = new byte[DEFAULT_COPY_BUFFER_SIZE];
+        BufferRecycler bufferRecycler = getBufferRecycler();
+        byte[] buffer = bufferRecycler.allocByteBuffer(0, DEFAULT_COPY_BUFFER_SIZE);
         int inputLength;
         while (-1 != (inputLength = in.read(buffer))) {
             out.write(buffer, 0, inputLength);
         }
+        bufferRecycler.releaseByteBuffer(0, buffer);
     }
 
     /**
@@ -64,11 +80,13 @@ public class ContentUtil {
      * @throws IOException
      */
     public static void copy(final Reader in, final Writer out) throws IOException {
-        final char[] buffer = new char[DEFAULT_COPY_BUFFER_SIZE];
+        BufferRecycler bufferRecycler = getBufferRecycler();
+        char[] buffer = bufferRecycler.allocCharBuffer(0, DEFAULT_COPY_BUFFER_SIZE);
         int inputLength;
         while (-1 != (inputLength = in.read(buffer))) {
             out.write(buffer, 0, inputLength);
         }
+        bufferRecycler.releaseCharBuffer(0, buffer);
     }
 
     public static byte[] buffer(final InputStream in) throws IOException {

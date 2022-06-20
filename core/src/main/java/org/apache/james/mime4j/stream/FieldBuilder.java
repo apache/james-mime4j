@@ -21,6 +21,7 @@ package org.apache.james.mime4j.stream;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 /**
  * <p>
@@ -68,6 +69,8 @@ public interface FieldBuilder {
      * Returns combined content of all lines processed so far or <code>null</code>
      * if the builder does not retain original raw content.
      */
-    ByteArrayBuffer getRaw();
+    RecycledByteArrayBuffer getRaw();
+
+    void release();
 
 }

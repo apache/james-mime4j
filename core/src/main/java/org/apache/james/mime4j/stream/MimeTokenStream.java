@@ -258,7 +258,8 @@ public class MimeTokenStream {
      * triggered 'start' events.
      */
     public void stop() {
-        rootentity.stop();
+        rootentity.stopSoft();
+        fieldBuilder.release();
     }
 
     /**
@@ -380,7 +381,10 @@ public class MimeTokenStream {
             if (state != EntityState.T_END_OF_STREAM) {
                 return state;
             }
-            entities.removeLast();
+            final EntityStateMachine entityStateMachine = entities.removeLast();
+            if (entityStateMachine instanceof MimeEntity) {
+                ((MimeEntity) entityStateMachine).stop();
+            }
             if (entities.isEmpty()) {
                 currentStateMachine = null;
             } else {

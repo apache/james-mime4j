@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.io;
 
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -120,6 +121,11 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
 
     @Override
     public boolean unread(ByteArrayBuffer buf) {
+        return bis != null && bis.unread(buf);
+    }
+
+    @Override
+    public boolean unread(RecycledByteArrayBuffer buf) {
         return bis != null && bis.unread(buf);
     }
 
