@@ -35,6 +35,7 @@ import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.ByteArrayOutputStreamRecycler;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
@@ -223,10 +224,10 @@ public class BasicBodyFactory implements BodyFactory {
 
     static class StringBody3 extends TextBody {
 
-        private final ByteArrayOutputStream content;
+        private final ByteArrayOutputStreamRecycler.Wrapper content;
         private final Charset charset;
 
-        StringBody3(final ByteArrayOutputStream content, final Charset charset) {
+        StringBody3(final ByteArrayOutputStreamRecycler.Wrapper content, final Charset charset) {
             super();
             this.content = content;
             this.charset = charset;
@@ -239,16 +240,17 @@ public class BasicBodyFactory implements BodyFactory {
 
         @Override
         public Reader getReader() throws IOException {
-            return new InputStreamReader(this.content.toInputStream(), this.charset);
+            return new InputStreamReader(this.content.getValue().toInputStream(), this.charset);
         }
 
         @Override
         public InputStream getInputStream() throws IOException {
-            return this.content.toInputStream();
+            return this.content.getValue().toInputStream();
         }
 
         @Override
         public void dispose() {
+            this.content.release();
         }
 
         @Override
@@ -285,20 +287,21 @@ public class BasicBodyFactory implements BodyFactory {
 
     static class BinaryBody3 extends BinaryBody {
 
-        private final ByteArrayOutputStream content;
+        private final ByteArrayOutputStreamRecycler.Wrapper content;
 
-        BinaryBody3(ByteArrayOutputStream content) {
+        BinaryBody3(ByteArrayOutputStreamRecycler.Wrapper content) {
             super();
             this.content = content;
         }
 
         @Override
         public InputStream getInputStream() throws IOException {
-            return content.toInputStream();
+            return content.getValue().toInputStream();
         }
 
         @Override
         public void dispose() {
+            content.release();
         }
 
         @Override
