@@ -39,6 +39,7 @@ import org.apache.james.mime4j.Charsets;
  */
 public class ContentUtil {
     protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal<>();
+    protected static final ThreadLocal<SoftReference<ByteArrayOutputStreamRecycler>> _outputStreamRecyclerRef = new ThreadLocal<>();
 
     public static BufferRecycler getBufferRecycler() {
         SoftReference<BufferRecycler> ref = _recyclerRef.get();
@@ -48,6 +49,18 @@ public class ContentUtil {
             br = new BufferRecycler();
             ref = new SoftReference<>(br);
             _recyclerRef.set(ref);
+        }
+        return br;
+    }
+
+    public static ByteArrayOutputStreamRecycler getOutputStreamRecycler() {
+        SoftReference<ByteArrayOutputStreamRecycler> ref = _outputStreamRecyclerRef.get();
+        ByteArrayOutputStreamRecycler br = (ref == null) ? null : ref.get();
+
+        if (br == null) {
+            br = new ByteArrayOutputStreamRecycler();
+            ref = new SoftReference<>(br);
+            _outputStreamRecyclerRef.set(ref);
         }
         return br;
     }
@@ -98,12 +111,12 @@ public class ContentUtil {
         return buf.toByteArray();
     }
 
-    public static ByteArrayOutputStream bufferEfficient(final InputStream in) throws IOException {
+    public static ByteArrayOutputStreamRecycler.Wrapper bufferEfficient(final InputStream in) throws IOException {
         if (in == null) {
             throw new IllegalArgumentException("Input stream may not be null");
         }
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
-        copy(in, buf);
+        ByteArrayOutputStreamRecycler.Wrapper buf = getOutputStreamRecycler().allocOutputStream();
+        copy(in, buf.getValue());
         return buf;
     }
 
