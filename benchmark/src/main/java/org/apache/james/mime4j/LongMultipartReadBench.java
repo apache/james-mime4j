@@ -121,12 +121,13 @@ public class LongMultipartReadBench {
 
     private static final class MimeTokenStreamTest implements Test {
         public void run(byte[] content, int repetitions) throws Exception {
-            MimeTokenStream stream = new MimeTokenStream();
             for (int i = 0; i < repetitions; i++) {
+                MimeTokenStream stream = new MimeTokenStream();
                 stream.parse(new ByteArrayInputStream(content));
                 for (EntityState state = stream.getState(); state != EntityState.T_END_OF_STREAM; state = stream
                         .next()) {
                 }
+                stream.stop();
             }
         }
     }
@@ -140,6 +141,7 @@ public class LongMultipartReadBench {
                 MimeStreamParser parser = new MimeStreamParser();
                 parser.setContentHandler(contentHandler);
                 parser.parse(new ByteArrayInputStream(content));
+                parser.stop();
             }
         }
     }
@@ -164,6 +166,7 @@ public class LongMultipartReadBench {
                 parser.setContentDecoding(true);
                 parser.setContentHandler(contentHandler);
                 parser.parse(new ByteArrayInputStream(content));
+                parser.stop();
             }
         }
     }
