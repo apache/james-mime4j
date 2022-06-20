@@ -131,6 +131,7 @@ public class MimeStreamParser {
                         bodyContent = mimeTokenStream.getInputStream();
                     }
                     handler.body(desc, bodyContent);
+                    bodyContent.close();
                     break;
                 case T_END_BODYPART:
                     handler.endBodyPart();

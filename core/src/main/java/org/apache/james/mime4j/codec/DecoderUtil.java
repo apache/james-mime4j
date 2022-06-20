@@ -21,18 +21,34 @@ package org.apache.james.mime4j.codec;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.ref.SoftReference;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Map;
 
 import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.BufferRecycler;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 /**
  * Static methods for decoding strings, byte arrays and encoded words.
  */
 public class DecoderUtil {
+    protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal<>();
+
+    public static BufferRecycler getBufferRecycler() {
+        SoftReference<BufferRecycler> ref = _recyclerRef.get();
+        BufferRecycler br = (ref == null) ? null : ref.get();
+
+        if (br == null) {
+            br = new BufferRecycler();
+            ref = new SoftReference<>(br);
+            _recyclerRef.set(ref);
+        }
+        return br;
+    }
 
     /**
      * Decodes a string containing quoted-printable encoded data.
@@ -44,8 +60,8 @@ public class DecoderUtil {
         try {
             QuotedPrintableInputStream is = new QuotedPrintableInputStream(
                     InputStreams.createAscii(s), monitor);
+            RecycledByteArrayBuffer buf = new RecycledByteArrayBuffer(getBufferRecycler(), s.length());
             try {
-                ByteArrayBuffer buf = new ByteArrayBuffer(s.length());
                 int b;
                 while ((b = is.read()) != -1) {
                     buf.append(b);
@@ -53,6 +69,7 @@ public class DecoderUtil {
                 return buf.toByteArray();
             } finally {
                 is.close();
+                buf.release();
             }
         } catch (IOException ex) {
             // This should never happen!
@@ -71,8 +88,8 @@ public class DecoderUtil {
         try {
             Base64InputStream is = new Base64InputStream(
                     InputStreams.createAscii(s), monitor);
+            RecycledByteArrayBuffer buf = new RecycledByteArrayBuffer(getBufferRecycler(), s.length());
             try {
-                ByteArrayBuffer buf = new ByteArrayBuffer(s.length());
                 int b;
                 while ((b = is.read()) != -1) {
                     buf.append(b);
@@ -80,6 +97,7 @@ public class DecoderUtil {
                 return buf.toByteArray();
             } finally {
                 is.close();
+                buf.release();
             }
         } catch (IOException ex) {
             // This should never happen!
