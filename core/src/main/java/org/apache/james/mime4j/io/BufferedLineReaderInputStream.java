@@ -41,6 +41,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     private byte[] buffer;
     private int bufpos;
     private int buflen;
+    private int[] shiftTable;
 
     private final int maxLineLen;
 
@@ -60,6 +61,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         this.buflen = 0;
         this.maxLineLen = maxLineLen;
         this.truncated = false;
+        this.shiftTable = new int[256];
     }
 
     public BufferedLineReaderInputStream(
@@ -244,7 +246,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             return -1;
         }
 
-        int[] shiftTable = new int[256];
+
         for (int i = 0; i < shiftTable.length; i++) {
             shiftTable[i] = pattern.length + 1;
         }
