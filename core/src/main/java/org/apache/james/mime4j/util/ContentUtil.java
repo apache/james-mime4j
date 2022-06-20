@@ -98,6 +98,15 @@ public class ContentUtil {
         return buf.toByteArray();
     }
 
+    public static ByteArrayOutputStream bufferEfficient(final InputStream in) throws IOException {
+        if (in == null) {
+            throw new IllegalArgumentException("Input stream may not be null");
+        }
+        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        copy(in, buf);
+        return buf;
+    }
+
     public static String buffer(final Reader in) throws IOException {
         if (in == null) {
             throw new IllegalArgumentException("Reader may not be null");

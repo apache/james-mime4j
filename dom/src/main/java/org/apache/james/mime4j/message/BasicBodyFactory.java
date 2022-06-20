@@ -29,6 +29,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.SingleBody;
@@ -116,7 +117,7 @@ public class BasicBodyFactory implements BodyFactory {
         if (content == null) {
             throw new IllegalArgumentException("Input stream may not be null");
         }
-        return new StringBody2(ContentUtil.buffer(content), resolveCharset(mimeCharset));
+        return new StringBody3(ContentUtil.bufferEfficient(content), resolveCharset(mimeCharset));
     }
 
     public TextBody textBody(final String text, final Charset charset) {
@@ -138,7 +139,7 @@ public class BasicBodyFactory implements BodyFactory {
     }
 
     public BinaryBody binaryBody(final InputStream is) throws IOException {
-        return new BinaryBody1(ContentUtil.buffer(is));
+        return new BinaryBody3(ContentUtil.bufferEfficient(is));
     }
 
     public BinaryBody binaryBody(final byte[] buf) {
@@ -220,6 +221,43 @@ public class BasicBodyFactory implements BodyFactory {
 
     }
 
+    static class StringBody3 extends TextBody {
+
+        private final ByteArrayOutputStream content;
+        private final Charset charset;
+
+        StringBody3(final ByteArrayOutputStream content, final Charset charset) {
+            super();
+            this.content = content;
+            this.charset = charset;
+        }
+
+        @Override
+        public String getMimeCharset() {
+            return this.charset != null ? this.charset.name() : null;
+        }
+
+        @Override
+        public Reader getReader() throws IOException {
+            return new InputStreamReader(this.content.toInputStream(), this.charset);
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return this.content.toInputStream();
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public SingleBody copy() {
+            return new StringBody3(this.content, this.charset);
+        }
+
+    }
+
     static class BinaryBody1 extends BinaryBody {
 
         private final byte[] content;
@@ -241,6 +279,31 @@ public class BasicBodyFactory implements BodyFactory {
         @Override
         public SingleBody copy() {
             return new BinaryBody1(this.content);
+        }
+
+    }
+
+    static class BinaryBody3 extends BinaryBody {
+
+        private final ByteArrayOutputStream content;
+
+        BinaryBody3(ByteArrayOutputStream content) {
+            super();
+            this.content = content;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return content.toInputStream();
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public SingleBody copy() {
+            return new BinaryBody3(content);
         }
 
     }
