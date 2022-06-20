@@ -319,6 +319,7 @@ public class DefaultMessageBuilder implements MessageBuilder {
                 parser.setRecurse();
             }
             parser.parse(is);
+            parser.stop();
             return message;
         } catch (MimeException e) {
             throw new MimeIOException(e);

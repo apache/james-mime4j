@@ -21,13 +21,29 @@ package org.apache.james.mime4j.codec;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 
+import org.apache.james.mime4j.util.BufferRecycler;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 /**
  * Performs Quoted-Printable decoding on an underlying stream.
  */
 public class QuotedPrintableInputStream extends InputStream {
+    protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal<>();
+
+    public static BufferRecycler getBufferRecycler() {
+        SoftReference<BufferRecycler> ref = _recyclerRef.get();
+        BufferRecycler br = (ref == null) ? null : ref.get();
+
+        if (br == null) {
+            br = new BufferRecycler();
+            ref = new SoftReference<>(br);
+            _recyclerRef.set(ref);
+        }
+        return br;
+    }
 
     private static final int DEFAULT_BUFFER_SIZE = 1024 * 2;
 
@@ -38,8 +54,8 @@ public class QuotedPrintableInputStream extends InputStream {
     private final byte[] singleByte = new byte[1];
 
     private final InputStream in;
-    private final ByteArrayBuffer decodedBuf;
-    private final ByteArrayBuffer blanks;
+    private final RecycledByteArrayBuffer decodedBuf;
+    private final RecycledByteArrayBuffer blanks;
 
     private final byte[] encoded;
     private int pos = 0; // current index into encoded buffer
@@ -57,9 +73,9 @@ public class QuotedPrintableInputStream extends InputStream {
     protected QuotedPrintableInputStream(final int bufsize, final InputStream in, DecodeMonitor monitor) {
         super();
         this.in = in;
-        this.encoded = new byte[bufsize];
-        this.decodedBuf = new ByteArrayBuffer(512);
-        this.blanks = new ByteArrayBuffer(512);
+        this.encoded = getBufferRecycler().allocByteBuffer(1, bufsize);
+        this.decodedBuf = new RecycledByteArrayBuffer(getBufferRecycler(), 512);
+        this.blanks = new RecycledByteArrayBuffer(getBufferRecycler(), 512);
         this.closed = false;
         this.monitor = monitor;
     }
@@ -85,6 +101,9 @@ public class QuotedPrintableInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         closed = true;
+        getBufferRecycler().releaseByteBuffer(1, encoded);
+        decodedBuf.release();
+        blanks.release();
     }
 
     private int fillBuffer() throws IOException {
