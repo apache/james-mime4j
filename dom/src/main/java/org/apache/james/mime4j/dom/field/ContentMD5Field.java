@@ -21,6 +21,10 @@ package org.apache.james.mime4j.dom.field;
 
 public interface ContentMD5Field extends ParsedField {
 
+    default boolean bodyDescriptionField() {
+        return true;
+    }
+
     /**
      * Gets the content MD5 raw value defined in this field.
      *
