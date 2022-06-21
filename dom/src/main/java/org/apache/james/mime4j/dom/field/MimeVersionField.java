@@ -21,6 +21,10 @@ package org.apache.james.mime4j.dom.field;
 
 public interface MimeVersionField extends ParsedField {
 
+    default boolean bodyDescriptionField() {
+        return true;
+    }
+
     int getMinorVersion();
 
     int getMajorVersion();
