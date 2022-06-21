@@ -56,10 +56,7 @@ public class JMHLongMultipartReadBench {
     @Test
     public void launchBenchmark() throws Exception {
         Options opt = new OptionsBuilder()
-            // Specify which benchmarks to run.
-            // You can be more specific if you'd like to run only one benchmark per test.
-            .include(this.getClass().getName() + ".*")
-            // Set the following options as needed
+            .include(this.getClass().getName() + ".benchmark*")
             .mode (Mode.AverageTime)
             .addProfiler(GCProfiler.class)
             .timeUnit(TimeUnit.MICROSECONDS)
