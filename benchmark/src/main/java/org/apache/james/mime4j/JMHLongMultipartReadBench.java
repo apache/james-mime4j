@@ -29,6 +29,7 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.MessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.SimpleContentHandler;
 import org.apache.james.mime4j.parser.AbstractContentHandler;
 import org.apache.james.mime4j.parser.ContentHandler;
@@ -46,9 +47,11 @@ import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 import org.openjdk.jmh.runner.options.TimeValue;
+import org.openjdk.jmh.util.NullOutputStream;
 
 public class JMHLongMultipartReadBench {
     private static final byte[] CONTENT = loadMessage("long-multipart.msg");
+    private static final byte[] BUFFER = new byte[4096];
 
     @Test
     public void launchBenchmark() throws Exception {
@@ -109,10 +112,10 @@ public class JMHLongMultipartReadBench {
         ContentHandler contentHandler = new AbstractContentHandler() {
         };
 
-            MimeStreamParser parser = new MimeStreamParser();
-            parser.setContentHandler(contentHandler);
-            parser.parse(new ByteArrayInputStream(CONTENT));
-            parser.stop();
+        MimeStreamParser parser = new MimeStreamParser();
+        parser.setContentHandler(contentHandler);
+        parser.parse(new ByteArrayInputStream(CONTENT));
+        parser.stop();
     }
 
     @Benchmark
@@ -121,8 +124,7 @@ public class JMHLongMultipartReadBench {
             @Override
             public void body(BodyDescriptor bd, InputStream is)
                 throws IOException {
-                byte[] b = new byte[4096];
-                while (is.read(b) != -1);
+                while (is.read(BUFFER) != -1) ;
             }
 
             @Override
@@ -130,17 +132,25 @@ public class JMHLongMultipartReadBench {
             }
         };
 
-            MimeStreamParser parser = new MimeStreamParser();
-            parser.setContentDecoding(true);
-            parser.setContentHandler(contentHandler);
-            parser.parse(new ByteArrayInputStream(CONTENT));
-            parser.stop();
+        MimeStreamParser parser = new MimeStreamParser();
+        parser.setContentDecoding(true);
+        parser.setContentHandler(contentHandler);
+        parser.parse(new ByteArrayInputStream(CONTENT));
+        parser.stop();
     }
 
     @Benchmark
     public void benchmark4(Blackhole bh) throws Exception{
         MessageBuilder builder = new DefaultMessageBuilder();
         Message message = builder.parseMessage(new ByteArrayInputStream(CONTENT));
+        message.dispose();
+    }
+
+    @Benchmark
+    public void benchmark5(Blackhole bh) throws Exception{
+        MessageBuilder builder = new DefaultMessageBuilder();
+        Message message = builder.parseMessage(new ByteArrayInputStream(CONTENT));
+        new DefaultMessageWriter().writeMessage(message, new NullOutputStream());
         message.dispose();
     }
 }

@@ -22,6 +22,7 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -254,6 +255,11 @@ public class BasicBodyFactory implements BodyFactory {
         }
 
         @Override
+        public void writeTo(OutputStream out) throws IOException {
+            content.getValue().writeTo(out);
+        }
+
+        @Override
         public SingleBody copy() {
             return new StringBody3(this.content, this.charset);
         }
@@ -302,6 +308,11 @@ public class BasicBodyFactory implements BodyFactory {
         @Override
         public void dispose() {
             content.release();
+        }
+
+        @Override
+        public void writeTo(OutputStream out) throws IOException {
+            content.getValue().writeTo(out);
         }
 
         @Override
