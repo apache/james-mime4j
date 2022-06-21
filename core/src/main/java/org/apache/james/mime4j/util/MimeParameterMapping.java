@@ -28,19 +28,15 @@ public class MimeParameterMapping {
     private final Map<String, String> parameters = new HashMap<>();
 
     public Map<String, String> getParameters() {
-        Map<String,String> result = new HashMap<>();
-        for (Map.Entry<String, String > entry : parameters.entrySet()) {
-            result.put(entry.getKey(), decodeParameterValue(entry.getValue()) );
-        }
-        return result;
+        return parameters;
     }
 
     public void addParameter(String name, String value) {
         String key = removeSectionFromName(name).toLowerCase();
         if (parameters.containsKey(key)) {
-            parameters.put(key, parameters.get(key) + value);
+            parameters.put(key, decodeParameterValue(parameters.get(key) + value));
         } else {
-            parameters.put(key, value);
+            parameters.put(key, decodeParameterValue(value));
         }
     }
 
