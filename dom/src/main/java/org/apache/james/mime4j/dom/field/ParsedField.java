@@ -26,6 +26,10 @@ import org.apache.james.mime4j.stream.Field;
  */
 public interface ParsedField extends Field {
 
+    default boolean bodyDescriptionField() {
+        return false;
+    }
+
     /**
      * Returns <code>true</code> if this field is valid, i.e. no errors were
      * encountered while parsing the field value.

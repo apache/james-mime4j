@@ -24,6 +24,10 @@ import java.util.Map;
 
 public interface ContentDispositionField extends ParsedField {
 
+    default boolean bodyDescriptionField() {
+        return true;
+    }
+
     /** The <code>inline</code> disposition type. */
     String DISPOSITION_TYPE_INLINE = "inline";
     /** The <code>attachment</code> disposition type. */
