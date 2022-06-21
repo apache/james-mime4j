@@ -61,7 +61,7 @@ public class JMHLongMultipartReadBench {
     public void launchBenchmark() throws Exception {
         Options opt = new OptionsBuilder()
             .include(this.getClass().getName() + ".benchmark*")
-            .mode (Mode.AverageTime)
+            .mode(Mode.AverageTime)
             .addProfiler(GCProfiler.class)
             .timeUnit(TimeUnit.MICROSECONDS)
             .warmupTime(TimeValue.seconds(5))
