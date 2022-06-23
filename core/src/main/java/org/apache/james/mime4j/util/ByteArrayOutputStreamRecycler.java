@@ -22,13 +22,14 @@ package org.apache.james.mime4j.util;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 
 public class ByteArrayOutputStreamRecycler {
     public static class Wrapper {
         private final ByteArrayOutputStreamRecycler recycler;
-        private final ByteArrayOutputStream value;
+        private final UnsynchronizedByteArrayOutputStream value;
 
-        public Wrapper(ByteArrayOutputStreamRecycler recycler, ByteArrayOutputStream value) {
+        public Wrapper(ByteArrayOutputStreamRecycler recycler, UnsynchronizedByteArrayOutputStream value) {
             this.recycler = recycler;
             this.value = value;
         }
@@ -37,26 +38,26 @@ public class ByteArrayOutputStreamRecycler {
             recycler.release(value);
         }
 
-        public ByteArrayOutputStream getValue() {
+        public UnsynchronizedByteArrayOutputStream getValue() {
             return value;
         }
     }
 
-    protected final ConcurrentLinkedQueue<ByteArrayOutputStream> buffers;
+    protected final ConcurrentLinkedQueue<UnsynchronizedByteArrayOutputStream> buffers;
 
     public ByteArrayOutputStreamRecycler() {
         buffers = new ConcurrentLinkedQueue<>();
     }
 
     public Wrapper allocOutputStream() {
-        ByteArrayOutputStream result = buffers.poll();
+        UnsynchronizedByteArrayOutputStream result = buffers.poll();
         if (result == null) {
-            result = new ByteArrayOutputStream();
+            result = new UnsynchronizedByteArrayOutputStream();
         }
         return new Wrapper(this, result);
     }
 
-    private void release(ByteArrayOutputStream value) {
+    private void release(UnsynchronizedByteArrayOutputStream value) {
         if (value != null) {
             value.reset();
             buffers.offer(value);
