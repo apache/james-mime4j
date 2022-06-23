@@ -31,7 +31,7 @@ import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 import org.apache.james.mime4j.Charsets;
 
 /**
@@ -106,7 +106,7 @@ public class ContentUtil {
         if (in == null) {
             throw new IllegalArgumentException("Input stream may not be null");
         }
-        ByteArrayOutputStream buf = new ByteArrayOutputStream();
+        UnsynchronizedByteArrayOutputStream buf = new UnsynchronizedByteArrayOutputStream();
         copy(in, buf);
         return buf.toByteArray();
     }

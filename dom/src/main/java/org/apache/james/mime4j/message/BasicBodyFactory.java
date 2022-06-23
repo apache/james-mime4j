@@ -30,7 +30,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.SingleBody;
