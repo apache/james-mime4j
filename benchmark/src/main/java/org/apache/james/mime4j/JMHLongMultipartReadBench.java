@@ -23,11 +23,13 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
-import org.apache.james.mime4j.dom.MessageBuilder;
+import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.SimpleContentHandler;
@@ -51,7 +53,9 @@ import org.openjdk.jmh.util.NullOutputStream;
 
 public class JMHLongMultipartReadBench {
     private static final byte[] CONTENT = loadMessage("long-multipart.msg");
+    private static final byte[] CONTENT_HEADERS = loadMessage("long-headers.msg");
     private static final byte[] BUFFER = new byte[4096];
+    private static final DefaultMessageBuilder MESSAGE_BUILDER = new DefaultMessageBuilder();
 
     @Test
     public void launchBenchmark() throws Exception {
@@ -78,14 +82,8 @@ public class JMHLongMultipartReadBench {
             ClassLoader cl = JMHLongMultipartReadBench.class.getClassLoader();
 
             ByteArrayOutputStream outstream = new ByteArrayOutputStream();
-            InputStream instream = cl.getResourceAsStream(resourceName);
-            if (instream == null) {
-                return null;
-            }
-            try {
+            try (InputStream instream = cl.getResourceAsStream(resourceName)) {
                 ContentUtil.copy(instream, outstream);
-            } finally {
-                instream.close();
             }
 
             return outstream.toByteArray();
@@ -138,16 +136,44 @@ public class JMHLongMultipartReadBench {
 
     @Benchmark
     public void benchmark4(Blackhole bh) throws Exception{
-        MessageBuilder builder = new DefaultMessageBuilder();
-        Message message = builder.parseMessage(new ByteArrayInputStream(CONTENT));
+        Message message = MESSAGE_BUILDER.parseMessage(new ByteArrayInputStream(CONTENT));
+        bh.consume(message);
+        message.dispose();
+    }
+
+    @Benchmark
+    public void benchmark4headers(Blackhole bh) throws Exception{
+        Message message = MESSAGE_BUILDER.parseMessage(new ByteArrayInputStream(CONTENT_HEADERS));
+        bh.consume(message);
         message.dispose();
     }
 
     @Benchmark
     public void benchmark5(Blackhole bh) throws Exception{
-        MessageBuilder builder = new DefaultMessageBuilder();
-        Message message = builder.parseMessage(new ByteArrayInputStream(CONTENT));
+        Message message = MESSAGE_BUILDER.parseMessage(new ByteArrayInputStream(CONTENT));
         new DefaultMessageWriter().writeMessage(message, new NullOutputStream());
+        bh.consume(message);
         message.dispose();
+    }
+
+    @Benchmark
+    public void benchmark7(Blackhole bh) throws Exception{
+        Message message = Message.Builder.of()
+            .use(new LenientFieldParser())
+            .setDate(new Date())
+            .setSubject("Test email")
+            .setFrom("btellier@apache.org")
+            .setTo("other@apache.org")
+            .setBody("Body of the message", StandardCharsets.US_ASCII)
+            .build();
+        new DefaultMessageWriter().writeMessage(message, new NullOutputStream());
+        bh.consume(message);
+        message.dispose();
+    }
+
+    @Benchmark
+    public void benchmark6(Blackhole bh) throws Exception{
+        Header header = MESSAGE_BUILDER.parseHeader(new ByteArrayInputStream(CONTENT_HEADERS));
+        bh.consume(header);
     }
 }
