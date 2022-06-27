@@ -75,7 +75,7 @@ public class Fields {
      * @return the newly created <i>Content-Type</i> field.
      */
     public static ContentTypeField contentType(String contentType) {
-        return parse(ContentTypeFieldImpl.PARSER, FieldName.CONTENT_TYPE,
+        return parse(ContentTypeFieldLenientImpl.PARSER, FieldName.CONTENT_TYPE,
                 contentType);
     }
 
@@ -97,7 +97,7 @@ public class Fields {
             throw new IllegalArgumentException();
 
         if (parameters == null || parameters.isEmpty()) {
-            return parse(ContentTypeFieldImpl.PARSER, FieldName.CONTENT_TYPE,
+            return parse(ContentTypeFieldLenientImpl.PARSER, FieldName.CONTENT_TYPE,
                     mimeType);
         } else {
             StringBuilder sb = new StringBuilder(mimeType);
@@ -128,7 +128,7 @@ public class Fields {
             throw new IllegalArgumentException(mimeType + " is not a valid MIME type");
         }
         if (parameters == null) {
-            return parse(ContentTypeFieldImpl.PARSER, FieldName.CONTENT_TYPE,
+            return parse(ContentTypeFieldLenientImpl.PARSER, FieldName.CONTENT_TYPE,
                     mimeType);
         } else {
             StringBuilder sb = new StringBuilder(mimeType);
@@ -319,22 +319,22 @@ public class Fields {
             Date creationDate, Date modificationDate, Date readDate) {
         Map<String, String> parameters = new HashMap<String, String>();
         if (filename != null) {
-            parameters.put(ContentDispositionFieldImpl.PARAM_FILENAME, filename);
+            parameters.put(ContentDispositionFieldLenientImpl.PARAM_FILENAME, filename);
         }
         if (size >= 0) {
-            parameters.put(ContentDispositionFieldImpl.PARAM_SIZE, Long
+            parameters.put(ContentDispositionFieldLenientImpl.PARAM_SIZE, Long
                     .toString(size));
         }
         if (creationDate != null) {
-            parameters.put(ContentDispositionFieldImpl.PARAM_CREATION_DATE,
+            parameters.put(ContentDispositionFieldLenientImpl.PARAM_CREATION_DATE,
                     MimeUtil.formatDate(creationDate, null));
         }
         if (modificationDate != null) {
-            parameters.put(ContentDispositionFieldImpl.PARAM_MODIFICATION_DATE,
+            parameters.put(ContentDispositionFieldLenientImpl.PARAM_MODIFICATION_DATE,
                     MimeUtil.formatDate(modificationDate, null));
         }
         if (readDate != null) {
-            parameters.put(ContentDispositionFieldImpl.PARAM_READ_DATE, MimeUtil
+            parameters.put(ContentDispositionFieldLenientImpl.PARAM_READ_DATE, MimeUtil
                     .formatDate(readDate, null));
         }
         return contentDisposition(dispositionType, parameters);
@@ -664,24 +664,24 @@ public class Fields {
     private static DateTimeField date0(String fieldName, Date date,
             TimeZone zone) {
         final String formattedDate = MimeUtil.formatDate(date, zone);
-        return parse(DateTimeFieldImpl.PARSER, fieldName, formattedDate);
+        return parse(DateTimeFieldLenientImpl.PARSER, fieldName, formattedDate);
     }
 
     private static MailboxField mailbox0(String fieldName, Mailbox mailbox) {
         String fieldValue = encodeAddresses(Collections.singleton(mailbox));
-        return parse(MailboxFieldImpl.PARSER, fieldName, fieldValue);
+        return parse(MailboxFieldLenientImpl.PARSER, fieldName, fieldValue);
     }
 
     private static MailboxListField mailboxList0(String fieldName,
             Iterable<Mailbox> mailboxes) {
         String fieldValue = encodeAddresses(mailboxes);
-        return parse(MailboxListFieldImpl.PARSER, fieldName, fieldValue);
+        return parse(MailboxListFieldLenientImpl.PARSER, fieldName, fieldValue);
     }
 
     private static AddressListField addressList0(String fieldName,
             Iterable<? extends Address> addresses) {
         String fieldValue = encodeAddresses(addresses);
-        return parse(AddressListFieldImpl.PARSER, fieldName, fieldValue);
+        return parse(AddressListFieldLenientImpl.PARSER, fieldName, fieldValue);
     }
 
     private static void checkValidFieldName(String fieldName) {
