@@ -40,6 +40,7 @@ import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 /**
  * Default implementation of {@link MessageWriter}.
@@ -271,6 +272,9 @@ public class DefaultMessageWriter implements MessageWriter {
             throws IOException {
         if (byteSequence instanceof ByteArrayBuffer) {
             ByteArrayBuffer bab = (ByteArrayBuffer) byteSequence;
+            out.write(bab.buffer(), 0, bab.length());
+        } else if (byteSequence instanceof RecycledByteArrayBuffer) {
+            RecycledByteArrayBuffer bab = (RecycledByteArrayBuffer) byteSequence;
             out.write(bab.buffer(), 0, bab.length());
         } else {
             out.write(byteSequence.toByteArray());
