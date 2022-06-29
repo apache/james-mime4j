@@ -163,6 +163,11 @@ public class BasicBodyFactory implements BodyFactory {
         }
 
         @Override
+        public Charset getCharset() {
+            return charset;
+        }
+
+        @Override
         public Reader getReader() throws IOException {
             return new StringReader(this.content);
         }
@@ -201,6 +206,11 @@ public class BasicBodyFactory implements BodyFactory {
         }
 
         @Override
+        public Charset getCharset() {
+            return charset;
+        }
+
+        @Override
         public Reader getReader() throws IOException {
             return new InputStreamReader(InputStreams.create(this.content), this.charset);
         }
@@ -235,6 +245,11 @@ public class BasicBodyFactory implements BodyFactory {
         @Override
         public String getMimeCharset() {
             return this.charset != null ? this.charset.name() : null;
+        }
+
+        @Override
+        public Charset getCharset() {
+            return charset;
         }
 
         @Override

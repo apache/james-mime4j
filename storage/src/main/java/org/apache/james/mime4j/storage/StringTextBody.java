@@ -50,6 +50,11 @@ class StringTextBody extends TextBody {
     }
 
     @Override
+    public Charset getCharset() {
+        return charset;
+    }
+
+    @Override
     public InputStream getInputStream() throws IOException {
         return new ByteArrayInputStream(text.getBytes(charset.name()));
     }
