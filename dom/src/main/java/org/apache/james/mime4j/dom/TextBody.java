@@ -21,6 +21,7 @@ package org.apache.james.mime4j.dom;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.charset.Charset;
 
 /**
  * Encapsulates the contents of a <code>text/*</code> entity body.
@@ -39,6 +40,8 @@ public abstract class TextBody extends SingleBody {
      * @return the MIME charset.
      */
     public abstract String getMimeCharset();
+
+    public abstract Charset getCharset();
 
     /**
      * Gets a <code>Reader</code> which may be used to read out the contents
