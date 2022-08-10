@@ -112,4 +112,34 @@ public class DateTimeTest {
         Assert.assertEquals(1515169108000L, f.getTime());
     }
 
+    @Test
+    public void parseShouldSupportUppercaseDayOfWeek() throws Exception {
+        Date f = parse("WED, 10 Aug 2022 20:00:00 +0200");
+        Assert.assertEquals(1660154400000L, f.getTime());
+    }
+
+    @Test
+    public void parseShouldSupportLowercaseDayOfWeek() throws Exception {
+        Date f = parse("wed, 10 Aug 2022 20:00:00 +0200");
+        Assert.assertEquals(1660154400000L, f.getTime());
+    }
+
+    @Test
+    public void parseShouldSupportUppercaseMonth() throws Exception {
+        Date f = parse("Wed, 10 AUG 2022 20:00:00 +0200");
+        Assert.assertEquals(1660154400000L, f.getTime());
+    }
+
+    @Test
+    public void parseShouldSupportLowercaseMonth() throws Exception {
+        Date f = parse("Wed, 10 aug 2022 20:00:00 +0200");
+        Assert.assertEquals(1660154400000L, f.getTime());
+    }
+
+    @Test
+    public void parseShouldSupportMixedCaseDate() throws Exception {
+        Date f = parse("WeD, 10 aUg 2022 20:00:00 +0200");
+        Assert.assertEquals(1660154400000L, f.getTime());
+    }
+
 }
