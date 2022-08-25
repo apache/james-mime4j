@@ -228,5 +228,10 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
             return new ContentTypeFieldImpl(rawField, monitor);
         }
 
+        @Override
+        public String toString() {
+            return "ContentTypeFieldImpl.PARSER";
+        }
+
     };
 }

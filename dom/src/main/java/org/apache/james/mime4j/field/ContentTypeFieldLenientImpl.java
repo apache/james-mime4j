@@ -150,6 +150,11 @@ public class ContentTypeFieldLenientImpl extends AbstractField implements Conten
             return new ContentTypeFieldLenientImpl(rawField, monitor);
         }
 
+        @Override 
+        public String toString() {
+            return "ContentTypeFieldLenientImpl.PARSER";
+        }
+
     };
 
 }
