@@ -19,11 +19,8 @@
 
 package org.apache.james.mime4j.util;
 
-import java.lang.ref.SoftReference;
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.Optional;
 
 /**
  * This is a small utility class, whose main functionality is to allow
@@ -37,6 +34,10 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * to not rely on {@code ThreadLocal} access.
  */
 public class BufferRecycler {
+    static final boolean ENABLED = Optional.ofNullable(System.getProperty("james.mime4j.buffer.recycling.enabled"))
+        .map(Boolean::parseBoolean)
+        .orElse(true);
+
     protected final ArrayList<byte[]>[] _byteBuffers;
     protected final ArrayList<char[]>[] _charBuffers;
     protected final ArrayList<int[]> _intBuffers;
@@ -122,7 +123,9 @@ public class BufferRecycler {
         if (buffer == null) {
             return;
         }
-        _intBuffers.add(buffer);
+        if (ENABLED) {
+            _intBuffers.add(buffer);
+        }
     }
     
     public final char[] allocCharBuffer(int ix) {
@@ -146,7 +149,9 @@ public class BufferRecycler {
     }
 
     public void releaseCharBuffer(int ix, char[] buffer) {
-        _charBuffers[ix].add(buffer);
+        if (ENABLED) {
+            _charBuffers[ix].add(buffer);
+        }
     }
 
     protected byte[] balloc(int size) {
