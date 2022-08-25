@@ -58,7 +58,7 @@ public class ByteArrayOutputStreamRecycler {
     }
 
     private void release(UnsynchronizedByteArrayOutputStream value) {
-        if (value != null) {
+        if (value != null && BufferRecycler.ENABLED) {
             value.reset();
             buffers.offer(value);
         }
