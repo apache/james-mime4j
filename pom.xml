@@ -50,7 +50,7 @@
 
     <scm>
         <connection>scm:git:http://git-wip-us.apache.org/repos/asf/james-mime4j.git</connection>
-        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/james-mime4j.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com/apache/james-mime4j.git</developerConnection>
         <url>https://git-wip-us.apache.org/repos/asf/james-mime4j.git</url>
       <tag>HEAD</tag>
   </scm>
