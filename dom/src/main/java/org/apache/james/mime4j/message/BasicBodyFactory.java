@@ -227,6 +227,11 @@ public class BasicBodyFactory implements BodyFactory {
         }
 
         @Override
+        public long size() {
+            return content.length;
+        }
+
+        @Override
         public void dispose() {
         }
 
@@ -269,6 +274,11 @@ public class BasicBodyFactory implements BodyFactory {
         }
 
         @Override
+        public long size() {
+            return content.getValue().size();
+        }
+
+        @Override
         public void writeTo(OutputStream out) throws IOException {
             content.getValue().writeTo(out);
         }
@@ -305,6 +315,11 @@ public class BasicBodyFactory implements BodyFactory {
         }
 
         @Override
+        public long size() {
+            return content.length;
+        }
+
+        @Override
         public void dispose() {
         }
 
@@ -332,6 +347,11 @@ public class BasicBodyFactory implements BodyFactory {
         @Override
         public void writeTo(OutputStream out) throws IOException {
             content.getValue().writeTo(out);
+        }
+
+        @Override
+        public long size() {
+            return content.getValue().size();
         }
 
         @Override
