@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.output.NullOutputStream;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
@@ -80,6 +82,10 @@ public abstract class SingleBody implements Body {
         InputStream in = getInputStream();
         ContentUtil.copy(in, out);
         in.close();
+    }
+
+    public long size() throws IOException {
+        return IOUtils.copyLarge(getInputStream(), NullOutputStream.NULL_OUTPUT_STREAM);
     }
 
     /**
