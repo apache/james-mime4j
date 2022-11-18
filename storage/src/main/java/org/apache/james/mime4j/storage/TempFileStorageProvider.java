@@ -26,6 +26,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -107,7 +108,7 @@ public class TempFileStorageProvider extends AbstractStorageProvider {
     }
 
     public StorageOutputStream createStorageOutputStream() throws IOException {
-        File file = File.createTempFile(prefix, suffix, directory);
+        File file = Files.createTempFile(directory.toPath(), prefix, suffix).toFile();
         file.deleteOnExit();
 
         return new TempFileStorageOutputStream(file);
