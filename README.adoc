@@ -5,7 +5,7 @@ image:https://img.shields.io/badge/Join%20us-Mailing%20lists-purple.svg[link="ht
 link:https://gitter.im/apache/james-project[image:https://badges.gitter.im/apache/james-project.svg[Join the chat at link:https://gitter.im/apache/james-project]]
 image:https://img.shields.io/badge/CI-Jenkins-blue.svg[link="https://ci-builds.apache.org/job/james/job/ApacheJames-Mime4J/"]
 image:https://img.shields.io/badge/Documentation-green.svg[link="https://james.apache.org/mime4j/index.html"]
-image:https://img.shields.io/badge/Downloads-0.8.8-yellow.svg[link="https://james.apache.org/download.cgi#Apache_Mime4J"]
+image:https://img.shields.io/badge/Downloads-0.8.9-yellow.svg[link="https://james.apache.org/download.cgi#Apache_Mime4J"]
 image:https://img.shields.io/badge/Tickets-JIRA-blue.svg[link="https://issues.apache.org/jira/projects/MIME4J/issues"]
 image:https://img.shields.io/badge/License-ApacheV2-orange.svg[link="https://www.apache.org/licenses/"]
 image:https://img.shields.io/badge/Latests-news-red.svg[link="https://james.apache.org/index.html#posts"]
@@ -55,7 +55,7 @@ Add this maven dependency to import MIME4J core:
 <dependency>
     <groupId>org.apache.james</groupId>
     <artifactId>apache-mime4j-core</artifactId>
-    <version>0.8.8</version>
+    <version>0.8.9</version>
 </dependency>
 ....
 
@@ -65,7 +65,7 @@ Add this maven dependency to import MIME4J dom:
 <dependency>
     <groupId>org.apache.james</groupId>
     <artifactId>apache-mime4j-dom</artifactId>
-    <version>0.8.8</version>
+    <version>0.8.9</version>
 </dependency>
 ....
 ====

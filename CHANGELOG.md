@@ -5,6 +5,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [UNRELEASED]
 
+## [0.8.9] - 2022-12-30
+
+Bug fixes:
+ 
+ - MIME4J-322 Rely on Files.createTempFile (#82)
+
+Enhancements:
+
+ - MIME4J-321 SingleBody should return its size (#80)
+
 ## [0.8.8] - 2022-10-28
 
 Upgrades:
