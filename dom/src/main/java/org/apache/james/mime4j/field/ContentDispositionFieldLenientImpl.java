@@ -51,7 +51,7 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
     private boolean parsed = false;
 
     private String dispositionType = "";
-    private final Map<String, String> parameters = new HashMap<String, String>();
+    private final MimeParameterMapping mapping = new MimeParameterMapping();
 
     private boolean creationDateParsed;
     private Date creationDate;
@@ -78,14 +78,14 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
         if (!parsed) {
             parse();
         }
-        return parameters.get(name);
+        return mapping.get(name);
     }
 
     public Map<String, String> getParameters() {
         if (!parsed) {
             parse();
         }
-        return Collections.unmodifiableMap(parameters);
+        return Collections.unmodifiableMap(mapping.getParameters());
     }
 
     public boolean isDispositionType(String dispositionType) {
@@ -160,11 +160,9 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
         } else {
             dispositionType = null;
         }
-        MimeParameterMapping mapping = new MimeParameterMapping();
         for (NameValuePair pair : body.getParams()) {
             mapping.addParameter(pair.getName(), pair.getValue());
         }
-        parameters.putAll(mapping.getParameters());
     }
 
     private Date parseDate(final String paramName) {
