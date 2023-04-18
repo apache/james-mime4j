@@ -19,7 +19,6 @@
 
 package org.apache.james.mime4j.util;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,9 +53,9 @@ public class MimeParameterMapping {
         try {
             return java.net.URLDecoder.decode(fileName, charset);
         }
-        catch (UnsupportedEncodingException ignore) {
+        catch (Exception ignore) {
+            return fileName;
         }
-        return MimeUtil.unscrambleHeaderValue(value);
     }
 
     private String removeSectionFromName(String parameterName) {
