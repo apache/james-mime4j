@@ -30,6 +30,10 @@ public class MimeParameterMapping {
         return parameters;
     }
 
+    public String get(String name) {
+        return parameters.get(name);
+    }
+
     public void addParameter(String name, String value) {
         String key = removeSectionFromName(name).toLowerCase();
         if (parameters.containsKey(key)) {
