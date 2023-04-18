@@ -197,4 +197,14 @@ public class LenientContentDispositionFieldTest {
                 f.getFilename());
     }
 
+    @Test
+    public void testBadEncodingFilename() throws MimeException {
+         ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
+                 "        filename*=utf-8''4%P001!.DOC;\n" +
+                 "        filename=\"4%P001!.DOC\"");
+
+         Assert.assertEquals(f.getDispositionType(), "attachment");
+         Assert.assertEquals(f.getFilename(), "4%P001!.DOC4%P001!.DOC");
+    }
+
 }

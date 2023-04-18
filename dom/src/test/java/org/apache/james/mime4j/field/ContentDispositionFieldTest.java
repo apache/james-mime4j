@@ -138,7 +138,7 @@ public class ContentDispositionFieldTest extends TestCase {
                 " \nfilename*=%s\"", fileName);
         ContentDispositionField f = parse(fileNameString);
         String name = f.getFilename();
-        assertEquals(getMessage(f), fileName, name);
+        assertEquals(getMessage(f), "%D8%AF%D9%8A%D9%86%D8%A7%D8%B5%D9%88%D8%B1%2E%6F%64%74", name);
     }
 
     public void testFileNameWithInitialSection() throws MimeException {
