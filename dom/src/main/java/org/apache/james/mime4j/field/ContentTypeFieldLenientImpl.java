@@ -137,7 +137,7 @@ public class ContentTypeFieldLenientImpl extends AbstractField implements Conten
         mimeType = main;
         mediaType = type;
         subType = subtype;
-        parameters.clear();
+
         for (NameValuePair nmp: body.getParams()) {
             String name = nmp.getName().toLowerCase(Locale.US);
             parameters.put(name, nmp.getValue());
