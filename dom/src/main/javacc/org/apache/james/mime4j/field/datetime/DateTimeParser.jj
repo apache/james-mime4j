@@ -72,6 +72,22 @@ public class DateTimeParser {
 		}
     }
 
+    public DateTime parseAll() throws ParseException {
+		try {
+			return doParseAll();
+		} catch (TokenMgrError e) {
+			throw new ParseException(e);
+		}
+    }
+
+    public DateTime parseLine() throws ParseException {
+		try {
+			return doParseLine();
+		} catch (TokenMgrError e) {
+			throw new ParseException(e);
+		}
+    }
+
     private static int parseDigits(Token token) {
         return Integer.parseInt(token.image, 10);
     }
@@ -152,14 +168,14 @@ public class DateTimeParser {
 
 PARSER_END(DateTimeParser)
 
-DateTime parseLine() :
+private DateTime doParseLine() :
 {DateTime dt;}
 {
 	dt=date_time() ["\r"] "\n"
 	{ return dt; }
 }
 
-DateTime parseAll() :
+private DateTime doParseAll() :
 {DateTime dt;}
 {
 	dt=date_time() <EOF>
