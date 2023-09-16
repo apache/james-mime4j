@@ -48,21 +48,35 @@
         <module>james-utils</module>
     </modules>
 
-    <scm>
-        <connection>scm:git:http://git-wip-us.apache.org/repos/asf/james-mime4j.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/apache/james-mime4j.git</developerConnection>
-        <url>https://git-wip-us.apache.org/repos/asf/james-mime4j.git</url>
-      <tag>HEAD</tag>
-  </scm>
-    <issueManagement>
-        <url>http://issues.apache.org/jira/browse/MIME4J</url>
-    </issueManagement>
+<!--    <scm>-->
+<!--        <connection>scm:git:http://git-wip-us.apache.org/repos/asf/james-mime4j.git</connection>-->
+<!--        <developerConnection>scm:git:ssh://git@github.com/apache/james-mime4j.git</developerConnection>-->
+<!--        <url>https://git-wip-us.apache.org/repos/asf/james-mime4j.git</url>-->
+<!--      <tag>HEAD</tag>-->
+<!--  </scm>-->
+<!--    <issueManagement>-->
+<!--        <url>http://issues.apache.org/jira/browse/MIME4J</url>-->
+<!--    </issueManagement>-->
 
+<!--    <distributionManagement>-->
+<!--        <site>-->
+<!--            <id>mime4j-website</id>-->
+<!--            <url>scpexe://people.apache.org/www/james.apache.org/mime4j/</url>-->
+<!--        </site>-->
+<!--    </distributionManagement>-->
+
+    <!--  Distribution Management has been changed to make jar available ion local repo  -->
     <distributionManagement>
-        <site>
-            <id>mime4j-website</id>
-            <url>scpexe://people.apache.org/www/james.apache.org/mime4j/</url>
-        </site>
+        <repository>
+            <id>olympus.maven.releases</id>
+            <name>Olympus Release Repository</name>
+            <url>http://ci.aws.talk.to:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>olympus.maven.snapshots</id>
+            <name>Olympus Snapshot Repository</name>
+            <url>http://ci.aws.talk.to:8081/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <properties>

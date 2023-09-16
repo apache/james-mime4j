@@ -52,6 +52,8 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
     private String charset;
     private String transferEncoding;
     private long contentLength;
+    public int headerStartByte;
+    public int bodyStartByte;
 
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
@@ -79,6 +81,8 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
         charset = null;
         transferEncoding = null;
         contentLength = -1;
+        headerStartByte = 0;
+        bodyStartByte = 0;
     }
 
     public BodyDescriptorBuilder newChild() {
@@ -107,7 +111,7 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
         return new BasicBodyDescriptor(actualMimeType, actualMediaType, actualSubType,
                 boundary, actualCharset,
                 transferEncoding != null ? transferEncoding : "7bit",
-                contentLength);
+                contentLength, headerStartByte, bodyStartByte);
     }
 
     /**
@@ -144,6 +148,16 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
             parseContentType(field);
         }
         return null;
+    }
+
+    @Override
+    public void setHeaderStartByte(int headerStartByte) {
+        this.headerStartByte = headerStartByte;
+    }
+
+    @Override
+    public void setBodyStartByte(int bodyStartByte) {
+        this.bodyStartByte = bodyStartByte;
     }
 
     private void parseContentType(Field field) throws MimeException {

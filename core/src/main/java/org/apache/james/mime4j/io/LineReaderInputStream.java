@@ -63,4 +63,14 @@ public abstract class LineReaderInputStream extends FilterInputStream {
     public abstract boolean unread(ByteArrayBuffer buf);
     public abstract boolean unread(RecycledByteArrayBuffer buf);
 
+    /**
+     * Retrieves the number of bytes consumed or processed by the implementing class.
+     *
+     * @return The count of bytes consumed.
+     * @throws RuntimeException if the method is not implemented by the concrete subclass.
+     */
+    public int getBytesConsumed() {
+        throw new RuntimeException("Not Implemented");
+    }
+
 }

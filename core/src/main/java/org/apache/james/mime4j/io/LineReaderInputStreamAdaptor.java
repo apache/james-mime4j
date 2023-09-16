@@ -25,6 +25,8 @@ import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static java.util.Objects.isNull;
+
 /**
  * <code>InputStream</code> used by the MIME parser to detect whether the
  * underlying data stream was used (read from) and whether the end of the
@@ -146,5 +148,10 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
             count -= res;
         }
         return result;
+    }
+
+    @Override
+    public int getBytesConsumed() {
+        return isNull(bis) ? super.getBytesConsumed() : bis.getBytesConsumed();
     }
 }

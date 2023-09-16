@@ -56,6 +56,8 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
     private final DecodeMonitor monitor;
     private final FieldParser<? extends ParsedField> fieldParser;
     private final Map<String, ParsedField> fields;
+    public int headerStartByte;
+    public int bodyStartByte;
 
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
@@ -84,6 +86,8 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
 
     public void reset() {
         fields.clear();
+        headerStartByte = 0;
+        bodyStartByte = 0;
     }
 
     public Field addField(final RawField rawfield) throws MimeException {
@@ -135,7 +139,7 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
         }
         return new MaximalBodyDescriptor(
                 actualMimeType, actualMediaType, actualSubType, actualBoundary, actualCharset,
-                fields);
+          headerStartByte, bodyStartByte, fields);
     }
 
     public BodyDescriptorBuilder newChild() {
@@ -153,4 +157,13 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
         return new DefaultBodyDescriptorBuilder(actualMimeType, fieldParser, monitor);
     }
 
+    @Override
+    public void setHeaderStartByte(int headerStartByte) {
+        this.headerStartByte = headerStartByte;
+    }
+
+    @Override
+    public void setBodyStartByte(int bodyStartByte) {
+        this.bodyStartByte = bodyStartByte;
+    }
 }

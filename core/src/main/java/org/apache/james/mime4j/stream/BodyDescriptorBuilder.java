@@ -67,6 +67,20 @@ public interface BodyDescriptorBuilder {
     Field addField(RawField field) throws MimeException;
 
     /**
+     * Sets the start byte location of the header for the respective part.
+     *
+     * @param position The start byte location of the header.
+     */
+    void setHeaderStartByte(int position);
+
+    /**
+     * Sets the start byte location of the body for the respective part.
+     *
+     * @param position The start byte location of the body.
+     */
+    void setBodyStartByte(int position);
+
+    /**
      * Builds an instance of {@link BodyDescriptor} based on the internal state.
      */
     BodyDescriptor build();

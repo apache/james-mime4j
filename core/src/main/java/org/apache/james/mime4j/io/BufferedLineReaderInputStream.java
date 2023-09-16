@@ -56,6 +56,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
     private byte[] buffer;
     private int bufpos;
+    private int bytesConsumed;
     private int buflen;
     private int[] shiftTable;
 
@@ -79,6 +80,12 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         this.maxLineLen = maxLineLen;
         this.truncated = false;
         this.shiftTable = bufferRecycler.allocintBuffer(256);
+
+        // When a new BufferedLineReaderInputStream is created at the start of each part,
+        // we set the starting point for byte consumption to the previous value.
+        if (instream instanceof LineReaderInputStream) {
+            this.bytesConsumed = ((LineReaderInputStream) instream).getBytesConsumed();
+        }
     }
 
     public BufferedLineReaderInputStream(
@@ -169,6 +176,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
                 return -1;
             }
         }
+        bytesConsumed++;
         return this.buffer[this.bufpos++] & 0xff;
     }
 
@@ -190,6 +198,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             chunk = len;
         }
         System.arraycopy(this.buffer, this.bufpos, b, off, chunk);
+        this.bytesConsumed += chunk;
         this.bufpos += chunk;
         return chunk;
     }
@@ -360,6 +369,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     protected int skip(int n) {
         int chunk = Math.min(n, bufferLen());
         this.bufpos += chunk;
+        this.bytesConsumed += chunk;
         return chunk;
     }
 
@@ -422,6 +432,11 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         buffer = buf.buffer();
         tempBuffer = true;
         return true;
+    }
+
+    @Override
+    public int getBytesConsumed() {
+        return bytesConsumed;
     }
 
 }
