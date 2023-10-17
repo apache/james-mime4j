@@ -27,14 +27,7 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
-import org.apache.james.mime4j.io.BufferedLineReaderInputStream;
-import org.apache.james.mime4j.io.LimitedInputStream;
-import org.apache.james.mime4j.io.LineNumberSource;
-import org.apache.james.mime4j.io.LineReaderInputStream;
-import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
-import org.apache.james.mime4j.io.MaxHeaderLimitException;
-import org.apache.james.mime4j.io.MaxLineLimitException;
-import org.apache.james.mime4j.io.MimeBoundaryInputStream;
+import org.apache.james.mime4j.io.*;
 import org.apache.james.mime4j.util.BufferRecycler;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
@@ -262,6 +255,7 @@ class MimeEntity implements EntityStateMachine {
     protected boolean nextField() throws MimeException, IOException {
         int maxHeaderCount = config.getMaxHeaderCount();
         // the loop is here to transparently skip invalid headers
+
         for (;;) {
             if (endOfHeader) {
                 return false;
@@ -308,10 +302,12 @@ class MimeEntity implements EntityStateMachine {
             break;
         case T_START_HEADER:
             bodyDescBuilder.reset();
+            bodyDescBuilder.setHeaderStartByte(this.inbuffer.getBytesConsumed());
         case T_FIELD:
             state = nextField() ? EntityState.T_FIELD : EntityState.T_END_HEADER;
             break;
         case T_END_HEADER:
+            bodyDescBuilder.setBodyStartByte(this.inbuffer.getBytesConsumed());
             body = bodyDescBuilder.build();
             String mimeType = body.getMimeType();
             if (recursionMode == RecursionMode.M_FLAT) {

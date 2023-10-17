@@ -63,6 +63,8 @@ public class MaximalBodyDescriptor implements BodyDescriptor {
     private final String mimeType;
     private final String boundary;
     private final String charset;
+    public final int headerStartByte;
+    public final int bodyStartByte;
     private final Map<String, ParsedField> fields;
 
     MaximalBodyDescriptor(
@@ -71,6 +73,8 @@ public class MaximalBodyDescriptor implements BodyDescriptor {
             final String subType,
             final String boundary,
             final String charset,
+            int headerStartByte,
+            int bodyStartByte,
             final Map<String, ParsedField> fields) {
         super();
         this.mimeType = mimeType;
@@ -78,6 +82,8 @@ public class MaximalBodyDescriptor implements BodyDescriptor {
         this.subType = subType;
         this.boundary = boundary;
         this.charset = charset;
+        this.headerStartByte = headerStartByte;
+        this.bodyStartByte = bodyStartByte;
         this.fields = fields != null ? new HashMap<String, ParsedField>(fields) :
             Collections.<String, ParsedField>emptyMap();
     }
@@ -293,6 +299,16 @@ public class MaximalBodyDescriptor implements BodyDescriptor {
     public String getContentMD5Raw() {
         ContentMD5Field contentMD5Field = (ContentMD5Field) fields.get(CONTENT_MD5);
         return contentMD5Field != null ? contentMD5Field.getMD5Raw() : null;
+    }
+
+    @Override
+    public int getHeaderStartByte() {
+        return this.headerStartByte;
+    }
+
+    @Override
+    public int getBodyStartByte() {
+        return this.bodyStartByte;
     }
 
     @Override

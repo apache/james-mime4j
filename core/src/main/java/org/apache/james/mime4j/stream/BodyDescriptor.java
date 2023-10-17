@@ -31,4 +31,18 @@ public interface BodyDescriptor extends ContentDescriptor {
      */
     String getBoundary();
 
+    /**
+     * Returns the start byte position of the header for this body.
+     *
+     * @return Start byte position of the header.
+     */
+    int getHeaderStartByte();
+
+    /**
+     * Returns the start byte position of the body for this body.
+     *
+     * @return Start byte position of the body.
+     */
+    int getBodyStartByte();
+
 }

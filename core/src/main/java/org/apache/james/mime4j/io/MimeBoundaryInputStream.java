@@ -362,4 +362,9 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     public boolean unread(RecycledByteArrayBuffer buf) {
         return false;
     }
+
+    @Override
+    public int getBytesConsumed() {
+        return this.buffer.getBytesConsumed();
+    }
 }
