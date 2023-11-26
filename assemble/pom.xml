@@ -23,7 +23,7 @@
     <parent>
         <artifactId>apache-mime4j-project</artifactId>
         <groupId>org.apache.james</groupId>
-        <version>0.8.5</version>
+        <version>0.8.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -59,7 +59,7 @@
                 <version>3.1.1</version>
                 <configuration>
                     <descriptorSourceDirectory>${basedir}/src/assemble/</descriptorSourceDirectory>
-                    <tarLongFileMode>gnu</tarLongFileMode>
+                    <tarLongFileMode>posix</tarLongFileMode>
                 </configuration>
                 <executions>
                     <execution>

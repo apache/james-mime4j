@@ -101,6 +101,11 @@ public class DateTimeTest {
         });
     }
 
+    @Test(expected=ParseException.class)
+    public void testParseInvalidDateTime() throws Exception {
+        new DateTimeParser(new StringReader("Thu, 29 Jan   \u008Crodkowoeuropejski czas stand.")).parseAll();
+    }
+
     private void ensureAllEqual(String[] dateStrings) throws ParseException {
         for (int i = 0; i < dateStrings.length - 1; i++) {
             long date1 = new DateTimeParser(new StringReader(dateStrings[i])).parseAll().getDate().getTime();

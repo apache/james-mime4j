@@ -5,7 +5,7 @@ Requisites
 ----------
 
 * Build with Maven 3 (http://maven.apache.org)
-* Compile with JDK 1.5 or above
+* Compile with JDK 1.8 or above
 
 Quickstart
 ----------

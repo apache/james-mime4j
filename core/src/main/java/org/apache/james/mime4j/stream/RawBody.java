@@ -47,7 +47,7 @@ public final class RawBody {
     }
 
     public List<NameValuePair> getParams() {
-        return new ArrayList<NameValuePair>(this.params);
+        return this.params;
     }
 
     @Override

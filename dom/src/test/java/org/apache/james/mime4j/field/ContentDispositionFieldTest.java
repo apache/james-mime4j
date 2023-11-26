@@ -92,6 +92,13 @@ public class ContentDispositionFieldTest extends TestCase {
         assertFalse(f.isAttachment());
     }
 
+    private static String getMessage(ContentDispositionField field) {
+        if( field.getParseException() == null) {
+            return "";
+        }
+        return field.getParseException().getMessage() + " when parsing " + field.getRaw();
+    }
+
     public void testGetFilename() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: inline; filename=yada.txt");
         assertEquals("yada.txt", f.getFilename());
@@ -105,6 +112,48 @@ public class ContentDispositionFieldTest extends TestCase {
         f = parse("Content-Disposition: inline");
         assertNull(f.getFilename());
     }
+
+    public void testNonAsciiFilename() throws MimeException {
+        ContentDispositionField f =
+                parse("Content-Disposition: attachment;"
+                        + "\nfilename*0=\"=?UTF-8?Q?3-2_FORPROSJEKT_2-Sheet_-_XXX_A_2_40_?="
+                        + "\n=?UTF-8?Q?\";"
+                        + "\nfilename*1=\"201_-_Fasader_nord=C3=B8st_og_nordvest.dwg?=\"");
+
+        assertEquals(getMessage(f),
+                "3-2 FORPROSJEKT 2-Sheet - XXX A 2 40 201 - Fasader nordøst og nordvest.dwg",
+                f.getFilename());
+    }
+
+    public void testExtendedNotation() throws MimeException {
+        ContentDispositionField f = parse("Content-Disposition: attachment;\n" +
+                " filename*=utf-8''%D8%AF%D9%8A%D9%86%D8%A7%D8%B5%D9%88%D8%B1%2E%6F%64%74");
+        String name = f.getFilename();
+        assertEquals(getMessage(f), "ديناصور.odt", name);
+    }
+
+    public void testExtendedNotationWithEmptyCharsetShouldNotCrash() throws MimeException {
+        String fileName = "''%D8%AF%D9%8A%D9%86%D8%A7%D8%B5%D9%88%D8%B1%2E%6F%64%74";
+        String fileNameString = String.format("\"Content-Disposition: attachment;\n" +
+                " \nfilename*=%s\"", fileName);
+        ContentDispositionField f = parse(fileNameString);
+        String name = f.getFilename();
+        assertEquals(getMessage(f), "%D8%AF%D9%8A%D9%86%D8%A7%D8%B5%D9%88%D8%B1%2E%6F%64%74", name);
+    }
+
+    public void testFileNameWithInitialSection() throws MimeException {
+        ContentDispositionField f = parse("Content-Disposition: attachment;"
+                + "\nfilename*0*=filename.txt");
+        assertEquals(getMessage(f),"filename.txt", f.getFilename());
+    }
+
+    public void testFileNameWithMultipleSections() throws MimeException {
+        ContentDispositionField f = parse("Content-Disposition: attachment;"
+                + "\nfilename*0=\"first part \"; filename*1=\"of long filename.txt\"");
+        f.getFilename();
+        assertEquals(getMessage(f),"first part of long filename.txt", f.getFilename());
+    }
+
 
     public void testGetCreationDate() throws Exception {
         ContentDispositionField f = parse("Content-Disposition: inline; "

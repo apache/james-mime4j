@@ -29,7 +29,7 @@
 
     <groupId>org.apache.james</groupId>
     <artifactId>apache-mime4j-project</artifactId>
-    <version>0.8.5</version>
+    <version>0.8.10-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Apache James :: Mime4j :: Project</name>
@@ -50,9 +50,9 @@
 
     <scm>
         <connection>scm:git:http://git-wip-us.apache.org/repos/asf/james-mime4j.git</connection>
-        <developerConnection>scm:git:https://git-wip-us.apache.org/repos/asf/james-mime4j.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com/apache/james-mime4j.git</developerConnection>
         <url>https://git-wip-us.apache.org/repos/asf/james-mime4j.git</url>
-      <tag>apache-mime4j-project-0.8.5</tag>
+      <tag>HEAD</tag>
   </scm>
     <issueManagement>
         <url>http://issues.apache.org/jira/browse/MIME4J</url>
@@ -70,10 +70,10 @@
 
         <target.jdk>1.8</target.jdk>
         <commons-logging.version>1.2</commons-logging.version>
-        <log4j.version>1.2.17</log4j.version>
-        <junit.version>4.12</junit.version>
-        <mockito.version>3.0.0</mockito.version>
-        <commons-io.version>2.6</commons-io.version>
+        <log4j.version>2.19.0</log4j.version>
+        <junit.version>4.13.2</junit.version>
+        <mockito.version>3.12.4</mockito.version>
+        <commons-io.version>2.11.0</commons-io.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -115,8 +115,8 @@
                 <version>${commons-logging.version}</version>
             </dependency>
             <dependency>
-                <groupId>log4j</groupId>
-                <artifactId>log4j</artifactId>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
                 <version>${log4j.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -124,12 +124,11 @@
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
                 <version>${junit.version}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.13.2</version>
+                <version>3.21.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -219,4 +218,69 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>jdk9</id>
+            <activation>
+                <jdk>[1.9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <release>8</release>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.3.0</version>
+                <reportSets>
+                    <reportSet>
+                        <id>aggregate</id>
+                        <inherited>false</inherited>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                    <reportSet>
+                        <id>default</id>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+                <configuration>
+                    <linksource>true</linksource>
+                    <maxmemory>1g</maxmemory>
+                    <minmemory>256m</minmemory>
+                    <source>${target.jdk}</source>
+                    <tags>
+                        <tag>
+                            <name>note</name>
+                            <placement>a</placement>
+                            <head>NOTE</head>
+                        </tag>
+                        <tag>
+                            <name>todo</name>
+                            <placement>a</placement>
+                            <head>TODO</head>
+                        </tag>
+                        <tag>
+                            <name>warning</name>
+                            <placement>a</placement>
+                            <head>WARNING</head>
+                        </tag>
+                    </tags>
+                </configuration>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

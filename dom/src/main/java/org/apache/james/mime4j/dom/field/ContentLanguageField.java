@@ -23,6 +23,10 @@ import java.util.List;
 
 public interface ContentLanguageField extends ParsedField {
 
+    default boolean bodyDescriptionField() {
+        return true;
+    }
+
     /**
      * Gets the content language(s) defined in this field.
      *

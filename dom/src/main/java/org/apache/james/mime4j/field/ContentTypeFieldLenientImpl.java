@@ -137,7 +137,7 @@ public class ContentTypeFieldLenientImpl extends AbstractField implements Conten
         mimeType = main;
         mediaType = type;
         subType = subtype;
-        parameters.clear();
+
         for (NameValuePair nmp: body.getParams()) {
             String name = nmp.getName().toLowerCase(Locale.US);
             parameters.put(name, nmp.getValue());
@@ -148,6 +148,11 @@ public class ContentTypeFieldLenientImpl extends AbstractField implements Conten
 
         public ContentTypeField parse(final Field rawField, final DecodeMonitor monitor) {
             return new ContentTypeFieldLenientImpl(rawField, monitor);
+        }
+
+        @Override 
+        public String toString() {
+            return "ContentTypeFieldLenientImpl.PARSER";
         }
 
     };

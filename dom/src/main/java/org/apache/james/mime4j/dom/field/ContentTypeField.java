@@ -23,6 +23,10 @@ import java.util.Map;
 
 public interface ContentTypeField extends ParsedField {
 
+    default boolean bodyDescriptionField() {
+        return true;
+    }
+
     /** The prefix of all <code>multipart</code> MIME types. */
     String TYPE_MULTIPART_PREFIX = "multipart/";
     /** The <code>multipart/digest</code> MIME type. */

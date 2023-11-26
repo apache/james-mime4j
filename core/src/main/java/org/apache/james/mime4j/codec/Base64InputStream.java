@@ -21,13 +21,29 @@ package org.apache.james.mime4j.codec;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 
+import org.apache.james.mime4j.util.BufferRecycler;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 /**
  * Performs Base-64 decoding on an underlying stream.
  */
 public class Base64InputStream extends InputStream {
+    protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal<>();
+
+    public static BufferRecycler getBufferRecycler() {
+        SoftReference<BufferRecycler> ref = _recyclerRef.get();
+        BufferRecycler br = (ref == null) ? null : ref.get();
+
+        if (br == null) {
+            br = new BufferRecycler();
+            ref = new SoftReference<>(br);
+            _recyclerRef.set(ref);
+        }
+        return br;
+    }
     private static final int ENCODED_BUFFER_SIZE = 1536;
 
     private static final int[] BASE64_DECODE = new int[256];
@@ -47,7 +63,7 @@ public class Base64InputStream extends InputStream {
 
     private final InputStream in;
     private final byte[] encoded;
-    private final ByteArrayBuffer decodedBuf;
+    private final RecycledByteArrayBuffer decodedBuf;
 
     private int position = 0; // current index into encoded buffer
     private int size = 0; // current size of encoded buffer
@@ -64,8 +80,8 @@ public class Base64InputStream extends InputStream {
     protected Base64InputStream(int bufsize, InputStream in, DecodeMonitor monitor) {
         if (in == null)
             throw new IllegalArgumentException();
-        this.encoded = new byte[bufsize];
-        this.decodedBuf = new ByteArrayBuffer(512);
+        this.encoded = getBufferRecycler().allocByteBuffer(1, bufsize);
+        this.decodedBuf = new RecycledByteArrayBuffer(getBufferRecycler(), 512);
         this.in = in;
         this.monitor = monitor;
     }
@@ -130,6 +146,8 @@ public class Base64InputStream extends InputStream {
             return;
 
         closed = true;
+        getBufferRecycler().releaseByteBuffer(1, encoded);
+        decodedBuf.release();
     }
 
     private int read0(final byte[] buffer, final int off, final int len) throws IOException {

@@ -89,7 +89,7 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
     public Field addField(final RawField rawfield) throws MimeException {
         ParsedField field = fieldParser.parse(rawfield, monitor);
         String name = field.getNameLowerCase();
-        if (!fields.containsKey(name)) {
+        if (field.bodyDescriptionField() && !fields.containsKey(name)) {
             fields.put(name, field);
         }
         return field;

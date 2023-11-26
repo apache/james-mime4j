@@ -5,6 +5,69 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [UNRELEASED]
 
+## [0.8.9] - 2022-12-30
+
+Bug fixes:
+ 
+ - MIME4J-322 Rely on Files.createTempFile (#82)
+
+Enhancements:
+
+ - MIME4J-321 SingleBody should return its size (#80)
+
+## [0.8.8] - 2022-10-28
+
+Upgrades:
+
+ - Bump log4j-core from 2.16.0 to 2.19.0
+
+Bug fixes:
+ 
+ - MIME4J-320 Make DateTimeParser case-insensitive for day of week and month
+ - MIME4J-316 Parts missing in case of a specific combination of boundaries
+ - MIME4J-313 -- correctly allow for builds with JDK > 8 but target/release of 8. (#67)
+
+Enhancements:
+
+ - MIME4J-315 Add a convenient method to parse DateTime
+ - MIME4J-315 Add a convenient method to transform DateTime into a java date
+ 
+Performance:
+
+ - MIME4J-317 Improve message writing (JMH + optimized copy)
+ - MIME4J-318 Add a TextBody::getCharset
+ - MIME4J-318 Buffer recycling
+ - MIME4J-318 Fasten ContentDispositionFieldLenientImpl
+ - MIME4J-318 DefaultBodyDescriptorBuilder should avoid copying all headers
+ - MIME4J-318 Fields: rely on lenient parsers
+
+## [0.8.7] - 2022-04-01
+
+Bug fixes:
+
+ - Support for JRE 8 plateform
+ - MIME4J-307 AbstractHeader::getField (with cast) should handle missing header (#59)
+ - MIME4J-109 use correct character encoding when parsing of MIME parameter value (#66)
+ - MIME4J-253 fix parsing encoded local part (#65)
+
+Enhancements:
+
+ - MIME4J-309 MimeUtil::date0 should use DateTimeFormatter (#61)
+
+## [0.8.6] - 2021-09-24
+
+Changes included in this release:
+
+Performance enhancements:
+
+ - MIME4J-306 MimeUtil::unfold should group char appends (#52)
+ - MIME4J-305 ContentUtil::decode can avoid using StringBuilder (#51)
+ - MIME4J-304 DecoderUtil::decodeEncodedWords without REGEXP (#50)
+
+Various changes:
+
+ - Add maven-javadoc-plugin (#54)
+
 ## [0.8.5] - 2021-07-01
 
 Changes included in this release:

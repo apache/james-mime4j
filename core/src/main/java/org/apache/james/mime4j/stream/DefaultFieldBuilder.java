@@ -19,17 +19,33 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.lang.ref.SoftReference;
 import java.util.BitSet;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
+import org.apache.james.mime4j.util.BufferRecycler;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 /**
  * Default implementation of {@link FieldBuilder}.
  *
  */
 public class DefaultFieldBuilder implements FieldBuilder {
+    protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal<>();
+
+    public static BufferRecycler getBufferRecycler() {
+        SoftReference<BufferRecycler> ref = _recyclerRef.get();
+        BufferRecycler br = (ref == null) ? null : ref.get();
+
+        if (br == null) {
+            br = new BufferRecycler();
+            ref = new SoftReference<>(br);
+            _recyclerRef.set(ref);
+        }
+        return br;
+    }
 
     private static final BitSet FIELD_CHARS = new BitSet();
 
@@ -42,11 +58,11 @@ public class DefaultFieldBuilder implements FieldBuilder {
         }
     }
 
-    private final ByteArrayBuffer buf;
+    private final RecycledByteArrayBuffer buf;
     private final int maxlen;
 
     public DefaultFieldBuilder(int maxlen) {
-        this.buf = new ByteArrayBuffer(1024);
+        this.buf = new RecycledByteArrayBuffer(getBufferRecycler(), 4096);
         this.maxlen = maxlen;
     }
 
@@ -88,8 +104,12 @@ public class DefaultFieldBuilder implements FieldBuilder {
         return field;
     }
 
-    public ByteArrayBuffer getRaw() {
+    public RecycledByteArrayBuffer getRaw() {
         return this.buf;
+    }
+
+    public void release() {
+        this.buf.release();
     }
 
 }

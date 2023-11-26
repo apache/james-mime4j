@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeException;
@@ -82,7 +82,7 @@ public class MimeTokenStream {
     private final DecodeMonitor monitor;
     private final FieldBuilder fieldBuilder;
     private final BodyDescriptorBuilder bodyDescBuilder;
-    private final LinkedList<EntityStateMachine> entities = new LinkedList<EntityStateMachine>();
+    private final ArrayDeque<EntityStateMachine> entities = new ArrayDeque<>();
 
     private EntityState state = EntityState.T_END_OF_STREAM;
     private EntityStateMachine currentStateMachine;
@@ -258,7 +258,8 @@ public class MimeTokenStream {
      * triggered 'start' events.
      */
     public void stop() {
-        rootentity.stop();
+        rootentity.stopSoft();
+        fieldBuilder.release();
     }
 
     /**
@@ -380,7 +381,10 @@ public class MimeTokenStream {
             if (state != EntityState.T_END_OF_STREAM) {
                 return state;
             }
-            entities.removeLast();
+            final EntityStateMachine entityStateMachine = entities.removeLast();
+            if (entityStateMachine instanceof MimeEntity) {
+                ((MimeEntity) entityStateMachine).stop();
+            }
             if (entities.isEmpty()) {
                 currentStateMachine = null;
             } else {

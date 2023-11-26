@@ -22,6 +22,7 @@ package org.apache.james.mime4j.stream;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 import junit.framework.TestCase;
 
@@ -40,7 +41,7 @@ public class DefaultFieldBuilderTest extends TestCase {
         builder.append(line("raw:   stuff;\r\n"));
         builder.append(line("   more stuff;\r\n"));
         builder.append(line("   a lot more stuff\r\n"));
-        ByteArrayBuffer buf = builder.getRaw();
+        RecycledByteArrayBuffer buf = builder.getRaw();
         assertNotNull(buf);
         assertEquals("raw:   stuff;\r\n   more stuff;\r\n   a lot more stuff\r\n",
                 new String(buf.toByteArray(), "US-ASCII"));
@@ -60,7 +61,7 @@ public class DefaultFieldBuilderTest extends TestCase {
         builder.append(line("raw  : stuff;\r\n"));
         builder.append(line("   more stuff;\r\n"));
         builder.append(line("   a lot more stuff\r\n"));
-        ByteArrayBuffer buf = builder.getRaw();
+        RecycledByteArrayBuffer buf = builder.getRaw();
         assertNotNull(buf);
         assertEquals("raw  : stuff;\r\n   more stuff;\r\n   a lot more stuff\r\n",
                 new String(buf.toByteArray(), "US-ASCII"));
@@ -80,7 +81,7 @@ public class DefaultFieldBuilderTest extends TestCase {
         builder.append(line("raw:   stuff;\r\n"));
         builder.append(line("   more stuff;\r\n"));
         builder.append(line("   a lot more stuff"));
-        ByteArrayBuffer buf = builder.getRaw();
+        RecycledByteArrayBuffer buf = builder.getRaw();
         assertNotNull(buf);
         assertEquals("raw:   stuff;\r\n   more stuff;\r\n   a lot more stuff",
                 new String(buf.toByteArray(), "US-ASCII"));
@@ -109,7 +110,7 @@ public class DefaultFieldBuilderTest extends TestCase {
         DefaultFieldBuilder builder = new DefaultFieldBuilder(0);
         builder.reset();
         builder.append(line("raw: some stuff\r\n"));
-        ByteArrayBuffer buf = builder.getRaw();
+        RecycledByteArrayBuffer buf = builder.getRaw();
         assertNotNull(buf);
         assertEquals("raw: some stuff\r\n", new String(buf.toByteArray(), "US-ASCII"));
         builder.reset();

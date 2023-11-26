@@ -199,8 +199,9 @@ public class MessageMatcher {
     }
 
     private boolean checkBody(final CharBuffer buffer, MimeTokenStream parser) throws IOException {
-        final Reader reader = parser.getReader();
-        return isFoundIn(reader, buffer);
+        try (Reader reader = parser.getReader()) {
+            return isFoundIn(reader, buffer);
+        }
     }
 
     private CharBuffer createBuffer(final CharSequence searchContent) {

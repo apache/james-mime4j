@@ -19,17 +19,17 @@
 
 package org.apache.james.mime4j.field;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.text.ParsePosition;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
@@ -39,20 +39,19 @@ import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.stream.RawBody;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
+import org.apache.james.mime4j.util.MimeParameterMapping;
 
 /**
  * Represents a <code>Content-Disposition</code> field.
  */
 public class ContentDispositionFieldLenientImpl extends AbstractField implements ContentDispositionField {
 
-    private static final String DEFAULT_DATE_FORMAT = "EEE, dd MMM yyyy hh:mm:ss ZZZZ";
-
-    private final List<String> datePatterns;
+    private static final DateTimeFormatter DEFAULT_DATE_FORMAT = DateTimeFieldLenientImpl.RFC_5322;
 
     private boolean parsed = false;
 
     private String dispositionType = "";
-    private final Map<String, String> parameters = new HashMap<String, String>();
+    private final MimeParameterMapping mapping = new MimeParameterMapping();
 
     private boolean creationDateParsed;
     private Date creationDate;
@@ -64,14 +63,8 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
     private Date readDate;
 
     ContentDispositionFieldLenientImpl(final Field rawField,
-            final Collection<String> dateParsers, final DecodeMonitor monitor) {
+                                       final DecodeMonitor monitor) {
         super(rawField, monitor);
-        this.datePatterns = new ArrayList<String>();
-        if (dateParsers != null) {
-            this.datePatterns.addAll(dateParsers);
-        } else {
-            this.datePatterns.add(DEFAULT_DATE_FORMAT);
-        }
     }
 
     public String getDispositionType() {
@@ -85,14 +78,14 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
         if (!parsed) {
             parse();
         }
-        return parameters.get(name.toLowerCase());
+        return mapping.get(name);
     }
 
     public Map<String, String> getParameters() {
         if (!parsed) {
             parse();
         }
-        return Collections.unmodifiableMap(parameters);
+        return Collections.unmodifiableMap(mapping.getParameters());
     }
 
     public boolean isDispositionType(String dispositionType) {
@@ -167,10 +160,8 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
         } else {
             dispositionType = null;
         }
-        parameters.clear();
-        for (NameValuePair nmp: body.getParams()) {
-            String name = nmp.getName().toLowerCase(Locale.US);
-            parameters.put(name, nmp.getValue());
+        for (NameValuePair pair : body.getParams()) {
+            mapping.addParameter(pair.getName(), pair.getValue());
         }
     }
 
@@ -179,18 +170,13 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
         if (value == null) {
             return null;
         }
-        for (String datePattern: datePatterns) {
-            try {
-                SimpleDateFormat parser = new SimpleDateFormat(datePattern, Locale.US);
-                parser.setTimeZone(TimeZone.getTimeZone("GMT"));
-                parser.setLenient(true);
-                return parser.parse(value);
-            } catch (ParseException ignore) {
-            }
-        }
-        if (monitor.isListening()) {
-            monitor.warn(paramName + " parameter is invalid: " + value,
+        try {
+            return Date.from(Instant.from(DEFAULT_DATE_FORMAT.parse(value, new ParsePosition(0))));
+        } catch (Exception ignore) {
+            if (monitor.isListening()) {
+                monitor.warn(paramName + " parameter is invalid: " + value,
                     paramName + " parameter is ignored");
+            }
         }
         return null;
     }
@@ -198,7 +184,7 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
     public static final FieldParser<ContentDispositionField> PARSER = new FieldParser<ContentDispositionField>() {
 
         public ContentDispositionField parse(final Field rawField, final DecodeMonitor monitor) {
-            return new ContentDispositionFieldLenientImpl(rawField, null, monitor);
+            return new ContentDispositionFieldLenientImpl(rawField, monitor);
         }
 
     };

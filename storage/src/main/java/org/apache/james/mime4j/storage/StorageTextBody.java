@@ -46,6 +46,11 @@ class StorageTextBody extends TextBody {
     }
 
     @Override
+    public Charset getCharset() {
+        return charset;
+    }
+
+    @Override
     public Reader getReader() throws IOException {
         return new InputStreamReader(storage.getInputStream(), charset);
     }

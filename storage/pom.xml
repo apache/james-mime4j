@@ -23,7 +23,7 @@
     <parent>
         <artifactId>apache-mime4j-project</artifactId>
         <groupId>org.apache.james</groupId>
-        <version>0.8.5</version>
+        <version>0.8.10-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -45,6 +45,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

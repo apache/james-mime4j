@@ -96,16 +96,7 @@ public class SingleBodyBuilder {
             return this;
         }
         if (other instanceof TextBody) {
-            String charsetName = ((TextBody) other).getMimeCharset();
-            if (charsetName != null) {
-                try {
-                    this.charset = Charset.forName(charsetName);
-                } catch (IllegalCharsetNameException ex) {
-                    throw new UnsupportedEncodingException(charsetName);
-                } catch (UnsupportedCharsetException ex) {
-                    throw new UnsupportedEncodingException(charsetName);
-                }
-            }
+            this.charset = ((TextBody) other).getCharset();
         }
         this.bin = ContentUtil.buffer(other.getInputStream());
         return this;

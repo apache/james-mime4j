@@ -21,6 +21,7 @@ package org.apache.james.mime4j.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
@@ -34,11 +35,26 @@ import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
+import org.apache.james.mime4j.util.BufferRecycler;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.MimeUtil;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 class MimeEntity implements EntityStateMachine {
+    protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal<>();
+
+    public static BufferRecycler getBufferRecycler() {
+        SoftReference<BufferRecycler> ref = _recyclerRef.get();
+        BufferRecycler br = (ref == null) ? null : ref.get();
+
+        if (br == null) {
+            br = new BufferRecycler();
+            ref = new SoftReference<>(br);
+            _recyclerRef.set(ref);
+        }
+        return br;
+    }
 
     private final EntityState endState;
     private final MimeConfig config;
@@ -97,19 +113,6 @@ class MimeEntity implements EntityStateMachine {
             LineNumberSource lineSource,
             InputStream instream,
             MimeConfig config,
-            EntityState startState,
-            EntityState endState,
-            BodyDescriptorBuilder bodyDescBuilder) {
-        this(lineSource, instream, config, startState, endState,
-                config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(config.getMaxHeaderLen()),
-                bodyDescBuilder);
-    }
-
-    MimeEntity(
-            LineNumberSource lineSource,
-            InputStream instream,
-            MimeConfig config,
             BodyDescriptorBuilder bodyDescBuilder) {
         this(lineSource, instream, config,
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
@@ -154,6 +157,19 @@ class MimeEntity implements EntityStateMachine {
     }
 
     public void stop() {
+        stopSoft();
+        inbuffer.release();
+        getBufferRecycler().releaseByteBuffer(0, tmpbuf);
+    }
+
+    public void stopSoft() {
+        if(currentMimePartStream != null) {
+            try {
+                currentMimePartStream.close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
         this.inbuffer.truncate();
     }
 
@@ -271,7 +287,7 @@ class MimeEntity implements EntityStateMachine {
                 monitor(Event.INVALID_HEADER);
                 if (config.isMalformedHeaderStartsBody()) {
                     LineReaderInputStream instream = getDataStream();
-                    ByteArrayBuffer buf = fieldBuilder.getRaw();
+                    RecycledByteArrayBuffer buf = fieldBuilder.getRaw();
                     // Complain, if raw data is not available or cannot be 'unread'
                     if (buf == null || !instream.unread(buf)) {
                         throw new MimeParseEventException(Event.INVALID_HEADER);
@@ -387,7 +403,7 @@ class MimeEntity implements EntityStateMachine {
     private void advanceToBoundary() throws IOException {
         if (!dataStream.eof()) {
             if (tmpbuf == null) {
-                tmpbuf = new byte[2048];
+                tmpbuf = getBufferRecycler().allocByteBuffer(0, 2048);
             }
             InputStream instream = getLimitedContentStream();
             while (instream.read(tmpbuf)!= -1) {

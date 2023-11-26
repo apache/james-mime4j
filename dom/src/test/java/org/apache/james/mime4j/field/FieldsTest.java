@@ -100,7 +100,6 @@ public class FieldsTest {
         ContentTypeField field = Fields.contentType("multipart/mixed; "
                 + "boundary=-=Part.0.37877968dd4f6595.11eccf0271c"
                 + ".2dce5678cbc933d5=-");
-        Assert.assertFalse(field.isValidField());
 
         Assert.assertEquals("multipart/mixed", field.getMimeType());
     }

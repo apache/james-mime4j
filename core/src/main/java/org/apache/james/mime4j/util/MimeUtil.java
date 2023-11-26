@@ -19,12 +19,29 @@
 
 package org.apache.james.mime4j.util;
 
+import static java.time.temporal.ChronoField.DAY_OF_MONTH;
+import static java.time.temporal.ChronoField.DAY_OF_WEEK;
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MILLI_OF_SECOND;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoField.MONTH_OF_YEAR;
+import static java.time.temporal.ChronoField.OFFSET_SECONDS;
+import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
+import static java.time.temporal.ChronoField.YEAR;
+
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.ResolverStyle;
+import java.time.format.SignStyle;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
 
@@ -171,15 +188,17 @@ public final class MimeUtil {
      * @return the formatted time string.
      */
     public static String formatDate(Date date, TimeZone zone) {
-        DateFormat df = RFC822_DATE_FORMAT.get();
+        return RFC822_DATE_FORMAT
+            .withZone(zone(zone))
+            .format(date.toInstant());
+    }
 
+    private static ZoneId zone(TimeZone zone) {
         if (zone == null) {
-            df.setTimeZone(TimeZone.getDefault());
+            return TimeZone.getDefault().toZoneId();
         } else {
-            df.setTimeZone(zone);
+            return zone.toZoneId();
         }
-
-        return df.format(date);
     }
 
     /**
@@ -263,11 +282,18 @@ public final class MimeUtil {
             sb.append(s, 0, crlfIdx);
         }
 
+        int lastLineBreak = crlfIdx;
         for (int idx = crlfIdx + 1; idx < length; idx++) {
             char c = s.charAt(idx);
-            if (c != '\r' && c != '\n') {
-                sb.append(c);
+            if (c == '\r' || c == '\n') {
+                if (idx > lastLineBreak + 1) {
+                    sb.append(s, lastLineBreak + 1, idx);
+                }
+                lastLineBreak = idx;
             }
+        }
+        if (lastLineBreak < s.length() - 1 && s.length() > 0) {
+            sb.append(s, lastLineBreak + 1, s.length());
         }
 
         return sb.toString();
@@ -287,39 +313,55 @@ public final class MimeUtil {
         return counter++;
     }
 
-    private static final ThreadLocal<DateFormat> RFC822_DATE_FORMAT = new ThreadLocal<DateFormat>() {
-        @Override
-        protected DateFormat initialValue() {
-            return new Rfc822DateFormat();
-        }
-    };
+    private static final int INITIAL_YEAR = 1970;
+    public static final DateTimeFormatter RFC822_DATE_FORMAT = new DateTimeFormatterBuilder()
+        .parseCaseInsensitive()
+        .parseLenient()
+        .appendText(DAY_OF_WEEK, dayOfWeek())
+        .appendLiteral(", ")
+        .appendValue(DAY_OF_MONTH, 1, 2, SignStyle.NOT_NEGATIVE)
+        .appendLiteral(' ')
+        .appendText(MONTH_OF_YEAR, monthOfYear())
+        .appendLiteral(' ')
+        .appendValueReduced(YEAR, 4, 4, INITIAL_YEAR)
+        .appendLiteral(' ')
+        .appendValue(HOUR_OF_DAY, 2)
+        .appendLiteral(':')
+        .appendValue(MINUTE_OF_HOUR, 2)
+        .appendLiteral(':')
+        .appendValue(SECOND_OF_MINUTE, 2)
+        .appendLiteral(' ')
+        .appendOffset("+HHMM", "+0000")
+        .toFormatter()
+        .withZone(TimeZone.getDefault().toZoneId())
+        .withLocale(Locale.US);
 
-    private static final class Rfc822DateFormat extends SimpleDateFormat {
-        private static final long serialVersionUID = 1L;
+    private static Map<Long, String> monthOfYear() {
+        HashMap<Long, String> result = new HashMap<>();
+        result.put(1L, "Jan");
+        result.put(2L, "Feb");
+        result.put(3L, "Mar");
+        result.put(4L, "Apr");
+        result.put(5L, "May");
+        result.put(6L, "Jun");
+        result.put(7L, "Jul");
+        result.put(8L, "Aug");
+        result.put(9L, "Sep");
+        result.put(10L, "Oct");
+        result.put(11L, "Nov");
+        result.put(12L, "Dec");
+        return result;
+    }
 
-        public Rfc822DateFormat() {
-            super("EEE, d MMM yyyy HH:mm:ss ", Locale.US);
-        }
-
-        @Override
-        public StringBuffer format(Date date, StringBuffer toAppendTo,
-                FieldPosition pos) {
-            StringBuffer sb = super.format(date, toAppendTo, pos);
-
-            int zoneMillis = calendar.get(GregorianCalendar.ZONE_OFFSET);
-            int dstMillis = calendar.get(GregorianCalendar.DST_OFFSET);
-            int minutes = (zoneMillis + dstMillis) / 1000 / 60;
-
-            if (minutes < 0) {
-                sb.append('-');
-                minutes = -minutes;
-            } else {
-                sb.append('+');
-            }
-
-            sb.append(String.format("%02d%02d", minutes / 60, minutes % 60));
-
-            return sb;
-        }
+    private static Map<Long, String> dayOfWeek() {
+        HashMap<Long, String> result = new HashMap<>();
+        result.put(1L, "Mon");
+        result.put(2L, "Tue");
+        result.put(3L, "Wed");
+        result.put(4L, "Thu");
+        result.put(5L, "Fri");
+        result.put(6L, "Sat");
+        result.put(7L, "Sun");
+        return result;
     }
 }

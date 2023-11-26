@@ -19,16 +19,32 @@
 
 package org.apache.james.mime4j.io;
 
+import org.apache.james.mime4j.util.BufferRecycler;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.SoftReference;
 
 /**
  * Input buffer that can be used to search for patterns using Quick Search
  * algorithm in data read from an {@link InputStream}.
  */
 public class BufferedLineReaderInputStream extends LineReaderInputStream {
+    protected static final ThreadLocal<SoftReference<BufferRecycler>> _recyclerRef = new ThreadLocal<>();
+
+    public static BufferRecycler getBufferRecycler() {
+        SoftReference<BufferRecycler> ref = _recyclerRef.get();
+        BufferRecycler br = (ref == null) ? null : ref.get();
+
+        if (br == null) {
+            br = new BufferRecycler();
+            ref = new SoftReference<>(br);
+            _recyclerRef.set(ref);
+        }
+        return br;
+    }
 
     private boolean truncated;
 
@@ -41,6 +57,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     private byte[] buffer;
     private int bufpos;
     private int buflen;
+    private int[] shiftTable;
 
     private final int maxLineLen;
 
@@ -55,11 +72,13 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         if (buffersize <= 0) {
             throw new IllegalArgumentException("Buffer size may not be negative or zero");
         }
-        this.buffer = new byte[buffersize];
+        BufferRecycler bufferRecycler = getBufferRecycler();
+        this.buffer = bufferRecycler.allocByteBuffer(0, buffersize);
         this.bufpos = 0;
         this.buflen = 0;
         this.maxLineLen = maxLineLen;
         this.truncated = false;
+        this.shiftTable = bufferRecycler.allocintBuffer(256);
     }
 
     public BufferedLineReaderInputStream(
@@ -128,6 +147,12 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     public void truncate() {
         clear();
         this.truncated = true;
+    }
+
+    public void release() {
+        BufferRecycler bufferRecycler = getBufferRecycler();
+        bufferRecycler.releaseByteBuffer(0, buffer);
+        bufferRecycler.releaseIntBuffer(shiftTable);
     }
 
     protected boolean readAllowed() {
@@ -244,7 +269,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             return -1;
         }
 
-        int[] shiftTable = new int[256];
+
         for (int i = 0; i < shiftTable.length; i++) {
             shiftTable[i] = pattern.length + 1;
         }
@@ -375,6 +400,19 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
     @Override
     public boolean unread(ByteArrayBuffer buf) {
+        if (tempBuffer) return false;
+        origBuffer = buffer;
+        origBuflen = buflen;
+        origBufpos = bufpos;
+        bufpos = 0;
+        buflen = buf.length();
+        buffer = buf.buffer();
+        tempBuffer = true;
+        return true;
+    }
+
+    @Override
+    public boolean unread(RecycledByteArrayBuffer buf) {
         if (tempBuffer) return false;
         origBuffer = buffer;
         origBuflen = buflen;

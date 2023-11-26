@@ -22,6 +22,7 @@ package org.apache.james.mime4j.message;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
@@ -34,6 +35,7 @@ import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.ByteArrayOutputStreamRecycler;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
@@ -116,7 +118,7 @@ public class BasicBodyFactory implements BodyFactory {
         if (content == null) {
             throw new IllegalArgumentException("Input stream may not be null");
         }
-        return new StringBody2(ContentUtil.buffer(content), resolveCharset(mimeCharset));
+        return new StringBody3(ContentUtil.bufferEfficient(content), resolveCharset(mimeCharset));
     }
 
     public TextBody textBody(final String text, final Charset charset) {
@@ -138,7 +140,7 @@ public class BasicBodyFactory implements BodyFactory {
     }
 
     public BinaryBody binaryBody(final InputStream is) throws IOException {
-        return new BinaryBody1(ContentUtil.buffer(is));
+        return new BinaryBody3(ContentUtil.bufferEfficient(is));
     }
 
     public BinaryBody binaryBody(final byte[] buf) {
@@ -159,6 +161,11 @@ public class BasicBodyFactory implements BodyFactory {
         @Override
         public String getMimeCharset() {
             return this.charset != null ? this.charset.name() : null;
+        }
+
+        @Override
+        public Charset getCharset() {
+            return charset;
         }
 
         @Override
@@ -200,6 +207,11 @@ public class BasicBodyFactory implements BodyFactory {
         }
 
         @Override
+        public Charset getCharset() {
+            return charset;
+        }
+
+        @Override
         public Reader getReader() throws IOException {
             return new InputStreamReader(InputStreams.create(this.content), this.charset);
         }
@@ -210,12 +222,75 @@ public class BasicBodyFactory implements BodyFactory {
         }
 
         @Override
+        public void writeTo(OutputStream out) throws IOException {
+            out.write(content);
+        }
+
+        @Override
+        public long size() {
+            return content.length;
+        }
+
+        @Override
         public void dispose() {
         }
 
         @Override
         public SingleBody copy() {
             return new StringBody2(this.content, this.charset);
+        }
+
+    }
+
+    static class StringBody3 extends TextBody {
+
+        private final ByteArrayOutputStreamRecycler.Wrapper content;
+        private final Charset charset;
+
+        StringBody3(final ByteArrayOutputStreamRecycler.Wrapper content, final Charset charset) {
+            super();
+            this.content = content;
+            this.charset = charset;
+        }
+
+        @Override
+        public String getMimeCharset() {
+            return this.charset != null ? this.charset.name() : null;
+        }
+
+        @Override
+        public Charset getCharset() {
+            return charset;
+        }
+
+        @Override
+        public Reader getReader() throws IOException {
+            return new InputStreamReader(this.content.getValue().toInputStream(), this.charset);
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return this.content.getValue().toInputStream();
+        }
+
+        @Override
+        public long size() {
+            return content.getValue().size();
+        }
+
+        @Override
+        public void writeTo(OutputStream out) throws IOException {
+            content.getValue().writeTo(out);
+        }
+
+        @Override
+        public void dispose() {
+            this.content.release();
+        }
+
+        @Override
+        public SingleBody copy() {
+            return new StringBody3(this.content, this.charset);
         }
 
     }
@@ -235,12 +310,58 @@ public class BasicBodyFactory implements BodyFactory {
         }
 
         @Override
+        public void writeTo(OutputStream out) throws IOException {
+            out.write(content);
+        }
+
+        @Override
+        public long size() {
+            return content.length;
+        }
+
+        @Override
         public void dispose() {
         }
 
         @Override
         public SingleBody copy() {
             return new BinaryBody1(this.content);
+        }
+
+    }
+
+    static class BinaryBody3 extends BinaryBody {
+
+        private final ByteArrayOutputStreamRecycler.Wrapper content;
+
+        BinaryBody3(ByteArrayOutputStreamRecycler.Wrapper content) {
+            super();
+            this.content = content;
+        }
+
+        @Override
+        public InputStream getInputStream() throws IOException {
+            return content.getValue().toInputStream();
+        }
+
+        @Override
+        public void writeTo(OutputStream out) throws IOException {
+            content.getValue().writeTo(out);
+        }
+
+        @Override
+        public long size() {
+            return content.getValue().size();
+        }
+
+        @Override
+        public void dispose() {
+            content.release();
+        }
+
+        @Override
+        public SingleBody copy() {
+            return new BinaryBody3(content);
         }
 
     }
