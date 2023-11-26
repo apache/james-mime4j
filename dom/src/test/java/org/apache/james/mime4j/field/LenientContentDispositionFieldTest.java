@@ -124,7 +124,7 @@ public class LenientContentDispositionFieldTest {
             " FileName=\"=?WINDOWS-1251?Q?3244659=5F=C0=EA=F2_=E7=E0_=C8=FE=EB=FC_?=\n" +
             " =?WINDOWS-1251?Q?2020.pdf?=\"")
             .getBytes(StandardCharsets.UTF_8);
-        
+
         ContentDispositionField f = parse(data);
 
         Assert.assertEquals("WINDOWS-1251 Q encoded filename", "3244659_Акт за Июль 2020.pdf", f.getFilename());
@@ -132,13 +132,24 @@ public class LenientContentDispositionFieldTest {
 
     @Test
     public void testGetFilenameUtf8() throws Exception {
-        byte[] data = 
+        byte[] data =
             "Content-Disposition: attachment; filename=\"УПД ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"СТАНЦИЯ ВИРТУАЛЬНАЯ\" 01-05-21.pdf\""
             .getBytes(StandardCharsets.UTF_8);
 
         ContentDispositionField f = parse(data);
 
         Assert.assertEquals("UTF8 encoded filename", "УПД ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"СТАНЦИЯ ВИРТУАЛЬНАЯ\" 01-05-21.pdf", f.getFilename());
+    }
+
+    @Test
+    public void testGetFilenameMultipartUtf8() throws Exception {
+        byte[] data = ("Content-Disposition: attachment;\n" +
+            "	filename*0*=\"UTF-8''%D0%A0%D0%BE%D1%81%D1%82%D0%B5%D0%BB%D0%B5%D0%BA%D0%BE\";\n" +
+            "	filename*1*=\"%D0%BC%2E%78%6C%73%78\"\n")
+            .getBytes(StandardCharsets.UTF_8);
+
+        ContentDispositionField f = parse(data);
+        Assert.assertEquals("Ростелеком.xlsx", f.getFilename());
     }
 
     @Test
