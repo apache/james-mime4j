@@ -25,6 +25,8 @@ import java.util.Map;
 public class MimeParameterMapping {
 
     private final Map<String, String> parameters = new HashMap<>();
+    /** Charset, taken from the first item added to {@link #parameters}. */
+    private String charset;
 
     public Map<String, String> getParameters() {
         return parameters;
@@ -50,15 +52,23 @@ public class MimeParameterMapping {
         int charsetEnd = value.indexOf("'");
         int languageEnd = value.indexOf("'", charsetEnd + 1);
         if (charsetEnd < 0 || languageEnd < 0) {
-            return MimeUtil.unscrambleHeaderValue(value);
+            if (charset != null) {
+                return urlDecode(value);
+            } else {
+                return MimeUtil.unscrambleHeaderValue(value);
+            }
         }
-        String charset = value.substring(0, charsetEnd);
+        charset = value.substring(0, charsetEnd);
         String fileName = value.substring(languageEnd + 1);
+        return urlDecode(fileName);
+    }
+
+    private String urlDecode(String value) {
         try {
-            return java.net.URLDecoder.decode(fileName, charset);
+            return java.net.URLDecoder.decode(value, charset);
         }
         catch (Exception ignore) {
-            return fileName;
+            return value;
         }
     }
 
