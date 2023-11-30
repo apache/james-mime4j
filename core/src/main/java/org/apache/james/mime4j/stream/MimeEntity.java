@@ -326,6 +326,8 @@ class MimeEntity implements EntityStateMachine {
         case T_START_MULTIPART:
             if (dataStream.isUsed()) {
                 advanceToBoundary();
+                bodyDescBuilder.setBodyEndByte(this.inbuffer.getBytesConsumed());
+                body = bodyDescBuilder.build();
                 state = EntityState.T_END_MULTIPART;
                 break;
             } else {
@@ -356,7 +358,13 @@ class MimeEntity implements EntityStateMachine {
             if (!empty) break;
             // continue to next state
         case T_EPILOGUE:
+            bodyDescBuilder.setBodyEndByte(this.inbuffer.getBytesConsumed());
+            body = bodyDescBuilder.build();
             state = EntityState.T_END_MULTIPART;
+            break;
+        case T_END_BODYPART:
+            if (state == endState) state = EntityState.T_END_OF_STREAM;
+            else state = endState;
             break;
         case T_BODY:
         case T_END_MULTIPART:
@@ -474,6 +482,7 @@ class MimeEntity implements EntityStateMachine {
         case T_PREAMBLE:
         case T_EPILOGUE:
         case T_END_OF_STREAM:
+        case T_END_MULTIPART:
             return body;
         default:
             throw new IllegalStateException("Invalid state :" + stateToString(state));

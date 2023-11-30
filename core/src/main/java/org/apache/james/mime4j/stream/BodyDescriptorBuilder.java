@@ -81,6 +81,12 @@ public interface BodyDescriptorBuilder {
     void setBodyStartByte(int position);
 
     /**
+     * Sets the end byte location of the body for the respective part.
+     * @param position The end byte location of the body.
+     */
+    void setBodyEndByte(int position);
+
+    /**
      * Builds an instance of {@link BodyDescriptor} based on the internal state.
      */
     BodyDescriptor build();

@@ -54,6 +54,7 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
     private long contentLength;
     public int headerStartByte;
     public int bodyStartByte;
+    public int bodyEndByte;
 
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
@@ -111,7 +112,7 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
         return new BasicBodyDescriptor(actualMimeType, actualMediaType, actualSubType,
                 boundary, actualCharset,
                 transferEncoding != null ? transferEncoding : "7bit",
-                contentLength, headerStartByte, bodyStartByte);
+                contentLength, headerStartByte, bodyStartByte, bodyEndByte);
     }
 
     /**
@@ -160,7 +161,12 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
         this.bodyStartByte = bodyStartByte;
     }
 
-    private void parseContentType(Field field) throws MimeException {
+  @Override
+  public void setBodyEndByte(int bodyEndByte) {
+    this.bodyEndByte = bodyEndByte;
+  }
+
+  private void parseContentType(Field field) throws MimeException {
         RawField rawfield;
         if (field instanceof RawField) {
             rawfield = ((RawField) field);
