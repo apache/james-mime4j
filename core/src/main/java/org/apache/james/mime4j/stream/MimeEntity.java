@@ -21,6 +21,7 @@ package org.apache.james.mime4j.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Base64;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
@@ -406,7 +407,7 @@ class MimeEntity implements EntityStateMachine {
     private InputStream decodedStream(InputStream instream) {
         String transferEncoding = body.getTransferEncoding();
         if (MimeUtil.isBase64Encoding(transferEncoding)) {
-            instream = new Base64InputStream(instream, monitor);
+            instream = Base64.getMimeDecoder().wrap(instream);
         } else if (MimeUtil.isQuotedPrintableEncoded(transferEncoding)) {
             instream = new QuotedPrintableInputStream(instream, monitor);
         }

@@ -22,6 +22,7 @@ package org.apache.james.mime4j.codec;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Base64;
 
 /**
  * Utility methods related to codecs.
@@ -80,9 +81,9 @@ public class CodecUtil {
      * @throws IOException if an I/O error occurs
      */
     public static void encodeBase64(final InputStream in, final OutputStream out) throws IOException {
-        Base64OutputStream b64Out = new Base64OutputStream(out);
-        copy(in, b64Out);
-        b64Out.close();
+        try (OutputStream b64Out = Base64.getMimeEncoder().wrap(out)) {
+            copy(in, b64Out);
+        }
     }
 
     /**
@@ -102,7 +103,7 @@ public class CodecUtil {
      * @throws IOException
      */
     public static OutputStream wrapBase64(final OutputStream out) throws IOException {
-        return new Base64OutputStream(out);
+        return Base64.getMimeEncoder().wrap(out);
     }
 
 }
