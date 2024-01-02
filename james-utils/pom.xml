@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.apache.james</groupId>
         <artifactId>apache-mime4j-project</artifactId>
-        <version>0.8.11-TITAN-SNAPSHOT</version>
+        <version>0.8.11-TITAN-RELEASE</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
