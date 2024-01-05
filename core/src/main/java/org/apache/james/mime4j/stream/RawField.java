@@ -56,6 +56,29 @@ public final class RawField implements Field {
 
     public RawField(String name, String body) {
         this(null, -1, name, body);
+
+        int pos = 0;
+
+        while (true) {
+            pos = body.indexOf('\r', pos);
+            if (pos < 0) {
+                break;
+            }
+            if (pos < body.length() + 2) {
+                if (body.charAt(pos + 1) != '\n') {
+                    throw new IllegalArgumentException("Injection of un-encoded line breaks inside header field could be assimilated to header injection");
+                }
+                if (pos != body.length() - 2 && !isSpace(body, pos + 2)) {
+                    throw new IllegalArgumentException("Injection of un-encoded line breaks inside header field could be assimilated to header injection");
+                }
+            }
+            pos ++;
+        }
+    }
+
+    private static boolean isSpace(String body, int pos) {
+        return body.charAt(pos) == ' '
+            || body.charAt(pos) == '\t';
     }
 
     public ByteSequence getRaw() {
