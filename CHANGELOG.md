@@ -5,6 +5,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [UNRELEASED]
 
+Bug fixes:
+
+ - Prevent header injection with MIME4J DOM
+ - MIME4J-325 DateTimeParser should throw ParseException if value can't be parsed (#88)
+ - MIME4J-324 Handle URL parsing exception in LenientContentDispositionField
+
+Performance:
+
+ - ContentTypeFieldLenientImpl: clear is not needed (#86)
+ - MIME4J-322 Use ArrayDeque in MimeTokenStream
+ - MIME4J-324 Avoid an extra copy of ContentDispositionFieldLenientImpl parameters
+
 ## [0.8.9] - 2022-12-30
 
 Bug fixes:
