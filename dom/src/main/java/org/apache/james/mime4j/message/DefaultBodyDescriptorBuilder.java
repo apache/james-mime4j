@@ -157,7 +157,9 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
                 actualMimeType = DEFAULT_MIME_TYPE;
             }
         }
-        return new DefaultBodyDescriptorBuilder(actualMimeType, fieldParser, monitor);
+        DefaultBodyDescriptorBuilder child = new DefaultBodyDescriptorBuilder(actualMimeType, fieldParser, monitor);
+        child.setDefaultCharset(defaultCharset);
+        return child;
     }
 
 }
