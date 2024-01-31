@@ -133,10 +133,10 @@ public class MaximalBodyDescriptorTest {
 
         builder.reset();
         bd = builder.build();
-        Assert.assertEquals("us-ascii", bd.getCharset());
+        Assert.assertEquals("US-ASCII", bd.getCharset());
         builder.addField(new RawField("Content-Type ", "text/type"));
         bd = builder.build();
-        Assert.assertEquals("us-ascii", bd.getCharset());
+        Assert.assertEquals("US-ASCII", bd.getCharset());
 
         /*
          * Test boundary.
