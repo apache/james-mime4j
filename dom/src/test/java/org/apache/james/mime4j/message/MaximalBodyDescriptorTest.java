@@ -126,7 +126,7 @@ public class MaximalBodyDescriptorTest {
          * Test charset.
          */
         BodyDescriptor bd = builder.build();
-        Assert.assertEquals("us-ascii", bd.getCharset());
+        Assert.assertEquals("US-ASCII", bd.getCharset());
         builder.addField(new RawField("Content-Type ", "text/type; charset=ISO-8859-1"));
         bd = builder.build();
         Assert.assertEquals("ISO-8859-1", bd.getCharset());
@@ -189,7 +189,7 @@ public class MaximalBodyDescriptorTest {
         BodyDescriptorBuilder builder = new DefaultBodyDescriptorBuilder();
         builder.addField(new RawField("To", "me@example.org"));
         BodyDescriptor bd = builder.build();
-        Assert.assertEquals("us-ascii", bd.getCharset());
+        Assert.assertEquals("US-ASCII", bd.getCharset());
     }
 
     @Test
