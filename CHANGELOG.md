@@ -5,6 +5,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [UNRELEASED]
 
+## [0.8.10] - 2024-02-22
+
+CVE-2024-21742: Mime4J DOM header injection
+
 Bug fixes:
 
  - Prevent header injection with MIME4J DOM
