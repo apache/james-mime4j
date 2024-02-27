@@ -29,7 +29,7 @@
 
     <groupId>org.apache.james</groupId>
     <artifactId>apache-mime4j-project</artifactId>
-    <version>0.8.10-SNAPSHOT</version>
+    <version>0.8.10</version>
     <packaging>pom</packaging>
 
     <name>Apache James :: Mime4j :: Project</name>
