@@ -109,6 +109,18 @@ public class LenientAddressBuilderTest {
     }
 
     @Test
+    public void shouldTolerateMalformedEncoding() throws Exception {
+        String s = "\"=?windows-1251?B?onsonsmekqixrbahkinyv?=\" <atfilpd@louisphaethon.co.ua>";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        Mailbox address = (Mailbox) parser.parseAddress(raw, cursor, RawFieldParser.INIT_BITSET(','));
+
+        Assert.assertEquals("atfilpd@louisphaethon.co.ua", address.getAddress());
+        Assert.assertEquals("ў{(ћЙћ’Ё±\u00AD¶Ў’)т", address.getName());
+    }
+
+    @Test
     public void testParseAddressTruncated() throws Exception {
         String s = "<  some  one  ";
         ByteSequence raw = ContentUtil.encode(s);

@@ -440,7 +440,7 @@ public class RawFieldParser {
 
         String decoded = ContentUtil.decode(dstRaw);
         if (decoded.startsWith("=?")) {
-            decoded = DecoderUtil.decodeEncodedWords(decoded, DecodeMonitor.STRICT);
+            decoded = DecoderUtil.decodeEncodedWords(decoded, DecodeMonitor.SILENT);
         }
 
         dst.append(decoded);
