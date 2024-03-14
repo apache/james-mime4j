@@ -58,6 +58,7 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
     private final Map<String, ParsedField> fields;
     public int headerStartByte;
     public int bodyStartByte;
+    private int bodyEndByte;
 
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
@@ -139,7 +140,7 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
         }
         return new MaximalBodyDescriptor(
                 actualMimeType, actualMediaType, actualSubType, actualBoundary, actualCharset,
-          headerStartByte, bodyStartByte, fields);
+          headerStartByte, bodyStartByte, bodyEndByte, fields);
     }
 
     public BodyDescriptorBuilder newChild() {
@@ -165,5 +166,10 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
     @Override
     public void setBodyStartByte(int bodyStartByte) {
         this.bodyStartByte = bodyStartByte;
+    }
+
+    @Override
+    public void setBodyEndByte(int bodyEndByte) {
+        this.bodyEndByte = bodyEndByte;
     }
 }

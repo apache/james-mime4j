@@ -45,4 +45,6 @@ public interface BodyDescriptor extends ContentDescriptor {
      */
     int getBodyStartByte();
 
+    int getBodyEndByte();
+
 }

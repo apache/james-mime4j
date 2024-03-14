@@ -30,17 +30,18 @@ class BasicBodyDescriptor implements BodyDescriptor {
     private final long contentLength;
     public final int headerStartByte;
     public final int bodyStartByte;
+    public final int bodyEndByte;
 
     BasicBodyDescriptor(
-            final String mimeType,
-            final String mediaType,
-            final String subType,
-            final String boundary,
-            final String charset,
-            final String transferEncoding,
-            final long contentLength,
-            int partHeaderStartByte,
-            int partBodyStartByte) {
+      final String mimeType,
+      final String mediaType,
+      final String subType,
+      final String boundary,
+      final String charset,
+      final String transferEncoding,
+      final long contentLength,
+      int partHeaderStartByte,
+      int partBodyStartByte, int bodyEndByte) {
         super();
         this.mimeType = mimeType;
         this.mediaType = mediaType;
@@ -51,6 +52,7 @@ class BasicBodyDescriptor implements BodyDescriptor {
         this.contentLength = contentLength;
         this.headerStartByte = partHeaderStartByte;
         this.bodyStartByte = partBodyStartByte;
+        this.bodyEndByte = bodyEndByte;
     }
 
     public String getMimeType() {
@@ -91,7 +93,12 @@ class BasicBodyDescriptor implements BodyDescriptor {
         return bodyStartByte;
     }
 
-    @Override
+  @Override
+  public int getBodyEndByte() {
+    return bodyEndByte;
+  }
+
+  @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("[mimeType=");
