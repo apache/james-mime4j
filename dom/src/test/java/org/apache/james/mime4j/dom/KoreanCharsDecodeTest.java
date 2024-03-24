@@ -35,13 +35,13 @@ public class KoreanCharsDecodeTest {
     // This test passes as the value is base64-encoded.
     @Test
     public void testKoreanCharsDecodeBase64Encoded() throws Exception {
-        String sb = "From: foo@bar.com\r\n" +
+        String emlContent = "From: foo@bar.com\r\n" +
                 "To: =?UTF-8?B?7Iuc7ZeY?= <koreantest@example.com>\r\n" +
                 "Content-type: text/html\r\n" +
                 "\r\n" +
                 "<div>foo bar</div>\r\n";
 
-        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(sb.getBytes()));
+        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(emlContent.getBytes()));
         String to = ((Mailbox) parsed.getTo().get(0)).getName();
         assertEquals("시험", to);
     }
@@ -49,13 +49,13 @@ public class KoreanCharsDecodeTest {
     // This test fails as the value is not base64-encoded.
     @Test
     public void testKoreanCharsDecodeNotBase64Encoded() throws Exception {
-        String sb = "From: foo@bar.com\r\n" +
+        String emlContent = "From: foo@bar.com\r\n" +
                 "To: \"시험\" <koreantest@example.com>\r\n" +
                 "Content-type: text/html\r\n" +
                 "\r\n" +
                 "<div>foo bar</div>\r\n";
 
-        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(sb.getBytes()));
+        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(emlContent.getBytes()));
         String to = ((Mailbox) parsed.getTo().get(0)).getName();
         assertEquals("시험", to);
     }
