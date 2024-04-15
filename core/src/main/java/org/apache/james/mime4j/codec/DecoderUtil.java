@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.codec;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
@@ -28,7 +29,6 @@ import java.util.Map;
 
 import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.util.BufferRecycler;
-import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
@@ -122,6 +122,10 @@ public class DecoderUtil {
         return new String(decodedBytes, charset);
     }
 
+    static byte[] decodeByteAryB(String encodedText, DecodeMonitor monitor) throws UnsupportedEncodingException {
+        return decodeBase64(encodedText, monitor);
+    }
+
     /**
      * Decodes an encoded text encoded with the 'Q' encoding (described in
      * RFC 2047) found in a header field body.
@@ -138,6 +142,10 @@ public class DecoderUtil {
 
         byte[] decodedBytes = decodeQuotedPrintable(encodedText, monitor);
         return new String(decodedBytes, charset);
+    }
+
+    static byte[] decodeByteAryQ(String encodedText, DecodeMonitor monitor) throws UnsupportedEncodingException {
+        return decodeQuotedPrintable(replaceUnderscores(encodedText), monitor);
     }
 
     static String decodeEncodedWords(String body)  {
@@ -208,8 +216,11 @@ public class DecoderUtil {
             Map<Charset, Charset> charsetOverrides)
             throws IllegalArgumentException {
 
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         StringBuilder sb = new StringBuilder();
         int position = 0;
+        String mimeCharset ="";
+        String encoding ="";
 
         while (position < body.length()) {
             int startPattern = body.indexOf("=?", position);
@@ -217,6 +228,7 @@ public class DecoderUtil {
                 if (position == 0) {
                     return body;
                 }
+                appendStringBuffer(fallback, charsetOverrides, out, sb, mimeCharset);
                 sb.append(body, position, body.length());
                 break;
             }
@@ -227,29 +239,48 @@ public class DecoderUtil {
 
             if (charsetEnd < 0 || encodingEnd < 0 || encodedTextEnd < 0) {
                 // Invalid pattern
+                appendStringBuffer(fallback, charsetOverrides, out, sb, mimeCharset);
                 sb.append(body, position, startPattern + 2);
                 position = startPattern + 2;
             } else if (encodingEnd == encodedTextEnd) {
+                appendStringBuffer(fallback, charsetOverrides, out, sb, mimeCharset);
                 sb.append(body, position, Math.min(encodedTextEnd + 2, body.length()));
                 position = encodedTextEnd +2;
             } else {
                 String separator = body.substring(position, startPattern);
                 if ((!CharsetUtil.isWhitespace(separator) || position == 0) && !separator.isEmpty()) {
+                    appendStringBuffer(fallback, charsetOverrides, out, sb, mimeCharset);
                     sb.append(separator);
                 }
-                String mimeCharset = body.substring(startPattern + 2, charsetEnd);
-                String encoding = body.substring(charsetEnd + 1, encodingEnd);
+                String mimeCurCharset = body.substring(startPattern + 2, charsetEnd);
+                String curEncoding = body.substring(charsetEnd + 1, encodingEnd);
                 String encodedText = body.substring(encodingEnd + 1, encodedTextEnd);
+
+                if (!mimeCharset.isEmpty() && !mimeCurCharset.equals(mimeCharset)){
+                    appendStringBuffer(fallback, charsetOverrides, out, sb, mimeCharset);
+                }
+
+                if (!encoding.isEmpty() && !curEncoding.equals(encoding)){
+                    appendStringBuffer(fallback, charsetOverrides, out, sb, mimeCharset);
+                }
+
+                mimeCharset=mimeCurCharset;
+                encoding=curEncoding;
 
                 if (encodedText.isEmpty()) {
                     position = encodedTextEnd + 2;
                     continue;
                 }
-                String decoded;
-                decoded = tryDecodeEncodedWord(mimeCharset, encoding, encodedText, monitor, fallback, charsetOverrides);
+                byte []decoded;
+
+                decoded = tryDecodeEncodedWord(mimeCurCharset, curEncoding, encodedText, monitor, fallback, charsetOverrides);
                 if (decoded != null) {
-                    if (!CharsetUtil.isWhitespace(decoded) && !decoded.isEmpty()) {
-                        sb.append(decoded);
+                    if (0 < decoded.length) {
+                        try {
+                            out.write(decoded);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 } else {
                     sb.append(body, startPattern, encodedTextEnd + 2);
@@ -257,11 +288,26 @@ public class DecoderUtil {
                 position = encodedTextEnd + 2;
             }
         }
+        appendStringBuffer(fallback, charsetOverrides, out, sb,mimeCharset);
+
         return sb.toString();
     }
 
+    private static void appendStringBuffer(Charset fallback, Map<Charset, Charset> charsetOverrides, ByteArrayOutputStream out, StringBuilder sb, String mimeCharset) {
+        if (0 < out.size()) {
+            byte[] byTemp = out.toByteArray();
+            Charset charset = lookupCharset(mimeCharset, fallback, charsetOverrides);
+            if (null == charset) {
+                int aaa = 0;
+                System.out.println(aaa);
+            }
+            sb.append(new String(byTemp, charset));
+            out.reset();
+        }
+    }
+
     // return null on error
-    private static String tryDecodeEncodedWord(
+    private static byte[] tryDecodeEncodedWord(
             final String mimeCharset,
             final String encoding,
             final String encodedText,
@@ -283,9 +329,9 @@ public class DecoderUtil {
 
         try {
             if (encoding.equalsIgnoreCase("Q")) {
-                return DecoderUtil.decodeQ(encodedText, charset.name(), monitor);
+                return decodeByteAryQ(encodedText, monitor);
             } else if (encoding.equalsIgnoreCase("B")) {
-                return DecoderUtil.decodeB(encodedText, charset.name(), monitor);
+                return decodeByteAryB(encodedText, monitor);
             } else {
                 monitor(monitor, mimeCharset, encoding, encodedText, "leaving word encoded",
                         "Warning: Unknown encoding in encoded word");
