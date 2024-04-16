@@ -297,10 +297,6 @@ public class DecoderUtil {
         if (0 < out.size()) {
             byte[] byTemp = out.toByteArray();
             Charset charset = lookupCharset(mimeCharset, fallback, charsetOverrides);
-            if (null == charset) {
-                int aaa = 0;
-                System.out.println(aaa);
-            }
             sb.append(new String(byTemp, charset));
             out.reset();
         }
