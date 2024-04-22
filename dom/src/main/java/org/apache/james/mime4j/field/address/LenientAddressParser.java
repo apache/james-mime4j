@@ -152,7 +152,7 @@ public class LenientAddressParser implements AddressParser {
         }
         pos = cursor.getPos();
         current = (char) (buf.byteAt(pos) & 0xff);
-        if (current == AT) {
+        if (current == AT || current == CLOSING_BRACKET) {
             cursor.updatePos(pos + 1);
         } else {
             return createMailbox(openingText, domainList, localPart, null);

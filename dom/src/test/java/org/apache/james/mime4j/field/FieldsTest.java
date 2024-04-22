@@ -21,6 +21,7 @@ package org.apache.james.mime4j.field;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -397,6 +398,14 @@ public class FieldsTest {
         Assert.assertEquals("Resent-To: The Does: JD <john.doe@acme.org>, "
                 + "jane.doe@example.org;, Mary\r\n Smith <mary@example.net>",
                 decode(field));
+    }
+
+    @Test
+    public void testAddressListWhenMailboxAbsentDomain() {
+        Mailbox mailbox = new Mailbox("name1", "localpart", "");
+        AddressListField field = Fields.addressList("To", Collections.singleton(mailbox));
+        Assert.assertEquals(1, field.getAddressList().size());
+        Assert.assertEquals(mailbox, field.getAddressList().get(0));
     }
 
     @Test
