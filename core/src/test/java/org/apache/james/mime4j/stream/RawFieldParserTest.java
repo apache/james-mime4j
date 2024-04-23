@@ -461,4 +461,37 @@ public class RawFieldParserTest {
         org.junit.Assert.assertEquals("simple boundary", params.get(0).getValue());
     }
 
+    @Test
+    public void testRegressionForContentDispositionParsingASCIIonly() {
+        ByteSequence buf = ContentUtil.encode(
+                "Content-Disposition: form-data; name=\"filedata\"; filename=\"Sanity a.doc\"");
+        ParserCursor cursor = new ParserCursor(0, buf.length());
+        List<NameValuePair> params = parser.parseParameters(buf, cursor);
+
+        org.junit.Assert.assertEquals(3, params.size());
+        org.junit.Assert.assertEquals("Content-Disposition: form-data", params.get(0).getName());
+        org.junit.Assert.assertEquals(null, params.get(0).getValue());
+        org.junit.Assert.assertEquals("name", params.get(1).getName());
+        org.junit.Assert.assertEquals("filedata", params.get(1).getValue());
+        org.junit.Assert.assertEquals("filename", params.get(2).getName());
+        org.junit.Assert.assertEquals("Sanity a.doc", params.get(2).getValue());
+   }
+
+    @Test
+    public void testRegressionForContentDispositionParsingUTF8() {
+        ByteSequence buf = ContentUtil.encode(
+                "Content-Disposition: form-data; name=\"filedata\"; filename=\"Sanity ä.doc\"");
+        ParserCursor cursor = new ParserCursor(0, buf.length());
+        List<NameValuePair> params = parser.parseParameters(buf, cursor);
+
+        org.junit.Assert.assertEquals(3, params.size());
+        org.junit.Assert.assertEquals("Content-Disposition: form-data", params.get(0).getName());
+        org.junit.Assert.assertEquals(null, params.get(0).getValue());
+        org.junit.Assert.assertEquals("name", params.get(1).getName());
+        org.junit.Assert.assertEquals("filedata", params.get(1).getValue());
+        org.junit.Assert.assertEquals("filename", params.get(2).getName());
+        org.junit.Assert.assertEquals("Sanity ä.doc", params.get(2).getValue());
+   }
+
+
 }
