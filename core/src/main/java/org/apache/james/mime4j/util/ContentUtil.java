@@ -30,6 +30,7 @@ import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 import org.apache.james.mime4j.Charsets;
@@ -131,7 +132,8 @@ public class ContentUtil {
 
     /**
      * Encodes the specified string into an immutable sequence of bytes using
-     * the US-ASCII charset.
+     * the US-ASCII charset or UTF-8 in case none ASCII characters are in the 
+     * sequence.
      *
      * @param string
      *            string to encode.
@@ -140,6 +142,9 @@ public class ContentUtil {
     public static ByteSequence encode(CharSequence string) {
         if (string == null) {
             return null;
+        }
+        if (!CharsetUtil.isASCII(string)) {
+            return encode(StandardCharsets.UTF_8, string);
         }
         ByteArrayBuffer buf = new ByteArrayBuffer(string.length());
         for (int i = 0; i < string.length(); i++) {

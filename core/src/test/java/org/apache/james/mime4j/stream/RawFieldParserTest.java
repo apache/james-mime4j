@@ -26,7 +26,6 @@ import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class RawFieldParserTest {
@@ -478,8 +477,7 @@ public class RawFieldParserTest {
 
     @Test
     public void testRegressionForContentDispositionParsingUTF8() {
-        ByteSequence buf = ContentUtil.encode(StandardCharsets.UTF_8, 
-                "name=\"filedata\"; filename=\"Sanity ä.doc\"");
+        ByteSequence buf = ContentUtil.encode("name=\"filedata\"; filename=\"Sanity ä.doc\"");
         ParserCursor cursor = new ParserCursor(0, buf.length());
         List<NameValuePair> params = parser.parseParameters(buf, cursor);
 

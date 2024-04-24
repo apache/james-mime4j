@@ -19,14 +19,12 @@
 
 package org.apache.james.mime4j.field;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
-import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
@@ -37,11 +35,6 @@ public class LenientContentDispositionFieldTest {
     static ContentDispositionField parse(final String s) throws MimeException {
         ByteSequence raw = ContentUtil.encode(s);
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
-        return ContentDispositionFieldLenientImpl.PARSER.parse(rawField, null);
-    }
-
-    static ContentDispositionField parse(final byte[] raw) throws MimeException {
-        RawField rawField = RawFieldParser.DEFAULT.parseField(new ByteArrayBuffer(raw, true));
         return ContentDispositionFieldLenientImpl.PARSER.parse(rawField, null);
     }
 
@@ -120,35 +113,25 @@ public class LenientContentDispositionFieldTest {
 
     @Test
     public void testGetFilenameEncoded() throws Exception {
-        byte[] data = ("Content-Disposition: attachment;\n" +
-            " FileName=\"=?WINDOWS-1251?Q?3244659=5F=C0=EA=F2_=E7=E0_=C8=FE=EB=FC_?=\n" +
-            " =?WINDOWS-1251?Q?2020.pdf?=\"")
-            .getBytes(StandardCharsets.UTF_8);
-
-        ContentDispositionField f = parse(data);
+        ContentDispositionField f = parse("Content-Disposition: attachment;\n" +
+        " FileName=\"=?WINDOWS-1251?Q?3244659=5F=C0=EA=F2_=E7=E0_=C8=FE=EB=FC_?=\n" +
+        " =?WINDOWS-1251?Q?2020.pdf?=\"");
 
         Assert.assertEquals("WINDOWS-1251 Q encoded filename", "3244659_Акт за Июль 2020.pdf", f.getFilename());
     }
 
     @Test
     public void testGetFilenameUtf8() throws Exception {
-        byte[] data =
-            "Content-Disposition: attachment; filename=\"УПД ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"СТАНЦИЯ ВИРТУАЛЬНАЯ\" 01-05-21.pdf\""
-            .getBytes(StandardCharsets.UTF_8);
-
-        ContentDispositionField f = parse(data);
+        ContentDispositionField f = parse("Content-Disposition: attachment; filename=\"УПД ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \\\"СТАНЦИЯ ВИРТУАЛЬНАЯ\\\" 01-05-21.pdf\"");
 
         Assert.assertEquals("UTF8 encoded filename", "УПД ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ \"СТАНЦИЯ ВИРТУАЛЬНАЯ\" 01-05-21.pdf", f.getFilename());
     }
 
     @Test
     public void testGetFilenameMultipartUtf8() throws Exception {
-        byte[] data = ("Content-Disposition: attachment;\n" +
-            "	filename*0*=\"UTF-8''%D0%A0%D0%BE%D1%81%D1%82%D0%B5%D0%BB%D0%B5%D0%BA%D0%BE\";\n" +
-            "	filename*1*=\"%D0%BC%2E%78%6C%73%78\"\n")
-            .getBytes(StandardCharsets.UTF_8);
-
-        ContentDispositionField f = parse(data);
+        ContentDispositionField f = parse("Content-Disposition: attachment;\n" +
+        "	filename*0*=\"UTF-8''%D0%A0%D0%BE%D1%81%D1%82%D0%B5%D0%BB%D0%B5%D0%BA%D0%BE\";\n" +
+        "	filename*1*=\"%D0%BC%2E%78%6C%73%78\"\n");
         Assert.assertEquals("Ростелеком.xlsx", f.getFilename());
     }
 
