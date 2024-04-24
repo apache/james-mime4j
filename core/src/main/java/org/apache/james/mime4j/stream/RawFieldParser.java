@@ -237,23 +237,31 @@ public class RawFieldParser {
      * @return filename value or {@code null}.
      */
     private String parseUtf8Filename(ByteSequence buf, final ParserCursor cursor) {
-        final String prefix = "filename=\"";
-        if (cursor.getPos() < prefix.length()) {
+        final String prefix = "filename=";
+        if (cursor.getPos() < prefix.length() || cursor.atEnd()) {
             return null;
         }
         //ensure filename prefix is right before the current cursor position
-        for (int pos = prefix.length(); pos >= 0; --pos) {
+        for (int pos = prefix.length(); pos > 0; --pos) {
             char current = (char) (buf.byteAt(cursor.getPos() - pos) & 0xff);
             if (current != prefix.charAt(prefix.length() - pos)) {
                 return null;
             }
         }
 
-        byte[] bytes = new byte[cursor.getUpperBound() - cursor.getPos()];
-        for (int pos = cursor.getPos(); pos < cursor.getUpperBound(); ++pos){
-            bytes[pos - cursor.getPos()] = buf.byteAt(pos);
+        int pos = cursor.getPos();
+        int indexFrom = cursor.getPos();
+        int indexTo = cursor.getUpperBound() - 1;
+        char current = (char) (buf.byteAt(pos) & 0xff);
+        char last = (char) (buf.byteAt(cursor.getUpperBound() - 1) & 0xff);
+        if (current != '\"' || last != '\"') {
+            return null;
         }
-        return new String(bytes, StandardCharsets.UTF_8);
+        pos++;
+        indexFrom++;
+
+        cursor.updatePos(cursor.getUpperBound());
+        return ContentUtil.decode(buf, indexFrom, indexTo - indexFrom, StandardCharsets.UTF_8);
     }
 
     /**

@@ -26,6 +26,7 @@ import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class RawFieldParserTest {
@@ -464,33 +465,29 @@ public class RawFieldParserTest {
     @Test
     public void testRegressionForContentDispositionParsingASCIIonly() {
         ByteSequence buf = ContentUtil.encode(
-                "Content-Disposition: form-data; name=\"filedata\"; filename=\"Sanity a.doc\"");
+                "name=\"filedata\"; filename=\"Sanity a.doc\"");
         ParserCursor cursor = new ParserCursor(0, buf.length());
         List<NameValuePair> params = parser.parseParameters(buf, cursor);
 
-        org.junit.Assert.assertEquals(3, params.size());
-        org.junit.Assert.assertEquals("Content-Disposition: form-data", params.get(0).getName());
-        org.junit.Assert.assertEquals(null, params.get(0).getValue());
-        org.junit.Assert.assertEquals("name", params.get(1).getName());
-        org.junit.Assert.assertEquals("filedata", params.get(1).getValue());
-        org.junit.Assert.assertEquals("filename", params.get(2).getName());
-        org.junit.Assert.assertEquals("Sanity a.doc", params.get(2).getValue());
+        org.junit.Assert.assertEquals(2, params.size());
+        org.junit.Assert.assertEquals("name", params.get(0).getName());
+        org.junit.Assert.assertEquals("filedata", params.get(0).getValue());
+        org.junit.Assert.assertEquals("filename", params.get(1).getName());
+        org.junit.Assert.assertEquals("Sanity a.doc", params.get(1).getValue());
    }
 
     @Test
     public void testRegressionForContentDispositionParsingUTF8() {
-        ByteSequence buf = ContentUtil.encode(
-                "Content-Disposition: form-data; name=\"filedata\"; filename=\"Sanity ä.doc\"");
+        ByteSequence buf = ContentUtil.encode(StandardCharsets.UTF_8, 
+                "name=\"filedata\"; filename=\"Sanity ä.doc\"");
         ParserCursor cursor = new ParserCursor(0, buf.length());
         List<NameValuePair> params = parser.parseParameters(buf, cursor);
 
-        org.junit.Assert.assertEquals(3, params.size());
-        org.junit.Assert.assertEquals("Content-Disposition: form-data", params.get(0).getName());
-        org.junit.Assert.assertEquals(null, params.get(0).getValue());
-        org.junit.Assert.assertEquals("name", params.get(1).getName());
-        org.junit.Assert.assertEquals("filedata", params.get(1).getValue());
-        org.junit.Assert.assertEquals("filename", params.get(2).getName());
-        org.junit.Assert.assertEquals("Sanity ä.doc", params.get(2).getValue());
+        org.junit.Assert.assertEquals(2, params.size());
+        org.junit.Assert.assertEquals("name", params.get(0).getName());
+        org.junit.Assert.assertEquals("filedata", params.get(0).getValue());
+        org.junit.Assert.assertEquals("filename", params.get(1).getName());
+        org.junit.Assert.assertEquals("Sanity ä.doc", params.get(1).getValue());
    }
 
 
