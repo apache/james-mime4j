@@ -195,12 +195,6 @@ public class RawFieldParser {
      *  is not delimited by any character.
      */
     public String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        if (!CharsetUtil.isASCII(buf)) {
-            String value = parseUtf8Filename(buf);
-            if (value != null)
-                return value;
-        }
-
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
@@ -227,25 +221,6 @@ public class RawFieldParser {
             }
         }
         return dst.toString();
-    }
-
-    /**
-     * Special case for parsing {@code filename} attribute in nonstandard encoding like:
-     * {@code Content-Disposition: attachment; filename="УПД ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ "СТАНЦИЯ ВИРТУАЛЬНАЯ" 01-05-21.pdf"}
-     * 
-     * @param buf field raw.
-     * @return filename value or {@code null}.
-     */
-    private String parseUtf8Filename(ByteSequence buf) {
-        final String value = new String(buf.toByteArray(), StandardCharsets.UTF_8);
-
-        final String prefix = "filename=\"";
-        final int pos = value.indexOf(prefix);
-        if (pos > 0) {
-            return value.substring(pos + prefix.length(), value.length() - 1);
-        }
-        
-        return null;
     }
 
     /**
@@ -379,16 +354,22 @@ public class RawFieldParser {
         int pos = cursor.getPos();
         int indexFrom = cursor.getPos();
         int indexTo = cursor.getUpperBound();
+
+        ByteArrayBuffer dstRaw = new ByteArrayBuffer(indexTo - indexFrom);
+
         for (int i = indexFrom; i < indexTo; i++) {
-            char current = (char) (buf.byteAt(i) & 0xff);
+            byte currentByte = buf.byteAt(i);
+            char current = (char) (currentByte & 0xff);
             if ((delimiters != null && delimiters.get(current))
                     || CharsetUtil.isWhitespace(current) || current == '(' || current == '\"') {
                 break;
             } else {
                 pos++;
-                dst.append(current);
+                dstRaw.append(currentByte);
             }
         }
+        String decoded = CharsetUtil.isASCII(dstRaw) ? ContentUtil.decode(dstRaw) : ContentUtil.decode(StandardCharsets.UTF_8, dstRaw);
+        dst.append(decoded);
         cursor.updatePos(pos);
     }
 
@@ -414,16 +395,17 @@ public class RawFieldParser {
         pos++;
         indexFrom++;
 
-        ByteArrayBuffer dstRaw = new ByteArrayBuffer(200);
+        ByteArrayBuffer dstRaw = new ByteArrayBuffer(indexTo - indexFrom);
 
         boolean escaped = false;
         for (int i = indexFrom; i < indexTo; i++, pos++) {
-            current = (char) (buf.byteAt(i) & 0xff);
+            byte currentByte = buf.byteAt(i);
+            current = (char) (currentByte & 0xff);
             if (escaped) {
                 if (current != '\"' && current != '\\') {
                     dstRaw.append('\\');
                 }
-                dstRaw.append(current);
+                dstRaw.append(currentByte);
                 escaped = false;
             } else {
                 if (current == '\"') {
@@ -433,12 +415,12 @@ public class RawFieldParser {
                 if (current == '\\') {
                     escaped = true;
                 } else if (current != '\r' && current != '\n') {
-                    dstRaw.append(current);
+                    dstRaw.append(currentByte);
                 }
             }
         }
 
-        String decoded = ContentUtil.decode(dstRaw);
+        String decoded = CharsetUtil.isASCII(dstRaw) ? ContentUtil.decode(dstRaw) : ContentUtil.decode(StandardCharsets.UTF_8, dstRaw);
         if (decoded.startsWith("=?")) {
             decoded = DecoderUtil.decodeEncodedWords(decoded, DecodeMonitor.SILENT);
         }
