@@ -44,6 +44,14 @@ public class UnstructuredFieldTest {
     }
 
     @Test
+    public void testUnfoldWithEqualSign() throws Exception {
+        UnstructuredField f = (UnstructuredField) DefaultFieldParser.parse("\n" +
+            "References: <CAMpLFpB=uu_mqGwf5RToWqCfkd9cmZKBoJ782872YDgfp1d2sA@mail.gmail.com>\n" +
+            " <CAMpLFpCVygEwb+t=FmD6TqiDLrQHkREvh=_2=ZinF8WH1-yxbQ@mail.gmail.com>\r\n");
+        Assert.assertEquals("<CAMpLFpB=uu_mqGwf5RToWqCfkd9cmZKBoJ782872YDgfp1d2sA@mail.gmail.com> <CAMpLFpCVygEwb+t=FmD6TqiDLrQHkREvh=_2=ZinF8WH1-yxbQ@mail.gmail.com>", f.getValue());
+    }
+
+    @Test
     public void testGetBodyUtf8() throws Exception {
         UnstructuredField f;
 
