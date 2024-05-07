@@ -108,6 +108,20 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals("=?utf-8?Q?Dupont,_Gr=C3=A9goire", mailbox.getName());
     }
 
+    @Test // MIME4J-327
+    public void testNameUTF8Support() throws Exception {
+        String s = "\"시험\" <koreantest@example.com>";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, raw.length());
+
+        Address address = parser.parseAddress(raw, cursor, RawFieldParser.INIT_BITSET(','));
+        Assert.assertNotNull(address);
+        Assert.assertTrue(address instanceof Mailbox);
+        Mailbox mailbox = (Mailbox) address;
+        Assert.assertEquals("시험", mailbox.getName());
+        Assert.assertEquals("koreantest@example.com", mailbox.getAddress());
+    }
+
     @Test
     public void shouldTolerateMalformedEncoding() throws Exception {
         String s = "\"=?windows-1251?B?onsonsmekqixrbahkinyv?=\" <atfilpd@louisphaethon.co.ua>";
