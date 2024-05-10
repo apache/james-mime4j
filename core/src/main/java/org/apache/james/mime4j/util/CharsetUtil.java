@@ -57,6 +57,23 @@ public class CharsetUtil {
     }
 
     /**
+     * Returns <code>true</code> if the specified byte array consists entirely of
+     * US ASCII characters.
+     *
+     * @param raw
+     *            byte array to test.
+     * @return <code>true</code> if the specified string consists entirely of
+     *         US ASCII characters, <code>false</code> otherwise.
+     */
+    public static boolean isASCII(ByteSequence raw) {
+        for (int i = 0; i < raw.length(); i++) {
+            if (!isASCII((char) (raw.byteAt(i) & 0xff)))
+                return false;
+        }
+        return true;
+    }
+
+    /**
      * Returns <code>true</code> if the specified string consists entirely of
      * US ASCII characters.
      *
@@ -78,6 +95,27 @@ public class CharsetUtil {
         return true;
     }
 
+    /**
+     * Returns <code>true</code> if the specified string consists entirely of
+     * US ASCII characters.
+     *
+     * @param s
+     *            string to test.
+     * @return <code>true</code> if the specified string consists entirely of
+     *         US ASCII characters, <code>false</code> otherwise.
+     */
+    public static boolean isASCII(final CharSequence s) {
+        if (s == null) {
+            throw new IllegalArgumentException("String may not be null");
+        }
+        final int len = s.length();
+        for (int i = 0; i < len; i++) {
+            if (!isASCII(s.charAt(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
     /**
      * Returns <code>true</code> if the specified character is a whitespace
      * character (CR, LF, SP or HT).

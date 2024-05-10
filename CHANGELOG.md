@@ -3,7 +3,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
-## [UNRELEASED]
+## [0.8.11] - 2024-03-05
+
+ - MIME4J-326 SILENT monitor for header decoding
+
+## [0.8.10] - 2024-02-22
+
+CVE-2024-21742: Mime4J DOM header injection
+
+Bug fixes:
+
+ - Prevent header injection with MIME4J DOM
+ - MIME4J-325 DateTimeParser should throw ParseException if value can't be parsed (#88)
+ - MIME4J-324 Handle URL parsing exception in LenientContentDispositionField
+
+Performance:
+
+ - ContentTypeFieldLenientImpl: clear is not needed (#86)
+ - MIME4J-322 Use ArrayDeque in MimeTokenStream
+ - MIME4J-324 Avoid an extra copy of ContentDispositionFieldLenientImpl parameters
 
 ## [0.8.9] - 2022-12-30
 

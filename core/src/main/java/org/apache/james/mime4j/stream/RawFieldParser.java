@@ -19,11 +19,15 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.codec.DecoderUtil;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -350,16 +354,22 @@ public class RawFieldParser {
         int pos = cursor.getPos();
         int indexFrom = cursor.getPos();
         int indexTo = cursor.getUpperBound();
+
+        ByteArrayBuffer dstRaw = new ByteArrayBuffer(indexTo - indexFrom);
+
         for (int i = indexFrom; i < indexTo; i++) {
-            char current = (char) (buf.byteAt(i) & 0xff);
+            byte currentByte = buf.byteAt(i);
+            char current = (char) (currentByte & 0xff);
             if ((delimiters != null && delimiters.get(current))
                     || CharsetUtil.isWhitespace(current) || current == '(' || current == '\"') {
                 break;
             } else {
                 pos++;
-                dst.append(current);
+                dstRaw.append(currentByte);
             }
         }
+        String decoded = CharsetUtil.isASCII(dstRaw) ? ContentUtil.decode(dstRaw) : ContentUtil.decode(StandardCharsets.UTF_8, dstRaw);
+        dst.append(decoded);
         cursor.updatePos(pos);
     }
 
@@ -384,14 +394,18 @@ public class RawFieldParser {
         }
         pos++;
         indexFrom++;
+
+        ByteArrayBuffer dstRaw = new ByteArrayBuffer(indexTo - indexFrom);
+
         boolean escaped = false;
         for (int i = indexFrom; i < indexTo; i++, pos++) {
-            current = (char) (buf.byteAt(i) & 0xff);
+            byte currentByte = buf.byteAt(i);
+            current = (char) (currentByte & 0xff);
             if (escaped) {
                 if (current != '\"' && current != '\\') {
-                    dst.append('\\');
+                    dstRaw.append('\\');
                 }
-                dst.append(current);
+                dstRaw.append(currentByte);
                 escaped = false;
             } else {
                 if (current == '\"') {
@@ -401,10 +415,18 @@ public class RawFieldParser {
                 if (current == '\\') {
                     escaped = true;
                 } else if (current != '\r' && current != '\n') {
-                    dst.append(current);
+                    dstRaw.append(currentByte);
                 }
             }
         }
+
+        String decoded = CharsetUtil.isASCII(dstRaw) ? ContentUtil.decode(dstRaw) : ContentUtil.decode(StandardCharsets.UTF_8, dstRaw);
+        if (decoded.startsWith("=?")) {
+            decoded = DecoderUtil.decodeEncodedWords(decoded, DecodeMonitor.SILENT);
+        }
+
+        dst.append(decoded);
+
         cursor.updatePos(pos);
     }
 
