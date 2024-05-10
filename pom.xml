@@ -70,12 +70,12 @@
         <repository>
             <id>olympus.maven.releases</id>
             <name>Olympus Release Repository</name>
-            <url>http://ci.aws.talk.to:8081/nexus/content/repositories/releases</url>
+            <url>https://maven.ops.flock.com:8081/nexus/content/repositories/releases</url>
         </repository>
         <snapshotRepository>
             <id>olympus.maven.snapshots</id>
             <name>Olympus Snapshot Repository</name>
-            <url>http://ci.aws.talk.to:8081/nexus/content/repositories/snapshots</url>
+            <url>https://maven.ops.flock.com:8081/nexus/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
