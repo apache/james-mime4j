@@ -30,6 +30,7 @@ import java.lang.ref.SoftReference;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 import org.apache.james.mime4j.Charsets;
@@ -131,7 +132,8 @@ public class ContentUtil {
 
     /**
      * Encodes the specified string into an immutable sequence of bytes using
-     * the US-ASCII charset.
+     * the US-ASCII charset or UTF-8 in case none ASCII characters are in the 
+     * sequence.
      *
      * @param string
      *            string to encode.
@@ -140,6 +142,9 @@ public class ContentUtil {
     public static ByteSequence encode(CharSequence string) {
         if (string == null) {
             return null;
+        }
+        if (!CharsetUtil.isASCII(string)) {
+            return encode(StandardCharsets.UTF_8, string);
         }
         ByteArrayBuffer buf = new ByteArrayBuffer(string.length());
         for (int i = 0; i < string.length(); i++) {
@@ -221,6 +226,37 @@ public class ContentUtil {
             underlying[i - offset] = (char) (byteSequence.byteAt(i) & 0xff);
         }
         return new String(underlying);
+    }
+
+    /**
+     * Decodes a sub-sequence of the specified sequence of bytes into a string
+     * using the US-ASCII charset with falling back to {@link #decode(Charset, ByteSequence, int, int)} 
+     * on a first non US-ASCII character.
+     * 
+     * @param byteSequence
+     *            sequence of bytes to decode.
+     * @param offset
+     *            offset into the byte sequence.
+     * @param length
+     *            number of bytes.
+     * @param charset
+     *            fallback charset.
+     * @return decoded string.
+     */
+    public static String decode(ByteSequence byteSequence, int offset, int length, Charset charset) {
+        if (byteSequence == null) {
+            return null;
+        }
+
+        StringBuilder buf = new StringBuilder(length);
+        for (int i = offset; i < offset + length; i++) {
+            char ch = (char) (byteSequence.byteAt(i) & 0xff);
+            if (!CharsetUtil.isASCII(ch)) {
+                return decode(charset, byteSequence, offset, length);
+            }
+            buf.append(ch);
+        }
+        return buf.toString();
     }
 
     /**

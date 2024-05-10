@@ -36,6 +36,13 @@ public class DecoderUtilTest {
     }
 
     @Test
+    public void testDoubleLineBEncoding() {
+        String s = DecoderUtil.decodeEncodedWords("=?utf-8?B?W1NQQU1dIFJlOiBbbWNsb3VkLWJhcmlzdGFdIO2BtOudvOyasOuTnOuwlOumrOyKpO2DgCA37LCoIO2WieyCrC3rsJztkQ==?=\n" +
+            "=?utf-8?B?nOyekOujjCDtj6zrqacg6rO17Jyg?= ", DecodeMonitor.STRICT);
+        Assert.assertEquals("[SPAM] Re: [mcloud-barista] 클라우드바리스타 7차 행사-발표자료 포멧 공유 ", s);
+    }
+
+    @Test
     public void testDecodeQ() throws UnsupportedEncodingException {
         String s = DecoderUtil.decodeQ("=e1_=e2=09=E3_=E4_", "ISO8859-1", DecodeMonitor.STRICT);
         Assert.assertEquals("\u00e1 \u00e2\t\u00e3 \u00e4 ", s);

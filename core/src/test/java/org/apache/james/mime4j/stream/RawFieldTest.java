@@ -19,6 +19,9 @@
 
 package org.apache.james.mime4j.stream;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+
 import junit.framework.Assert;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -45,11 +48,11 @@ public class RawFieldTest {
         Assert.assertEquals("stuff", field1.getBody());
         Assert.assertEquals("raw: stuff", field1.toString());
 
-        RawField field2 = new RawField("raw", null);
+        RawField field2 = new RawField("raw", "any");
         Assert.assertNull(field2.getRaw());
         Assert.assertEquals("raw", field2.getName());
-        Assert.assertEquals(null, field2.getBody());
-        Assert.assertEquals("raw: ", field2.toString());
+        Assert.assertEquals("any", field2.getBody());
+        Assert.assertEquals("raw: any", field2.toString());
     }
 
     @Test
@@ -61,6 +64,37 @@ public class RawFieldTest {
         Assert.assertEquals("raw", field.getName());
         Assert.assertEquals("stuff;  more stuff", field.getBody());
         Assert.assertEquals(s, field.toString());
+    }
+
+    @Test
+    public void shouldRejectAmbiguousLineEnding() {
+        assertThatThrownBy(() -> new RawField("Name", "Value\r\ncheating")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldAcceptCRLFTerminatedHeader() {
+        assertThatCode(() -> new RawField("Name", "Value\r\n")).doesNotThrowAnyException();
+    }
+
+    @Test
+    public void shouldAcceptTabFolding() {
+        assertThatCode(() -> new RawField("Name", "Value\r\n\thello")).doesNotThrowAnyException();
+    }
+
+    @Test
+    public void shouldAcceptSpaceFolding() {
+        assertThatCode(() -> new RawField("Name", "Value\r\n hello")).doesNotThrowAnyException();
+    }
+
+    @Test
+    public void shouldAcceptOnlyDelimiter() {
+        assertThatCode(() -> new RawField("Name", "\r\n")).doesNotThrowAnyException();
+    }
+
+
+    @Test
+    public void shouldAcceptNoDelimiter() {
+        assertThatCode(() -> new RawField("Name", "Value")).doesNotThrowAnyException();
     }
 
 }

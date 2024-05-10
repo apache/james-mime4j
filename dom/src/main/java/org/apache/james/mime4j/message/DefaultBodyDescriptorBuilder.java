@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.message;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -56,9 +58,10 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
     private final DecodeMonitor monitor;
     private final FieldParser<? extends ParsedField> fieldParser;
     private final Map<String, ParsedField> fields;
-    public int headerStartByte;
-    public int bodyStartByte;
+    private int headerStartByte;
+    private int bodyStartByte;
     private int bodyEndByte;
+    private Charset defaultCharset = StandardCharsets.US_ASCII;
 
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
@@ -83,6 +86,10 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
         this.fieldParser = fieldParser != null ? fieldParser : DefaultFieldParser.getParser();
         this.monitor = monitor != null ? monitor : DecodeMonitor.SILENT;
         this.fields = new HashMap<String, ParsedField>();
+    }
+
+    public void setDefaultCharset(Charset charset) {
+        this.defaultCharset = charset;
     }
 
     public void reset() {
@@ -133,7 +140,7 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
             }
         }
         if (actualCharset == null && MEDIA_TYPE_TEXT.equals(actualMediaType)) {
-            actualCharset = US_ASCII;
+            actualCharset = defaultCharset.name();
         }
         if (!MimeUtil.isMultipart(actualMimeType)) {
             actualBoundary = null;
@@ -155,7 +162,9 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
                 actualMimeType = DEFAULT_MIME_TYPE;
             }
         }
-        return new DefaultBodyDescriptorBuilder(actualMimeType, fieldParser, monitor);
+        DefaultBodyDescriptorBuilder child = new DefaultBodyDescriptorBuilder(actualMimeType, fieldParser, monitor);
+        child.setDefaultCharset(defaultCharset);
+        return child;
     }
 
     @Override

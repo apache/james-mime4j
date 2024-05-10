@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.Message;
@@ -45,6 +46,16 @@ public class DefaultMessageWriterTest {
                 "Subject: Cool subject\r\n" +
                 "\r\n" +
                 "this is the body");
+    }
+    
+    @Test
+    public void shouldThrowOnHeaderInjectionAttempt() throws Exception {
+        Message.Builder builder = Message.Builder.of()
+            .setBody("this is the body", Charsets.UTF_8)
+            .setFrom("sender@localhost");
+
+        assertThatThrownBy(() -> builder.setContentTransferEncoding("victim@attacker.com\r\nReply-To: attacker@evil.com"))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
 }

@@ -19,7 +19,11 @@
 
 package org.apache.james.mime4j.field;
 
+import java.nio.charset.StandardCharsets;
+
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -37,6 +41,24 @@ public class UnstructuredFieldTest {
 
         f = (UnstructuredField) DefaultFieldParser.parse("Subject:yada");
         Assert.assertEquals("Testing value without a leading ' '", "yada", f.getValue());
+    }
+
+    @Test
+    public void testUnfoldWithEqualSign() throws Exception {
+        UnstructuredField f = (UnstructuredField) DefaultFieldParser.parse("\n" +
+            "References: <CAMpLFpB=uu_mqGwf5RToWqCfkd9cmZKBoJ782872YDgfp1d2sA@mail.gmail.com>\n" +
+            " <CAMpLFpCVygEwb+t=FmD6TqiDLrQHkREvh=_2=ZinF8WH1-yxbQ@mail.gmail.com>\r\n");
+        Assert.assertEquals("<CAMpLFpB=uu_mqGwf5RToWqCfkd9cmZKBoJ782872YDgfp1d2sA@mail.gmail.com> <CAMpLFpCVygEwb+t=FmD6TqiDLrQHkREvh=_2=ZinF8WH1-yxbQ@mail.gmail.com>", f.getValue());
+    }
+
+    @Test
+    public void testGetBodyUtf8() throws Exception {
+        UnstructuredField f;
+
+        byte[] data = "Subject: Счет для ООО \"СТАНЦИЯ ВИРТУАЛЬНАЯ\" от ООО \"Цифровые системы\"".getBytes(StandardCharsets.UTF_8);
+
+        f = (UnstructuredField) DefaultFieldParser.parse(new ByteArrayBuffer(data, true), DecodeMonitor.SILENT);
+        Assert.assertEquals("Testing UTF8 value 1", "Счет для ООО \"СТАНЦИЯ ВИРТУАЛЬНАЯ\" от ООО \"Цифровые системы\"", f.getValue());
     }
 
 }
