@@ -25,23 +25,30 @@ import org.junit.Test;
 public class MimeUtilTest {
 
     @Test
-    public void testFold() throws Exception {
+    public void testFold() {
+        Assert.assertEquals("this\r\n is\r\n a\r\n test", MimeUtil.fold("this is a test", 0, 4));
+        Assert.assertEquals("this\r\n is a\r\n test", MimeUtil.fold("this is a test", 0, 5));
+        Assert.assertEquals("this\r\n is\r\n a\r\n test", MimeUtil.fold("this is a test", 1, 4));
+    }
+
+    @Test
+    public void testFoldWithDefaultMaxCharacters() {
         Assert.assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 68));
         Assert.assertEquals("this is\r\n a test", MimeUtil.fold("this is a test", 69));
         Assert.assertEquals("this\r\n is a test", MimeUtil.fold("this is a test", 70));
         Assert.assertEquals("this  \r\n   is a test", MimeUtil.fold(
-                "this     is a test", 70));
+            "this     is a test", 70));
     }
 
     @Test
     public void testFoldOverlyLongNonWhitespace() throws Exception {
         String ninety = "1234567890123456789012345678901234567890"
-                + "12345678901234567890123456789012345678901234567890";
+            + "12345678901234567890123456789012345678901234567890";
         String input = String.format("testing 1 2 %s testing %s", ninety,
-                ninety);
+            ninety);
 
         String expected = String.format(
-                "testing 1 2\r\n %s\r\n testing\r\n %s", ninety, ninety);
+            "testing 1 2\r\n %s\r\n testing\r\n %s", ninety, ninety);
 
         Assert.assertEquals(expected, MimeUtil.fold(input, 0));
     }
@@ -65,10 +72,10 @@ public class MimeUtilTest {
         Assert.assertEquals("this is a test", MimeUtil.unfold("this is\r\n a test"));
         Assert.assertEquals("this is a test", MimeUtil.unfold("this\r\n is a test"));
         Assert.assertEquals("this     is a test", MimeUtil
-                .unfold("this  \r\n   is a test"));
+            .unfold("this  \r\n   is a test"));
 
         Assert.assertEquals("this is a test", MimeUtil
-                .unfold("this\r\n is\r\n a\r\n test"));
+            .unfold("this\r\n is\r\n a\r\n test"));
     }
 
 }

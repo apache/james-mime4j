@@ -73,6 +73,10 @@ public final class MimeUtil {
      * The <code>7bit</code> encoding.
      */
     public static final String ENC_7BIT = "7bit";
+    /**
+     * The default maximum number of characters.
+     */
+    public static final int DEFAULT_MAX_CHARACTERS = 76;
 
     // used to create unique ids
     private static final Random random = new Random();
@@ -203,10 +207,10 @@ public final class MimeUtil {
 
     /**
      * Splits the specified string into a multiple-line representation with
-     * lines no longer than 76 characters (because the line might contain
+     * lines no longer than the maximum number of characters (because the line might contain
      * encoded words; see <a href='http://www.faqs.org/rfcs/rfc2047.html'>RFC
      * 2047</a> section 2). If the string contains non-whitespace sequences
-     * longer than 76 characters a line break is inserted at the whitespace
+     * longer than the maximum number of characters a line break is inserted at the whitespace
      * character following the sequence resulting in a line longer than 76
      * characters.
      *
@@ -215,11 +219,11 @@ public final class MimeUtil {
      * @param usedCharacters
      *            number of characters already used up. Usually the number of
      *            characters for header field name plus colon and one space.
+     * @param maxCharacters
+     *            maximum number of characters
      * @return a multiple-line representation of the given string.
      */
-    public static String fold(String s, int usedCharacters) {
-        final int maxCharacters = 76;
-
+    public static String fold(String s, int usedCharacters, int maxCharacters) {
         final int length = s.length();
         if (usedCharacters + length <= maxCharacters)
             return s;
@@ -247,6 +251,26 @@ public final class MimeUtil {
     }
 
     /**
+     * Splits the specified string into a multiple-line representation with
+     * lines no longer than 76 characters (because the line might contain
+     * encoded words; see <a href='http://www.faqs.org/rfcs/rfc2047.html'>RFC
+     * 2047</a> section 2). If the string contains non-whitespace sequences
+     * longer than 76 characters a line break is inserted at the whitespace
+     * character following the sequence resulting in a line longer than 76
+     * characters.
+     *
+     * @param s
+     *            string to split.
+     * @param usedCharacters
+     *            number of characters already used up. Usually the number of
+     *            characters for header field name plus colon and one space.
+     * @return a multiple-line representation of the given string.
+     */
+    public static String fold(String s, int usedCharacters) {
+        return fold(s, usedCharacters, DEFAULT_MAX_CHARACTERS);
+    }
+
+    /**
      * Unfold a multiple-line representation into a single line.
      *
      * @param s
@@ -266,7 +290,7 @@ public final class MimeUtil {
     }
 
     /**
-    Unfold and decode header value
+     Unfold and decode header value
      */
     public static String unscrambleHeaderValue(String headerValue) {
         return DecoderUtil.decodeEncodedWords(
