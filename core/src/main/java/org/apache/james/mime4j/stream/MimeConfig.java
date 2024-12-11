@@ -27,7 +27,7 @@ import org.apache.james.mime4j.MimeException;
 public final class MimeConfig {
 
     public static final MimeConfig PERMISSIVE = MimeConfig.custom()
-        .setMaxContentLen(150 * 1024 * 1024)
+        .setMaxContentLen(250 * 1024 * 1024)
         .setMaxHeaderCount(-1)
         .setMaxHeaderLen(-1)
         .setMaxLineLen(-1)
