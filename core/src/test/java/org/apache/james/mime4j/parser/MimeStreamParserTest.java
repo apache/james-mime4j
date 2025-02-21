@@ -21,6 +21,7 @@ package org.apache.james.mime4j.parser;
 
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.util.LinkedList;
 
 public class MimeStreamParserTest {
@@ -425,6 +427,55 @@ public class MimeStreamParserTest {
                 + "</message>\r\n";
 
         parser.parse(new ByteArrayInputStream(msg.getBytes()));
+        String result = handler.sb.toString();
+
+        Assert.assertEquals(expected, result);
+    }
+
+    @Test
+    public void testRfc6531() throws Exception {
+        MimeStreamParser parser = new MimeStreamParser(MimeConfig.STRICT);
+        parser.setContentDecoding(true);
+        TestHandler handler = new TestHandler();
+        parser.setContentHandler(handler);
+
+        String msg = "Subject: Naive Subject\r\n"
+                + "From: foo@ø.example\r\n"
+                + "To: ø@example.com\r\n"
+                + "Content-Type: text/plain; charset=utf-8\r\n"
+                + "\r\n"
+                + "This sentence ends with the letter x.\r\n";
+        String expected = "<message>\r\n"
+                + "<header>\r\n"
+                + "<field>\r\n"
+                + "Subject: Naive Subject"
+                + "</field>\r\n"
+                + "<field>\r\n"
+                + "From: foo@ø.example"
+                + "</field>\r\n"
+                + "<field>\r\n"
+                + "To: ø@example.com"
+                + "</field>\r\n"
+                + "<field>\r\n"
+                + "Content-Type: text/plain; charset=utf-8"
+                + "</field>\r\n"
+                + "</header>\r\n"
+                + "<body>\r\n"
+                + "This sentence ends with the letter x.\r\n"
+                + "</body>\r\n"
+                + "</message>\r\n";
+
+        // Dot the ı's and check that the ø is present in the message
+        // as its UTF8 encoding, 0xC3 0xB8. If the test uses anything
+        // else, then passing the test doesn't imply correctness.
+        byte[] msgAsUtf8 = msg.getBytes(Charset.forName("utf8"));
+        int i = 0;
+        while(i+1 < msgAsUtf8.length &&
+              (msgAsUtf8[i] != 0xC3 || msgAsUtf8[i+1] != 0xB8))
+              i++;
+        Assert.assertTrue(i < msgAsUtf8.length);
+
+        parser.parse(new ByteArrayInputStream(msgAsUtf8));
         String result = handler.sb.toString();
 
         Assert.assertEquals(expected, result);

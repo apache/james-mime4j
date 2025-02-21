@@ -38,6 +38,9 @@ public class RawFieldTest {
         Assert.assertEquals("raw", field.getName());
         Assert.assertEquals("stuff;  more stuff", field.getBody());
         Assert.assertEquals(s, field.toString());
+        raw = ContentUtil.encode("To: ø@ø.example");
+        field = new RawField(raw, 3, "To", null);
+        Assert.assertEquals("ø@ø.example", field.getBody());
     }
 
     @Test

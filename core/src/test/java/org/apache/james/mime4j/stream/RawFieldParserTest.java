@@ -75,6 +75,25 @@ public class RawFieldParserTest {
         Assert.assertTrue(cursor.atEnd());
     }
 
+
+    @Test
+    public void testUtf8StringParsing() throws Exception {
+        String s = "grå \"rød\"";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, 2 + s.length());
+
+        StringBuilder strbuf1 = new StringBuilder();
+        parser.copyContent(raw, cursor, RawFieldParser.INIT_BITSET(':'), strbuf1);
+        Assert.assertFalse(cursor.atEnd());
+        Assert.assertEquals("grå", strbuf1.toString());
+
+        parser.skipWhiteSpace(raw, cursor);
+
+        StringBuilder strbuf2 = new StringBuilder();
+        parser.copyQuotedContent(raw, cursor, strbuf2);
+        Assert.assertEquals("rød", strbuf2.toString());
+    }
+
     @Test
     public void testTokenParsingWithQuotedPairs() throws Exception {
         String s = "raw: \"\\\"some\\stuff\\\\\"";
