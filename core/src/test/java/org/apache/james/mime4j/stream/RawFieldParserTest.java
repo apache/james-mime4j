@@ -248,6 +248,17 @@ public class RawFieldParserTest {
     }
 
     @Test
+    public void testLongString() throws Exception {
+        String body = "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890";
+        String s = "raw: " + body;
+        ByteSequence raw = ContentUtil.encode(s);
+
+        RawField rawField = parser.parseField(raw);
+        Assert.assertEquals("raw", rawField.getName());
+        Assert.assertEquals(body, rawField.getBody());
+    }
+
+    @Test
     public void testParsingInvalidSyntax2() throws Exception {
         String s = "raw    \t \t";
         ByteSequence raw = ContentUtil.encode(s);
