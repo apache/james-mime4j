@@ -439,7 +439,7 @@ public class MimeStreamParserTest {
         TestHandler handler = new TestHandler();
         parser.setContentHandler(handler);
 
-        String msg = "Subject: Naive Subject\r\n"
+        String msg = "Subject: Naïve Subject\r\n"
                 + "From: foo@ø.example\r\n"
                 + "To: ø@example.com\r\n"
                 + "Content-Type: text/plain; charset=utf-8\r\n"
@@ -448,7 +448,7 @@ public class MimeStreamParserTest {
         String expected = "<message>\r\n"
                 + "<header>\r\n"
                 + "<field>\r\n"
-                + "Subject: Naive Subject"
+                + "Subject: Naïve Subject"
                 + "</field>\r\n"
                 + "<field>\r\n"
                 + "From: foo@ø.example"
