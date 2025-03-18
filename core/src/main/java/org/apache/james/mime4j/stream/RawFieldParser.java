@@ -323,6 +323,7 @@ public class RawFieldParser {
      */
     public void copyContent(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
             final StringBuilder dst) {
+        ByteArrayBuffer dstRaw = new ByteArrayBuffer(80);
         int pos = cursor.getPos();
         int indexFrom = cursor.getPos();
         int indexTo = cursor.getUpperBound();
@@ -333,10 +334,11 @@ public class RawFieldParser {
                 break;
             } else {
                 pos++;
-                dst.append(current);
+                dstRaw.append(current);
             }
         }
         cursor.updatePos(pos);
+        dst.append(ContentUtil.decode(StandardCharsets.UTF_8, dstRaw));
     }
 
     /**

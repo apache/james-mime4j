@@ -217,7 +217,7 @@ public class LenientAddressParser implements AddressParser {
 
     public Mailbox parseMailbox(final CharSequence text) {
         ByteSequence raw = ContentUtil.encode(text);
-        ParserCursor cursor = new ParserCursor(0, text.length());
+        ParserCursor cursor = new ParserCursor(0, raw.length());
         return parseMailbox(raw, cursor, null);
     }
 

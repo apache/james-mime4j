@@ -231,6 +231,11 @@ public class LenientAddressBuilderTest {
                 "\"Hans M\374ller\" <hans.mueller@acme.org>");
         Assert.assertEquals("Hans M\374ller", mailbox5.getName());
         Assert.assertEquals("hans.mueller@acme.org", mailbox5.getAddress());
+
+        // UTF8 should be allowed in atoms too now
+        Mailbox mailbox6 = parser.parseMailbox(
+                "<dr.müller@dr-müller-lüdenscheid.de>");
+        Assert.assertEquals("dr.müller@dr-müller-lüdenscheid.de", mailbox6.getAddress());
     }
 
     @Test
