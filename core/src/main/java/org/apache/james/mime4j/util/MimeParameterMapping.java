@@ -57,7 +57,8 @@ public class MimeParameterMapping {
     }
 
     private void handleSection(String key, String value) {
-        if (! hasSection.contains(key) && parameters.containsKey(key)) {
+        //if the key there was not sectioned, remove it.
+        if (! hasSection.contains(key)) {
             parameters.remove(key);
         }
         if (parameters.containsKey(key)) {
