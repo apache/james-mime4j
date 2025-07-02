@@ -49,6 +49,7 @@ public class MimeParameterMapping {
         }
         key = key.toLowerCase(Locale.ROOT);
         //We're conforming to Thunderbird's behavior: https://bugzilla.mozilla.org/show_bug.cgi?id=588781
+        //See MIME4J-332
         //If there are sectioned and non-sectioned keys for a given field, prefer the sectioned keys
         //If there are multiple non-sectioned keys, use the first and ignore the rest
 
