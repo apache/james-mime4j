@@ -48,6 +48,10 @@ public class MimeParameterMapping {
             key = key.substring(0, sectionDelimiter);
         }
         key = key.toLowerCase(Locale.ROOT);
+        //We're conforming to Thunderbird's behavior: https://bugzilla.mozilla.org/show_bug.cgi?id=588781
+        //If there are sectioned and non-sectioned keys for a given field, prefer the sectioned keys
+        //If there are multiple non-sectioned keys, use the first and ignore the rest
+
         //switch on whether there's a section in the key
         if (sectionDelimiter < 0) {
             handleNoSection(key, value);
@@ -57,7 +61,7 @@ public class MimeParameterMapping {
     }
 
     private void handleSection(String key, String value) {
-        //if the key there was not sectioned, remove it.
+        //if the key/value we already stored in parameters was not sectioned, remove it.
         if (! hasSection.contains(key)) {
             parameters.remove(key);
         }
