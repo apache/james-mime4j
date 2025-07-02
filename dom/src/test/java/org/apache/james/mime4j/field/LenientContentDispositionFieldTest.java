@@ -19,10 +19,15 @@
 
 package org.apache.james.mime4j.field;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.StringReader;
 import java.util.Date;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
+import org.apache.james.mime4j.field.contentdisposition.parser.ContentDispositionParser;
+import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -231,10 +236,40 @@ public class LenientContentDispositionFieldTest {
     public void testBadEncodingFilename() throws MimeException {
          ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
                  "        filename*=utf-8''4%P001!.DOC;\n" +
-                 "        filename=\"4%P001!.DOC\"");
+                 "        filename=\"4%P002!.DOC\"");
 
          Assert.assertEquals(f.getDispositionType(), "attachment");
-         Assert.assertEquals(f.getFilename(), "4%P001!.DOC4%P001!.DOC");
+         Assert.assertEquals(f.getFilename(), "4%P001!.DOC");
     }
 
+    @Test
+    public void testDuplicateFields() throws MimeException {
+        //test that the first is taken and that concatenation is not applied
+        ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
+                "filename=\"foo\";\n" +
+                "filename=\"bar2.rtf\";\n" +
+                "filename=\"bar3.rtf\"");
+        assertEquals("foo", f.getFilename());
+
+
+        //test that field names with * are preferred to those without
+        //and test that those with * are properly concatenated
+        f = parse("Content-Disposition: attachment; \n" +
+                "filename*=\"foo\";\n" +
+                "filename=\"bar2.rtf\";\n" +
+                "filename*=\"bar3.rtf\"");
+        assertEquals("foobar3.rtf", f.getFilename());
+
+        f = parse("Content-Disposition: attachment; \n" +
+                "filename=\"bar1.rtf\";\n" +
+                "filename*=\"foo\";\n" +
+                "filename*=\"bar3.rtf\"");
+        assertEquals("foobar3.rtf", f.getFilename());
+
+        f = parse("Content-Disposition: attachment; \n" +
+                "filename*=\"foo\";\n" +
+                "filename*=\"bar2.rtf\";\n" +
+                "filename=\"bar3.rtf\"");
+        assertEquals("foobar2.rtf", f.getFilename());
+    }
 }
