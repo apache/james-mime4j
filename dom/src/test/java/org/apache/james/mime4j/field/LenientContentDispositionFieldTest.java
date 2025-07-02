@@ -21,13 +21,10 @@ package org.apache.james.mime4j.field;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.StringReader;
 import java.util.Date;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
-import org.apache.james.mime4j.field.contentdisposition.parser.ContentDispositionParser;
-import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -238,8 +235,8 @@ public class LenientContentDispositionFieldTest {
                  "        filename*=utf-8''4%P001!.DOC;\n" +
                  "        filename=\"4%P002!.DOC\"");
 
-         Assert.assertEquals(f.getDispositionType(), "attachment");
-         Assert.assertEquals(f.getFilename(), "4%P001!.DOC");
+         Assert.assertEquals("attachment", f.getDispositionType());
+         Assert.assertEquals("4%P001!.DOC", f.getFilename());
     }
 
     @Test
