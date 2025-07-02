@@ -247,11 +247,31 @@ public class LenientContentDispositionFieldTest {
                 "filename=\"bar2.rtf\";\n" +
                 "filename=\"bar3.rtf\"");
         assertEquals("foo", f.getFilename());
+    }
 
-
+    @Test
+    public void testDuplicateFieldsPreferStar() throws MimeException {
         //test that field names with * are preferred to those without
-        //and test that those with * are properly concatenated
+        ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
+                "filename*=\"foo\";\"");
+        assertEquals("foo", f.getFilename());
+
         f = parse("Content-Disposition: attachment; \n" +
+                "filename*=\"foo\";\n" +
+                "filename=\"bar2.rtf\";\n" +
+                "filename=\"bar3.rtf\"");
+        assertEquals("foo", f.getFilename());
+
+        f = parse("Content-Disposition: attachment; \n" +
+                "filename=\"bar2.rtf\";\n" +
+                "filename*=\"foo\";\n" +
+                "filename=\"bar3.rtf\"");
+        assertEquals("foo", f.getFilename());
+    }
+
+    @Test
+    public void testDuplicateFieldsConcatenation() throws MimeException {
+        ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
                 "filename*=\"foo\";\n" +
                 "filename=\"bar2.rtf\";\n" +
                 "filename*=\"bar3.rtf\"");
