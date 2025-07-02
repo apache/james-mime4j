@@ -20,11 +20,16 @@
 package org.apache.james.mime4j.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class MimeParameterMapping {
 
     private final Map<String, String> parameters = new HashMap<>();
+    private final Set<String> hasSection = new HashSet<>();
+
     /** Charset, taken from the first item added to {@link #parameters}. */
     private String charset;
 
@@ -36,13 +41,40 @@ public class MimeParameterMapping {
         return parameters.get(name);
     }
 
-    public void addParameter(String name, String value) {
-        String key = removeSectionFromName(name).toLowerCase();
+    public void addParameter(final String name, String value) {
+        String key = name;
+        int sectionDelimiter = name.indexOf("*");
+        if (sectionDelimiter > -1) {
+            key = key.substring(0, sectionDelimiter);
+        }
+        key = key.toLowerCase(Locale.ROOT);
+        //switch on whether there's a section in the key
+        if (sectionDelimiter < 0) {
+            handleNoSection(key, value);
+        } else {
+            handleSection(key, value);
+        }
+    }
+
+    private void handleSection(String key, String value) {
+        if (! hasSection.contains(key) && parameters.containsKey(key)) {
+            parameters.remove(key);
+        }
         if (parameters.containsKey(key)) {
             parameters.put(key, decodeParameterValue(parameters.get(key) + value));
         } else {
             parameters.put(key, decodeParameterValue(value));
         }
+        hasSection.add(key);
+    }
+
+    private void handleNoSection(String key, String value) {
+        if (parameters.containsKey(key)) {
+            //if there's already a value here, and this is a no section key
+            //ignore this value
+            return;
+        }
+        parameters.put(key, decodeParameterValue(value));
     }
 
     private String decodeParameterValue(String value) {

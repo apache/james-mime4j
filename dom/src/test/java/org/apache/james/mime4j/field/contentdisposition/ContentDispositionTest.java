@@ -19,7 +19,12 @@
 
 package org.apache.james.mime4j.field.contentdisposition;
 
+import static org.junit.Assert.assertEquals;
+
+import java.io.StringReader;
+
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.field.contentdisposition.parser.ContentDispositionParser;
 import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
 import org.junit.Assert;
 import org.junit.Test;
