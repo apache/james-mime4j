@@ -19,7 +19,6 @@
 
 package org.apache.james.mime4j.field.contentdisposition;
 
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.field.contentdisposition.parser.ParseException;
 import org.junit.Assert;
