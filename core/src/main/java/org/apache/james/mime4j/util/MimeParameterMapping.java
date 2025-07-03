@@ -81,9 +81,15 @@ public class MimeParameterMapping {
     /** Charset, taken from the first item added via {@link #addParameter(String, String)}. */
     private String charset;
 
+    /**
+     *
+     * @return an Unmodifiable map of the parameters as calculated
+     * by the algorithm described in the class javadoc via {@link #get(String)}
+     */
     public Map<String, String> getParameters() {
         if (needToUpdate) {
             updateParameters();
+            needToUpdate = false;
         }
         return Collections.unmodifiableMap(parameters);
     }
@@ -93,15 +99,14 @@ public class MimeParameterMapping {
         for (String param : parameterNames) {
             parameters.put(param, get(param));
         }
-        needToUpdate = false;
     }
 
     /**
      * Applies the algorithm described in the class javadoc and returns
      * the decoded value from the best option.
      *
-     * @param name field name (must be lowercased
-     * @return
+     * @param name field name (must be lowercased)
+     * @return field value or <code>null</code> if it doesn't exist
      */
     public String get(String name) {
         if (! parameterNames.contains(name)) {
@@ -147,9 +152,9 @@ public class MimeParameterMapping {
     }
 
     public void addParameter(final String name, String value) {
-        needToUpdate = true;
         ParameterTypePair parameterTypePair = getParameterTypePair(name);
         parameterNames.add(parameterTypePair.fieldName);
+        needToUpdate = true;
         switch (parameterTypePair.fieldType) {
             case EXTENDED:
                 extended.putIfAbsent(parameterTypePair.fieldName, value);
