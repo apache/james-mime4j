@@ -236,7 +236,7 @@ public class LenientContentDispositionFieldTest {
                  "        filename=\"4%P002!.DOC\"");
 
          Assert.assertEquals("attachment", f.getDispositionType());
-         Assert.assertEquals("4%P001!.DOC", f.getFilename());
+         Assert.assertEquals("4%P002!.DOC", f.getFilename());
     }
 
     @Test
@@ -250,11 +250,16 @@ public class LenientContentDispositionFieldTest {
     }
 
     @Test
-    public void testDuplicateFieldsPreferStar() throws MimeException {
-        //test that field names with * are preferred to those without
+    public void testDuplicateFieldsPreferExtended() throws MimeException {
+        //test that extended field names are preferred to standard field names
         ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
                 "filename*=\"foo\";\"");
         assertEquals("foo", f.getFilename());
+
+        f = parse("Content-Disposition: attachment;\n" +
+                "filename*=\"UTF-8''%D0%BC%2E%78%6C%73%78\";\n" +
+                "filename=\"bar2.rtf\";");
+        assertEquals("м.xlsx", f.getFilename());
 
         f = parse("Content-Disposition: attachment; \n" +
                 "filename*=\"foo\";\n" +
@@ -270,22 +275,22 @@ public class LenientContentDispositionFieldTest {
     }
 
     @Test
-    public void testDuplicateFieldsConcatenation() throws MimeException {
+    public void testStandardAndContinuationFields() throws MimeException {
         ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
-                "filename*=\"foo\";\n" +
+                "filename*0=\"foo\";\n" +
                 "filename=\"bar2.rtf\";\n" +
-                "filename*=\"bar3.rtf\"");
+                "filename*1=\"bar3.rtf\"");
         assertEquals("foobar3.rtf", f.getFilename());
 
         f = parse("Content-Disposition: attachment; \n" +
                 "filename=\"bar1.rtf\";\n" +
-                "filename*=\"foo\";\n" +
-                "filename*=\"bar3.rtf\"");
+                "filename*0=\"foo\";\n" +
+                "filename*1=\"bar3.rtf\"");
         assertEquals("foobar3.rtf", f.getFilename());
 
         f = parse("Content-Disposition: attachment; \n" +
-                "filename*=\"foo\";\n" +
-                "filename*=\"bar2.rtf\";\n" +
+                "filename*0=\"foo\";\n" +
+                "filename*1=\"bar2.rtf\";\n" +
                 "filename=\"bar3.rtf\"");
         assertEquals("foobar2.rtf", f.getFilename());
     }
