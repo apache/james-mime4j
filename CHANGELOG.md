@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [0.8.13] - unreleased
+
+ - MIME4J-332 Improve handling of "sectioned" field names
+ - MIME4J-331 Add support for RFC-6532 Internationalized Email Headers, and test it. (#114)
+ - MIME4J-330 Fix MimeStreamParser bug: part body stream ends with CR
+
+## [0.8.12] - 2024-12-23
+
+New release tagged without changes.
+
 ## [0.8.11] - 2024-03-05
 
  - MIME4J-326 SILENT monitor for header decoding
