@@ -194,17 +194,7 @@ public class DefaultMessageWriter implements MessageWriter {
      *             if an I/O error occurs.
      */
     public void writeField(Field field, OutputStream out) throws IOException {
-        ByteSequence raw = field.getRaw();
-        if (raw == null) {
-            StringBuilder buf = new StringBuilder();
-            buf.append(field.getName());
-            buf.append(": ");
-            String body = field.getBody();
-            if (body != null) {
-                buf.append(body);
-            }
-            raw = ContentUtil.encode(MimeUtil.fold(buf.toString(), 0));
-        }
+        ByteSequence raw = field.getSafeRaw();
         writeBytes(raw, out);
         out.write(CRLF);
     }
