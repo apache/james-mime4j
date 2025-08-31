@@ -61,4 +61,9 @@ public interface Field {
      */
     ByteSequence getRaw();
 
+    /**
+     * Gets original (raw) representation of the field, if available,
+     * or compute it lazily otherwise.
+     */
+    ByteSequence getSafeRaw();
 }

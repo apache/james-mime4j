@@ -22,10 +22,11 @@ package org.apache.james.mime4j.stream;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatCode;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
-import junit.framework.Assert;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 public class RawFieldTest {
 
@@ -35,6 +36,7 @@ public class RawFieldTest {
         ByteSequence raw = ContentUtil.encode(s);
         RawField field = new RawField(raw, 3, "raw", null);
         Assert.assertSame(raw, field.getRaw());
+        Assert.assertSame(raw, field.getSafeRaw());
         Assert.assertEquals("raw", field.getName());
         Assert.assertEquals("stuff;  more stuff", field.getBody());
         Assert.assertEquals(s, field.toString());
@@ -47,12 +49,14 @@ public class RawFieldTest {
     public void testPublicConstructor() throws Exception {
         RawField field1 = new RawField("raw", "stuff");
         Assert.assertNull(field1.getRaw());
+        Assert.assertEquals("raw: stuff", ContentUtil.decode(field1.getSafeRaw()));
         Assert.assertEquals("raw", field1.getName());
         Assert.assertEquals("stuff", field1.getBody());
         Assert.assertEquals("raw: stuff", field1.toString());
 
         RawField field2 = new RawField("raw", "any");
         Assert.assertNull(field2.getRaw());
+        Assert.assertEquals("raw: any", ContentUtil.decode(field2.getSafeRaw()));
         Assert.assertEquals("raw", field2.getName());
         Assert.assertEquals("any", field2.getBody());
         Assert.assertEquals("raw: any", field2.toString());
@@ -64,6 +68,7 @@ public class RawFieldTest {
         ByteSequence raw = ContentUtil.encode(s);
         RawField field = new RawField(raw, 3, "raw", null);
         Assert.assertSame(raw, field.getRaw());
+        Assert.assertSame(raw, field.getSafeRaw());
         Assert.assertEquals("raw", field.getName());
         Assert.assertEquals("stuff;  more stuff", field.getBody());
         Assert.assertEquals(s, field.toString());
