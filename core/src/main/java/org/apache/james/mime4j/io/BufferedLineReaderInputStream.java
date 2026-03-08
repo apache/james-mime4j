@@ -58,6 +58,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     private int bufpos;
     private int buflen;
     private int[] shiftTable;
+    private byte[] cachedShiftPattern;
 
     private final int maxLineLen;
 
@@ -270,12 +271,15 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         }
 
 
-        for (int i = 0; i < shiftTable.length; i++) {
-            shiftTable[i] = pattern.length + 1;
-        }
-        for (int i = 0; i < pattern.length; i++) {
-            int x = pattern[i] & 0xff;
-            shiftTable[x] = pattern.length - i;
+        if (pattern != cachedShiftPattern) {
+            for (int i = 0; i < shiftTable.length; i++) {
+                shiftTable[i] = pattern.length + 1;
+            }
+            for (int i = 0; i < pattern.length; i++) {
+                int x = pattern[i] & 0xff;
+                shiftTable[x] = pattern.length - i;
+            }
+            cachedShiftPattern = pattern;
         }
 
         int j = 0;
