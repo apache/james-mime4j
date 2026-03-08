@@ -43,6 +43,12 @@ import org.apache.james.mime4j.util.ContentUtil;
  */
 public class RawFieldParser {
 
+    // Reused per-thread byte accumulation buffer for non-ASCII / quoted-string content.
+    // Safe because copyContent, copyUnquotedContent and copyQuotedContent are leaf methods
+    // that never call each other, so the buffer is never accessed re-entrantly.
+    private static final ThreadLocal<ByteArrayBuffer> DECODE_BUFFER =
+            ThreadLocal.withInitial(() -> new ByteArrayBuffer(256));
+
     public static BitSet INIT_BITSET(int ... b) {
         BitSet bitset = new BitSet(b.length);
         for (int aB : b) {
@@ -323,22 +329,43 @@ public class RawFieldParser {
      */
     public void copyContent(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
             final StringBuilder dst) {
-        ByteArrayBuffer dstRaw = new ByteArrayBuffer(80);
         int pos = cursor.getPos();
-        int indexFrom = cursor.getPos();
+        int indexFrom = pos;
         int indexTo = cursor.getUpperBound();
+        int dstStart = dst.length();
         for (int i = indexFrom; i < indexTo; i++) {
-            char current = (char) (buf.byteAt(i) & 0xff);
+            byte bVal = buf.byteAt(i);
+            char current = (char) (bVal & 0xff);
             if ((delimiters != null && delimiters.get(current))
                     || CharsetUtil.isWhitespace(current) || current == '(') {
                 break;
-            } else {
-                pos++;
-                dstRaw.append(current);
             }
+            pos++;
+            if (bVal < 0) {
+                // Non-ASCII byte: undo the ASCII chars written so far, redo via UTF-8 decode
+                dst.setLength(dstStart);
+                ByteArrayBuffer dstRaw = DECODE_BUFFER.get();
+                dstRaw.clear();
+                for (int j = indexFrom; j <= i; j++) {
+                    dstRaw.append(buf.byteAt(j));
+                }
+                for (int k = i + 1; k < indexTo; k++) {
+                    byte bk = buf.byteAt(k);
+                    char ck = (char) (bk & 0xff);
+                    if ((delimiters != null && delimiters.get(ck))
+                            || CharsetUtil.isWhitespace(ck) || ck == '(') {
+                        break;
+                    }
+                    pos++;
+                    dstRaw.append(bk);
+                }
+                cursor.updatePos(pos);
+                dst.append(ContentUtil.decode(StandardCharsets.UTF_8, dstRaw));
+                return;
+            }
+            dst.append(current);
         }
         cursor.updatePos(pos);
-        dst.append(ContentUtil.decode(StandardCharsets.UTF_8, dstRaw));
     }
 
     /**
@@ -354,24 +381,41 @@ public class RawFieldParser {
     public void copyUnquotedContent(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
                             final StringBuilder dst) {
         int pos = cursor.getPos();
-        int indexFrom = cursor.getPos();
+        int indexFrom = pos;
         int indexTo = cursor.getUpperBound();
-
-        ByteArrayBuffer dstRaw = new ByteArrayBuffer(indexTo - indexFrom);
-
+        int dstStart = dst.length();
         for (int i = indexFrom; i < indexTo; i++) {
-            byte currentByte = buf.byteAt(i);
-            char current = (char) (currentByte & 0xff);
+            byte bVal = buf.byteAt(i);
+            char current = (char) (bVal & 0xff);
             if ((delimiters != null && delimiters.get(current))
                     || CharsetUtil.isWhitespace(current) || current == '(' || current == '\"') {
                 break;
-            } else {
-                pos++;
-                dstRaw.append(currentByte);
             }
+            pos++;
+            if (bVal < 0) {
+                // Non-ASCII byte: undo the ASCII chars written so far, redo via UTF-8 decode
+                dst.setLength(dstStart);
+                ByteArrayBuffer dstRaw = DECODE_BUFFER.get();
+                dstRaw.clear();
+                for (int j = indexFrom; j <= i; j++) {
+                    dstRaw.append(buf.byteAt(j));
+                }
+                for (int k = i + 1; k < indexTo; k++) {
+                    byte bk = buf.byteAt(k);
+                    char ck = (char) (bk & 0xff);
+                    if ((delimiters != null && delimiters.get(ck))
+                            || CharsetUtil.isWhitespace(ck) || ck == '(' || ck == '\"') {
+                        break;
+                    }
+                    pos++;
+                    dstRaw.append(bk);
+                }
+                cursor.updatePos(pos);
+                dst.append(ContentUtil.decode(StandardCharsets.UTF_8, dstRaw));
+                return;
+            }
+            dst.append(current);
         }
-        String decoded = CharsetUtil.isASCII(dstRaw) ? ContentUtil.decode(dstRaw) : ContentUtil.decode(StandardCharsets.UTF_8, dstRaw);
-        dst.append(decoded);
         cursor.updatePos(pos);
     }
 
@@ -397,7 +441,8 @@ public class RawFieldParser {
         pos++;
         indexFrom++;
 
-        ByteArrayBuffer dstRaw = new ByteArrayBuffer(indexTo - indexFrom);
+        ByteArrayBuffer dstRaw = DECODE_BUFFER.get();
+        dstRaw.clear();
 
         boolean escaped = false;
         for (int i = indexFrom; i < indexTo; i++, pos++) {
@@ -422,12 +467,24 @@ public class RawFieldParser {
             }
         }
 
-        String decoded = CharsetUtil.isASCII(dstRaw) ? ContentUtil.decode(dstRaw) : ContentUtil.decode(StandardCharsets.UTF_8, dstRaw);
-        if (decoded.startsWith("=?")) {
-            decoded = DecoderUtil.decodeEncodedWords(decoded, DecodeMonitor.SILENT);
+        if (CharsetUtil.isASCII(dstRaw)) {
+            // Check for encoded word directly on bytes — avoids an intermediate String
+            if (dstRaw.length() > 1 && dstRaw.byteAt(0) == '=' && dstRaw.byteAt(1) == '?') {
+                String raw = ContentUtil.decode(dstRaw);
+                dst.append(DecoderUtil.decodeEncodedWords(raw, DecodeMonitor.SILENT));
+            } else {
+                // Pure ASCII, not encoded: append bytes as chars — no String allocation
+                for (int i = 0; i < dstRaw.length(); i++) {
+                    dst.append((char) (dstRaw.byteAt(i) & 0xff));
+                }
+            }
+        } else {
+            String decoded = ContentUtil.decode(StandardCharsets.UTF_8, dstRaw);
+            if (decoded.startsWith("=?")) {
+                decoded = DecoderUtil.decodeEncodedWords(decoded, DecodeMonitor.SILENT);
+            }
+            dst.append(decoded);
         }
-
-        dst.append(decoded);
 
         cursor.updatePos(pos);
     }
