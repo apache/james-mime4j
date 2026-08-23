@@ -1,4 +1,39 @@
-= Apache James jSieve documentation
+= Apache James Mime4J
 
+image::james-logo.png[link="https://james.apache.org"]
 
-TODO: This is a placeholder. Migrate older documentation.
+Apache James Mime4J is developed by the https://james.apache.org/[Apache James] team but
+now has a dedicated https://james.apache.org/mail.html#Mime4j[mailing list].
+
+Apache James Mime4J provides a parser,
+https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/parser/MimeStreamParser.html[`MimeStreamParser`],
+for e-mail message streams in plain rfc822 and MIME format. The parser uses a callback
+mechanism to report parsing events such as the start of an entity header, the start of a
+body, etc. If you are familiar with the http://www.saxproject.org/[SAX] XML parser
+interface you should have no problem getting started with Mime4J.
+
+The parser only deals with the structure of the message stream. It won't do any decoding
+of base64 or quoted-printable encoded header fields and bodies. This is intentional - the
+parser should only provide the most basic functionality needed to build more complex
+parsers. However, Mime4J does include facilities to decode bodies and fields and the
+`Message` class described below handles decoding of fields and bodies transparently.
+
+The parser has been designed to be extremely tolerant against messages violating the
+standards. It has been tested using a large corpus (>5000) of e-mail messages. As a
+benchmark the widely used perl `MIME::Tools` parser has been used. Mime4J and MIME::Tools
+rarely differ (<25 in those 5000). When they do (which only occurs for illegally formatted
+spam messages) we think Mime4J does a better job.
+
+Mime4J can also be used to build a tree representation of an e-mail message using the
+https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/message/Message.html[`Message`]
+class. Using this facility Mime4J automatically handles the decoding of fields and bodies
+and uses temporary files for large attachments. This representation is similar to the
+representation constructed by the JavaMail APIs but is more tolerant to messages violating
+the standards.
+
+== Examples
+
+As part of our git repository we provide a couple of
+https://github.com/apache/james-mime4j/tree/master/examples[examples] to ease the use of Mime4J.
+
+Read the xref:samples.adoc[examples page].
