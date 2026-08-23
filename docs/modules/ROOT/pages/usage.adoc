@@ -6,6 +6,10 @@ Alternatively, you may use the iterative API, which is available through the
 https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/parser/MimeTokenStream.html[`MimeTokenStream`].
 In terms of speed, you should not note any differences.
 
+Both are low-level: they report the structure of a message as it is read. If you would
+rather manipulate a message as a tree of objects — or build one — see
+xref:dom.adoc[Using the DOM API].
+
 * <<Token streams>>
 * <<Sample token stream>>
 * <<Event handlers>>

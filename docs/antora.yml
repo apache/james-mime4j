@@ -4,3 +4,7 @@ version: '0.8.15-SNAPSHOT'
 prerelease: true
 nav:
   - modules/ROOT/nav.adoc
+asciidoc:
+  attributes:
+    # Latest released version, as published on Maven central. Bump on release.
+    mime4j-version: '0.8.14@'
