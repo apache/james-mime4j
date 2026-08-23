@@ -29,7 +29,7 @@ https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/message/Message.
 class. Using this facility Mime4J automatically handles the decoding of fields and bodies
 and uses temporary files for large attachments. This representation is similar to the
 representation constructed by the JavaMail APIs but is more tolerant to messages violating
-the standards.
+the standards. See xref:dom.adoc[Using the DOM API] to get started with it.
 
 == Examples
 

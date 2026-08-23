@@ -2,6 +2,7 @@
 * xref:status.adoc[Status]
 * xref:samples.adoc[Examples]
 * xref:usage.adoc[Usage]
+* xref:dom.adoc[Using the DOM API]
 * xref:development/index.adoc[Developer corner]
 ** xref:development/build.adoc[Build]
 * https://james.apache.org/mail.html#Mime4j[Mailing list]
