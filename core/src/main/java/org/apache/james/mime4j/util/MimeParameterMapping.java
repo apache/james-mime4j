@@ -73,7 +73,7 @@ public class MimeParameterMapping {
     private final Set<String> parameterNames = new HashSet<>();
     private final Map<String, String> standard = new HashMap<>();
     private final Map<String, String> extended = new HashMap<>();
-    private final Map<String, String> continuation = new HashMap<>();
+    private final Map<String, StringBuilder> continuation = new HashMap<>();
 
     private final Map<String, String> parameters = new HashMap<>();
     private boolean needToUpdate = true;
@@ -122,7 +122,7 @@ public class MimeParameterMapping {
         }
         if (continuation.containsKey(name)) {
             try {
-                return decodeParameterValue(continuation.get(name));
+                return decodeParameterValue(continuation.get(name).toString());
             } catch (DecodeException e) {
                 //ignore and try standard
             }
@@ -141,7 +141,7 @@ public class MimeParameterMapping {
         }
 
         if (continuation.containsKey(name)) {
-            return continuation.get(name);
+            return continuation.get(name).toString();
         }
 
         if (extended.containsKey(name)) {
@@ -160,12 +160,8 @@ public class MimeParameterMapping {
                 extended.putIfAbsent(parameterTypePair.fieldName, value);
                 break;
             case CONTINUATION:
-                if (continuation.containsKey(parameterTypePair.fieldName)) {
-                    String newValue = continuation.get(parameterTypePair.fieldName) + value;
-                    continuation.put(parameterTypePair.fieldName, newValue);
-                } else {
-                    continuation.put(parameterTypePair.fieldName, value);
-                }
+                continuation.computeIfAbsent(parameterTypePair.fieldName, k -> new StringBuilder())
+                        .append(value);
                 break;
             case STANDARD:
                 standard.putIfAbsent(parameterTypePair.fieldName, value);
