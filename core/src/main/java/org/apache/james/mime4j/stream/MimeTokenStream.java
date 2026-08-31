@@ -31,9 +31,11 @@ import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineNumberInputStream;
+import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
 import org.apache.james.mime4j.io.MaxPartCountLimitException;
+import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
@@ -93,6 +95,7 @@ public class MimeTokenStream {
     private MimeEntity rootentity;
     private int partCount;
     private int totalHeaderCount;
+    private long totalHeaderLen;
 
     /**
      * Constructs a standard (lax) stream.
@@ -211,6 +214,7 @@ public class MimeTokenStream {
         currentStateMachine = rootentity;
         partCount = 0;
         totalHeaderCount = 0;
+        totalHeaderLen = 0;
         entities.clear();
         entities.add(currentStateMachine);
         state = currentStateMachine.getState();
@@ -388,7 +392,7 @@ public class MimeTokenStream {
             state = currentStateMachine.getState();
             if (state != EntityState.T_END_OF_STREAM) {
                 if (state == EntityState.T_FIELD) {
-                    checkTotalHeaderLimit();
+                    checkTotalHeaderLimits();
                 }
                 return state;
             }
@@ -440,16 +444,43 @@ public class MimeTokenStream {
      * a consumer building a DOM, so only a message wide budget bounds that graph
      * independently of the part count.
      * <p>
+     * The same reasoning applies to header bytes: {@link MimeConfig#getMaxHeaderLen()}
+     * bounds one field, but {@code Content-Type} and {@code Content-Disposition}
+     * occur once per entity and so multiply by the part count.
+     * <p>
      * Counts the fields actually reported to the caller: malformed fields the
      * parser skips are not retained and so do not consume the budget.
      */
-    private void checkTotalHeaderLimit() throws MimeException {
+    private void checkTotalHeaderLimits() throws MimeException {
         int maxTotalHeaderCount = config.getMaxTotalHeaderCount();
         totalHeaderCount++;
         if (maxTotalHeaderCount > 0 && totalHeaderCount > maxTotalHeaderCount) {
             throw new MaxHeaderLimitException("Maximum total header limit ("
                     + maxTotalHeaderCount + ") exceeded");
         }
+        long maxTotalHeaderLen = config.getMaxTotalHeaderLen();
+        if (maxTotalHeaderLen > 0) {
+            totalHeaderLen += rawLengthOf(currentStateMachine.getField());
+            if (totalHeaderLen > maxTotalHeaderLen) {
+                throw new MaxHeaderLengthLimitException("Maximum total header length limit ("
+                        + maxTotalHeaderLen + ") exceeded");
+            }
+        }
+    }
+
+    /**
+     * Size of a field as it appeared on the wire. Falls back to the rendered length
+     * when a field carries no raw bytes, rather than calling {@code getSafeRaw()}
+     * which would allocate them just to measure them.
+     */
+    private static int rawLengthOf(Field field) {
+        ByteSequence raw = field.getRaw();
+        if (raw != null) {
+            return raw.length();
+        }
+        String name = field.getName();
+        String body = field.getBody();
+        return (name != null ? name.length() : 0) + (body != null ? body.length() : 0) + 4;
     }
 
     /**

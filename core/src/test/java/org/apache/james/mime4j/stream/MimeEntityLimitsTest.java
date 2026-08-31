@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
 import org.apache.james.mime4j.io.MaxPartCountLimitException;
@@ -344,15 +345,109 @@ public class MimeEntityLimitsTest {
         }
     }
 
+    /** A multipart whose every part carries one header of {@code bytes} octets. */
+    private static InputStream multipartWithFatHeaders(int parts, int bytes) {
+        StringBuilder pad = new StringBuilder("x: ");
+        while (pad.length() < bytes) {
+            pad.append('a');
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append("Content-Type: multipart/mixed; boundary=b\r\n\r\n");
+        for (int p = 0; p < parts; p++) {
+            sb.append("--b\r\n").append(pad).append("\r\n\r\n");
+        }
+        sb.append("--b--\r\n");
+        return new ByteArrayInputStream(sb.toString().getBytes(Charsets.US_ASCII));
+    }
+
+    @Test
+    public void totalHeaderLengthShouldAccumulateAcrossEntities() throws Exception {
+        // 20 parts x 1000 octets: no single header is anywhere near maxHeaderLen
+        MimeConfig config = MimeConfig.custom()
+                .setMaxLineLen(-1)
+                .setMaxHeaderLen(-1)
+                .setMaxTotalHeaderLen(10000)
+                .build();
+        try {
+            parse(config, multipartWithFatHeaders(20, 1000));
+            Assert.fail("MaxHeaderLengthLimitException expected");
+        } catch (MaxHeaderLengthLimitException expected) {
+            Assert.assertTrue(expected.getMessage(),
+                    expected.getMessage().startsWith("Maximum total header length limit (10000)"));
+        }
+    }
+
+    @Test
+    public void totalHeaderLengthShouldAcceptAMessageWithinTheLimit() throws Exception {
+        MimeConfig config = MimeConfig.custom()
+                .setMaxLineLen(-1)
+                .setMaxHeaderLen(-1)
+                .setMaxTotalHeaderLen(1024 * 1024)
+                .build();
+        Assert.assertEquals(20, parse(config, multipartWithFatHeaders(20, 1000)));
+    }
+
+    @Test
+    public void totalHeaderLengthShouldBeDisabledWhenNegative() throws Exception {
+        MimeConfig config = MimeConfig.custom()
+                .setMaxLineLen(-1)
+                .setMaxHeaderLen(-1)
+                .setMaxTotalHeaderLen(-1)
+                .build();
+        Assert.assertEquals(20, parse(config, multipartWithFatHeaders(20, 100000)));
+    }
+
+    @Test
+    public void totalHeaderLengthShouldBeDisabledWhenZero() throws Exception {
+        MimeConfig config = MimeConfig.custom()
+                .setMaxLineLen(-1)
+                .setMaxHeaderLen(-1)
+                .setMaxTotalHeaderLen(0)
+                .build();
+        Assert.assertEquals(20, parse(config, multipartWithFatHeaders(20, 100000)));
+    }
+
+    @Test
+    public void defaultConfigShouldBoundTheTotalHeaderLength() throws Exception {
+        Assert.assertEquals(1024 * 1024, MimeConfig.DEFAULT.getMaxTotalHeaderLen());
+        Assert.assertEquals(1024 * 1024, MimeConfig.PERMISSIVE.getMaxTotalHeaderLen());
+        try {
+            // 512 parts x 8 KB of headers = 4 MB, no single header over 64 KB
+            parse(MimeConfig.PERMISSIVE, multipartWithFatHeaders(512, 8192));
+            Assert.fail("MaxHeaderLengthLimitException expected");
+        } catch (MaxHeaderLengthLimitException expected) {
+            // expected
+        }
+    }
+
+    @Test
+    public void permissiveConfigShouldBoundASingleHeaderLength() throws Exception {
+        Assert.assertEquals(64 * 1024, MimeConfig.PERMISSIVE.getMaxHeaderLen());
+        StringBuilder sb = new StringBuilder("x: ");
+        while (sb.length() < 64 * 1024 + 16) {
+            sb.append('a');
+        }
+        sb.append("\r\n\r\nbody\r\n");
+        InputStream in = new ByteArrayInputStream(sb.toString().getBytes(Charsets.US_ASCII));
+        try {
+            parse(MimeConfig.PERMISSIVE, in);
+            Assert.fail("MaxHeaderLengthLimitException expected");
+        } catch (MaxHeaderLengthLimitException expected) {
+            // expected
+        }
+    }
+
     @Test
     public void copyShouldCarryTheLimitsOver() {
         MimeConfig config = MimeConfig.copy(MimeConfig.custom()
                 .setMaxPartCount(7)
                 .setMaxNestingDepth(9)
                 .setMaxTotalHeaderCount(11)
+                .setMaxTotalHeaderLen(13)
                 .build()).build();
         Assert.assertEquals(7, config.getMaxPartCount());
         Assert.assertEquals(9, config.getMaxNestingDepth());
         Assert.assertEquals(11, config.getMaxTotalHeaderCount());
+        Assert.assertEquals(13, config.getMaxTotalHeaderLen());
     }
 }
