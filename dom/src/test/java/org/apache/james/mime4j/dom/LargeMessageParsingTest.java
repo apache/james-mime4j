@@ -22,8 +22,11 @@ package org.apache.james.mime4j.dom;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
+import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.stream.MimeConfig;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class LargeMessageParsingTest {
@@ -31,19 +34,42 @@ public class LargeMessageParsingTest {
     @Test
     public void parsingALargeMessageWithPermissiveConfigShouldSucceed() throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(100 * 1024 * 1024);
-        // 32 * 1.000.000 = ~ 30,5 Mo of headers
-        for (int i = 0; i < 1000000; i++) {
-            outputStream.write(String.format("header: static important value\r\n", i, i).getBytes());
+        // as many headers as the permissive profile allows
+        for (int i = 0; i < MimeConfig.PERMISSIVE.getMaxHeaderCount(); i++) {
+            outputStream.write("header: static important value\r\n".getBytes());
         }
         outputStream.write("\r\n".getBytes());
         // 38 * 1.600.000 = ~ 58 Mo of body
         for (int i = 0; i < 1600000; i++) {
-            outputStream.write(String.format("abcdeghijklmnopqrstuvwxyz0123456789\r\n", i, i).getBytes());
+            outputStream.write("abcdeghijklmnopqrstuvwxyz0123456789\r\n".getBytes());
         }
 
         DefaultMessageBuilder messageBuilder = new DefaultMessageBuilder();
         messageBuilder.setMimeEntityConfig(MimeConfig.PERMISSIVE);
         messageBuilder.parseMessage(new ByteArrayInputStream(outputStream.toByteArray()));
+    }
+
+    @Test
+    public void parsingAHeaderFloodWithPermissiveConfigShouldBeRejected() throws Exception {
+        // A header field costs a handful of bytes on the wire but is retained as an
+        // object graph by the DOM, so an unbounded header count lets a small message
+        // exhaust the heap. MIME4J-269 introduced the permissive profile to be
+        // "very permissive while still denying a single email to use all JVM
+        // memory"; bounding the header count is part of that second half.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(32 * 1024 * 1024);
+        for (int i = 0; i < 1000000; i++) {
+            outputStream.write("header: static important value\r\n".getBytes());
+        }
+        outputStream.write("\r\n".getBytes());
+
+        DefaultMessageBuilder messageBuilder = new DefaultMessageBuilder();
+        messageBuilder.setMimeEntityConfig(MimeConfig.PERMISSIVE);
+        try {
+            messageBuilder.parseMessage(new ByteArrayInputStream(outputStream.toByteArray()));
+            Assert.fail("MimeIOException expected");
+        } catch (MimeIOException e) {
+            Assert.assertTrue(e.getCause() instanceof MaxHeaderLimitException);
+        }
     }
 
     @Test
