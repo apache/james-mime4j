@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
 import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
 import org.apache.james.mime4j.io.MaxPartCountLimitException;
 import org.junit.Assert;
@@ -242,12 +243,116 @@ public class MimeEntityLimitsTest {
     }
 
     @Test
+    public void permissiveConfigShouldBoundTheHeaderCount() throws Exception {
+        Assert.assertEquals(4096, MimeConfig.PERMISSIVE.getMaxHeaderCount());
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 4097; i++) {
+            sb.append("x:\r\n");
+        }
+        sb.append("\r\nbody\r\n");
+        InputStream in = new ByteArrayInputStream(sb.toString().getBytes(Charsets.US_ASCII));
+        try {
+            parse(MimeConfig.PERMISSIVE, in);
+            Assert.fail("MaxHeaderLimitException expected");
+        } catch (MaxHeaderLimitException expected) {
+            // expected
+        }
+    }
+
+    /** A multipart of {@code parts} body parts, each carrying {@code headers} fields. */
+    private static InputStream multipartWithHeaders(int parts, int headers) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Content-Type: multipart/mixed; boundary=b\r\n\r\n");
+        for (int p = 0; p < parts; p++) {
+            sb.append("--b\r\n");
+            for (int h = 0; h < headers; h++) {
+                sb.append("x:\r\n");
+            }
+            sb.append("\r\n");
+        }
+        sb.append("--b--\r\n");
+        return new ByteArrayInputStream(sb.toString().getBytes(Charsets.US_ASCII));
+    }
+
+    @Test
+    public void totalHeaderLimitShouldAccumulateAcrossEntities() throws Exception {
+        // 5 parts x 3 fields = 15 fields, none of which trips the per entity limit
+        MimeConfig config = MimeConfig.custom()
+                .setMaxHeaderCount(1000)
+                .setMaxTotalHeaderCount(10)
+                .build();
+        try {
+            parse(config, multipartWithHeaders(5, 3));
+            Assert.fail("MaxHeaderLimitException expected");
+        } catch (MaxHeaderLimitException expected) {
+            Assert.assertEquals("Maximum total header limit (10) exceeded", expected.getMessage());
+        }
+    }
+
+    @Test
+    public void totalHeaderLimitShouldAcceptAMessageAtTheLimit() throws Exception {
+        // 5 parts x 3 fields, plus the root message's own Content-Type field
+        MimeConfig config = MimeConfig.custom()
+                .setMaxHeaderCount(1000)
+                .setMaxTotalHeaderCount(5 * 3 + 1)
+                .build();
+        Assert.assertEquals(5, parse(config, multipartWithHeaders(5, 3)));
+    }
+
+    @Test
+    public void totalHeaderLimitShouldCountTheRootMessageFields() throws Exception {
+        MimeConfig config = MimeConfig.custom()
+                .setMaxHeaderCount(1000)
+                .setMaxTotalHeaderCount(5 * 3)
+                .build();
+        try {
+            parse(config, multipartWithHeaders(5, 3));
+            Assert.fail("MaxHeaderLimitException expected");
+        } catch (MaxHeaderLimitException expected) {
+            // the root Content-Type is the 16th field
+        }
+    }
+
+    @Test
+    public void totalHeaderLimitShouldBeDisabledWhenNegative() throws Exception {
+        MimeConfig config = MimeConfig.custom()
+                .setMaxHeaderCount(-1)
+                .setMaxTotalHeaderCount(-1)
+                .build();
+        Assert.assertEquals(50, parse(config, multipartWithHeaders(50, 100)));
+    }
+
+    @Test
+    public void totalHeaderLimitShouldBeDisabledWhenZero() throws Exception {
+        MimeConfig config = MimeConfig.custom()
+                .setMaxHeaderCount(-1)
+                .setMaxTotalHeaderCount(0)
+                .build();
+        Assert.assertEquals(50, parse(config, multipartWithHeaders(50, 100)));
+    }
+
+    @Test
+    public void defaultConfigShouldBoundTheTotalHeaderCount() throws Exception {
+        Assert.assertEquals(16384, MimeConfig.DEFAULT.getMaxTotalHeaderCount());
+        Assert.assertEquals(16384, MimeConfig.PERMISSIVE.getMaxTotalHeaderCount());
+        try {
+            // 400 parts x 100 fields = 40000 fields, only 100 per entity
+            parse(MimeConfig.PERMISSIVE, multipartWithHeaders(400, 100));
+            Assert.fail("MaxHeaderLimitException expected");
+        } catch (MaxHeaderLimitException expected) {
+            // expected
+        }
+    }
+
+    @Test
     public void copyShouldCarryTheLimitsOver() {
         MimeConfig config = MimeConfig.copy(MimeConfig.custom()
                 .setMaxPartCount(7)
                 .setMaxNestingDepth(9)
+                .setMaxTotalHeaderCount(11)
                 .build()).build();
         Assert.assertEquals(7, config.getMaxPartCount());
         Assert.assertEquals(9, config.getMaxNestingDepth());
+        Assert.assertEquals(11, config.getMaxTotalHeaderCount());
     }
 }

@@ -31,6 +31,7 @@ import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineNumberInputStream;
+import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
 import org.apache.james.mime4j.io.MaxPartCountLimitException;
 import org.apache.james.mime4j.util.CharsetUtil;
@@ -91,6 +92,7 @@ public class MimeTokenStream {
     private RecursionMode recursionMode = RecursionMode.M_RECURSE;
     private MimeEntity rootentity;
     private int partCount;
+    private int totalHeaderCount;
 
     /**
      * Constructs a standard (lax) stream.
@@ -208,6 +210,7 @@ public class MimeTokenStream {
         rootentity.setRecursionMode(recursionMode);
         currentStateMachine = rootentity;
         partCount = 0;
+        totalHeaderCount = 0;
         entities.clear();
         entities.add(currentStateMachine);
         state = currentStateMachine.getState();
@@ -384,6 +387,9 @@ public class MimeTokenStream {
             }
             state = currentStateMachine.getState();
             if (state != EntityState.T_END_OF_STREAM) {
+                if (state == EntityState.T_FIELD) {
+                    checkTotalHeaderLimit();
+                }
                 return state;
             }
             final EntityStateMachine entityStateMachine = entities.removeLast();
@@ -423,6 +429,26 @@ public class MimeTokenStream {
         if (maxNestingDepth > 0 && entities.size() >= maxNestingDepth) {
             throw new MaxNestingDepthLimitException("Maximum nesting depth limit ("
                     + maxNestingDepth + ") exceeded");
+        }
+    }
+
+    /**
+     * Enforces the message wide budget on header fields. {@link MimeConfig#getMaxHeaderCount()}
+     * is enforced per entity by {@link MimeEntity} and so resets on every part,
+     * which lets a message stay under it in every single entity while still
+     * carrying a very large number of fields overall. Every field is retained by
+     * a consumer building a DOM, so only a message wide budget bounds that graph
+     * independently of the part count.
+     * <p>
+     * Counts the fields actually reported to the caller: malformed fields the
+     * parser skips are not retained and so do not consume the budget.
+     */
+    private void checkTotalHeaderLimit() throws MimeException {
+        int maxTotalHeaderCount = config.getMaxTotalHeaderCount();
+        totalHeaderCount++;
+        if (maxTotalHeaderCount > 0 && totalHeaderCount > maxTotalHeaderCount) {
+            throw new MaxHeaderLimitException("Maximum total header limit ("
+                    + maxTotalHeaderCount + ") exceeded");
         }
     }
 
