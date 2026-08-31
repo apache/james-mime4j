@@ -31,6 +31,8 @@ import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineNumberInputStream;
+import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
+import org.apache.james.mime4j.io.MaxPartCountLimitException;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
@@ -88,6 +90,7 @@ public class MimeTokenStream {
     private EntityStateMachine currentStateMachine;
     private RecursionMode recursionMode = RecursionMode.M_RECURSE;
     private MimeEntity rootentity;
+    private int partCount;
 
     /**
      * Constructs a standard (lax) stream.
@@ -204,6 +207,7 @@ public class MimeTokenStream {
 
         rootentity.setRecursionMode(recursionMode);
         currentStateMachine = rootentity;
+        partCount = 0;
         entities.clear();
         entities.add(currentStateMachine);
         state = currentStateMachine.getState();
@@ -374,6 +378,7 @@ public class MimeTokenStream {
         while (currentStateMachine != null) {
             EntityStateMachine next = currentStateMachine.advance();
             if (next != null) {
+                checkEntityLimits();
                 entities.add(next);
                 currentStateMachine = next;
             }
@@ -394,6 +399,31 @@ public class MimeTokenStream {
         }
         state = EntityState.T_END_OF_STREAM;
         return state;
+    }
+
+    /**
+     * Enforces the limits on the total number of MIME entities a message may be
+     * made of and on how deeply those entities may be nested. Both are message
+     * wide limits, unlike the header and content limits which are enforced per
+     * entity, and they bound the work a consumer of this token stream can be
+     * made to do by a small but pathologically structured message.
+     * <p>
+     * Called before a newly discovered entity is pushed onto the stack.
+     */
+    private void checkEntityLimits() throws MimeException {
+        int maxPartCount = config.getMaxPartCount();
+        if (maxPartCount > 0 && partCount >= maxPartCount) {
+            throw new MaxPartCountLimitException("Maximum part count limit ("
+                    + maxPartCount + ") exceeded");
+        }
+        partCount++;
+        int maxNestingDepth = config.getMaxNestingDepth();
+        // entities already holds the parent chain of the entity being pushed,
+        // the root message included, so the new entity sits at depth size + 1.
+        if (maxNestingDepth > 0 && entities.size() >= maxNestingDepth) {
+            throw new MaxNestingDepthLimitException("Maximum nesting depth limit ("
+                    + maxNestingDepth + ") exceeded");
+        }
     }
 
     /**
