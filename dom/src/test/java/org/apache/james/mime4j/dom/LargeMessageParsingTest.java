@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.stream.MimeConfig;
@@ -74,25 +75,26 @@ public class LargeMessageParsingTest {
 
     @Test
     public void parsingAMessageWithLongLinesWithPermissiveConfigShouldSucceed() throws Exception {
-        ByteArrayOutputStream longLineOutputStream = new ByteArrayOutputStream( 1024 * 1024);
-        ByteArrayOutputStream longHeaderOutputStream = new ByteArrayOutputStream( 1024 * 1024);
+        ByteArrayOutputStream longLineOutputStream = new ByteArrayOutputStream(1024 * 1024);
+        ByteArrayOutputStream longHeaderOutputStream = new ByteArrayOutputStream(1024 * 1024);
 
         longHeaderOutputStream.write("header: ".getBytes());
-        // Each header is ~ 500 Ko
-        for (int i = 0; i < 50 * 1024; i++) {
+        // Each header stays just under the permissive per header cap
+        while (longHeaderOutputStream.size() < MimeConfig.PERMISSIVE.getMaxHeaderLen() - 32) {
             longHeaderOutputStream.write("0123456789".getBytes());
         }
         longHeaderOutputStream.write("\r\n".getBytes());
 
-        // Each line is ~ 1Mo
+        // Each line is ~ 1Mo: long lines are still unbounded under the permissive profile
         for (int i = 0; i < 100 * 1024; i++) {
             longLineOutputStream.write("0123456789".getBytes());
         }
         longLineOutputStream.write("\r\n".getBytes());
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream(100 * 1024 * 1024);
-        // 60 * 0.5 = ~ 30 Mo of headers
-        for (int i = 0; i < 60; i++) {
+        // as many ~64 Ko headers as the total header budget allows
+        long headers = MimeConfig.PERMISSIVE.getMaxTotalHeaderLen() / longHeaderOutputStream.size();
+        for (int i = 0; i < headers; i++) {
             outputStream.write(longHeaderOutputStream.toByteArray());
         }
         outputStream.write("\r\n".getBytes());
@@ -104,5 +106,28 @@ public class LargeMessageParsingTest {
         DefaultMessageBuilder messageBuilder = new DefaultMessageBuilder();
         messageBuilder.setMimeEntityConfig(MimeConfig.PERMISSIVE);
         messageBuilder.parseMessage(new ByteArrayInputStream(outputStream.toByteArray()));
+    }
+
+    @Test
+    public void parsingAnOversizedHeaderWithPermissiveConfigShouldBeRejected() throws Exception {
+        // An address, group or parameter list is retained as one object per item, so
+        // a single unbounded header amplifies without limit. 500 Ko in one field used
+        // to be accepted; MIME4J-269's "denying a single email to use all JVM memory"
+        // covers this too.
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(1024 * 1024);
+        outputStream.write("header: ".getBytes());
+        for (int i = 0; i < 50 * 1024; i++) {
+            outputStream.write("0123456789".getBytes());
+        }
+        outputStream.write("\r\n\r\nbody\r\n".getBytes());
+
+        DefaultMessageBuilder messageBuilder = new DefaultMessageBuilder();
+        messageBuilder.setMimeEntityConfig(MimeConfig.PERMISSIVE);
+        try {
+            messageBuilder.parseMessage(new ByteArrayInputStream(outputStream.toByteArray()));
+            Assert.fail("MimeIOException expected");
+        } catch (MimeIOException e) {
+            Assert.assertTrue(e.getCause() instanceof MaxHeaderLengthLimitException);
+        }
     }
 }
