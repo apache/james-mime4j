@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [0.8.15] - 2026-09-03
+
+ - [ENHANCEMENT] More configurable parsing limits and better defaults
+ - [DOCUMENTATION] Migrate site content to Antora
+
 ## [0.8.14] - 2026-04-21
 
  - [PERF] Reduce String allocs in RawFieldParser

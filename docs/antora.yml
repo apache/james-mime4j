@@ -7,4 +7,4 @@ nav:
 asciidoc:
   attributes:
     # Latest released version, as published on Maven central. Bump on release.
-    mime4j-version: '0.8.14@'
+    mime4j-version: '0.8.15@'
