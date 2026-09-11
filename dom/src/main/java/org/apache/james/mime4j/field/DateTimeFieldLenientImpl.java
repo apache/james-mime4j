@@ -136,14 +136,27 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         parsed = true;
         date = null;
         String body = getBody();
-        if (body != null) {
-            body = body.trim();
+        if (body == null) {
+            return;
+        }
+        String text = body.trim();
+        if (!mayBeRfc5322(text)) {
+            return;
         }
         try {
-            date = Date.from(Instant.from(RFC_5322.parse(body, new ParsePosition(0))));
+            date = Date.from(Instant.from(RFC_5322.parse(text, new ParsePosition(0))));
         } catch (Exception e) {
-            // Ignore
+            // Ignore: invalid date
         }
+    }
+
+    /**
+     * Cheap pre-check that rejects obviously invalid values such as <code>unknown</code> or an
+     * empty string without paying for a parse exception. A RFC 5322 date always carries a
+     * <code>HH:MM</code> time, hence a colon.
+     */
+    private static boolean mayBeRfc5322(final String text) {
+        return text.indexOf(':') > 0;
     }
 
     public static final FieldParser<DateTimeField> PARSER = new FieldParser<DateTimeField>() {

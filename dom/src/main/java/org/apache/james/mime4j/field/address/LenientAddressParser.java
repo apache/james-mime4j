@@ -55,6 +55,25 @@ public class LenientAddressParser implements AddressParser {
     private static final BitSet COMMA_ONLY             = RawFieldParser.INIT_BITSET(COMMA);
     private static final BitSet COLON_ONLY             = RawFieldParser.INIT_BITSET(COLON);
     private static final BitSet SEMICOLON_ONLY         = RawFieldParser.INIT_BITSET(SEMICOLON);
+    private static final BitSet ROUTE_STOP             = RawFieldParser.INIT_BITSET(COMMA, COLON);
+    private static final BitSet MAILBOX_STOP           = RawFieldParser.INIT_BITSET(AT, OPENING_BRACKET);
+    private static final BitSet ADDRESS_STOP           = RawFieldParser.INIT_BITSET(COLON, AT, OPENING_BRACKET);
+    private static final BitSet BRACKETED_ROUTE_STOP   = union(ROUTE_STOP, CLOSING_BRACKET_ONLY);
+    private static final BitSet ADDRESS_IN_LIST_STOP   = union(ADDRESS_STOP, COMMA_ONLY);
+
+    /**
+     * Returns the union of a stop set with optional extra delimiters, sharing the
+     * base set when there is nothing to add. Callers must not mutate the result.
+     */
+    private static BitSet union(final BitSet base, final BitSet delimiters) {
+        if (delimiters == null) {
+            return base;
+        }
+        BitSet result = new BitSet();
+        result.or(base);
+        result.or(delimiters);
+        return result;
+    }
 
     public static final LenientAddressParser DEFAULT = new LenientAddressParser(DecodeMonitor.SILENT);
 
@@ -85,10 +104,10 @@ public class LenientAddressParser implements AddressParser {
     }
 
     DomainList parseRoute(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        BitSet bitset = RawFieldParser.INIT_BITSET(COMMA, COLON);
-        if (delimiters != null) {
-            bitset.or(delimiters);
-        }
+        return parseRouteUntil(buf, cursor, union(ROUTE_STOP, delimiters));
+    }
+
+    private DomainList parseRouteUntil(final ByteSequence buf, final ParserCursor cursor, final BitSet stopSet) {
         List<String> domains = null;
         for (;;) {
             this.parser.skipAllWhiteSpace(buf, cursor);
@@ -102,7 +121,7 @@ public class LenientAddressParser implements AddressParser {
             } else {
                 break;
             }
-            String s = parseDomain(buf, cursor, bitset);
+            String s = parseDomain(buf, cursor, stopSet);
             if (s != null && s.length() > 0) {
                 if (domains == null) {
                     domains = new ArrayList<String>();
@@ -145,7 +164,7 @@ public class LenientAddressParser implements AddressParser {
         } else {
             return createMailbox(null, null, openingText, null);
         }
-        DomainList domainList = parseRoute(buf, cursor, CLOSING_BRACKET_ONLY);
+        DomainList domainList = parseRouteUntil(buf, cursor, BRACKETED_ROUTE_STOP);
         String localPart = this.parser.parseValue(buf, cursor, AT_AND_CLOSING_BRACKET);
         if (cursor.atEnd()) {
             return createMailbox(openingText, domainList, localPart, null);
@@ -192,11 +211,12 @@ public class LenientAddressParser implements AddressParser {
 
     public Mailbox parseMailbox(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        BitSet bitset = RawFieldParser.INIT_BITSET(AT, OPENING_BRACKET);
-        if (delimiters != null) {
-            bitset.or(delimiters);
-        }
-        String openingText = this.parser.parseValue(buf, cursor, bitset);
+        return parseMailbox(buf, cursor, delimiters, union(MAILBOX_STOP, delimiters));
+    }
+
+    private Mailbox parseMailbox(
+            final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters, final BitSet stopSet) {
+        String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
             return createMailbox(openingText);
         }
@@ -223,10 +243,8 @@ public class LenientAddressParser implements AddressParser {
 
     List<Mailbox> parseMailboxes(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        BitSet bitset = RawFieldParser.INIT_BITSET(COMMA);
-        if (delimiters != null) {
-            bitset.or(delimiters);
-        }
+        BitSet bitset = union(COMMA_ONLY, delimiters);
+        BitSet mailboxStop = union(MAILBOX_STOP, bitset);
         List<Mailbox> mboxes = new ArrayList<Mailbox>();
         while (!cursor.atEnd()) {
             int pos = cursor.getPos();
@@ -236,7 +254,7 @@ public class LenientAddressParser implements AddressParser {
             } else if (current == COMMA) {
                 cursor.updatePos(pos + 1);
             } else {
-                Mailbox mbox = parseMailbox(buf, cursor, bitset);
+                Mailbox mbox = parseMailbox(buf, cursor, bitset, mailboxStop);
                 if (mbox != null) {
                     mboxes.add(mbox);
                 }
@@ -267,11 +285,12 @@ public class LenientAddressParser implements AddressParser {
 
     public Address parseAddress(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        BitSet bitset = RawFieldParser.INIT_BITSET(COLON, AT, OPENING_BRACKET);
-        if (delimiters != null) {
-            bitset.or(delimiters);
-        }
-        String openingText = this.parser.parseValue(buf, cursor, bitset);
+        return parseAddress(buf, cursor, delimiters, union(ADDRESS_STOP, delimiters));
+    }
+
+    private Address parseAddress(
+            final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters, final BitSet stopSet) {
+        String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
             return createMailbox(openingText);
         }
@@ -316,7 +335,7 @@ public class LenientAddressParser implements AddressParser {
             if (current == COMMA) {
                 cursor.updatePos(pos + 1);
             } else {
-                Address address = parseAddress(buf, cursor, COMMA_ONLY);
+                Address address = parseAddress(buf, cursor, COMMA_ONLY, ADDRESS_IN_LIST_STOP);
                 if (address != null) {
                     addresses.add(address);
                 }

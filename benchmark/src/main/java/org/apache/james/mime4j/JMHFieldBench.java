@@ -30,6 +30,7 @@ import org.apache.james.mime4j.field.ContentTypeFieldImpl;
 import org.apache.james.mime4j.field.ContentTypeFieldLenientImpl;
 import org.apache.james.mime4j.field.DateTimeFieldImpl;
 import org.apache.james.mime4j.field.DateTimeFieldLenientImpl;
+import org.apache.james.mime4j.field.UnstructuredFieldImpl;
 import org.apache.james.mime4j.stream.RawField;
 import org.junit.Test;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -64,6 +65,18 @@ public class JMHFieldBench {
     public void dateLenient(Blackhole bh) {
         bh.consume(DateTimeFieldLenientImpl.PARSER.parse(new RawField("Date", "Tue, 26 Apr 2022 02:27:54 +0000"), DecodeMonitor.SILENT)
             .getDate());
+    }
+
+    @Benchmark
+    public void dateLenientInvalid(Blackhole bh) {
+        bh.consume(DateTimeFieldLenientImpl.PARSER.parse(new RawField("Date", "unknown"), DecodeMonitor.SILENT)
+            .getDate());
+    }
+
+    @Benchmark
+    public void unstructuredPlain(Blackhole bh) {
+        bh.consume(UnstructuredFieldImpl.PARSER.parse(new RawField("Subject", "A plain subject without encoded words"), DecodeMonitor.SILENT)
+            .getValue());
     }
 
     @Benchmark
