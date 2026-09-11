@@ -34,12 +34,15 @@ import org.apache.james.mime4j.message.MultipartImpl;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.util.BufferRecycler;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.ContentUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * A <code>ContentHandler</code> for building an <code>Entity</code> to be
@@ -47,18 +50,17 @@ import java.util.Stack;
  */
 public class ParserStreamContentHandler implements ContentHandler {
 
+    private static final int COPY_BUFFER_SIZE = 4096;
+
     private final Entity entity;
     private final MessageImplFactory messageImplFactory;
     private final BodyFactory bodyFactory;
-    private final Stack<Object> stack;
+    private final Deque<Object> stack;
 
     public ParserStreamContentHandler(
             final Entity entity,
             final BodyFactory bodyFactory) {
-        this.entity = entity;
-        this.messageImplFactory = new DefaultMessageImplFactory();
-        this.bodyFactory = bodyFactory;
-        this.stack = new Stack<Object>();
+        this(entity, new DefaultMessageImplFactory(), bodyFactory);
     }
 
     public ParserStreamContentHandler(
@@ -68,14 +70,58 @@ public class ParserStreamContentHandler implements ContentHandler {
         this.entity = entity;
         this.messageImplFactory = messageImplFactory;
         this.bodyFactory = bodyFactory;
-        this.stack = new Stack<Object>();
+        this.stack = new ArrayDeque<Object>();
     }
 
-    private void expect(Class<?> c) {
-        if (!c.isInstance(stack.peek())) {
-            throw new IllegalStateException("Internal stack error: "
-                    + "Expected '" + c.getName() + "' found '"
-                    + stack.peek().getClass().getName() + "'");
+    private static IllegalStateException unexpected(final Class<?> expected, final Object found) {
+        return new IllegalStateException("Internal stack error: "
+                + "Expected '" + expected.getName() + "' found '"
+                + found.getClass().getName() + "'");
+    }
+
+    private Entity peekEntity() {
+        Object top = stack.peek();
+        if (top instanceof Entity) {
+            return (Entity) top;
+        }
+        throw unexpected(Entity.class, top);
+    }
+
+    private Header peekHeader() {
+        Object top = stack.peek();
+        if (top instanceof Header) {
+            return (Header) top;
+        }
+        throw unexpected(Header.class, top);
+    }
+
+    private Multipart peekMultipart() {
+        Object top = stack.peek();
+        if (top instanceof Multipart) {
+            return (Multipart) top;
+        }
+        throw unexpected(Multipart.class, top);
+    }
+
+    private MultipartImpl peekMultipartImpl() {
+        Object top = stack.peek();
+        if (top instanceof MultipartImpl) {
+            return (MultipartImpl) top;
+        }
+        throw unexpected(MultipartImpl.class, top);
+    }
+
+    private void expectMessage() {
+        Object top = stack.peek();
+        if (!(top instanceof Message)) {
+            throw unexpected(Message.class, top);
+        }
+    }
+
+    private void expectBodyPart() {
+        Object top = stack.peek();
+        if (!(top instanceof BodyPart)) {
+            throw unexpected(BodyPart.class, top);
         }
     }
 
@@ -83,15 +129,14 @@ public class ParserStreamContentHandler implements ContentHandler {
         if (stack.isEmpty()) {
             stack.push(this.entity);
         } else {
-            expect(Entity.class);
             Message m = messageImplFactory.messageImpl();
-            ((Entity) stack.peek()).setBody(m);
+            peekEntity().setBody(m);
             stack.push(m);
         }
     }
 
     public void endMessage() throws MimeException {
-        expect(Message.class);
+        expectMessage();
         stack.pop();
     }
 
@@ -100,39 +145,31 @@ public class ParserStreamContentHandler implements ContentHandler {
     }
 
     public void field(Field field) throws MimeException {
-        expect(Header.class);
-        ((Header) stack.peek()).addField(field);
+        peekHeader().addField(field);
     }
 
     public void endHeader() throws MimeException {
-        expect(Header.class);
-        Header h = (Header) stack.pop();
-        expect(Entity.class);
-        ((Entity) stack.peek()).setHeader(h);
+        Header h = peekHeader();
+        stack.pop();
+        peekEntity().setHeader(h);
     }
 
     public void startMultipart(final BodyDescriptor bd) throws MimeException {
-        expect(Entity.class);
-
-        final Entity e = (Entity) stack.peek();
-        final String subType = bd.getSubType();
-        final Multipart multiPart = new MultipartImpl(subType);
+        final Entity e = peekEntity();
+        final Multipart multiPart = new MultipartImpl(bd.getSubType());
         e.setBody(multiPart);
         stack.push(multiPart);
     }
 
     public void body(BodyDescriptor bd, final InputStream is) throws MimeException, IOException {
-        expect(Entity.class);
-
+        final Entity e = peekEntity();
         final Body body;
         if (bd.getMimeType().startsWith("text/")) {
             body = bodyFactory.textBody(is, bd.getCharset());
         } else {
             body = bodyFactory.binaryBody(is);
         }
-
-        Entity entity = ((Entity) stack.peek());
-        entity.setBody(body);
+        e.setBody(body);
     }
 
     public void endMultipart() throws MimeException {
@@ -140,28 +177,22 @@ public class ParserStreamContentHandler implements ContentHandler {
     }
 
     public void startBodyPart() throws MimeException {
-        expect(Multipart.class);
-
         BodyPart bodyPart = new BodyPart();
-        ((Multipart) stack.peek()).addBodyPart(bodyPart);
+        peekMultipart().addBodyPart(bodyPart);
         stack.push(bodyPart);
     }
 
     public void endBodyPart() throws MimeException {
-        expect(BodyPart.class);
+        expectBodyPart();
         stack.pop();
     }
 
     public void epilogue(InputStream is) throws MimeException, IOException {
-        expect(MultipartImpl.class);
-        ByteSequence bytes = loadStream(is);
-        ((MultipartImpl) stack.peek()).setEpilogueRaw(bytes);
+        peekMultipartImpl().setEpilogueRaw(loadStream(is));
     }
 
     public void preamble(InputStream is) throws MimeException, IOException {
-        expect(MultipartImpl.class);
-        ByteSequence bytes = loadStream(is);
-        ((MultipartImpl) stack.peek()).setPreambleRaw(bytes);
+        peekMultipartImpl().setPreambleRaw(loadStream(is));
     }
 
     /**
@@ -175,14 +206,18 @@ public class ParserStreamContentHandler implements ContentHandler {
     }
 
     private static ByteSequence loadStream(InputStream in) throws IOException {
-        ByteArrayBuffer bab = new ByteArrayBuffer(64);
-
-        int b;
-        while ((b = in.read()) != -1) {
-            bab.append(b);
+        BufferRecycler recycler = ContentUtil.getBufferRecycler();
+        byte[] chunk = recycler.allocByteBuffer(0, COPY_BUFFER_SIZE);
+        try {
+            ByteArrayBuffer bab = new ByteArrayBuffer(64);
+            int len;
+            while ((len = in.read(chunk)) != -1) {
+                bab.append(chunk, 0, len);
+            }
+            return bab;
+        } finally {
+            recycler.releaseByteBuffer(0, chunk);
         }
-
-        return bab;
     }
 
 }
