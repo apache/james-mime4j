@@ -261,6 +261,30 @@ public class LenientAddressBuilderTest {
     }
 
     @Test
+    public void testParseAddressListNonASCII() throws Exception {
+        String wire = "Gr\u00fc\u00dfe <hans.mueller@acme.org>";
+        Mailbox parsed = parser.parseAddressList(wire).flatten().get(0);
+        Assert.assertEquals("Gr\u00fc\u00dfe", parsed.getName());
+        Assert.assertEquals("hans.mueller@acme.org", parsed.getAddress());
+    }
+
+    @Test
+    public void testParseAddressNonASCII() throws Exception {
+        String wire = "Gr\u00fc\u00dfe <hans.mueller@acme.org>";
+        Mailbox parsed = (Mailbox) parser.parseAddress(wire);
+        Assert.assertEquals("Gr\u00fc\u00dfe", parsed.getName());
+        Assert.assertEquals("hans.mueller@acme.org", parsed.getAddress());
+    }
+
+    @Test
+    public void testParseGroupNonASCII() throws Exception {
+        String wire = "Gr\u00fc\u00dfe: hans.mueller@acme.org;";
+        Group group = parser.parseGroup(wire);
+        Assert.assertEquals("Gr\u00fc\u00dfe", group.getName());
+        Assert.assertEquals("hans.mueller@acme.org", group.getMailboxes().get(0).getAddress());
+    }
+
+    @Test
     public void testParsePartialQuotes() throws Exception {
         Mailbox mailbox1 = parser.parseMailbox(
                 "Hans \"M\374ller\" is a good fella <hans.mueller@acme.org>");
