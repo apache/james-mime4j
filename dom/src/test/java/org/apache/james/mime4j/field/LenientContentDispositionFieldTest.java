@@ -19,6 +19,8 @@
 
 package org.apache.james.mime4j.field;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Date;
 
 import org.apache.james.mime4j.MimeException;
@@ -231,10 +233,65 @@ public class LenientContentDispositionFieldTest {
     public void testBadEncodingFilename() throws MimeException {
          ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
                  "        filename*=utf-8''4%P001!.DOC;\n" +
-                 "        filename=\"4%P001!.DOC\"");
+                 "        filename=\"4%P002!.DOC\"");
 
-         Assert.assertEquals(f.getDispositionType(), "attachment");
-         Assert.assertEquals(f.getFilename(), "4%P001!.DOC4%P001!.DOC");
+         Assert.assertEquals("attachment", f.getDispositionType());
+         Assert.assertEquals("4%P002!.DOC", f.getFilename());
     }
 
+    @Test
+    public void testDuplicateFields() throws MimeException {
+        //test that the first is taken and that concatenation is not applied
+        ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
+                "filename=\"foo\";\n" +
+                "filename=\"bar2.rtf\";\n" +
+                "filename=\"bar3.rtf\"");
+        assertEquals("foo", f.getFilename());
+    }
+
+    @Test
+    public void testDuplicateFieldsPreferExtended() throws MimeException {
+        //test that extended field names are preferred to standard field names
+        ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
+                "filename*=\"foo\";\"");
+        assertEquals("foo", f.getFilename());
+
+        f = parse("Content-Disposition: attachment;\n" +
+                "filename*=\"UTF-8''%D0%BC%2E%78%6C%73%78\";\n" +
+                "filename=\"bar2.rtf\";");
+        assertEquals("м.xlsx", f.getFilename());
+
+        f = parse("Content-Disposition: attachment; \n" +
+                "filename*=\"foo\";\n" +
+                "filename=\"bar2.rtf\";\n" +
+                "filename=\"bar3.rtf\"");
+        assertEquals("foo", f.getFilename());
+
+        f = parse("Content-Disposition: attachment; \n" +
+                "filename=\"bar2.rtf\";\n" +
+                "filename*=\"foo\";\n" +
+                "filename=\"bar3.rtf\"");
+        assertEquals("foo", f.getFilename());
+    }
+
+    @Test
+    public void testStandardAndContinuationFields() throws MimeException {
+        ContentDispositionField f = parse("Content-Disposition: attachment; \n" +
+                "filename*0=\"foo\";\n" +
+                "filename=\"bar2.rtf\";\n" +
+                "filename*1=\"bar3.rtf\"");
+        assertEquals("foobar3.rtf", f.getFilename());
+
+        f = parse("Content-Disposition: attachment; \n" +
+                "filename=\"bar1.rtf\";\n" +
+                "filename*0=\"foo\";\n" +
+                "filename*1=\"bar3.rtf\"");
+        assertEquals("foobar3.rtf", f.getFilename());
+
+        f = parse("Content-Disposition: attachment; \n" +
+                "filename*0=\"foo\";\n" +
+                "filename*1=\"bar2.rtf\";\n" +
+                "filename=\"bar3.rtf\"");
+        assertEquals("foobar2.rtf", f.getFilename());
+    }
 }

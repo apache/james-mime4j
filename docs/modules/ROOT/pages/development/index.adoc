@@ -1,0 +1,16 @@
+= Getting started with Mime4J
+
+Overview of the getting started documentation.
+
+[cols="1,2"]
+|===
+|Document |Description
+
+|https://james.apache.org/download.cgi#Apache_Mime4J[Download]
+|Before you can start using Mime4J, you'll have to download the distribution to your system
+(unless you plan on building the project from source). This document provides links to the
+various distributions available.
+
+|xref:development/build.adoc[Building Mime4J]
+|Describes how to build Mime4J from the sources.
+|===

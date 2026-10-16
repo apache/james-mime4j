@@ -20,7 +20,7 @@
 package org.apache.james.mime4j.dom;
 
 /**
- * A <tt>Disposable</tt> is an object that should be disposed of explicitly
+ * A <code>Disposable</code> is an object that should be disposed of explicitly
  * when it is no longer needed.
  *
  * The dispose method is invoked to release resources that the object is

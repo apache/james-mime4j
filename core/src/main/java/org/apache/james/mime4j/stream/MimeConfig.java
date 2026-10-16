@@ -28,8 +28,8 @@ public final class MimeConfig {
 
     public static final MimeConfig PERMISSIVE = MimeConfig.custom()
         .setMaxContentLen(150 * 1024 * 1024)
-        .setMaxHeaderCount(-1)
-        .setMaxHeaderLen(-1)
+        .setMaxHeaderCount(4096)
+        .setMaxHeaderLen(64 * 1024)
         .setMaxLineLen(-1)
         .build();
     public static final MimeConfig DEFAULT = new Builder().build();
@@ -43,6 +43,10 @@ public final class MimeConfig {
     private final int maxHeaderCount;
     private final int maxHeaderLen;
     private final long maxContentLen;
+    private final int maxTotalHeaderCount;
+    private final long maxTotalHeaderLen;
+    private final int maxPartCount;
+    private final int maxNestingDepth;
     private final boolean countLineNumbers;
     private final String headlessParsing;
     private final boolean malformedHeaderStartsBody;
@@ -53,6 +57,10 @@ public final class MimeConfig {
             int maxHeaderCount,
             int maxHeaderLen,
             long maxContentLen,
+            int maxTotalHeaderCount,
+            long maxTotalHeaderLen,
+            int maxPartCount,
+            int maxNestingDepth,
             boolean countLineNumbers,
             String headlessParsing,
             boolean malformedHeaderStartsBody) {
@@ -63,6 +71,10 @@ public final class MimeConfig {
         this.maxHeaderCount = maxHeaderCount;
         this.maxHeaderLen = maxHeaderLen;
         this.maxContentLen = maxContentLen;
+        this.maxTotalHeaderCount = maxTotalHeaderCount;
+        this.maxTotalHeaderLen = maxTotalHeaderLen;
+        this.maxPartCount = maxPartCount;
+        this.maxNestingDepth = maxNestingDepth;
         this.headlessParsing = headlessParsing;
     }
 
@@ -132,6 +144,50 @@ public final class MimeConfig {
     }
 
     /**
+     * Returns the maximum total header count limit
+     *
+     * @see Builder#setMaxTotalHeaderCount(int)
+     *
+     * @return value of the maximum total header count limit
+     */
+    public int getMaxTotalHeaderCount() {
+        return maxTotalHeaderCount;
+    }
+
+    /**
+     * Returns the maximum total header length limit
+     *
+     * @see Builder#setMaxTotalHeaderLen(long)
+     *
+     * @return value of the maximum total header length limit
+     */
+    public long getMaxTotalHeaderLen() {
+        return maxTotalHeaderLen;
+    }
+
+    /**
+     * Returns the maximum part count limit
+     *
+     * @see Builder#setMaxPartCount(int)
+     *
+     * @return value of the maximum part count limit
+     */
+    public int getMaxPartCount() {
+        return maxPartCount;
+    }
+
+    /**
+     * Returns the maximum nesting depth limit
+     *
+     * @see Builder#setMaxNestingDepth(int)
+     *
+     * @return value of the maximum nesting depth limit
+     */
+    public int getMaxNestingDepth() {
+        return maxNestingDepth;
+    }
+
+    /**
      * Returns the value of the line number counting mode.
      *
      * @return value of the line number counting mode.
@@ -159,6 +215,10 @@ public final class MimeConfig {
                 .append(", maxHeaderCount=").append(maxHeaderCount)
                 .append(", maxHeaderLen=").append(maxHeaderLen)
                 .append(", maxContentLen=").append(maxContentLen)
+                .append(", maxTotalHeaderCount=").append(maxTotalHeaderCount)
+                .append(", maxTotalHeaderLen=").append(maxTotalHeaderLen)
+                .append(", maxPartCount=").append(maxPartCount)
+                .append(", maxNestingDepth=").append(maxNestingDepth)
                 .append(", countLineNumbers=").append(countLineNumbers)
                 .append(", headlessParsing=").append(headlessParsing)
                 .append(", malformedHeaderStartsBody=").append(malformedHeaderStartsBody)
@@ -180,6 +240,10 @@ public final class MimeConfig {
             .setMaxHeaderCount(config.getMaxHeaderCount())
             .setMaxHeaderLen(config.getMaxHeaderLen())
             .setMaxContentLen(config.getMaxContentLen())
+            .setMaxTotalHeaderCount(config.getMaxTotalHeaderCount())
+            .setMaxTotalHeaderLen(config.getMaxTotalHeaderLen())
+            .setMaxPartCount(config.getMaxPartCount())
+            .setMaxNestingDepth(config.getMaxNestingDepth())
             .setCountLineNumbers(config.isCountLineNumbers())
             .setHeadlessParsing(config.getHeadlessParsing())
             .setMalformedHeaderStartsBody(config.isMalformedHeaderStartsBody());
@@ -192,6 +256,10 @@ public final class MimeConfig {
         private int maxHeaderCount;
         private int maxHeaderLen;
         private long maxContentLen;
+        private int maxTotalHeaderCount;
+        private long maxTotalHeaderLen;
+        private int maxPartCount;
+        private int maxNestingDepth;
         private boolean countLineNumbers;
         private String headlessParsing;
         private boolean malformedHeaderStartsBody;
@@ -204,6 +272,10 @@ public final class MimeConfig {
             this.maxHeaderCount = 1000;
             this.maxHeaderLen = 10000;
             this.maxContentLen = -1;
+            this.maxTotalHeaderCount = 16384;
+            this.maxTotalHeaderLen = 1024 * 1024;
+            this.maxPartCount = 512;
+            this.maxNestingDepth = 64;
             this.headlessParsing = null;
         }
 
@@ -310,6 +382,101 @@ public final class MimeConfig {
         }
 
         /**
+         * Sets the maximum number of header fields a message may contain in
+         * total, across every entity. Parsing will be terminated with a
+         * {@link org.apache.james.mime4j.io.MaxHeaderLimitException} if a message
+         * carries more fields than this limit. If this parameter is set to a non
+         * positive value the total header count check will be disabled.
+         * <p>
+         * This complements {@link #setMaxHeaderCount(int)}, which is enforced per
+         * entity and therefore multiplies by {@link #setMaxPartCount(int)}: a
+         * message may hold few enough fields in every single entity yet still
+         * carry a very large number of them overall. Only a message wide budget
+         * bounds the retained header graph independently of the part count.
+         * <p>
+         * Default value: <code>16384</code>
+         *
+         * @param maxTotalHeaderCount
+         *            maximum total header count limit
+         */
+        public Builder setMaxTotalHeaderCount(int maxTotalHeaderCount) {
+            this.maxTotalHeaderCount = maxTotalHeaderCount;
+            return this;
+        }
+
+        /**
+         * Sets the maximum number of bytes a message may spend on header fields in
+         * total, across every entity. Parsing will be terminated with a
+         * {@link org.apache.james.mime4j.io.MaxHeaderLengthLimitException} if a
+         * message carries more header bytes than this limit. If this parameter is
+         * set to a non positive value the total header length check is disabled.
+         * <p>
+         * This is to {@link #setMaxHeaderLen(int)} what
+         * {@link #setMaxTotalHeaderCount(int)} is to {@link #setMaxHeaderCount(int)}.
+         * A per header bound multiplies by the number of entities: {@code Content-Type}
+         * and {@code Content-Disposition} occur once per part, so bounding each one
+         * still leaves {@link #setMaxPartCount(int)} times that much. Address, group
+         * and parameter lists are retained as one object per item, so only a message
+         * wide budget on header bytes bounds the retained graph.
+         * <p>
+         * Default value: <code>1048576</code> (1 MB)
+         *
+         * @param maxTotalHeaderLen
+         *            maximum total header length limit
+         */
+        public Builder setMaxTotalHeaderLen(long maxTotalHeaderLen) {
+            this.maxTotalHeaderLen = maxTotalHeaderLen;
+            return this;
+        }
+
+        /**
+         * Sets the maximum number of MIME entities (body parts and embedded
+         * messages) a message may be made of. Parsing will be terminated with a
+         * {@link org.apache.james.mime4j.io.MaxPartCountLimitException} if a
+         * message contains more entities than this limit. If this parameter is
+         * set to a non positive value the part count check will be disabled.
+         * <p>
+         * The top level message itself is not counted, so a limit of
+         * <code>1</code> allows a multipart message holding a single body part.
+         * <p>
+         * Unlike {@link #setMaxHeaderCount(int)} and
+         * {@link #setMaxContentLen(long)}, which are enforced per entity, this
+         * limit applies to the message as a whole. Without it a small message
+         * made of a very large number of tiny parts can make a consumer
+         * building an object graph per part exhaust its memory.
+         * <p>
+         * Default value: <code>512</code>
+         *
+         * @param maxPartCount
+         *            maximum part count limit
+         */
+        public Builder setMaxPartCount(int maxPartCount) {
+            this.maxPartCount = maxPartCount;
+            return this;
+        }
+
+        /**
+         * Sets the maximum nesting depth of MIME entities. Parsing will be
+         * terminated with a
+         * {@link org.apache.james.mime4j.io.MaxNestingDepthLimitException} if
+         * entities are nested more deeply than this limit. If this parameter is
+         * set to a non positive value the nesting depth check will be disabled.
+         * <p>
+         * The top level message is at depth <code>1</code>, so a limit of
+         * <code>2</code> allows a multipart message whose body parts are not
+         * themselves multipart or embedded messages.
+         * <p>
+         * Default value: <code>64</code>
+         *
+         * @param maxNestingDepth
+         *            maximum nesting depth limit
+         */
+        public Builder setMaxNestingDepth(int maxNestingDepth) {
+            this.maxNestingDepth = maxNestingDepth;
+            return this;
+        }
+
+        /**
          * Defines whether the parser should count line numbers. If enabled line
          * numbers are included in the debug output.
          * <p>
@@ -346,6 +513,10 @@ public final class MimeConfig {
                     maxHeaderCount,
                     maxHeaderLen,
                     maxContentLen,
+                    maxTotalHeaderCount,
+                    maxTotalHeaderLen,
+                    maxPartCount,
+                    maxNestingDepth,
                     countLineNumbers,
                     headlessParsing,
                     malformedHeaderStartsBody);

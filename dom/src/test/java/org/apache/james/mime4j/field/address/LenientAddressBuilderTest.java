@@ -231,6 +231,11 @@ public class LenientAddressBuilderTest {
                 "\"Hans M\374ller\" <hans.mueller@acme.org>");
         Assert.assertEquals("Hans M\374ller", mailbox5.getName());
         Assert.assertEquals("hans.mueller@acme.org", mailbox5.getAddress());
+
+        // UTF8 should be allowed in atoms too now
+        Mailbox mailbox6 = parser.parseMailbox(
+                "<dr.müller@dr-müller-lüdenscheid.de>");
+        Assert.assertEquals("dr.müller@dr-müller-lüdenscheid.de", mailbox6.getAddress());
     }
 
     @Test
@@ -253,6 +258,30 @@ public class LenientAddressBuilderTest {
                 "Hans M\374ller <hans.mueller@acme.org>");
         Assert.assertEquals("Hans M\374ller", mailbox1.getName());
         Assert.assertEquals("hans.mueller@acme.org", mailbox1.getAddress());
+    }
+
+    @Test
+    public void testParseAddressListNonASCII() throws Exception {
+        String wire = "Gr\u00fc\u00dfe <hans.mueller@acme.org>";
+        Mailbox parsed = parser.parseAddressList(wire).flatten().get(0);
+        Assert.assertEquals("Gr\u00fc\u00dfe", parsed.getName());
+        Assert.assertEquals("hans.mueller@acme.org", parsed.getAddress());
+    }
+
+    @Test
+    public void testParseAddressNonASCII() throws Exception {
+        String wire = "Gr\u00fc\u00dfe <hans.mueller@acme.org>";
+        Mailbox parsed = (Mailbox) parser.parseAddress(wire);
+        Assert.assertEquals("Gr\u00fc\u00dfe", parsed.getName());
+        Assert.assertEquals("hans.mueller@acme.org", parsed.getAddress());
+    }
+
+    @Test
+    public void testParseGroupNonASCII() throws Exception {
+        String wire = "Gr\u00fc\u00dfe: hans.mueller@acme.org;";
+        Group group = parser.parseGroup(wire);
+        Assert.assertEquals("Gr\u00fc\u00dfe", group.getName());
+        Assert.assertEquals("hans.mueller@acme.org", group.getMailboxes().get(0).getAddress());
     }
 
     @Test

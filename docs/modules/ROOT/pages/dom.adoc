@@ -1,0 +1,396 @@
+= Using the DOM API
+
+Mime4J offers two ways of looking at a message. The xref:usage.adoc[streaming API] hands you
+parsing events one at a time and never holds the whole message in memory. The *DOM API*,
+described here, turns a message into a tree of objects that you can navigate, modify and
+write back out. It is the API you want when you need random access to the parts of a
+message, or when you need to *build* a message rather than read one.
+
+The DOM API lives in the `apache-mime4j-dom` artifact:
+
+[source,xml,subs=attributes+]
+----
+<dependency>
+    <groupId>org.apache.james</groupId>
+    <artifactId>apache-mime4j-dom</artifactId>
+    <version>{mime4j-version}</version>
+</dependency>
+----
+
+`apache-mime4j-dom` pulls in `apache-mime4j-core` transitively. The optional
+`apache-mime4j-storage` artifact is only needed if you want body parts stored somewhere
+other than the heap; see <<Choosing where body parts are stored>>.
+
+== The object model
+
+A parsed message is a tree of *entities*. An
+https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/dom/Entity.html[`Entity`]
+is anything with a header and a body: the message itself, and every body part inside it.
+
+[source]
+----
+Entity
+ |- Header          a list of Field (name / value)
+ |- Body            one of:
+     |- SingleBody      a leaf part
+     |   |- TextBody        text/* — readable as characters
+     |   |- BinaryBody      everything else — readable as bytes
+     |- Multipart       a container, holds a List<Entity>
+     |- Message         a nested message/rfc822 part
+----
+
+The two concrete entity types are
+https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/dom/Message.html[`Message`]
+(the root, or a nested `message/rfc822` part) and
+https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/message/BodyPart.html[`BodyPart`]
+(a part inside a `Multipart`). Both expose `getHeader()`, `getBody()`, `getMimeType()`,
+`getCharset()`, `getDispositionType()` and `getFilename()`.
+
+Note that a body is *not* an entity: a `Multipart` has no header of its own, it borrows the
+`Content-Type` of the entity that holds it.
+
+== Parsing a message
+
+The shortest way to parse is `Message.Builder.of(InputStream)`:
+
+[source,java]
+----
+Message message = Message.Builder.of(inputStream).build();
+----
+
+Real-world mail is frequently malformed. `MimeConfig.PERMISSIVE` relaxes the limits and
+recovery rules of the parser, which is usually what you want when parsing messages you did
+not produce yourself:
+
+[source,java]
+----
+Message message = Message.Builder.of()
+        .use(MimeConfig.PERMISSIVE)
+        .parse(inputStream)
+        .build();
+----
+
+`MimeConfig` also comes as `DEFAULT` (the default) and `STRICT` (rejects anything that
+violates the RFCs), and `MimeConfig.custom()` lets you tune individual limits such as
+`setMaxLineLen`, `setMaxHeaderCount` or `setMaxContentLen`. Those limits matter: they are
+what protects you from hostile messages crafted to exhaust CPU or memory.
+
+The same thing can be done with a reusable
+https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/message/DefaultMessageBuilder.html[`DefaultMessageBuilder`],
+which is handy when you parse many messages with the same settings:
+
+[source,java]
+----
+DefaultMessageBuilder builder = new DefaultMessageBuilder();
+builder.setMimeEntityConfig(MimeConfig.PERMISSIVE);
+
+Message message = builder.parseMessage(inputStream);
+----
+
+== Reading headers
+
+Common fields have typed accessors that give you parsed values rather than raw strings:
+
+[source,java]
+----
+String subject = message.getSubject();
+Date date = message.getDate();
+
+for (Mailbox mailbox : message.getFrom()) {
+    System.out.println(mailbox.getName() + " <" + mailbox.getAddress() + ">");
+}
+----
+
+`getFrom()` returns a `MailboxList`; `getTo()`, `getCc()`, `getBcc()` and `getReplyTo()`
+return an `AddressList`, whose elements are either a `Mailbox` or a `Group` of mailboxes.
+
+Any other field is reachable through the header. A header may hold several fields with the
+same name — `Received` is the usual example — so both a single-valued and a list-valued
+accessor exist:
+
+[source,java]
+----
+Field field = message.getHeader().getField("X-Spam-Score");
+if (field != null) {
+    System.out.println(field.getName() + ": " + field.getBody());
+}
+
+List<Field> received = message.getHeader().getFields("Received");
+----
+
+== Reading the body
+
+For a simple `text/plain` message the body is a `TextBody`, which decodes the transfer
+encoding and the charset for you:
+
+[source,java]
+----
+if (message.getBody() instanceof TextBody) {
+    TextBody body = (TextBody) message.getBody();
+    try (Reader reader = body.getReader()) {
+        StringWriter writer = new StringWriter();
+        reader.transferTo(writer);
+        return writer.toString();
+    }
+}
+----
+
+A multipart message needs to be walked. The three cases to handle are the ones from the
+object model above — a container, a nested message, and a leaf:
+
+[source,java]
+----
+void walk(Entity entity, int depth) throws IOException {
+    String indent = "  ".repeat(depth);
+    System.out.println(indent + entity.getMimeType()
+            + (entity.getFilename() != null ? " (" + entity.getFilename() + ")" : ""));
+
+    Body body = entity.getBody();
+    if (body instanceof Multipart) {
+        for (Entity part : ((Multipart) body).getBodyParts()) {
+            walk(part, depth + 1);
+        }
+    } else if (body instanceof Message) {
+        walk((Message) body, depth + 1);
+    } else if (body instanceof SingleBody) {
+        System.out.println(indent + "  " + ((SingleBody) body).size() + " bytes");
+    }
+}
+----
+
+On a forwarded message that prints:
+
+----
+multipart/mixed
+  text/plain
+    22 bytes
+  message/rfc822
+    multipart/mixed
+      text/plain
+        33 bytes
+      application/pdf (invoice.pdf)
+        13 bytes
+----
+
+The same traversal is how you pull attachments out. `SingleBody.writeTo(OutputStream)`
+writes the *decoded* content, so you get the actual file bytes, not base64:
+
+[source,java]
+----
+void extractAttachments(Entity entity, OutputStream sink) throws IOException {
+    Body body = entity.getBody();
+    if (body instanceof Multipart) {
+        for (Entity part : ((Multipart) body).getBodyParts()) {
+            extractAttachments(part, sink);
+        }
+    } else if ("attachment".equalsIgnoreCase(entity.getDispositionType())) {
+        ((SingleBody) body).writeTo(sink);
+    }
+}
+----
+
+== Building a message
+
+`Message.Builder` builds a message from scratch. Setting a header field is a method call,
+and `setBody` sets the `Content-Type` for you:
+
+[source,java]
+----
+Message message = Message.Builder.of()
+        .setFrom("John Doe <jdoe@machine.example>")
+        .setTo("Mary Smith <mary@example.net>")
+        .setSubject("Saying hello")
+        .setDate(new Date())
+        .generateMessageId("machine.example")
+        .setBody("Hello, Mary!", StandardCharsets.UTF_8)
+        .build();
+----
+
+`Date` and `From` are required by RFC 5322, and a `Message-ID` should be present. The
+address setters take either a `Mailbox`/`Address` object or a string, and the string forms
+throw `ParseException` if the address does not parse.
+
+A multipart message is assembled with `MultipartBuilder` and `BodyPartBuilder`, which offer
+the same header methods per part:
+
+[source,java]
+----
+Message message = Message.Builder.of()
+        .setFrom("John Doe <jdoe@machine.example>")
+        .setTo("Mary Smith <mary@example.net>")
+        .setSubject("Invoice")
+        .setDate(new Date())
+        .setBody(MultipartBuilder.create("mixed")
+                .addBodyPart(BodyPartBuilder.create()
+                        .setBody("Please find the invoice attached.", StandardCharsets.UTF_8)
+                        .setContentTransferEncoding("quoted-printable")
+                        .build())
+                .addBodyPart(BodyPartBuilder.create()
+                        .setBody(pdf, "application/pdf")
+                        .setContentTransferEncoding("base64")
+                        .setContentDisposition("attachment", "invoice.pdf")
+                        .build())
+                .build())
+        .build();
+----
+
+`setContentDisposition("attachment", "invoice.pdf")` sets both the disposition type and the
+filename. Boundaries are generated for you.
+
+`MultipartBuilder.addTextPart` and `addBinaryPart` are shorthands for the common cases, and
+`setBody(text, subtype, charset)` picks the text subtype:
+
+[source,java]
+----
+Message message = Message.Builder.of()
+        .setSubject("Hello")
+        .setBody(MultipartBuilder.create("alternative")
+                .addTextPart("Hello, Mary!", StandardCharsets.UTF_8)
+                .addBodyPart(BodyPartBuilder.create()
+                        .setBody("<p>Hello, <b>Mary</b>!</p>", "html", StandardCharsets.UTF_8)
+                        .build())
+                .build())
+        .build();
+----
+
+For a header field Mime4J has no dedicated setter for, pass a `Field`. `RawField` is the
+simplest implementation, and
+https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/field/Fields.html[`Fields`]
+has factory methods that build correctly encoded structured fields:
+
+[source,java]
+----
+Message message = Message.Builder.of()
+        .setField(new RawField("X-Mailer", "my-app 1.0"))
+        .setBody("Hello", StandardCharsets.UTF_8)
+        .build();
+----
+
+Nesting a whole message as a `message/rfc822` part — forwarding — is just another
+`setBody` overload:
+
+[source,java]
+----
+Message forwarded = Message.Builder.of()
+        .setFrom("John Doe <jdoe@machine.example>")
+        .setSubject("Fwd: " + original.getSubject())
+        .setBody(MultipartBuilder.create("mixed")
+                .addTextPart("See the message below.", StandardCharsets.UTF_8)
+                .addBodyPart(BodyPartBuilder.create()
+                        .setBody(original)
+                        .build())
+                .build())
+        .build();
+----
+
+== Modifying an existing message
+
+`Message.Builder.of(Message)` copies an existing message into a builder. The copy can be
+modified without touching the original:
+
+[source,java]
+----
+Message.Builder builder = Message.Builder.of(original);
+builder.setSubject("Re: " + original.getSubject());
+builder.removeFields("Message-ID");
+builder.generateMessageId("machine.example");
+
+Message reply = builder.build();
+----
+
+`builder.getBody()` gives access to the copied body, so you can cast it to `Multipart` and
+use `addBodyPart`, `removeBodyPart` or `replaceBodyPart` to restructure the message before
+building it. An entity you remove from a tree no longer has an owner — call `dispose()` on
+it, as explained below.
+
+== Writing a message out
+
+https://james.apache.org/mime4j/apidocs/org/apache/james/mime4j/message/DefaultMessageWriter.html[`DefaultMessageWriter`]
+serializes a message back to the wire format:
+
+[source,java]
+----
+MessageWriter writer = new DefaultMessageWriter();
+writer.writeMessage(message, outputStream);
+----
+
+For small messages there is a shortcut:
+
+[source,java]
+----
+byte[] raw = DefaultMessageWriter.asBytes(message);
+----
+
+The writer also has `writeEntity`, `writeMultipart`, `writeHeader` and `writeBody` if you
+need to serialize a fragment.
+
+== Choosing where body parts are stored
+
+By default Mime4J keeps the content of every body part *in memory*
+(`BasicBodyFactory`). That is fine for ordinary mail and terrible for a 200 MB attachment.
+The `apache-mime4j-storage` artifact provides body factories that spill content elsewhere:
+
+[source,xml,subs=attributes+]
+----
+<dependency>
+    <groupId>org.apache.james</groupId>
+    <artifactId>apache-mime4j-storage</artifactId>
+    <version>{mime4j-version}</version>
+</dependency>
+----
+
+[source,java]
+----
+// keep the first 100 kB of each part in memory, write the remainder to a temporary file
+StorageProvider storageProvider =
+        new ThresholdStorageProvider(new TempFileStorageProvider(), 100 * 1024);
+StorageBodyFactory bodyFactory = new StorageBodyFactory(storageProvider, DecodeMonitor.SILENT);
+
+DefaultMessageBuilder builder = new DefaultMessageBuilder();
+builder.setBodyFactory(bodyFactory);
+
+Message message = builder.parseMessage(inputStream);
+----
+
+`ThresholdStorageProvider` keeps the first `thresholdSize` bytes of a part in memory and
+sends only the remainder to its back-end, so small parts never touch the disk at all.
+
+Providers compose. `MemoryStorageProvider` and `TempFileStorageProvider` are the two that
+actually store content; `ThresholdStorageProvider` and `CipherStorageProvider` decorate
+another provider — the latter scrambles whatever the back-end writes, through the JCE API:
+
+[source,java]
+----
+StorageProvider provider = new ThresholdStorageProvider(
+        new CipherStorageProvider(new TempFileStorageProvider()), 100 * 1024);
+----
+
+The same body factory can be handed to `MultipartBuilder.use(...)` and
+`BodyPartBuilder.use(...)` when you are building a message with large parts.
+
+== Releasing resources
+
+Once a body part may live in a temporary file, releasing it is your responsibility.
+`Message` and `BodyPart` implement `Disposable`: calling `dispose()` on a message disposes
+of the whole tree underneath it.
+
+[source,java]
+----
+Message message = Message.Builder.of(inputStream).build();
+try {
+    // use the message
+} finally {
+    message.dispose();
+}
+----
+
+Disposing is harmless with the default in-memory factory, so make it a habit — it is what
+lets you switch to a storage-backed factory later without leaking files. The one case that
+needs attention is an entity you detached from its tree with `removeBodyPart`: nothing will
+dispose of it for you.
+
+== Complete examples
+
+Runnable versions of all of the above live in the
+https://github.com/apache/james-mime4j/tree/master/examples/src/main/java/org/apache/james/mime4j/samples[examples]
+module — see xref:samples.adoc[Examples] for a description of each one.

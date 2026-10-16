@@ -80,6 +80,14 @@ public abstract class AbstractField implements ParsedField {
     }
 
     /**
+     * Gets original (raw) representation of the field, if available,
+     * or compute it lazily otherwise.
+     */
+    public ByteSequence getSafeRaw() {
+        return rawField.getSafeRaw();
+    }
+
+    /**
      * @see ParsedField#isValidField()
      */
     public boolean isValidField() {

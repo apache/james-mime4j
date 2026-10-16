@@ -23,13 +23,13 @@
     <parent>
         <groupId>org.apache</groupId>
         <artifactId>apache</artifactId>
-        <version>21</version>
+        <version>35</version>
         <relativePath />
     </parent>
 
     <groupId>org.apache.james</groupId>
     <artifactId>apache-mime4j-project</artifactId>
-    <version>0.8.12-TITAN-RELEASE</version>
+    <version>0.8.16-TITAN-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Apache James :: Mime4j :: Project</name>
@@ -82,12 +82,12 @@
     <properties>
         <james-skin.version>1.8</james-skin.version>
 
-        <target.jdk>1.8</target.jdk>
-        <commons-logging.version>1.2</commons-logging.version>
-        <log4j.version>2.19.0</log4j.version>
+        <target.jdk>1.11</target.jdk>
+        <commons-logging.version>1.3.5</commons-logging.version>
+        <log4j.version>2.25.4</log4j.version>
         <junit.version>4.13.2</junit.version>
-        <mockito.version>3.12.4</mockito.version>
-        <commons-io.version>2.17.0</commons-io.version>
+        <mockito.version>4.11.0</mockito.version>
+        <commons-io.version>2.19.0</commons-io.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -142,7 +142,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.21.0</version>
+                <version>3.27.7</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -201,7 +201,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.4.2</version>
                 <executions>
                     <execution>
                         <id>jar</id>
@@ -217,13 +217,13 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>5.1.1</version>
+                <version>5.1.9</version>
                 <extensions>true</extensions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.14.0</version>
                 <configuration>
                     <optimize>true</optimize>
                     <source>${target.jdk}</source>
@@ -255,7 +255,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.11.2</version>
                 <reportSets>
                     <reportSet>
                         <id>aggregate</id>

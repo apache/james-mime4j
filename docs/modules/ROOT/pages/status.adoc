@@ -1,0 +1,27 @@
+= Status
+
+The 0.4 release brought a number of significant improvements in terms of supported
+capabilities, flexibility and performance.
+
+The 0.5 release addressed a number of important issues discovered since the 0.4 release.
+In particular it improved Mime4J ability to deal with malformed data streams including
+those intentionally crafted to cause excessive CPU and memory utilization that can lead to
+DoS conditions.
+
+The 0.6 release brought another round of API enhancements and performance optimizations.
+As of this release Mime4J requires a Java 1.5 compatible runtime.
+
+The 0.7 release brings another round of API enhancements, bug fixes and performance
+optimizations. A major effort has been put in code reorganization, separating parsing code
+from DOM manipulation code. Mime4J has been restructured into three separate modules:
+`core`, `dom` and `storage`. The `core` package provides an event-driven SAX style parser
+that relies on a callback mechanism to report parsing events such as the start of an
+entity header, the start of a body, etc. The `dom` package contains base/abstract classes
+and interfaces for MIME-DOM manipulation aiming to provide the base for a full featured
+traversable DOM. Per default the Mime4J DOM builder stores content of individual body
+parts in memory. The `storage` package provides support for more complex storage backends
+such as on-disk storage systems, overflow on max limit, or encrypted storage through the
+JSSE API.
+
+The next release will be version 0.8. As of this release Mime4J requires a Java 1.6
+compatible runtime.

@@ -85,6 +85,24 @@ public final class RawField implements Field {
         return raw;
     }
 
+    /**
+     * Gets original (raw) representation of the field, if available,
+     * or compute it lazily otherwise.
+     */
+    public ByteSequence getSafeRaw() {
+        if (raw == null) {
+            StringBuilder buf = new StringBuilder();
+            buf.append(getName());
+            buf.append(": ");
+            String body = getBody();
+            if (body != null) {
+                buf.append(body);
+            }
+            return ContentUtil.encode(MimeUtil.fold(buf.toString(), 0));
+        }
+        return raw;
+    }
+
     public String getName() {
         return name;
     }

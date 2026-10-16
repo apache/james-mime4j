@@ -221,6 +221,9 @@ public class ContentUtil {
         if (byteSequence == null) {
             return null;
         }
+        if (byteSequence instanceof ByteArrayBuffer) {
+            return new String(((ByteArrayBuffer) byteSequence).buffer(), offset, length, StandardCharsets.ISO_8859_1);
+        }
         char[] underlying = new char[length];
         for (int i = offset; i < offset + length; i++) {
             underlying[i - offset] = (char) (byteSequence.byteAt(i) & 0xff);
@@ -316,12 +319,7 @@ public class ContentUtil {
         if (b == null) {
             return null;
         }
-        try {
-            return new String(b, (charset != null ? charset : Charsets.DEFAULT_CHARSET).name());
-        } catch (UnsupportedEncodingException ex) {
-            // Should never happen
-            throw new Error(ex);
-        }
+        return new String(b, charset != null ? charset : Charsets.DEFAULT_CHARSET);
     }
 
     public static String toAsciiString(final byte[] b) {
@@ -332,13 +330,7 @@ public class ContentUtil {
         if (b == null) {
             return null;
         }
-        try {
-            return new String(b, off, len,
-                    (charset != null ? charset : Charsets.DEFAULT_CHARSET).name());
-        } catch (UnsupportedEncodingException ex) {
-            // Should never happen
-            throw new Error(ex);
-        }
+        return new String(b, off, len, charset != null ? charset : Charsets.DEFAULT_CHARSET);
     }
 
     public static String toAsciiString(final byte[] b, int off, int len) {
@@ -349,13 +341,7 @@ public class ContentUtil {
         if (b == null) {
             return null;
         }
-        try {
-            return new String(b.buffer(), 0, b.length(),
-                    (charset != null ? charset : Charsets.DEFAULT_CHARSET).name());
-        } catch (UnsupportedEncodingException ex) {
-            // Should never happen
-            throw new Error(ex);
-        }
+        return new String(b.buffer(), 0, b.length(), charset != null ? charset : Charsets.DEFAULT_CHARSET);
     }
 
     public static String toAsciiString(final ByteArrayBuffer b) {

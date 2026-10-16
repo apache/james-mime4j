@@ -1,0 +1,62 @@
+= Building Mime4J
+
+== Using a stable release
+
+Go to the https://james.apache.org/download.cgi#Apache_Mime4J[download pages] and download
+the most recent release in your preferred format, either `james-mime4j-x.y-src.tar.gz` or
+`james-mime4j-x.y-src.zip`. Extracting the archived sources will create the directory
+`james-mime4j-x.y/`.
+
+== Checking out the sources
+
+Issue the following command in a shell:
+
+----
+git clone https://github.com/apache/james-mime4j.git
+----
+
+== Download and install Maven
+
+You will need to download and install https://maven.apache.org/[Maven] before building the
+sources. Maven 3.6.0 is the minimum required version.
+
+One of the main differences between Maven and plain ant is that Maven manages external
+dependencies for your projects and (at least in theory) you should no longer have to store
+third-party jar files in your source code tree. It maintains a local repository of
+versioned libraries and shares them between your Maven projects. If it can't find the
+necessary files there it will attempt to download them from Maven central. So to use the
+Maven build, you need to have a network connection available for the initial download of
+the project dependencies.
+
+== Building the Mime4J jar
+
+Once Maven has been installed, building the project should be as simple as typing
+
+----
+cd james-mime4j-x.y/ (cd james-mime4j/ if sources come from git)
+mvn package
+----
+
+from the command line. Maven will automatically run all test cases for you and create the
+jar file in the `target` directory.
+
+To install the jars into your local Maven repository run:
+
+----
+mvn install
+----
+
+Useful options include:
+
+* `-DskipTests` to skip the test suite.
+* `-T 4` to parallelize the build on several CPUs.
+
+[NOTE]
+====
+Mime4J uses https://javacc.github.io/javacc/[JavaCC] to generate parsers for header fields.
+If your IDE does not pick up the generated code automatically, add
+`target/generated-sources/javacc` and `target/generated-sources/jjtree` as source folders.
+====
+
+For more information on using Maven, have a look at the
+https://maven.apache.org/[Maven web site].

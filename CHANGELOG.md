@@ -3,6 +3,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
+## [0.8.15] - 2026-09-03
+
+ - [ENHANCEMENT] More configurable parsing limits and better defaults
+ - [DOCUMENTATION] Migrate site content to Antora
+
+## [0.8.14] - 2026-04-21
+
+ - [PERF] Reduce String allocs in RawFieldParser
+ - [PERF] String allocation & conversions
+ - [PERF] Boundary matching - prevent QS table rebuilt every call￼
+ - Adopt JDK 11 as a build target
+ - MIME4J-333 Introducing a getSafeRaw() method in RawField (#118)￼
+ - Various minor build dependency upgrade
+
+## [0.8.13] - 2025-07-17
+
+ - MIME4J-332 Improve handling of "sectioned" field names
+ - MIME4J-331 Add support for RFC-6532 Internationalized Email Headers, and test it. (#114)
+ - MIME4J-330 Fix MimeStreamParser bug: part body stream ends with CR
+
+## [0.8.12] - 2024-12-23
+
+New release tagged without changes.
+
 ## [0.8.11] - 2024-03-05
 
  - MIME4J-326 SILENT monitor for header decoding

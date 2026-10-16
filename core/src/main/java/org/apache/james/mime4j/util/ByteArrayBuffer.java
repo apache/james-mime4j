@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.util;
 
+import java.nio.charset.StandardCharsets;
 
 /**
  * A resizable byte array.
@@ -175,7 +176,7 @@ public final class ByteArrayBuffer implements ByteSequence {
 
     @Override
     public String toString() {
-        return new String(toByteArray());
+        return new String(this.buffer, 0, this.len, StandardCharsets.ISO_8859_1);
     }
 
 }

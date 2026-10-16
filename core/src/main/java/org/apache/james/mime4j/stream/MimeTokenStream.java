@@ -31,6 +31,11 @@ import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.LineNumberInputStream;
+import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
+import org.apache.james.mime4j.io.MaxHeaderLimitException;
+import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
+import org.apache.james.mime4j.io.MaxPartCountLimitException;
+import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
@@ -88,6 +93,9 @@ public class MimeTokenStream {
     private EntityStateMachine currentStateMachine;
     private RecursionMode recursionMode = RecursionMode.M_RECURSE;
     private MimeEntity rootentity;
+    private int partCount;
+    private int totalHeaderCount;
+    private long totalHeaderLen;
 
     /**
      * Constructs a standard (lax) stream.
@@ -204,6 +212,9 @@ public class MimeTokenStream {
 
         rootentity.setRecursionMode(recursionMode);
         currentStateMachine = rootentity;
+        partCount = 0;
+        totalHeaderCount = 0;
+        totalHeaderLen = 0;
         entities.clear();
         entities.add(currentStateMachine);
         state = currentStateMachine.getState();
@@ -374,11 +385,15 @@ public class MimeTokenStream {
         while (currentStateMachine != null) {
             EntityStateMachine next = currentStateMachine.advance();
             if (next != null) {
+                checkEntityLimits();
                 entities.add(next);
                 currentStateMachine = next;
             }
             state = currentStateMachine.getState();
             if (state != EntityState.T_END_OF_STREAM) {
+                if (state == EntityState.T_FIELD) {
+                    checkTotalHeaderLimits();
+                }
                 return state;
             }
             final EntityStateMachine entityStateMachine = entities.removeLast();
@@ -394,6 +409,78 @@ public class MimeTokenStream {
         }
         state = EntityState.T_END_OF_STREAM;
         return state;
+    }
+
+    /**
+     * Enforces the limits on the total number of MIME entities a message may be
+     * made of and on how deeply those entities may be nested. Both are message
+     * wide limits, unlike the header and content limits which are enforced per
+     * entity, and they bound the work a consumer of this token stream can be
+     * made to do by a small but pathologically structured message.
+     * <p>
+     * Called before a newly discovered entity is pushed onto the stack.
+     */
+    private void checkEntityLimits() throws MimeException {
+        int maxPartCount = config.getMaxPartCount();
+        if (maxPartCount > 0 && partCount >= maxPartCount) {
+            throw new MaxPartCountLimitException("Maximum part count limit ("
+                    + maxPartCount + ") exceeded");
+        }
+        partCount++;
+        int maxNestingDepth = config.getMaxNestingDepth();
+        // entities already holds the parent chain of the entity being pushed,
+        // the root message included, so the new entity sits at depth size + 1.
+        if (maxNestingDepth > 0 && entities.size() >= maxNestingDepth) {
+            throw new MaxNestingDepthLimitException("Maximum nesting depth limit ("
+                    + maxNestingDepth + ") exceeded");
+        }
+    }
+
+    /**
+     * Enforces the message wide budget on header fields. {@link MimeConfig#getMaxHeaderCount()}
+     * is enforced per entity by {@link MimeEntity} and so resets on every part,
+     * which lets a message stay under it in every single entity while still
+     * carrying a very large number of fields overall. Every field is retained by
+     * a consumer building a DOM, so only a message wide budget bounds that graph
+     * independently of the part count.
+     * <p>
+     * The same reasoning applies to header bytes: {@link MimeConfig#getMaxHeaderLen()}
+     * bounds one field, but {@code Content-Type} and {@code Content-Disposition}
+     * occur once per entity and so multiply by the part count.
+     * <p>
+     * Counts the fields actually reported to the caller: malformed fields the
+     * parser skips are not retained and so do not consume the budget.
+     */
+    private void checkTotalHeaderLimits() throws MimeException {
+        int maxTotalHeaderCount = config.getMaxTotalHeaderCount();
+        totalHeaderCount++;
+        if (maxTotalHeaderCount > 0 && totalHeaderCount > maxTotalHeaderCount) {
+            throw new MaxHeaderLimitException("Maximum total header limit ("
+                    + maxTotalHeaderCount + ") exceeded");
+        }
+        long maxTotalHeaderLen = config.getMaxTotalHeaderLen();
+        if (maxTotalHeaderLen > 0) {
+            totalHeaderLen += rawLengthOf(currentStateMachine.getField());
+            if (totalHeaderLen > maxTotalHeaderLen) {
+                throw new MaxHeaderLengthLimitException("Maximum total header length limit ("
+                        + maxTotalHeaderLen + ") exceeded");
+            }
+        }
+    }
+
+    /**
+     * Size of a field as it appeared on the wire. Falls back to the rendered length
+     * when a field carries no raw bytes, rather than calling {@code getSafeRaw()}
+     * which would allocate them just to measure them.
+     */
+    private static int rawLengthOf(Field field) {
+        ByteSequence raw = field.getRaw();
+        if (raw != null) {
+            return raw.length();
+        }
+        String name = field.getName();
+        String body = field.getBody();
+        return (name != null ? name.length() : 0) + (body != null ? body.length() : 0) + 4;
     }
 
     /**

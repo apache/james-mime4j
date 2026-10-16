@@ -243,7 +243,9 @@ TOKEN :
 {
 	< #ALPHA: ["a" - "z", "A" - "Z"] >
 |	< #DIGIT: ["0" - "9"] >
+|	< UTF8NONASCII: ["\u0080" - "\uFFFF"] >
 |	< #ATEXT: ( <ALPHA> | <DIGIT>
+			  | <UTF8NONASCII>
 			  | "!" | "#" | "$" | "%"
 			  | "&" | "'" | "*" | "+"
 			  | "-" | "/" | "=" | "?"
