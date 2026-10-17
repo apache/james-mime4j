@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 
 ## [0.8.15] - 2026-09-03
 
+CVE-2026-85108: Apache James MIME4J: Denial of service due to Allocation of Resources Without Limits or Throttling
+
  - [ENHANCEMENT] More configurable parsing limits and better defaults
  - [DOCUMENTATION] Migrate site content to Antora
 
