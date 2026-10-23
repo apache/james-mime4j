@@ -26,11 +26,23 @@ import org.apache.james.mime4j.MimeException;
  */
 public final class MimeConfig {
 
+    /**
+     * Lenient profile, still bounded so a single message cannot exhaust the JVM memory.
+     *
+     * <p>Its limits can be overridden through system properties, read once at class loading:
+     * <ul>
+     *     <li>{@code james.mime4j.permissive.max.content.length} (default 100 MB)</li>
+     *     <li>{@code james.mime4j.permissive.max.header.count} (default 4096)</li>
+     *     <li>{@code james.mime4j.permissive.max.header.length} (default 64 KB)</li>
+     *     <li>{@code james.mime4j.permissive.max.line.length} (default -1, unbounded)</li>
+     * </ul>
+     * A negative value disables the corresponding check.
+     */
     public static final MimeConfig PERMISSIVE = MimeConfig.custom()
-        .setMaxContentLen(100 * 1024 * 1024)
-        .setMaxHeaderCount(4096)
-        .setMaxHeaderLen(64 * 1024)
-        .setMaxLineLen(-1)
+        .setMaxContentLen(Long.getLong("james.mime4j.permissive.max.content.length", 100 * 1024 * 1024))
+        .setMaxHeaderCount(Integer.getInteger("james.mime4j.permissive.max.header.count", 4096))
+        .setMaxHeaderLen(Integer.getInteger("james.mime4j.permissive.max.header.length", 64 * 1024))
+        .setMaxLineLen(Integer.getInteger("james.mime4j.permissive.max.line.length", -1))
         .build();
     public static final MimeConfig DEFAULT = new Builder().build();
     public static final MimeConfig STRICT = new Builder()
