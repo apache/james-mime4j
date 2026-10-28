@@ -23,7 +23,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.apache.james.mime4j.Charsets;
+import java.util.Collections;
+
 import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.stream.RawField;
 import org.junit.Test;
 
 public class DefaultMessageWriterTest {
@@ -55,6 +60,48 @@ public class DefaultMessageWriterTest {
             .setFrom("sender@localhost");
 
         assertThatThrownBy(() -> builder.setContentTransferEncoding("victim@attacker.com\r\nReply-To: attacker@evil.com"))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void rawFieldShouldRejectBareLF() {
+        assertThatThrownBy(() -> new RawField("X-Custom", "x\nBcc: victim@example.com"))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void rawFieldShouldRejectTrailingCRLF() {
+        assertThatThrownBy(() -> new RawField("X-Custom", "\r\n"))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void messageIdShouldRejectTrailingCRLF() {
+        assertThatThrownBy(() -> Fields.messageId("<a@b>\r\n"))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void messageIdShouldRejectBareLF() {
+        assertThatThrownBy(() -> Fields.messageId("\n\n"))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void fromShouldRejectBareLFInDisplayName() {
+        assertThatThrownBy(() -> Fields.from(new Mailbox("\n!", "", "")))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void contentTypeShouldRejectBareLFInParameter() {
+        assertThatThrownBy(() -> Fields.contentType("text/plain", Collections.singletonMap("name", "\n")))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void contentDispositionShouldRejectBareLFInFilename() {
+        assertThatThrownBy(() -> Fields.contentDisposition("attachment", "\n!"))
             .isInstanceOf(IllegalArgumentException.class);
     }
 
