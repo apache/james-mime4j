@@ -80,8 +80,8 @@ public class RawFieldTest {
     }
 
     @Test
-    public void shouldAcceptCRLFTerminatedHeader() {
-        assertThatCode(() -> new RawField("Name", "Value\r\n")).doesNotThrowAnyException();
+    public void shouldRejectCRLFTerminatedHeader() {
+        assertThatThrownBy(() -> new RawField("Name", "Value\r\n")).isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
@@ -95,8 +95,48 @@ public class RawFieldTest {
     }
 
     @Test
-    public void shouldAcceptOnlyDelimiter() {
-        assertThatCode(() -> new RawField("Name", "\r\n")).doesNotThrowAnyException();
+    public void shouldRejectOnlyDelimiter() {
+        assertThatThrownBy(() -> new RawField("Name", "\r\n")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldRejectBareLF() {
+        assertThatThrownBy(() -> new RawField("Name", "x\nBcc: victim@example.com")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldRejectBareLFBeforeSpace() {
+        assertThatThrownBy(() -> new RawField("Name", "x\n y")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldRejectOnlyLF() {
+        assertThatThrownBy(() -> new RawField("Name", "\n\n")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldRejectBareCR() {
+        assertThatThrownBy(() -> new RawField("Name", "x\rBcc: victim@example.com")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldRejectTrailingCR() {
+        assertThatThrownBy(() -> new RawField("Name", "Value\r")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldRejectCRLFLF() {
+        assertThatThrownBy(() -> new RawField("Name", "Value\r\n\n")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldRejectFoldFollowedByEmptyLine() {
+        assertThatThrownBy(() -> new RawField("Name", "Value\r\n a\r\n\r\nbody")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldAcceptMultipleFolds() {
+        assertThatCode(() -> new RawField("Name", "a\r\n b\r\n\tc")).doesNotThrowAnyException();
     }
 
 

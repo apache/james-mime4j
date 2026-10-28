@@ -57,22 +57,32 @@ public final class RawField implements Field {
     public RawField(String name, String body) {
         this(null, -1, name, body);
 
-        int pos = 0;
+        if (body != null) {
+            checkLineBreaks(body);
+        }
+    }
 
-        while (true) {
-            pos = body.indexOf('\r', pos);
-            if (pos < 0) {
-                break;
+    /**
+     * Only folds (CRLF followed by SP or HTAB) are allowed: a bare CR, a bare LF or a CRLF not
+     * followed by whitespace (including at the end of the body) would start a new header line or
+     * end the header block once written.
+     */
+    private static void checkLineBreaks(String body) {
+        int length = body.length();
+        for (int pos = 0; pos < length; pos++) {
+            char c = body.charAt(pos);
+            if (c == '\n') {
+                throw new IllegalArgumentException("Injection of un-encoded line breaks inside header field could be assimilated to header injection");
             }
-            if (pos < body.length() + 2) {
-                if (body.charAt(pos + 1) != '\n') {
+            if (c == '\r') {
+                if (pos + 2 >= length
+                    || body.charAt(pos + 1) != '\n'
+                    || !isSpace(body, pos + 2)) {
                     throw new IllegalArgumentException("Injection of un-encoded line breaks inside header field could be assimilated to header injection");
                 }
-                if (pos != body.length() - 2 && !isSpace(body, pos + 2)) {
-                    throw new IllegalArgumentException("Injection of un-encoded line breaks inside header field could be assimilated to header injection");
-                }
+                // Skip the LF of the fold
+                pos++;
             }
-            pos ++;
         }
     }
 
