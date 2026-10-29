@@ -518,5 +518,18 @@ public class RawFieldParserTest {
         org.junit.Assert.assertEquals("Sanity ä.doc", params.get(1).getValue());
    }
 
+    private String parseValue(String text) {
+        ByteSequence raw = ContentUtil.encode(text);
+        return parser.parseValue(raw, new ParserCursor(0, raw.length()), null);
+    }
 
+    @Test
+    public void backslashBeforeAFoldShouldApplyToTheFollowingWhitespace() throws Exception {
+        String folded = parseValue("\"a\\\r\n b\"");
+
+        Assert.assertEquals(-1, folded.indexOf('\r'));
+        Assert.assertEquals(-1, folded.indexOf('\n'));
+        Assert.assertEquals(parseValue("\"a\\ b\""), folded);
+        Assert.assertEquals(parseValue("\"a\\\tb\""), parseValue("\"a\\\r\n\tb\""));
+    }
 }

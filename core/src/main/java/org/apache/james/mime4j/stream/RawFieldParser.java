@@ -460,6 +460,10 @@ public class RawFieldParser {
             byte currentByte = buf.byteAt(i);
             current = (char) (currentByte & 0xff);
             if (escaped) {
+                if (current == '\r' || current == '\n') {
+                    // A fold is not part of the value: the quoted pair applies to the WSP after it
+                    continue;
+                }
                 if (current != '\"' && current != '\\') {
                     dstRaw.append('\\');
                 }
