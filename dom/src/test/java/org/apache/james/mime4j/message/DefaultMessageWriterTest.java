@@ -28,6 +28,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
+import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.field.Fields;
@@ -123,5 +124,22 @@ public class DefaultMessageWriterTest {
         byte[] once = parseAndWrite(message);
 
         assertThat(new String(parseAndWrite(once), StandardCharsets.UTF_8)).isEqualTo(new String(once, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void headerLineEndingWithLfShouldStillParseOnceWrittenWithCrlf() throws Exception {
+        StringBuilder value = new StringBuilder();
+        while (value.length() < 998 - "X-Long: ".length()) {
+            value.append('a');
+        }
+        byte[] input = ("X-Long: " + value + "\n\n").getBytes(StandardCharsets.US_ASCII);
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        Header header = builder.parseHeader(new ByteArrayInputStream(input));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeHeader(header, out);
+
+        Header reparsed = builder.parseHeader(new ByteArrayInputStream(out.toByteArray()));
+
+        assertThat(reparsed.getField("X-Long").getBody()).isEqualTo(value.toString());
     }
 }
