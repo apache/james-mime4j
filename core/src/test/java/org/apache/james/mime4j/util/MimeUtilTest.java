@@ -160,4 +160,18 @@ public class MimeUtilTest {
         }
         Assert.assertEquals(MimeUtil.unfold(value), MimeUtil.unfold(folded));
     }
+
+    @Test
+    public void formatDateShouldWriteTheYearInFull() {
+        TimeZone gmt = TimeZone.getTimeZone("GMT");
+
+        Assert.assertEquals("Thu, 1 Jan 17756 00:00:00 +0000", MimeUtil.formatDate(Date.from(Instant.parse("+17756-01-01T00:00:00Z")), gmt));
+        Assert.assertEquals("Fri, 1 Jan 0196 00:00:00 +0000", MimeUtil.formatDate(Date.from(Instant.parse("0196-01-01T00:00:00Z")), gmt));
+        assertFormatDateDenotesTheInstant("2024-06-01T12:34:56Z", "GMT");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void formatDateShouldRejectNegativeYears() {
+        MimeUtil.formatDate(Date.from(Instant.parse("-4964-01-01T00:00:00Z")), TimeZone.getTimeZone("GMT"));
+    }
 }
