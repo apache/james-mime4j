@@ -89,6 +89,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         }
 
         fillBuffer();
+        // Read until we know whether the stream is empty, whatever the size of the reads
+        while (!atBoundary && !eof && !hasData()) {
+            fillBuffer();
+        }
     }
 
     /**
@@ -243,6 +247,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
                 int remaining = buffer.limit() - pos;
                 if (remaining <= 0) {
                     // Make sure the boundary is terminated with EOS
+                    if (!eof) {
+                        // The buffer ends here, not necessarily the stream: read more before deciding
+                        i = -1;
+                    }
                     break;
                 } else {
                     // or with a whitespace or '--'
@@ -282,8 +290,17 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         return initialLength == 0;
     }
 
-    public boolean isFullyConsumed() {
-        return completed && !buffer.hasBufferedData();
+    public boolean isFullyConsumed() throws IOException {
+        if (!completed) {
+            return false;
+        }
+        // Read until we know whether data follows, whatever the size of the reads
+        while (!buffer.hasBufferedData()) {
+            if (!buffer.readAllowed() || buffer.fillBuffer() == -1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void calculateBoundaryLen() throws IOException {
