@@ -145,6 +145,15 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         return start;
     }
 
+    private int endOfFirstLine() {
+        int limit = mboxCharBuffer.limit();
+        int end = 0;
+        while (end < limit && mboxCharBuffer.get(end) != '\r' && mboxCharBuffer.get(end) != '\n') {
+            end++;
+        }
+        return end;
+    }
+
     public Iterator<CharBufferWrapper> iterator() {
         return new MessageIterator();
     }
@@ -173,6 +182,10 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         public CharBufferWrapper next() {
             final CharBuffer message;
             fromLineFound = fromLineMatcher.find();
+            if (fromLineFound && fromLineMatcher.end() == mboxCharBuffer.limit() && byteBuffer.hasRemaining()) {
+                // The From_ line may be cut by the end of the buffer: examine it again after the refill
+                fromLineFound = false;
+            }
             if (fromLineFound) {
                 message = mboxCharBuffer.slice();
                 message.position(messageStart(findEnd));
@@ -196,14 +209,12 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
                     } catch (CharConversionException ex) {
                         throw new RuntimeException(ex);
                     }
+                    // The buffer now starts with the From_ line of the current message
+                    int start = messageStart(endOfFirstLine());
                     fromLineMatcher = MESSAGE_START.matcher(mboxCharBuffer);
-                    fromLineFound = fromLineMatcher.find();
-                    if (fromLineFound) {
-                        saveFindPositions(fromLineMatcher);
-                    }
                     message = mboxCharBuffer.slice();
-                    message.position(messageStart(fromLineMatcher.end()));
-                    fromLineFound = fromLineMatcher.find();
+                    message.position(start);
+                    fromLineFound = fromLineMatcher.find(start);
                     if (fromLineFound) {
                         saveFindPositions(fromLineMatcher);
                         message.limit(fromLineMatcher.start());
