@@ -22,7 +22,9 @@ package org.apache.james.mime4j.io;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 import java.io.IOException;
@@ -65,7 +67,9 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             final String boundary,
             final boolean strict) throws IOException {
         super(inbuffer);
-        int bufferSize = 2 * boundary.length();
+        // Same bytes as the writer (and the UTF-8 decoding of the header): not the low byte of each char
+        ByteSequence boundaryBytes = ContentUtil.encode(boundary);
+        int bufferSize = 2 * boundaryBytes.length();
         if (bufferSize < 4096) {
             bufferSize = 4096;
         }
@@ -80,12 +84,11 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         this.completed = false;
 
         this.strict = strict;
-        this.boundary = new byte[boundary.length() + 2];
+        this.boundary = new byte[boundaryBytes.length() + 2];
         this.boundary[0] = (byte) '-';
         this.boundary[1] = (byte) '-';
-        for (int i = 0; i < boundary.length(); i++) {
-            byte ch = (byte) boundary.charAt(i);
-            this.boundary[i + 2] = ch;
+        for (int i = 0; i < boundaryBytes.length(); i++) {
+            this.boundary[i + 2] = boundaryBytes.byteAt(i);
         }
 
         fillBuffer();

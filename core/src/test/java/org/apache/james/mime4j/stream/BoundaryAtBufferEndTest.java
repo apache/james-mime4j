@@ -88,4 +88,14 @@ public class BoundaryAtBufferEndTest {
     public void nestedMultipartsShouldBeParsedTheSameWhateverTheReadSizes() throws Exception {
         assertSameEventsWhateverTheReadSizes(NESTED);
     }
+
+    @Test
+    public void nonAsciiBoundaryShouldBeMatchedAsUtf8() throws Exception {
+        String message = "Content-Type: multipart/mixed; boundary=\"été\"\r\n\r\n"
+            + "--été\r\n\r\nfirst\r\n--été--\r\n";
+
+        List<String> events = events(new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8)));
+
+        Assert.assertTrue(events.toString(), events.contains("T_BODY first"));
+    }
 }

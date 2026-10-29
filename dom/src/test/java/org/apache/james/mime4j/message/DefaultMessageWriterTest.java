@@ -23,6 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.apache.james.mime4j.Charsets;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import org.apache.james.mime4j.dom.Message;
@@ -105,4 +108,20 @@ public class DefaultMessageWriterTest {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
+    private static byte[] parseAndWrite(byte[] message) throws Exception {
+        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(message));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(parsed, out);
+        return out.toByteArray();
+    }
+
+    @Test
+    public void writingAMessageWithANonAsciiBoundaryShouldBeIdempotent() throws Exception {
+        byte[] message = ("Content-Type: multipart/mixed; boundary=\"été\"\r\n\r\n"
+            + "--été\r\n\r\nfirst\r\n--été--\r\n").getBytes(StandardCharsets.UTF_8);
+
+        byte[] once = parseAndWrite(message);
+
+        assertThat(new String(parseAndWrite(once), StandardCharsets.UTF_8)).isEqualTo(new String(once, StandardCharsets.UTF_8));
+    }
 }
