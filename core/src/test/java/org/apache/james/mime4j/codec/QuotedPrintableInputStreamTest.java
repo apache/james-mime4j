@@ -227,4 +227,31 @@ public class QuotedPrintableInputStreamTest {
         }
     }
 
+
+    @Test
+    public void closingTwiceShouldNotMakeTwoLaterStreamsShareABuffer() throws Exception {
+        QuotedPrintableInputStream closed = new QuotedPrintableInputStream(InputStreams.createAscii("abc"), false);
+        closed.close();
+        closed.close();
+
+        String first = "first=20text with  some   blanks=\r\n and more";
+        String second = "SECOND=20TEXT WITH  SOME   BLANKS=\r\n AND MORE";
+        QuotedPrintableInputStream in1 = new QuotedPrintableInputStream(InputStreams.createAscii(first), false);
+        QuotedPrintableInputStream in2 = new QuotedPrintableInputStream(InputStreams.createAscii(second), false);
+        StringBuilder out1 = new StringBuilder();
+        StringBuilder out2 = new StringBuilder();
+        int b1 = 0;
+        int b2 = 0;
+        while (b1 != -1 || b2 != -1) {
+            if (b1 != -1 && (b1 = in1.read()) != -1) {
+                out1.append((char) b1);
+            }
+            if (b2 != -1 && (b2 = in2.read()) != -1) {
+                out2.append((char) b2);
+            }
+        }
+
+        Assert.assertEquals("first text with  some   blanks and more", out1.toString());
+        Assert.assertEquals("SECOND TEXT WITH  SOME   BLANKS AND MORE", out2.toString());
+    }
 }
