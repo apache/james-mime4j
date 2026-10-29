@@ -201,7 +201,8 @@ public class Base64InputStream extends InputStream {
 
                 if (value == BASE64_PAD) {
                     index = decodePad(data, sextets, buffer, index, to);
-                    return index - off;
+                    // nothing decoded by this call: the pad ends the stream, never return 0
+                    return index == off ? EOF : index - off;
                 }
 
                 int decoded = BASE64_DECODE[value];
