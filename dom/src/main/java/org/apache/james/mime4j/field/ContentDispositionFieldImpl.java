@@ -88,7 +88,7 @@ public class ContentDispositionFieldImpl extends AbstractField implements Conten
         if (!parsed)
             parse();
 
-        return parameters.get(name.toLowerCase());
+        return parameters.get(name.toLowerCase(Locale.US));
     }
 
     /**
