@@ -127,7 +127,8 @@ public class MimeParameterMapping {
         }
         if (standard.containsKey(name)) {
             // RFC 2231 encoding only applies to extended parameters
-            return MimeUtil.unscrambleHeaderValue(standard.get(name));
+            String value = standard.get(name);
+            return value != null ? MimeUtil.unscrambleHeaderValue(value) : null;
         }
         //couldn't decode anything. not clear what the "spec" says is the right behavior
         //For now, back off in reverse order
@@ -152,6 +153,10 @@ public class MimeParameterMapping {
                 extended.putIfAbsent(parameterTypePair.fieldName, value);
                 break;
             case CONTINUATION:
+                if (value == null) {
+                    // a valueless section carries nothing: the joining stops at the gap it leaves
+                    break;
+                }
                 continuation.computeIfAbsent(parameterTypePair.fieldName, k -> new TreeMap<>())
                         .putIfAbsent(parameterTypePair.section, new Section(value, parameterTypePair.encoded));
                 break;
