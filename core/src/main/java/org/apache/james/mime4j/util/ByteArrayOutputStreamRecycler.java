@@ -20,22 +20,42 @@
 package org.apache.james.mime4j.util;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.io.output.UnsynchronizedByteArrayOutputStream;
 
 public class ByteArrayOutputStreamRecycler {
+    /**
+     * Reference counted handle on a recycled buffer: the buffer goes back to the recycler
+     * once, when the last reference is released.
+     */
     public static class Wrapper {
+        private static final AtomicIntegerFieldUpdater<Wrapper> REFERENCES =
+            AtomicIntegerFieldUpdater.newUpdater(Wrapper.class, "references");
+
         private final ByteArrayOutputStreamRecycler recycler;
         private final UnsynchronizedByteArrayOutputStream value;
+        private volatile int references = 1;
 
         public Wrapper(ByteArrayOutputStreamRecycler recycler, UnsynchronizedByteArrayOutputStream value) {
             this.recycler = recycler;
             this.value = value;
         }
 
+        /**
+         * Registers an additional owner of the underlying buffer, which then needs one more
+         * {@link #release()} before being recycled.
+         */
+        public Wrapper retain() {
+            REFERENCES.incrementAndGet(this);
+            return this;
+        }
+
         public void release() {
-            recycler.release(value);
+            if (REFERENCES.decrementAndGet(this) == 0) {
+                recycler.release(value);
+            }
         }
 
         public UnsynchronizedByteArrayOutputStream getValue() {
