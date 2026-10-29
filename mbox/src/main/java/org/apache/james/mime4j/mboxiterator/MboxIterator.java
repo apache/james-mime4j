@@ -130,11 +130,19 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
     }
 
     /**
-     * Start of the message that follows the From_ line ending at <code>end</code>. The line can end
-     * the buffer (or the file) without a line terminator.
+     * Start of the message that follows the From_ line ending at <code>end</code>: skips its line
+     * terminator (CRLF, LF or CR). The line can end the buffer (or the file) without one.
      */
     private int messageStart(int end) {
-        return Math.min(end + 1, mboxCharBuffer.limit());
+        int limit = mboxCharBuffer.limit();
+        int start = end;
+        if (start < limit && mboxCharBuffer.get(start) == '\r') {
+            start++;
+        }
+        if (start < limit && mboxCharBuffer.get(start) == '\n') {
+            start++;
+        }
+        return start;
     }
 
     public Iterator<CharBufferWrapper> iterator() {
