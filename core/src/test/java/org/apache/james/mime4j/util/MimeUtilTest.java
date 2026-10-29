@@ -78,4 +78,40 @@ public class MimeUtilTest {
             .unfold("this\r\n is\r\n a\r\n test"));
     }
 
+    private static String repeat(String s, int count) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(s);
+        }
+        return result.toString();
+    }
+
+    private static void assertNoWhitespaceOnlyLine(String s, int usedCharacters) {
+        String folded = MimeUtil.fold(s, usedCharacters);
+
+        Assert.assertFalse(folded, folded.startsWith("\r\n"));
+        String[] lines = folded.split("\r\n");
+        for (int i = 1; i < lines.length; i++) {
+            // a continuation line made only of whitespace
+            Assert.assertFalse(folded, lines[i].trim().isEmpty());
+        }
+        Assert.assertEquals(s, MimeUtil.unfold(folded));
+    }
+
+    @Test
+    public void foldShouldNotProduceWhitespaceOnlyLines() {
+        assertNoWhitespaceOnlyLine(repeat("a", 75) + "\t\t\t\t\t", 1);
+        assertNoWhitespaceOnlyLine(repeat("\t", 21), 150);
+        assertNoWhitespaceOnlyLine(repeat("a", 75) + "     ", 9);
+        assertNoWhitespaceOnlyLine(repeat("a", 70) + repeat(" ", 100) + "b", 9);
+        assertNoWhitespaceOnlyLine(repeat(" ", 100) + "b", 9);
+    }
+
+    @Test
+    public void foldShouldStillFoldTextAfterWhitespaceRuns() {
+        String folded = MimeUtil.fold(repeat("word ", 40) + "end", 9);
+
+        Assert.assertTrue(folded, folded.contains("\r\n "));
+        Assert.assertEquals(repeat("word ", 40) + "end", MimeUtil.unfold(folded));
+    }
 }

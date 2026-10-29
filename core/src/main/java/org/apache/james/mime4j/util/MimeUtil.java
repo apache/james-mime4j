@@ -230,8 +230,16 @@ public final class MimeUtil {
 
         StringBuilder sb = new StringBuilder();
 
+        // Never break before trailing whitespace nor after a whitespace only line:
+        // that would write a line made only of whitespace (or start with a line break)
+        int lastNonWspIdx = length - 1;
+        while (lastNonWspIdx >= 0 && isWsp(s.charAt(lastNonWspIdx))) {
+            lastNonWspIdx--;
+        }
+
         int lastLineBreak = -usedCharacters;
         int wspIdx = indexOfWsp(s, 0);
+        boolean lineHasText = wspIdx > 0;
         while (true) {
             if (wspIdx == length) {
                 sb.append(s.substring(Math.max(0, lastLineBreak)));
@@ -240,10 +248,14 @@ public final class MimeUtil {
 
             int nextWspIdx = indexOfWsp(s, wspIdx + 1);
 
-            if (nextWspIdx - lastLineBreak > maxCharacters) {
+            if (nextWspIdx - lastLineBreak > maxCharacters && lineHasText && wspIdx < lastNonWspIdx) {
                 sb.append(s, Math.max(0, lastLineBreak), wspIdx);
                 sb.append("\r\n");
                 lastLineBreak = wspIdx;
+                lineHasText = false;
+            }
+            if (nextWspIdx > wspIdx + 1) {
+                lineHasText = true;
             }
 
             wspIdx = nextWspIdx;
@@ -326,11 +338,14 @@ public final class MimeUtil {
     private static int indexOfWsp(String s, int fromIndex) {
         final int len = s.length();
         for (int index = fromIndex; index < len; index++) {
-            char c = s.charAt(index);
-            if (c == ' ' || c == '\t')
+            if (isWsp(s.charAt(index)))
                 return index;
         }
         return len;
+    }
+
+    private static boolean isWsp(char c) {
+        return c == ' ' || c == '\t';
     }
 
     private static synchronized int nextCounterValue() {
