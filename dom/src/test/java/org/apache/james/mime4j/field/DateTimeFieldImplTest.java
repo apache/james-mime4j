@@ -19,6 +19,8 @@
 package org.apache.james.mime4j.field;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.TimeZone;
 
@@ -75,5 +77,12 @@ public class DateTimeFieldImplTest {
         ByteSequence raw = ContentUtil.encode(s);
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return DateTimeFieldImpl.PARSER.parse(rawField, null);
+    }
+
+    @Test
+    public void parseShouldFailWhenYearIsTooLong() throws Exception {
+        DateTimeField field = parse("Date: 1 Jan 99999999999 00:00 +0000");
+        assertNull(field.getDate());
+        assertNotNull(field.getParseException());
     }
 }

@@ -244,6 +244,10 @@ String year() :
     t=<DIGITS> 
     {
       String year = (String) t.image;
+      if (year.length() > 9)
+      {
+        throw new ParseException("Invalid year: " + year);
+      }
       if (year.length() == 2) 
       {
         if (year.charAt(0) > '6')
