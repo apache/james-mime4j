@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.codec;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -253,5 +254,27 @@ public class QuotedPrintableInputStreamTest {
 
         Assert.assertEquals("first text with  some   blanks and more", out1.toString());
         Assert.assertEquals("SECOND TEXT WITH  SOME   BLANKS AND MORE", out2.toString());
+    }
+
+    private static String decodeReadingAtMost(String encoded, int readSize) throws IOException {
+        InputStream source = new FilterInputStream(InputStreams.createAscii(encoded)) {
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return super.read(b, off, Math.min(len, readSize));
+            }
+        };
+        try (QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(source, false)) {
+            return new String(IOUtils.toByteArray(decoder), "ISO-8859-1");
+        }
+    }
+
+    @Test
+    public void decodingShouldNotDependOnReadSizes() throws Exception {
+        for (String encoded : new String[] {"7bY==\r\nYLY", "7bY==\nYLY", "a=3D=\r\nb", "a=\r\nb==c", "=4", "=", "a=\r"}) {
+            String whole = decodeReadingAtMost(encoded, Integer.MAX_VALUE);
+            for (int readSize = 1; readSize < 6; readSize++) {
+                Assert.assertEquals(encoded + " read by " + readSize, whole, decodeReadingAtMost(encoded, readSize));
+            }
+        }
     }
 }
