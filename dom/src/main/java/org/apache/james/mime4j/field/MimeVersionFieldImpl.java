@@ -27,6 +27,7 @@ import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
 import org.apache.james.mime4j.field.mimeversion.parser.MimeVersionParser;
 import org.apache.james.mime4j.field.mimeversion.parser.ParseException;
+import org.apache.james.mime4j.field.mimeversion.parser.TokenMgrError;
 import org.apache.james.mime4j.stream.Field;
 
 /**
@@ -66,6 +67,8 @@ public class MimeVersionFieldImpl extends AbstractField implements MimeVersionFi
                 }
             } catch (MimeException ex) {
                 parsedException = new ParseException(ex);
+            } catch (TokenMgrError e) {
+                parsedException = new ParseException(e);
             }
         }
     }
