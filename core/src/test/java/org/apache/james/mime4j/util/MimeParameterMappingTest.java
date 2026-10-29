@@ -128,4 +128,27 @@ public class MimeParameterMappingTest {
         mapping.addParameter("filename*", "utf-8''a+b.txt");
         Assert.assertEquals("a+b.txt", mapping.get("filename"));
     }
+
+    @Test
+    public void valuelessStandardParameterShouldBeNull() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename", null);
+
+        Assert.assertNull(mapping.get("filename"));
+        Assert.assertTrue(mapping.getParameters().containsKey("filename"));
+        Assert.assertNull(mapping.getParameters().get("filename"));
+    }
+
+    @Test
+    public void valuelessSectionShouldBeIgnored() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*0", null);
+        Assert.assertNull(mapping.get("filename"));
+        Assert.assertNull(mapping.getParameters().get("filename"));
+
+        MimeParameterMapping laterSection = new MimeParameterMapping();
+        laterSection.addParameter("filename*0*", "utf-8''a");
+        laterSection.addParameter("filename*1", null);
+        Assert.assertEquals("a", laterSection.get("filename"));
+    }
 }

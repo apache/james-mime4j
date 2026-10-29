@@ -303,4 +303,19 @@ public class LenientContentDispositionFieldTest {
         Assert.assertEquals("value", f.getParameter("NAME"));
         Assert.assertEquals("file.txt", f.getFilename());
     }
+
+    @Test
+    public void valuelessParametersShouldNotThrow() throws Exception {
+        ContentDispositionField standard = parse("Content-Disposition: attachment; filename");
+        Assert.assertNull(standard.getFilename());
+        Assert.assertTrue(standard.getParameters().containsKey("filename"));
+        Assert.assertNull(standard.getParameters().get("filename"));
+
+        ContentDispositionField section = parse("Content-Disposition: attachment; filename*0");
+        Assert.assertNull(section.getFilename());
+        Assert.assertNull(section.getParameters().get("filename"));
+
+        ContentDispositionField laterSection = parse("Content-Disposition: attachment; filename*0*=utf-8''a; filename*1");
+        Assert.assertEquals("a", laterSection.getFilename());
+    }
 }
