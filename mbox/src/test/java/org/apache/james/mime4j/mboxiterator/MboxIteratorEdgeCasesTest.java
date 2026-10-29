@@ -55,4 +55,16 @@ public class MboxIteratorEdgeCasesTest {
     public void lastFromLineEndingTheFileShouldGiveAnEmptyMessage() throws IOException {
         Assert.assertEquals(Arrays.asList("body\n", ""), messages("From a@b 2011\nbody\nFrom c@d 2012", 1024));
     }
+
+    @Test
+    public void crlfLineEndsShouldNotLeaveAStrayLineFeed() throws IOException {
+        Assert.assertEquals(Arrays.asList("Subject: a\r\n\r\nbody\r\n", "Subject: b\r\n"),
+            messages("From a@b 2011\r\nSubject: a\r\n\r\nbody\r\nFrom c@d 2012\r\nSubject: b\r\n", 1024));
+    }
+
+    @Test
+    public void lfLineEndsShouldStillBeSupported() throws IOException {
+        Assert.assertEquals(Arrays.asList("Subject: a\n", "Subject: b\n"),
+            messages("From a@b 2011\nSubject: a\nFrom c@d 2012\nSubject: b\n", 1024));
+    }
 }
