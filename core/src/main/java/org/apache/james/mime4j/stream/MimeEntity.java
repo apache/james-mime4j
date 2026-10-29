@@ -289,9 +289,13 @@ class MimeEntity implements EntityStateMachine {
                     LineReaderInputStream instream = getDataStream();
                     RecycledByteArrayBuffer buf = fieldBuilder.getRaw();
                     // Complain, if raw data is not available or cannot be 'unread'
-                    if (buf == null || !instream.unread(buf)) {
+                    // The line read ahead (next field or empty line) belongs to the body too
+                    if (buf == null
+                        || (linebuf.length() > 0 && !instream.unread(linebuf))
+                        || !instream.unread(buf)) {
                         throw new MimeParseEventException(Event.INVALID_HEADER);
                     }
+                    linebuf.clear();
                     return false;
                 }
             }

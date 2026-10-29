@@ -49,12 +49,6 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     private boolean truncated;
     private boolean released;
 
-    boolean tempBuffer = false;
-
-    private byte[] origBuffer;
-    private int origBufpos;
-    private int origBuflen;
-
     private byte[] buffer;
     private int bufpos;
     private int buflen;
@@ -105,18 +99,6 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     }
 
     public int fillBuffer() throws IOException {
-        if (tempBuffer) {
-            // we was on tempBuffer.
-            // check that we completed the tempBuffer
-            if (bufpos != buflen) throw new IllegalStateException("unread only works when a buffer is fully read before the next refill is asked!");
-            // restore the original buffer
-            buffer = origBuffer;
-            buflen = origBuflen;
-            bufpos = origBufpos;
-            tempBuffer = false;
-            // return that we just read bufferLen data.
-            return bufferLen();
-        }
         // compact the buffer if necessary
         if (this.bufpos > 0) { // could swtich to (this.buffer.length / 2) but needs a 4*boundary capacity, then (instead of 2).
             int len = bufferLen();
@@ -391,46 +373,40 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             buffer.append((char) this.buffer[i]);
         }
         buffer.append("]");
-        if (tempBuffer) {
-            buffer.append("-ORIG[pos: ");
-            buffer.append(this.origBufpos);
-            buffer.append("]");
-            buffer.append("[limit: ");
-            buffer.append(this.origBuflen);
-            buffer.append("]");
-            buffer.append("[");
-            for (int i = this.origBufpos; i < this.origBuflen; i++) {
-                buffer.append((char) this.origBuffer[i]);
-            }
-            buffer.append("]");
-        }
         return buffer.toString();
     }
 
     @Override
     public boolean unread(ByteArrayBuffer buf) {
-        if (tempBuffer) return false;
-        origBuffer = buffer;
-        origBuflen = buflen;
-        origBufpos = bufpos;
-        bufpos = 0;
-        buflen = buf.length();
-        buffer = buf.buffer();
-        tempBuffer = true;
+        prepend(buf.buffer(), buf.length());
         return true;
     }
 
     @Override
     public boolean unread(RecycledByteArrayBuffer buf) {
-        if (tempBuffer) return false;
-        origBuffer = buffer;
-        origBuflen = buflen;
-        origBufpos = bufpos;
-        bufpos = 0;
-        buflen = buf.length();
-        buffer = buf.buffer();
-        tempBuffer = true;
+        prepend(buf.buffer(), buf.length());
         return true;
+    }
+
+    /**
+     * Copies the given bytes in front of the buffered data, so that the buffer keeps owning its
+     * array and the following reads and refills see one contiguous buffer.
+     */
+    private void prepend(byte[] bytes, int len) {
+        if (len <= this.bufpos) {
+            this.bufpos -= len;
+        } else {
+            int remaining = bufferLen();
+            byte[] target = this.buffer;
+            if (len + remaining > this.buffer.length) {
+                target = new byte[len + remaining];
+            }
+            System.arraycopy(this.buffer, this.bufpos, target, len, remaining);
+            this.buffer = target;
+            this.bufpos = 0;
+            this.buflen = len + remaining;
+        }
+        System.arraycopy(bytes, 0, this.buffer, this.bufpos, len);
     }
 
 }
