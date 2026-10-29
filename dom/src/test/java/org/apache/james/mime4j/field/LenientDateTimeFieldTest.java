@@ -126,4 +126,15 @@ public class LenientDateTimeFieldTest {
     public void numericOffsetShouldWinOverAFollowingZoneName() throws Exception {
         Assert.assertEquals(Instant.parse("2008-07-16T15:12:33Z"), parse("Date: Wed, 16 Jul 2008 17:12:33 +0200 PDT").getDate().toInstant());
     }
+
+    @Test
+    public void shortYearsShouldBeMappedAsTheStrictParserDoes() throws Exception {
+        Assert.assertEquals(Instant.parse("2000-10-04T10:00:00Z"), parse("Date: 4 Oct 0 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2004-10-04T10:00:00Z"), parse("Date: Mon, 4 Oct 4 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2069-10-04T10:00:00Z"), parse("Date: 4 Oct 69 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1970-10-04T10:00:00Z"), parse("Date: 4 Oct 70 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2000-10-04T10:00:00Z"), parse("Date: 4 Oct 100 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2899-10-04T10:00:00Z"), parse("Date: 4 Oct 999 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2001-10-04T10:00:00Z"), parse("Date: 4 Oct 2001 10:00:00 +0000").getDate().toInstant());
+    }
 }
