@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -172,5 +173,16 @@ public class HeaderImplTest {
         Assert.assertEquals(2, header.getFields().size());
         Assert.assertEquals("7bit", header.getField("Content-tranſfer-encoding").getBody());
         Assert.assertEquals("base64", header.getField("Content-transfer-encoding").getBody());
+    }
+
+    @Test
+    public void setFieldShouldNotThrowWhenLowerCasedNamesCollide() throws Exception {
+        Header header = new HeaderImpl();
+        header.addField(new RawField("i̇", "v0"));
+        Field replacement = new RawField("İ", "v1");
+
+        header.setField(replacement);
+
+        Assert.assertEquals(Collections.singletonList(replacement), header.getFields());
     }
 }
