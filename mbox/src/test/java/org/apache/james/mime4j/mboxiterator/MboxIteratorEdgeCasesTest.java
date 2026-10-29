@@ -77,13 +77,6 @@ public class MboxIteratorEdgeCasesTest {
     }
 
     @Test
-    public void firstFromLineCutByTheBufferShouldNotThrow() throws IOException {
-        // "From a@b 2011" ends at char 64, where the first decoded buffer ends
-        Assert.assertEquals(Arrays.asList("body\n"),
-            messages(repeat('y', 50) + "\nFrom a@b 2011x\nbody\n", 64));
-    }
-
-    @Test
     public void lineCutByTheBufferShouldNotBeTakenForAFromLine() throws IOException {
         // "From c@d 2012" ends at char 64, where the first decoded buffer ends
         String body = repeat('x', 19) + "\nFrom c@d 2012x\nmore\n";
@@ -95,5 +88,28 @@ public class MboxIteratorEdgeCasesTest {
         // "From c@d 2012" ends at char 64, where the first decoded buffer ends
         String first = repeat('x', 36) + "\n";
         Assert.assertEquals(Arrays.asList(first, "more\n"), messages("From a@b 2011\n" + first + "From c@d 2012\nmore\n", 64));
+    }
+
+    @Test
+    public void firstLineCutByTheFirstBufferShouldNotBeAFromLine() throws IOException {
+        // the first 64 chars end with 4 digits, the whole line does not
+        String mbox = "From " + repeat('a', 55) + "2003abc\nbody\n";
+        try {
+            Assert.assertEquals(Arrays.asList(), messages(mbox, 64));
+        } catch (IllegalArgumentException e) {
+            // "does not contain From_ lines": acceptable
+        }
+    }
+
+    @Test
+    public void laterLineCutByTheFirstBufferShouldBeExaminedAgain() throws IOException {
+        // "From a@b 2011" ends at char 64, after 50 chars of garbage: it is a From_ line
+        Assert.assertEquals(Arrays.asList("body\n"), messages(repeat('y', 50) + "\nFrom a@b 2011\nbody\n", 64));
+        // "From a@b 2011" ends at char 64, but the line goes on: it is not one
+        try {
+            Assert.assertEquals(Arrays.asList(), messages(repeat('y', 50) + "\nFrom a@b 2011x\nbody\n", 64));
+        } catch (IllegalArgumentException e) {
+            // "does not contain From_ lines": acceptable
+        }
     }
 }
