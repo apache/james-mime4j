@@ -188,4 +188,9 @@ public class DecoderUtilTest {
     public void strictMonitorShouldReportUnexpectedBase64ByteAsIllegalArgument() {
         DecoderUtil.decodeEncodedWords("=?utf-8?B?Q*Q=?=", DecodeMonitor.STRICT);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void strictMonitorShouldReportNonStandardSoftLineBreakAsIllegalArgument() {
+        DecoderUtil.decodeEncodedWords("=?utf-8?Q?a=\tb?=", DecodeMonitor.STRICT);
+    }
 }
