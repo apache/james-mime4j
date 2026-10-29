@@ -107,7 +107,7 @@ public final class MimeUtil {
      * Return true, if the given MIME type indicates a multipart entity.
      */
     public static boolean isMultipart(String pMimeType) {
-        return pMimeType != null  &&  pMimeType.toLowerCase().startsWith("multipart/");
+        return pMimeType != null  &&  pMimeType.toLowerCase(Locale.US).startsWith("multipart/");
     }
 
     /**

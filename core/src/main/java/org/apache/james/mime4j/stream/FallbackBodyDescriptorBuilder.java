@@ -164,7 +164,7 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
         String type = null;
         String subtype = null;
         if (main != null) {
-            main = main.toLowerCase().trim();
+            main = main.toLowerCase(Locale.US).trim();
             int index = main.indexOf('/');
             boolean valid = false;
             if (index != -1) {

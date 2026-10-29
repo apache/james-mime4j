@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -97,7 +98,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
         if (!parsed)
             parse();
 
-        return parameters.get(name.toLowerCase());
+        return parameters.get(name.toLowerCase(Locale.US));
     }
 
     /**
@@ -204,7 +205,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
         subType = parser.getSubType();
 
         if (mediaType != null && subType != null) {
-            mimeType = (mediaType + "/" + subType).toLowerCase();
+            mimeType = (mediaType + "/" + subType).toLowerCase(Locale.US);
 
             List<String> paramNames = parser.getParamNames();
             List<String> paramValues = parser.getParamValues();
@@ -212,7 +213,7 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
             if (paramNames != null && paramValues != null) {
                 final int len = Math.min(paramNames.size(), paramValues.size());
                 for (int i = 0; i < len; i++) {
-                    String paramName = paramNames.get(i).toLowerCase();
+                    String paramName = paramNames.get(i).toLowerCase(Locale.US);
                     String paramValue = paramValues.get(i);
                     parameters.put(paramName, paramValue);
                 }

@@ -74,7 +74,7 @@ public class ContentTypeFieldLenientImpl extends AbstractField implements Conten
         if (!parsed) {
             parse();
         }
-        return parameters.get(name.toLowerCase());
+        return parameters.get(name.toLowerCase(Locale.US));
     }
 
     public Map<String, String> getParameters() {
@@ -114,7 +114,7 @@ public class ContentTypeFieldLenientImpl extends AbstractField implements Conten
         String type = null;
         String subtype = null;
         if (main != null) {
-            main = main.toLowerCase().trim();
+            main = main.toLowerCase(Locale.US).trim();
             int index = main.indexOf('/');
             boolean valid = false;
             if (index != -1) {
