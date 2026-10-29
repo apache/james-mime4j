@@ -92,4 +92,10 @@ public class LenientContentTypeFieldTest {
         Assert.assertEquals("\"hepp\"  =us\t-ascii", f.getParameter("charset"));
     }
 
+    @Test
+    public void quotedBoundaryShouldNotBeDecodedAsEncodedWord() throws Exception {
+        ContentTypeField f = parse("Content-Type: multipart/mixed; boundary=\"=?utf-8?q?x?=\"; name=\"=?utf-8?q?y?=\"");
+        Assert.assertEquals("=?utf-8?q?x?=", f.getBoundary());
+        Assert.assertEquals("y", f.getParameter("name"));
+    }
 }

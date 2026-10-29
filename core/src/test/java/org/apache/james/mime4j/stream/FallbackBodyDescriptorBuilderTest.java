@@ -170,4 +170,9 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
         assertNull(bd.getCharset());
     }
 
+    public void testQuotedBoundaryShouldNotBeDecodedAsEncodedWord() throws Exception {
+        FallbackBodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
+        builder.addField(new RawField("Content-Type", "multipart/mixed; boundary=\"=?utf-8?q?x?=\""));
+        assertEquals("=?utf-8?q?x?=", builder.build().getBoundary());
+    }
 }
