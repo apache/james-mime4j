@@ -78,9 +78,6 @@ public class MimeParameterMapping {
     private final Map<String, String> parameters = new HashMap<>();
     private boolean needToUpdate = true;
 
-    /** Charset, taken from the first item added via {@link #addParameter(String, String)}. */
-    private String charset;
-
     /**
      *
      * @return an Unmodifiable map of the parameters as calculated
@@ -128,17 +125,11 @@ public class MimeParameterMapping {
             }
         }
         if (standard.containsKey(name)) {
-            try {
-                return decodeParameterValue(standard.get(name));
-            } catch (DecodeException e) {
-                //ignore and try without decoding
-            }
+            // RFC 2231 encoding only applies to extended parameters
+            return MimeUtil.unscrambleHeaderValue(standard.get(name));
         }
         //couldn't decode anything. not clear what the "spec" says is the right behavior
         //For now, back off in reverse order
-        if (standard.containsKey(name)) {
-            return standard.get(name);
-        }
 
         if (continuation.containsKey(name)) {
             return continuation.get(name).toString();
@@ -175,13 +166,9 @@ public class MimeParameterMapping {
         int charsetEnd = value.indexOf("'");
         int languageEnd = value.indexOf("'", charsetEnd + 1);
         if (charsetEnd < 0 || languageEnd < 0) {
-            if (charset != null) {
-                return urlDecode(value);
-            } else {
-                return MimeUtil.unscrambleHeaderValue(value);
-            }
+            return MimeUtil.unscrambleHeaderValue(value);
         }
-        charset = value.substring(0, charsetEnd);
+        String charset = value.substring(0, charsetEnd);
         String fileName = value.substring(languageEnd + 1);
         //check that the charset is valid
         try {
@@ -189,10 +176,10 @@ public class MimeParameterMapping {
         } catch (IllegalArgumentException e) {
             return fileName;
         }
-        return urlDecode(fileName);
+        return urlDecode(fileName, charset);
     }
 
-    private String urlDecode(String value) throws DecodeException {
+    private String urlDecode(String value, String charset) throws DecodeException {
         try {
             return java.net.URLDecoder.decode(value, charset);
         } catch (Exception e) {
