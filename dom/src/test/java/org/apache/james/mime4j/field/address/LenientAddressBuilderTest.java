@@ -575,4 +575,19 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals("::日本", ((Group) list.get(1)).getName());
         Assert.assertEquals("é", parser.parseGroup("=?ISO-8859-1?Q?=E9?=: a@example.com;").getName());
     }
+
+    @Test
+    public void whitespaceAroundDotsOfALocalPartShouldNotBeKept() {
+        Assert.assertEquals("john.doe", parser.parseMailbox("john . doe@example.com").getLocalPart());
+        Assert.assertEquals("john.doe", ((Mailbox) parser.parseAddress("john . doe@example.com")).getLocalPart());
+        Assert.assertEquals("john.doe", parser.parseMailbox("John <john . doe@example.com>").getLocalPart());
+
+        AddressList list = parser.parseAddressList("a@b.c, john . doe @example.com");
+        Assert.assertEquals("john.doe", ((Mailbox) list.get(1)).getLocalPart());
+    }
+
+    @Test
+    public void quotedWhitespaceOfALocalPartShouldBeKept() {
+        Assert.assertEquals("john . doe", parser.parseMailbox("\"john . doe\"@example.com").getLocalPart());
+    }
 }
