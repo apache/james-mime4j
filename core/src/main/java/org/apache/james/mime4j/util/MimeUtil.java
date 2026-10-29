@@ -32,6 +32,7 @@ import static java.time.temporal.ChronoField.YEAR;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
@@ -202,9 +203,14 @@ public final class MimeUtil {
             // truncated to whole minutes, so that the local time and the offset denote the instant
             zoneId = ZoneOffset.ofTotalSeconds(offsetSeconds / 60 * 60);
         }
-        return RFC822_DATE_FORMAT
-            .withZone(zoneId)
-            .format(instant);
+        try {
+            return RFC822_DATE_PRINTER
+                .withZone(zoneId)
+                .format(instant);
+        } catch (DateTimeException e) {
+            // RFC 5322 years are 4*DIGIT: a negative year cannot be written
+            throw new IllegalArgumentException("Cannot format " + instant + " as a RFC 5322 date", e);
+        }
     }
 
     private static ZoneId zone(TimeZone zone) {
@@ -371,27 +377,41 @@ public final class MimeUtil {
     }
 
     private static final int INITIAL_YEAR = 1970;
-    public static final DateTimeFormatter RFC822_DATE_FORMAT = new DateTimeFormatterBuilder()
-        .parseCaseInsensitive()
-        .parseLenient()
-        .appendText(DAY_OF_WEEK, dayOfWeek())
-        .appendLiteral(", ")
-        .appendValue(DAY_OF_MONTH, 1, 2, SignStyle.NOT_NEGATIVE)
-        .appendLiteral(' ')
-        .appendText(MONTH_OF_YEAR, monthOfYear())
-        .appendLiteral(' ')
-        .appendValueReduced(YEAR, 4, 4, INITIAL_YEAR)
-        .appendLiteral(' ')
-        .appendValue(HOUR_OF_DAY, 2)
-        .appendLiteral(':')
-        .appendValue(MINUTE_OF_HOUR, 2)
-        .appendLiteral(':')
-        .appendValue(SECOND_OF_MINUTE, 2)
-        .appendLiteral(' ')
-        .appendOffset("+HHMM", "+0000")
-        .toFormatter()
-        .withZone(TimeZone.getDefault().toZoneId())
-        .withLocale(Locale.US);
+    public static final DateTimeFormatter RFC822_DATE_FORMAT = rfc822DateFormat(true);
+
+    /**
+     * Writes the year in full: a reduced 4 digit year would keep its 4 rightmost digits only.
+     */
+    private static final DateTimeFormatter RFC822_DATE_PRINTER = rfc822DateFormat(false);
+
+    private static DateTimeFormatter rfc822DateFormat(boolean reducedYear) {
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
+            .parseCaseInsensitive()
+            .parseLenient()
+            .appendText(DAY_OF_WEEK, dayOfWeek())
+            .appendLiteral(", ")
+            .appendValue(DAY_OF_MONTH, 1, 2, SignStyle.NOT_NEGATIVE)
+            .appendLiteral(' ')
+            .appendText(MONTH_OF_YEAR, monthOfYear())
+            .appendLiteral(' ');
+        if (reducedYear) {
+            builder.appendValueReduced(YEAR, 4, 4, INITIAL_YEAR);
+        } else {
+            builder.appendValue(YEAR, 4, 10, SignStyle.NOT_NEGATIVE);
+        }
+        return builder
+            .appendLiteral(' ')
+            .appendValue(HOUR_OF_DAY, 2)
+            .appendLiteral(':')
+            .appendValue(MINUTE_OF_HOUR, 2)
+            .appendLiteral(':')
+            .appendValue(SECOND_OF_MINUTE, 2)
+            .appendLiteral(' ')
+            .appendOffset("+HHMM", "+0000")
+            .toFormatter()
+            .withZone(TimeZone.getDefault().toZoneId())
+            .withLocale(Locale.US);
+    }
 
     private static Map<Long, String> monthOfYear() {
         HashMap<Long, String> result = new HashMap<>();
