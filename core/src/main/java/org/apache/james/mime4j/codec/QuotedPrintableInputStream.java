@@ -192,7 +192,8 @@ public class QuotedPrintableInputStream extends InputStream {
 
         while (index < to) {
 
-            if (limit - pos < 3) {
+            // '=' needs up to 3 bytes of look-ahead ("==" followed by CRLF)
+            if (limit - pos < 4) {
                 int bytesRead = fillBuffer();
                 eof = bytesRead == -1;
             }
@@ -237,8 +238,8 @@ public class QuotedPrintableInputStream extends InputStream {
                     }
                     blanks.clear();
                 } else if (b == EQ) {
-                    if (limit - pos < 2 && !eof) {
-                        // not enough buffered data
+                    if (limit - pos < 3 && !eof) {
+                        // not enough buffered data: the decoding must not depend on the read sizes
                         pos--;
                         break;
                     }
