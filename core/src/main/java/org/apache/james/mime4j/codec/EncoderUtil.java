@@ -115,6 +115,10 @@ public class EncoderUtil {
         // atom = [CFWS] 1*atext [CFWS]
         // CFWS = comment or folding white space
 
+        if (displayName.indexOf('\r') >= 0 || displayName.indexOf('\n') >= 0) {
+            throw new IllegalArgumentException("Injection of un-encoded line breaks inside a display name could be assimilated to header injection");
+        }
+
         if (isAtomPhrase(displayName)) {
             return displayName;
         } else if (hasToBeEncoded(displayName, 0)) {
