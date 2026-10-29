@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.field;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -44,11 +45,11 @@ public class DelegatingFieldParser implements FieldParser<ParsedField> {
      * @param parser the parser for fields named <code>name</code>
      */
     public void setFieldParser(final String name, final FieldParser<? extends ParsedField> parser) {
-        parsers.put(name.toLowerCase(), parser);
+        parsers.put(name.toLowerCase(Locale.US), parser);
     }
 
     public FieldParser<? extends ParsedField> getParser(final String name) {
-        final FieldParser<? extends ParsedField> field = parsers.get(name.toLowerCase());
+        final FieldParser<? extends ParsedField> field = parsers.get(name.toLowerCase(Locale.US));
         if (field == null) {
             return defaultParser;
         }
