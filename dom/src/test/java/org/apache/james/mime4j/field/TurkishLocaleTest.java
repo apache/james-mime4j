@@ -27,6 +27,8 @@ import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
+import org.apache.james.mime4j.dom.field.MimeVersionField;
+import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.message.DefaultMessageBuilder;
 import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.MimeTokenStream;
@@ -91,5 +93,18 @@ public class TurkishLocaleTest {
         Message message = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(MESSAGE.getBytes(StandardCharsets.US_ASCII)));
 
         Assert.assertTrue(message.getBody() instanceof Multipart);
+    }
+
+    @Test
+    public void fieldParsersShouldBeFoundIndependentlyOfTheLocale() throws Exception {
+        DefaultFieldParser parser = new DefaultFieldParser();
+
+        ParsedField mimeVersion = parser.parse(new RawField("MIME-Version", "1.0"), null);
+        ParsedField contentId = parser.parse(new RawField("Content-ID", "<id@example.com>"), null);
+
+        Assert.assertTrue(mimeVersion instanceof MimeVersionField);
+        Assert.assertEquals("<id@example.com>", contentId.getBody());
+        Assert.assertTrue(contentId.getClass().getName(), contentId instanceof ContentIdFieldImpl);
+        Assert.assertSame(parser.getParser("MIME-Version"), parser.getParser("mime-version"));
     }
 }
