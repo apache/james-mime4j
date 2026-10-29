@@ -85,4 +85,19 @@ public class DateTimeFieldImplTest {
         assertNull(field.getDate());
         assertNotNull(field.getParseException());
     }
+
+    @Test
+    public void parseShouldFailWhenANumberIsTooLong() throws Exception {
+        assertParseException("Date: 9999999990:00");
+        assertParseException("Date: 1 Jan 2020 9999999999903:00 +0000");
+        assertParseException("Date: 1 Jan 2020 03:9999999999900 +0000");
+        assertParseException("Date: 1 Jan 2020 03:00:9999999999900 +0000");
+        assertParseException("Date: 1 Jan 2020 03:00 +9999999999900");
+    }
+
+    private void assertParseException(String header) throws Exception {
+        DateTimeField field = parse(header);
+        assertNull(field.getDate());
+        assertNotNull(field.getParseException());
+    }
 }

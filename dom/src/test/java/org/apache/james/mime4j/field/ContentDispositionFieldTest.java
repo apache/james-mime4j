@@ -214,4 +214,12 @@ public class ContentDispositionFieldTest extends TestCase {
         assertEquals(12, f.getSize());
     }
 
+    public void testOversizedNumberInADateParameterShouldBeIgnored() throws MimeException {
+        ContentDispositionField f = parse("Content-Disposition: attachment; "
+            + "creation-date=\"99999999999 Jan 2020 00:00 +0000\"; "
+            + "modification-date=\"1 Jan 2020 00:00 +99999999999\"");
+
+        assertNull(f.getCreationDate());
+        assertNull(f.getModificationDate());
+    }
 }
