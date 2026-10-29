@@ -327,4 +327,21 @@ public class EncoderUtilTest {
             }
         }
     }
+
+    @Test
+    public void textHoldingAnEncodedWordLookalikeShouldBeEncoded() {
+        for (String text : new String[] {"=?utf-8?q?x?=", "a =?utf-8?q?x?= b", "=?=?=?=?=?", "=?utf-8?q?x?=\"\""}) {
+            String displayName = EncoderUtil.encodeAddressDisplayName(text);
+            String unstructured = EncoderUtil.encodeIfNecessary(text, Usage.TEXT_TOKEN, 0);
+
+            Assert.assertEquals(text, DecoderUtil.decodeEncodedWords(displayName, DecodeMonitor.SILENT));
+            Assert.assertEquals(text, DecoderUtil.decodeEncodedWords(unstructured, DecodeMonitor.SILENT));
+        }
+    }
+
+    @Test
+    public void textWithoutEncodedWordLookalikeShouldNotBeEncoded() {
+        Assert.assertEquals("a = b ? c", EncoderUtil.encodeIfNecessary("a = b ? c", Usage.TEXT_TOKEN, 0));
+        Assert.assertEquals("a?=b", EncoderUtil.encodeAddressDisplayName("a?=b"));
+    }
 }

@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.AddressListField;
@@ -36,6 +37,7 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
+import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.address.DefaultAddressParser;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -436,4 +438,19 @@ public class FieldsTest {
         return s;
     }
 
+    @Test
+    public void subjectHoldingAnEncodedWordLookalikeShouldReadBackUnchanged() throws Exception {
+        UnstructuredField field = Fields.subject("=?utf-8?q?x?=");
+
+        Assert.assertEquals("=?utf-8?q?x?=", field.getValue());
+        Assert.assertEquals("=?utf-8?q?x?=", ((UnstructuredField) LenientFieldParser.parse("Subject: " + field.getBody(), DecodeMonitor.SILENT)).getValue());
+    }
+
+    @Test
+    public void displayNameHoldingAnEncodedWordLookalikeShouldReadBackUnchanged() throws Exception {
+        MailboxField field = Fields.sender(new Mailbox("=?=?=?=?=?", "a", "a"));
+
+        Assert.assertEquals("=?=?=?=?=?", field.getMailbox().getName());
+        Assert.assertEquals("=?=?=?=?=?", DefaultAddressParser.DEFAULT.parseMailbox(field.getBody()).getName());
+    }
 }

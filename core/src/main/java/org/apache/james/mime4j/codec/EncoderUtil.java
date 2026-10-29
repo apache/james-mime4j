@@ -119,10 +119,10 @@ public class EncoderUtil {
             throw new IllegalArgumentException("Injection of un-encoded line breaks inside a display name could be assimilated to header injection");
         }
 
-        if (isAtomPhrase(displayName)) {
-            return displayName;
-        } else if (hasToBeEncoded(displayName, 0)) {
+        if (hasToBeEncoded(displayName, 0)) {
             return encodeEncodedWord(displayName, Usage.WORD_ENTITY);
+        } else if (isAtomPhrase(displayName)) {
+            return displayName;
         } else {
             return quote(displayName);
         }
@@ -197,9 +197,11 @@ public class EncoderUtil {
     /**
      * Determines if the specified string has to encoded into an encoded-word.
      * Returns <code>true</code> if the text contains characters that don't
-     * fall into the printable ASCII character set or if the text contains a
+     * fall into the printable ASCII character set, if the text contains a
      * 'word' (sequence of non-whitespace characters) longer than 77 characters
-     * (including characters already used up in the line).
+     * (including characters already used up in the line) or if the text contains
+     * <code>=?</code>, which readers would take for the start of an encoded word
+     * (RFC 2047 section 5).
      *
      * @param text
      *            text to analyze.
@@ -232,6 +234,11 @@ public class EncoderUtil {
 
                 if (ch < 32 || ch >= 127) {
                     // non-printable ascii character has to be encoded
+                    return true;
+                }
+
+                if (ch == '=' && idx + 1 < text.length() && text.charAt(idx + 1) == '?') {
+                    // would be decoded as an encoded word when read back
                     return true;
                 }
             }
