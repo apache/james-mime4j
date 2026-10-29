@@ -98,4 +98,29 @@ public class BoundaryAtBufferEndTest {
 
         Assert.assertTrue(events.toString(), events.contains("T_BODY first"));
     }
+
+    private static List<String> rawEvents(String message) throws Exception {
+        MimeTokenStream stream = new MimeTokenStream();
+        stream.setRecursionMode(RecursionMode.M_RAW);
+        stream.parse(new ByteArrayInputStream(message.getBytes(StandardCharsets.US_ASCII)));
+        List<String> out = new ArrayList<>();
+        for (EntityState s = stream.getState(); s != EntityState.T_END_OF_STREAM; s = stream.next()) {
+            if (s == EntityState.T_RAW_ENTITY || s == EntityState.T_EPILOGUE) {
+                out.add(s + " " + new String(org.apache.commons.io.IOUtils.toByteArray(stream.getInputStream()), StandardCharsets.US_ASCII));
+            } else {
+                out.add(s.toString());
+            }
+        }
+        return out;
+    }
+
+    @Test
+    public void aLastLoneLfAfterADelimiterShouldNotDependOnLineEnds() throws Exception {
+        String lf = "Content-Type: multipart/mixed;boundary=\"boundary\"\n\n--\n--boundary\n";
+        Assert.assertEquals(rawEvents(lf.replace("\n", "\r\n")), rawEvents(lf));
+
+        String epilogue = "Content-Type: multipart/mixed;boundary=\"b\"\n\n--b\n\nx\n--b--\n";
+        Assert.assertEquals(events(new ByteArrayInputStream(epilogue.replace("\n", "\r\n").getBytes(StandardCharsets.US_ASCII))).size(),
+            events(new ByteArrayInputStream(epilogue.getBytes(StandardCharsets.US_ASCII))).size());
+    }
 }
