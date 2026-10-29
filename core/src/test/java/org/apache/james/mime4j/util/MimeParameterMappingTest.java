@@ -86,4 +86,46 @@ public class MimeParameterMappingTest {
         Assert.assertEquals("\u00e9", mapping.get("a"));
         Assert.assertEquals("\u00e9", mapping.get("b"));
     }
+
+    @Test
+    public void continuationSegmentsShouldBeOrderedByNumber() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*2", "ghi");
+        mapping.addParameter("filename*0", "abc");
+        mapping.addParameter("filename*1", "def");
+        Assert.assertEquals("abcdefghi", mapping.get("filename"));
+    }
+
+    @Test
+    public void continuationShouldStopAtTheFirstMissingSection() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*2*", ".");
+        mapping.addParameter("filename*0*", ".abc");
+        Assert.assertEquals(".abc", mapping.get("filename"));
+    }
+
+    @Test
+    public void continuationShouldKeepTheFirstOccurrenceOfASection() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*0", "abc");
+        mapping.addParameter("filename*0", "xyz");
+        mapping.addParameter("filename*1", "def");
+        Assert.assertEquals("abcdef", mapping.get("filename"));
+    }
+
+    @Test
+    public void encodedContinuationShouldUseTheCharsetOfTheFirstSection() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*1*", "%A9");
+        mapping.addParameter("filename*0*", "utf-8''%C3");
+        mapping.addParameter("filename*2", "%41+b");
+        Assert.assertEquals("\u00e9%41+b", mapping.get("filename"));
+    }
+
+    @Test
+    public void plusShouldNotBeDecodedAsASpace() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*", "utf-8''a+b.txt");
+        Assert.assertEquals("a+b.txt", mapping.get("filename"));
+    }
 }
