@@ -227,13 +227,45 @@ public class MessageMatcher {
     }
 
     public boolean isFoundIn(final Reader reader, final CharBuffer buffer) throws IOException {
+        // Knuth-Morris-Pratt: matches overlapping prefixes and texts ending the input
+        final int length = buffer.limit();
+        if (length == 0) {
+            return true;
+        }
+        final int[] fallback = fallbackTable(buffer, length);
+        int matched = 0;
         int read;
         while ((read = reader.read()) != -1) {
-            if (matches(buffer, computeNextChar(isCaseInsensitive, (char) read))) {
-                return true;
+            final char next = computeNextChar(isCaseInsensitive, (char) read);
+            while (matched > 0 && buffer.get(matched) != next) {
+                matched = fallback[matched - 1];
+            }
+            if (buffer.get(matched) == next) {
+                matched++;
+                if (matched == length) {
+                    return true;
+                }
             }
         }
         return false;
+    }
+
+    /**
+     * For each prefix of the searched text, the length of its longest proper prefix that is also a suffix.
+     */
+    private static int[] fallbackTable(final CharBuffer buffer, final int length) {
+        final int[] fallback = new int[length];
+        int k = 0;
+        for (int i = 1; i < length; i++) {
+            while (k > 0 && buffer.get(i) != buffer.get(k)) {
+                k = fallback[k - 1];
+            }
+            if (buffer.get(i) == buffer.get(k)) {
+                k++;
+            }
+            fallback[i] = k;
+        }
+        return fallback;
     }
 
     private char computeNextChar(boolean isCaseInsensitive, char read) {
@@ -242,22 +274,6 @@ public class MessageMatcher {
         } else {
             return read;
         }
-    }
-
-    private boolean matches(final CharBuffer buffer, final char next) {
-        if (buffer.hasRemaining()) {
-            final boolean partialMatch = (buffer.position() > 0);
-            final char matching = buffer.get();
-            if (next != matching) {
-                buffer.rewind();
-                if (partialMatch) {
-                    return matches(buffer, next);
-                }
-            }
-        } else {
-            return true;
-        }
-        return false;
     }
 
 }
