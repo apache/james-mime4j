@@ -136,4 +136,28 @@ public class MimeUtilTest {
         assertFormatDateDenotesTheInstant("2024-06-01T12:34:56Z", "Europe/Paris");
         assertFormatDateDenotesTheInstant("2024-06-01T12:34:56Z", "Asia/Kolkata");
     }
+
+    @Test
+    public void foldShouldNotBreakRightAfterAFoldAlreadyInTheValue() {
+        String value = "X-Custom: " + repeat("x", 70) + "\r\n " + repeat("y", 10) + " z";
+        String folded = MimeUtil.fold(value, 0);
+
+        Assert.assertFalse(folded, folded.contains("\r\n\r\n"));
+        Assert.assertEquals(MimeUtil.unfold(value), MimeUtil.unfold(folded));
+
+        String tabs = "V\tV\t:\r\n\t\r\n\t\r\n\t\r\n\t:\r\n\t\r\n\t\r\n\t\t\r\n\t:\r\n\t\r\n\t\r\n\t\t\r\n\t:\r\n\t\r\n\t";
+        String foldedTabs = MimeUtil.fold("Content-Type: text/plain; name=\"" + tabs + "\"", 0);
+        Assert.assertFalse(foldedTabs, foldedTabs.contains("\r\n\r\n"));
+    }
+
+    @Test
+    public void foldShouldStillFoldLongLinesOfAPrefoldedValue() {
+        String value = repeat("word ", 10) + "\r\n " + repeat("word ", 30) + "end";
+        String folded = MimeUtil.fold(value, 9);
+
+        for (String line : folded.split("\r\n")) {
+            Assert.assertTrue(folded, line.length() <= 76);
+        }
+        Assert.assertEquals(MimeUtil.unfold(value), MimeUtil.unfold(folded));
+    }
 }
