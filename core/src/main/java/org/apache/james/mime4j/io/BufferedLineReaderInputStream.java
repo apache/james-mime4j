@@ -47,6 +47,7 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     }
 
     private boolean truncated;
+    private boolean released;
 
     boolean tempBuffer = false;
 
@@ -151,6 +152,10 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     }
 
     public void release() {
+        if (released) {
+            return;
+        }
+        released = true;
         BufferRecycler bufferRecycler = getBufferRecycler();
         bufferRecycler.releaseByteBuffer(0, buffer);
         bufferRecycler.releaseIntBuffer(shiftTable);

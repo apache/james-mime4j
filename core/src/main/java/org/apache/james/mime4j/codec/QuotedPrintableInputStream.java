@@ -99,6 +99,9 @@ public class QuotedPrintableInputStream extends InputStream {
      */
     @Override
     public void close() {
+        if (closed) {
+            return;
+        }
         closed = true;
         getBufferRecycler().releaseByteBuffer(1, encoded);
         decodedBuf.release();

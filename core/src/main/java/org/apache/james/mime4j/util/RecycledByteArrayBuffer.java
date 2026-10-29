@@ -28,6 +28,7 @@ public final class RecycledByteArrayBuffer implements ByteSequence {
     private final BufferRecycler bufferRecycler;
     private byte[] buffer;
     private int len;
+    private boolean released;
 
     public RecycledByteArrayBuffer(BufferRecycler bufferRecycler, int capacity) {
         super();
@@ -182,7 +183,11 @@ public final class RecycledByteArrayBuffer implements ByteSequence {
     }
 
     public void release() {
-        bufferRecycler.releaseByteBuffer(0, buffer);
+        // Releasing twice would hand the same array to two later users
+        if (!released) {
+            released = true;
+            bufferRecycler.releaseByteBuffer(0, buffer);
+        }
     }
 
 }
