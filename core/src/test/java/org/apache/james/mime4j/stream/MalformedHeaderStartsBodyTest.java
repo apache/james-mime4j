@@ -62,4 +62,23 @@ public class MalformedHeaderStartsBodyTest {
         Assert.assertTrue(events.toString(), events.contains("T_PREAMBLE this header line has no colon\r\n"));
         Assert.assertTrue(events.toString(), events.contains("T_BODY x"));
     }
+
+    @Test
+    public void stopAfterAMalformedHeaderShouldNotBreakNext() throws Exception {
+        String boundary = "0123456789012345678901234567890123456789012345678901234567890ab";
+        String message = "Content-Type: multipart/mixed; boundary=" + boundary + "\r\n"
+            + "Content-Ty the body i\r\n"
+            + "x\r\n";
+        MimeTokenStream stream = new MimeTokenStream(CONFIG);
+        stream.parse(new ByteArrayInputStream(message.getBytes(StandardCharsets.US_ASCII)));
+
+        List<EntityState> states = new ArrayList<>();
+        for (EntityState s = stream.getState(); s != EntityState.T_END_OF_STREAM; s = stream.next()) {
+            states.add(s);
+            if (s == EntityState.T_END_HEADER) {
+                stream.stop();
+            }
+        }
+        Assert.assertEquals(EntityState.T_END_MESSAGE, states.get(states.size() - 1));
+    }
 }
