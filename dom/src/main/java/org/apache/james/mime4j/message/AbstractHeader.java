@@ -247,7 +247,11 @@ public abstract class AbstractHeader implements Header {
             }
         }
 
-        fields.add(firstOccurrence, field);
+        if (firstOccurrence == -1) {
+            fields.add(field);
+        } else {
+            fields.add(firstOccurrence, field);
+        }
     }
 
     /**
