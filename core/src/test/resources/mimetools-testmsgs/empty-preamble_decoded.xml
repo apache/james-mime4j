@@ -30,8 +30,5 @@ Content-Transfer-Encoding: base64</field>
 </header>
 <binary-body name="empty-preamble_decoded_1_2.bin"/>
 </body-part>
-<epilogue>
-
-</epilogue>
 </multipart>
 </message>

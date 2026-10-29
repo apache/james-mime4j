@@ -354,6 +354,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
 
                 } else {
                     if (eof) {
+                        if (buffer.length() == 1) {
+                            // a last byte ends the delimiter line (LF) or belongs to it
+                            buffer.skip(1);
+                        }
                         break;
                     }
                     fillBuffer();

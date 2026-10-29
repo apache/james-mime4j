@@ -47,8 +47,5 @@ Content-transfer-encoding: base64 </field>
 </header>
 <binary-body name="twopart_decoded_1_2.bin"/>
 </body-part>
-<epilogue>
-
-</epilogue>
 </multipart>
 </message>

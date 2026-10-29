@@ -31,8 +31,5 @@ Content-Disposition: attachment;
 </header>
 <text-body name="attachment-filename-encoding-UTF8_decoded_1_2.txt"/>
 </body-part>
-<epilogue>
-
-</epilogue>
 </multipart>
 </message>
