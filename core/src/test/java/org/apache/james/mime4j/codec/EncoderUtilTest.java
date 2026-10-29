@@ -316,4 +316,15 @@ public class EncoderUtilTest {
         return ContentUtil.toAsciiString(buf);
     }
 
+    @Test
+    public void displayNameShouldRejectLineBreaks() {
+        for (String displayName : new String[] {"y\n", "y\r", "a\r\n b"}) {
+            try {
+                EncoderUtil.encodeAddressDisplayName(displayName);
+                Assert.fail("Expecting IllegalArgumentException for " + displayName);
+            } catch (IllegalArgumentException e) {
+                // expected
+            }
+        }
+    }
 }
