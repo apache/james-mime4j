@@ -529,4 +529,28 @@ public class LenientAddressBuilderTest {
 
     }
 
+    @Test
+    public void angleAddrWithoutDomainShouldNotSwallowFollowingAddresses() {
+        AddressList list = parser.parseAddressList("<postmaster>, alice@example.com, bob@example.com");
+
+        Assert.assertEquals(3, list.size());
+        Mailbox first = (Mailbox) list.get(0);
+        Assert.assertEquals("postmaster", first.getLocalPart());
+        Assert.assertNull(first.getDomain());
+        Assert.assertEquals("alice@example.com", ((Mailbox) list.get(1)).getAddress());
+        Assert.assertEquals("bob@example.com", ((Mailbox) list.get(2)).getAddress());
+    }
+
+    @Test
+    public void angleAddrWithoutDomainShouldNotSwallowFollowingGroupMembers() {
+        AddressList list = parser.parseAddressList("group: \"a\" <local>, \"b\" <b@example.com>;, c@example.com");
+
+        Assert.assertEquals(2, list.size());
+        Group group = (Group) list.get(0);
+        Assert.assertEquals(2, group.getMailboxes().size());
+        Assert.assertEquals("local", group.getMailboxes().get(0).getLocalPart());
+        Assert.assertNull(group.getMailboxes().get(0).getDomain());
+        Assert.assertEquals("b@example.com", group.getMailboxes().get(1).getAddress());
+        Assert.assertEquals("c@example.com", ((Mailbox) list.get(1)).getAddress());
+    }
 }

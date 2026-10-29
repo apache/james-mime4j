@@ -171,21 +171,26 @@ public class LenientAddressParser implements AddressParser {
         }
         pos = cursor.getPos();
         current = (char) (buf.byteAt(pos) & 0xff);
-        if (current == AT || current == CLOSING_BRACKET) {
+        String domain;
+        if (current == AT) {
             cursor.updatePos(pos + 1);
+            domain = parseDomain(buf, cursor, CLOSING_BRACKET_ONLY);
+            if (cursor.atEnd()) {
+                return createMailbox(openingText, domainList, localPart, domain);
+            }
+            pos = cursor.getPos();
+            current = (char) (buf.byteAt(pos) & 0xff);
+            if (current == CLOSING_BRACKET) {
+                cursor.updatePos(pos + 1);
+            } else {
+                return createMailbox(openingText, domainList, localPart, domain);
+            }
+        } else if (current == CLOSING_BRACKET) {
+            // <local> without domain: the address ends here
+            cursor.updatePos(pos + 1);
+            domain = null;
         } else {
             return createMailbox(openingText, domainList, localPart, null);
-        }
-        String domain = parseDomain(buf, cursor, CLOSING_BRACKET_ONLY);
-        if (cursor.atEnd()) {
-            return createMailbox(openingText, domainList, localPart, domain);
-        }
-        pos = cursor.getPos();
-        current = (char) (buf.byteAt(pos) & 0xff);
-        if (current == CLOSING_BRACKET) {
-            cursor.updatePos(pos + 1);
-        } else {
-            return createMailbox(openingText, domainList, localPart, domain);
         }
         while (!cursor.atEnd()) {
             pos = cursor.getPos();
