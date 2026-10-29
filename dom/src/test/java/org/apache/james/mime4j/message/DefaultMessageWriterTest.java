@@ -142,4 +142,23 @@ public class DefaultMessageWriterTest {
 
         assertThat(reparsed.getField("X-Long").getBody()).isEqualTo(value.toString());
     }
+
+    @Test
+    public void prefoldedFieldShouldNotEndTheHeaderBlock() throws Exception {
+        StringBuilder x = new StringBuilder();
+        while (x.length() < 70) {
+            x.append('x');
+        }
+        Message message = Message.Builder.of()
+            .setBody("SENTINEL-BODY", StandardCharsets.US_ASCII)
+            .addField(new RawField("X-Custom", x + "\r\n yyyyyyyyyy z"))
+            .addField(new RawField("X-Sentinel", "1"))
+            .build();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(message, out);
+
+        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(out.toByteArray()));
+
+        assertThat(parsed.getHeader().getField("X-Sentinel")).isNotNull();
+    }
 }

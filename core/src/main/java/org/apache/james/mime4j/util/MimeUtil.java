@@ -248,6 +248,8 @@ public final class MimeUtil {
         }
 
         int lastLineBreak = -usedCharacters;
+        // where the current line starts: an inserted line break or a fold already in the value
+        int lineStart = lastLineBreak;
         int wspIdx = indexOfWsp(s, 0);
         boolean lineHasText = wspIdx > 0;
         while (true) {
@@ -258,10 +260,16 @@ public final class MimeUtil {
 
             int nextWspIdx = indexOfWsp(s, wspIdx + 1);
 
-            if (nextWspIdx - lastLineBreak > maxCharacters && lineHasText && wspIdx < lastNonWspIdx) {
+            if (wspIdx > 0 && s.charAt(wspIdx - 1) == '\n') {
+                // the value is already folded here: a new line starts with this whitespace,
+                // breaking before it would write an empty line
+                lineStart = wspIdx;
+                lineHasText = false;
+            } else if (nextWspIdx - lineStart > maxCharacters && lineHasText && wspIdx < lastNonWspIdx) {
                 sb.append(s, Math.max(0, lastLineBreak), wspIdx);
                 sb.append("\r\n");
                 lastLineBreak = wspIdx;
+                lineStart = wspIdx;
                 lineHasText = false;
             }
             if (nextWspIdx > wspIdx + 1) {
