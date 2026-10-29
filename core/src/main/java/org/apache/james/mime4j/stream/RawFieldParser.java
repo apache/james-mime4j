@@ -151,7 +151,8 @@ public class RawFieldParser {
         if (delim == ';') {
             return new NameValuePair(name, null);
         }
-        String value = parseValue(buf, cursor, SEMICOLON);
+        // The boundary is a byte exact delimiter: never decode it as an encoded word
+        String value = parseValue(buf, cursor, SEMICOLON, !"boundary".equalsIgnoreCase(name));
         if (!cursor.atEnd()) {
             cursor.updatePos(cursor.getPos() + 1);
         }
@@ -201,6 +202,11 @@ public class RawFieldParser {
      *  is not delimited by any character.
      */
     public String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
+        return parseValue(buf, cursor, delimiters, true);
+    }
+
+    private String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+            final boolean decodeEncodedWords) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
@@ -216,7 +222,7 @@ public class RawFieldParser {
                 if (dst.length() > 0 && whitespace) {
                     dst.append(' ');
                 }
-                copyQuotedContent(buf, cursor, dst);
+                copyQuotedContent(buf, cursor, dst, decodeEncodedWords);
                 whitespace = false;
             } else {
                 if (dst.length() > 0 && whitespace) {
@@ -428,6 +434,11 @@ public class RawFieldParser {
      */
     public void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst) {
+        copyQuotedContent(buf, cursor, dst, true);
+    }
+
+    private void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
+            final StringBuilder dst, final boolean decodeEncodedWords) {
         if (cursor.atEnd()) {
             return;
         }
@@ -469,7 +480,7 @@ public class RawFieldParser {
 
         if (CharsetUtil.isASCII(dstRaw)) {
             // Check for encoded word directly on bytes — avoids an intermediate String
-            if (dstRaw.length() > 1 && dstRaw.byteAt(0) == '=' && dstRaw.byteAt(1) == '?') {
+            if (decodeEncodedWords && dstRaw.length() > 1 && dstRaw.byteAt(0) == '=' && dstRaw.byteAt(1) == '?') {
                 String raw = ContentUtil.decode(dstRaw);
                 dst.append(DecoderUtil.decodeEncodedWords(raw, DecodeMonitor.SILENT));
             } else {
@@ -480,7 +491,7 @@ public class RawFieldParser {
             }
         } else {
             String decoded = ContentUtil.decode(StandardCharsets.UTF_8, dstRaw);
-            if (decoded.startsWith("=?")) {
+            if (decodeEncodedWords && decoded.startsWith("=?")) {
                 decoded = DecoderUtil.decodeEncodedWords(decoded, DecodeMonitor.SILENT);
             }
             dst.append(decoded);
