@@ -28,6 +28,7 @@ import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
@@ -147,4 +148,29 @@ public class HeaderImplTest {
         Assert.assertEquals("Message-ID", header.getFields().get(3).getName());
     }
 
+    @Test
+    public void removeFieldsShouldKeepListAndIndexConsistent() throws Exception {
+        Header header = new HeaderImpl();
+        header.addField(new RawField("MIME-Version", "1.0"));
+        header.addField(new RawField("MIME-Verſion", "1.0"));
+
+        Assert.assertEquals(1, header.removeFields("MIME-Version"));
+
+        Assert.assertEquals(1, header.getFields().size());
+        Assert.assertEquals("MIME-Verſion", header.getFields().get(0).getName());
+        Assert.assertNotNull(header.getField("MIME-Verſion"));
+    }
+
+    @Test
+    public void setFieldShouldKeepListAndIndexConsistent() throws Exception {
+        Header header = new HeaderImpl();
+        header.addField(new RawField("Content-tranſfer-encoding", "7bit"));
+        header.addField(new RawField("Content-transfer-encoding", "7bit"));
+
+        header.setField(new RawField("Content-transfer-encoding", "base64"));
+
+        Assert.assertEquals(2, header.getFields().size());
+        Assert.assertEquals("7bit", header.getField("Content-tranſfer-encoding").getBody());
+        Assert.assertEquals("base64", header.getField("Content-transfer-encoding").getBody());
+    }
 }
