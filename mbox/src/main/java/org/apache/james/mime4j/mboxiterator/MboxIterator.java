@@ -129,6 +129,14 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         findEnd = lineMatcher.end();
     }
 
+    /**
+     * Start of the message that follows the From_ line ending at <code>end</code>. The line can end
+     * the buffer (or the file) without a line terminator.
+     */
+    private int messageStart(int end) {
+        return Math.min(end + 1, mboxCharBuffer.limit());
+    }
+
     public Iterator<CharBufferWrapper> iterator() {
         return new MessageIterator();
     }
@@ -159,7 +167,7 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
             fromLineFound = fromLineMatcher.find();
             if (fromLineFound) {
                 message = mboxCharBuffer.slice();
-                message.position(findEnd + 1);
+                message.position(messageStart(findEnd));
                 saveFindPositions(fromLineMatcher);
                 message.limit(fromLineMatcher.start());
             } else {
@@ -186,7 +194,7 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
                         saveFindPositions(fromLineMatcher);
                     }
                     message = mboxCharBuffer.slice();
-                    message.position(fromLineMatcher.end() + 1);
+                    message.position(messageStart(fromLineMatcher.end()));
                     fromLineFound = fromLineMatcher.find();
                     if (fromLineFound) {
                         saveFindPositions(fromLineMatcher);
@@ -194,7 +202,7 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
                     }
                 } else {
                     message = mboxCharBuffer.slice();
-                    message.position(findEnd + 1);
+                    message.position(messageStart(findEnd));
                     message.limit(message.capacity());
                 }
             }
