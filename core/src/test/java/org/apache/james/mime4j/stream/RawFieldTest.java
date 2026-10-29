@@ -145,4 +145,11 @@ public class RawFieldTest {
         assertThatCode(() -> new RawField("Name", "Value")).doesNotThrowAnyException();
     }
 
+    @Test
+    public void singleSpaceAfterTheColonShouldGiveAnEmptyBody() throws Exception {
+        Assert.assertEquals("", RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject: ")).getBody());
+        Assert.assertEquals("", RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject:")).getBody());
+        Assert.assertEquals(" ", RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject:  ")).getBody());
+        Assert.assertEquals("x", RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject: x")).getBody());
+    }
 }

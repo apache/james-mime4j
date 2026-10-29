@@ -132,7 +132,7 @@ public final class RawField implements Field {
         if (raw != null) {
             int len = raw.length();
             int off = delimiterIdx + 1;
-            if (len > off + 1 && (CharsetUtil.isWhitespace((char) (raw.byteAt(off) & 0xff)))) {
+            if (len > off && (CharsetUtil.isWhitespace((char) (raw.byteAt(off) & 0xff)))) {
                 off++;
             }
             return MimeUtil.unfold(ContentUtil.decode(raw, off, len - off, StandardCharsets.UTF_8));
