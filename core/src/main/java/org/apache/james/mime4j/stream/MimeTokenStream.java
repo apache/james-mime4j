@@ -96,6 +96,8 @@ public class MimeTokenStream {
     private int partCount;
     private int totalHeaderCount;
     private long totalHeaderLen;
+    /** Failure of the first step of {@link #parseHeadless}, reported by the next call to {@link #next()} */
+    private Exception pendingFailure;
 
     /**
      * Constructs a standard (lax) stream.
@@ -176,12 +178,10 @@ public class MimeTokenStream {
         doParse(stream, EntityState.T_END_HEADER);
         try {
             next();
-        } catch (IOException e) {
-            // Should never happend: the first next after END_HEADER does not produce IO
-            throw new IllegalStateException(e);
-        } catch (MimeException e) {
-            // This should never happen
-            throw new IllegalStateException(e);
+        } catch (IOException | MimeException e) {
+            // A limit or the reading of a multipart can fail here: report it as next() does
+            // for a message with a header, without changing the signature of this method
+            pendingFailure = e;
         }
         return newContentType;
     }
@@ -212,6 +212,7 @@ public class MimeTokenStream {
 
         rootentity.setRecursionMode(recursionMode);
         currentStateMachine = rootentity;
+        pendingFailure = null;
         partCount = 0;
         totalHeaderCount = 0;
         totalHeaderLen = 0;
@@ -379,6 +380,14 @@ public class MimeTokenStream {
      *   {@link #getState()} was already {@link EntityState#T_END_OF_STREAM}.
      */
     public EntityState next() throws IOException, MimeException {
+        if (pendingFailure != null) {
+            Exception failure = pendingFailure;
+            pendingFailure = null;
+            if (failure instanceof IOException) {
+                throw (IOException) failure;
+            }
+            throw (MimeException) failure;
+        }
         if (state == EntityState.T_END_OF_STREAM  ||  currentStateMachine == null) {
             throw new IllegalStateException("No more tokens are available.");
         }
