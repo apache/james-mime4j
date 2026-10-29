@@ -96,11 +96,40 @@ public class LenientAddressParser implements AddressParser {
                 this.parser.skipWhiteSpace(buf, cursor);
             } else if (current == '(') {
                 this.parser.skipComment(buf, cursor);
+            } else if (current == '[' && copyDomainLiteral(buf, cursor, delimiters, dst)) {
+                continue;
             } else {
                 this.parser.copyContent(buf, cursor, delimiters, dst);
             }
         }
         return dst.toString();
+    }
+
+    /**
+     * Copies a domain literal up to its closing bracket: '(' and ')' are dtext there, not a comment
+     * (RFC 5322 section 3.4.1). Returns false, copying nothing, when no ']' comes before a delimiter.
+     */
+    private boolean copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+                                      final StringBuilder dst) {
+        int from = cursor.getPos();
+        int to = cursor.getUpperBound();
+        for (int i = from + 1; i < to; i++) {
+            char current = (char) (buf.byteAt(i) & 0xff);
+            if (current == ']') {
+                for (int j = from; j <= i; j++) {
+                    char c = (char) (buf.byteAt(j) & 0xff);
+                    if (c != '\r' && c != '\n') {
+                        dst.append(c);
+                    }
+                }
+                cursor.updatePos(i + 1);
+                return true;
+            }
+            if (delimiters != null && delimiters.get(current)) {
+                return false;
+            }
+        }
+        return false;
     }
 
     DomainList parseRoute(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
