@@ -590,4 +590,17 @@ public class LenientAddressBuilderTest {
     public void quotedWhitespaceOfALocalPartShouldBeKept() {
         Assert.assertEquals("john . doe", parser.parseMailbox("\"john . doe\"@example.com").getLocalPart());
     }
+
+    @Test
+    public void parenthesisInADomainLiteralShouldNotStartAComment() throws Exception {
+        String value = "user@[192.168.0.(1], other@example.com";
+        AddressList lenient = parser.parseAddressList(value);
+        AddressList strict = DefaultAddressParser.DEFAULT.parseAddressList(value);
+
+        Assert.assertEquals(2, strict.flatten().size());
+        Assert.assertEquals(2, lenient.flatten().size());
+        Assert.assertEquals(strict.flatten().get(0).getDomain(), lenient.flatten().get(0).getDomain());
+        Assert.assertEquals("other@example.com", lenient.flatten().get(1).getAddress());
+        Assert.assertEquals("[1.2.3.4]", parser.parseMailbox("John <john@[1.2.3.4]>").getDomain());
+    }
 }
