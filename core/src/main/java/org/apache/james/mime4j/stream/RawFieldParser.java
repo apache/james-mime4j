@@ -437,6 +437,24 @@ public class RawFieldParser {
         copyQuotedContent(buf, cursor, dst, true);
     }
 
+    /**
+     * Whether the CR or LF at <code>index</code> belongs to a fold: CRLF or LF followed by SP or HTAB.
+     */
+    private static boolean isFoldAt(final ByteSequence buf, final int index, final int indexTo) {
+        int i = index;
+        if (buf.byteAt(i) == '\r') {
+            i++;
+            if (i >= indexTo || buf.byteAt(i) != '\n') {
+                return false;
+            }
+        }
+        if (buf.byteAt(i) != '\n') {
+            return false;
+        }
+        i++;
+        return i < indexTo && (buf.byteAt(i) == ' ' || buf.byteAt(i) == '\t');
+    }
+
     private void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst, final boolean decodeEncodedWords) {
         if (cursor.atEnd()) {
@@ -460,7 +478,7 @@ public class RawFieldParser {
             byte currentByte = buf.byteAt(i);
             current = (char) (currentByte & 0xff);
             if (escaped) {
-                if (current == '\r' || current == '\n') {
+                if (isFoldAt(buf, i, indexTo)) {
                     // A fold is not part of the value: the quoted pair applies to the WSP after it
                     continue;
                 }

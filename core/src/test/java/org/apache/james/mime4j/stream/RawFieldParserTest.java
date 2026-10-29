@@ -532,4 +532,15 @@ public class RawFieldParserTest {
         Assert.assertEquals(parseValue("\"a\\ b\""), folded);
         Assert.assertEquals(parseValue("\"a\\\tb\""), parseValue("\"a\\\r\n\tb\""));
     }
+
+    @Test
+    public void backslashBeforeALineBreakThatIsNotAFoldShouldKeepItsMeaning() throws Exception {
+        Assert.assertEquals("a\\\r\"b", parseValue("\"a\\\r\\\"b\""));
+        Assert.assertEquals("a\\\n\"b", parseValue("\"a\\\n\n\\\"b\""));
+
+        ByteSequence raw = ContentUtil.encode("attachment; filename=\"a\\\r\\\"; size=1.txt\"");
+        RawBody body = parser.parseRawBody(raw, new ParserCursor(0, raw.length()));
+        Assert.assertEquals(1, body.getParams().size());
+        Assert.assertEquals("a\\\r\"; size=1.txt", body.getParams().get(0).getValue());
+    }
 }
