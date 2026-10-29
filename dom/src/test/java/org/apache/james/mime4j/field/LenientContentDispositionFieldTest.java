@@ -294,4 +294,13 @@ public class LenientContentDispositionFieldTest {
                 "filename=\"bar3.rtf\"");
         assertEquals("foobar2.rtf", f.getFilename());
     }
+
+    @Test
+    public void getParameterShouldBeCaseInsensitive() throws Exception {
+        ContentDispositionField f = parse("Content-Disposition: attachment; Name=value; FILENAME=file.txt");
+
+        Assert.assertEquals("value", f.getParameter("Name"));
+        Assert.assertEquals("value", f.getParameter("NAME"));
+        Assert.assertEquals("file.txt", f.getFilename());
+    }
 }
