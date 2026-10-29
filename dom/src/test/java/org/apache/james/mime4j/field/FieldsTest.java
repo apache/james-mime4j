@@ -469,4 +469,27 @@ public class FieldsTest {
         Assert.assertNull(field.getParseException());
         Assert.assertEquals("日本", field.getParameter("name"));
     }
+
+    @Test
+    public void allDigitTokensShouldParse() throws Exception {
+        ContentTypeField parameter = (ContentTypeField) DefaultFieldParser.parse("Content-Type: application/x-foo; v1=2; 9=x");
+        Assert.assertNull(parameter.getParseException());
+        Assert.assertEquals("x", parameter.getParameter("9"));
+
+        ContentTypeField digits = Fields.contentType("6/s");
+        Assert.assertNull(digits.getParseException());
+        Assert.assertEquals("6/s", digits.getMimeType());
+
+        ContentTypeField subtype = (ContentTypeField) DefaultFieldParser.parse("Content-Type: L/2; a=\"\"");
+        Assert.assertNull(subtype.getParseException());
+        Assert.assertEquals("l/2", subtype.getMimeType());
+
+        ContentDispositionField disposition = Fields.contentDisposition("2");
+        Assert.assertNull(disposition.getParseException());
+        Assert.assertEquals("2", disposition.getDispositionType());
+
+        ContentDispositionField dispositionParameter = (ContentDispositionField) DefaultFieldParser.parse("Content-Disposition: nN; 9=\"x\"; a=\"\"");
+        Assert.assertNull(dispositionParameter.getParseException());
+        Assert.assertEquals("x", dispositionParameter.getParameter("9"));
+    }
 }

@@ -104,7 +104,7 @@ void parse() :
 	Token subtype;
 }
 {
-	type=<ATOKEN> "/" subtype=<ATOKEN>
+	type=token() "/" subtype=token()
 	{
 		this.type = type.image;
 		this.subtype = subtype.image;
@@ -118,11 +118,21 @@ void parameter() :
 	String val;
 }
 {
-	attrib=<ATOKEN> "=" val=value()
+	attrib=token() "=" val=value()
 	{
 		paramNames.add(attrib.image);
 		paramValues.add(val);
 	}
+}
+
+// An RFC 2045 token: the lexer reads an all-digit one as <DIGITS>
+Token token() :
+{Token t;}
+{
+(	t=<ATOKEN>
+|   t=<DIGITS>
+)
+	{ return t; }
 }
 
 String value() :
