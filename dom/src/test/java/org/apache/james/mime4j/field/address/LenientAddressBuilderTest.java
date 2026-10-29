@@ -553,4 +553,17 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals("b@example.com", group.getMailboxes().get(1).getAddress());
         Assert.assertEquals("c@example.com", ((Mailbox) list.get(1)).getAddress());
     }
+
+    @Test
+    public void emptyAngleAddressShouldReadBackFromTheFormatter() {
+        for (String text : new String[] {"<", "<>", "name <>"}) {
+            Mailbox mailbox = parser.parseMailbox(text);
+            String encoded = AddressFormatter.DEFAULT.encode(mailbox);
+            Mailbox readBack = parser.parseMailbox(encoded);
+
+            Assert.assertNotNull(encoded, readBack);
+            Assert.assertEquals(encoded, mailbox.getName(), readBack.getName());
+            Assert.assertEquals(encoded, mailbox.getAddress(), readBack.getAddress());
+        }
+    }
 }
