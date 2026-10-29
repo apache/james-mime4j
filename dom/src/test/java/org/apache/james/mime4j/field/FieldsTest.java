@@ -453,4 +453,20 @@ public class FieldsTest {
         Assert.assertEquals("=?=?=?=?=?", field.getMailbox().getName());
         Assert.assertEquals("=?=?=?=?=?", DefaultAddressParser.DEFAULT.parseMailbox(field.getBody()).getName());
     }
+
+    @Test
+    public void nonAsciiFilenameShouldReadBackFromTheBuiltField() throws Exception {
+        ContentDispositionField field = Fields.contentDisposition("attachment", "日本 😀");
+
+        Assert.assertNull(field.getParseException());
+        Assert.assertEquals("日本 😀", field.getFilename());
+    }
+
+    @Test
+    public void nonAsciiContentTypeParameterShouldReadBackFromTheBuiltField() throws Exception {
+        ContentTypeField field = Fields.contentType("application/pdf", Collections.singletonMap("name", "日本"));
+
+        Assert.assertNull(field.getParseException());
+        Assert.assertEquals("日本", field.getParameter("name"));
+    }
 }
