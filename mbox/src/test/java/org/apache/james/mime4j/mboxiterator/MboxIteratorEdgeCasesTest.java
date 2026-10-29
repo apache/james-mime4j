@@ -67,4 +67,33 @@ public class MboxIteratorEdgeCasesTest {
         Assert.assertEquals(Arrays.asList("Subject: a\n", "Subject: b\n"),
             messages("From a@b 2011\nSubject: a\nFrom c@d 2012\nSubject: b\n", 1024));
     }
+
+    private static String repeat(char c, int count) {
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            result.append(c);
+        }
+        return result.toString();
+    }
+
+    @Test
+    public void firstFromLineCutByTheBufferShouldNotThrow() throws IOException {
+        // "From a@b 2011" ends at char 64, where the first decoded buffer ends
+        Assert.assertEquals(Arrays.asList("body\n"),
+            messages(repeat('y', 50) + "\nFrom a@b 2011x\nbody\n", 64));
+    }
+
+    @Test
+    public void lineCutByTheBufferShouldNotBeTakenForAFromLine() throws IOException {
+        // "From c@d 2012" ends at char 64, where the first decoded buffer ends
+        String body = repeat('x', 19) + "\nFrom c@d 2012x\nmore\n";
+        Assert.assertEquals(Arrays.asList("m0\n", body), messages("From a@b 2011\nm0\nFrom e@f 2010\n" + body, 64));
+    }
+
+    @Test
+    public void fromLineCutByTheBufferShouldStillSplitMessages() throws IOException {
+        // "From c@d 2012" ends at char 64, where the first decoded buffer ends
+        String first = repeat('x', 36) + "\n";
+        Assert.assertEquals(Arrays.asList(first, "more\n"), messages("From a@b 2011\n" + first + "From c@d 2012\nmore\n", 64));
+    }
 }
