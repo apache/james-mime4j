@@ -83,6 +83,14 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             .appendLiteral(' ')
             .appendOffsetId()
         .optionalEnd()
+        .optionalStart()
+            .appendLiteral(' ')
+            .appendText(OFFSET_SECONDS, obsoleteZones())
+        .optionalEnd()
+        .optionalStart()
+            .appendLiteral(' ')
+            .appendText(OFFSET_SECONDS, obsoleteDaylightZones())
+        .optionalEnd()
         .toFormatter()
         .withZone(ZoneId.of("GMT"))
         .withResolverStyle(ResolverStyle.LENIENT)
@@ -103,6 +111,28 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         result.put(10L, "Oct");
         result.put(11L, "Nov");
         result.put(12L, "Dec");
+        return result;
+    }
+
+    /**
+     * RFC 5322 obs-zone. Split in two maps as several names share an offset.
+     * UT, GMT and military zones (taken as -0000) default to GMT.
+     */
+    private static Map<Long, String> obsoleteZones() {
+        HashMap<Long, String> result = new HashMap<>();
+        result.put(-4L * 3600, "EDT");
+        result.put(-5L * 3600, "EST");
+        result.put(-6L * 3600, "CST");
+        result.put(-7L * 3600, "MST");
+        result.put(-8L * 3600, "PST");
+        return result;
+    }
+
+    private static Map<Long, String> obsoleteDaylightZones() {
+        HashMap<Long, String> result = new HashMap<>();
+        result.put(-5L * 3600, "CDT");
+        result.put(-6L * 3600, "MDT");
+        result.put(-7L * 3600, "PDT");
         return result;
     }
 
