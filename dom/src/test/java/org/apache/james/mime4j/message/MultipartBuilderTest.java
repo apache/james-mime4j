@@ -19,7 +19,10 @@
 
 package org.apache.james.mime4j.message;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +30,7 @@ import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.Entity;
 import org.apache.james.mime4j.dom.Header;
+import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
@@ -202,4 +206,21 @@ public class MultipartBuilderTest {
         Assert.assertEquals("base64", te2.getEncoding());
     }
 
+    @Test
+    public void nonAsciiPreambleAndEpilogueShouldReadBackAfterWriting() throws Exception {
+        Multipart multipart = MultipartBuilder.create("mixed")
+            .setPreamble("préambule 😀")
+            .setEpilogue("épilogue")
+            .addTextPart("body", StandardCharsets.UTF_8)
+            .build();
+        Message message = Message.Builder.of().setBody(multipart).build();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(message, out);
+
+        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(out.toByteArray()));
+
+        Multipart parsedMultipart = (Multipart) parsed.getBody();
+        Assert.assertEquals("préambule 😀", parsedMultipart.getPreamble());
+        Assert.assertEquals("épilogue", parsedMultipart.getEpilogue());
+    }
 }
