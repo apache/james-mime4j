@@ -173,4 +173,19 @@ public class DecoderUtilTest {
         String decoded = DecoderUtil.decodeEncodedWords("=?ISO-8859-1?Q?You=92re_a_winner?=", DecodeMonitor.SILENT, null, overrides);
         Assert.assertEquals("You’re a winner", decoded);
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void strictMonitorShouldReportUnexpectedEndOfBase64AsIllegalArgument() {
+        DecoderUtil.decodeEncodedWords("=?utf-8?B?QQ?=", DecodeMonitor.STRICT);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void strictMonitorShouldReportUnexpectedPaddingAsIllegalArgument() {
+        DecoderUtil.decodeEncodedWords("=?utf-8?B?QUJD=QUJD?=", DecodeMonitor.STRICT);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void strictMonitorShouldReportUnexpectedBase64ByteAsIllegalArgument() {
+        DecoderUtil.decodeEncodedWords("=?utf-8?B?Q*Q=?=", DecodeMonitor.STRICT);
+    }
 }
