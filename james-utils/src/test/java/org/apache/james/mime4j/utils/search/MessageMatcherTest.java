@@ -198,6 +198,33 @@ public class MessageMatcherTest {
         assertThat(messageMatcher.messageMatches(stream("X-A: a\r\nX-B: b\r\n\r\nbody"))).isFalse();
     }
 
+    @Test
+    public void severalTextsShouldAllBeSearchedIgnoringMime() throws Exception {
+        MessageMatcher messageMatcher = MessageMatcher.builder()
+            .searchContents(Lists.<CharSequence>newArrayList("first", "second"))
+            .ignoringMime(true)
+            .build();
+        assertThat(messageMatcher.messageMatches(stream("the first and the second"))).isTrue();
+    }
+
+    @Test
+    public void severalTextsShouldAllBeSearchedInMimeParts() throws Exception {
+        MessageMatcher messageMatcher = MessageMatcher.builder()
+            .searchContents(Lists.<CharSequence>newArrayList("second", "first"))
+            .includeHeaders(true)
+            .build();
+        assertThat(messageMatcher.messageMatches(stream("Subject: first\r\n\r\nsecond"))).isTrue();
+    }
+
+    @Test
+    public void severalTextsShouldNotMatchWhenOneIsAbsent() throws Exception {
+        MessageMatcher messageMatcher = MessageMatcher.builder()
+            .searchContents(Lists.<CharSequence>newArrayList("first", "third"))
+            .ignoringMime(true)
+            .build();
+        assertThat(messageMatcher.messageMatches(stream("the first and the second"))).isFalse();
+    }
+
     private InputStream stream(String content) {
         return new ByteArrayInputStream(content.getBytes(StandardCharsets.US_ASCII));
     }

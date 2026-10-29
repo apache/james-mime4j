@@ -34,6 +34,8 @@ import java.io.StringReader;
 import java.nio.CharBuffer;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -127,24 +129,23 @@ public class MessageMatcher {
      * @throws MimeException
      */
     public boolean messageMatches(final InputStream input) throws IOException, MimeException {
+        // All the searched texts are looked for in a single pass: the input can only be read once
+        final List<NeedleMatcher> matchers = new ArrayList<>();
         for (CharSequence charSequence : searchContents) {
             if (charSequence != null) {
-                final CharBuffer buffer = createBuffer(charSequence);
-                if (ignoringMime) {
-                    if (! isFoundIn(new InputStreamReader(input), buffer)) {
-                        return false;
-                    }
-                } else {
-                    if (!matchBufferInMailBeingMimeAware(input, buffer)) {
-                        return false;
-                    }
-                }
+                matchers.add(new NeedleMatcher(createBuffer(charSequence)));
             }
         }
-        return true;
+        if (allFound(matchers)) {
+            return true;
+        }
+        if (ignoringMime) {
+            return searchIn(new InputStreamReader(input), matchers);
+        }
+        return matchBufferInMailBeingMimeAware(input, matchers);
     }
 
-    private boolean matchBufferInMailBeingMimeAware(final InputStream input, final CharBuffer buffer) throws IOException, MimeException {
+    private boolean matchBufferInMailBeingMimeAware(final InputStream input, final List<NeedleMatcher> matchers) throws IOException, MimeException {
         try {
             MimeConfig config = MimeConfig.custom().setMaxLineLen(-1).setMaxHeaderLen(-1).build();
 
@@ -157,14 +158,14 @@ public class MessageMatcher {
                     case T_EPILOGUE:
                     case T_BODY:
                         if (contentTypes.isEmpty() || contentTypes.contains(parser.getBodyDescriptor().getMimeType())) {
-                            if (checkBody(buffer, parser)) {
+                            if (checkBody(matchers, parser)) {
                                 return true;
                             }
                         }
                         break;
                     case T_FIELD:
                         if (includeHeaders) {
-                            if (checkHeader(buffer, parser)) {
+                            if (checkHeader(matchers, parser)) {
                                 return true;
                             }
                         }
@@ -192,15 +193,15 @@ public class MessageMatcher {
         return false;
     }
 
-    private boolean checkHeader(final CharBuffer buffer, MimeTokenStream parser) throws IOException {
+    private boolean checkHeader(final List<NeedleMatcher> matchers, MimeTokenStream parser) throws IOException {
         final String value = parser.getField().getBody();
         final StringReader reader = new StringReader(value);
-        return isFoundIn(reader, buffer);
+        return searchIn(reader, matchers);
     }
 
-    private boolean checkBody(final CharBuffer buffer, MimeTokenStream parser) throws IOException {
+    private boolean checkBody(final List<NeedleMatcher> matchers, MimeTokenStream parser) throws IOException {
         try (Reader reader = parser.getReader()) {
-            return isFoundIn(reader, buffer);
+            return searchIn(reader, matchers);
         }
     }
 
@@ -227,45 +228,42 @@ public class MessageMatcher {
     }
 
     public boolean isFoundIn(final Reader reader, final CharBuffer buffer) throws IOException {
-        // Knuth-Morris-Pratt: matches overlapping prefixes and texts ending the input
-        final int length = buffer.limit();
-        if (length == 0) {
-            return true;
+        return searchIn(reader, Collections.singletonList(new NeedleMatcher(buffer)));
+    }
+
+    /**
+     * Feeds the reader to the matchers not found yet. A match never spans two readers.
+     *
+     * @return true once every matcher found its text
+     */
+    private boolean searchIn(final Reader reader, final List<NeedleMatcher> matchers) throws IOException {
+        for (NeedleMatcher matcher : matchers) {
+            matcher.reset();
         }
-        final int[] fallback = fallbackTable(buffer, length);
-        int matched = 0;
         int read;
         while ((read = reader.read()) != -1) {
             final char next = computeNextChar(isCaseInsensitive, (char) read);
-            while (matched > 0 && buffer.get(matched) != next) {
-                matched = fallback[matched - 1];
-            }
-            if (buffer.get(matched) == next) {
-                matched++;
-                if (matched == length) {
-                    return true;
+            boolean allFound = true;
+            for (NeedleMatcher matcher : matchers) {
+                if (!matcher.found) {
+                    matcher.accept(next);
+                    allFound &= matcher.found;
                 }
+            }
+            if (allFound) {
+                return true;
             }
         }
         return false;
     }
 
-    /**
-     * For each prefix of the searched text, the length of its longest proper prefix that is also a suffix.
-     */
-    private static int[] fallbackTable(final CharBuffer buffer, final int length) {
-        final int[] fallback = new int[length];
-        int k = 0;
-        for (int i = 1; i < length; i++) {
-            while (k > 0 && buffer.get(i) != buffer.get(k)) {
-                k = fallback[k - 1];
+    private static boolean allFound(final List<NeedleMatcher> matchers) {
+        for (NeedleMatcher matcher : matchers) {
+            if (!matcher.found) {
+                return false;
             }
-            if (buffer.get(i) == buffer.get(k)) {
-                k++;
-            }
-            fallback[i] = k;
         }
-        return fallback;
+        return true;
     }
 
     private char computeNextChar(boolean isCaseInsensitive, char read) {
@@ -273,6 +271,59 @@ public class MessageMatcher {
             return Character.toUpperCase(read);
         } else {
             return read;
+        }
+    }
+
+    /**
+     * Knuth-Morris-Pratt matcher of one searched text: matches overlapping prefixes and texts
+     * ending the input.
+     */
+    private static final class NeedleMatcher {
+        private final CharBuffer needle;
+        private final int length;
+        private final int[] fallback;
+        private int matched;
+        private boolean found;
+
+        NeedleMatcher(final CharBuffer needle) {
+            this.needle = needle;
+            this.length = needle.limit();
+            this.fallback = fallbackTable(needle, length);
+            this.found = length == 0;
+        }
+
+        void reset() {
+            matched = 0;
+        }
+
+        void accept(final char next) {
+            while (matched > 0 && needle.get(matched) != next) {
+                matched = fallback[matched - 1];
+            }
+            if (needle.get(matched) == next) {
+                matched++;
+                if (matched == length) {
+                    found = true;
+                }
+            }
+        }
+
+        /**
+         * For each prefix of the searched text, the length of its longest proper prefix that is also a suffix.
+         */
+        private static int[] fallbackTable(final CharBuffer buffer, final int length) {
+            final int[] fallback = new int[length];
+            int k = 0;
+            for (int i = 1; i < length; i++) {
+                while (k > 0 && buffer.get(i) != buffer.get(k)) {
+                    k = fallback[k - 1];
+                }
+                if (buffer.get(i) == buffer.get(k)) {
+                    k++;
+                }
+                fallback[i] = k;
+            }
+            return fallback;
         }
     }
 
