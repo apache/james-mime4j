@@ -566,4 +566,13 @@ public class LenientAddressBuilderTest {
             Assert.assertEquals(encoded, mailbox.getAddress(), readBack.getAddress());
         }
     }
+
+    @Test
+    public void groupNamesShouldBeDecoded() {
+        AddressList list = parser.parseAddressList("=?ISO-8859-1?B?6SIiIg==?=:;, =?UTF-8?B?Ojrml6XmnKw=?=: a@example.com;");
+
+        Assert.assertEquals("é\"\"\"", ((Group) list.get(0)).getName());
+        Assert.assertEquals("::日本", ((Group) list.get(1)).getName());
+        Assert.assertEquals("é", parser.parseGroup("=?ISO-8859-1?Q?=E9?=: a@example.com;").getName());
+    }
 }

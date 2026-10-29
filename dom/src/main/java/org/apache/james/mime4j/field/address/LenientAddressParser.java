@@ -206,6 +206,13 @@ public class LenientAddressParser implements AddressParser {
         return createMailbox(openingText, domainList, localPart, domain);
     }
 
+    /**
+     * A group name is a phrase, in which RFC 2047 allows encoded words, as in display names.
+     */
+    private String decodeGroupName(final String name) {
+        return name != null ? DecoderUtil.decodeEncodedWords(name, this.monitor) : null;
+    }
+
     private Mailbox createMailbox(final String localPart) {
         if (localPart != null && localPart.length() > 0) {
             return new Mailbox(null, null, DecoderUtil.decodeEncodedWords(localPart, this.monitor), null);
@@ -271,7 +278,7 @@ public class LenientAddressParser implements AddressParser {
     public Group parseGroup(final ByteSequence buf, final ParserCursor cursor) {
         String name = this.parser.parseToken(buf, cursor, COLON_ONLY);
         if (cursor.atEnd()) {
-            return new Group(name, Collections.<Mailbox>emptyList());
+            return new Group(decodeGroupName(name), Collections.<Mailbox>emptyList());
         }
         int pos = cursor.getPos();
         int current = (char) (buf.byteAt(pos) & 0xff);
@@ -279,7 +286,7 @@ public class LenientAddressParser implements AddressParser {
             cursor.updatePos(pos + 1);
         }
         List<Mailbox> mboxes = parseMailboxes(buf, cursor, SEMICOLON_ONLY);
-        return new Group(name, mboxes);
+        return new Group(decodeGroupName(name), mboxes);
     }
 
     public Group parseGroup(final CharSequence text) {
@@ -320,7 +327,7 @@ public class LenientAddressParser implements AddressParser {
                     cursor.updatePos(pos + 1);
                 }
             }
-            return new Group(openingText, mboxes);
+            return new Group(decodeGroupName(openingText), mboxes);
         } else {
             return createMailbox(openingText);
         }
