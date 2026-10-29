@@ -52,4 +52,38 @@ public class MimeParameterMappingTest {
         }
         Assert.assertEquals(segments * 10, mapping.get("filename").length());
     }
+
+    @Test
+    public void charsetOfAParameterShouldNotLeakToOthers() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*1", "%2f");
+        mapping.addParameter("x*", "utf-8''");
+
+        String first = mapping.get("filename");
+        mapping.get("x");
+
+        Assert.assertEquals("%2f", first);
+        Assert.assertEquals("%2f", mapping.get("filename"));
+        Assert.assertEquals("%2f", mapping.getParameters().get("filename"));
+    }
+
+    @Test
+    public void standardParametersShouldNotBeRfc2231Decoded() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename", "utf-8''a%2fb");
+        mapping.addParameter("x*", "utf-8''y");
+
+        Assert.assertEquals("utf-8''a%2fb", mapping.get("filename"));
+        Assert.assertEquals("y", mapping.get("x"));
+    }
+
+    @Test
+    public void extendedParametersShouldBeDecodedWithTheirOwnCharset() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("a*", "iso-8859-1''%E9");
+        mapping.addParameter("b*", "utf-8''%C3%A9");
+
+        Assert.assertEquals("\u00e9", mapping.get("a"));
+        Assert.assertEquals("\u00e9", mapping.get("b"));
+    }
 }
