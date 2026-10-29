@@ -32,7 +32,9 @@ import static java.time.temporal.ChronoField.YEAR;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
@@ -192,9 +194,17 @@ public final class MimeUtil {
      * @return the formatted time string.
      */
     public static String formatDate(Date date, TimeZone zone) {
+        Instant instant = date.toInstant();
+        ZoneId zoneId = zone(zone);
+        int offsetSeconds = zoneId.getRules().getOffset(instant).getTotalSeconds();
+        if (offsetSeconds % 60 != 0) {
+            // +HHMM cannot carry the seconds of a local mean time offset: format with the offset
+            // truncated to whole minutes, so that the local time and the offset denote the instant
+            zoneId = ZoneOffset.ofTotalSeconds(offsetSeconds / 60 * 60);
+        }
         return RFC822_DATE_FORMAT
-            .withZone(zone(zone))
-            .format(date.toInstant());
+            .withZone(zoneId)
+            .format(instant);
     }
 
     private static ZoneId zone(TimeZone zone) {

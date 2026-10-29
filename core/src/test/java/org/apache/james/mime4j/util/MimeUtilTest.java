@@ -19,6 +19,12 @@
 
 package org.apache.james.mime4j.util;
 
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.TimeZone;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -113,5 +119,21 @@ public class MimeUtilTest {
 
         Assert.assertTrue(folded, folded.contains("\r\n "));
         Assert.assertEquals(repeat("word ", 40) + "end", MimeUtil.unfold(folded));
+    }
+
+    private static void assertFormatDateDenotesTheInstant(String instant, String zone) {
+        Date date = Date.from(Instant.parse(instant));
+        String formatted = MimeUtil.formatDate(date, TimeZone.getTimeZone(zone));
+
+        Instant back = ZonedDateTime.parse(formatted, DateTimeFormatter.RFC_1123_DATE_TIME).toInstant();
+        Assert.assertEquals(formatted, date.toInstant(), back);
+    }
+
+    @Test
+    public void formatDateShouldDenoteTheSameInstantWhenTheOffsetHasSeconds() {
+        assertFormatDateDenotesTheInstant("1900-01-16T00:00:00Z", "Africa/Abidjan");
+        assertFormatDateDenotesTheInstant("1900-01-01T00:00:00Z", "Europe/Paris");
+        assertFormatDateDenotesTheInstant("2024-06-01T12:34:56Z", "Europe/Paris");
+        assertFormatDateDenotesTheInstant("2024-06-01T12:34:56Z", "Asia/Kolkata");
     }
 }
