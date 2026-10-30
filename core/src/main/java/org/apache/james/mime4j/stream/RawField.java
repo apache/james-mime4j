@@ -80,6 +80,15 @@ public final class RawField implements Field {
                     || !isSpace(body, pos + 2)) {
                     throw new IllegalArgumentException("Injection of un-encoded line breaks inside header field could be assimilated to header injection");
                 }
+                // The continuation line must hold more than whitespace: a whitespace only line
+                // would be written, which some readers take as the end of the header block
+                int next = pos + 2;
+                while (next < length && isSpace(body, next)) {
+                    next++;
+                }
+                if (next == length || body.charAt(next) == '\r') {
+                    throw new IllegalArgumentException("A folded header field line holds only whitespace");
+                }
                 // Skip the LF of the fold
                 pos++;
             }

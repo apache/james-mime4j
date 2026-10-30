@@ -152,4 +152,16 @@ public class RawFieldTest {
         Assert.assertEquals(" ", RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject:  ")).getBody());
         Assert.assertEquals("x", RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject: x")).getBody());
     }
+
+    @Test
+    public void shouldRejectAWhitespaceOnlyContinuationLine() {
+        assertThatThrownBy(() -> new RawField("Name", "\r\n\t")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new RawField("Name", "x\r\n \r\n y")).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new RawField("Name", "x\r\n \t ")).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void shouldAcceptAContinuationLineStartingWithSeveralWhitespaces() {
+        assertThatCode(() -> new RawField("Name", "x\r\n \t y")).doesNotThrowAnyException();
+    }
 }
