@@ -58,6 +58,9 @@ public class EncoderUtil {
 
     private static final Pattern QUOTE = Pattern.compile("[\\\\\"]");
 
+    /** Characters that end or restructure an address in a header: never written raw in a domain */
+    private static final String DOMAIN_STRUCTURE_CHARS = ",;:<>()\"@\\";
+
     private static BitSet initChars(String specials) {
         BitSet bs = new BitSet(128);
         for (char ch = 33; ch < 127; ch++) {
@@ -149,15 +152,15 @@ public class EncoderUtil {
     }
 
     /**
-     * Checks the domain of an address specification as described in RFC 5322 section 3.4.1:
-     * a dot-atom (non ASCII characters allowed, as in internationalized domains) or a domain
-     * literal. Anything else could change the meaning of the header it is written in, e.g. a ","
-     * adding recipients.
+     * Encodes the domain of an address specification as described in RFC 5322 section 3.4.1. A
+     * dot-atom (non ASCII characters allowed, as in internationalized domains) or a domain literal
+     * is returned unchanged. From any other domain, such as the ones a lenient parser reads from
+     * malformed addresses, the characters that would change the structure of the header (e.g. a
+     * "," adding recipients) are dropped.
      *
      * @param domain
-     *            domain to check.
-     * @return the domain, unchanged.
-     * @throws IllegalArgumentException if the domain is neither a dot-atom nor a domain literal.
+     *            domain to encode.
+     * @return the encoded domain.
      */
     public static String encodeAddressDomain(String domain) {
         // domain = dot-atom / domain-literal
@@ -166,7 +169,14 @@ public class EncoderUtil {
         if (isDotAtomText(domain, true) || isDomainLiteral(domain)) {
             return domain;
         }
-        throw new IllegalArgumentException("Invalid domain: " + domain);
+        StringBuilder sb = new StringBuilder(domain.length());
+        for (int idx = 0; idx < domain.length(); idx++) {
+            char ch = domain.charAt(idx);
+            if (ch >= 128 || (ch > 32 && ch < 127 && DOMAIN_STRUCTURE_CHARS.indexOf(ch) == -1)) {
+                sb.append(ch);
+            }
+        }
+        return sb.toString();
     }
 
     private static boolean isDomainLiteral(String str) {

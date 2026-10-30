@@ -34,6 +34,7 @@ import java.util.Collections;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.field.AddressListField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.address.LenientAddressParser;
@@ -193,8 +194,20 @@ public class DefaultMessageWriterTest {
     }
 
     @Test
-    public void toShouldRejectADomainAddingRecipients() {
-        assertThatThrownBy(() -> Fields.to(new Mailbox("a", "example.com, other@example.org")))
-            .isInstanceOf(IllegalArgumentException.class);
+    public void aDomainShouldNotAddRecipients() {
+        AddressListField field = Fields.to(new Mailbox("a", "example.com, other@example.org"));
+
+        assertThat(LenientAddressParser.DEFAULT.parseAddressList(field.getBody()).flatten()).hasSize(1);
+    }
+
+    @Test
+    public void mailboxesParsedFromMalformedAddressesShouldBeWrittenBack() {
+        for (String address : new String[] {"a@[", "a@example.com.", "a@example..com"}) {
+            Mailbox parsed = LenientAddressParser.DEFAULT.parseMailbox(address);
+
+            AddressListField field = Fields.to(parsed);
+
+            assertThat(LenientAddressParser.DEFAULT.parseMailbox(field.getBody()).getDomain()).isEqualTo(parsed.getDomain());
+        }
     }
 }

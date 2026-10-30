@@ -358,14 +358,17 @@ public class EncoderUtilTest {
     }
 
     @Test
-    public void domainsThatWouldChangeTheHeaderShouldBeRejected() {
-        for (String domain : new String[] {"example.com, other@example.org", ",\u0000", "a b", "a..b", "[a]b]", "a>"}) {
-            try {
-                EncoderUtil.encodeAddressDomain(domain);
-                Assert.fail("Expecting IllegalArgumentException for " + domain);
-            } catch (IllegalArgumentException e) {
-                // expected
-            }
-        }
+    public void domainsThatWouldChangeTheHeaderShouldBeNeutralized() {
+        Assert.assertEquals("example.comotherexample.org", EncoderUtil.encodeAddressDomain("example.com, other@example.org"));
+        Assert.assertEquals("", EncoderUtil.encodeAddressDomain(",\u0000"));
+        Assert.assertEquals("ab", EncoderUtil.encodeAddressDomain("a b"));
+        Assert.assertEquals("a", EncoderUtil.encodeAddressDomain("a>"));
+    }
+
+    @Test
+    public void harmlessMalformedDomainsShouldBeKept() {
+        Assert.assertEquals("[", EncoderUtil.encodeAddressDomain("["));
+        Assert.assertEquals("example.com.", EncoderUtil.encodeAddressDomain("example.com."));
+        Assert.assertEquals("a..b", EncoderUtil.encodeAddressDomain("a..b"));
     }
 }
