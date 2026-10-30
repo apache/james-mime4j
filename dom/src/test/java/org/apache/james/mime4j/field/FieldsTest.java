@@ -492,4 +492,20 @@ public class FieldsTest {
         Assert.assertNull(dispositionParameter.getParseException());
         Assert.assertEquals("x", dispositionParameter.getParameter("9"));
     }
+
+    @Test
+    public void invalidParameterNamesShouldBeRejected() {
+        try {
+            Fields.contentDisposition("attachment", Collections.singletonMap("*", ""));
+            Assert.fail("Expecting IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        try {
+            Fields.contentType("text/plain", Collections.singletonMap("a; charset", "x"));
+            Assert.fail("Expecting IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
 }
