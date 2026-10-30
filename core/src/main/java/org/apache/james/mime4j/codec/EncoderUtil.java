@@ -56,8 +56,6 @@ public class EncoderUtil {
 
     private static final BitSet ATEXT_CHARS = initChars("()<>@.,;:\\\"[]");
 
-    private static final Pattern RFC2231_PARAMETER_NAME = Pattern.compile("[^*]+\\*(\\d+\\*?)?");
-
     private static final Pattern QUOTE = Pattern.compile("[\\\\\"]");
 
     /** Characters that end or restructure an address in a header: never written raw in a domain */
@@ -212,7 +210,7 @@ public class EncoderUtil {
     public static String encodeHeaderParameter(String name, String value) {
         // A name that is not a token (";", "=") would add parameters, a stray "*" would be read
         // as an RFC 2231 section
-        if (!isToken(name) || (name.indexOf('*') >= 0 && !RFC2231_PARAMETER_NAME.matcher(name).matches())) {
+        if (!isToken(name) || !isPlainOrRfc2231Name(name)) {
             throw new IllegalArgumentException("Invalid parameter name: " + name);
         }
         name = name.toLowerCase(Locale.US);
@@ -559,6 +557,31 @@ public class EncoderUtil {
         }
 
         return containsAText && !previousIsSpace;
+    }
+
+    /**
+     * Whether the name holds no "*", or holds it in one of the RFC 2231 forms:
+     * <code>name*</code>, <code>name*N</code> or <code>name*N*</code>.
+     */
+    private static boolean isPlainOrRfc2231Name(String name) {
+        int star = name.indexOf('*');
+        if (star < 0) {
+            return true;
+        }
+        if (star == 0) {
+            return false;
+        }
+        int idx = star + 1;
+        final int length = name.length();
+        while (idx < length && name.charAt(idx) >= '0' && name.charAt(idx) <= '9') {
+            idx++;
+        }
+        if (idx == length) {
+            // name* or name*N
+            return true;
+        }
+        // name*N*: digits required before the last star
+        return idx > star + 1 && idx == length - 1 && name.charAt(idx) == '*';
     }
 
     // RFC 5322 section 3.2.3

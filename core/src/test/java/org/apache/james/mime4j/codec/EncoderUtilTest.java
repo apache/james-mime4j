@@ -374,7 +374,7 @@ public class EncoderUtilTest {
 
     @Test
     public void invalidParameterNamesShouldBeRejected() {
-        for (String name : new String[] {"*", "a*b", "*0", "a;b", "a=b", "a b", "", "a\""}) {
+        for (String name : new String[] {"*", "a*b", "*0", "a**", "a*1*2", "a;b", "a=b", "a b", "", "a\""}) {
             try {
                 EncoderUtil.encodeHeaderParameter(name, "v");
                 Assert.fail("Expecting IllegalArgumentException for " + name);
