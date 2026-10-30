@@ -25,6 +25,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class MimeTokenStreamTest {
 
@@ -80,5 +84,20 @@ public class MimeTokenStreamTest {
 
     private void checkNextIs(EntityState expected) throws Exception {
         Assert.assertEquals(MimeTokenStream.stateToString(expected), MimeTokenStream.stateToString(stream.next()));
+    }
+
+    @Test
+    public void aCommentInAFieldNameShouldNotRenameTheField() throws Exception {
+        String message = "Fr(x)om: ceo@example.com\r\nFrom: sender@attacker.example\r\n(!!!: x\r\nSubject: hello\r\n\r\nbody\r\n";
+        MimeTokenStream stream = new MimeTokenStream();
+        stream.parse(new ByteArrayInputStream(message.getBytes(StandardCharsets.US_ASCII)));
+
+        List<String> names = new ArrayList<>();
+        for (EntityState state = stream.getState(); state != EntityState.T_END_HEADER; state = stream.next()) {
+            if (state == EntityState.T_FIELD) {
+                names.add(stream.getField().getName());
+            }
+        }
+        Assert.assertEquals(Arrays.asList("Fr(x)om", "From", "(!!!", "Subject"), names);
     }
 }
