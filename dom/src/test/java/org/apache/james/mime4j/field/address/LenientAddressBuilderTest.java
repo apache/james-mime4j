@@ -614,4 +614,14 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals("[é]", ((Mailbox) list.get(0)).getDomain());
         Assert.assertEquals("b@example.com", ((Mailbox) list.get(1)).getAddress());
     }
+
+    @Test
+    public void formattedLocalPartShouldNotLoseItsContent() {
+        Mailbox parsed = (Mailbox) parser.parseAddressList("\"\\\r").get(0);
+        String encoded = AddressFormatter.DEFAULT.encode(parsed);
+        Mailbox again = (Mailbox) parser.parseAddressList(encoded).get(0);
+
+        Assert.assertEquals(-1, encoded.indexOf('\r'));
+        Assert.assertEquals(parsed.getLocalPart().replace("\r", ""), again.getLocalPart());
+    }
 }

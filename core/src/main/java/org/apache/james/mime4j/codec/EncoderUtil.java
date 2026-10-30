@@ -143,7 +143,8 @@ public class EncoderUtil {
         if (isDotAtomText(localPart)) {
             return localPart;
         } else {
-            return quote(localPart);
+            // CR and LF can be neither qtext nor quoted-pair (RFC 5322 section 3.2.4): readers drop them
+            return quote(localPart.replace("\r", "").replace("\n", ""));
         }
     }
 

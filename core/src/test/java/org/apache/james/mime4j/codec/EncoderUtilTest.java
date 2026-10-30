@@ -343,4 +343,10 @@ public class EncoderUtilTest {
         Assert.assertEquals("a = b ? c", EncoderUtil.encodeIfNecessary("a = b ? c", Usage.TEXT_TOKEN, 0));
         Assert.assertEquals("a?=b", EncoderUtil.encodeAddressDisplayName("a?=b"));
     }
+
+    @Test
+    public void localPartShouldNotHoldRawLineBreaks() {
+        Assert.assertEquals("\"\\\\\"", EncoderUtil.encodeAddressLocalPart("\\\r"));
+        Assert.assertEquals("\"a b\"", EncoderUtil.encodeAddressLocalPart("a\r\n b"));
+    }
 }
