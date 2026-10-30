@@ -337,4 +337,12 @@ public class DefaultAddressBuilderTest {
         }
     }
 
+    @Test
+    public void groupNamesShouldBeDecoded() throws Exception {
+        AddressList list = parser.parseAddressList("=?ISO-8859-1?B?6SIi?=:;, =?ISO-8859-1?Q?=E9?=: a@example.com;");
+
+        Assert.assertEquals("é\"\"", ((Group) list.get(0)).getName());
+        Assert.assertEquals("é", ((Group) list.get(1)).getName());
+        Assert.assertEquals("é", parser.parseGroup("=?ISO-8859-1?Q?=E9?=: a@example.com;").getName());
+    }
 }
