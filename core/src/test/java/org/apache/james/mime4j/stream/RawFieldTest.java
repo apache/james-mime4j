@@ -164,4 +164,17 @@ public class RawFieldTest {
     public void shouldAcceptAContinuationLineStartingWithSeveralWhitespaces() {
         assertThatCode(() -> new RawField("Name", "x\r\n \t y")).doesNotThrowAnyException();
     }
+
+    @Test
+    public void shouldRejectInvalidFieldNames() {
+        for (String name : new String[] {" : ", "", "  ", "Name:", "Bcc\r\nX", "X\nY", "X Y", "Né"}) {
+            assertThatThrownBy(() -> new RawField(name, "value")).as(name).isInstanceOf(IllegalArgumentException.class);
+        }
+    }
+
+    @Test
+    public void shouldAcceptValidFieldNames() {
+        assertThatCode(() -> new RawField("X-Custom_1.2!#$%&'*+/=?^`{|}~", "value")).doesNotThrowAnyException();
+        assertThatCode(() -> new RawField(" Subject ", "value")).doesNotThrowAnyException();
+    }
 }

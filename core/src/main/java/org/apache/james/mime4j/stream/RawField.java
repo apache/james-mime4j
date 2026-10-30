@@ -57,8 +57,25 @@ public final class RawField implements Field {
     public RawField(String name, String body) {
         this(null, -1, name, body);
 
+        checkName(this.name);
         if (body != null) {
             checkLineBreaks(body);
+        }
+    }
+
+    /**
+     * RFC 5322 field-name = 1*ftext, ftext = %d33-57 / %d59-126: a ":", a whitespace or a line
+     * break in the name would change the fields of the header once written.
+     */
+    private static void checkName(String name) {
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Empty header field name");
+        }
+        for (int pos = 0; pos < name.length(); pos++) {
+            char c = name.charAt(pos);
+            if (c < 33 || c > 126 || c == ':') {
+                throw new IllegalArgumentException("Invalid header field name: " + name);
+            }
         }
     }
 
