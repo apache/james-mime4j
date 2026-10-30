@@ -98,4 +98,14 @@ public class LenientContentTypeFieldTest {
         Assert.assertEquals("=?utf-8?q?x?=", f.getBoundary());
         Assert.assertEquals("y", f.getParameter("name"));
     }
+
+    @Test
+    public void strictAndLenientShouldAgreeOnATrailingControlCharacter() throws Exception {
+        String raw = "Content-Type: message/rfc822\u0005";
+        ContentTypeField lenient = parse(raw);
+        ContentTypeField strict = (ContentTypeField) DefaultFieldParser.parse(raw);
+
+        Assert.assertEquals(strict.getMimeType(), lenient.getMimeType());
+        Assert.assertEquals("message/rfc822", parse("Content-Type:  message/rfc822 ").getMimeType());
+    }
 }

@@ -175,4 +175,14 @@ public class FallbackBodyDescriptorBuilderTest extends TestCase {
         builder.addField(new RawField("Content-Type", "multipart/mixed; boundary=\"=?utf-8?q?x?=\""));
         assertEquals("=?utf-8?q?x?=", builder.build().getBoundary());
     }
+
+    public void testControlCharacterShouldNotBeTrimmedFromTheMimeType() throws Exception {
+        FallbackBodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
+        builder.addField(new RawField("Content-Type", "message/rfc822\u0005"));
+        assertEquals("message/rfc822\u0005", builder.build().getMimeType());
+
+        FallbackBodyDescriptorBuilder whitespace = new FallbackBodyDescriptorBuilder();
+        whitespace.addField(new RawField("Content-Type", " message / rfc822 \t"));
+        assertEquals("message/rfc822", whitespace.build().getMimeType());
+    }
 }
