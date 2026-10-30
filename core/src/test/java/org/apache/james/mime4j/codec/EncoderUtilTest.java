@@ -317,14 +317,13 @@ public class EncoderUtilTest {
     }
 
     @Test
-    public void displayNameShouldRejectLineBreaks() {
+    public void displayNameWithLineBreaksShouldBeEncoded() {
         for (String displayName : new String[] {"y\n", "y\r", "a\r\n b"}) {
-            try {
-                EncoderUtil.encodeAddressDisplayName(displayName);
-                Assert.fail("Expecting IllegalArgumentException for " + displayName);
-            } catch (IllegalArgumentException e) {
-                // expected
-            }
+            String encoded = EncoderUtil.encodeAddressDisplayName(displayName);
+
+            Assert.assertEquals(encoded, -1, encoded.indexOf('\n'));
+            Assert.assertEquals(encoded, -1, encoded.indexOf('\r'));
+            Assert.assertEquals(displayName, DecoderUtil.decodeEncodedWords(encoded, DecodeMonitor.SILENT));
         }
     }
 

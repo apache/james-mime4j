@@ -34,7 +34,9 @@ import java.util.Collections;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.field.address.LenientAddressParser;
 import org.apache.james.mime4j.stream.RawField;
 import org.junit.Test;
 
@@ -95,9 +97,21 @@ public class DefaultMessageWriterTest {
     }
 
     @Test
-    public void fromShouldRejectBareLFInDisplayName() {
-        assertThatThrownBy(() -> Fields.from(new Mailbox("\n!", "", "")))
-            .isInstanceOf(IllegalArgumentException.class);
+    public void fromShouldEncodeBareLFInDisplayName() {
+        MailboxListField field = Fields.from(new Mailbox("\n!", "a", "example.com"));
+
+        assertThat(field.getBody()).doesNotContain("\n").doesNotContain("\r");
+        assertThat(field.getMailboxList().get(0).getName()).isEqualTo("\n!");
+    }
+
+    @Test
+    public void parsedDisplayNameWithLineBreakShouldBeWrittenBack() throws Exception {
+        Mailbox parsed = LenientAddressParser.DEFAULT.parseMailbox("=?us-ascii?q?a=0Ab?= <a@example.com>");
+
+        MailboxListField field = Fields.from(parsed);
+
+        assertThat(field.getBody()).doesNotContain("\n");
+        assertThat(LenientAddressParser.DEFAULT.parseMailbox(field.getBody()).getName()).isEqualTo("a\nb");
     }
 
     @Test
