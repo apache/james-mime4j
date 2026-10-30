@@ -63,15 +63,16 @@ class Builder {
             return buildAngleAddr((ASTangle_addr) n);
         } else if (n instanceof ASTphrase) {
             String name = buildString((ASTphrase) n, false);
+            // a group name is a phrase as a display name: both may hold encoded words
+            try {
+                name = DecoderUtil.decodeEncodedWords(name, monitor);
+            } catch (IllegalArgumentException e) {
+                throw new ParseException(e);
+            }
             Node n2 = it.next();
             if (n2 instanceof ASTgroup_body) {
                 return new Group(name, buildGroupBody((ASTgroup_body) n2, monitor));
             } else if (n2 instanceof ASTangle_addr) {
-                try {
-                    name = DecoderUtil.decodeEncodedWords(name, monitor);
-                } catch (IllegalArgumentException e) {
-                    throw new ParseException(e);
-                }
                 Mailbox mb = buildAngleAddr((ASTangle_addr) n2);
                 return new Mailbox(name, mb.getRoute(), mb.getLocalPart(),
                         mb.getDomain());
