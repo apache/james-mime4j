@@ -518,5 +518,44 @@ public class RawFieldParserTest {
         org.junit.Assert.assertEquals("Sanity ä.doc", params.get(1).getValue());
    }
 
+    private String parseValue(String text) {
+        ByteSequence raw = ContentUtil.encode(text);
+        return parser.parseValue(raw, new ParserCursor(0, raw.length()), null);
+    }
 
+    @Test
+    public void backslashBeforeAFoldShouldApplyToTheFollowingWhitespace() throws Exception {
+        String folded = parseValue("\"a\\\r\n b\"");
+
+        Assert.assertEquals(-1, folded.indexOf('\r'));
+        Assert.assertEquals(-1, folded.indexOf('\n'));
+        Assert.assertEquals(parseValue("\"a\\ b\""), folded);
+        Assert.assertEquals(parseValue("\"a\\\tb\""), parseValue("\"a\\\r\n\tb\""));
+    }
+
+    @Test
+    public void backslashBeforeALineBreakThatIsNotAFoldShouldKeepItsMeaning() throws Exception {
+        Assert.assertEquals("a\\\r\"b", parseValue("\"a\\\r\\\"b\""));
+        Assert.assertEquals("a\\\n\"b", parseValue("\"a\\\n\n\\\"b\""));
+
+        ByteSequence raw = ContentUtil.encode("attachment; filename=\"a\\\r\\\"; size=1.txt\"");
+        RawBody body = parser.parseRawBody(raw, new ParserCursor(0, raw.length()));
+        Assert.assertEquals(1, body.getParams().size());
+        Assert.assertEquals("a\\\r\"; size=1.txt", body.getParams().get(0).getValue());
+    }
+
+    @Test
+    public void fieldNameShouldNotHoldComments() throws Exception {
+        RawField renamed = parser.parseField(ContentUtil.encode("Subj(x)ect: hello"));
+        Assert.assertEquals("Subj(x)ect", renamed.getName());
+        Assert.assertEquals("hello", renamed.getBody());
+
+        RawField opening = parser.parseField(ContentUtil.encode("(!!!: hello"));
+        Assert.assertEquals("(!!!", opening.getName());
+        Assert.assertEquals("hello", opening.getBody());
+
+        RawField obsolete = parser.parseField(ContentUtil.encode("Subject \t: hello"));
+        Assert.assertEquals("Subject", obsolete.getName());
+        Assert.assertEquals("hello", obsolete.getBody());
+    }
 }

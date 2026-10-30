@@ -78,7 +78,7 @@ public class ContentDispositionFieldLenientImpl extends AbstractField implements
         if (!parsed) {
             parse();
         }
-        return mapping.get(name);
+        return mapping.get(name.toLowerCase(Locale.ROOT));
     }
 
     public Map<String, String> getParameters() {

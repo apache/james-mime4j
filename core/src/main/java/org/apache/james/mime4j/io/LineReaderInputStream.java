@@ -63,4 +63,23 @@ public abstract class LineReaderInputStream extends FilterInputStream {
     public abstract boolean unread(ByteArrayBuffer buf);
     public abstract boolean unread(RecycledByteArrayBuffer buf);
 
+    /**
+     * Whether the line read so far in <code>dst</code> exceeds <code>maxLineLen</code>. The line is
+     * measured as if it ended with a single LF, whatever its actual terminator, so that a line
+     * accepted with a LF is also accepted once written with CRLF.
+     */
+    protected static boolean exceedsMaxLineLen(ByteArrayBuffer dst, int maxLineLen) {
+        if (maxLineLen <= 0) {
+            return false;
+        }
+        int len = dst.length();
+        if (len > 0 && dst.byteAt(len - 1) == '\n') {
+            len--;
+        }
+        if (len > 0 && dst.byteAt(len - 1) == '\r') {
+            len--;
+        }
+        return len + 1 >= maxLineLen;
+    }
+
 }

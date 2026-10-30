@@ -33,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LenientAddressBuilderTest {
@@ -529,4 +530,121 @@ public class LenientAddressBuilderTest {
 
     }
 
+    @Test
+    public void angleAddrWithoutDomainShouldNotSwallowFollowingAddresses() {
+        AddressList list = parser.parseAddressList("<postmaster>, alice@example.com, bob@example.com");
+
+        Assert.assertEquals(3, list.size());
+        Mailbox first = (Mailbox) list.get(0);
+        Assert.assertEquals("postmaster", first.getLocalPart());
+        Assert.assertNull(first.getDomain());
+        Assert.assertEquals("alice@example.com", ((Mailbox) list.get(1)).getAddress());
+        Assert.assertEquals("bob@example.com", ((Mailbox) list.get(2)).getAddress());
+    }
+
+    @Test
+    public void angleAddrWithoutDomainShouldNotSwallowFollowingGroupMembers() {
+        AddressList list = parser.parseAddressList("group: \"a\" <local>, \"b\" <b@example.com>;, c@example.com");
+
+        Assert.assertEquals(2, list.size());
+        Group group = (Group) list.get(0);
+        Assert.assertEquals(2, group.getMailboxes().size());
+        Assert.assertEquals("local", group.getMailboxes().get(0).getLocalPart());
+        Assert.assertNull(group.getMailboxes().get(0).getDomain());
+        Assert.assertEquals("b@example.com", group.getMailboxes().get(1).getAddress());
+        Assert.assertEquals("c@example.com", ((Mailbox) list.get(1)).getAddress());
+    }
+
+    @Test
+    public void emptyAngleAddressShouldReadBackFromTheFormatter() {
+        for (String text : new String[] {"<", "<>", "name <>"}) {
+            Mailbox mailbox = parser.parseMailbox(text);
+            String encoded = AddressFormatter.DEFAULT.encode(mailbox);
+            Mailbox readBack = parser.parseMailbox(encoded);
+
+            Assert.assertNotNull(encoded, readBack);
+            Assert.assertEquals(encoded, mailbox.getName(), readBack.getName());
+            Assert.assertEquals(encoded, mailbox.getAddress(), readBack.getAddress());
+        }
+    }
+
+    @Test
+    public void groupNamesShouldBeDecoded() {
+        AddressList list = parser.parseAddressList("=?ISO-8859-1?B?6SIiIg==?=:;, =?UTF-8?B?Ojrml6XmnKw=?=: a@example.com;");
+
+        Assert.assertEquals("é\"\"\"", ((Group) list.get(0)).getName());
+        Assert.assertEquals("::日本", ((Group) list.get(1)).getName());
+        Assert.assertEquals("é", parser.parseGroup("=?ISO-8859-1?Q?=E9?=: a@example.com;").getName());
+    }
+
+    @Test
+    public void whitespaceAroundDotsOfALocalPartShouldNotBeKept() {
+        Assert.assertEquals("john.doe", parser.parseMailbox("john . doe@example.com").getLocalPart());
+        Assert.assertEquals("john.doe", ((Mailbox) parser.parseAddress("john . doe@example.com")).getLocalPart());
+        Assert.assertEquals("john.doe", parser.parseMailbox("John <john . doe@example.com>").getLocalPart());
+
+        AddressList list = parser.parseAddressList("a@b.c, john . doe @example.com");
+        Assert.assertEquals("john.doe", ((Mailbox) list.get(1)).getLocalPart());
+    }
+
+    @Test
+    public void quotedWhitespaceOfALocalPartShouldBeKept() {
+        Assert.assertEquals("john . doe", parser.parseMailbox("\"john . doe\"@example.com").getLocalPart());
+    }
+
+    @Test
+    public void parenthesisInADomainLiteralShouldNotStartAComment() throws Exception {
+        String value = "user@[192.168.0.(1], other@example.com";
+        AddressList lenient = parser.parseAddressList(value);
+        AddressList strict = DefaultAddressParser.DEFAULT.parseAddressList(value);
+
+        Assert.assertEquals(2, strict.flatten().size());
+        Assert.assertEquals(2, lenient.flatten().size());
+        Assert.assertEquals(strict.flatten().get(0).getDomain(), lenient.flatten().get(0).getDomain());
+        Assert.assertEquals("other@example.com", lenient.flatten().get(1).getAddress());
+        Assert.assertEquals("[1.2.3.4]", parser.parseMailbox("John <john@[1.2.3.4]>").getDomain());
+    }
+
+    @Test
+    public void nonAsciiDomainLiteralShouldBeDecodedAsUtf8() throws Exception {
+        String value = "a@[é], b@example.com";
+        ByteSequence raw = ContentUtil.encode(value);
+
+        AddressList list = parser.parseAddressList(raw, new ParserCursor(0, raw.length()));
+
+        Assert.assertEquals("[é]", ((Mailbox) list.get(0)).getDomain());
+        Assert.assertEquals("b@example.com", ((Mailbox) list.get(1)).getAddress());
+    }
+
+    @Test
+    public void formattedLocalPartShouldNotLoseItsContent() {
+        Mailbox parsed = (Mailbox) parser.parseAddressList("\"\\\r").get(0);
+        String encoded = AddressFormatter.DEFAULT.encode(parsed);
+        Mailbox again = (Mailbox) parser.parseAddressList(encoded).get(0);
+
+        Assert.assertEquals(-1, encoded.indexOf('\r'));
+        Assert.assertEquals(parsed.getLocalPart().replace("\r", ""), again.getLocalPart());
+    }
+
+    @Test
+    public void displayNameWhitespaceShouldReadBackFromTheFormatter() {
+        for (String name : new String[] {"J  J", " a", "D ", "N\tD", "\tDo   ", "John Doe"}) {
+            String encoded = AddressFormatter.DEFAULT.encode(new Mailbox(name, "a", "example.com"));
+
+            Assert.assertEquals(encoded, name, parser.parseMailbox(encoded).getName());
+            String group = AddressFormatter.DEFAULT.encode(new Group(name, new MailboxList(new ArrayList<>(), true)));
+            Assert.assertEquals(group, name, ((Group) parser.parseAddressList(group).get(0)).getName());
+        }
+        Assert.assertEquals("John Doe <a@example.com>", AddressFormatter.DEFAULT.encode(new Mailbox("John Doe", "a", "example.com")));
+    }
+
+    @Test
+    public void aDomainNeutralizedToNothingShouldNotLeaveAnAt() {
+        Mailbox parsed = (Mailbox) parser.parseAddress("@\"");
+        String encoded = AddressFormatter.DEFAULT.encode(parsed);
+
+        Assert.assertEquals("<>", encoded);
+        Assert.assertEquals("a", AddressFormatter.DEFAULT.encode(new Mailbox("a", ",;")));
+        Assert.assertEquals("John <a>", AddressFormatter.DEFAULT.encode(new Mailbox("John", "a", "<>")));
+    }
 }

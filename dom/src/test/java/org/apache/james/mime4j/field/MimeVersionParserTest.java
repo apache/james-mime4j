@@ -73,4 +73,12 @@ public class MimeVersionParserTest {
         Assert.assertNotNull(f.getParseException());
     }
 
+    @Test
+    public void unexpectedCharacterShouldBeAParseException() throws Exception {
+        MimeVersionField f = parse("MIME-Version: #1.0");
+
+        Assert.assertEquals(MimeVersionFieldImpl.DEFAULT_MAJOR_VERSION, f.getMajorVersion());
+        Assert.assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
+        Assert.assertNotNull(f.getParseException());
+    }
 }

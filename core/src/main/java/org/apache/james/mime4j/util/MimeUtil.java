@@ -32,7 +32,10 @@ import static java.time.temporal.ChronoField.YEAR;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.time.Instant;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
@@ -107,7 +110,7 @@ public final class MimeUtil {
      * Return true, if the given MIME type indicates a multipart entity.
      */
     public static boolean isMultipart(String pMimeType) {
-        return pMimeType != null  &&  pMimeType.toLowerCase().startsWith("multipart/");
+        return pMimeType != null  &&  pMimeType.toLowerCase(Locale.US).startsWith("multipart/");
     }
 
     /**
@@ -192,9 +195,22 @@ public final class MimeUtil {
      * @return the formatted time string.
      */
     public static String formatDate(Date date, TimeZone zone) {
-        return RFC822_DATE_FORMAT
-            .withZone(zone(zone))
-            .format(date.toInstant());
+        Instant instant = date.toInstant();
+        ZoneId zoneId = zone(zone);
+        int offsetSeconds = zoneId.getRules().getOffset(instant).getTotalSeconds();
+        if (offsetSeconds % 60 != 0) {
+            // +HHMM cannot carry the seconds of a local mean time offset: format with the offset
+            // truncated to whole minutes, so that the local time and the offset denote the instant
+            zoneId = ZoneOffset.ofTotalSeconds(offsetSeconds / 60 * 60);
+        }
+        try {
+            return RFC822_DATE_PRINTER
+                .withZone(zoneId)
+                .format(instant);
+        } catch (DateTimeException e) {
+            // RFC 5322 years are 4*DIGIT: a negative year cannot be written
+            throw new IllegalArgumentException("Cannot format " + instant + " as a RFC 5322 date", e);
+        }
     }
 
     private static ZoneId zone(TimeZone zone) {
@@ -230,8 +246,18 @@ public final class MimeUtil {
 
         StringBuilder sb = new StringBuilder();
 
+        // Never break before trailing whitespace nor after a whitespace only line:
+        // that would write a line made only of whitespace (or start with a line break)
+        int lastNonWspIdx = length - 1;
+        while (lastNonWspIdx >= 0 && isWsp(s.charAt(lastNonWspIdx))) {
+            lastNonWspIdx--;
+        }
+
         int lastLineBreak = -usedCharacters;
+        // where the current line starts: an inserted line break or a fold already in the value
+        int lineStart = lastLineBreak;
         int wspIdx = indexOfWsp(s, 0);
+        boolean lineHasText = wspIdx > 0;
         while (true) {
             if (wspIdx == length) {
                 sb.append(s.substring(Math.max(0, lastLineBreak)));
@@ -240,14 +266,47 @@ public final class MimeUtil {
 
             int nextWspIdx = indexOfWsp(s, wspIdx + 1);
 
-            if (nextWspIdx - lastLineBreak > maxCharacters) {
+            if (wspIdx > 0 && s.charAt(wspIdx - 1) == '\n') {
+                // the value is already folded here: a new line starts with this whitespace,
+                // breaking before it would write an empty line
+                lineStart = wspIdx;
+                lineHasText = false;
+            } else if (nextWspIdx - lineStart > maxCharacters && lineHasText && wspIdx < lastNonWspIdx
+                    && !endsWithFold(s, wspIdx)) {
                 sb.append(s, Math.max(0, lastLineBreak), wspIdx);
                 sb.append("\r\n");
                 lastLineBreak = wspIdx;
+                lineStart = wspIdx;
+                lineHasText = false;
+            }
+            if (holdsText(s, wspIdx + 1, nextWspIdx)) {
+                lineHasText = true;
             }
 
             wspIdx = nextWspIdx;
         }
+    }
+
+    /**
+     * Whether the whitespace run starting at <code>index</code> is followed by a fold already in the value:
+     * breaking there would write a whitespace only line.
+     */
+    private static boolean endsWithFold(String s, int index) {
+        int i = index;
+        while (i < s.length() && isWsp(s.charAt(i))) {
+            i++;
+        }
+        return i < s.length() && s.charAt(i) == '\r';
+    }
+
+    private static boolean holdsText(String s, int from, int to) {
+        for (int i = from; i < to; i++) {
+            char c = s.charAt(i);
+            if (c != '\r' && c != '\n') {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -326,11 +385,14 @@ public final class MimeUtil {
     private static int indexOfWsp(String s, int fromIndex) {
         final int len = s.length();
         for (int index = fromIndex; index < len; index++) {
-            char c = s.charAt(index);
-            if (c == ' ' || c == '\t')
+            if (isWsp(s.charAt(index)))
                 return index;
         }
         return len;
+    }
+
+    private static boolean isWsp(char c) {
+        return c == ' ' || c == '\t';
     }
 
     private static synchronized int nextCounterValue() {
@@ -338,27 +400,41 @@ public final class MimeUtil {
     }
 
     private static final int INITIAL_YEAR = 1970;
-    public static final DateTimeFormatter RFC822_DATE_FORMAT = new DateTimeFormatterBuilder()
-        .parseCaseInsensitive()
-        .parseLenient()
-        .appendText(DAY_OF_WEEK, dayOfWeek())
-        .appendLiteral(", ")
-        .appendValue(DAY_OF_MONTH, 1, 2, SignStyle.NOT_NEGATIVE)
-        .appendLiteral(' ')
-        .appendText(MONTH_OF_YEAR, monthOfYear())
-        .appendLiteral(' ')
-        .appendValueReduced(YEAR, 4, 4, INITIAL_YEAR)
-        .appendLiteral(' ')
-        .appendValue(HOUR_OF_DAY, 2)
-        .appendLiteral(':')
-        .appendValue(MINUTE_OF_HOUR, 2)
-        .appendLiteral(':')
-        .appendValue(SECOND_OF_MINUTE, 2)
-        .appendLiteral(' ')
-        .appendOffset("+HHMM", "+0000")
-        .toFormatter()
-        .withZone(TimeZone.getDefault().toZoneId())
-        .withLocale(Locale.US);
+    public static final DateTimeFormatter RFC822_DATE_FORMAT = rfc822DateFormat(true);
+
+    /**
+     * Writes the year in full: a reduced 4 digit year would keep its 4 rightmost digits only.
+     */
+    private static final DateTimeFormatter RFC822_DATE_PRINTER = rfc822DateFormat(false);
+
+    private static DateTimeFormatter rfc822DateFormat(boolean reducedYear) {
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder()
+            .parseCaseInsensitive()
+            .parseLenient()
+            .appendText(DAY_OF_WEEK, dayOfWeek())
+            .appendLiteral(", ")
+            .appendValue(DAY_OF_MONTH, 1, 2, SignStyle.NOT_NEGATIVE)
+            .appendLiteral(' ')
+            .appendText(MONTH_OF_YEAR, monthOfYear())
+            .appendLiteral(' ');
+        if (reducedYear) {
+            builder.appendValueReduced(YEAR, 4, 4, INITIAL_YEAR);
+        } else {
+            builder.appendValue(YEAR, 4, 10, SignStyle.NOT_NEGATIVE);
+        }
+        return builder
+            .appendLiteral(' ')
+            .appendValue(HOUR_OF_DAY, 2)
+            .appendLiteral(':')
+            .appendValue(MINUTE_OF_HOUR, 2)
+            .appendLiteral(':')
+            .appendValue(SECOND_OF_MINUTE, 2)
+            .appendLiteral(' ')
+            .appendOffset("+HHMM", "+0000")
+            .toFormatter()
+            .withZone(TimeZone.getDefault().toZoneId())
+            .withLocale(Locale.US);
+    }
 
     private static Map<Long, String> monthOfYear() {
         HashMap<Long, String> result = new HashMap<>();

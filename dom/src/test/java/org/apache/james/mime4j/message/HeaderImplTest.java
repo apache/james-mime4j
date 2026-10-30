@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.message;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -28,6 +29,7 @@ import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
@@ -147,4 +149,45 @@ public class HeaderImplTest {
         Assert.assertEquals("Message-ID", header.getFields().get(3).getName());
     }
 
+    @Test
+    public void removeFieldsShouldKeepListAndIndexConsistent() throws Exception {
+        Header header = new HeaderImpl();
+        header.addField(parsed("MIME-Version", "1.0"));
+        header.addField(parsed("MIME-Verſion", "1.0"));
+
+        Assert.assertEquals(1, header.removeFields("MIME-Version"));
+
+        Assert.assertEquals(1, header.getFields().size());
+        Assert.assertEquals("MIME-Verſion", header.getFields().get(0).getName());
+        Assert.assertNotNull(header.getField("MIME-Verſion"));
+    }
+
+    @Test
+    public void setFieldShouldKeepListAndIndexConsistent() throws Exception {
+        Header header = new HeaderImpl();
+        header.addField(parsed("Content-tranſfer-encoding", "7bit"));
+        header.addField(parsed("Content-transfer-encoding", "7bit"));
+
+        header.setField(parsed("Content-transfer-encoding", "base64"));
+
+        Assert.assertEquals(2, header.getFields().size());
+        Assert.assertEquals("7bit", header.getField("Content-tranſfer-encoding").getBody());
+        Assert.assertEquals("base64", header.getField("Content-transfer-encoding").getBody());
+    }
+
+    @Test
+    public void setFieldShouldNotThrowWhenLowerCasedNamesCollide() throws Exception {
+        Header header = new HeaderImpl();
+        header.addField(parsed("i̇", "v0"));
+        Field replacement = parsed("İ", "v1");
+
+        header.setField(replacement);
+
+        Assert.assertEquals(Collections.singletonList(replacement), header.getFields());
+    }
+
+    /** A field read from a message: its name is not checked as one built by the application */
+    private static Field parsed(String name, String body) throws Exception {
+        return RawFieldParser.DEFAULT.parseField(ContentUtil.encode(name + ": " + body));
+    }
 }

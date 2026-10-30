@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.stream.ParserCursor;
 import org.apache.james.mime4j.stream.RawFieldParser;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -96,11 +98,43 @@ public class LenientAddressParser implements AddressParser {
                 this.parser.skipWhiteSpace(buf, cursor);
             } else if (current == '(') {
                 this.parser.skipComment(buf, cursor);
+            } else if (current == '[' && copyDomainLiteral(buf, cursor, delimiters, dst)) {
+                continue;
             } else {
                 this.parser.copyContent(buf, cursor, delimiters, dst);
             }
         }
         return dst.toString();
+    }
+
+    /**
+     * Copies a domain literal up to its closing bracket: '(' and ')' are dtext there, not a comment
+     * (RFC 5322 section 3.4.1). Returns false, copying nothing, when no ']' comes before a delimiter.
+     */
+    private boolean copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+                                      final StringBuilder dst) {
+        int from = cursor.getPos();
+        int to = cursor.getUpperBound();
+        for (int i = from + 1; i < to; i++) {
+            char current = (char) (buf.byteAt(i) & 0xff);
+            if (current == ']') {
+                ByteArrayBuffer literal = new ByteArrayBuffer(i + 1 - from);
+                for (int j = from; j <= i; j++) {
+                    byte b = buf.byteAt(j);
+                    if (b != '\r' && b != '\n') {
+                        literal.append(b);
+                    }
+                }
+                // UTF-8, as the other parts of the header
+                dst.append(ContentUtil.decode(StandardCharsets.UTF_8, literal));
+                cursor.updatePos(i + 1);
+                return true;
+            }
+            if (delimiters != null && delimiters.get(current)) {
+                return false;
+            }
+        }
+        return false;
     }
 
     DomainList parseRoute(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
@@ -165,27 +199,32 @@ public class LenientAddressParser implements AddressParser {
             return createMailbox(null, null, openingText, null);
         }
         DomainList domainList = parseRouteUntil(buf, cursor, BRACKETED_ROUTE_STOP);
-        String localPart = this.parser.parseValue(buf, cursor, AT_AND_CLOSING_BRACKET);
+        String localPart = parseLocalPart(buf, cursor, AT_AND_CLOSING_BRACKET);
         if (cursor.atEnd()) {
             return createMailbox(openingText, domainList, localPart, null);
         }
         pos = cursor.getPos();
         current = (char) (buf.byteAt(pos) & 0xff);
-        if (current == AT || current == CLOSING_BRACKET) {
+        String domain;
+        if (current == AT) {
             cursor.updatePos(pos + 1);
+            domain = parseDomain(buf, cursor, CLOSING_BRACKET_ONLY);
+            if (cursor.atEnd()) {
+                return createMailbox(openingText, domainList, localPart, domain);
+            }
+            pos = cursor.getPos();
+            current = (char) (buf.byteAt(pos) & 0xff);
+            if (current == CLOSING_BRACKET) {
+                cursor.updatePos(pos + 1);
+            } else {
+                return createMailbox(openingText, domainList, localPart, domain);
+            }
+        } else if (current == CLOSING_BRACKET) {
+            // <local> without domain: the address ends here
+            cursor.updatePos(pos + 1);
+            domain = null;
         } else {
             return createMailbox(openingText, domainList, localPart, null);
-        }
-        String domain = parseDomain(buf, cursor, CLOSING_BRACKET_ONLY);
-        if (cursor.atEnd()) {
-            return createMailbox(openingText, domainList, localPart, domain);
-        }
-        pos = cursor.getPos();
-        current = (char) (buf.byteAt(pos) & 0xff);
-        if (current == CLOSING_BRACKET) {
-            cursor.updatePos(pos + 1);
-        } else {
-            return createMailbox(openingText, domainList, localPart, domain);
         }
         while (!cursor.atEnd()) {
             pos = cursor.getPos();
@@ -199,6 +238,44 @@ public class LenientAddressParser implements AddressParser {
             }
         }
         return createMailbox(openingText, domainList, localPart, domain);
+    }
+
+    /**
+     * Like {@link RawFieldParser#parseValue}, but the unquoted whitespace around dots is not part
+     * of the local part (RFC 5322 obs-local-part: <code>john . doe</code> is <code>john.doe</code>).
+     */
+    private String parseLocalPart(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
+        StringBuilder dst = new StringBuilder();
+        boolean whitespace = false;
+        while (!cursor.atEnd()) {
+            char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
+            if (delimiters != null && delimiters.get(current)) {
+                break;
+            } else if (CharsetUtil.isWhitespace(current)) {
+                this.parser.skipWhiteSpace(buf, cursor);
+                whitespace = true;
+            } else if (current == '(') {
+                this.parser.skipComment(buf, cursor);
+            } else {
+                if (whitespace && dst.length() > 0 && current != '.' && dst.charAt(dst.length() - 1) != '.') {
+                    dst.append(' ');
+                }
+                if (current == '\"') {
+                    this.parser.copyQuotedContent(buf, cursor, dst);
+                } else {
+                    this.parser.copyUnquotedContent(buf, cursor, delimiters, dst);
+                }
+                whitespace = false;
+            }
+        }
+        return dst.toString();
+    }
+
+    /**
+     * A group name is a phrase, in which RFC 2047 allows encoded words, as in display names.
+     */
+    private String decodeGroupName(final String name) {
+        return name != null ? DecoderUtil.decodeEncodedWords(name, this.monitor) : null;
     }
 
     private Mailbox createMailbox(final String localPart) {
@@ -216,6 +293,7 @@ public class LenientAddressParser implements AddressParser {
 
     private Mailbox parseMailbox(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters, final BitSet stopSet) {
+        int start = cursor.getPos();
         String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
             return createMailbox(openingText);
@@ -227,9 +305,13 @@ public class LenientAddressParser implements AddressParser {
             return parseMailboxAddress(openingText, buf, cursor);
         } else if (current == AT) {
             // localPart @ domain form
+            // Without joined whitespace, parsing it as a local part gives the same text
+            String localPart = openingText.indexOf(' ') < 0
+                ? openingText
+                : parseLocalPart(buf, new ParserCursor(start, pos), null);
             cursor.updatePos(pos + 1);
             String domain = parseDomain(buf, cursor, delimiters);
-            return new Mailbox(null, null, openingText, domain);
+            return new Mailbox(null, null, localPart, domain);
         } else {
             return createMailbox(openingText);
         }
@@ -266,7 +348,7 @@ public class LenientAddressParser implements AddressParser {
     public Group parseGroup(final ByteSequence buf, final ParserCursor cursor) {
         String name = this.parser.parseToken(buf, cursor, COLON_ONLY);
         if (cursor.atEnd()) {
-            return new Group(name, Collections.<Mailbox>emptyList());
+            return new Group(decodeGroupName(name), Collections.<Mailbox>emptyList());
         }
         int pos = cursor.getPos();
         int current = (char) (buf.byteAt(pos) & 0xff);
@@ -274,7 +356,7 @@ public class LenientAddressParser implements AddressParser {
             cursor.updatePos(pos + 1);
         }
         List<Mailbox> mboxes = parseMailboxes(buf, cursor, SEMICOLON_ONLY);
-        return new Group(name, mboxes);
+        return new Group(decodeGroupName(name), mboxes);
     }
 
     public Group parseGroup(final CharSequence text) {
@@ -290,6 +372,7 @@ public class LenientAddressParser implements AddressParser {
 
     private Address parseAddress(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters, final BitSet stopSet) {
+        int start = cursor.getPos();
         String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
             return createMailbox(openingText);
@@ -301,9 +384,13 @@ public class LenientAddressParser implements AddressParser {
             return parseMailboxAddress(openingText, buf, cursor);
         } else if (current == AT) {
             // localPart @ domain form
+            // Without joined whitespace, parsing it as a local part gives the same text
+            String localPart = openingText.indexOf(' ') < 0
+                ? openingText
+                : parseLocalPart(buf, new ParserCursor(start, pos), null);
             cursor.updatePos(pos + 1);
             String domain = parseDomain(buf, cursor, delimiters);
-            return new Mailbox(null, null, openingText, domain);
+            return new Mailbox(null, null, localPart, domain);
         } else if (current == COLON) {
             // group-name: localPart @ domain, name <localPart @ domain>; form
             cursor.updatePos(pos + 1);
@@ -315,7 +402,7 @@ public class LenientAddressParser implements AddressParser {
                     cursor.updatePos(pos + 1);
                 }
             }
-            return new Group(openingText, mboxes);
+            return new Group(decodeGroupName(openingText), mboxes);
         } else {
             return createMailbox(openingText);
         }

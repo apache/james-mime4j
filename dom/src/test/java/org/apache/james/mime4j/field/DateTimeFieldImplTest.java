@@ -19,7 +19,11 @@
 package org.apache.james.mime4j.field;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
+import java.time.Instant;
+import java.util.Date;
 import java.util.TimeZone;
 
 import org.apache.james.mime4j.MimeException;
@@ -28,6 +32,7 @@ import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
+import org.apache.james.mime4j.util.MimeUtil;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,5 +80,37 @@ public class DateTimeFieldImplTest {
         ByteSequence raw = ContentUtil.encode(s);
         RawField rawField = RawFieldParser.DEFAULT.parseField(raw);
         return DateTimeFieldImpl.PARSER.parse(rawField, null);
+    }
+
+    @Test
+    public void parseShouldFailWhenYearIsTooLong() throws Exception {
+        DateTimeField field = parse("Date: 1 Jan 99999999999 00:00 +0000");
+        assertNull(field.getDate());
+        assertNotNull(field.getParseException());
+    }
+
+    @Test
+    public void parseShouldFailWhenANumberIsTooLong() throws Exception {
+        assertParseException("Date: 9999999990:00");
+        assertParseException("Date: 1 Jan 2020 9999999999903:00 +0000");
+        assertParseException("Date: 1 Jan 2020 03:9999999999900 +0000");
+        assertParseException("Date: 1 Jan 2020 03:00:9999999999900 +0000");
+        assertParseException("Date: 1 Jan 2020 03:00 +9999999999900");
+    }
+
+    private void assertParseException(String header) throws Exception {
+        DateTimeField field = parse(header);
+        assertNull(field.getDate());
+        assertNotNull(field.getParseException());
+    }
+
+    @Test
+    public void datesBeforeTheGregorianReformShouldReadBackWhatTheFormatterWrites() throws Exception {
+        for (String instant : new String[] {"0196-01-01T00:00:00Z", "1000-06-15T12:00:00Z", "1582-10-04T00:00:00Z", "1582-10-15T00:00:00Z"}) {
+            Date date = Date.from(Instant.parse(instant));
+            DateTimeField field = parse("Date: " + MimeUtil.formatDate(date, TimeZone.getTimeZone("GMT")));
+
+            assertEquals(instant, date, field.getDate());
+        }
     }
 }

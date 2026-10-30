@@ -25,6 +25,7 @@ import java.util.Map;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -164,12 +165,13 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
         String type = null;
         String subtype = null;
         if (main != null) {
-            main = main.toLowerCase().trim();
+            // Only whitespace: a control character makes the type invalid, as for the strict parser
+            main = CharsetUtil.trimWhitespace(main.toLowerCase(Locale.US));
             int index = main.indexOf('/');
             boolean valid = false;
             if (index != -1) {
-                type = main.substring(0, index).trim();
-                subtype = main.substring(index + 1).trim();
+                type = CharsetUtil.trimWhitespace(main.substring(0, index));
+                subtype = CharsetUtil.trimWhitespace(main.substring(index + 1));
                 if (type.length() > 0 && subtype.length() > 0) {
                     main = type + "/" + subtype;
                     valid = true;

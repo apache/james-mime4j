@@ -23,11 +23,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
+import org.apache.james.mime4j.stream.MimeConfig;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
+import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.address.Mailbox;
+import org.apache.james.mime4j.dom.field.AddressListField;
+import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.field.Fields;
+import org.apache.james.mime4j.field.address.LenientAddressParser;
 import org.apache.james.mime4j.stream.RawField;
 import org.junit.Test;
 
@@ -88,9 +99,21 @@ public class DefaultMessageWriterTest {
     }
 
     @Test
-    public void fromShouldRejectBareLFInDisplayName() {
-        assertThatThrownBy(() -> Fields.from(new Mailbox("\n!", "", "")))
-            .isInstanceOf(IllegalArgumentException.class);
+    public void fromShouldEncodeBareLFInDisplayName() {
+        MailboxListField field = Fields.from(new Mailbox("\n!", "a", "example.com"));
+
+        assertThat(field.getBody()).doesNotContain("\n").doesNotContain("\r");
+        assertThat(field.getMailboxList().get(0).getName()).isEqualTo("\n!");
+    }
+
+    @Test
+    public void parsedDisplayNameWithLineBreakShouldBeWrittenBack() throws Exception {
+        Mailbox parsed = LenientAddressParser.DEFAULT.parseMailbox("=?us-ascii?q?a=0Ab?= <a@example.com>");
+
+        MailboxListField field = Fields.from(parsed);
+
+        assertThat(field.getBody()).doesNotContain("\n");
+        assertThat(LenientAddressParser.DEFAULT.parseMailbox(field.getBody()).getName()).isEqualTo("a\nb");
     }
 
     @Test
@@ -105,4 +128,106 @@ public class DefaultMessageWriterTest {
             .isInstanceOf(IllegalArgumentException.class);
     }
 
+    private static byte[] parseAndWrite(byte[] message) throws Exception {
+        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(message));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(parsed, out);
+        return out.toByteArray();
+    }
+
+    @Test
+    public void writingAMessageWithANonAsciiBoundaryShouldBeIdempotent() throws Exception {
+        byte[] message = ("Content-Type: multipart/mixed; boundary=\"été\"\r\n\r\n"
+            + "--été\r\n\r\nfirst\r\n--été--\r\n").getBytes(StandardCharsets.UTF_8);
+
+        byte[] once = parseAndWrite(message);
+
+        assertThat(new String(parseAndWrite(once), StandardCharsets.UTF_8)).isEqualTo(new String(once, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void headerLineEndingWithLfShouldStillParseOnceWrittenWithCrlf() throws Exception {
+        StringBuilder value = new StringBuilder();
+        while (value.length() < 998 - "X-Long: ".length()) {
+            value.append('a');
+        }
+        byte[] input = ("X-Long: " + value + "\n\n").getBytes(StandardCharsets.US_ASCII);
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        Header header = builder.parseHeader(new ByteArrayInputStream(input));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeHeader(header, out);
+
+        Header reparsed = builder.parseHeader(new ByteArrayInputStream(out.toByteArray()));
+
+        assertThat(reparsed.getField("X-Long").getBody()).isEqualTo(value.toString());
+    }
+
+    @Test
+    public void prefoldedFieldShouldNotEndTheHeaderBlock() throws Exception {
+        StringBuilder x = new StringBuilder();
+        while (x.length() < 70) {
+            x.append('x');
+        }
+        Message message = Message.Builder.of()
+            .setBody("SENTINEL-BODY", StandardCharsets.US_ASCII)
+            .addField(new RawField("X-Custom", x + "\r\n yyyyyyyyyy z"))
+            .addField(new RawField("X-Sentinel", "1"))
+            .build();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(message, out);
+
+        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(out.toByteArray()));
+
+        assertThat(parsed.getHeader().getField("X-Sentinel")).isNotNull();
+    }
+
+    @Test
+    public void headlessParsingShouldReportAFailureOfItsFirstStep() {
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        builder.setMimeEntityConfig(MimeConfig.custom()
+            .setMaxNestingDepth(1)
+            .setHeadlessParsing("message/rfc822")
+            .build());
+
+        assertThatThrownBy(() -> builder.parseMessage(new ByteArrayInputStream("From: a@b.c\r\n\r\nbody\r\n".getBytes(StandardCharsets.US_ASCII))))
+            .isInstanceOf(MimeIOException.class)
+            .hasCauseInstanceOf(MaxNestingDepthLimitException.class);
+    }
+
+    @Test
+    public void aDomainShouldNotAddRecipients() {
+        AddressListField field = Fields.to(new Mailbox("a", "example.com, other@example.org"));
+
+        assertThat(LenientAddressParser.DEFAULT.parseAddressList(field.getBody()).flatten()).hasSize(1);
+    }
+
+    @Test
+    public void mailboxesParsedFromMalformedAddressesShouldBeWrittenBack() {
+        for (String address : new String[] {"a@[", "a@example.com.", "a@example..com"}) {
+            Mailbox parsed = LenientAddressParser.DEFAULT.parseMailbox(address);
+
+            AddressListField field = Fields.to(parsed);
+
+            assertThat(LenientAddressParser.DEFAULT.parseMailbox(field.getBody()).getDomain()).isEqualTo(parsed.getDomain());
+        }
+    }
+
+    @Test
+    public void partsOfAnEncodedMultipartShouldSurviveARoundTrip() throws Exception {
+        for (String encoding : new String[] {"base64", "quoted-printable"}) {
+            byte[] input = ("Content-Type: multipart/mixed; boundary=b\r\n"
+                + "Content-Transfer-Encoding: " + encoding + "\r\n"
+                + "\r\n"
+                + "--b\r\n"
+                + "\r\n"
+                + "hello\r\n"
+                + "--b--\r\n").getBytes(StandardCharsets.US_ASCII);
+
+            byte[] once = parseAndWrite(input);
+            Message reparsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(once));
+
+            assertThat(((Multipart) reparsed.getBody()).getCount()).as(encoding).isEqualTo(1);
+            assertThat(new String(parseAndWrite(once), StandardCharsets.US_ASCII)).isEqualTo(new String(once, StandardCharsets.US_ASCII));
+        }
+    }
 }

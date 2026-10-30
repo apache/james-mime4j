@@ -58,6 +58,9 @@ public class EncoderUtil {
 
     private static final Pattern QUOTE = Pattern.compile("[\\\\\"]");
 
+    /** Characters that end or restructure an address in a header: never written raw in a domain */
+    private static final String DOMAIN_STRUCTURE_CHARS = ",;:<>()\"@\\";
+
     private static BitSet initChars(String specials) {
         BitSet bs = new BitSet(128);
         for (char ch = 33; ch < 127; ch++) {
@@ -115,10 +118,11 @@ public class EncoderUtil {
         // atom = [CFWS] 1*atext [CFWS]
         // CFWS = comment or folding white space
 
-        if (isAtomPhrase(displayName)) {
-            return displayName;
-        } else if (hasToBeEncoded(displayName, 0)) {
+        // CR and LF (control characters) make hasToBeEncoded true: never written raw
+        if (hasToBeEncoded(displayName, 0)) {
             return encodeEncodedWord(displayName, Usage.WORD_ENTITY);
+        } else if (isAtomPhrase(displayName)) {
+            return displayName;
         } else {
             return quote(displayName);
         }
@@ -142,8 +146,52 @@ public class EncoderUtil {
         if (isDotAtomText(localPart)) {
             return localPart;
         } else {
-            return quote(localPart);
+            // CR and LF can be neither qtext nor quoted-pair (RFC 5322 section 3.2.4): readers drop them
+            return quote(localPart.replace("\r", "").replace("\n", ""));
         }
+    }
+
+    /**
+     * Encodes the domain of an address specification as described in RFC 5322 section 3.4.1. A
+     * dot-atom (non ASCII characters allowed, as in internationalized domains) or a domain literal
+     * is returned unchanged. From any other domain, such as the ones a lenient parser reads from
+     * malformed addresses, the characters that would change the structure of the header (e.g. a
+     * "," adding recipients) are dropped.
+     *
+     * @param domain
+     *            domain to encode.
+     * @return the encoded domain.
+     */
+    public static String encodeAddressDomain(String domain) {
+        // domain = dot-atom / domain-literal
+        // domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
+        // dtext = %d33-90 / %d94-126
+        if (isDotAtomText(domain, true) || isDomainLiteral(domain)) {
+            return domain;
+        }
+        StringBuilder sb = new StringBuilder(domain.length());
+        for (int idx = 0; idx < domain.length(); idx++) {
+            char ch = domain.charAt(idx);
+            if (ch >= 128 || (ch > 32 && ch < 127 && DOMAIN_STRUCTURE_CHARS.indexOf(ch) == -1)) {
+                sb.append(ch);
+            }
+        }
+        return sb.toString();
+    }
+
+    private static boolean isDomainLiteral(String str) {
+        final int length = str.length();
+        if (length < 2 || str.charAt(0) != '[' || str.charAt(length - 1) != ']') {
+            return false;
+        }
+        for (int idx = 1; idx < length - 1; idx++) {
+            char ch = str.charAt(idx);
+            boolean dtext = (ch >= 33 && ch <= 90) || (ch >= 94 && ch <= 126) || ch >= 128;
+            if (!dtext && ch != ' ' && ch != '\t') {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -156,8 +204,15 @@ public class EncoderUtil {
      * @param value
      *            parameter value.
      * @return encoded result.
+     * @throws IllegalArgumentException if the name is not a token, or holds a "*" outside of the
+     *             RFC 2231 forms (<code>name*</code>, <code>name*N</code>, <code>name*N*</code>).
      */
     public static String encodeHeaderParameter(String name, String value) {
+        // A name that is not a token (";", "=") would add parameters, a stray "*" would be read
+        // as an RFC 2231 section
+        if (!isToken(name) || !isPlainOrRfc2231Name(name)) {
+            throw new IllegalArgumentException("Invalid parameter name: " + name);
+        }
         name = name.toLowerCase(Locale.US);
 
         // value := token / quoted-string
@@ -193,9 +248,11 @@ public class EncoderUtil {
     /**
      * Determines if the specified string has to encoded into an encoded-word.
      * Returns <code>true</code> if the text contains characters that don't
-     * fall into the printable ASCII character set or if the text contains a
+     * fall into the printable ASCII character set, if the text contains a
      * 'word' (sequence of non-whitespace characters) longer than 77 characters
-     * (including characters already used up in the line).
+     * (including characters already used up in the line) or if the text contains
+     * <code>=?</code>, which readers would take for the start of an encoded word
+     * (RFC 2047 section 5).
      *
      * @param text
      *            text to analyze.
@@ -228,6 +285,11 @@ public class EncoderUtil {
 
                 if (ch < 32 || ch >= 127) {
                     // non-printable ascii character has to be encoded
+                    return true;
+                }
+
+                if (ch == '=' && idx + 1 < text.length() && text.charAt(idx + 1) == '?') {
+                    // would be decoded as an encoded word when read back
                     return true;
                 }
             }
@@ -475,24 +537,59 @@ public class EncoderUtil {
 
     private static boolean isAtomPhrase(String str) {
         // atom = [CFWS] 1*atext [CFWS]
+        // Readers drop leading and trailing whitespace and collapse runs into one SP:
+        // only words separated by a single SP read back unchanged
 
         boolean containsAText = false;
+        boolean previousIsSpace = true;
 
         final int length = str.length();
         for (int idx = 0; idx < length; idx++) {
             char ch = str.charAt(idx);
             if (ATEXT_CHARS.get(ch)) {
                 containsAText = true;
-            } else if (!CharsetUtil.isWhitespace(ch)) {
+                previousIsSpace = false;
+            } else if (ch == ' ' && !previousIsSpace) {
+                previousIsSpace = true;
+            } else {
                 return false;
             }
         }
 
-        return containsAText;
+        return containsAText && !previousIsSpace;
+    }
+
+    /**
+     * Whether the name holds no "*", or holds it in one of the RFC 2231 forms:
+     * <code>name*</code>, <code>name*N</code> or <code>name*N*</code>.
+     */
+    private static boolean isPlainOrRfc2231Name(String name) {
+        int star = name.indexOf('*');
+        if (star < 0) {
+            return true;
+        }
+        if (star == 0) {
+            return false;
+        }
+        int idx = star + 1;
+        final int length = name.length();
+        while (idx < length && name.charAt(idx) >= '0' && name.charAt(idx) <= '9') {
+            idx++;
+        }
+        if (idx == length) {
+            // name* or name*N
+            return true;
+        }
+        // name*N*: digits required before the last star
+        return idx > star + 1 && idx == length - 1 && name.charAt(idx) == '*';
     }
 
     // RFC 5322 section 3.2.3
     private static boolean isDotAtomText(String str) {
+        return isDotAtomText(str, false);
+    }
+
+    private static boolean isDotAtomText(String str, boolean allowNonAscii) {
         // dot-atom-text = 1*atext *("." 1*atext)
         // atext = ALPHA / DIGIT / "!" / "#" / "$" / "%" / "&" / "'" / "*" /
         // "+" / "-" / "/" / "=" / "?" / "^" / "_" / "`" / "{" / "|" / "}" / "~"
@@ -510,7 +607,7 @@ public class EncoderUtil {
                 if (prev == '.' || idx == length - 1)
                     return false;
             } else {
-                if (!ATEXT_CHARS.get(ch))
+                if (!ATEXT_CHARS.get(ch) && !(allowNonAscii && ch >= 128))
                     return false;
             }
 

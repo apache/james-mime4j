@@ -57,8 +57,25 @@ public final class RawField implements Field {
     public RawField(String name, String body) {
         this(null, -1, name, body);
 
+        checkName(this.name);
         if (body != null) {
             checkLineBreaks(body);
+        }
+    }
+
+    /**
+     * RFC 5322 field-name = 1*ftext, ftext = %d33-57 / %d59-126: a ":", a whitespace or a line
+     * break in the name would change the fields of the header once written.
+     */
+    private static void checkName(String name) {
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Empty header field name");
+        }
+        for (int pos = 0; pos < name.length(); pos++) {
+            char c = name.charAt(pos);
+            if (c < 33 || c > 126 || c == ':') {
+                throw new IllegalArgumentException("Invalid header field name: " + name);
+            }
         }
     }
 
@@ -79,6 +96,15 @@ public final class RawField implements Field {
                     || body.charAt(pos + 1) != '\n'
                     || !isSpace(body, pos + 2)) {
                     throw new IllegalArgumentException("Injection of un-encoded line breaks inside header field could be assimilated to header injection");
+                }
+                // The continuation line must hold more than whitespace: a whitespace only line
+                // would be written, which some readers take as the end of the header block
+                int next = pos + 2;
+                while (next < length && isSpace(body, next)) {
+                    next++;
+                }
+                if (next == length || body.charAt(next) == '\r') {
+                    throw new IllegalArgumentException("A folded header field line holds only whitespace");
                 }
                 // Skip the LF of the fold
                 pos++;
@@ -132,7 +158,7 @@ public final class RawField implements Field {
         if (raw != null) {
             int len = raw.length();
             int off = delimiterIdx + 1;
-            if (len > off + 1 && (CharsetUtil.isWhitespace((char) (raw.byteAt(off) & 0xff)))) {
+            if (len > off && (CharsetUtil.isWhitespace((char) (raw.byteAt(off) & 0xff)))) {
                 off++;
             }
             return MimeUtil.unfold(ContentUtil.decode(raw, off, len - off, StandardCharsets.UTF_8));

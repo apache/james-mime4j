@@ -94,6 +94,17 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         decodeNextCharBuffer();
         fromLineMatcher = MESSAGE_START.matcher(mboxCharBuffer);
         fromLineFound = fromLineMatcher.find();
+        while (fromLineFound && isCutByTheBuffer(fromLineMatcher)) {
+            if (fromLineMatcher.start() > 0) {
+                // examine the line again once completed by the next decoded chars
+                refillFrom(fromLineMatcher.start());
+                fromLineMatcher = MESSAGE_START.matcher(mboxCharBuffer);
+                fromLineFound = fromLineMatcher.find();
+            } else {
+                // the line does not even fit in the buffer: it cannot be checked, so it is not a From_ line
+                fromLineFound = fromLineMatcher.find();
+            }
+        }
         if (fromLineFound) {
             saveFindPositions(fromLineMatcher);
         } else if (fromLineMatcher.hitEnd()) {
@@ -103,6 +114,27 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
             throw new IllegalArgumentException("File " + path + " does not contain From_ lines that match the pattern '"
                     + MESSAGE_START.pattern() + "'! Maybe not be a valid Mbox or wrong matcher.");
         }
+    }
+
+    /**
+     * Whether the match ends with the decoded chars while more input remains: its '$' may then
+     * have matched the end of the buffer, not of a line.
+     */
+    private boolean isCutByTheBuffer(Matcher matcher) {
+        return matcher.end() == mboxCharBuffer.limit() && byteBuffer.hasRemaining();
+    }
+
+    /**
+     * Keeps the chars from <code>start</code> at the beginning of the buffer and decodes the next ones after them.
+     */
+    private void refillFrom(int start) throws CharConversionException {
+        CharBuffer oldData = mboxCharBuffer.duplicate();
+        mboxCharBuffer.clear();
+        oldData.position(start);
+        while (oldData.hasRemaining()) {
+            mboxCharBuffer.put(oldData.get());
+        }
+        decodeNextCharBuffer();
     }
 
     private void decodeNextCharBuffer() throws CharConversionException {
@@ -127,6 +159,31 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
     private void saveFindPositions(Matcher lineMatcher) {
         findStart = lineMatcher.start();
         findEnd = lineMatcher.end();
+    }
+
+    /**
+     * Start of the message that follows the From_ line ending at <code>end</code>: skips its line
+     * terminator (CRLF, LF or CR). The line can end the buffer (or the file) without one.
+     */
+    private int messageStart(int end) {
+        int limit = mboxCharBuffer.limit();
+        int start = end;
+        if (start < limit && mboxCharBuffer.get(start) == '\r') {
+            start++;
+        }
+        if (start < limit && mboxCharBuffer.get(start) == '\n') {
+            start++;
+        }
+        return start;
+    }
+
+    private int endOfFirstLine() {
+        int limit = mboxCharBuffer.limit();
+        int end = 0;
+        while (end < limit && mboxCharBuffer.get(end) != '\r' && mboxCharBuffer.get(end) != '\n') {
+            end++;
+        }
+        return end;
     }
 
     public Iterator<CharBufferWrapper> iterator() {
@@ -157,9 +214,13 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
         public CharBufferWrapper next() {
             final CharBuffer message;
             fromLineFound = fromLineMatcher.find();
+            if (fromLineFound && isCutByTheBuffer(fromLineMatcher)) {
+                // The From_ line may be cut by the end of the buffer: examine it again after the refill
+                fromLineFound = false;
+            }
             if (fromLineFound) {
                 message = mboxCharBuffer.slice();
-                message.position(findEnd + 1);
+                message.position(messageStart(findEnd));
                 saveFindPositions(fromLineMatcher);
                 message.limit(fromLineMatcher.start());
             } else {
@@ -169,32 +230,24 @@ public class MboxIterator implements Iterable<CharBufferWrapper>, Closeable {
                  */
                 if (byteBuffer.hasRemaining()) {
                     // decode another batch, but remember to copy the remaining chars first
-                    CharBuffer oldData = mboxCharBuffer.duplicate();
-                    mboxCharBuffer.clear();
-                    oldData.position(findStart);
-                    while (oldData.hasRemaining()) {
-                        mboxCharBuffer.put(oldData.get());
-                    }
                     try {
-                        decodeNextCharBuffer();
+                        refillFrom(findStart);
                     } catch (CharConversionException ex) {
                         throw new RuntimeException(ex);
                     }
+                    // The buffer now starts with the From_ line of the current message
+                    int start = messageStart(endOfFirstLine());
                     fromLineMatcher = MESSAGE_START.matcher(mboxCharBuffer);
-                    fromLineFound = fromLineMatcher.find();
-                    if (fromLineFound) {
-                        saveFindPositions(fromLineMatcher);
-                    }
                     message = mboxCharBuffer.slice();
-                    message.position(fromLineMatcher.end() + 1);
-                    fromLineFound = fromLineMatcher.find();
+                    message.position(start);
+                    fromLineFound = fromLineMatcher.find(start);
                     if (fromLineFound) {
                         saveFindPositions(fromLineMatcher);
                         message.limit(fromLineMatcher.start());
                     }
                 } else {
                     message = mboxCharBuffer.slice();
-                    message.position(findEnd + 1);
+                    message.position(messageStart(findEnd));
                     message.limit(message.capacity());
                 }
             }

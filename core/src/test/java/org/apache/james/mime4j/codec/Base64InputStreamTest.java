@@ -254,4 +254,19 @@ public class Base64InputStreamTest {
         Assert.assertEquals("This is the plain text message", ContentUtil.toAsciiString(buf));
     }
 
+    @Test
+    public void readShouldNotReturnZeroOnALeadingPad() throws Exception {
+        Base64InputStream in = new Base64InputStream(InputStreams.createAscii("=AAAA"), DecodeMonitor.SILENT);
+
+        Assert.assertEquals(-1, in.read(new byte[16], 0, 16));
+    }
+
+    @Test
+    public void readShouldNotReturnZeroOnAPadAfterACompleteQuantum() throws Exception {
+        Base64InputStream in = new Base64InputStream(InputStreams.createAscii("QUJD="), DecodeMonitor.SILENT);
+        byte[] buffer = new byte[3];
+
+        Assert.assertEquals(3, in.read(buffer, 0, 3));
+        Assert.assertEquals(-1, in.read(buffer, 0, 3));
+    }
 }

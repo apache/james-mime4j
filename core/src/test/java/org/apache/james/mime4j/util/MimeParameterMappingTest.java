@@ -52,4 +52,103 @@ public class MimeParameterMappingTest {
         }
         Assert.assertEquals(segments * 10, mapping.get("filename").length());
     }
+
+    @Test
+    public void charsetOfAParameterShouldNotLeakToOthers() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*1", "%2f");
+        mapping.addParameter("x*", "utf-8''");
+
+        String first = mapping.get("filename");
+        mapping.get("x");
+
+        Assert.assertEquals("%2f", first);
+        Assert.assertEquals("%2f", mapping.get("filename"));
+        Assert.assertEquals("%2f", mapping.getParameters().get("filename"));
+    }
+
+    @Test
+    public void standardParametersShouldNotBeRfc2231Decoded() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename", "utf-8''a%2fb");
+        mapping.addParameter("x*", "utf-8''y");
+
+        Assert.assertEquals("utf-8''a%2fb", mapping.get("filename"));
+        Assert.assertEquals("y", mapping.get("x"));
+    }
+
+    @Test
+    public void extendedParametersShouldBeDecodedWithTheirOwnCharset() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("a*", "iso-8859-1''%E9");
+        mapping.addParameter("b*", "utf-8''%C3%A9");
+
+        Assert.assertEquals("\u00e9", mapping.get("a"));
+        Assert.assertEquals("\u00e9", mapping.get("b"));
+    }
+
+    @Test
+    public void continuationSegmentsShouldBeOrderedByNumber() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*2", "ghi");
+        mapping.addParameter("filename*0", "abc");
+        mapping.addParameter("filename*1", "def");
+        Assert.assertEquals("abcdefghi", mapping.get("filename"));
+    }
+
+    @Test
+    public void continuationShouldStopAtTheFirstMissingSection() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*2*", ".");
+        mapping.addParameter("filename*0*", ".abc");
+        Assert.assertEquals(".abc", mapping.get("filename"));
+    }
+
+    @Test
+    public void continuationShouldKeepTheFirstOccurrenceOfASection() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*0", "abc");
+        mapping.addParameter("filename*0", "xyz");
+        mapping.addParameter("filename*1", "def");
+        Assert.assertEquals("abcdef", mapping.get("filename"));
+    }
+
+    @Test
+    public void encodedContinuationShouldUseTheCharsetOfTheFirstSection() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*1*", "%A9");
+        mapping.addParameter("filename*0*", "utf-8''%C3");
+        mapping.addParameter("filename*2", "%41+b");
+        Assert.assertEquals("\u00e9%41+b", mapping.get("filename"));
+    }
+
+    @Test
+    public void plusShouldNotBeDecodedAsASpace() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*", "utf-8''a+b.txt");
+        Assert.assertEquals("a+b.txt", mapping.get("filename"));
+    }
+
+    @Test
+    public void valuelessStandardParameterShouldBeNull() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename", null);
+
+        Assert.assertNull(mapping.get("filename"));
+        Assert.assertTrue(mapping.getParameters().containsKey("filename"));
+        Assert.assertNull(mapping.getParameters().get("filename"));
+    }
+
+    @Test
+    public void valuelessSectionShouldBeIgnored() {
+        MimeParameterMapping mapping = new MimeParameterMapping();
+        mapping.addParameter("filename*0", null);
+        Assert.assertNull(mapping.get("filename"));
+        Assert.assertNull(mapping.getParameters().get("filename"));
+
+        MimeParameterMapping laterSection = new MimeParameterMapping();
+        laterSection.addParameter("filename*0*", "utf-8''a");
+        laterSection.addParameter("filename*1", null);
+        Assert.assertEquals("a", laterSection.get("filename"));
+    }
 }

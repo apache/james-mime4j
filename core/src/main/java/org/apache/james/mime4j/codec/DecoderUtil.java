@@ -72,8 +72,8 @@ public class DecoderUtil {
                 buf.release();
             }
         } catch (IOException ex) {
-            // This should never happen!
-            throw new Error(ex);
+            // Reading from memory: only the strict DecodeMonitor makes the decoder fail
+            throw new IllegalArgumentException(ex.getMessage(), ex);
         }
     }
 
@@ -100,8 +100,8 @@ public class DecoderUtil {
                 buf.release();
             }
         } catch (IOException ex) {
-            // This should never happen!
-            throw new Error(ex);
+            // Reading from memory: only the strict DecodeMonitor makes the decoder fail
+            throw new IllegalArgumentException(ex.getMessage(), ex);
         }
     }
 

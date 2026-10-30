@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.codec;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -227,4 +228,53 @@ public class QuotedPrintableInputStreamTest {
         }
     }
 
+
+    @Test
+    public void closingTwiceShouldNotMakeTwoLaterStreamsShareABuffer() throws Exception {
+        QuotedPrintableInputStream closed = new QuotedPrintableInputStream(InputStreams.createAscii("abc"), false);
+        closed.close();
+        closed.close();
+
+        String first = "first=20text with  some   blanks=\r\n and more";
+        String second = "SECOND=20TEXT WITH  SOME   BLANKS=\r\n AND MORE";
+        QuotedPrintableInputStream in1 = new QuotedPrintableInputStream(InputStreams.createAscii(first), false);
+        QuotedPrintableInputStream in2 = new QuotedPrintableInputStream(InputStreams.createAscii(second), false);
+        StringBuilder out1 = new StringBuilder();
+        StringBuilder out2 = new StringBuilder();
+        int b1 = 0;
+        int b2 = 0;
+        while (b1 != -1 || b2 != -1) {
+            if (b1 != -1 && (b1 = in1.read()) != -1) {
+                out1.append((char) b1);
+            }
+            if (b2 != -1 && (b2 = in2.read()) != -1) {
+                out2.append((char) b2);
+            }
+        }
+
+        Assert.assertEquals("first text with  some   blanks and more", out1.toString());
+        Assert.assertEquals("SECOND TEXT WITH  SOME   BLANKS AND MORE", out2.toString());
+    }
+
+    private static String decodeReadingAtMost(String encoded, int readSize) throws IOException {
+        InputStream source = new FilterInputStream(InputStreams.createAscii(encoded)) {
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return super.read(b, off, Math.min(len, readSize));
+            }
+        };
+        try (QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(source, false)) {
+            return new String(IOUtils.toByteArray(decoder), "ISO-8859-1");
+        }
+    }
+
+    @Test
+    public void decodingShouldNotDependOnReadSizes() throws Exception {
+        for (String encoded : new String[] {"7bY==\r\nYLY", "7bY==\nYLY", "a=3D=\r\nb", "a=\r\nb==c", "=4", "=", "a=\r"}) {
+            String whole = decodeReadingAtMost(encoded, Integer.MAX_VALUE);
+            for (int readSize = 1; readSize < 6; readSize++) {
+                Assert.assertEquals(encoded + " read by " + readSize, whole, decodeReadingAtMost(encoded, readSize));
+            }
+        }
+    }
 }

@@ -70,7 +70,9 @@ public class DateTime {
     }
 
     public static Date convertToDate(int year, int month, int day, int hour, int minute, int second, int timeZone) {
-        Calendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT+0"));
+        GregorianCalendar c = new GregorianCalendar(TimeZone.getTimeZone("GMT+0"));
+        // Proleptic Gregorian, as MimeUtil#formatDate (java.time): not Julian before 1582-10-15
+        c.setGregorianChange(new Date(Long.MIN_VALUE));
         c.set(year, month - 1, day, hour, minute, second);
         c.set(Calendar.MILLISECOND, 0);
 

@@ -164,13 +164,13 @@ public class BufferedLineReaderInputStreamTest {
         String teststr = "1234567890\r\n";
         byte[] raw = ContentUtil.toAsciiByteArray(teststr);
 
-        LineReaderInputStream instream1 = create(raw, 1024, 13);
+        LineReaderInputStream instream1 = create(raw, 1024, 12);
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8);
         linebuf.clear();
         instream1.readLine(linebuf);
         instream1.close();
 
-        LineReaderInputStream instream2 = create(raw, 1024, 12);
+        LineReaderInputStream instream2 = create(raw, 1024, 11);
         linebuf.clear();
         try {
             instream2.readLine(linebuf);
@@ -181,4 +181,21 @@ public class BufferedLineReaderInputStreamTest {
         instream2.close();
     }
 
+    @Test
+    public void maxLineLimitShouldNotDependOnTheLineTerminator() throws Exception {
+        for (String line : new String[] {"1234567890\r\n", "1234567890\n", "1234567890"}) {
+            byte[] raw = ContentUtil.toAsciiByteArray(line);
+
+            ByteArrayBuffer linebuf = new ByteArrayBuffer(8);
+            create(raw, 1024, 12).readLine(linebuf);
+            Assert.assertEquals(line, ContentUtil.toAsciiString(linebuf));
+
+            try {
+                create(raw, 1024, 11).readLine(new ByteArrayBuffer(8));
+                Assert.fail("MaxLineLimitException should have been thrown for " + line);
+            } catch (MaxLineLimitException ex) {
+                // expected
+            }
+        }
+    }
 }

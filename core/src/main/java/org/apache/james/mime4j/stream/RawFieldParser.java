@@ -72,13 +72,28 @@ public class RawFieldParser {
         if (raw == null) {
             return null;
         }
-        ParserCursor cursor = new ParserCursor(0, raw.length());
-        String name = parseToken(raw, cursor, COLON);
-        if (cursor.atEnd()) {
+        // The name is the exact text before the first colon: no comment nor whitespace handling,
+        // otherwise "Subj(x)ect" would be read as "Subject"
+        int length = raw.length();
+        int colon = 0;
+        while (colon < length && raw.byteAt(colon) != ':') {
+            colon++;
+        }
+        if (colon == length) {
             throw new MimeException("Invalid MIME field: no name/value separator found: " +
                     raw.toString());
         }
-        return new RawField(raw, cursor.getPos(), name, null);
+        // obs-optional: whitespace allowed between the name and the colon
+        int nameEnd = colon;
+        while (nameEnd > 0 && (raw.byteAt(nameEnd - 1) == ' ' || raw.byteAt(nameEnd - 1) == '\t')) {
+            nameEnd--;
+        }
+        int nameStart = 0;
+        while (nameStart < nameEnd && (raw.byteAt(nameStart) == ' ' || raw.byteAt(nameStart) == '\t')) {
+            nameStart++;
+        }
+        String name = ContentUtil.decode(raw, nameStart, nameEnd - nameStart, StandardCharsets.UTF_8);
+        return new RawField(raw, colon, name, null);
     }
 
     /**
@@ -151,7 +166,8 @@ public class RawFieldParser {
         if (delim == ';') {
             return new NameValuePair(name, null);
         }
-        String value = parseValue(buf, cursor, SEMICOLON);
+        // The boundary is a byte exact delimiter: never decode it as an encoded word
+        String value = parseValue(buf, cursor, SEMICOLON, !"boundary".equalsIgnoreCase(name));
         if (!cursor.atEnd()) {
             cursor.updatePos(cursor.getPos() + 1);
         }
@@ -201,6 +217,11 @@ public class RawFieldParser {
      *  is not delimited by any character.
      */
     public String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
+        return parseValue(buf, cursor, delimiters, true);
+    }
+
+    private String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+            final boolean decodeEncodedWords) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
@@ -216,7 +237,7 @@ public class RawFieldParser {
                 if (dst.length() > 0 && whitespace) {
                     dst.append(' ');
                 }
-                copyQuotedContent(buf, cursor, dst);
+                copyQuotedContent(buf, cursor, dst, decodeEncodedWords);
                 whitespace = false;
             } else {
                 if (dst.length() > 0 && whitespace) {
@@ -428,6 +449,29 @@ public class RawFieldParser {
      */
     public void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst) {
+        copyQuotedContent(buf, cursor, dst, true);
+    }
+
+    /**
+     * Whether the CR or LF at <code>index</code> belongs to a fold: CRLF or LF followed by SP or HTAB.
+     */
+    private static boolean isFoldAt(final ByteSequence buf, final int index, final int indexTo) {
+        int i = index;
+        if (buf.byteAt(i) == '\r') {
+            i++;
+            if (i >= indexTo || buf.byteAt(i) != '\n') {
+                return false;
+            }
+        }
+        if (buf.byteAt(i) != '\n') {
+            return false;
+        }
+        i++;
+        return i < indexTo && (buf.byteAt(i) == ' ' || buf.byteAt(i) == '\t');
+    }
+
+    private void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
+            final StringBuilder dst, final boolean decodeEncodedWords) {
         if (cursor.atEnd()) {
             return;
         }
@@ -449,6 +493,10 @@ public class RawFieldParser {
             byte currentByte = buf.byteAt(i);
             current = (char) (currentByte & 0xff);
             if (escaped) {
+                if (isFoldAt(buf, i, indexTo)) {
+                    // A fold is not part of the value: the quoted pair applies to the WSP after it
+                    continue;
+                }
                 if (current != '\"' && current != '\\') {
                     dstRaw.append('\\');
                 }
@@ -469,7 +517,7 @@ public class RawFieldParser {
 
         if (CharsetUtil.isASCII(dstRaw)) {
             // Check for encoded word directly on bytes — avoids an intermediate String
-            if (dstRaw.length() > 1 && dstRaw.byteAt(0) == '=' && dstRaw.byteAt(1) == '?') {
+            if (decodeEncodedWords && dstRaw.length() > 1 && dstRaw.byteAt(0) == '=' && dstRaw.byteAt(1) == '?') {
                 String raw = ContentUtil.decode(dstRaw);
                 dst.append(DecoderUtil.decodeEncodedWords(raw, DecodeMonitor.SILENT));
             } else {
@@ -480,7 +528,7 @@ public class RawFieldParser {
             }
         } else {
             String decoded = ContentUtil.decode(StandardCharsets.UTF_8, dstRaw);
-            if (decoded.startsWith("=?")) {
+            if (decodeEncodedWords && decoded.startsWith("=?")) {
                 decoded = DecoderUtil.decodeEncodedWords(decoded, DecodeMonitor.SILENT);
             }
             dst.append(decoded);

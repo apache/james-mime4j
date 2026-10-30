@@ -246,6 +246,7 @@ public class BasicBodyFactory implements BodyFactory {
 
         private final ByteArrayOutputStreamRecycler.Wrapper content;
         private final Charset charset;
+        private boolean disposed;
 
         StringBody3(final ByteArrayOutputStreamRecycler.Wrapper content, final Charset charset) {
             super();
@@ -285,12 +286,15 @@ public class BasicBodyFactory implements BodyFactory {
 
         @Override
         public void dispose() {
-            this.content.release();
+            if (!disposed) {
+                disposed = true;
+                this.content.release();
+            }
         }
 
         @Override
         public SingleBody copy() {
-            return new StringBody3(this.content, this.charset);
+            return new StringBody3(this.content.retain(), this.charset);
         }
 
     }
@@ -333,6 +337,7 @@ public class BasicBodyFactory implements BodyFactory {
     static class BinaryBody3 extends BinaryBody {
 
         private final ByteArrayOutputStreamRecycler.Wrapper content;
+        private boolean disposed;
 
         BinaryBody3(ByteArrayOutputStreamRecycler.Wrapper content) {
             super();
@@ -356,12 +361,15 @@ public class BasicBodyFactory implements BodyFactory {
 
         @Override
         public void dispose() {
-            content.release();
+            if (!disposed) {
+                disposed = true;
+                content.release();
+            }
         }
 
         @Override
         public SingleBody copy() {
-            return new BinaryBody3(content);
+            return new BinaryBody3(content.retain());
         }
 
     }

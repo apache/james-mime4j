@@ -21,6 +21,7 @@ package org.apache.james.mime4j.stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
@@ -449,5 +450,21 @@ public class MimeEntityLimitsTest {
         Assert.assertEquals(9, config.getMaxNestingDepth());
         Assert.assertEquals(11, config.getMaxTotalHeaderCount());
         Assert.assertEquals(13, config.getMaxTotalHeaderLen());
+    }
+
+    @Test
+    public void parseHeadlessShouldReportTheNestingLimitFromNext() throws Exception {
+        MimeTokenStream stream = new MimeTokenStream(MimeConfig.custom().setMaxNestingDepth(1).build());
+        stream.parseHeadless(new ByteArrayInputStream(
+            "From: Me <me@example.com>\r\n\r\nbody".getBytes(StandardCharsets.US_ASCII)), "message/rfc822");
+
+        try {
+            for (EntityState s = stream.getState(); s != EntityState.T_END_OF_STREAM; s = stream.next()) {
+                // consume
+            }
+            Assert.fail("the nesting limit should be reported");
+        } catch (MaxNestingDepthLimitException expected) {
+            // a MimeException, as for a message/rfc822 with a header
+        }
     }
 }

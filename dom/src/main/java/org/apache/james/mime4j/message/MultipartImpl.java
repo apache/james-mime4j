@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.message;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 
@@ -75,7 +76,8 @@ public class MultipartImpl extends AbstractMultipart {
     @Override
     public String getPreamble() {
         if (!preambleComputed) {
-            preambleStrCache = preamble != null ? ContentUtil.decode(preamble) : null;
+            // UTF-8, as setPreamble encodes non ASCII text and as headers are decoded
+            preambleStrCache = preamble != null ? ContentUtil.decode(StandardCharsets.UTF_8, preamble) : null;
             preambleComputed = true;
         }
         return preambleStrCache;
@@ -113,7 +115,7 @@ public class MultipartImpl extends AbstractMultipart {
     @Override
     public String getEpilogue() {
         if (!epilogueComputed) {
-            epilogueStrCache = epilogue != null ? ContentUtil.decode(epilogue) : null;
+            epilogueStrCache = epilogue != null ? ContentUtil.decode(StandardCharsets.UTF_8, epilogue) : null;
             epilogueComputed = true;
         }
         return epilogueStrCache;

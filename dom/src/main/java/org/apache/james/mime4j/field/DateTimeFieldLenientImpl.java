@@ -83,6 +83,14 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             .appendLiteral(' ')
             .appendOffsetId()
         .optionalEnd()
+        .optionalStart()
+            .appendLiteral(' ')
+            .appendText(OFFSET_SECONDS, obsoleteZones())
+        .optionalEnd()
+        .optionalStart()
+            .appendLiteral(' ')
+            .appendText(OFFSET_SECONDS, obsoleteDaylightZones())
+        .optionalEnd()
         .toFormatter()
         .withZone(ZoneId.of("GMT"))
         .withResolverStyle(ResolverStyle.LENIENT)
@@ -103,6 +111,28 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         result.put(10L, "Oct");
         result.put(11L, "Nov");
         result.put(12L, "Dec");
+        return result;
+    }
+
+    /**
+     * RFC 5322 obs-zone. Split in two maps as several names share an offset.
+     * UT, GMT and military zones (taken as -0000) default to GMT.
+     */
+    private static Map<Long, String> obsoleteZones() {
+        HashMap<Long, String> result = new HashMap<>();
+        result.put(-4L * 3600, "EDT");
+        result.put(-5L * 3600, "EST");
+        result.put(-6L * 3600, "CST");
+        result.put(-7L * 3600, "MST");
+        result.put(-8L * 3600, "PST");
+        return result;
+    }
+
+    private static Map<Long, String> obsoleteDaylightZones() {
+        HashMap<Long, String> result = new HashMap<>();
+        result.put(-5L * 3600, "CDT");
+        result.put(-6L * 3600, "MDT");
+        result.put(-7L * 3600, "PDT");
         return result;
     }
 
@@ -144,10 +174,42 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             return;
         }
         try {
-            date = Date.from(Instant.from(RFC_5322.parse(text, new ParsePosition(0))));
+            date = Date.from(Instant.from(RFC_5322.parse(normalizeShortYear(text), new ParsePosition(0))));
         } catch (Exception e) {
             // Ignore: invalid date
         }
+    }
+
+    /**
+     * The lenient formatter reads a 1 or 3 digit year literally: map it as RFC 5322 section 4.3
+     * and the strict parser do (1 digit: 2000 + year, 3 digits: 1900 + year).
+     */
+    private static String normalizeShortYear(final String text) {
+        int pos = 0;
+        if (text.length() > 4 && text.charAt(3) == ',') {
+            // day-of-week ", "
+            pos = 5;
+        }
+        int dayStart = pos;
+        while (pos < text.length() && Character.isDigit(text.charAt(pos))) {
+            pos++;
+        }
+        // " Mon "
+        if (pos == dayStart || pos + 5 >= text.length() || text.charAt(pos) != ' ' || text.charAt(pos + 4) != ' ') {
+            return text;
+        }
+        int yearStart = pos + 5;
+        int yearEnd = yearStart;
+        while (yearEnd < text.length() && Character.isDigit(text.charAt(yearEnd))) {
+            yearEnd++;
+        }
+        int digits = yearEnd - yearStart;
+        if (digits != 1 && digits != 3) {
+            return text;
+        }
+        int year = Integer.parseInt(text.substring(yearStart, yearEnd));
+        year += digits == 1 ? 2000 : 1900;
+        return text.substring(0, yearStart) + year + text.substring(yearEnd);
     }
 
     /**

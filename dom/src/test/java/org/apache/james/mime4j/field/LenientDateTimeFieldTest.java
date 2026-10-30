@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field;
 
+import java.time.Instant;
 import java.util.Date;
 
 import org.apache.james.mime4j.MimeException;
@@ -106,4 +107,34 @@ public class LenientDateTimeFieldTest {
         Assert.assertEquals(1515169108000L, f.getDate().getTime());
     }
 
+    @Test
+    public void obsoleteZonesShouldBeHonoured() throws Exception {
+        Assert.assertEquals(Instant.parse("1997-11-21T14:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 EST").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T13:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 EDT").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T15:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 CST").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T14:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 CDT").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T16:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 MST").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T15:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 MDT").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1901-01-02T17:22:32Z"), parse("Date: 2 Jan 1901 09:22:32 PST").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T16:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 PDT").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T09:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 UT").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T09:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 GMT").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T09:55:06Z"), parse("Date: Fri, 21 Nov 1997 09:55:06 Z").getDate().toInstant());
+    }
+
+    @Test
+    public void numericOffsetShouldWinOverAFollowingZoneName() throws Exception {
+        Assert.assertEquals(Instant.parse("2008-07-16T15:12:33Z"), parse("Date: Wed, 16 Jul 2008 17:12:33 +0200 PDT").getDate().toInstant());
+    }
+
+    @Test
+    public void shortYearsShouldBeMappedAsTheStrictParserDoes() throws Exception {
+        Assert.assertEquals(Instant.parse("2000-10-04T10:00:00Z"), parse("Date: 4 Oct 0 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2004-10-04T10:00:00Z"), parse("Date: Mon, 4 Oct 4 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2069-10-04T10:00:00Z"), parse("Date: 4 Oct 69 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1970-10-04T10:00:00Z"), parse("Date: 4 Oct 70 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2000-10-04T10:00:00Z"), parse("Date: 4 Oct 100 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2899-10-04T10:00:00Z"), parse("Date: 4 Oct 999 10:00:00 +0000").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2001-10-04T10:00:00Z"), parse("Date: 4 Oct 2001 10:00:00 +0000").getDate().toInstant());
+    }
 }

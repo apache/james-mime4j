@@ -88,8 +88,12 @@ public class DateTimeParser {
 		}
     }
 
-    private static int parseDigits(Token token) {
-        return Integer.parseInt(token.image, 10);
+    private static int parseDigits(Token token) throws ParseException {
+        try {
+            return Integer.parseInt(token.image, 10);
+        } catch (NumberFormatException e) {
+            throw new ParseException("Invalid number: " + token.image);
+        }
     }
 
     private static int getMilitaryZoneOffset(char c) {
@@ -244,6 +248,10 @@ String year() :
     t=<DIGITS> 
     {
       String year = (String) t.image;
+      if (year.length() > 9)
+      {
+        throw new ParseException("Invalid year: " + year);
+      }
       if (year.length() == 2) 
       {
         if (year.charAt(0) > '6')

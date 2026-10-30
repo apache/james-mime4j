@@ -133,19 +133,32 @@ public class AddressFormatter {
         if (mailbox == null) {
             throw new IllegalArgumentException("Mailbox may not be null");
         }
+        // A neutralized domain can be empty: then no "@" is written
+        String domain = mailbox.getDomain() != null ? EncoderUtil.encodeAddressDomain(mailbox.getDomain()) : null;
+        if (domain != null && domain.isEmpty()) {
+            domain = null;
+        }
+        // An empty address is written "<>": a bare "" would read back as no address at all
+        boolean emptyAddress = mailbox.getLocalPart().isEmpty() && domain == null;
+        boolean includeAngleBrackets = mailbox.getName() != null || emptyAddress;
         if (mailbox.getName() != null) {
             sb.append(EncoderUtil.encodeAddressDisplayName(mailbox.getName()));
-            sb.append(" <");
+            sb.append(' ');
         }
-        sb.append(EncoderUtil.encodeAddressLocalPart(mailbox.getLocalPart()));
+        if (includeAngleBrackets) {
+            sb.append('<');
+        }
+        if (!emptyAddress) {
+            sb.append(EncoderUtil.encodeAddressLocalPart(mailbox.getLocalPart()));
+        }
         // domain = dot-atom / domain-literal
         // domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
         // dtext = %d33-90 / %d94-126
-        if (mailbox.getDomain() != null) {
+        if (domain != null) {
             sb.append('@');
-            sb.append(mailbox.getDomain());
+            sb.append(domain);
         }
-        if (mailbox.getName() != null) {
+        if (includeAngleBrackets) {
             sb.append('>');
         }
     }

@@ -22,7 +22,9 @@ package org.apache.james.mime4j.io;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
+import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 import java.io.IOException;
@@ -65,7 +67,9 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             final String boundary,
             final boolean strict) throws IOException {
         super(inbuffer);
-        int bufferSize = 2 * boundary.length();
+        // Same bytes as the writer (and the UTF-8 decoding of the header): not the low byte of each char
+        ByteSequence boundaryBytes = ContentUtil.encode(boundary);
+        int bufferSize = 2 * boundaryBytes.length();
         if (bufferSize < 4096) {
             bufferSize = 4096;
         }
@@ -80,15 +84,18 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         this.completed = false;
 
         this.strict = strict;
-        this.boundary = new byte[boundary.length() + 2];
+        this.boundary = new byte[boundaryBytes.length() + 2];
         this.boundary[0] = (byte) '-';
         this.boundary[1] = (byte) '-';
-        for (int i = 0; i < boundary.length(); i++) {
-            byte ch = (byte) boundary.charAt(i);
-            this.boundary[i + 2] = ch;
+        for (int i = 0; i < boundaryBytes.length(); i++) {
+            this.boundary[i + 2] = boundaryBytes.byteAt(i);
         }
 
         fillBuffer();
+        // Read until we know whether the stream is empty, whatever the size of the reads
+        while (!atBoundary && !eof && !hasData()) {
+            fillBuffer();
+        }
     }
 
     /**
@@ -243,6 +250,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
                 int remaining = buffer.limit() - pos;
                 if (remaining <= 0) {
                     // Make sure the boundary is terminated with EOS
+                    if (!eof) {
+                        // The buffer ends here, not necessarily the stream: read more before deciding
+                        i = -1;
+                    }
                     break;
                 } else {
                     // or with a whitespace or '--'
@@ -282,8 +293,17 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         return initialLength == 0;
     }
 
-    public boolean isFullyConsumed() {
-        return completed && !buffer.hasBufferedData();
+    public boolean isFullyConsumed() throws IOException {
+        if (!completed) {
+            return false;
+        }
+        // Read until we know whether data follows, whatever the size of the reads
+        while (!buffer.hasBufferedData()) {
+            if (!buffer.readAllowed() || buffer.fillBuffer() == -1) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void calculateBoundaryLen() throws IOException {
@@ -334,6 +354,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
 
                 } else {
                     if (eof) {
+                        if (buffer.length() == 1) {
+                            // a last byte ends the delimiter line (LF) or belongs to it
+                            buffer.skip(1);
+                        }
                         break;
                     }
                     fillBuffer();

@@ -203,7 +203,8 @@ public abstract class AbstractHeader implements Header {
 
         for (Iterator<Field> iterator = fields.iterator(); iterator.hasNext();) {
             Field field = iterator.next();
-            if (field.getName().equalsIgnoreCase(name))
+            // Same key as the index: equalsIgnoreCase disagrees with it on some non ASCII names
+            if (field.getNameLowerCase().equals(lowerCaseName))
                 iterator.remove();
         }
 
@@ -237,7 +238,8 @@ public abstract class AbstractHeader implements Header {
         int index = 0;
         for (Iterator<Field> iterator = fields.iterator(); iterator.hasNext(); index++) {
             Field f = iterator.next();
-            if (f.getName().equalsIgnoreCase(field.getName())) {
+            // Same key as the index: equalsIgnoreCase disagrees with it on some non ASCII names
+            if (f.getNameLowerCase().equals(lowerCaseName)) {
                 iterator.remove();
 
                 if (firstOccurrence == -1)
@@ -245,7 +247,11 @@ public abstract class AbstractHeader implements Header {
             }
         }
 
-        fields.add(firstOccurrence, field);
+        if (firstOccurrence == -1) {
+            fields.add(field);
+        } else {
+            fields.add(firstOccurrence, field);
+        }
     }
 
     /**

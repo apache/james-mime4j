@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.AddressListField;
@@ -36,6 +37,7 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.DateTimeField;
 import org.apache.james.mime4j.dom.field.MailboxField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
+import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.address.DefaultAddressParser;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -436,4 +438,74 @@ public class FieldsTest {
         return s;
     }
 
+    @Test
+    public void subjectHoldingAnEncodedWordLookalikeShouldReadBackUnchanged() throws Exception {
+        UnstructuredField field = Fields.subject("=?utf-8?q?x?=");
+
+        Assert.assertEquals("=?utf-8?q?x?=", field.getValue());
+        Assert.assertEquals("=?utf-8?q?x?=", ((UnstructuredField) LenientFieldParser.parse("Subject: " + field.getBody(), DecodeMonitor.SILENT)).getValue());
+    }
+
+    @Test
+    public void displayNameHoldingAnEncodedWordLookalikeShouldReadBackUnchanged() throws Exception {
+        MailboxField field = Fields.sender(new Mailbox("=?=?=?=?=?", "a", "a"));
+
+        Assert.assertEquals("=?=?=?=?=?", field.getMailbox().getName());
+        Assert.assertEquals("=?=?=?=?=?", DefaultAddressParser.DEFAULT.parseMailbox(field.getBody()).getName());
+    }
+
+    @Test
+    public void nonAsciiFilenameShouldReadBackFromTheBuiltField() throws Exception {
+        ContentDispositionField field = Fields.contentDisposition("attachment", "日本 😀");
+
+        Assert.assertNull(field.getParseException());
+        Assert.assertEquals("日本 😀", field.getFilename());
+    }
+
+    @Test
+    public void nonAsciiContentTypeParameterShouldReadBackFromTheBuiltField() throws Exception {
+        ContentTypeField field = Fields.contentType("application/pdf", Collections.singletonMap("name", "日本"));
+
+        Assert.assertNull(field.getParseException());
+        Assert.assertEquals("日本", field.getParameter("name"));
+    }
+
+    @Test
+    public void allDigitTokensShouldParse() throws Exception {
+        ContentTypeField parameter = (ContentTypeField) DefaultFieldParser.parse("Content-Type: application/x-foo; v1=2; 9=x");
+        Assert.assertNull(parameter.getParseException());
+        Assert.assertEquals("x", parameter.getParameter("9"));
+
+        ContentTypeField digits = Fields.contentType("6/s");
+        Assert.assertNull(digits.getParseException());
+        Assert.assertEquals("6/s", digits.getMimeType());
+
+        ContentTypeField subtype = (ContentTypeField) DefaultFieldParser.parse("Content-Type: L/2; a=\"\"");
+        Assert.assertNull(subtype.getParseException());
+        Assert.assertEquals("l/2", subtype.getMimeType());
+
+        ContentDispositionField disposition = Fields.contentDisposition("2");
+        Assert.assertNull(disposition.getParseException());
+        Assert.assertEquals("2", disposition.getDispositionType());
+
+        ContentDispositionField dispositionParameter = (ContentDispositionField) DefaultFieldParser.parse("Content-Disposition: nN; 9=\"x\"; a=\"\"");
+        Assert.assertNull(dispositionParameter.getParseException());
+        Assert.assertEquals("x", dispositionParameter.getParameter("9"));
+    }
+
+    @Test
+    public void invalidParameterNamesShouldBeRejected() {
+        try {
+            Fields.contentDisposition("attachment", Collections.singletonMap("*", ""));
+            Assert.fail("Expecting IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        try {
+            Fields.contentType("text/plain", Collections.singletonMap("a; charset", "x"));
+            Assert.fail("Expecting IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+    }
 }

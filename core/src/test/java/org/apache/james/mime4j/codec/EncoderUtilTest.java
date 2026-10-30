@@ -39,8 +39,8 @@ public class EncoderUtilTest {
     public void testEncodeAddressDisplayName() throws Exception {
         Assert.assertEquals("\"\"", EncoderUtil.encodeAddressDisplayName(""));
         Assert.assertEquals("test", EncoderUtil.encodeAddressDisplayName("test"));
-        Assert.assertEquals(" test ", EncoderUtil.encodeAddressDisplayName(" test "));
-        Assert.assertEquals(" test\ttest ", EncoderUtil
+        Assert.assertEquals("\" test \"", EncoderUtil.encodeAddressDisplayName(" test "));
+        Assert.assertEquals("\" test\ttest \"", EncoderUtil
                 .encodeAddressDisplayName(" test\ttest "));
         Assert.assertEquals("\"test()\"", EncoderUtil
                 .encodeAddressDisplayName("test()"));
@@ -316,4 +316,79 @@ public class EncoderUtilTest {
         return ContentUtil.toAsciiString(buf);
     }
 
+    @Test
+    public void displayNameWithLineBreaksShouldBeEncoded() {
+        for (String displayName : new String[] {"y\n", "y\r", "a\r\n b"}) {
+            String encoded = EncoderUtil.encodeAddressDisplayName(displayName);
+
+            Assert.assertEquals(encoded, -1, encoded.indexOf('\n'));
+            Assert.assertEquals(encoded, -1, encoded.indexOf('\r'));
+            Assert.assertEquals(displayName, DecoderUtil.decodeEncodedWords(encoded, DecodeMonitor.SILENT));
+        }
+    }
+
+    @Test
+    public void textHoldingAnEncodedWordLookalikeShouldBeEncoded() {
+        for (String text : new String[] {"=?utf-8?q?x?=", "a =?utf-8?q?x?= b", "=?=?=?=?=?", "=?utf-8?q?x?=\"\""}) {
+            String displayName = EncoderUtil.encodeAddressDisplayName(text);
+            String unstructured = EncoderUtil.encodeIfNecessary(text, Usage.TEXT_TOKEN, 0);
+
+            Assert.assertEquals(text, DecoderUtil.decodeEncodedWords(displayName, DecodeMonitor.SILENT));
+            Assert.assertEquals(text, DecoderUtil.decodeEncodedWords(unstructured, DecodeMonitor.SILENT));
+        }
+    }
+
+    @Test
+    public void textWithoutEncodedWordLookalikeShouldNotBeEncoded() {
+        Assert.assertEquals("a = b ? c", EncoderUtil.encodeIfNecessary("a = b ? c", Usage.TEXT_TOKEN, 0));
+        Assert.assertEquals("a?=b", EncoderUtil.encodeAddressDisplayName("a?=b"));
+    }
+
+    @Test
+    public void localPartShouldNotHoldRawLineBreaks() {
+        Assert.assertEquals("\"\\\\\"", EncoderUtil.encodeAddressLocalPart("\\\r"));
+        Assert.assertEquals("\"a b\"", EncoderUtil.encodeAddressLocalPart("a\r\n b"));
+    }
+
+    @Test
+    public void validDomainsShouldBeKept() {
+        Assert.assertEquals("example.com", EncoderUtil.encodeAddressDomain("example.com"));
+        Assert.assertEquals("[192.168.0.(1]", EncoderUtil.encodeAddressDomain("[192.168.0.(1]"));
+        Assert.assertEquals("éxample.com", EncoderUtil.encodeAddressDomain("éxample.com"));
+    }
+
+    @Test
+    public void domainsThatWouldChangeTheHeaderShouldBeNeutralized() {
+        Assert.assertEquals("example.comotherexample.org", EncoderUtil.encodeAddressDomain("example.com, other@example.org"));
+        Assert.assertEquals("", EncoderUtil.encodeAddressDomain(",\u0000"));
+        Assert.assertEquals("ab", EncoderUtil.encodeAddressDomain("a b"));
+        Assert.assertEquals("a", EncoderUtil.encodeAddressDomain("a>"));
+    }
+
+    @Test
+    public void harmlessMalformedDomainsShouldBeKept() {
+        Assert.assertEquals("[", EncoderUtil.encodeAddressDomain("["));
+        Assert.assertEquals("example.com.", EncoderUtil.encodeAddressDomain("example.com."));
+        Assert.assertEquals("a..b", EncoderUtil.encodeAddressDomain("a..b"));
+    }
+
+    @Test
+    public void invalidParameterNamesShouldBeRejected() {
+        for (String name : new String[] {"*", "a*b", "*0", "a**", "a*1*2", "a;b", "a=b", "a b", "", "a\""}) {
+            try {
+                EncoderUtil.encodeHeaderParameter(name, "v");
+                Assert.fail("Expecting IllegalArgumentException for " + name);
+            } catch (IllegalArgumentException e) {
+                // expected
+            }
+        }
+    }
+
+    @Test
+    public void tokenAndRfc2231ParameterNamesShouldBeAccepted() {
+        Assert.assertEquals("filename=v", EncoderUtil.encodeHeaderParameter("FileName", "v"));
+        Assert.assertEquals("filename*=v", EncoderUtil.encodeHeaderParameter("filename*", "v"));
+        Assert.assertEquals("filename*0=v", EncoderUtil.encodeHeaderParameter("filename*0", "v"));
+        Assert.assertEquals("filename*1*=v", EncoderUtil.encodeHeaderParameter("filename*1*", "v"));
+    }
 }

@@ -25,6 +25,7 @@
 options {
 	STATIC=false;
 	LOOKAHEAD=1;
+	UNICODE_INPUT=true;
 	JDK_VERSION = "1.5";
 	OUTPUT_DIRECTORY = "../../../../../../../../../target/generated-sources/javacc";
 	//DEBUG_PARSER=true;
@@ -102,7 +103,7 @@ void parse() :
 	Token dispositionType;
 }
 {
-	dispositionType=<ATOKEN>
+	dispositionType=token()
 	{
 		this.dispositionType = dispositionType.image;
 	}
@@ -115,10 +116,20 @@ void parameter() :
 	String val;
 }
 {
-	attrib=<ATOKEN> "=" val=value()
+	attrib=token() "=" val=value()
 	{
         mapping.addParameter(attrib.image, val);
 	}
+}
+
+// An RFC 2045 token: the lexer reads an all-digit one as <DIGITS>
+Token token() :
+{Token t;}
+{
+(	t=<ATOKEN>
+|   t=<DIGITS>
+)
+	{ return t; }
 }
 
 String value() :
