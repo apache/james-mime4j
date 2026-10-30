@@ -151,7 +151,7 @@ public class AddressFormatter {
         // dtext = %d33-90 / %d94-126
         if (mailbox.getDomain() != null) {
             sb.append('@');
-            sb.append(mailbox.getDomain());
+            sb.append(EncoderUtil.encodeAddressDomain(mailbox.getDomain()));
         }
         if (includeAngleBrackets) {
             sb.append('>');
