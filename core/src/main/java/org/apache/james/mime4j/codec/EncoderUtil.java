@@ -56,6 +56,8 @@ public class EncoderUtil {
 
     private static final BitSet ATEXT_CHARS = initChars("()<>@.,;:\\\"[]");
 
+    private static final Pattern RFC2231_PARAMETER_NAME = Pattern.compile("[^*]+\\*(\\d+\\*?)?");
+
     private static final Pattern QUOTE = Pattern.compile("[\\\\\"]");
 
     /** Characters that end or restructure an address in a header: never written raw in a domain */
@@ -204,8 +206,15 @@ public class EncoderUtil {
      * @param value
      *            parameter value.
      * @return encoded result.
+     * @throws IllegalArgumentException if the name is not a token, or holds a "*" outside of the
+     *             RFC 2231 forms (<code>name*</code>, <code>name*N</code>, <code>name*N*</code>).
      */
     public static String encodeHeaderParameter(String name, String value) {
+        // A name that is not a token (";", "=") would add parameters, a stray "*" would be read
+        // as an RFC 2231 section
+        if (!isToken(name) || (name.indexOf('*') >= 0 && !RFC2231_PARAMETER_NAME.matcher(name).matches())) {
+            throw new IllegalArgumentException("Invalid parameter name: " + name);
+        }
         name = name.toLowerCase(Locale.US);
 
         // value := token / quoted-string

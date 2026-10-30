@@ -371,4 +371,24 @@ public class EncoderUtilTest {
         Assert.assertEquals("example.com.", EncoderUtil.encodeAddressDomain("example.com."));
         Assert.assertEquals("a..b", EncoderUtil.encodeAddressDomain("a..b"));
     }
+
+    @Test
+    public void invalidParameterNamesShouldBeRejected() {
+        for (String name : new String[] {"*", "a*b", "*0", "a;b", "a=b", "a b", "", "a\""}) {
+            try {
+                EncoderUtil.encodeHeaderParameter(name, "v");
+                Assert.fail("Expecting IllegalArgumentException for " + name);
+            } catch (IllegalArgumentException e) {
+                // expected
+            }
+        }
+    }
+
+    @Test
+    public void tokenAndRfc2231ParameterNamesShouldBeAccepted() {
+        Assert.assertEquals("filename=v", EncoderUtil.encodeHeaderParameter("FileName", "v"));
+        Assert.assertEquals("filename*=v", EncoderUtil.encodeHeaderParameter("filename*", "v"));
+        Assert.assertEquals("filename*0=v", EncoderUtil.encodeHeaderParameter("filename*0", "v"));
+        Assert.assertEquals("filename*1*=v", EncoderUtil.encodeHeaderParameter("filename*1*", "v"));
+    }
 }
