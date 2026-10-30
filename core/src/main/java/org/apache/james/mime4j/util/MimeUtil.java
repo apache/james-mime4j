@@ -271,19 +271,42 @@ public final class MimeUtil {
                 // breaking before it would write an empty line
                 lineStart = wspIdx;
                 lineHasText = false;
-            } else if (nextWspIdx - lineStart > maxCharacters && lineHasText && wspIdx < lastNonWspIdx) {
+            } else if (nextWspIdx - lineStart > maxCharacters && lineHasText && wspIdx < lastNonWspIdx
+                    && !endsWithFold(s, wspIdx)) {
                 sb.append(s, Math.max(0, lastLineBreak), wspIdx);
                 sb.append("\r\n");
                 lastLineBreak = wspIdx;
                 lineStart = wspIdx;
                 lineHasText = false;
             }
-            if (nextWspIdx > wspIdx + 1) {
+            if (holdsText(s, wspIdx + 1, nextWspIdx)) {
                 lineHasText = true;
             }
 
             wspIdx = nextWspIdx;
         }
+    }
+
+    /**
+     * Whether the whitespace run starting at <code>index</code> is followed by a fold already in the value:
+     * breaking there would write a whitespace only line.
+     */
+    private static boolean endsWithFold(String s, int index) {
+        int i = index;
+        while (i < s.length() && isWsp(s.charAt(i))) {
+            i++;
+        }
+        return i < s.length() && s.charAt(i) == '\r';
+    }
+
+    private static boolean holdsText(String s, int from, int to) {
+        for (int i = from; i < to; i++) {
+            char c = s.charAt(i);
+            if (c != '\r' && c != '\n') {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
