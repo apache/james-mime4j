@@ -149,6 +149,42 @@ public class EncoderUtil {
     }
 
     /**
+     * Checks the domain of an address specification as described in RFC 5322 section 3.4.1:
+     * a dot-atom (non ASCII characters allowed, as in internationalized domains) or a domain
+     * literal. Anything else could change the meaning of the header it is written in, e.g. a ","
+     * adding recipients.
+     *
+     * @param domain
+     *            domain to check.
+     * @return the domain, unchanged.
+     * @throws IllegalArgumentException if the domain is neither a dot-atom nor a domain literal.
+     */
+    public static String encodeAddressDomain(String domain) {
+        // domain = dot-atom / domain-literal
+        // domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
+        // dtext = %d33-90 / %d94-126
+        if (isDotAtomText(domain, true) || isDomainLiteral(domain)) {
+            return domain;
+        }
+        throw new IllegalArgumentException("Invalid domain: " + domain);
+    }
+
+    private static boolean isDomainLiteral(String str) {
+        final int length = str.length();
+        if (length < 2 || str.charAt(0) != '[' || str.charAt(length - 1) != ']') {
+            return false;
+        }
+        for (int idx = 1; idx < length - 1; idx++) {
+            char ch = str.charAt(idx);
+            boolean dtext = (ch >= 33 && ch <= 90) || (ch >= 94 && ch <= 126) || ch >= 128;
+            if (!dtext && ch != ' ' && ch != '\t') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Encodes the specified strings into a header parameter as described in RFC
      * 2045 section 5.1 and RFC 2183 section 2. The specified strings should not
      * contain any illegal (control or non-ASCII) characters.
@@ -502,6 +538,10 @@ public class EncoderUtil {
 
     // RFC 5322 section 3.2.3
     private static boolean isDotAtomText(String str) {
+        return isDotAtomText(str, false);
+    }
+
+    private static boolean isDotAtomText(String str, boolean allowNonAscii) {
         // dot-atom-text = 1*atext *("." 1*atext)
         // atext = ALPHA / DIGIT / "!" / "#" / "$" / "%" / "&" / "'" / "*" /
         // "+" / "-" / "/" / "=" / "?" / "^" / "_" / "`" / "{" / "|" / "}" / "~"
@@ -519,7 +559,7 @@ public class EncoderUtil {
                 if (prev == '.' || idx == length - 1)
                     return false;
             } else {
-                if (!ATEXT_CHARS.get(ch))
+                if (!ATEXT_CHARS.get(ch) && !(allowNonAscii && ch >= 128))
                     return false;
             }
 

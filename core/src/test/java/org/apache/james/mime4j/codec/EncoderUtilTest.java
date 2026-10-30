@@ -349,4 +349,23 @@ public class EncoderUtilTest {
         Assert.assertEquals("\"\\\\\"", EncoderUtil.encodeAddressLocalPart("\\\r"));
         Assert.assertEquals("\"a b\"", EncoderUtil.encodeAddressLocalPart("a\r\n b"));
     }
+
+    @Test
+    public void validDomainsShouldBeKept() {
+        Assert.assertEquals("example.com", EncoderUtil.encodeAddressDomain("example.com"));
+        Assert.assertEquals("[192.168.0.(1]", EncoderUtil.encodeAddressDomain("[192.168.0.(1]"));
+        Assert.assertEquals("éxample.com", EncoderUtil.encodeAddressDomain("éxample.com"));
+    }
+
+    @Test
+    public void domainsThatWouldChangeTheHeaderShouldBeRejected() {
+        for (String domain : new String[] {"example.com, other@example.org", ",\u0000", "a b", "a..b", "[a]b]", "a>"}) {
+            try {
+                EncoderUtil.encodeAddressDomain(domain);
+                Assert.fail("Expecting IllegalArgumentException for " + domain);
+            } catch (IllegalArgumentException e) {
+                // expected
+            }
+        }
+    }
 }

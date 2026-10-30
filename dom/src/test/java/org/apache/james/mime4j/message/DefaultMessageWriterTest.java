@@ -191,4 +191,10 @@ public class DefaultMessageWriterTest {
             .isInstanceOf(MimeIOException.class)
             .hasCauseInstanceOf(MaxNestingDepthLimitException.class);
     }
+
+    @Test
+    public void toShouldRejectADomainAddingRecipients() {
+        assertThatThrownBy(() -> Fields.to(new Mailbox("a", "example.com, other@example.org")))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
 }
