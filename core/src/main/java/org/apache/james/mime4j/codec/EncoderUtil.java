@@ -115,10 +115,7 @@ public class EncoderUtil {
         // atom = [CFWS] 1*atext [CFWS]
         // CFWS = comment or folding white space
 
-        if (displayName.indexOf('\r') >= 0 || displayName.indexOf('\n') >= 0) {
-            throw new IllegalArgumentException("Injection of un-encoded line breaks inside a display name could be assimilated to header injection");
-        }
-
+        // CR and LF (control characters) make hasToBeEncoded true: never written raw
         if (hasToBeEncoded(displayName, 0)) {
             return encodeEncodedWord(displayName, Usage.WORD_ENTITY);
         } else if (isAtomPhrase(displayName)) {
