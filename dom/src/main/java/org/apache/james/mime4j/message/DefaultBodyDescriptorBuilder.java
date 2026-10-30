@@ -146,17 +146,8 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
     }
 
     public BodyDescriptorBuilder newChild() {
-        String actualMimeType;
-        ContentTypeField contentTypeField = (ContentTypeField) fields.get(CONTENT_TYPE);
-        if (contentTypeField != null) {
-            actualMimeType = contentTypeField.getMimeType();
-        } else {
-            if (MimeUtil.isSameMimeType("multipart/digest", parentMimeType)) {
-                actualMimeType = EMAIL_MESSAGE_MIME_TYPE;
-            } else {
-                actualMimeType = DEFAULT_MIME_TYPE;
-            }
-        }
+        // The type build() resolves: a multipart type without boundary is not the type of this entity
+        String actualMimeType = build().getMimeType();
         DefaultBodyDescriptorBuilder child = new DefaultBodyDescriptorBuilder(actualMimeType, fieldParser, monitor);
         child.setDefaultCharset(defaultCharset);
         return child;
