@@ -637,4 +637,14 @@ public class LenientAddressBuilderTest {
         }
         Assert.assertEquals("John Doe <a@example.com>", AddressFormatter.DEFAULT.encode(new Mailbox("John Doe", "a", "example.com")));
     }
+
+    @Test
+    public void aDomainNeutralizedToNothingShouldNotLeaveAnAt() {
+        Mailbox parsed = (Mailbox) parser.parseAddress("@\"");
+        String encoded = AddressFormatter.DEFAULT.encode(parsed);
+
+        Assert.assertEquals("<>", encoded);
+        Assert.assertEquals("a", AddressFormatter.DEFAULT.encode(new Mailbox("a", ",;")));
+        Assert.assertEquals("John <a>", AddressFormatter.DEFAULT.encode(new Mailbox("John", "a", "<>")));
+    }
 }
