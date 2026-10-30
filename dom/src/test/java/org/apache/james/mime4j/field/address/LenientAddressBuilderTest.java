@@ -33,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LenientAddressBuilderTest {
@@ -623,5 +624,17 @@ public class LenientAddressBuilderTest {
 
         Assert.assertEquals(-1, encoded.indexOf('\r'));
         Assert.assertEquals(parsed.getLocalPart().replace("\r", ""), again.getLocalPart());
+    }
+
+    @Test
+    public void displayNameWhitespaceShouldReadBackFromTheFormatter() {
+        for (String name : new String[] {"J  J", " a", "D ", "N\tD", "\tDo   ", "John Doe"}) {
+            String encoded = AddressFormatter.DEFAULT.encode(new Mailbox(name, "a", "example.com"));
+
+            Assert.assertEquals(encoded, name, parser.parseMailbox(encoded).getName());
+            String group = AddressFormatter.DEFAULT.encode(new Group(name, new MailboxList(new ArrayList<>(), true)));
+            Assert.assertEquals(group, name, ((Group) parser.parseAddressList(group).get(0)).getName());
+        }
+        Assert.assertEquals("John Doe <a@example.com>", AddressFormatter.DEFAULT.encode(new Mailbox("John Doe", "a", "example.com")));
     }
 }
