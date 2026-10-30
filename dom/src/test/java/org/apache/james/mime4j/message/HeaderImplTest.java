@@ -29,7 +29,7 @@ import org.apache.james.mime4j.field.DefaultFieldParser;
 import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.message.HeaderImpl;
 import org.apache.james.mime4j.stream.Field;
-import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
@@ -152,8 +152,8 @@ public class HeaderImplTest {
     @Test
     public void removeFieldsShouldKeepListAndIndexConsistent() throws Exception {
         Header header = new HeaderImpl();
-        header.addField(new RawField("MIME-Version", "1.0"));
-        header.addField(new RawField("MIME-Verſion", "1.0"));
+        header.addField(parsed("MIME-Version", "1.0"));
+        header.addField(parsed("MIME-Verſion", "1.0"));
 
         Assert.assertEquals(1, header.removeFields("MIME-Version"));
 
@@ -165,10 +165,10 @@ public class HeaderImplTest {
     @Test
     public void setFieldShouldKeepListAndIndexConsistent() throws Exception {
         Header header = new HeaderImpl();
-        header.addField(new RawField("Content-tranſfer-encoding", "7bit"));
-        header.addField(new RawField("Content-transfer-encoding", "7bit"));
+        header.addField(parsed("Content-tranſfer-encoding", "7bit"));
+        header.addField(parsed("Content-transfer-encoding", "7bit"));
 
-        header.setField(new RawField("Content-transfer-encoding", "base64"));
+        header.setField(parsed("Content-transfer-encoding", "base64"));
 
         Assert.assertEquals(2, header.getFields().size());
         Assert.assertEquals("7bit", header.getField("Content-tranſfer-encoding").getBody());
@@ -178,11 +178,16 @@ public class HeaderImplTest {
     @Test
     public void setFieldShouldNotThrowWhenLowerCasedNamesCollide() throws Exception {
         Header header = new HeaderImpl();
-        header.addField(new RawField("i̇", "v0"));
-        Field replacement = new RawField("İ", "v1");
+        header.addField(parsed("i̇", "v0"));
+        Field replacement = parsed("İ", "v1");
 
         header.setField(replacement);
 
         Assert.assertEquals(Collections.singletonList(replacement), header.getFields());
+    }
+
+    /** A field read from a message: its name is not checked as one built by the application */
+    private static Field parsed(String name, String body) throws Exception {
+        return RawFieldParser.DEFAULT.parseField(ContentUtil.encode(name + ": " + body));
     }
 }
