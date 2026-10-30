@@ -23,6 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.apache.james.mime4j.Charsets;
+import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
+import org.apache.james.mime4j.stream.MimeConfig;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
@@ -160,5 +163,18 @@ public class DefaultMessageWriterTest {
         Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(out.toByteArray()));
 
         assertThat(parsed.getHeader().getField("X-Sentinel")).isNotNull();
+    }
+
+    @Test
+    public void headlessParsingShouldReportAFailureOfItsFirstStep() {
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        builder.setMimeEntityConfig(MimeConfig.custom()
+            .setMaxNestingDepth(1)
+            .setHeadlessParsing("message/rfc822")
+            .build());
+
+        assertThatThrownBy(() -> builder.parseMessage(new ByteArrayInputStream("From: a@b.c\r\n\r\nbody\r\n".getBytes(StandardCharsets.US_ASCII))))
+            .isInstanceOf(MimeIOException.class)
+            .hasCauseInstanceOf(MaxNestingDepthLimitException.class);
     }
 }
