@@ -223,4 +223,18 @@ public class MultipartBuilderTest {
         Assert.assertEquals("préambule 😀", parsedMultipart.getPreamble());
         Assert.assertEquals("épilogue", parsedMultipart.getEpilogue());
     }
+
+    @Test
+    public void embeddedMessageOfADigestPartWithoutBoundaryShouldDefaultToTextPlain() throws Exception {
+        String message = "Content-Type: multipart/digest; boundary=b\r\n\r\n"
+            + "--b\r\nContent-Type: multipart/digest\r\n\r\n"
+            + "Subject: inner\r\n\r\nhello\r\n--b--\r\n";
+
+        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(message.getBytes(StandardCharsets.US_ASCII)));
+
+        Entity part = ((Multipart) parsed.getBody()).getBodyParts().get(0);
+        Message embedded = (Message) part.getBody();
+        Assert.assertEquals("inner", embedded.getSubject());
+        Assert.assertTrue(embedded.getBody() instanceof TextBody);
+    }
 }
