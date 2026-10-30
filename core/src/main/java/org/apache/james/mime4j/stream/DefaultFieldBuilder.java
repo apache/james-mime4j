@@ -60,6 +60,7 @@ public class DefaultFieldBuilder implements FieldBuilder {
 
     private final RecycledByteArrayBuffer buf;
     private final int maxlen;
+    private int measuredLength;
 
     public DefaultFieldBuilder(int maxlen) {
         this.buf = new RecycledByteArrayBuffer(getBufferRecycler(), 4096);
@@ -68,6 +69,7 @@ public class DefaultFieldBuilder implements FieldBuilder {
 
     public void reset() {
         this.buf.clear();
+        this.measuredLength = 0;
     }
 
     public void append(final ByteArrayBuffer line) throws MaxHeaderLengthLimitException {
@@ -75,9 +77,16 @@ public class DefaultFieldBuilder implements FieldBuilder {
             return;
         }
         int len = line.length();
-        if (this.maxlen > 0 && this.buf.length() + len >= this.maxlen) {
+        // Count each line as if it ended with a single LF: a field accepted with LF line ends
+        // is also accepted once written with CRLF
+        int measured = len;
+        if (len > 1 && line.byteAt(len - 1) == '\n' && line.byteAt(len - 2) == '\r') {
+            measured--;
+        }
+        if (this.maxlen > 0 && this.measuredLength + measured >= this.maxlen) {
             throw new MaxHeaderLengthLimitException("Maximum header length limit (" + this.maxlen + ") exceeded");
         }
+        this.measuredLength += measured;
         this.buf.append(line.buffer(), 0, line.length());
     }
 

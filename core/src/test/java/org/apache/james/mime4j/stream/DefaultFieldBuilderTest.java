@@ -134,4 +134,23 @@ public class DefaultFieldBuilderTest extends TestCase {
         }
     }
 
+    public void testMaxLengthShouldNotDependOnTheLineTerminators() throws Exception {
+        // "raw: some stuff" + " more" with LF is 22 bytes
+        for (String eol : new String[] {"\n", "\r\n"}) {
+            DefaultFieldBuilder accepting = new DefaultFieldBuilder(23);
+            accepting.reset();
+            accepting.append(line("raw: some stuff" + eol));
+            accepting.append(line(" more" + eol));
+            assertEquals("some stuff more", accepting.build().getBody());
+
+            DefaultFieldBuilder rejecting = new DefaultFieldBuilder(22);
+            rejecting.reset();
+            rejecting.append(line("raw: some stuff" + eol));
+            try {
+                rejecting.append(line(" more" + eol));
+                fail("MimeException should have been thrown with " + eol.length() + " byte line ends");
+            } catch (MimeException expected) {
+            }
+        }
+    }
 }
