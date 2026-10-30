@@ -116,6 +116,11 @@ public class MimeStreamParser {
             handler.startHeader();
             handler.field(contentType);
             handler.endHeader();
+            if (mimeTokenStream.getState() == EntityState.T_END_HEADER) {
+                // the first step of the headless parsing failed: next() reports it,
+                // the end of the header must not be reported twice
+                mimeTokenStream.next();
+            }
         } else {
             mimeTokenStream.parse(instream);
         }
