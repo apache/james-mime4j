@@ -127,6 +127,10 @@ public abstract class AbstractEntity implements Entity {
         ContentTypeField childType = getContentTypeField();
         Entity parent = getParent();
         ContentTypeField parentType = parent != null ? (ContentTypeField) (parent).getHeader().getField(FieldName.CONTENT_TYPE_LOWERCASE) : null;
+        if (parentType != null && parentType.isMultipart() && parentType.getBoundary() == null) {
+            // a multipart type without boundary is not the type of the parent: it gives no default
+            parentType = null;
+        }
         return calcMimeType(childType, parentType);
     }
 

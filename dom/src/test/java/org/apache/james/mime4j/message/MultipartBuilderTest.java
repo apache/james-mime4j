@@ -236,5 +236,7 @@ public class MultipartBuilderTest {
         Message embedded = (Message) part.getBody();
         Assert.assertEquals("inner", embedded.getSubject());
         Assert.assertTrue(embedded.getBody() instanceof TextBody);
+        Assert.assertEquals("message/rfc822", part.getMimeType());
+        Assert.assertEquals("text/plain", embedded.getMimeType());
     }
 }
