@@ -520,20 +520,26 @@ public class EncoderUtil {
 
     private static boolean isAtomPhrase(String str) {
         // atom = [CFWS] 1*atext [CFWS]
+        // Readers drop leading and trailing whitespace and collapse runs into one SP:
+        // only words separated by a single SP read back unchanged
 
         boolean containsAText = false;
+        boolean previousIsSpace = true;
 
         final int length = str.length();
         for (int idx = 0; idx < length; idx++) {
             char ch = str.charAt(idx);
             if (ATEXT_CHARS.get(ch)) {
                 containsAText = true;
-            } else if (!CharsetUtil.isWhitespace(ch)) {
+                previousIsSpace = false;
+            } else if (ch == ' ' && !previousIsSpace) {
+                previousIsSpace = true;
+            } else {
                 return false;
             }
         }
 
-        return containsAText;
+        return containsAText && !previousIsSpace;
     }
 
     // RFC 5322 section 3.2.3

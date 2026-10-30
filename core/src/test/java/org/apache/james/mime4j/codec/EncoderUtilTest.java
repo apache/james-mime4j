@@ -39,8 +39,8 @@ public class EncoderUtilTest {
     public void testEncodeAddressDisplayName() throws Exception {
         Assert.assertEquals("\"\"", EncoderUtil.encodeAddressDisplayName(""));
         Assert.assertEquals("test", EncoderUtil.encodeAddressDisplayName("test"));
-        Assert.assertEquals(" test ", EncoderUtil.encodeAddressDisplayName(" test "));
-        Assert.assertEquals(" test\ttest ", EncoderUtil
+        Assert.assertEquals("\" test \"", EncoderUtil.encodeAddressDisplayName(" test "));
+        Assert.assertEquals("\" test\ttest \"", EncoderUtil
                 .encodeAddressDisplayName(" test\ttest "));
         Assert.assertEquals("\"test()\"", EncoderUtil
                 .encodeAddressDisplayName("test()"));
