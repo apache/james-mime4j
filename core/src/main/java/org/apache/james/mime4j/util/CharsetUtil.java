@@ -152,6 +152,26 @@ public class CharsetUtil {
     }
 
     /**
+     * Removes the leading and trailing whitespace characters (CR, LF, SP or HT). Unlike
+     * {@link String#trim()}, other control characters are kept.
+     *
+     * @param s
+     *            string to trim.
+     * @return the trimmed string.
+     */
+    public static String trimWhitespace(final String s) {
+        int start = 0;
+        int end = s.length();
+        while (start < end && isWhitespace(s.charAt(start))) {
+            start++;
+        }
+        while (end > start && isWhitespace(s.charAt(end - 1))) {
+            end--;
+        }
+        return s.substring(start, end);
+    }
+
+    /**
      * <p>
      * Returns a {@link Charset} instance if character set with the given name
      * is recognized and supported by Java runtime. Returns <code>null</code>
