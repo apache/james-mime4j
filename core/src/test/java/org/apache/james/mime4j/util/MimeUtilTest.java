@@ -174,4 +174,23 @@ public class MimeUtilTest {
     public void formatDateShouldRejectNegativeYears() {
         MimeUtil.formatDate(Date.from(Instant.parse("-4964-01-01T00:00:00Z")), TimeZone.getTimeZone("GMT"));
     }
+
+    private static void assertNoWhitespaceOnlyLineIn(String folded) {
+        for (String line : folded.split("\r\n", -1)) {
+            Assert.assertFalse("whitespace-only line in " + folded, !line.isEmpty() && line.trim().isEmpty());
+        }
+    }
+
+    @Test
+    public void foldShouldNotBreakRightBeforeAFoldAlreadyInTheValue() {
+        String value = "X-" + repeat("a", 90) + ": \r\n\tvalue";
+        String folded = MimeUtil.fold(value, 0);
+        assertNoWhitespaceOnlyLineIn(folded);
+        Assert.assertEquals(MimeUtil.unfold(value), MimeUtil.unfold(folded));
+
+        String word = repeat("a", 80) + " \r\n\tb";
+        String foldedWord = MimeUtil.fold(word, 10);
+        assertNoWhitespaceOnlyLineIn(foldedWord);
+        Assert.assertEquals(MimeUtil.unfold(word), MimeUtil.unfold(foldedWord));
+    }
 }
