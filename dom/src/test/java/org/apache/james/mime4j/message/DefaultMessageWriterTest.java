@@ -33,6 +33,7 @@ import java.util.Collections;
 
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
+import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.AddressListField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
@@ -208,6 +209,25 @@ public class DefaultMessageWriterTest {
             AddressListField field = Fields.to(parsed);
 
             assertThat(LenientAddressParser.DEFAULT.parseMailbox(field.getBody()).getDomain()).isEqualTo(parsed.getDomain());
+        }
+    }
+
+    @Test
+    public void partsOfAnEncodedMultipartShouldSurviveARoundTrip() throws Exception {
+        for (String encoding : new String[] {"base64", "quoted-printable"}) {
+            byte[] input = ("Content-Type: multipart/mixed; boundary=b\r\n"
+                + "Content-Transfer-Encoding: " + encoding + "\r\n"
+                + "\r\n"
+                + "--b\r\n"
+                + "\r\n"
+                + "hello\r\n"
+                + "--b--\r\n").getBytes(StandardCharsets.US_ASCII);
+
+            byte[] once = parseAndWrite(input);
+            Message reparsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(once));
+
+            assertThat(((Multipart) reparsed.getBody()).getCount()).as(encoding).isEqualTo(1);
+            assertThat(new String(parseAndWrite(once), StandardCharsets.US_ASCII)).isEqualTo(new String(once, StandardCharsets.US_ASCII));
         }
     }
 }
