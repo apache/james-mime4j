@@ -108,8 +108,10 @@ public class DefaultMessageWriter implements MessageWriter {
             throw new IllegalArgumentException("Missing body");
 
         boolean binaryBody = body instanceof BinaryBody;
-        OutputStream encOut = encodeStream(out, entity
-                .getContentTransferEncoding(), binaryBody);
+        // A multipart is never encoded (RFC 2045 section 6.4) and the parser does not decode one
+        OutputStream encOut = body instanceof Multipart
+            ? out
+            : encodeStream(out, entity.getContentTransferEncoding(), binaryBody);
 
         writeBody(body, encOut);
 
