@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -33,6 +34,7 @@ import org.apache.james.mime4j.dom.address.Group;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.stream.ParserCursor;
 import org.apache.james.mime4j.stream.RawFieldParser;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -116,12 +118,15 @@ public class LenientAddressParser implements AddressParser {
         for (int i = from + 1; i < to; i++) {
             char current = (char) (buf.byteAt(i) & 0xff);
             if (current == ']') {
+                ByteArrayBuffer literal = new ByteArrayBuffer(i + 1 - from);
                 for (int j = from; j <= i; j++) {
-                    char c = (char) (buf.byteAt(j) & 0xff);
-                    if (c != '\r' && c != '\n') {
-                        dst.append(c);
+                    byte b = buf.byteAt(j);
+                    if (b != '\r' && b != '\n') {
+                        literal.append(b);
                     }
                 }
+                // UTF-8, as the other parts of the header
+                dst.append(ContentUtil.decode(StandardCharsets.UTF_8, literal));
                 cursor.updatePos(i + 1);
                 return true;
             }

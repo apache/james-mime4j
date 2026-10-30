@@ -603,4 +603,15 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals("other@example.com", lenient.flatten().get(1).getAddress());
         Assert.assertEquals("[1.2.3.4]", parser.parseMailbox("John <john@[1.2.3.4]>").getDomain());
     }
+
+    @Test
+    public void nonAsciiDomainLiteralShouldBeDecodedAsUtf8() throws Exception {
+        String value = "a@[é], b@example.com";
+        ByteSequence raw = ContentUtil.encode(value);
+
+        AddressList list = parser.parseAddressList(raw, new ParserCursor(0, raw.length()));
+
+        Assert.assertEquals("[é]", ((Mailbox) list.get(0)).getDomain());
+        Assert.assertEquals("b@example.com", ((Mailbox) list.get(1)).getAddress());
+    }
 }
