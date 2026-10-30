@@ -543,4 +543,19 @@ public class RawFieldParserTest {
         Assert.assertEquals(1, body.getParams().size());
         Assert.assertEquals("a\\\r\"; size=1.txt", body.getParams().get(0).getValue());
     }
+
+    @Test
+    public void fieldNameShouldNotHoldComments() throws Exception {
+        RawField renamed = parser.parseField(ContentUtil.encode("Subj(x)ect: hello"));
+        Assert.assertEquals("Subj(x)ect", renamed.getName());
+        Assert.assertEquals("hello", renamed.getBody());
+
+        RawField opening = parser.parseField(ContentUtil.encode("(!!!: hello"));
+        Assert.assertEquals("(!!!", opening.getName());
+        Assert.assertEquals("hello", opening.getBody());
+
+        RawField obsolete = parser.parseField(ContentUtil.encode("Subject \t: hello"));
+        Assert.assertEquals("Subject", obsolete.getName());
+        Assert.assertEquals("hello", obsolete.getBody());
+    }
 }

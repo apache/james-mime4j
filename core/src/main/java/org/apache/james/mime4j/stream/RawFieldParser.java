@@ -72,13 +72,28 @@ public class RawFieldParser {
         if (raw == null) {
             return null;
         }
-        ParserCursor cursor = new ParserCursor(0, raw.length());
-        String name = parseToken(raw, cursor, COLON);
-        if (cursor.atEnd()) {
+        // The name is the exact text before the first colon: no comment nor whitespace handling,
+        // otherwise "Subj(x)ect" would be read as "Subject"
+        int length = raw.length();
+        int colon = 0;
+        while (colon < length && raw.byteAt(colon) != ':') {
+            colon++;
+        }
+        if (colon == length) {
             throw new MimeException("Invalid MIME field: no name/value separator found: " +
                     raw.toString());
         }
-        return new RawField(raw, cursor.getPos(), name, null);
+        // obs-optional: whitespace allowed between the name and the colon
+        int nameEnd = colon;
+        while (nameEnd > 0 && (raw.byteAt(nameEnd - 1) == ' ' || raw.byteAt(nameEnd - 1) == '\t')) {
+            nameEnd--;
+        }
+        int nameStart = 0;
+        while (nameStart < nameEnd && (raw.byteAt(nameStart) == ' ' || raw.byteAt(nameStart) == '\t')) {
+            nameStart++;
+        }
+        String name = ContentUtil.decode(raw, nameStart, nameEnd - nameStart, StandardCharsets.UTF_8);
+        return new RawField(raw, colon, name, null);
     }
 
     /**
