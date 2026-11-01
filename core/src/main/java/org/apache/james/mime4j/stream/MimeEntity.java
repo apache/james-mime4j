@@ -457,7 +457,7 @@ class MimeEntity implements EntityStateMachine {
 
     private InputStream getLimitedContentStream() {
         long maxContentLimit = config.getMaxContentLen();
-        if (maxContentLimit >= 0) {
+        if (maxContentLimit > 0) {
             return new LimitedInputStream(dataStream, maxContentLimit);
         } else {
             return dataStream;

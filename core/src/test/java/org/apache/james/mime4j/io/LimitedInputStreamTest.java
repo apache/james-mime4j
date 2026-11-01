@@ -55,4 +55,34 @@ public class LimitedInputStreamTest {
         limitedStream.close();
     }
 
+    @Test
+    public void streamEndingExactlyAtTheLimitShouldBeReadInFull() throws IOException {
+        byte[] data = new byte[]{'0', '1', '2'};
+        LimitedInputStream limitedStream = new LimitedInputStream(InputStreams.create(data), 3);
+        byte[] tmp = new byte[8];
+        Assert.assertEquals(3, limitedStream.read(tmp));
+        Assert.assertEquals(-1, limitedStream.read(tmp));
+        Assert.assertEquals(-1, limitedStream.read());
+        Assert.assertEquals(0, limitedStream.skip(1));
+    }
+
+    @Test
+    public void emptyStreamShouldNotExceedAZeroLimit() throws IOException {
+        LimitedInputStream limitedStream = new LimitedInputStream(InputStreams.create(new byte[0]), 0);
+        Assert.assertEquals(-1, limitedStream.read());
+    }
+
+    @Test
+    public void oneByteOverTheLimitShouldBeRejected() throws IOException {
+        byte[] data = new byte[]{'0', '1', '2', '3'};
+        LimitedInputStream limitedStream = new LimitedInputStream(InputStreams.create(data), 3);
+        byte[] tmp = new byte[8];
+        Assert.assertEquals(3, limitedStream.read(tmp));
+        try {
+            limitedStream.read(tmp);
+            Assert.fail("IOException should have been thrown");
+        } catch (IOException ex) {
+        }
+    }
+
 }

@@ -36,7 +36,7 @@ public final class MimeConfig {
      *     <li>{@code james.mime4j.permissive.max.header.length} (default 64 KB)</li>
      *     <li>{@code james.mime4j.permissive.max.line.length} (default -1, unbounded)</li>
      * </ul>
-     * A negative value disables the corresponding check.
+     * A non positive value disables the corresponding check.
      */
     public static final MimeConfig PERMISSIVE = MimeConfig.custom()
         .setMaxContentLen(Long.getLong("james.mime4j.permissive.max.content.length", 100 * 1024 * 1024))
@@ -386,6 +386,8 @@ public final class MimeConfig {
          * terminated with a {@link MimeException} if a content body exceeds the
          * maximum length limit. If this parameter is set to a non positive value
          * the content length check will be disabled.
+         * <p>
+         * A content body of exactly <code>maxContentLen</code> bytes is accepted.
          * <p>
          * Default value: <code>-1</code>
          *

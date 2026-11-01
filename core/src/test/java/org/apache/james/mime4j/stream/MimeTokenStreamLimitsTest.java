@@ -26,6 +26,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Test;
 
 public class MimeTokenStreamLimitsTest {
@@ -102,6 +103,53 @@ public class MimeTokenStreamLimitsTest {
             stream.next();
             fail("MimeException expected");
         } catch (MimeException expected) {
+        }
+    }
+
+    private static MimeTokenStream atBody(String msg, MimeConfig config) throws Exception {
+        MimeTokenStream stream = parse(msg, config);
+        while (stream.getState() != EntityState.T_BODY) {
+            stream.next();
+        }
+        return stream;
+    }
+
+    @Test
+    public void zeroMaxContentLenShouldDisableTheCheck() throws Exception {
+        String msg = "Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "preamble\r\n--b\r\n\r\npart\r\n--b--\r\nepilogue\r\n";
+        MimeTokenStream stream = parse(msg, MimeConfig.custom().setMaxContentLen(0).build());
+        int bodies = 0;
+        for (EntityState state = stream.getState(); state != EntityState.T_END_OF_STREAM; state = stream.next()) {
+            if (state == EntityState.T_BODY) {
+                assertEquals("part", new String(ContentUtil.buffer(stream.getInputStream()), StandardCharsets.US_ASCII));
+                bodies++;
+            }
+        }
+        assertEquals(1, bodies);
+    }
+
+    @Test
+    public void emptyBodyShouldNotExceedAZeroLimit() throws Exception {
+        MimeTokenStream stream = atBody("", MimeConfig.custom().setMaxContentLen(0).build());
+        assertEquals(-1, stream.getInputStream().read());
+    }
+
+    @Test
+    public void bodyOfExactlyMaxContentLenBytesShouldBeAccepted() throws Exception {
+        MimeTokenStream stream = atBody("Subject: a\r\n\r\nhello", MimeConfig.custom().setMaxContentLen(5).build());
+        assertEquals("hello", new String(ContentUtil.buffer(stream.getInputStream()), StandardCharsets.US_ASCII));
+        assertEquals(EntityState.T_END_MESSAGE, stream.next());
+    }
+
+    @Test
+    public void partsOfExactlyMaxContentLenBytesShouldBeSkippedByNext() throws Exception {
+        String msg = "Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "01234\r\n--b\r\n\r\nabcde\r\n--b--\r\n";
+        MimeTokenStream stream = parse(msg, MimeConfig.custom().setMaxContentLen(5).build());
+        EntityState state = stream.getState();
+        while (state != EntityState.T_END_OF_STREAM) {
+            state = stream.next();
         }
     }
 }

@@ -34,28 +34,45 @@ public class LimitedInputStream extends PositionInputStream {
         this.limit = limit;
     }
 
-    private void enforceLimit() throws IOException {
-        if (position >= limit) {
-            throw new IOException("Input stream limit exceeded. Limit was " + limit + " and position " + position);
+    /**
+     * Once the limit is reached, a stream that ends there is fine: whether the limit is exceeded
+     * is only known by reading one more byte.
+     *
+     * @return <code>true</code> when the limit is reached and the underlying stream is at its end.
+     * @throws IOException when the underlying stream holds more bytes than the limit.
+     */
+    private boolean endsAtLimit() throws IOException {
+        if (position < limit) {
+            return false;
         }
+        if (super.read() == -1) {
+            return true;
+        }
+        throw new IOException("Input stream limit exceeded. Limit was " + limit + " and position " + position);
     }
 
     @Override
     public int read() throws IOException {
-        enforceLimit();
+        if (endsAtLimit()) {
+            return -1;
+        }
         return super.read();
     }
 
     @Override
     public int read(byte b[], int off, int len) throws IOException {
-        enforceLimit();
+        if (endsAtLimit()) {
+            return -1;
+        }
         len = Math.min(len, getBytesLeft());
         return super.read(b, off, len);
     }
 
     @Override
     public long skip(long n) throws IOException {
-        enforceLimit();
+        if (endsAtLimit()) {
+            return 0;
+        }
         n = Math.min(n, getBytesLeft());
         return super.skip(n);
     }
