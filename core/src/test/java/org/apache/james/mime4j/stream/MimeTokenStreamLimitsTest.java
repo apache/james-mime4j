@@ -31,6 +31,7 @@ import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.io.MaxContentLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
+import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Test;
 
@@ -271,6 +272,52 @@ public class MimeTokenStreamLimitsTest {
             stream.next();
             fail("MaxHeaderLengthLimitException expected");
         } catch (MaxHeaderLengthLimitException expected) {
+        }
+    }
+
+    private static String headerOf(int fieldCount, String eol) {
+        StringBuilder msg = new StringBuilder();
+        for (int i = 0; i < fieldCount; i++) {
+            msg.append("X-Field-").append(i).append(": v").append(eol);
+        }
+        return msg.append(eol).append("body").append(eol).toString();
+    }
+
+    private static int countFields(MimeTokenStream stream) throws Exception {
+        int fields = 0;
+        for (EntityState state = stream.getState(); state != EntityState.T_END_OF_STREAM; state = stream.next()) {
+            if (state == EntityState.T_FIELD) {
+                fields++;
+            }
+        }
+        return fields;
+    }
+
+    @Test
+    public void headerOfExactlyMaxHeaderCountFieldsShouldBeAccepted() throws Exception {
+        for (String eol : new String[] {"\n", "\r\n"}) {
+            for (int max = 1; max <= 3; max++) {
+                MimeTokenStream stream = parse(headerOf(max, eol), MimeConfig.custom().setMaxHeaderCount(max).build());
+                assertEquals(max, countFields(stream));
+            }
+        }
+    }
+
+    @Test
+    public void headerOfExactlyMaxHeaderCountFieldsWithoutBodyShouldBeAccepted() throws Exception {
+        MimeTokenStream stream = parse("A: 1\r\nB: 2\r\n", MimeConfig.custom().setMaxHeaderCount(2).build());
+        assertEquals(2, countFields(stream));
+    }
+
+    @Test
+    public void headerOfOneFieldMoreThanMaxHeaderCountShouldBeRejected() throws Exception {
+        for (int max = 1; max <= 3; max++) {
+            MimeTokenStream stream = parse(headerOf(max + 1, "\r\n"), MimeConfig.custom().setMaxHeaderCount(max).build());
+            try {
+                countFields(stream);
+                fail("MaxHeaderLimitException expected for " + (max + 1) + " fields, limit " + max);
+            } catch (MaxHeaderLimitException expected) {
+            }
         }
     }
 }
