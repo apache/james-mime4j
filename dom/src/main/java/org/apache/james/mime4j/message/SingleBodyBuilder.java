@@ -32,6 +32,7 @@ import org.apache.james.mime4j.dom.BinaryBody;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.io.InputStreams;
+import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
@@ -104,6 +105,10 @@ public class SingleBodyBuilder {
 
     public TextBody buildText() throws IOException {
         Charset cs = this.charset != null ? this.charset : Charsets.DEFAULT_CHARSET;
+        if (this.text != null) {
+            // The text gets encoded: the label has to name a charset that encodes
+            cs = CharsetUtil.forEncoding(cs);
+        }
         if (this.bodyFactory != null) {
             if (this.text != null) {
                 return this.bodyFactory.textBody(InputStreams.create(this.text, cs), cs.name());

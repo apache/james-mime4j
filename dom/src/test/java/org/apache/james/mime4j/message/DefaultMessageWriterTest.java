@@ -28,12 +28,14 @@ import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
 import org.apache.james.mime4j.stream.MimeConfig;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.AddressListField;
 import org.apache.james.mime4j.dom.field.MailboxListField;
@@ -229,5 +231,76 @@ public class DefaultMessageWriterTest {
             assertThat(((Multipart) reparsed.getBody()).getCount()).as(encoding).isEqualTo(1);
             assertThat(new String(parseAndWrite(once), StandardCharsets.US_ASCII)).isEqualTo(new String(once, StandardCharsets.US_ASCII));
         }
+    }
+
+    private static Charset receivedDecodeOnlyCharset(String name) throws Exception {
+        String mail = "Subject: Hi\r\n"
+            + "Content-Type: text/plain; charset=" + name + "\r\n"
+            + "\r\n"
+            + "ok\r\n";
+        Message message = new DefaultMessageBuilder()
+            .parseMessage(new ByteArrayInputStream(mail.getBytes(StandardCharsets.US_ASCII)));
+        Charset received = ((TextBody) message.getBody()).getCharset();
+        assertThat(received.canEncode()).isFalse();
+        return received;
+    }
+
+    @Test
+    public void textBodyBuiltWithADecodeOnlyCharsetShouldBeWrittenInUtf8() throws Exception {
+        for (String name : new String[] {"ISO-2022-CN", "x-JISAutoDetect"}) {
+            Charset received = receivedDecodeOnlyCharset(name);
+
+            TextBody rebuilt = SingleBodyBuilder.create().setText("ok -- footer é").setCharset(received).buildText();
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            rebuilt.writeTo(out);
+
+            assertThat(rebuilt.getMimeCharset()).isEqualTo("UTF-8");
+            assertThat(new String(out.toByteArray(), StandardCharsets.UTF_8)).isEqualTo("ok -- footer é");
+        }
+    }
+
+    @Test
+    public void textBodyOfTheBasicFactoryWithADecodeOnlyCharsetShouldBeWrittenInUtf8() throws Exception {
+        TextBody body = BasicBodyFactory.INSTANCE.textBody("ok -- footer é", receivedDecodeOnlyCharset("ISO-2022-CN"));
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        body.writeTo(out);
+
+        assertThat(body.getMimeCharset()).isEqualTo("UTF-8");
+        assertThat(new String(out.toByteArray(), StandardCharsets.UTF_8)).isEqualTo("ok -- footer é");
+
+        TextBody byName = BasicBodyFactory.INSTANCE.textBody("ok", "ISO-2022-CN");
+        assertThat(byName.getMimeCharset()).isEqualTo("UTF-8");
+    }
+
+    @Test
+    public void bodyPartWithADecodeOnlyCharsetShouldBeWrittenWithAMatchingLabel() throws Exception {
+        Charset received = receivedDecodeOnlyCharset("ISO-2022-CN");
+        Multipart mp = MultipartBuilder.create("mixed")
+            .addBodyPart(BodyPartBuilder.create().setBody("ok -- footer é", "plain", received))
+            .build();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(Message.Builder.of().setBody(mp).build(), out);
+
+        String written = new String(out.toByteArray(), StandardCharsets.UTF_8);
+        assertThat(written).contains("Content-Type: text/plain; charset=UTF-8\r\n");
+        assertThat(written).contains("ok -- footer é");
+    }
+
+    @Test
+    public void messageAndTextPartBuiltWithADecodeOnlyCharsetShouldBeWrittenWithAMatchingLabel() throws Exception {
+        Charset received = receivedDecodeOnlyCharset("x-JISAutoDetect");
+        Multipart mp = MultipartBuilder.create("mixed")
+            .addTextPart("part é", received)
+            .build();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(Message.Builder.of().setBody(mp).build(), out);
+        assertThat(new String(out.toByteArray(), StandardCharsets.US_ASCII))
+            .contains("Content-Type: text/plain; charset=UTF-8\r\n");
+
+        out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(Message.Builder.of().setBody("body é", received).build(), out);
+        String written = new String(out.toByteArray(), StandardCharsets.UTF_8);
+        assertThat(written).contains("Content-Type: text/plain; charset=UTF-8\r\n");
+        assertThat(written).endsWith("body é");
     }
 }

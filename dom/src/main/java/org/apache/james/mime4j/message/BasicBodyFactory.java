@@ -36,6 +36,7 @@ import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.util.ByteArrayOutputStreamRecycler;
+import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 
 /**
@@ -155,7 +156,8 @@ public class BasicBodyFactory implements BodyFactory {
         StringBody1(final String content, final Charset charset) {
             super();
             this.content = content;
-            this.charset = charset;
+            // The text gets encoded when written: the label has to name a charset that encodes
+            this.charset = CharsetUtil.forEncoding(charset);
         }
 
         @Override

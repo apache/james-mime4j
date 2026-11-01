@@ -23,6 +23,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.IllegalCharsetNameException;
 import java.nio.charset.UnsupportedCharsetException;
 
+import org.apache.james.mime4j.Charsets;
+
 /**
  * Utility class for working with character sets.
  */
@@ -196,4 +198,21 @@ public class CharsetUtil {
         }
     }
 
- }
+ 
+
+    /**
+     * Returns a charset that text can be encoded to: the given charset when it can encode,
+     * UTF-8 otherwise. Some charsets, like ISO-2022-CN or x-JISAutoDetect, only decode.
+     *
+     * @param charset a charset, may be <code>null</code>.
+     * @return <code>null</code> for <code>null</code>, UTF-8 for a charset that cannot encode,
+     * the given charset otherwise.
+     */
+    public static Charset forEncoding(final Charset charset) {
+        if (charset == null || charset.canEncode()) {
+            return charset;
+        }
+        return Charsets.UTF_8;
+    }
+
+}

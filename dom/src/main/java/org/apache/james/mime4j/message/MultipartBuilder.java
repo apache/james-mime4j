@@ -37,6 +37,7 @@ import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * {@link org.apache.james.mime4j.dom.Multipart} builder.
@@ -230,7 +231,8 @@ public class MultipartBuilder {
     }
 
     public MultipartBuilder addTextPart(String text, Charset charset) throws IOException {
-        Charset cs = charset != null ? charset : Charsets.ISO_8859_1;
+        // The text gets encoded: the label has to name a charset that encodes
+        Charset cs = charset != null ? CharsetUtil.forEncoding(charset) : Charsets.ISO_8859_1;
         TextBody body = bodyFactory != null ? bodyFactory.textBody(
                 InputStreams.create(text, cs), cs.name()) : BasicBodyFactory.INSTANCE.textBody(text, cs);
         BodyPart bodyPart = BodyPartBuilder.create()

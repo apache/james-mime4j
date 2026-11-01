@@ -33,6 +33,7 @@ import org.apache.james.mime4j.internal.AbstractEntityBuilder;
 import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.NameValuePair;
+import org.apache.james.mime4j.util.CharsetUtil;
 
 /**
  * {@link org.apache.james.mime4j.message.BodyPart} builder.
@@ -169,6 +170,8 @@ public class BodyPartBuilder extends AbstractEntityBuilder {
      *            &quot;xml&quot;).
      */
     public BodyPartBuilder setBody(String text, String subtype, Charset charset) throws IOException {
+        // The text gets encoded: the label has to name a charset that encodes
+        charset = CharsetUtil.forEncoding(charset);
         String mimeType = "text/" + (subtype != null ? subtype : "plain");
         if (charset != null) {
             setField(Fields.contentType(mimeType, new NameValuePair("charset", charset.name())));
