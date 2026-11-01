@@ -46,6 +46,16 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     private boolean lastPart;
     private boolean completed;
 
+    /**
+     * Delimiter search state, kept across refills so that no byte is compared twice.
+     * {@code searchPos} is the first buffer position not yet ruled out as a delimiter start.
+     * When {@code searchAtLineStart} is set, it starts a line and its first {@code matched}
+     * bytes already equal the delimiter; otherwise the line it is in has no delimiter.
+     */
+    private int searchPos;
+    private boolean searchAtLineStart;
+    private int matched;
+
     private final BufferedLineReaderInputStream buffer;
 
     /**
@@ -82,6 +92,9 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         this.lastPart = false;
         this.initialLength = -1;
         this.completed = false;
+        this.searchPos = inbuffer.pos();
+        this.searchAtLineStart = true;
+        this.matched = 0;
 
         this.strict = strict;
         this.boundary = new byte[boundaryBytes.length() + 2];
@@ -228,65 +241,110 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         }
         int bytesRead;
         if (!hasData()) {
+            int before = buffer.pos();
             bytesRead = buffer.fillBuffer();
+            // the refill may have compacted the buffer: follow the bytes
+            int shift = buffer.pos() - before;
+            searchPos += shift;
+            if (atBoundary) {
+                limit += shift;
+            }
             if (bytesRead == -1) {
                 eof = true;
             }
         } else {
             bytesRead = 0;
         }
-
-        int i;
-        int off = buffer.pos();
-        for (;;) {
-            i = buffer.indexOf(boundary, off, buffer.limit() - off);
-            if (i == -1) {
-                break;
-            }
-            // Make sure the boundary is either at the very beginning of the buffer
-            // or preceded with LF
-            if (i == buffer.pos() || buffer.byteAt(i - 1) == '\n') {
-                int pos = i + boundary.length;
-                int remaining = buffer.limit() - pos;
-                if (remaining <= 0) {
-                    // Make sure the boundary is terminated with EOS
-                    if (!eof) {
-                        // The buffer ends here, not necessarily the stream: read more before deciding
-                        i = -1;
-                    }
-                    break;
-                } else {
-                    // or with a whitespace or '--'
-                    char ch = (char)(buffer.byteAt(pos));
-                    if (CharsetUtil.isWhitespace(ch)) {
-                        break;
-                    }
-                    if (ch == '-' && remaining > 1 && (char)(buffer.byteAt(pos+1)) == '-') {
-                        break;
-                    }
-                }
-            }
-            off = i + boundary.length;
+        if (atBoundary) {
+            return bytesRead;
         }
+
+        int i = findDelimiter();
         if (i != -1) {
             limit = i;
             atBoundary = true;
             calculateBoundaryLen();
+        } else if (eof) {
+            limit = buffer.limit();
         } else {
-            if (eof) {
-                limit = buffer.limit();
-            } else {
-                int position = buffer.limit() - (boundary.length + 3);    // 2nd position before boundary
-                if (position >= 0 && (char) buffer.byteAt(position) == '\r') {
-                    limit = buffer.limit() - (boundary.length + 3);
-                    // boundary [CR][LF] minus two chars
-                } else {
-                    limit = buffer.limit() - (boundary.length + 2);
-                    // boundary [LF] minus one char
-                }
+            // Hold back what may still turn out to be a delimiter, with the line break before it
+            int end = searchAtLineStart ? searchPos : buffer.limit();
+            if (searchAtLineStart && end > buffer.pos() && buffer.byteAt(end - 1) == '\n') {
+                end--;
             }
+            if (end > buffer.pos() && buffer.byteAt(end - 1) == '\r') {
+                end--;
+            }
+            limit = end;
         }
         return bytesRead;
+    }
+
+    /**
+     * Looks for the delimiter at the line starts of the buffered data, resuming where the
+     * previous call stopped. Each byte is compared a bounded number of times, whatever the
+     * boundary, so the search is linear in the size of the part.
+     *
+     * @return the position of the accepted delimiter, or -1 when the buffered data does not
+     * hold one yet.
+     */
+    private int findDelimiter() {
+        int end = buffer.limit();
+        if (searchPos < buffer.pos() || searchPos > end) {
+            // Bytes consumed or dropped by other means (e.g. the buffer truncated by stop()):
+            // start over from the current position
+            searchPos = buffer.pos();
+            searchAtLineStart = false;
+            matched = 0;
+        }
+        for (;;) {
+            if (searchAtLineStart) {
+                int cur = searchPos + matched;
+                while (matched < boundary.length && cur < end && buffer.byteAt(cur) == (boundary[matched] & 0xff)) {
+                    matched++;
+                    cur++;
+                }
+                if (matched < boundary.length) {
+                    if (cur >= end && !eof) {
+                        // Undecided: wait for more data
+                        return -1;
+                    }
+                } else {
+                    // The delimiter is terminated with EOS, a whitespace or '--'
+                    int remaining = end - cur;
+                    if (remaining <= 0) {
+                        if (eof) {
+                            return searchPos;
+                        }
+                        return -1;
+                    }
+                    int ch = buffer.byteAt(cur);
+                    if (CharsetUtil.isWhitespace((char) ch)) {
+                        return searchPos;
+                    }
+                    if (ch == '-') {
+                        if (remaining > 1) {
+                            if (buffer.byteAt(cur + 1) == '-') {
+                                return searchPos;
+                            }
+                        } else if (!eof) {
+                            return -1;
+                        }
+                    }
+                }
+                // Not a delimiter
+                searchAtLineStart = false;
+                matched = 0;
+            }
+            int lf = buffer.indexOf((byte) '\n', searchPos, end - searchPos);
+            if (lf == -1) {
+                searchPos = end;
+                return -1;
+            }
+            searchPos = lf + 1;
+            searchAtLineStart = true;
+            matched = 0;
+        }
     }
 
     public boolean isEmptyStream() {

@@ -24,8 +24,11 @@ import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 public class MimeBoundaryInputStreamTest {
 
@@ -335,4 +338,118 @@ public class MimeBoundaryInputStreamTest {
         instream.close();
     }
 
+    private static String repeat(char c, int n) {
+        StringBuilder b = new StringBuilder(n);
+        for (int i = 0; i < n; i++) {
+            b.append(c);
+        }
+        return b.toString();
+    }
+
+    private static long drain(MimeBoundaryInputStream part) throws IOException {
+        byte[] tmp = new byte[4096];
+        long n = 0;
+        for (int r = part.read(tmp); r != -1; r = part.read(tmp)) {
+            n += r;
+        }
+        return n;
+    }
+
+    private static String nearMissBody(int dashes, String separator, int size) {
+        // Shorter than the delimiter: never a delimiter, but each dash may start one
+        String nearMiss = repeat('-', dashes) + "+" + separator;
+        StringBuilder body = new StringBuilder(size + nearMiss.length());
+        while (body.length() < size) {
+            body.append(nearMiss);
+        }
+        return body.toString();
+    }
+
+    private static void assertNearMissBodyIsReadInTime(String separator) throws IOException {
+        String boundary = repeat('-', 20000);
+        String body = nearMissBody(18000, separator, 8 * 1024 * 1024);
+        String text = body + "\r\n--" + boundary + "--\r\n";
+
+        BufferedLineReaderInputStream buffer = new BufferedLineReaderInputStream(
+            new ByteArrayInputStream(text.getBytes(StandardCharsets.US_ASCII)), 4096);
+        MimeBoundaryInputStream part = new MimeBoundaryInputStream(buffer, boundary);
+
+        Assert.assertEquals(body.length(), drain(part));
+        Assert.assertTrue(part.isLastPart());
+    }
+
+    @Test(timeout = 5000)
+    public void boundarySearchShouldBeLinearForNearMissDelimitersOnOneLine() throws Exception {
+        assertNearMissBodyIsReadInTime("");
+    }
+
+    @Test(timeout = 5000)
+    public void boundarySearchShouldBeLinearForNearMissDelimiterLines() throws Exception {
+        assertNearMissBodyIsReadInTime("\r\n");
+    }
+
+    @Test(timeout = 5000)
+    public void boundarySearchShouldBeLinearWhenTheSourceReturnsFewBytesAtATime() throws Exception {
+        String boundary = repeat('-', 5000);
+        String body = nearMissBody(4999, "\n", 1024 * 1024);
+        String text = body + "\r\n--" + boundary + "--\r\n";
+
+        BufferedLineReaderInputStream buffer = new BufferedLineReaderInputStream(chunked(text, 1), 4096);
+        MimeBoundaryInputStream part = new MimeBoundaryInputStream(buffer, boundary);
+
+        Assert.assertEquals(body.length(), drain(part));
+        Assert.assertTrue(part.isLastPart());
+    }
+
+    private static InputStream chunked(String text, final int chunk) {
+        return new FilterInputStream(InputStreams.createAscii(text)) {
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return super.read(b, off, Math.min(len, chunk));
+            }
+        };
+    }
+
+    @Test
+    public void delimiterNotAtLineStartShouldBeIgnoredWhateverTheSourceReadSize() throws IOException {
+        String content = "x--boundary\r\nLine 1\r\nabc--boundary--\r\nLine 2";
+        String text = content + "\r\n--boundary--\r\n";
+
+        for (int chunk = 1; chunk <= text.length(); chunk++) {
+            BufferedLineReaderInputStream buffer = new BufferedLineReaderInputStream(chunked(text, chunk), 4096);
+            MimeBoundaryInputStream part = new MimeBoundaryInputStream(buffer, "boundary");
+            Assert.assertEquals("source read size " + chunk, content, read(part, 3));
+            Assert.assertTrue(part.isLastPart());
+        }
+    }
+
+    @Test
+    public void nearMissDelimitersShouldBeContentWhateverTheSourceReadSize() throws IOException {
+        String content = "Line 1\r\n--boundar\r\n--boundary-x\r\n--boundaryx\r\n--boundary-\r\nLine 2";
+        String text = content + "\r\n--boundary--\r\n";
+
+        for (int chunk = 1; chunk <= text.length(); chunk++) {
+            BufferedLineReaderInputStream buffer = new BufferedLineReaderInputStream(chunked(text, chunk), 4096);
+            MimeBoundaryInputStream part = new MimeBoundaryInputStream(buffer, "boundary");
+            Assert.assertEquals("source read size " + chunk, content, read(part, 3));
+            Assert.assertTrue(part.isLastPart());
+        }
+    }
+
+    @Test
+    public void readingAfterTheBufferIsTruncatedShouldEndThePart() throws IOException {
+        StringBuilder text = new StringBuilder("Line 1\r\n");
+        while (text.length() < 3 * 4096) {
+            text.append("some content line\r\n");
+        }
+        text.append("--boundary--\r\n");
+        BufferedLineReaderInputStream buffer = create(text.toString(), 4096);
+        MimeBoundaryInputStream part = new MimeBoundaryInputStream(buffer, "boundary");
+        Assert.assertTrue(part.read(new byte[100]) > 0);
+
+        // as MimeTokenStream#stop() does
+        buffer.truncate();
+
+        Assert.assertEquals(-1, part.read(new byte[100]));
+    }
 }
