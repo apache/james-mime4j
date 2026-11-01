@@ -287,8 +287,15 @@ public class MimeTokenStream {
      * </p>
      * <p>
      * This method is valid, if {@link #getState()} returns either of
-     * {@link EntityState#T_RAW_ENTITY}, {@link EntityState#T_PREAMBLE}, or
+     * {@link EntityState#T_RAW_ENTITY}, {@link EntityState#T_BODY},
+     * {@link EntityState#T_START_MULTIPART}, {@link EntityState#T_PREAMBLE}, or
      * {@link EntityState#T_EPILOGUE}.
+     * </p>
+     * <p>
+     * At {@link EntityState#T_START_MULTIPART}, it returns the raw multipart body:
+     * reading at least one byte from it means the multipart is consumed raw, its
+     * preamble, body parts and epilogue are then not parsed and the next state is
+     * {@link EntityState#T_END_MULTIPART}.
      * </p>
      *
      * @return Data stream, depending on the current state.
@@ -306,8 +313,15 @@ public class MimeTokenStream {
      * </p>
      * <p>
      * This method is valid, if {@link #getState()} returns either of
-     * {@link EntityState#T_RAW_ENTITY}, {@link EntityState#T_PREAMBLE}, or
+     * {@link EntityState#T_RAW_ENTITY}, {@link EntityState#T_BODY},
+     * {@link EntityState#T_START_MULTIPART}, {@link EntityState#T_PREAMBLE}, or
      * {@link EntityState#T_EPILOGUE}.
+     * </p>
+     * <p>
+     * At {@link EntityState#T_START_MULTIPART}, it returns the raw multipart body:
+     * reading at least one byte from it means the multipart is consumed raw, its
+     * preamble, body parts and epilogue are then not parsed and the next state is
+     * {@link EntityState#T_END_MULTIPART}.
      * </p>
      *
      * @return Data stream, depending on the current state.

@@ -100,4 +100,44 @@ public class MimeTokenStreamTest {
         }
         Assert.assertEquals(Arrays.asList("Fr(x)om", "From", "(!!!", "Subject"), names);
     }
+
+    private static List<EntityState> statesReadingAtStartMultipart(MimeConfig config, int len) throws Exception {
+        String msg = "Content-Type: multipart/mixed; boundary=b\r\n"
+            + "\r\n"
+            + "--b\r\n"
+            + "Content-Type: text/plain\r\n"
+            + "\r\n"
+            + "hello\r\n"
+            + "--b--\r\n";
+
+        MimeTokenStream stream = new MimeTokenStream(config);
+        stream.parse(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+        List<EntityState> states = new ArrayList<>();
+        for (EntityState state = stream.getState(); state != EntityState.T_END_OF_STREAM; state = stream.next()) {
+            states.add(state);
+            if (state == EntityState.T_START_MULTIPART) {
+                int read = stream.getInputStream().read(new byte[16], 0, len);
+                if (len == 0) {
+                    Assert.assertEquals(0, read);
+                }
+            }
+        }
+        return states;
+    }
+
+    @Test
+    public void zeroLengthReadAtStartMultipartShouldNotSkipTheParts() throws Exception {
+        for (MimeConfig config : new MimeConfig[] {MimeConfig.DEFAULT, MimeConfig.PERMISSIVE}) {
+            List<EntityState> states = statesReadingAtStartMultipart(config, 0);
+            Assert.assertTrue("body part lost: " + states, states.contains(EntityState.T_START_BODYPART));
+            Assert.assertTrue("body part lost: " + states, states.contains(EntityState.T_BODY));
+        }
+    }
+
+    @Test
+    public void readingTheRawMultipartBodyShouldSkipTheParts() throws Exception {
+        List<EntityState> states = statesReadingAtStartMultipart(MimeConfig.DEFAULT, 1);
+        Assert.assertFalse(states.toString(), states.contains(EntityState.T_START_BODYPART));
+        Assert.assertTrue(states.toString(), states.contains(EntityState.T_END_MULTIPART));
+    }
 }

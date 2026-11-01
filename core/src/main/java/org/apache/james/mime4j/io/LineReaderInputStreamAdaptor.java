@@ -65,6 +65,13 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
+        if (off < 0 || len < 0 || len > b.length - off) {
+            throw new IndexOutOfBoundsException();
+        }
+        if (len == 0) {
+            // Nothing read: the content is not used
+            return 0;
+        }
         int i = in.read(b, off, len);
         this.eof = i == -1;
         this.used = true;

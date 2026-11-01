@@ -65,6 +65,9 @@ public class LimitedInputStream extends PositionInputStream {
 
     @Override
     public int read(byte b[], int off, int len) throws IOException {
+        if (len == 0) {
+            return 0;
+        }
         if (endsAtLimit()) {
             return -1;
         }
