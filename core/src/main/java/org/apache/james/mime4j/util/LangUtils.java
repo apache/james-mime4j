@@ -45,6 +45,26 @@ public final class LangUtils {
     }
 
     /**
+     * Hashes a string consistently with {@link #equalsIgnoreCase(String, String)}: strings equal
+     * ignoring case get the same hash code. Each code point is folded the way
+     * {@link String#equalsIgnoreCase(String)} compares them, the lower case of its upper case;
+     * {@link String#toLowerCase(java.util.Locale)} does not fold that way (e.g. "\u0130" or
+     * "\u0131" vs "i", "\u017F" vs "s").
+     */
+    public static int hashCodeIgnoreCase(final int seed, final String s) {
+        if (s == null) {
+            return hashCode(seed, 0);
+        }
+        int hash = 0;
+        for (int i = 0; i < s.length(); ) {
+            int codePoint = s.codePointAt(i);
+            hash = 31 * hash + Character.toLowerCase(Character.toUpperCase(codePoint));
+            i += Character.charCount(codePoint);
+        }
+        return hashCode(seed, hash);
+    }
+
+    /**
      * Check if two objects are equal.
      *
      * @param obj1 first object to compare, may be {@code null}

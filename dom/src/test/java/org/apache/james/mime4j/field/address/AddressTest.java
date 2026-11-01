@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class AddressTest {
@@ -158,4 +159,39 @@ public class AddressTest {
         Assert.assertFalse(m1.hashCode() == m4.hashCode());
     }
 
+    @Test
+    public void equalMailboxesShouldHaveEqualHashCodesForNonAsciiDomains() {
+        String[][] pairs = {
+            {"\u0130nfo.example", "info.example"},   // dotted capital I vs i
+            {"\u0131nfo.example", "Info.example"},   // dotless i vs I
+            {"\u03C3\u03C2.gr", "\u03C3\u03C3.gr"},     // final sigma vs sigma
+            {"\u03A3\u03A3.gr", "\u03C3\u03C2.gr"},     // capital sigmas vs sigma, final sigma
+            {"\u017Fome.example", "some.example"},   // long s vs s
+            {"\u00B5.example", "\u03BC.example"},     // micro sign vs mu
+            {"\uD801\uDC00.example", "\uD801\uDC28.example"}, // Deseret capital vs small long i
+        };
+        for (String[] p : pairs) {
+            Mailbox m1 = new Mailbox("a", p[0]);
+            Mailbox m2 = new Mailbox("a", p[1]);
+            if (m1.equals(m2)) {
+                Assert.assertEquals(p[0] + " / " + p[1], m1.hashCode(), m2.hashCode());
+            }
+        }
+        Assert.assertEquals(new Mailbox("a", "\u0130nfo.example"), new Mailbox("a", "info.example"));
+    }
+
+    @Test
+    public void hashSetShouldDeduplicateParsedMailboxesWithNonAsciiDomains() {
+        List<Mailbox> mailboxes = LenientAddressParser.DEFAULT
+            .parseAddressList("a@\u0130nfo.example, a@info.example, a@\u017Fome.example, a@SOME.example").flatten();
+        Assert.assertEquals(mailboxes.get(0), mailboxes.get(1));
+        Assert.assertEquals(mailboxes.get(2), mailboxes.get(3));
+        Assert.assertEquals(2, new HashSet<>(mailboxes).size());
+    }
+
+    @Test
+    public void mailboxesDifferingOnlyByLocalPartCaseShouldNotBeEqual() {
+        Assert.assertNotEquals(new Mailbox("A", "example.com"), new Mailbox("a", "example.com"));
+        Assert.assertEquals(new Mailbox("a", "EXAMPLE.com").hashCode(), new Mailbox("a", "example.COM").hashCode());
+    }
 }

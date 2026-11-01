@@ -21,7 +21,6 @@ package org.apache.james.mime4j.dom.address;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.james.mime4j.util.LangUtils;
 
@@ -166,8 +165,8 @@ public class Mailbox extends Address {
     public int hashCode() {
         int hash = LangUtils.HASH_SEED;
         hash = LangUtils.hashCode(hash, this.localPart);
-        hash = LangUtils.hashCode(hash, this.domain != null ?
-                this.domain.toLowerCase(Locale.US) : null);
+        // Same folding as equals
+        hash = LangUtils.hashCodeIgnoreCase(hash, this.domain);
         return hash;
     }
 
