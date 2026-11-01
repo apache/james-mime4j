@@ -22,6 +22,8 @@ package org.apache.james.mime4j.io;
 import java.io.InputStream;
 import java.io.IOException;
 
+import org.apache.james.mime4j.MimeIOException;
+
 public class LimitedInputStream extends PositionInputStream {
 
     private final long limit;
@@ -39,7 +41,8 @@ public class LimitedInputStream extends PositionInputStream {
      * is only known by reading one more byte.
      *
      * @return <code>true</code> when the limit is reached and the underlying stream is at its end.
-     * @throws IOException when the underlying stream holds more bytes than the limit.
+     * @throws MimeIOException wrapping a {@link MaxContentLengthLimitException} when the
+     * underlying stream holds more bytes than the limit.
      */
     private boolean endsAtLimit() throws IOException {
         if (position < limit) {
@@ -48,7 +51,8 @@ public class LimitedInputStream extends PositionInputStream {
         if (super.read() == -1) {
             return true;
         }
-        throw new IOException("Input stream limit exceeded. Limit was " + limit + " and position " + position);
+        throw new MimeIOException(new MaxContentLengthLimitException(
+            "Input stream limit exceeded. Limit was " + limit + " and position " + position));
     }
 
     @Override

@@ -387,7 +387,10 @@ public final class MimeConfig {
          * maximum length limit. If this parameter is set to a non positive value
          * the content length check will be disabled.
          * <p>
-         * A content body of exactly <code>maxContentLen</code> bytes is accepted.
+         * A content body of exactly <code>maxContentLen</code> bytes is accepted. A longer
+         * one raises a {@link org.apache.james.mime4j.io.MaxContentLengthLimitException},
+         * wrapped into a {@link org.apache.james.mime4j.MimeIOException} when the body is
+         * read through an {@link java.io.InputStream}.
          * <p>
          * Default value: <code>-1</code>
          *

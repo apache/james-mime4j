@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.ref.SoftReference;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.codec.QuotedPrintableInputStream;
@@ -32,6 +33,7 @@ import org.apache.james.mime4j.io.LimitedInputStream;
 import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
+import org.apache.james.mime4j.io.MaxContentLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
@@ -407,13 +409,21 @@ class MimeEntity implements EntityStateMachine {
                 config.getMaxLineLen());
     }
 
-    private void advanceToBoundary() throws IOException {
+    private void advanceToBoundary() throws IOException, MimeException {
         if (!dataStream.eof()) {
             if (tmpbuf == null) {
                 tmpbuf = getBufferRecycler().allocByteBuffer(0, 2048);
             }
             InputStream instream = getLimitedContentStream();
-            while (instream.read(tmpbuf)!= -1) {
+            try {
+                while (instream.read(tmpbuf)!= -1) {
+                }
+            } catch (MimeIOException e) {
+                if (e.getCause() instanceof MaxContentLengthLimitException) {
+                    // A parse error: report it as next() documents
+                    throw e.getCause();
+                }
+                throw e;
             }
         }
     }

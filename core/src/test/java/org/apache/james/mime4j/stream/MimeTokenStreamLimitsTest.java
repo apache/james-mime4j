@@ -20,6 +20,7 @@
 package org.apache.james.mime4j.stream;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
@@ -27,6 +28,8 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.io.MaxContentLengthLimitException;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Test;
 
@@ -213,5 +216,29 @@ public class MimeTokenStreamLimitsTest {
             }
         }
         assertEquals("234|cde|hij|xyz|", bodies.toString());
+    }
+
+    @Test
+    public void exceededContentLimitShouldBeReportedAsMimeException() throws Exception {
+        String msg = "Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "0123456789\r\n--b\r\n\r\nx\r\n--b--\r\n";
+        MimeTokenStream stream = parse(msg, MimeConfig.custom().setMaxContentLen(5).build());
+        try {
+            while (stream.next() != EntityState.T_END_OF_STREAM) {
+            }
+            fail("the preamble exceeds maxContentLen");
+        } catch (MaxContentLengthLimitException expected) {
+        }
+    }
+
+    @Test
+    public void exceededContentLimitOnABodyReadShouldBeAMimeIOException() throws Exception {
+        MimeTokenStream stream = atBody("Subject: a\r\n\r\nhello!", MimeConfig.custom().setMaxContentLen(5).build());
+        try {
+            ContentUtil.buffer(stream.getInputStream());
+            fail("the 6-byte body exceeds maxContentLen=5");
+        } catch (MimeIOException expected) {
+            assertTrue(expected.getCause() instanceof MaxContentLengthLimitException);
+        }
     }
 }
