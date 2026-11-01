@@ -23,6 +23,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.james.mime4j.MimeException;
@@ -151,5 +152,66 @@ public class MimeTokenStreamLimitsTest {
         while (state != EntityState.T_END_OF_STREAM) {
             state = stream.next();
         }
+    }
+
+    @Test
+    public void contentLimitShouldApplyToTheWholeBodyAcrossContentStreams() throws Exception {
+        MimeTokenStream stream = atBody("Subject: a\r\n\r\nhello!", MimeConfig.custom().setMaxContentLen(5).build());
+        byte[] buf = new byte[4];
+        assertEquals(4, stream.getInputStream().read(buf));
+        try {
+            ContentUtil.buffer(stream.getInputStream());
+            fail("the 6-byte body exceeds maxContentLen=5");
+        } catch (IOException expected) {
+        }
+    }
+
+    @Test
+    public void contentLimitShouldApplyAcrossRawAndDecodedContentStreams() throws Exception {
+        MimeTokenStream stream = atBody("Subject: a\r\n\r\nhello!", MimeConfig.custom().setMaxContentLen(5).build());
+        assertEquals(4, stream.getInputStream().read(new byte[4]));
+        try {
+            ContentUtil.buffer(stream.getDecodedInputStream());
+            fail("the 6-byte body exceeds maxContentLen=5");
+        } catch (IOException expected) {
+        }
+    }
+
+    @Test
+    public void bodyOfExactlyTheLimitReadThroughSeveralStreamsShouldBeAccepted() throws Exception {
+        MimeTokenStream stream = atBody("Subject: a\r\n\r\nhello", MimeConfig.custom().setMaxContentLen(5).build());
+        assertEquals(4, stream.getInputStream().read(new byte[4]));
+        assertEquals("o", new String(ContentUtil.buffer(stream.getInputStream()), StandardCharsets.US_ASCII));
+    }
+
+    @Test
+    public void contentLimitShouldApplyWhenNextDrainsAPartlyReadPreamble() throws Exception {
+        String msg = "Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "0123456789\r\n--b\r\n\r\nx\r\n--b--\r\n";
+        MimeTokenStream stream = parse(msg, MimeConfig.custom().setMaxContentLen(8).build());
+        while (stream.getState() != EntityState.T_PREAMBLE) {
+            stream.next();
+        }
+        assertEquals(5, stream.getInputStream().read(new byte[5]));
+        try {
+            stream.next();
+            fail("the 10-byte preamble exceeds maxContentLen=8");
+        } catch (IOException | MimeException expected) {
+        }
+    }
+
+    @Test
+    public void eachPartShouldGetItsOwnContentLimit() throws Exception {
+        String msg = "Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "01234\r\n--b\r\n\r\nabcde\r\n--b\r\n\r\nfghij\r\n--b--\r\nvwxyz";
+        MimeTokenStream stream = parse(msg, MimeConfig.custom().setMaxContentLen(5).build());
+        StringBuilder bodies = new StringBuilder();
+        for (EntityState state = stream.getState(); state != EntityState.T_END_OF_STREAM; state = stream.next()) {
+            if (state == EntityState.T_BODY || state == EntityState.T_PREAMBLE || state == EntityState.T_EPILOGUE) {
+                assertEquals(2, stream.getInputStream().read(new byte[2]));
+                bodies.append(new String(ContentUtil.buffer(stream.getInputStream()), StandardCharsets.US_ASCII)).append('|');
+            }
+        }
+        assertEquals("234|cde|hij|xyz|", bodies.toString());
     }
 }

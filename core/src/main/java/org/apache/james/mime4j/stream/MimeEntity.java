@@ -76,6 +76,9 @@ class MimeEntity implements EntityStateMachine {
     private RecursionMode recursionMode;
     private MimeBoundaryInputStream currentMimePartStream;
     private LineReaderInputStreamAdaptor dataStream;
+    /** The limited view of {@link #dataStream}, shared by every reader of the current content. */
+    private InputStream limitedContentStream;
+    private LineReaderInputStreamAdaptor limitedContentStreamSource;
 
     private byte[] tmpbuf;
 
@@ -455,13 +458,20 @@ class MimeEntity implements EntityStateMachine {
         }
     }
 
+    /**
+     * The content limit applies to the whole content, whatever the number of streams it is read
+     * through: every call for the same content returns the same stream.
+     */
     private InputStream getLimitedContentStream() {
         long maxContentLimit = config.getMaxContentLen();
-        if (maxContentLimit > 0) {
-            return new LimitedInputStream(dataStream, maxContentLimit);
-        } else {
+        if (maxContentLimit <= 0) {
             return dataStream;
         }
+        if (limitedContentStreamSource != dataStream) {
+            limitedContentStream = new LimitedInputStream(dataStream, maxContentLimit);
+            limitedContentStreamSource = dataStream;
+        }
+        return limitedContentStream;
     }
 
     /**
