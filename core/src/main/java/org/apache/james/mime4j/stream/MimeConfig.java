@@ -330,6 +330,10 @@ public final class MimeConfig {
          * exceeds the maximum length limit. If this parameter is set to a non
          * positive value the line length check will be disabled.
          * <p>
+         * A line terminator counts as one byte, whether LF or CRLF, so that a line of
+         * exactly <code>maxLineLen</code> bytes is accepted: the default accepts the
+         * 998 characters + CRLF lines of RFC 5322.
+         * <p>
          * Default value: <code>1000</code>
          *
          * @param maxLineLen

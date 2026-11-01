@@ -64,9 +64,10 @@ public abstract class LineReaderInputStream extends FilterInputStream {
     public abstract boolean unread(RecycledByteArrayBuffer buf);
 
     /**
-     * Whether the line read so far in <code>dst</code> exceeds <code>maxLineLen</code>. The line is
-     * measured as if it ended with a single LF, whatever its actual terminator, so that a line
-     * accepted with a LF is also accepted once written with CRLF.
+     * Whether the line read so far in <code>dst</code> exceeds <code>maxLineLen</code>: a line of
+     * exactly <code>maxLineLen</code> bytes is accepted. The line is measured as if it ended with a
+     * single LF, whatever its actual terminator or the lack of one, so that a line accepted with a
+     * LF (or at the end of the input) is also accepted once written with CRLF.
      */
     protected static boolean exceedsMaxLineLen(ByteArrayBuffer dst, int maxLineLen) {
         if (maxLineLen <= 0) {
@@ -76,10 +77,11 @@ public abstract class LineReaderInputStream extends FilterInputStream {
         if (len > 0 && dst.byteAt(len - 1) == '\n') {
             len--;
         }
+        // Also a CR whose LF is not read yet
         if (len > 0 && dst.byteAt(len - 1) == '\r') {
             len--;
         }
-        return len + 1 >= maxLineLen;
+        return len + 1 > maxLineLen;
     }
 
 }

@@ -164,14 +164,14 @@ public class LineReaderInputStreamAdaptorTest {
         String teststr = "1234567890\r\n";
         byte[] raw = teststr.getBytes("US-ASCII");
 
-        LineReaderInputStreamAdaptor instream1 = create(raw, 12);
+        LineReaderInputStreamAdaptor instream1 = create(raw, 11);
         ByteArrayBuffer linebuf = new ByteArrayBuffer(8);
         linebuf.clear();
         instream1.readLine(linebuf);
 
         instream1.close();
 
-        LineReaderInputStreamAdaptor instream2 = create(raw, 11);
+        LineReaderInputStreamAdaptor instream2 = create(raw, 10);
         linebuf.clear();
         try {
             instream2.readLine(linebuf);
