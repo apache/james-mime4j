@@ -369,7 +369,8 @@ public final class MimeConfig {
          * A message header may be folded across multiple lines. This configuration
          * parameter is used to limit the total length of a header, i.e. the sum of
          * the length of all lines the header spans across (including line
-         * terminators).
+         * terminators, each counting as one byte, whether LF or CRLF). A header of
+         * exactly <code>maxHeaderLen</code> bytes is accepted.
          * <p>
          * Default value: <code>10000</code>
          *

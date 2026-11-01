@@ -83,7 +83,8 @@ public class DefaultFieldBuilder implements FieldBuilder {
         if (len > 1 && line.byteAt(len - 1) == '\n' && line.byteAt(len - 2) == '\r') {
             measured--;
         }
-        if (this.maxlen > 0 && this.measuredLength + measured >= this.maxlen) {
+        // A field of exactly maxlen bytes is accepted
+        if (this.maxlen > 0 && this.measuredLength + measured > this.maxlen) {
             throw new MaxHeaderLengthLimitException("Maximum header length limit (" + this.maxlen + ") exceeded");
         }
         this.measuredLength += measured;

@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.apache.james.mime4j.io.MaxContentLengthLimitException;
+import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Test;
 
@@ -239,6 +240,37 @@ public class MimeTokenStreamLimitsTest {
             fail("the 6-byte body exceeds maxContentLen=5");
         } catch (MimeIOException expected) {
             assertTrue(expected.getCause() instanceof MaxContentLengthLimitException);
+        }
+    }
+
+    @Test
+    public void fieldOfExactlyMaxHeaderLenBytesShouldBeAccepted() throws Exception {
+        // "Subject: a" + its terminator, counting as one byte: 11
+        for (String eol : new String[] {"\n", "\r\n"}) {
+            MimeTokenStream stream = parse("Subject: a" + eol + eol + "body" + eol, MimeConfig.custom().setMaxHeaderLen(11).build());
+            assertEquals(EntityState.T_START_HEADER, stream.next());
+            assertEquals(EntityState.T_FIELD, stream.next());
+            assertEquals("Subject", stream.getField().getName());
+        }
+    }
+
+    @Test
+    public void foldedFieldOfExactlyMaxHeaderLenBytesShouldBeAccepted() throws Exception {
+        // "Subject: a" + "\r\n" + " b" + "\r\n": 10 + 1 + 2 + 1
+        MimeTokenStream stream = parse("Subject: a\r\n b\r\n\r\nbody\r\n", MimeConfig.custom().setMaxHeaderLen(14).build());
+        assertEquals(EntityState.T_START_HEADER, stream.next());
+        assertEquals(EntityState.T_FIELD, stream.next());
+        assertEquals("Subject", stream.getField().getName());
+    }
+
+    @Test
+    public void fieldLongerThanMaxHeaderLenShouldBeRejected() throws Exception {
+        MimeTokenStream stream = parse("Subject: a\r\n\r\nbody\r\n", MimeConfig.custom().setMaxHeaderLen(10).build());
+        stream.next();
+        try {
+            stream.next();
+            fail("MaxHeaderLengthLimitException expected");
+        } catch (MaxHeaderLengthLimitException expected) {
         }
     }
 }
