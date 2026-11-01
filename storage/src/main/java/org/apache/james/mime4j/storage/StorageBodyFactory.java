@@ -292,6 +292,15 @@ public class StorageBodyFactory implements BodyFactory {
             }
             return FALLBACK_CHARSET;
         }
+        if (forEncoding && !charset.canEncode()) {
+            if (monitor.isListening()) {
+                monitor.warn(
+                        "MIME charset '" + mimeCharset + "' cannot be used "
+                        + "for encoding", "Using "
+                        + FALLBACK_CHARSET + " instead.");
+            }
+            return FALLBACK_CHARSET;
+        }
         return charset;
     }
 
