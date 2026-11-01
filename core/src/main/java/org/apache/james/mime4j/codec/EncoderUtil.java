@@ -361,7 +361,8 @@ public class EncoderUtil {
      * @param charset
      *            the Java charset that should be used to encode the specified
      *            string into a byte array. A suitable charset is detected
-     *            automatically if this parameter is <code>null</code>.
+     *            automatically if this parameter is <code>null</code> or names
+     *            a charset that cannot encode (e.g. ISO-2022-CN).
      * @param encoding
      *            the encoding to use for the encoded-word (either B or Q). A
      *            suitable encoding is automatically chosen if this parameter is
@@ -377,7 +378,7 @@ public class EncoderUtil {
         if (usedCharacters < 0 || usedCharacters > MAX_USED_CHARACTERS)
             throw new IllegalArgumentException();
 
-        if (charset == null)
+        if (charset == null || !charset.canEncode())
             charset = determineCharset(text);
 
         byte[] bytes = encode(text, charset);

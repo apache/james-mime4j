@@ -391,4 +391,19 @@ public class EncoderUtilTest {
         Assert.assertEquals("filename*0=v", EncoderUtil.encodeHeaderParameter("filename*0", "v"));
         Assert.assertEquals("filename*1*=v", EncoderUtil.encodeHeaderParameter("filename*1*", "v"));
     }
+
+    @Test
+    public void encodeEncodedWordShouldChooseAnEncodableCharsetForADecodeOnlyCharset() {
+        for (String name : new String[] {"ISO-2022-CN", "x-JISAutoDetect"}) {
+            Charset decodeOnly = Charset.forName(name);
+            Assert.assertFalse(decodeOnly.canEncode());
+
+            for (String text : new String[] {"Hi", "Grüße 你好"}) {
+                for (Encoding encoding : new Encoding[] {null, Encoding.B, Encoding.Q}) {
+                    String encoded = EncoderUtil.encodeEncodedWord(text, Usage.TEXT_TOKEN, 0, decodeOnly, encoding);
+                    Assert.assertEquals(text, DecoderUtil.decodeEncodedWords(encoded, DecodeMonitor.SILENT));
+                }
+            }
+        }
+    }
 }
