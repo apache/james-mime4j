@@ -112,7 +112,9 @@ public class DateTimeFieldLenientFastPathTest {
     @Test
     public void fastPathShouldServeTheUsualForms() {
         String[] usual = {"Tue, 26 Apr 2022 02:27:54 +0000", "26 Apr 2022 02:27:54 +0000", "tue, 26 APR 2022 02:27:54 -0000",
-            "Wed, 16 Jul 2008 17:12:33 +0200 (PDT)", "Mon, 1 Jan 2024 00:00:00 -0500 (EST)", "Thu, 29 Feb 2024 23:59:59 +1759"};
+            "Wed, 16 Jul 2008 17:12:33 +0200 (PDT)", "Mon, 1 Jan 2024 00:00:00 -0500 (EST)", "Thu, 29 Feb 2024 23:59:59 +1759",
+            // out of range, resolved leniently by both formatters, without an exception
+            "Tue, 31 Feb 2022 02:27:54 +0000", "Tue, 26 Apr 2022 24:00:60 +0000"};
         for (String text : usual) {
             Date fast = DateTimeFieldLenientImpl.parseCommonForm(text);
             Assert.assertNotNull(text, fast);
