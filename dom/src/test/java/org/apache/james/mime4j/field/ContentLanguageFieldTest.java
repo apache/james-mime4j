@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.james.mime4j.MimeException;
@@ -83,6 +84,30 @@ public class ContentLanguageFieldTest extends TestCase {
     public void testTrailingCommentAndWhitespaceStayValid() throws Exception {
         ContentLanguageField f = parse("Content-Language: en, de (German) ");
         assertEquals(2, f.getLanguages().size());
+        assertNull(f.getParseException());
+    }
+
+    public void testSubtagWithoutHyphenIsAParseError() throws Exception {
+        ContentLanguageField f = parse("Content-Language: en 4t");
+        List<String> langs = f.getLanguages();
+        assertNotNull(f.getParseException());
+        assertFalse(langs.contains("en-4t"));
+    }
+
+    public void testWhitespaceInsideTagIsAParseError() throws Exception {
+        for (String value : new String[] {"en-US, zh-Hant- in", "en -US", "et-\r\n n", "en- 4t"}) {
+            ContentLanguageField f = parse("Content-Language: " + value);
+            assertEquals(value, 0, f.getLanguages().size());
+            assertNotNull(value, f.getParseException());
+        }
+    }
+
+    public void testValidTagsStillParse() throws Exception {
+        ContentLanguageField f = parse("Content-Language: en-US, zh-Hant-TW, x-4t");
+        assertEquals(Arrays.asList("en-US", "zh-Hant-TW", "x-4t"), f.getLanguages());
+        assertNull(f.getParseException());
+        f = parse("Content-Language: en-US , de ,fr");
+        assertEquals(Arrays.asList("en-US", "de", "fr"), f.getLanguages());
         assertNull(f.getParseException());
     }
 }

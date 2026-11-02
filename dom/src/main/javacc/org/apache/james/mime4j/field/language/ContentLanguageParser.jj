@@ -79,6 +79,7 @@ private List<String> doParse() :
 String language() :
 {
 	Token token;
+	Token dash;
 	StringBuffer languageTag = new StringBuffer();
 	String result;
 }
@@ -88,19 +89,17 @@ String language() :
 				languageTag.append(token.image);
 			}
 		( 
-		"-" 
+		dash = "-" 
 // This keeps TOKENising simple
-				token = <ALPHA> 
-					{
-						languageTag.append('-');
-						languageTag.append(token.image);
+			( token = <ALPHA> | token = <ALPHANUM> )
+				{
+					// A subtag directly follows its "-": no whitespace inside a tag
+					if (dash.specialToken != null || token.specialToken != null) {
+						throw new ParseException("Whitespace inside language tag " + languageTag + "-" + token.image);
 					}
-				|
-				token = <ALPHANUM> 
-					{
-						languageTag.append('-');
-						languageTag.append(token.image);
-					}
+					languageTag.append('-');
+					languageTag.append(token.image);
+				}
 		)*
 	
 	{
