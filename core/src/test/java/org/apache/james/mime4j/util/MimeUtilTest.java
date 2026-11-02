@@ -193,4 +193,17 @@ public class MimeUtilTest {
         assertNoWhitespaceOnlyLineIn(foldedWord);
         Assert.assertEquals(MimeUtil.unfold(word), MimeUtil.unfold(foldedWord));
     }
+
+    @Test
+    public void foldShouldBreakBeforeALeadingWhitespaceWhenTheUsedCharactersFillTheLine() {
+        String value = " " + repeat("a", 990);
+        String folded = MimeUtil.fold(value, 9, 998);
+
+        // the first line holds the 9 used characters only
+        Assert.assertTrue(folded.startsWith("\r\n "));
+        for (String line : ("123456789" + folded).split("\r\n")) {
+            Assert.assertTrue(line.length() <= 998);
+        }
+        Assert.assertEquals(value, MimeUtil.unfold(folded));
+    }
 }

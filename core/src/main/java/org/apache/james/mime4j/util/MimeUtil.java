@@ -257,7 +257,8 @@ public final class MimeUtil {
         // where the current line starts: an inserted line break or a fold already in the value
         int lineStart = lastLineBreak;
         int wspIdx = indexOfWsp(s, 0);
-        boolean lineHasText = wspIdx > 0;
+        // The used characters (usually the field name and its colon) are text of the first line
+        boolean lineHasText = wspIdx > 0 || usedCharacters > 0;
         while (true) {
             if (wspIdx == length) {
                 sb.append(s.substring(Math.max(0, lastLineBreak)));
