@@ -60,4 +60,26 @@ public class ContentLocationFieldTest extends TestCase {
         assertEquals("this/that/whatnot", location);
     }
 
+    public void testQuotedPairInComment() throws Exception {
+        ContentLocationField f = parse("Content-Location: http://example.com/(a\\) b)c");
+        assertEquals("http://example.com/c", f.getLocation());
+        assertNull(f.getParseException());
+    }
+
+    public void testQuotedPairInCommentShouldAgreeWithTheLenientParser() throws Exception {
+        String[] values = {"http://example.com/(a\\) b)c", "a(\\()b", "a(x\\\\)b", "a(\\))b", "a((\\)))b"};
+        for (String value : values) {
+            ContentLocationField strict = parse("Content-Location: " + value);
+            ContentLocationField lenient = LenientContentLocationFieldTest.parse("Content-Location: " + value);
+            assertEquals(value, lenient.getLocation(), strict.getLocation());
+        }
+    }
+
+    public void testQuotedPairShouldNotSwallowTheRestOfTheValue() throws Exception {
+        // a quoted pair escapes one character: the closing quote and what follows are still read
+        ContentLocationField f = parse("Content-Location: \"a\\\"b\" (c\\) d) e");
+        assertNotNull(f.getLocation());
+        assertTrue(f.getLocation(), f.getLocation().endsWith("e"));
+        assertNull(f.getParseException());
+    }
 }
