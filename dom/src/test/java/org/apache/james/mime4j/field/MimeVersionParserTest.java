@@ -81,4 +81,16 @@ public class MimeVersionParserTest {
         Assert.assertEquals(MimeVersionFieldImpl.DEFAULT_MINOR_VERSION, f.getMinorVersion());
         Assert.assertNotNull(f.getParseException());
     }
+
+    @Test
+    public void testTrailingTextIsAParseError() throws Exception {
+        for (String value : new String[] {"1.3 x", "4 .1`", "1.3\u0000\u0000", "1.0;"}) {
+            MimeVersionField f = parse("MIME-Version: " + value);
+            f.getMajorVersion();
+            Assert.assertNotNull(value, f.getParseException());
+        }
+        // a trailing comment stays valid
+        check("2.4(A comment)", 2, 4);
+        check("1.0 (produced by x) ", 1, 0);
+    }
 }
