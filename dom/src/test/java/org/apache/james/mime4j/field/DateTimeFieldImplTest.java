@@ -113,4 +113,18 @@ public class DateTimeFieldImplTest {
             assertEquals(instant, date, field.getDate());
         }
     }
+
+    @Test
+    public void parseShouldAcceptAZeroPaddedYear() throws Exception {
+        DateTimeField field = parse("Date: 1 Jan 0000002024 00:00 +0000");
+        assertNull(field.getParseException());
+        assertEquals(parse("Date: 1 Jan 2024 00:00 +0000").getDate(), field.getDate());
+    }
+
+    @Test
+    public void parseShouldFailWhenAZeroPaddedYearIsTooLong() throws Exception {
+        DateTimeField field = parse("Date: 1 Jan 0099999999999 00:00 +0000");
+        assertNull(field.getDate());
+        assertNotNull(field.getParseException());
+    }
 }

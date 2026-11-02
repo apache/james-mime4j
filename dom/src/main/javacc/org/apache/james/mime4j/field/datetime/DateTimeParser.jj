@@ -248,7 +248,13 @@ String year() :
     t=<DIGITS> 
     {
       String year = (String) t.image;
-      if (year.length() > 9)
+      // Leading zeros do not count: "0000002024" is 2024
+      int significant = year.length();
+      for (int i = 0; i < year.length() - 1 && year.charAt(i) == '0'; i++)
+      {
+        significant--;
+      }
+      if (significant > 9)
       {
         throw new ParseException("Invalid year: " + year);
       }
