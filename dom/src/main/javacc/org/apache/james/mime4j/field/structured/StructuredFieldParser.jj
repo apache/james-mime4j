@@ -154,6 +154,12 @@ SKIP :
 
 <INCOMMENT> SKIP :
 {
+	// a quoted pair such as "\)" does not end the comment
+	< <QUOTEDPAIR> >
+}
+
+<INCOMMENT> SKIP :
+{
 	// ends a comment
 	")" : DEFAULT
 	// if this is ever changed to not be a SKIP, need
@@ -222,6 +228,7 @@ TOKEN :
 <*>
 TOKEN :
 {
+	// a quoted pair escapes a single character
 	< #QUOTEDPAIR: "\\" <ANY> >
-|	< #ANY: (~[])+ >
+|	< #ANY: ~[] >
 }
