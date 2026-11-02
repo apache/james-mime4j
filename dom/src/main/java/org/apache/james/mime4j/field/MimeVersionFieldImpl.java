@@ -56,7 +56,8 @@ public class MimeVersionFieldImpl extends AbstractField implements MimeVersionFi
             StringReader reader = new StringReader(body);
             MimeVersionParser parser = new MimeVersionParser(reader);
             try {
-                parser.parse();
+                // The whole value, not only its first valid prefix
+                parser.parseAll();
                 int v = parser.getMajorVersion();
                 if (v != MimeVersionParser.INITIAL_VERSION_VALUE) {
                     major = v;

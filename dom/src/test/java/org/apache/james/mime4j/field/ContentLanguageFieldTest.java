@@ -72,4 +72,17 @@ public class ContentLanguageFieldTest extends TestCase {
         assertNotNull(f.getParseException());
     }
 
+    public void testTrailingTextIsAParseError() throws Exception {
+        for (String value : new String[] {"a.", "na\"\u000e]a\"2p", "en, de;", "en-US x", "en ="}) {
+            ContentLanguageField f = parse("Content-Language: " + value);
+            assertEquals(value, 0, f.getLanguages().size());
+            assertNotNull(value, f.getParseException());
+        }
+    }
+
+    public void testTrailingCommentAndWhitespaceStayValid() throws Exception {
+        ContentLanguageField f = parse("Content-Language: en, de (German) ");
+        assertEquals(2, f.getLanguages().size());
+        assertNull(f.getParseException());
+    }
 }

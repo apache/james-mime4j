@@ -71,7 +71,8 @@ private List<String> doParse() :
 {
 }
 {
-	language() ( "," language() )*
+	// The whole value, not only its first valid prefix
+	language() ( "," language() )* <EOF>
 	{return languages;}
 }
 
