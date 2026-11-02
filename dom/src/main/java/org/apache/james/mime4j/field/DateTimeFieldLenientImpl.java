@@ -191,8 +191,9 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
 
     /**
      * The form nearly every mail carries, <code>[Ddd, ]d Mon yyyy HH:MM:SS +HHMM</code>, without the
-     * optional sections and the lenient resolution of {@link #RFC_5322}: an out of range value
-     * fails here and goes to {@link #RFC_5322}.
+     * optional sections of {@link #RFC_5322}. It resolves the same fields with the same lenient
+     * style, so that an out of range value such as <code>31 Feb</code> gives the same instant,
+     * without an exception.
      */
     private static final DateTimeFormatter SIMPLE_FORM = new DateTimeFormatterBuilder()
         .parseCaseInsensitive()
@@ -214,8 +215,8 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         .appendLiteral(' ')
         .appendOffset("+HHMM", "+0000")
         .toFormatter()
-        .withResolverStyle(ResolverStyle.STRICT)
         // As RFC_5322: the day of the week is not checked against the date
+        .withResolverStyle(ResolverStyle.LENIENT)
         .withResolverFields(DAY_OF_MONTH, MONTH_OF_YEAR, YEAR, HOUR_OF_DAY, MINUTE_OF_HOUR, SECOND_OF_MINUTE, OFFSET_SECONDS)
         .withLocale(Locale.US);
 
@@ -233,7 +234,7 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         try {
             return Date.from(Instant.from(SIMPLE_FORM.parse(text, new ParsePosition(0))));
         } catch (DateTimeException e) {
-            // e.g. an out of range value, which RFC_5322 resolves leniently
+            // e.g. an offset over 18 hours: RFC_5322 decides
             return null;
         }
     }
