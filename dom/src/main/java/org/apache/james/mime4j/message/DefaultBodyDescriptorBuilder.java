@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
+import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.ParsedField;
@@ -37,6 +38,8 @@ import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.stream.RawField;
 import org.apache.james.mime4j.util.MimeUtil;
+
+import static org.apache.james.mime4j.dom.field.ContentTypeField.TYPE_MULTIPART_PREFIX;
 
 /**
  * Default {@link BodyDescriptorBuilder} implementation.
@@ -96,10 +99,33 @@ public class DefaultBodyDescriptorBuilder implements BodyDescriptorBuilder {
     public Field addField(final RawField rawfield) throws MimeException {
         ParsedField field = fieldParser.parse(rawfield, monitor);
         String name = field.getNameLowerCase();
-        if (field.bodyDescriptionField() && !fields.containsKey(name)) {
-            fields.put(name, field);
+        if (field.bodyDescriptionField()) {
+            ParsedField previous = fields.get(name);
+            if (previous == null || !describesBody(previous) && describesBody(field)) {
+                fields.put(name, field);
+            }
         }
         return field;
+    }
+
+    /**
+     * Whether the field actually describes the body: a Content-Type with no
+     * mime type (empty or invalid, or a multipart type without boundary) or a
+     * Content-Transfer-Encoding with an empty value does not, and a later
+     * field may then be used instead.
+     */
+    private static boolean describesBody(ParsedField field) {
+        if (field instanceof ContentTypeField) {
+            ContentTypeField contentType = (ContentTypeField) field;
+            return contentType.getMimeType() != null
+                    && !(contentType.getMimeType().startsWith(TYPE_MULTIPART_PREFIX)
+                        && contentType.getBoundary() == null);
+        }
+        if (field instanceof ContentTransferEncodingField) {
+            String encoding = ((ContentTransferEncodingField) field).getEncoding();
+            return encoding != null && encoding.trim().length() > 0;
+        }
+        return true;
     }
 
     public BodyDescriptor build() {

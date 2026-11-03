@@ -28,6 +28,7 @@ import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.dom.field.ParsedField;
+import org.apache.james.mime4j.stream.Field;
 
 /**
  * Abstract MIME entity.
@@ -135,6 +136,15 @@ public abstract class AbstractEntity implements Entity {
     }
 
     private ContentTypeField getContentTypeField() {
+        // a first Content-Type header that yields no mime type (empty, invalid,
+        // or multipart without boundary) does not describe the body: use the next
+        // usable one, like the core FallbackBodyDescriptorBuilder does
+        for (Field field : getHeader().getFields(FieldName.CONTENT_TYPE_LOWERCASE)) {
+            ContentTypeField f = (ContentTypeField) field;
+            if (f.getMimeType() != null && !(f.isMultipart() && f.getBoundary() == null)) {
+                return f;
+            }
+        }
         return (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE_LOWERCASE);
     }
 
@@ -153,6 +163,16 @@ public abstract class AbstractEntity implements Entity {
      * @return the transfer encoding.
      */
     public String getContentTransferEncoding() {
+        // a first Content-Transfer-Encoding header with an empty value does not
+        // describe the body: use the next usable one, like the core
+        // FallbackBodyDescriptorBuilder does
+        for (Field field : getHeader().getFields(FieldName.CONTENT_TRANSFER_ENCODING)) {
+            ContentTransferEncodingField f = (ContentTransferEncodingField) field;
+            String encoding = f.getEncoding();
+            if (encoding != null && encoding.trim().length() > 0) {
+                return calcTransferEncoding(f);
+            }
+        }
         ContentTransferEncodingField f = (ContentTransferEncodingField)
                         getHeader().getField(FieldName.CONTENT_TRANSFER_ENCODING);
 
