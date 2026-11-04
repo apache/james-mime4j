@@ -534,14 +534,15 @@ public class RawFieldParserTest {
     }
 
     @Test
-    public void backslashBeforeALineBreakThatIsNotAFoldShouldKeepItsMeaning() throws Exception {
-        Assert.assertEquals("a\\\r\"b", parseValue("\"a\\\r\\\"b\""));
-        Assert.assertEquals("a\\\n\"b", parseValue("\"a\\\n\n\\\"b\""));
+    public void aLineBreakThatIsNotAFoldShouldBeDeletedAsByUnfold() throws Exception {
+        // MimeUtil#unfold, which the strict parsers read, deletes every CR and LF: the quoted pair
+        // then applies to the character after the line break
+        Assert.assertEquals(parseValue("\"a\\\\\"b\""), parseValue("\"a\\\r\\\"b\""));
+        Assert.assertEquals(parseValue("\"a\\\\\"b\""), parseValue("\"a\\\n\n\\\"b\""));
 
         ByteSequence raw = ContentUtil.encode("attachment; filename=\"a\\\r\\\"; size=1.txt\"");
         RawBody body = parser.parseRawBody(raw, new ParserCursor(0, raw.length()));
-        Assert.assertEquals(1, body.getParams().size());
-        Assert.assertEquals("a\\\r\"; size=1.txt", body.getParams().get(0).getValue());
+        Assert.assertEquals("a\\", body.getParams().get(0).getValue());
     }
 
     @Test
@@ -569,5 +570,17 @@ public class RawFieldParserTest {
         RawField obsolete = parser.parseField(ContentUtil.encode("Subject \t: hello"));
         Assert.assertEquals("Subject", obsolete.getName());
         Assert.assertEquals("hello", obsolete.getBody());
+    }
+
+    @Test
+    public void bareLineBreaksShouldBeDeletedLikeUnfoldDoes() {
+        ByteSequence buf = ContentUtil.encode("multi\rpart/mi\nxed; boundary=\"a\\\rb\"; c\r=d\r\n e");
+        ParserCursor cursor = new ParserCursor(0, buf.length());
+        RawBody body = parser.parseRawBody(buf, cursor);
+        org.junit.Assert.assertEquals("multipart/mixed", body.getValue());
+        List<NameValuePair> params = body.getParams();
+        org.junit.Assert.assertEquals("ab", params.get(0).getValue());
+        org.junit.Assert.assertEquals("c", params.get(1).getName());
+        org.junit.Assert.assertEquals("d e", params.get(1).getValue());
     }
 }

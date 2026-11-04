@@ -191,6 +191,10 @@ public class RawFieldParser {
             char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
             if (delimiters != null && delimiters.get(current)) {
                 break;
+            } else if (isLineBreak(current)) {
+                // As MimeUtil#unfold, which the strict parsers read: CR and LF are deleted, only
+                // the WSP of a fold separates words
+                cursor.updatePos(cursor.getPos() + 1);
             } else if (CharsetUtil.isWhitespace(current)) {
                 skipWhiteSpace(buf, cursor);
                 whitespace = true;
@@ -229,6 +233,10 @@ public class RawFieldParser {
             char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
             if (delimiters != null && delimiters.get(current)) {
                 break;
+            } else if (isLineBreak(current)) {
+                // As MimeUtil#unfold, which the strict parsers read: CR and LF are deleted, only
+                // the WSP of a fold separates words
+                cursor.updatePos(cursor.getPos() + 1);
             } else if (CharsetUtil.isWhitespace(current)) {
                 skipWhiteSpace(buf, cursor);
                 whitespace = true;
@@ -358,6 +366,11 @@ public class RawFieldParser {
         for (int i = indexFrom; i < indexTo; i++) {
             byte bVal = buf.byteAt(i);
             char current = (char) (bVal & 0xff);
+            if (isLineBreak(current)) {
+                // deleted, as by MimeUtil#unfold: the word goes on
+                pos++;
+                continue;
+            }
             if ((delimiters != null && delimiters.get(current))
                     || CharsetUtil.isWhitespace(current) || current == '(') {
                 break;
@@ -369,11 +382,17 @@ public class RawFieldParser {
                 ByteArrayBuffer dstRaw = DECODE_BUFFER.get();
                 dstRaw.clear();
                 for (int j = indexFrom; j <= i; j++) {
-                    dstRaw.append(buf.byteAt(j));
+                    if (!isLineBreak((char) (buf.byteAt(j) & 0xff))) {
+                        dstRaw.append(buf.byteAt(j));
+                    }
                 }
                 for (int k = i + 1; k < indexTo; k++) {
                     byte bk = buf.byteAt(k);
                     char ck = (char) (bk & 0xff);
+                    if (isLineBreak(ck)) {
+                        pos++;
+                        continue;
+                    }
                     if ((delimiters != null && delimiters.get(ck))
                             || CharsetUtil.isWhitespace(ck) || ck == '(') {
                         break;
@@ -409,6 +428,11 @@ public class RawFieldParser {
         for (int i = indexFrom; i < indexTo; i++) {
             byte bVal = buf.byteAt(i);
             char current = (char) (bVal & 0xff);
+            if (isLineBreak(current)) {
+                // deleted, as by MimeUtil#unfold: the word goes on
+                pos++;
+                continue;
+            }
             if ((delimiters != null && delimiters.get(current))
                     || CharsetUtil.isWhitespace(current) || current == '(' || current == '\"') {
                 break;
@@ -420,11 +444,17 @@ public class RawFieldParser {
                 ByteArrayBuffer dstRaw = DECODE_BUFFER.get();
                 dstRaw.clear();
                 for (int j = indexFrom; j <= i; j++) {
-                    dstRaw.append(buf.byteAt(j));
+                    if (!isLineBreak((char) (buf.byteAt(j) & 0xff))) {
+                        dstRaw.append(buf.byteAt(j));
+                    }
                 }
                 for (int k = i + 1; k < indexTo; k++) {
                     byte bk = buf.byteAt(k);
                     char ck = (char) (bk & 0xff);
+                    if (isLineBreak(ck)) {
+                        pos++;
+                        continue;
+                    }
                     if ((delimiters != null && delimiters.get(ck))
                             || CharsetUtil.isWhitespace(ck) || ck == '(' || ck == '\"') {
                         break;
@@ -453,22 +483,8 @@ public class RawFieldParser {
         copyQuotedContent(buf, cursor, dst, false);
     }
 
-    /**
-     * Whether the CR or LF at <code>index</code> belongs to a fold: CRLF or LF followed by SP or HTAB.
-     */
-    private static boolean isFoldAt(final ByteSequence buf, final int index, final int indexTo) {
-        int i = index;
-        if (buf.byteAt(i) == '\r') {
-            i++;
-            if (i >= indexTo || buf.byteAt(i) != '\n') {
-                return false;
-            }
-        }
-        if (buf.byteAt(i) != '\n') {
-            return false;
-        }
-        i++;
-        return i < indexTo && (buf.byteAt(i) == ' ' || buf.byteAt(i) == '\t');
+    private static boolean isLineBreak(final char c) {
+        return c == '\r' || c == '\n';
     }
 
     private void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
@@ -494,8 +510,9 @@ public class RawFieldParser {
             byte currentByte = buf.byteAt(i);
             current = (char) (currentByte & 0xff);
             if (escaped) {
-                if (isFoldAt(buf, i, indexTo)) {
-                    // A fold is not part of the value: the quoted pair applies to the WSP after it
+                if (isLineBreak(current)) {
+                    // Deleted, as by MimeUtil#unfold (a fold or a bare CR / LF): the quoted pair
+                    // applies to the character after it
                     continue;
                 }
                 // A boundary cannot hold a backslash (RFC 2046 bchars): the quoted pair is unescaped
