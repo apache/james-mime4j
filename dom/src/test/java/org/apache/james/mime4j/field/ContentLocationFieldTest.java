@@ -82,4 +82,23 @@ public class ContentLocationFieldTest extends TestCase {
         assertTrue(f.getLocation(), f.getLocation().endsWith("e"));
         assertNull(f.getParseException());
     }
+
+    public void testQuotedPairFollowedByTextInQuotedString() throws Exception {
+        ContentLocationField f = parse("Content-Location: \"a\\\"b\"");
+        assertNull(f.getParseException());
+        assertEquals("a\"b", f.getLocation());
+
+        f = parse("Content-Location: \"http://example.com/a\\\\b.html\"");
+        assertNull(f.getParseException());
+        assertEquals("http://example.com/a\\b.html", f.getLocation());
+    }
+
+    public void testQuotedPairInQuotedStringShouldAgreeWithTheLenientParser() throws Exception {
+        String[] values = {"\"a\\\"b\"", "\"http://example.com/a\\\\b.html\"", "\"ab\\\"\""};
+        for (String value : values) {
+            ContentLocationField strict = parse("Content-Location: " + value);
+            ContentLocationField lenient = LenientContentLocationFieldTest.parse("Content-Location: " + value);
+            assertEquals(value, lenient.getLocation(), strict.getLocation());
+        }
+    }
 }
