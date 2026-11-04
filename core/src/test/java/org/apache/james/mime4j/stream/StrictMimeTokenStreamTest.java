@@ -30,7 +30,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class StrictMimeTokenStreamTest {
@@ -149,5 +151,41 @@ public class StrictMimeTokenStreamTest {
 
     private void checkNextIs(EntityState expected) throws Exception {
         Assert.assertEquals(MimeTokenStream.stateToString(expected), MimeTokenStream.stateToString(parser.next()));
+    }
+
+    @Test
+    public void stopOnAFieldShouldEndTheHeaderInStrictMode() throws Exception {
+        String msg = "Subject: a\r\nFrom: b@example.com\r\n\r\nbody\r\n";
+        MimeTokenStream stream = new MimeTokenStream(MimeConfig.custom().setStrictParsing(true).build());
+        stream.parse(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+        stream.next(); // T_START_HEADER
+        Assert.assertEquals(EntityState.T_FIELD, stream.next());
+        stream.stop();
+
+        EntityState state;
+        do {
+            state = stream.next();
+        } while (state != EntityState.T_END_OF_STREAM);
+    }
+
+    @Test
+    public void stopAtTheEndOfAMessageRfc822HeaderShouldNotParseTheEncapsulatedMessage() throws Exception {
+        String msg = "Subject: a\r\nContent-Type: message/rfc822\r\n\r\n"
+            + "From: b@example.org\r\nSubject: c\r\n\r\nbody\r\n";
+        MimeTokenStream stream = new MimeTokenStream(MimeConfig.custom().setStrictParsing(true).build());
+        stream.parse(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+        while (stream.next() != EntityState.T_END_HEADER) {
+            // read the header
+        }
+        stream.stop();
+
+        List<EntityState> after = new ArrayList<>();
+        EntityState state;
+        do {
+            state = stream.next();
+            after.add(state);
+        } while (state != EntityState.T_END_OF_STREAM);
+        Assert.assertEquals(Arrays.asList(EntityState.T_BODY, EntityState.T_END_MESSAGE,
+            EntityState.T_END_OF_STREAM), after);
     }
 }

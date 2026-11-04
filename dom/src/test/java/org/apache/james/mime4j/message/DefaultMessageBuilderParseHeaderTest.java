@@ -127,4 +127,16 @@ public class DefaultMessageBuilderParseHeaderTest {
             }
         }
     }
+
+    @Test
+    public void strictParseHeaderShouldReturnTheHeaderOfAMessageRfc822Mail() throws Exception {
+        String msg = "Subject: a\r\nContent-Type: message/rfc822\r\n\r\n"
+            + "From: b@example.org\r\nSubject: c\r\n\r\nbody\r\n";
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        builder.setMimeEntityConfig(MimeConfig.custom().setStrictParsing(true).build());
+
+        Header header = builder.parseHeader(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+
+        assertThat(header.getFields()).extracting(f -> f.getName()).containsExactly("Subject", "Content-Type");
+    }
 }

@@ -236,7 +236,10 @@ class MimeEntity implements EntityStateMachine {
                 }
                 linebuf.clear();
                 if (instream.readLine(linebuf) == -1) {
-                    monitor(Event.HEADERS_PREMATURE_END);
+                    if (!stopped) {
+                        // A header cut short by stop() is not a malformed message
+                        monitor(Event.HEADERS_PREMATURE_END);
+                    }
                     endOfHeader = true;
                     break;
                 }
@@ -331,7 +334,8 @@ class MimeEntity implements EntityStateMachine {
                 state = EntityState.T_START_MULTIPART;
                 clearMimePartStream();
             } else if (recursionMode != RecursionMode.M_NO_RECURSE
-                    && MimeUtil.isMessage(mimeType)) {
+                    && MimeUtil.isMessage(mimeType) && !stopped) {
+                // Once stopped, the encapsulated message is not parsed: there is nothing left to read
                 state = EntityState.T_BODY;
                 return nextMessage();
             } else {
