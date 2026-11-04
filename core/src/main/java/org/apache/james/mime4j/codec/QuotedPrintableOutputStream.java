@@ -91,8 +91,10 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
             plain(SP);
         } else if (pendingTab) {
             plain(TB);
-        } else if (pendingCR) {
-            plain(CR);
+        }
+        if (pendingCR) {
+            // a CR that is not followed by LF is not a line break
+            escape(CR);
         }
         clearPending();
     }
@@ -120,14 +122,18 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
                     lineBreak();
                     clearPending();
                 } else {
+                    // a LF that is not preceded by CR is not a line break
                     writePending();
-                    plain(next);
+                    escape(next);
                 }
             }
         } else if (next == CR) {
             if (binary)  {
                 escape(next);
             } else {
+                if (pendingCR) {
+                    writePending();
+                }
                 pendingCR = true;
             }
         } else {

@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.apache.james.mime4j.Charsets;
 import org.apache.james.mime4j.MimeIOException;
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.io.MaxNestingDepthLimitException;
 import org.apache.james.mime4j.stream.MimeConfig;
 import java.io.ByteArrayInputStream;
@@ -35,6 +36,7 @@ import java.util.Collections;
 import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
+import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.TextBody;
 import org.apache.james.mime4j.dom.address.Mailbox;
 import org.apache.james.mime4j.dom.field.AddressListField;
@@ -42,6 +44,7 @@ import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.field.Fields;
 import org.apache.james.mime4j.field.address.LenientAddressParser;
 import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Test;
 
 public class DefaultMessageWriterTest {
@@ -302,5 +305,33 @@ public class DefaultMessageWriterTest {
         String written = new String(out.toByteArray(), StandardCharsets.UTF_8);
         assertThat(written).contains("Content-Type: text/plain; charset=UTF-8\r\n");
         assertThat(written).endsWith("body é");
+    }
+
+    @Test
+    public void quotedPrintableBodyWithMalformedEscapeSurvivesWriteAndParse() throws Exception {
+        byte[] raw = "Content-Transfer-Encoding: quoted-printable\r\n\r\na=2\r\nb\r\n".getBytes(StandardCharsets.US_ASCII);
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        Message m1 = builder.parseMessage(new ByteArrayInputStream(raw));
+        ByteArrayOutputStream w1 = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(m1, w1);
+        Message m2 = builder.parseMessage(new ByteArrayInputStream(w1.toByteArray()));
+
+        assertThat(ContentUtil.buffer(((SingleBody) m2.getBody()).getInputStream()))
+            .isEqualTo(ContentUtil.buffer(((SingleBody) m1.getBody()).getInputStream()));
+    }
+
+    @Test
+    public void quotedPrintableTextWithLoneCarriageReturnSurvivesStrictWriteAndParse() throws Exception {
+        byte[] raw = "Content-Transfer-Encoding: quoted-printable\r\n\r\na=0D\r\nb=0Dc=0A\r\n".getBytes(StandardCharsets.US_ASCII);
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        builder.setMimeEntityConfig(MimeConfig.STRICT);
+        builder.setDecodeMonitor(DecodeMonitor.STRICT);
+        Message m1 = builder.parseMessage(new ByteArrayInputStream(raw));
+        ByteArrayOutputStream w1 = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(m1, w1);
+        Message m2 = builder.parseMessage(new ByteArrayInputStream(w1.toByteArray()));
+
+        assertThat(ContentUtil.buffer(((SingleBody) m2.getBody()).getInputStream()))
+            .isEqualTo("a\r\r\nb\rc\n\r\n".getBytes(StandardCharsets.US_ASCII));
     }
 }

@@ -282,7 +282,10 @@ public class QuotedPrintableInputStream extends InputStream {
                             // TODO see MIME4J-160
                             index = transfer(EQ, buffer, index, to, true);
                             index = transfer(b2, buffer, index, to, false);
-                            index = transfer(b3, buffer, index, to, false);
+                            if (b3 != -1) {
+                                // b3 may be a line break or a blank: give it the usual handling
+                                pos--;
+                            }
                         } else {
                             index = transfer((upper << 4) | lower, buffer, index, to, true);
                         }

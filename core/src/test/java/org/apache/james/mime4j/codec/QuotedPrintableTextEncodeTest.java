@@ -116,12 +116,25 @@ public class QuotedPrintableTextEncodeTest {
 
     @Test
     public void testDontEscapeLF() throws Exception {
-        check("Ready\nFor\n", "Ready\nFor\n");
+        check("Ready\nFor\n", "Ready=0AFor=0A");
     }
 
     @Test
     public void testDontEscapeCR() throws Exception {
-        check("Ready\rFor\r", "Ready\rFor\r");
+        check("Ready\rFor\r", "Ready=0DFor=0D");
+    }
+
+    @Test
+    public void testLoneCarriageReturnsAndLineFeedsRoundTrip() throws Exception {
+        check("a\r\r\nb\rc", "a=0D\r\nb=0Dc");
+        check("a \rb\t\r", "a =0Db\t=0D");
+        check("a\n\r\n", "a=0A\r\n");
+        byte[] content = ContentUtil.toAsciiByteArray("a\r\r\nb\rc \r\t\n\n\r");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        EncoderUtil.encodeQ(InputStreams.create(content), out);
+        // strict decoding: the encoder must not write a bare CR or LF
+        InputStream in = new QuotedPrintableInputStream(InputStreams.create(out.toByteArray()), DecodeMonitor.STRICT);
+        assertEquals(content, ContentUtil.buffer(in));
     }
 
     @Test
