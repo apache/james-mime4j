@@ -104,7 +104,12 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             this.boundary[i + 2] = boundaryBytes.byteAt(i);
         }
 
-        fillBuffer();
+        if (inbuffer.hasBufferedData()) {
+            // Scan the bytes already buffered before reading more: the enclosing part may hold no more
+            findLimit();
+        } else {
+            fillBuffer();
+        }
         // Read until we know whether the stream is empty, whatever the size of the reads
         while (!atBoundary && !eof && !hasData()) {
             fillBuffer();
@@ -266,10 +271,16 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         } else {
             bytesRead = 0;
         }
-        if (atBoundary) {
-            return bytesRead;
+        if (!atBoundary) {
+            findLimit();
         }
+        return bytesRead;
+    }
 
+    /**
+     * Sets the limit of the readable data from the buffered bytes: up to the delimiter if they hold it.
+     */
+    private void findLimit() throws IOException {
         int i = findDelimiter();
         if (i != -1) {
             limit = i;
@@ -288,7 +299,6 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
             }
             limit = end;
         }
-        return bytesRead;
     }
 
     /**
@@ -436,6 +446,10 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
                     }
                     fillBuffer();
                 }
+            }
+            if (!eof && !buffer.hasBufferedData()) {
+                // Find out whether anything follows the delimiter line
+                fillBuffer();
             }
         }
     }

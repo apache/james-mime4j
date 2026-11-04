@@ -19,13 +19,19 @@
 
 package org.apache.james.mime4j.stream;
 
+import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.MimeIOException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StrictMimeTokenStreamTest {
 
@@ -92,6 +98,53 @@ public class StrictMimeTokenStreamTest {
         } catch (MimeIOException expected) {
             Assert.assertEquals("Oh my god! Boundary is missing!\r\n", sb.toString());
         }
+    }
+
+    private static final String NESTED_UNTERMINATED =
+        "Content-Type: multipart/mixed; boundary=a\r\n\r\n"
+        + "--a\r\n"
+        + "Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+        + "Th\r\n"
+        + "--b\r\n"
+        + "x";
+
+    private static List<String> events(InputStream in) throws Exception {
+        MimeTokenStream stream = new MimeTokenStream(MimeConfig.STRICT);
+        stream.parse(in);
+        List<String> events = new ArrayList<>();
+        try {
+            for (EntityState s = stream.getState(); s != EntityState.T_END_OF_STREAM; s = stream.next()) {
+                if (s == EntityState.T_PREAMBLE || s == EntityState.T_BODY || s == EntityState.T_EPILOGUE) {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    InputStream body = stream.getInputStream();
+                    byte[] b = new byte[512];
+                    int n;
+                    while ((n = body.read(b)) != -1) {
+                        out.write(b, 0, n);
+                    }
+                    events.add(s + " " + out.toString("US-ASCII"));
+                } else {
+                    events.add(s.toString());
+                }
+            }
+        } catch (MimeException | IOException e) {
+            events.add("EXCEPTION " + e.getMessage());
+        }
+        return events;
+    }
+
+    @Test
+    public void nestedMultipartWithoutClosingDelimiterDoesNotDependOnReadSizes() throws Exception {
+        byte[] message = NESTED_UNTERMINATED.getBytes("US-ASCII");
+        InputStream oneByteReads = new FilterInputStream(new ByteArrayInputStream(message)) {
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return super.read(b, off, Math.min(len, 1));
+            }
+        };
+        List<String> whole = events(new ByteArrayInputStream(message));
+        Assert.assertTrue(whole.toString(), whole.contains("T_PREAMBLE Th"));
+        Assert.assertEquals(events(oneByteReads), whole);
     }
 
     private void checkNextIs(EntityState expected) throws Exception {
