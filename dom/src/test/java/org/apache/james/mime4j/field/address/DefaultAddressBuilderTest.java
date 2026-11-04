@@ -345,4 +345,18 @@ public class DefaultAddressBuilderTest {
         Assert.assertEquals("é", ((Group) list.get(1)).getName());
         Assert.assertEquals("é", parser.parseGroup("=?ISO-8859-1?Q?=E9?=: a@example.com;").getName());
     }
+
+    @Test(timeout = 2000)
+    public void parseAddressListShouldFailFastOnALongInvalidPhrase() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 20000; i++) {
+            sb.append("a\"b\".");
+        }
+        try {
+            parser.parseAddressList(sb);
+            Assert.fail("ParseException expected");
+        } catch (ParseException expected) {
+            // expected
+        }
+    }
 }
