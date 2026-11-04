@@ -53,6 +53,7 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
     private String charset;
     private String transferEncoding;
     private long contentLength;
+    private boolean contentTypeSeen;
 
     /**
      * Creates a new root <code>BodyDescriptor</code> instance.
@@ -80,6 +81,7 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
         charset = null;
         transferEncoding = null;
         contentLength = -1;
+        contentTypeSeen = false;
     }
 
     public BodyDescriptorBuilder newChild() {
@@ -197,14 +199,19 @@ class FallbackBodyDescriptorBuilder implements BodyDescriptorBuilder {
             boundary = b;
         }
 
-        String c = params.get("charset");
-        charset = null;
-        if (c != null) {
-            c = c.trim();
-            if (c.length() > 0) {
-                charset = c;
+        // When no field gives a usable type, the charset comes from the first one,
+        // as for DefaultBodyDescriptorBuilder
+        if (mimeType != null || !contentTypeSeen) {
+            String c = params.get("charset");
+            charset = null;
+            if (c != null) {
+                c = c.trim();
+                if (c.length() > 0) {
+                    charset = c;
+                }
             }
         }
+        contentTypeSeen = true;
     }
 
 }
