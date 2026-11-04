@@ -647,4 +647,22 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals("a", AddressFormatter.DEFAULT.encode(new Mailbox("a", ",;")));
         Assert.assertEquals("John <a>", AddressFormatter.DEFAULT.encode(new Mailbox("John", "a", "<>")));
     }
+
+    @Test(timeout = 2000)
+    public void parseAddressListShouldBeLinearOnManyUnclosedDomainLiterals() {
+        StringBuilder sb = new StringBuilder("a@b");
+        for (int i = 0; i < 100000; i++) {
+            sb.append("[x ");
+        }
+        AddressList list = parser.parseAddressList(sb);
+        Assert.assertEquals(1, list.size());
+        Assert.assertEquals("b[x[x[x", ((Mailbox) list.get(0)).getDomain().substring(0, 7));
+    }
+
+    @Test
+    public void anUnclosedBracketShouldNotHideALaterDomainLiteral() {
+        AddressList list = parser.parseAddressList("a@b[x [y, c@[1.2.3.4]");
+        Assert.assertEquals(2, list.size());
+        Assert.assertEquals("[1.2.3.4]", ((Mailbox) list.get(1)).getDomain());
+    }
 }

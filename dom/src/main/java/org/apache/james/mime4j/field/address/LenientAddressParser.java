@@ -90,6 +90,9 @@ public class LenientAddressParser implements AddressParser {
 
     String parseDomain(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
         StringBuilder dst = new StringBuilder();
+        // Every '[' before this index has no ']' before the next delimiter: a failed scan for
+        // the closing bracket is not repeated for each of them, which would be quadratic.
+        int unclosedUntil = -1;
         while (!cursor.atEnd()) {
             char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
             if (delimiters != null && delimiters.get(current)) {
@@ -98,7 +101,8 @@ public class LenientAddressParser implements AddressParser {
                 this.parser.skipWhiteSpace(buf, cursor);
             } else if (current == '(') {
                 this.parser.skipComment(buf, cursor);
-            } else if (current == '[' && copyDomainLiteral(buf, cursor, delimiters, dst)) {
+            } else if (current == '[' && cursor.getPos() >= unclosedUntil
+                    && (unclosedUntil = copyDomainLiteral(buf, cursor, delimiters, dst)) < 0) {
                 continue;
             } else {
                 this.parser.copyContent(buf, cursor, delimiters, dst);
@@ -109,9 +113,10 @@ public class LenientAddressParser implements AddressParser {
 
     /**
      * Copies a domain literal up to its closing bracket: '(' and ')' are dtext there, not a comment
-     * (RFC 5322 section 3.4.1). Returns false, copying nothing, when no ']' comes before a delimiter.
+     * (RFC 5322 section 3.4.1). Returns -1 once copied. When no ']' comes before a delimiter, copies
+     * nothing and returns the index where the search stopped: the delimiter, or the upper bound.
      */
-    private boolean copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+    private int copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
                                       final StringBuilder dst) {
         int from = cursor.getPos();
         int to = cursor.getUpperBound();
@@ -128,13 +133,13 @@ public class LenientAddressParser implements AddressParser {
                 // UTF-8, as the other parts of the header
                 dst.append(ContentUtil.decode(StandardCharsets.UTF_8, literal));
                 cursor.updatePos(i + 1);
-                return true;
+                return -1;
             }
             if (delimiters != null && delimiters.get(current)) {
-                return false;
+                return i;
             }
         }
-        return false;
+        return to;
     }
 
     DomainList parseRoute(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
