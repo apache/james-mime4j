@@ -140,4 +140,24 @@ public class MimeTokenStreamTest {
         Assert.assertFalse(states.toString(), states.contains(EntityState.T_START_BODYPART));
         Assert.assertTrue(states.toString(), states.contains(EntityState.T_END_MULTIPART));
     }
+
+    @Test
+    public void stopInANestedPartShouldNotReportItsFields() throws Exception {
+        String msg = "From: a@example.org\nContent-Type: multipart/mixed; boundary=\"outer\"\n\n"
+            + "--outer\nContent-Type: multipart/alternative; boundary=\"inner\"\n\n"
+            + "--inner\nContent-Type: text/plain\nX-After: stop\n\nhello\n--inner--\n--outer--\n";
+        MimeTokenStream stream = new MimeTokenStream();
+        stream.parse(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+        int startHeaders = 0;
+        EntityState state;
+        while ((state = stream.next()) != EntityState.T_START_HEADER || ++startHeaders < 3) {
+            Assert.assertNotEquals(EntityState.T_END_OF_STREAM, state);
+        }
+        stream.stop();
+        for (int i = 0; i < 100 && (state = stream.next()) != EntityState.T_END_OF_STREAM; i++) {
+            Assert.assertNotEquals(EntityState.T_FIELD, state);
+            Assert.assertNotEquals(EntityState.T_START_BODYPART, state);
+        }
+        Assert.assertEquals(EntityState.T_END_OF_STREAM, state);
+    }
 }

@@ -271,6 +271,12 @@ public class MimeTokenStream {
      */
     public void stop() {
         rootentity.stopSoft();
+        // Nested entities read from their own buffers: stop them all
+        for (EntityStateMachine entity : entities) {
+            if (entity instanceof MimeEntity) {
+                ((MimeEntity) entity).stopSoft();
+            }
+        }
         fieldBuilder.release();
     }
 
