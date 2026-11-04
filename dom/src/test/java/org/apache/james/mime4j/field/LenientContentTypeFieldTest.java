@@ -108,4 +108,16 @@ public class LenientContentTypeFieldTest {
         Assert.assertEquals(strict.getMimeType(), lenient.getMimeType());
         Assert.assertEquals("message/rfc822", parse("Content-Type:  message/rfc822 ").getMimeType());
     }
+
+    @Test
+    public void quotedPairInBoundaryShouldBeUnescapedLikeTheStrictParser() throws Exception {
+        String raw = "Content-Type: multipart/mixed; boundary=\"a\\bc\"; name=\"a\\bc\"";
+        ContentTypeField lenient = parse(raw);
+        ContentTypeField strict = (ContentTypeField) DefaultFieldParser.parse(raw);
+
+        Assert.assertEquals("abc", strict.getBoundary());
+        Assert.assertEquals("abc", lenient.getBoundary());
+        // other parameters keep the backslash before an ordinary character, as before
+        Assert.assertEquals("a\\bc", lenient.getParameter("name"));
+    }
 }

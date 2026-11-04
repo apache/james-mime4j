@@ -545,6 +545,18 @@ public class RawFieldParserTest {
     }
 
     @Test
+    public void quotedPairInBoundaryShouldBeUnescaped() throws Exception {
+        ByteSequence raw = ContentUtil.encode("multipart/mixed; boundary=\"a\\bc\"; name=\"a\\bc\"");
+        RawBody body = parser.parseRawBody(raw, new ParserCursor(0, raw.length()));
+        Assert.assertEquals("abc", body.getParams().get(0).getValue());
+        Assert.assertEquals("a\\bc", body.getParams().get(1).getValue());
+
+        FallbackBodyDescriptorBuilder builder = new FallbackBodyDescriptorBuilder();
+        builder.addField(new RawField("Content-Type", "multipart/mixed; boundary=\"a\\bc\""));
+        Assert.assertEquals("abc", builder.build().getBoundary());
+    }
+
+    @Test
     public void fieldNameShouldNotHoldComments() throws Exception {
         RawField renamed = parser.parseField(ContentUtil.encode("Subj(x)ect: hello"));
         Assert.assertEquals("Subj(x)ect", renamed.getName());
