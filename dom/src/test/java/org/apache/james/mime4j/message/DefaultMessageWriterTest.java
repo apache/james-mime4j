@@ -347,4 +347,25 @@ public class DefaultMessageWriterTest {
         assertThat(ContentUtil.buffer(((SingleBody) m2.getBody()).getInputStream()))
             .isEqualTo("a\t".getBytes(StandardCharsets.US_ASCII));
     }
+
+    @Test
+    public void writeMessageShouldUseTheContentTypeThatDescribesTheBody() throws Exception {
+        String raw = "Content-Type: multipart/mixed\r\n"
+            + "Content-Type: multipart/mixed; boundary=b\r\n"
+            + "\r\n"
+            + "--b\r\n"
+            + "\r\n"
+            + "x\r\n"
+            + "--b--\r\n";
+        Message message = new DefaultMessageBuilder()
+            .parseMessage(new ByteArrayInputStream(raw.getBytes(StandardCharsets.US_ASCII)));
+        assertThat(message.getBody()).isInstanceOf(Multipart.class);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(message, out);
+
+        Message readBack = new DefaultMessageBuilder()
+            .parseMessage(new ByteArrayInputStream(out.toByteArray()));
+        assertThat(((Multipart) readBack.getBody()).getCount()).isEqualTo(1);
+    }
 }
