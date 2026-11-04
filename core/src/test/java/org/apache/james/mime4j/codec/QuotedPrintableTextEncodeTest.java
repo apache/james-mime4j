@@ -144,17 +144,30 @@ public class QuotedPrintableTextEncodeTest {
 
     @Test
     public void testDontEscapeSpaceBeforeLineEnd() throws Exception {
-        check("      ", "      ");
+        check("      ", "     =20");
     }
 
     @Test
     public void testDontEscapeTabsBeforeLineEnd() throws Exception {
-        check("\t\t\t\t", "\t\t\t\t");
+        check("\t\t\t\t", "\t\t\t=09");
     }
 
     @Test
     public void testDontWhiteSpaceBeforeLineEnd() throws Exception {
-        check("  \t\t  \t", "  \t\t  \t");
+        check("  \t\t  \t", "  \t\t  =09");
+    }
+
+    @Test
+    public void testEscapeWhitespaceAtEndOfContent() throws Exception {
+        check("a\t", "a=09");
+        check("a ", "a=20");
+        check("a \r", "a =0D");
+    }
+
+    @Test
+    public void testWhitespaceAtEndOfContentRoundTrips() throws Exception {
+        checkRoundtrip("a\t");
+        checkRoundtrip(" ");
     }
 
     private void checkRoundtrip(String content) throws Exception {

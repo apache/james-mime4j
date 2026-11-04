@@ -82,6 +82,11 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
     }
 
     private void completeEncoding() throws IOException {
+        if (!pendingCR && (pendingSpace || pendingTab)) {
+            // whitespace that ends the content ends an encoded line: it must be encoded
+            escape(pendingSpace ? SP : TB);
+            clearPending();
+        }
         writePending();
         flushOutput();
     }

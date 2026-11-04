@@ -334,4 +334,17 @@ public class DefaultMessageWriterTest {
         assertThat(ContentUtil.buffer(((SingleBody) m2.getBody()).getInputStream()))
             .isEqualTo("a\r\r\nb\rc\n\r\n".getBytes(StandardCharsets.US_ASCII));
     }
+
+    @Test
+    public void quotedPrintableBodyEndingWithWhitespaceSurvivesWriteAndParse() throws Exception {
+        byte[] raw = "Content-Transfer-Encoding: quoted-printable\r\n\r\na\t=\r\n".getBytes(StandardCharsets.US_ASCII);
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+        Message m1 = builder.parseMessage(new ByteArrayInputStream(raw));
+        ByteArrayOutputStream w1 = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(m1, w1);
+        Message m2 = builder.parseMessage(new ByteArrayInputStream(w1.toByteArray()));
+
+        assertThat(ContentUtil.buffer(((SingleBody) m2.getBody()).getInputStream()))
+            .isEqualTo("a\t".getBytes(StandardCharsets.US_ASCII));
+    }
 }
