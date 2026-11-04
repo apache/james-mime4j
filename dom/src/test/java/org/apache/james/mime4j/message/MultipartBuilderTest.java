@@ -33,9 +33,11 @@ import org.apache.james.mime4j.dom.Header;
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.TextBody;
+import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentTransferEncodingField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.NameValuePair;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -238,5 +240,53 @@ public class MultipartBuilderTest {
         Assert.assertTrue(embedded.getBody() instanceof TextBody);
         Assert.assertEquals("message/rfc822", part.getMimeType());
         Assert.assertEquals("text/plain", embedded.getMimeType());
+    }
+
+    @Test
+    public void longContentTypeParameterShouldBeRejected() {
+        String value = repeat("a", 1100);
+        MultipartBuilder multipart = MultipartBuilder.create("report")
+            .addContentTypeParameter(new NameValuePair("report-type", value));
+
+        Assert.assertThrows(IllegalArgumentException.class,
+            () -> Message.Builder.of().setBody(multipart.build()));
+    }
+
+    @Test
+    public void longFilenameIsWrittenWithinTheLineLimit() throws Exception {
+        assertLongFilenameRoundTrips(repeat("a", 1100));
+    }
+
+    @Test
+    public void longNonAsciiFilenameIsWrittenWithinTheLineLimit() throws Exception {
+        assertLongFilenameRoundTrips(repeat("\u00e9", 600));
+    }
+
+    private void assertLongFilenameRoundTrips(String filename) throws Exception {
+        Message message = Message.Builder.of()
+            .setBody(MultipartBuilder.create("mixed")
+                .addBodyPart(BodyPartBuilder.create()
+                    .setBody("body", StandardCharsets.UTF_8)
+                    .setContentDisposition("attachment", filename))
+                .build())
+            .build();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(message, out);
+
+        for (String line : new String(out.toByteArray(), StandardCharsets.ISO_8859_1).split("\r\n")) {
+            Assert.assertTrue(line, line.length() <= 998);
+        }
+        Message parsed = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(out.toByteArray()));
+        Entity part = ((Multipart) parsed.getBody()).getBodyParts().get(0);
+        Assert.assertEquals(filename,
+            ((ContentDispositionField) part.getHeader().getField("Content-Disposition")).getFilename());
+    }
+
+    private static String repeat(String s, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) {
+            sb.append(s);
+        }
+        return sb.toString();
     }
 }

@@ -54,6 +54,17 @@ public class EncoderUtil {
 
     private static final BitSet TOKEN_CHARS = initChars("()<>@,;:\\\"/[]?=");
 
+    // RFC 2231 attribute-char: a token char other than "*", "'" and "%"
+    private static final BitSet ATTRIBUTE_CHARS = initChars("()<>@,;:\\\"/[]?=*'%");
+
+    private static final Pattern WHITESPACE = Pattern.compile("[ \t]");
+
+    /** Longest run without whitespace written as is: it fits, with the folding space and a ";", on a 998 octet line */
+    private static final int MAX_PARAMETER_LENGTH = 998 - 2;
+
+    /** Length of the value of an RFC 2231 section written for a parameter that is too long */
+    private static final int PARAMETER_SECTION_LENGTH = 60;
+
     private static final BitSet ATEXT_CHARS = initChars("()<>@.,;:\\\"[]");
 
     private static final Pattern QUOTE = Pattern.compile("[\\\\\"]");
@@ -215,12 +226,108 @@ public class EncoderUtil {
         }
         name = name.toLowerCase(Locale.US);
 
+        return encodeHeaderParameterSection(name, value);
+    }
+
+    /**
+     * Encodes the specified strings into a header parameter like
+     * {@link #encodeHeaderParameter(String, String)}, for a header that is
+     * written on lines of at most 998 octets (RFC 5322 section 2.1.1). Folding
+     * only breaks a line at a whitespace: a parameter that holds a run without
+     * whitespace too long for one line is split into RFC 2231 sections, percent encoded in UTF-8 when the value
+     * is not printable ASCII, if the header parser of the field decodes them.
+     *
+     * @param name
+     *            parameter name.
+     * @param value
+     *            parameter value.
+     * @param rfc2231Sections
+     *            whether a parameter too long for one line may be split into
+     *            RFC 2231 sections.
+     * @return encoded result.
+     * @throws IllegalArgumentException if the name is invalid, or if the
+     *             parameter is too long for one line and cannot be split.
+     */
+    public static String encodeHeaderParameter(String name, String value, boolean rfc2231Sections) {
+        String parameter = encodeHeaderParameter(name, value);
+        if (fitsOnFoldedLines(parameter)) {
+            return parameter;
+        }
+        name = name.toLowerCase(Locale.US);
+        if (!rfc2231Sections || name.indexOf('*') >= 0) {
+            throw new IllegalArgumentException("Parameter too long for a header line: " + name);
+        }
+        return isPrintableAscii(value) ? encodeSections(name, value) : encodeEncodedSections(name, value);
+    }
+
+    private static String encodeHeaderParameterSection(String name, String value) {
         // value := token / quoted-string
         if (isToken(value)) {
             return name + "=" + value;
         } else {
             return name + "=" + quote(value);
         }
+    }
+
+    private static boolean fitsOnFoldedLines(String parameter) {
+        for (String run : WHITESPACE.split(parameter)) {
+            if (run.getBytes(Charsets.UTF_8).length > MAX_PARAMETER_LENGTH) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isPrintableAscii(String value) {
+        for (int idx = 0; idx < value.length(); idx++) {
+            char ch = value.charAt(idx);
+            if (ch < 32 || ch >= 127) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // RFC 2231 section 3: name*0="..."; name*1="..."
+    private static String encodeSections(String name, String value) {
+        StringBuilder sb = new StringBuilder();
+        int section = 0;
+        for (int start = 0; start < value.length(); start += PARAMETER_SECTION_LENGTH) {
+            if (section > 0) {
+                sb.append("; ");
+            }
+            String part = value.substring(start, Math.min(value.length(), start + PARAMETER_SECTION_LENGTH));
+            sb.append(encodeHeaderParameterSection(name + "*" + section, part));
+            section++;
+        }
+        return sb.toString();
+    }
+
+    // RFC 2231 sections 3 and 4: name*0*=utf-8''%XX...; name*1*=%XX...
+    private static String encodeEncodedSections(String name, String value) {
+        StringBuilder sb = new StringBuilder();
+        StringBuilder current = new StringBuilder("utf-8''");
+        int section = 0;
+        for (byte b : value.getBytes(Charsets.UTF_8)) {
+            int v = b & 0xff;
+            String encoded = ATTRIBUTE_CHARS.get(v)
+                    ? String.valueOf((char) v)
+                    : "%" + hexDigit(v >>> 4) + hexDigit(v & 0xf);
+            if (current.length() + encoded.length() > PARAMETER_SECTION_LENGTH) {
+                appendEncodedSection(sb, name, section++, current);
+                current.setLength(0);
+            }
+            current.append(encoded);
+        }
+        appendEncodedSection(sb, name, section, current);
+        return sb.toString();
+    }
+
+    private static void appendEncodedSection(StringBuilder sb, String name, int section, CharSequence value) {
+        if (section > 0) {
+            sb.append("; ");
+        }
+        sb.append(name).append('*').append(section).append("*=").append(value);
     }
 
     /**
