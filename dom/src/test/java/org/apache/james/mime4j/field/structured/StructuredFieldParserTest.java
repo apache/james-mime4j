@@ -63,6 +63,14 @@ public class StructuredFieldParserTest {
         Assert.assertEquals("Field Value", parse("Fi(This is a comment)eld (A (very (nested) )comment)Value"));
     }
 
+    @Test
+    public void testQuotedPairInQuotedString() throws Exception {
+        Assert.assertEquals("a\"b", parse("\"a\\\"b\""));
+        Assert.assertEquals("a\\b", parse("\"a\\\\b\""));
+        Assert.assertEquals("ab\"", parse("\"ab\\\"\""));
+        Assert.assertEquals("a\"\r\nb", parse("\"a\\\"\r\n b\""));
+    }
+
     private String parse(String in) throws Exception {
         StructuredFieldParser parser = new StructuredFieldParser(new StringReader(in));
         parser.setFoldingPreserved(true);

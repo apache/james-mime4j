@@ -123,6 +123,7 @@ private String doParse() :
 		|
 		t = <FOLD>
 			{
+				buffer.append(t.image);
 				if (preserveFolding) buffer.append("\r\n");
 			}
 		|
@@ -207,9 +208,12 @@ SKIP :
 
 <INQUOTEDSTRING> TOKEN :
 {
-	< STRING_CONTENT : (~["\"", "\\", "\r"])+ >
-	// Preserve line break within quotes but not trailing white space
-|	< FOLD: "\r\n" ( [" ", "\t"] )* >
+	// a token after a quoted pair (MORE) takes its image from image, where the
+	// quoted pair action removed the backslash, not from the raw input
+	< STRING_CONTENT : (~["\"", "\\", "\r"])+ > { matchedToken.image = image.toString(); }
+	// Preserve line break within quotes but not trailing white space:
+	// the image keeps only the quoted pairs before the fold
+|	< FOLD: "\r\n" ( [" ", "\t"] )* > { matchedToken.image = image.substring(0, image.length() - lengthOfMatch); }
 |	< QUOTEDSTRING: "\"" > { matchedToken.image = image.substring(0, image.length() - 1); } : DEFAULT
 }
 
