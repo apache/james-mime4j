@@ -20,6 +20,8 @@
 package org.apache.james.mime4j.message;
 
 import org.apache.james.mime4j.ExampleMail;
+import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.field.LenientFieldParser;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.BodyDescriptorBuilder;
 import org.apache.james.mime4j.stream.EntityState;
@@ -34,7 +36,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class MaximalBodyDescriptorTest {
@@ -334,6 +338,35 @@ public class MaximalBodyDescriptorTest {
         assertNotNull(descriptor);
         assertTrue("Parser is maximal so body descriptor should be maximal", descriptor instanceof MaximalBodyDescriptor);
         return (MaximalBodyDescriptor) descriptor;
+    }
+
+    @Test
+    public void unusableContentTypesShouldGiveTheSameCharsetInCoreAndDom() throws Exception {
+        String[] headers = {
+            "Content-Type: foo; charset=utf-8\r\nContent-Type: bar\r\n",
+            "Content-Type: foo\r\nContent-Type: bar; charset=utf-8\r\n",
+            "Content-Type: foo; charset=utf-8\r\nContent-Type: text/html\r\n",
+            "Content-Type: multipart/mixed; charset=utf-8\r\nContent-Type: bar; charset=iso-8859-1\r\n"};
+        for (String header : headers) {
+            byte[] msg = (header + "\r\nbody\r\n").getBytes(StandardCharsets.US_ASCII);
+
+            MimeTokenStream core = new MimeTokenStream(); // FallbackBodyDescriptorBuilder
+            core.parse(new ByteArrayInputStream(msg));
+            MimeTokenStream dom = new MimeTokenStream(MimeConfig.DEFAULT, null,
+                new DefaultBodyDescriptorBuilder(null, LenientFieldParser.getParser(), DecodeMonitor.SILENT));
+            dom.parse(new ByteArrayInputStream(msg));
+            while (core.next() != EntityState.T_BODY) { }
+            while (dom.next() != EntityState.T_BODY) { }
+
+            Assert.assertEquals(header, dom.getBodyDescriptor().getMimeType(), core.getBodyDescriptor().getMimeType());
+            // the default charset is "US-ASCII" in DOM and "us-ascii" in core
+            Assert.assertEquals(header, lowerCase(dom.getBodyDescriptor().getCharset()),
+                lowerCase(core.getBodyDescriptor().getCharset()));
+        }
+    }
+
+    private static String lowerCase(String s) {
+        return s == null ? null : s.toLowerCase(Locale.US);
     }
 
     private MaximalBodyDescriptor describe(byte[] mail) throws Exception {
