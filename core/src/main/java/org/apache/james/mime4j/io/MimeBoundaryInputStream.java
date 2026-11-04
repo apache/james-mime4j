@@ -145,6 +145,12 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
         if (completed) {
             return false;
         }
+        if (!buffer.readAllowed()) {
+            // The buffer was truncated by stop(): the part ends here, without its delimiter
+            eof = true;
+            completed = true;
+            return false;
+        }
         if (endOfStream() && !hasData()) {
             skipBoundary();
             verifyEndOfStream();
@@ -237,6 +243,11 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
 
     private int fillBuffer() throws IOException {
         if (eof) {
+            return -1;
+        }
+        if (!buffer.readAllowed()) {
+            // Truncated by stop(): the buffered bytes are gone and no more are read
+            eof = true;
             return -1;
         }
         int bytesRead;
@@ -385,6 +396,11 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
     private void skipBoundary() throws IOException {
         if (!completed) {
             completed = true;
+            if (!buffer.readAllowed()) {
+                // Truncated by stop(): no delimiter left to skip
+                eof = true;
+                return;
+            }
             buffer.skip(boundaryLen);
             boolean checkForLastPart = true;
             for (;;) {
