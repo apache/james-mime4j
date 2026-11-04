@@ -277,4 +277,11 @@ public class QuotedPrintableInputStreamTest {
             }
         }
     }
+
+    @Test
+    public void malformedEscapeBeforeLineBreakKeepsTheLineBreak() throws Exception {
+        InputStream in = new QuotedPrintableInputStream(InputStreams.createAscii("a=2\r\nb\r\n"), DecodeMonitor.SILENT);
+        // "=2" is left as is (MIME4J-160), the CRLF stays one line break
+        Assert.assertEquals("a=2\r\nb\r\n", readText(in));
+    }
 }
