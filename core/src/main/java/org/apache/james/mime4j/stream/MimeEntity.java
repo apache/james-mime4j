@@ -356,11 +356,15 @@ class MimeEntity implements EntityStateMachine {
             // better handle missing parts.
             // Removed the T_IN_BODYPART state (always use T_PREAMBLE)
             advanceToBoundary();
+            if (stopped) {
+                // stop(): the multipart ends here, whatever the part stream still holds. A part cut
+                // short is not a malformed message, and no new part starts.
+                clearMimePartStream();
+                state = EntityState.T_END_MULTIPART;
+                break;
+            }
             if (currentMimePartStream.eof() && !currentMimePartStream.isLastPart()) {
-                if (!stopped) {
-                    // A part cut short by stop() is not a malformed message
-                    monitor(Event.MIME_BODY_PREMATURE_END);
-                }
+                monitor(Event.MIME_BODY_PREMATURE_END);
             } else {
                 if (!currentMimePartStream.isLastPart()) {
                     clearMimePartStream();

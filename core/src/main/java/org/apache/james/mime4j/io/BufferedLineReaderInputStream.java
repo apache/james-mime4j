@@ -382,13 +382,18 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
 
     @Override
     public boolean unread(ByteArrayBuffer buf) {
-        prepend(buf.buffer(), buf.length());
+        if (!this.truncated) {
+            prepend(buf.buffer(), buf.length());
+        }
+        // else truncated by stop(): the bytes are dropped, as the rest of the buffer
         return true;
     }
 
     @Override
     public boolean unread(RecycledByteArrayBuffer buf) {
-        prepend(buf.buffer(), buf.length());
+        if (!this.truncated) {
+            prepend(buf.buffer(), buf.length());
+        }
         return true;
     }
 

@@ -25,6 +25,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -159,5 +160,63 @@ public class MimeTokenStreamTest {
             Assert.assertNotEquals(EntityState.T_START_BODYPART, state);
         }
         Assert.assertEquals(EntityState.T_END_OF_STREAM, state);
+    }
+
+    @Test(timeout = 10000)
+    public void stopOnAFieldFollowedByAMalformedLineShouldEndTheStream() throws Exception {
+        String msg = "Content-Type: multipart/mixed; boundary=b\r\n"
+            + "xyz\r\n"
+            + "--b\r\n"
+            + "\r\n"
+            + "x\r\n"
+            + "--b--\r\n";
+        MimeTokenStream stream = new MimeTokenStream(MimeConfig.custom()
+            .setMalformedHeaderStartsBody(true)
+            .build());
+        stream.parse(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+        EntityState state = stream.next(); // T_START_HEADER
+        state = stream.next();
+        Assert.assertEquals(EntityState.T_FIELD, state);
+        stream.stop();
+
+        int calls = 0;
+        while (state != EntityState.T_END_OF_STREAM) {
+            state = stream.next();
+            Assert.assertNotEquals(EntityState.T_START_BODYPART, state);
+            Assert.assertTrue("no T_END_OF_STREAM after stop()", ++calls < 1000);
+        }
+    }
+
+    @Test
+    public void stopAfterReadingThePreambleShouldNotStartABodyPart() throws Exception {
+        String msg = "Content-Type: multipart/mixed; boundary=b\r\n"
+            + "\r\n"
+            + "pre\r\n"
+            + "--b\r\n"
+            + "Subject: a\r\n"
+            + "\r\n"
+            + "x\r\n"
+            + "--b--\r\n";
+        for (boolean strict : new boolean[] {false, true}) {
+            MimeTokenStream stream = new MimeTokenStream(MimeConfig.custom().setStrictParsing(strict).build());
+            stream.parse(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+            EntityState state;
+            while ((state = stream.next()) != EntityState.T_PREAMBLE) {
+                Assert.assertNotEquals(EntityState.T_END_OF_STREAM, state);
+            }
+            InputStream preamble = stream.getInputStream();
+            while (preamble.read() != -1) {
+                // read the preamble to its end
+            }
+            stream.stop();
+
+            List<EntityState> after = new ArrayList<>();
+            while (state != EntityState.T_END_OF_STREAM) {
+                state = stream.next();
+                after.add(state);
+            }
+            Assert.assertEquals(Arrays.asList(EntityState.T_END_MULTIPART, EntityState.T_END_MESSAGE,
+                EntityState.T_END_OF_STREAM), after);
+        }
     }
 }
