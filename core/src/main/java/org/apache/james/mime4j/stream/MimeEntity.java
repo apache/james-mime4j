@@ -77,6 +77,7 @@ class MimeEntity implements EntityStateMachine {
 
     private RecursionMode recursionMode;
     private MimeBoundaryInputStream currentMimePartStream;
+    private boolean stopped;
     private LineReaderInputStreamAdaptor dataStream;
     /** The limited view of {@link #dataStream}, shared by every reader of the current content. */
     private InputStream limitedContentStream;
@@ -168,6 +169,7 @@ class MimeEntity implements EntityStateMachine {
     }
 
     public void stopSoft() {
+        this.stopped = true;
         if(currentMimePartStream != null) {
             try {
                 currentMimePartStream.close();
@@ -355,7 +357,10 @@ class MimeEntity implements EntityStateMachine {
             // Removed the T_IN_BODYPART state (always use T_PREAMBLE)
             advanceToBoundary();
             if (currentMimePartStream.eof() && !currentMimePartStream.isLastPart()) {
-                monitor(Event.MIME_BODY_PREMATURE_END);
+                if (!stopped) {
+                    // A part cut short by stop() is not a malformed message
+                    monitor(Event.MIME_BODY_PREMATURE_END);
+                }
             } else {
                 if (!currentMimePartStream.isLastPart()) {
                     clearMimePartStream();

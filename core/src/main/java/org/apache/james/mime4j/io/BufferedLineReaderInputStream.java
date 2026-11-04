@@ -99,6 +99,10 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     }
 
     public int fillBuffer() throws IOException {
+        if (this.truncated) {
+            // stop(): nothing more is read from the source
+            return -1;
+        }
         // compact the buffer if necessary
         if (this.bufpos > 0) { // could swtich to (this.buffer.length / 2) but needs a 4*boundary capacity, then (instead of 2).
             int len = bufferLen();

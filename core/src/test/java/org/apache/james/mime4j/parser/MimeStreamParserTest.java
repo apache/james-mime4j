@@ -31,6 +31,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.LinkedList;
 
 public class MimeStreamParserTest {
@@ -485,4 +486,57 @@ public class MimeStreamParserTest {
         return ContentUtil.decode(byteSequence);
     }
 
+
+    @Test(timeout = 10000)
+    public void stopAtTheEndOfTheHeaderShouldNotReadMoreFromAChunkedSource() throws Exception {
+        final byte[] msg = ("From: a@example.org\nContent-Type: multipart/mixed; boundary=b1\n\n"
+            + "--b1\nX-Part: one\n\nfirst body\n--b1\nX-Part: two\n\nsecond body\n--b1--\n")
+            .getBytes(StandardCharsets.US_ASCII);
+        final int[] delivered = {0};
+        InputStream source = new InputStream() {
+            // returns at most 8 bytes per read, like a socket
+            @Override
+            public int read() {
+                return delivered[0] < msg.length ? msg[delivered[0]++] & 0xff : -1;
+            }
+
+            @Override
+            public int read(byte[] b, int off, int len) {
+                if (delivered[0] >= msg.length) {
+                    return -1;
+                }
+                int n = Math.min(Math.min(len, 8), msg.length - delivered[0]);
+                System.arraycopy(msg, delivered[0], b, off, n);
+                delivered[0] += n;
+                return n;
+            }
+        };
+        final MimeStreamParser parser = new MimeStreamParser();
+        final int[] bodyParts = {0};
+        final int[] endMultipart = {0};
+        final int[] atStop = {-1};
+        parser.setContentHandler(new AbstractContentHandler() {
+            @Override
+            public void endHeader() {
+                atStop[0] = delivered[0];
+                parser.stop();
+            }
+
+            @Override
+            public void startBodyPart() {
+                bodyParts[0]++;
+            }
+
+            @Override
+            public void endMultipart() {
+                endMultipart[0]++;
+            }
+        });
+
+        parser.parse(source);
+
+        Assert.assertEquals(0, bodyParts[0]);
+        Assert.assertEquals(1, endMultipart[0]);
+        Assert.assertEquals(atStop[0], delivered[0]);
+    }
 }
