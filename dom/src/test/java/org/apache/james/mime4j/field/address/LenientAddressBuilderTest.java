@@ -618,7 +618,8 @@ public class LenientAddressBuilderTest {
 
     @Test
     public void formattedLocalPartShouldNotLoseItsContent() {
-        Mailbox parsed = (Mailbox) parser.parseAddressList("\"\\\r").get(0);
+        // The parser deletes a bare CR, as MimeUtil#unfold does: build the local part directly
+        Mailbox parsed = new Mailbox("\\\r", null);
         String encoded = AddressFormatter.DEFAULT.encode(parsed);
         Mailbox again = (Mailbox) parser.parseAddressList(encoded).get(0);
 
