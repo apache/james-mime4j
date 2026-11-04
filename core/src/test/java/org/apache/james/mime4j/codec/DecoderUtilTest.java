@@ -193,4 +193,20 @@ public class DecoderUtilTest {
     public void strictMonitorShouldReportNonStandardSoftLineBreakAsIllegalArgument() {
         DecoderUtil.decodeEncodedWords("=?utf-8?Q?a=\tb?=", DecodeMonitor.STRICT);
     }
+
+    @Test(timeout = 2000)
+    public void decodeEncodedWordsShouldBeLinearOnUnterminatedEncodedWords() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 200000; i++) {
+            sb.append("=?x");
+        }
+        String value = sb.toString();
+        Assert.assertEquals(value, DecoderUtil.decodeEncodedWords(value, DecodeMonitor.SILENT));
+    }
+
+    @Test
+    public void anUnterminatedEncodedWordShouldKeepTheWordsDecodedBeforeIt() {
+        Assert.assertEquals("ab =?x?q?c =?y",
+            DecoderUtil.decodeEncodedWords("=?utf-8?q?a?= =?utf-8?q?b?= =?x?q?c =?y", DecodeMonitor.SILENT));
+    }
 }
