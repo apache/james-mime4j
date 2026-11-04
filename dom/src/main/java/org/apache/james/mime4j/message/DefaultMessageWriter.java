@@ -34,7 +34,6 @@ import org.apache.james.mime4j.dom.MessageWriter;
 import org.apache.james.mime4j.dom.Multipart;
 import org.apache.james.mime4j.dom.SingleBody;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
-import org.apache.james.mime4j.dom.field.FieldName;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
@@ -242,8 +241,7 @@ public class DefaultMessageWriter implements MessageWriter {
             throw new IllegalArgumentException(
                     "Missing header in parent entity");
 
-        ContentTypeField contentType = (ContentTypeField) header
-                .getField(FieldName.CONTENT_TYPE_LOWERCASE);
+        ContentTypeField contentType = AbstractEntity.getContentTypeField(header);
         if (contentType == null)
             throw new IllegalArgumentException(
                     "Content-Type field not specified");

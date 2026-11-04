@@ -136,16 +136,23 @@ public abstract class AbstractEntity implements Entity {
     }
 
     private ContentTypeField getContentTypeField() {
-        // a first Content-Type header that yields no mime type (empty, invalid,
-        // or multipart without boundary) does not describe the body: use the next
-        // usable one, like the core FallbackBodyDescriptorBuilder does
-        for (Field field : getHeader().getFields(FieldName.CONTENT_TYPE_LOWERCASE)) {
+        return getContentTypeField(getHeader());
+    }
+
+    /**
+     * Returns the Content-Type field of the header that describes the body.
+     * A first Content-Type header that yields no mime type (empty, invalid,
+     * or multipart without boundary) does not describe the body: the next
+     * usable one is used, like the core FallbackBodyDescriptorBuilder does.
+     */
+    static ContentTypeField getContentTypeField(Header header) {
+        for (Field field : header.getFields(FieldName.CONTENT_TYPE_LOWERCASE)) {
             ContentTypeField f = (ContentTypeField) field;
             if (f.getMimeType() != null && !(f.isMultipart() && f.getBoundary() == null)) {
                 return f;
             }
         }
-        return (ContentTypeField) getHeader().getField(FieldName.CONTENT_TYPE_LOWERCASE);
+        return (ContentTypeField) header.getField(FieldName.CONTENT_TYPE_LOWERCASE);
     }
 
     /**
