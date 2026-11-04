@@ -238,10 +238,12 @@ public class DecoderUtil {
             int encodedTextEnd = body.indexOf("?=", encodingEnd + 1);
 
             if (charsetEnd < 0 || encodingEnd < 0 || encodedTextEnd < 0) {
-                // Invalid pattern
+                // Invalid pattern. The three searches only move forward with startPattern, so a later
+                // "=?" cannot complete an encoded word either: copy the rest instead of searching again
+                // from each "=?", which is quadratic.
                 appendStringBuffer(fallback, charsetOverrides, out, sb, mimeCharset);
-                sb.append(body, position, startPattern + 2);
-                position = startPattern + 2;
+                sb.append(body, position, body.length());
+                break;
             } else if (encodingEnd == encodedTextEnd) {
                 appendStringBuffer(fallback, charsetOverrides, out, sb, mimeCharset);
                 sb.append(body, position, Math.min(encodedTextEnd + 2, body.length()));
