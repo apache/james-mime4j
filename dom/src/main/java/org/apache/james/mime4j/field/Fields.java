@@ -103,8 +103,9 @@ public class Fields {
             StringBuilder sb = new StringBuilder(mimeType);
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
                 sb.append("; ");
+                // no Content-Type parser decodes RFC 2231 sections: a value too long for a line is rejected
                 sb.append(EncoderUtil.encodeHeaderParameter(entry.getKey(),
-                        entry.getValue()));
+                        entry.getValue(), false));
             }
             String contentType = sb.toString();
             return contentType(contentType);
@@ -136,7 +137,8 @@ public class Fields {
                 sb.append("; ");
                 String name = param.getName();
                 String value = param.getValue();
-                sb.append(EncoderUtil.encodeHeaderParameter(name, value != null ? value : ""));
+                // no Content-Type parser decodes RFC 2231 sections: a value too long for a line is rejected
+                sb.append(EncoderUtil.encodeHeaderParameter(name, value != null ? value : "", false));
             }
             String contentType = sb.toString();
             return contentType(contentType);
@@ -214,7 +216,7 @@ public class Fields {
             for (Map.Entry<String, String> entry : parameters.entrySet()) {
                 sb.append("; ");
                 sb.append(EncoderUtil.encodeHeaderParameter(entry.getKey(),
-                        entry.getValue()));
+                        entry.getValue(), true));
             }
             String contentDisposition = sb.toString();
             return contentDisposition(contentDisposition);
@@ -246,7 +248,7 @@ public class Fields {
                 sb.append("; ");
                 String name = param.getName();
                 String value = param.getValue();
-                sb.append(EncoderUtil.encodeHeaderParameter(name, value != null ? value : ""));
+                sb.append(EncoderUtil.encodeHeaderParameter(name, value != null ? value : "", true));
             }
             String contentDisposition = sb.toString();
             return contentDisposition(contentDisposition);
