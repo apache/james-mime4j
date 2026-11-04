@@ -109,4 +109,22 @@ public class DefaultMessageBuilderParseHeaderTest {
 
         assertThat(header.getFields()).hasSize(2);
     }
+
+    @Test
+    public void strictParseHeaderShouldAcceptAValidMultipart() throws Exception {
+        String[] messages = {
+            "From: a@example.org\nContent-Type: multipart/mixed; boundary=b1\n\n"
+                + "--b1\nX-Part: one\n\nfirst body\n--b1\nX-Part: two\n\nsecond body\n--b1--\n",
+            "Subject: @exams\nContent-Type: multipart/alternative;\n boundary=\"=_alt\"\n\n--=_alt--\n"};
+        for (MimeConfig base : new MimeConfig[] {MimeConfig.DEFAULT, MimeConfig.PERMISSIVE}) {
+            DefaultMessageBuilder builder = new DefaultMessageBuilder();
+            builder.setMimeEntityConfig(MimeConfig.copy(base).setStrictParsing(true).build());
+            for (String msg : messages) {
+                byte[] bytes = msg.getBytes(StandardCharsets.US_ASCII);
+
+                assertThat(builder.parseHeader(new ByteArrayInputStream(bytes)).getFields()).hasSize(2);
+                assertThat(builder.parseHeader(chunked(bytes)).getFields()).hasSize(2);
+            }
+        }
+    }
 }
