@@ -583,4 +583,13 @@ public class RawFieldParserTest {
         org.junit.Assert.assertEquals("c", params.get(1).getName());
         org.junit.Assert.assertEquals("d e", params.get(1).getValue());
     }
+
+    @Test
+    public void quotedPairInCharsetShouldBeUnescaped() {
+        ByteSequence buf = ContentUtil.encode("text/plain; charset=\"iso-8859\\-1\"; name=\"a\\bc\"");
+        RawBody body = parser.parseRawBody(buf, new ParserCursor(0, buf.length()));
+        org.junit.Assert.assertEquals("iso-8859-1", body.getParams().get(0).getValue());
+        // other parameters keep the backslash before an ordinary character, as before
+        org.junit.Assert.assertEquals("a\\bc", body.getParams().get(1).getValue());
+    }
 }

@@ -168,7 +168,10 @@ public class RawFieldParser {
         }
         // The boundary is a byte exact delimiter: never decode it as an encoded word,
         // and a quoted pair always stands for the escaped character alone
-        String value = parseValue(buf, cursor, SEMICOLON, "boundary".equalsIgnoreCase(name));
+        boolean boundary = "boundary".equalsIgnoreCase(name);
+        // Nor can a charset name hold a backslash (RFC 2978 mime-charset)
+        boolean unescape = boundary || "charset".equalsIgnoreCase(name);
+        String value = parseValue(buf, cursor, SEMICOLON, boundary, unescape);
         if (!cursor.atEnd()) {
             cursor.updatePos(cursor.getPos() + 1);
         }
@@ -222,11 +225,11 @@ public class RawFieldParser {
      *  is not delimited by any character.
      */
     public String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        return parseValue(buf, cursor, delimiters, false);
+        return parseValue(buf, cursor, delimiters, false, false);
     }
 
     private String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
-            final boolean boundary) {
+            final boolean boundary, final boolean unescape) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
         while (!cursor.atEnd()) {
@@ -246,7 +249,7 @@ public class RawFieldParser {
                 if (dst.length() > 0 && whitespace) {
                     dst.append(' ');
                 }
-                copyQuotedContent(buf, cursor, dst, boundary);
+                copyQuotedContent(buf, cursor, dst, boundary, unescape);
                 whitespace = false;
             } else {
                 if (dst.length() > 0 && whitespace) {
@@ -480,7 +483,7 @@ public class RawFieldParser {
      */
     public void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst) {
-        copyQuotedContent(buf, cursor, dst, false);
+        copyQuotedContent(buf, cursor, dst, false, false);
     }
 
     private static boolean isLineBreak(final char c) {
@@ -488,7 +491,7 @@ public class RawFieldParser {
     }
 
     private void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
-            final StringBuilder dst, final boolean boundary) {
+            final StringBuilder dst, final boolean boundary, final boolean unescape) {
         if (cursor.atEnd()) {
             return;
         }
@@ -515,8 +518,8 @@ public class RawFieldParser {
                     // applies to the character after it
                     continue;
                 }
-                // A boundary cannot hold a backslash (RFC 2046 bchars): the quoted pair is unescaped
-                if (!boundary && current != '\"' && current != '\\') {
+                // A boundary or a charset cannot hold a backslash: the quoted pair is unescaped
+                if (!unescape && current != '\"' && current != '\\') {
                     dstRaw.append('\\');
                 }
                 dstRaw.append(currentByte);
