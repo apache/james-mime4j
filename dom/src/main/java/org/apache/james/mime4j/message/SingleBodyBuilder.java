@@ -106,8 +106,9 @@ public class SingleBodyBuilder {
     public TextBody buildText() throws IOException {
         Charset cs = this.charset != null ? this.charset : Charsets.DEFAULT_CHARSET;
         if (this.text != null) {
-            // The text gets encoded: the label has to name a charset that encodes
-            cs = CharsetUtil.forEncoding(cs);
+            // The text gets encoded: the label has to name a charset that encodes it
+            Charset encoding = CharsetUtil.forEncoding(this.charset, this.text);
+            cs = encoding != null ? encoding : Charsets.DEFAULT_CHARSET;
         }
         if (this.bodyFactory != null) {
             if (this.text != null) {

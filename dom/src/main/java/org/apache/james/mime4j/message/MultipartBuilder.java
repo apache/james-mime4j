@@ -231,8 +231,10 @@ public class MultipartBuilder {
     }
 
     public MultipartBuilder addTextPart(String text, Charset charset) throws IOException {
-        // The text gets encoded: the label has to name a charset that encodes
-        Charset cs = charset != null ? CharsetUtil.forEncoding(charset) : Charsets.ISO_8859_1;
+        // The text gets encoded: the label has to name a charset that encodes it
+        Charset cs = charset != null ? charset
+            : Charsets.ISO_8859_1.newEncoder().canEncode(text) ? Charsets.ISO_8859_1 : Charsets.UTF_8;
+        cs = CharsetUtil.forEncoding(cs, text);
         TextBody body = bodyFactory != null ? bodyFactory.textBody(
                 InputStreams.create(text, cs), cs.name()) : BasicBodyFactory.INSTANCE.textBody(text, cs);
         BodyPart bodyPart = BodyPartBuilder.create()

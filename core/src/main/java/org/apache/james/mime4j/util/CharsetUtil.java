@@ -215,4 +215,30 @@ public class CharsetUtil {
         return Charsets.UTF_8;
     }
 
+    /**
+     * Returns the charset to encode a text with, so that the text is not silently altered.
+     * A charset chosen by the caller has to encode the whole text. Without a charset, the text
+     * stays in the default one (<code>null</code> is returned) or else takes UTF-8.
+     *
+     * @param charset the charset the caller chose, may be <code>null</code>.
+     * @param text the text to encode.
+     * @return the charset to use and to label the text with, <code>null</code> when the text fits
+     * the default charset and the caller chose none.
+     * @throws IllegalArgumentException if the charset cannot encode the text. A lone surrogate
+     * cannot be encoded by any charset.
+     */
+    public static Charset forEncoding(final Charset charset, final CharSequence text) {
+        Charset cs = forEncoding(charset);
+        if (cs == null) {
+            if (Charsets.DEFAULT_CHARSET.newEncoder().canEncode(text)) {
+                return null;
+            }
+            cs = Charsets.UTF_8;
+        }
+        if (!cs.newEncoder().canEncode(text)) {
+            throw new IllegalArgumentException("Charset " + cs.name() + " cannot encode the text");
+        }
+        return cs;
+    }
+
 }

@@ -170,8 +170,8 @@ public class BodyPartBuilder extends AbstractEntityBuilder {
      *            &quot;xml&quot;).
      */
     public BodyPartBuilder setBody(String text, String subtype, Charset charset) throws IOException {
-        // The text gets encoded: the label has to name a charset that encodes
-        charset = CharsetUtil.forEncoding(charset);
+        // The text gets encoded: the label has to name a charset that encodes it
+        charset = CharsetUtil.forEncoding(charset, text);
         String mimeType = "text/" + (subtype != null ? subtype : "plain");
         if (charset != null) {
             setField(Fields.contentType(mimeType, new NameValuePair("charset", charset.name())));

@@ -19,9 +19,13 @@
 
 package org.apache.james.mime4j.message;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -288,5 +292,62 @@ public class MultipartBuilderTest {
             sb.append(s);
         }
         return sb.toString();
+    }
+
+    @Test
+    public void textBodyInACharsetThatCannotEncodeItShouldBeRejected() throws Exception {
+        assertThatThrownBy(() -> Message.Builder.of().setBody("caf\u00e9", "plain", StandardCharsets.US_ASCII))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> BodyPartBuilder.create().setBody("caf\u00e9", "plain", StandardCharsets.US_ASCII))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> MultipartBuilder.create("mixed").addTextPart("\u20ac", StandardCharsets.ISO_8859_1))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> BasicBodyFactory.INSTANCE.textBody("caf\u00e9", StandardCharsets.US_ASCII))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> SingleBodyBuilder.create().setText("caf\u00e9").setCharset(StandardCharsets.US_ASCII).buildText())
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void textBodyWithALoneSurrogateShouldBeRejected() throws Exception {
+        assertThatThrownBy(() -> Message.Builder.of().setBody("a\ud83d", "plain", StandardCharsets.UTF_8))
+            .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> MultipartBuilder.create("mixed").addTextPart("a\ud83d", null))
+            .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    public void textWithoutACharsetShouldTakeOneThatCarriesIt() throws Exception {
+        Message part = Message.Builder.of()
+            .setBody(MultipartBuilder.create("mixed").addTextPart("\u20ac", null).build())
+            .build();
+        assertThat(readText(((Multipart) writeAndParse(part).getBody()).getBodyParts().get(0))).isEqualTo("\u20ac");
+
+        Message message = Message.Builder.of().setBody("caf\u00e9", "plain", null).build();
+        assertThat(readText(writeAndParse(message))).isEqualTo("caf\u00e9");
+
+        assertThat(BasicBodyFactory.INSTANCE.textBody("caf\u00e9").getMimeCharset()).isEqualTo("UTF-8");
+        assertThat(BasicBodyFactory.INSTANCE.textBody("cafe").getMimeCharset()).isEqualTo("US-ASCII");
+        assertThat(SingleBodyBuilder.create().setText("caf\u00e9").buildText().getMimeCharset()).isEqualTo("UTF-8");
+        // What the default charset carries keeps its label
+        assertThat(((ContentTypeField) ((Multipart) Message.Builder.of()
+                .setBody(MultipartBuilder.create("mixed").addTextPart("caf\u00e9", null).build()).build().getBody())
+            .getBodyParts().get(0).getHeader().getField("Content-Type")).getCharset()).isEqualTo("ISO-8859-1");
+    }
+
+    private static Message writeAndParse(Message message) throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        new DefaultMessageWriter().writeMessage(message, out);
+        return new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(out.toByteArray()));
+    }
+
+    private static String readText(Entity entity) throws Exception {
+        StringBuilder read = new StringBuilder();
+        try (Reader reader = ((TextBody) entity.getBody()).getReader()) {
+            for (int c = reader.read(); c != -1; c = reader.read()) {
+                read.append((char) c);
+            }
+        }
+        return read.toString();
     }
 }
