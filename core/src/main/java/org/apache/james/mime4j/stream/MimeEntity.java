@@ -78,6 +78,10 @@ class MimeEntity implements EntityStateMachine {
     private RecursionMode recursionMode;
     private MimeBoundaryInputStream currentMimePartStream;
     private boolean stopped;
+    /** Whether this entity is a body part or an encapsulated message, not the root. */
+    private boolean nested;
+    /** Whether the content of this entity was parsed as an encapsulated message. */
+    private boolean encapsulating;
     private LineReaderInputStreamAdaptor dataStream;
     /** The limited view of {@link #dataStream}, shared by every reader of the current content. */
     private InputStream limitedContentStream;
@@ -341,6 +345,7 @@ class MimeEntity implements EntityStateMachine {
                     && MimeUtil.isMessage(mimeType) && !stopped) {
                 // Once stopped, the encapsulated message is not parsed: there is nothing left to read
                 state = EntityState.T_BODY;
+                encapsulating = true;
                 return nextMessage();
             } else {
                 state = EntityState.T_BODY;
@@ -389,6 +394,9 @@ class MimeEntity implements EntityStateMachine {
             state = EntityState.T_END_MULTIPART;
             break;
         case T_BODY:
+            drainContent();
+            state = endState;
+            break;
         case T_END_MULTIPART:
             state = endState;
             break;
@@ -431,17 +439,41 @@ class MimeEntity implements EntityStateMachine {
             if (tmpbuf == null) {
                 tmpbuf = getBufferRecycler().allocByteBuffer(0, 2048);
             }
-            InputStream instream = getLimitedContentStream();
-            try {
-                while (instream.read(tmpbuf)!= -1) {
-                }
-            } catch (MimeIOException e) {
-                if (e.getCause() instanceof MaxContentLengthLimitException) {
-                    // A parse error: report it as next() documents
-                    throw e.getCause();
-                }
-                throw e;
+            drain(getLimitedContentStream());
+        }
+    }
+
+    private void drain(InputStream instream) throws IOException, MimeException {
+        try {
+            while (instream.read(tmpbuf)!= -1) {
             }
+        } catch (MimeIOException e) {
+            if (e.getCause() instanceof MaxContentLengthLimitException) {
+                // A parse error: report it as next() documents
+                throw e.getCause();
+            }
+            throw e;
+        }
+    }
+
+    /**
+     * Applies the content limit to the whole content of a nested entity, here where the bytes
+     * already read are counted, including what a decoder read ahead. Left to the parent, the rest
+     * would count from 0, so the outcome would depend on the size of the reads. An encapsulated
+     * message limits its own entities: what is left of it after them (data after the base64 pad,
+     * an epilogue) is read and discarded, whatever its size.
+     */
+    private void drainContent() throws IOException, MimeException {
+        if (!nested || stopped || config.getMaxContentLen() <= 0) {
+            return;
+        }
+        if (encapsulating) {
+            if (tmpbuf == null) {
+                tmpbuf = getBufferRecycler().allocByteBuffer(0, 2048);
+            }
+            drain(dataStream);
+        } else {
+            advanceToBoundary();
         }
     }
 
@@ -481,6 +513,7 @@ class MimeEntity implements EntityStateMachine {
                     fieldBuilder,
                     bodyDescBuilder.newChild());
             mimeentity.setRecursionMode(recursionMode);
+            mimeentity.nested = true;
             return mimeentity;
         }
     }
