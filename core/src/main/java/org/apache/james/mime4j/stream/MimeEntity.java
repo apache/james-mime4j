@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.stream;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
@@ -82,6 +83,8 @@ class MimeEntity implements EntityStateMachine {
     private boolean nested;
     /** Whether the content of this entity was parsed as an encapsulated message. */
     private boolean encapsulating;
+    /** The decoder of the encapsulated message, closed once this entity has read its content. */
+    private InputStream encapsulatedDecoder;
     private LineReaderInputStreamAdaptor dataStream;
     /** The limited view of {@link #dataStream}, shared by every reader of the current content. */
     private InputStream limitedContentStream;
@@ -395,6 +398,7 @@ class MimeEntity implements EntityStateMachine {
             break;
         case T_BODY:
             drainContent();
+            closeEncapsulatedDecoder();
             state = endState;
             break;
         case T_END_MULTIPART:
@@ -481,8 +485,32 @@ class MimeEntity implements EntityStateMachine {
         // optimize nesting of streams returning the "lower" stream instead of
         // always return dataStream (that would add a LineReaderInputStreamAdaptor in the chain)
         InputStream instream = currentMimePartStream != null ? currentMimePartStream : inbuffer;
-        instream = decodedStream(instream);
-        return nextMimeEntity(EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE, instream);
+        InputStream decoded = decodedStream(instream);
+        if (decoded != instream) {
+            encapsulatedDecoder = decoded;
+        }
+        return nextMimeEntity(EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE, new CloseShield(decoded));
+    }
+
+    private void closeEncapsulatedDecoder() throws IOException {
+        if (encapsulatedDecoder != null) {
+            encapsulatedDecoder.close();
+            encapsulatedDecoder = null;
+        }
+    }
+
+    /**
+     * Closing a body of the encapsulated message (MimeStreamParser does) must not close what this
+     * entity reads after it, as MimeBoundaryInputStream#close guarantees inside a multipart.
+     */
+    private static final class CloseShield extends FilterInputStream {
+        CloseShield(InputStream in) {
+            super(in);
+        }
+
+        @Override
+        public void close() {
+        }
     }
 
     private InputStream decodedStream(InputStream instream) {
