@@ -37,6 +37,7 @@ import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.stream.Field;
 import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
+import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
 import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
@@ -160,6 +161,14 @@ public class DefaultMessageWriter implements MessageWriter {
             preamble = multipart.getPreamble() != null ? ContentUtil.encode(multipart.getPreamble()) : null;
             epilogue = multipart.getEpilogue() != null ? ContentUtil.encode(multipart.getEpilogue()) : null;
         }
+        if (multipart.getBodyParts().isEmpty() && isClosedByAnEnclosingBoundary(multipart, contentType.getBoundary())) {
+            // The enclosing multipart would read a closing delimiter as its own, and the parts after
+            // this one as its epilogue. The first parse only read a preamble, cut by that delimiter.
+            if (preamble != null) {
+                writeBytes(preamble, out);
+            }
+            return;
+        }
         if (preamble != null) {
             writeBytes(preamble, out);
             out.write(CRLF);
@@ -228,6 +237,41 @@ public class DefaultMessageWriter implements MessageWriter {
         } else {
             return out;
         }
+    }
+
+    /**
+     * Whether an enclosing multipart reads the closing delimiter of this one as its own delimiter.
+     * Base64 hides the delimiters of what it encodes, quoted-printable does not.
+     */
+    private boolean isClosedByAnEnclosingBoundary(Multipart multipart, String boundary) {
+        Entity entity = multipart.getParent();
+        while (entity != null) {
+            if (!(entity.getBody() instanceof Multipart)
+                    && MimeUtil.isBase64Encoding(entity.getContentTransferEncoding())) {
+                return false;
+            }
+            Entity parent = entity.getParent();
+            if (parent != null && parent.getBody() instanceof Multipart && parent.getHeader() != null) {
+                ContentTypeField enclosing = AbstractEntity.getContentTypeField(parent.getHeader());
+                if (enclosing != null && enclosing.getBoundary() != null
+                        && isDelimiterOf(enclosing.getBoundary(), boundary + "--")) {
+                    return true;
+                }
+            }
+            entity = parent;
+        }
+        return false;
+    }
+
+    /** As MimeBoundaryInputStream: the boundary is followed by the end, a whitespace or "--". */
+    private static boolean isDelimiterOf(String boundary, String line) {
+        if (!line.startsWith(boundary)) {
+            return false;
+        }
+        int end = boundary.length();
+        return end == line.length()
+            || CharsetUtil.isWhitespace(line.charAt(end))
+            || line.startsWith("--", end);
     }
 
     private ContentTypeField getContentType(Multipart multipart) {

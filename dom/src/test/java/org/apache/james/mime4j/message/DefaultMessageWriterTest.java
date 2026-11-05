@@ -368,4 +368,60 @@ public class DefaultMessageWriterTest {
             .parseMessage(new ByteArrayInputStream(out.toByteArray()));
         assertThat(((Multipart) readBack.getBody()).getCount()).isEqualTo(1);
     }
+
+    private static void assertStableWithTwoParts(String input) throws Exception {
+        byte[] raw = input.getBytes(StandardCharsets.US_ASCII);
+        DefaultMessageBuilder builder = new DefaultMessageBuilder();
+
+        Message m1 = builder.parseMessage(new ByteArrayInputStream(raw));
+        byte[] w1 = DefaultMessageWriter.asBytes(m1);
+        Message m2 = builder.parseMessage(new ByteArrayInputStream(w1));
+
+        assertThat(((Multipart) m1.getBody()).getCount()).isEqualTo(2);
+        assertThat(((Multipart) m2.getBody()).getCount()).isEqualTo(2);
+        assertThat(DefaultMessageWriter.asBytes(m2)).isEqualTo(w1);
+    }
+
+    @Test
+    public void nestedMultipartWithTheBoundaryOfItsParentShouldNotCloseItsParent() throws Exception {
+        assertStableWithTwoParts("Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "--b\r\n"
+            + "Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "--b\r\n\r\n"
+            + "x\r\n"
+            + "--b--\r\n");
+    }
+
+    @Test
+    public void nestedMultipartWhoseClosingDelimiterMatchesItsParentShouldNotCloseItsParent() throws Exception {
+        assertStableWithTwoParts("Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "--b\r\n"
+            + "Content-Type: multipart/mixed; boundary=\"b--\"\r\n\r\n"
+            + "--b\r\n\r\n"
+            + "x\r\n"
+            + "--b--\r\n");
+    }
+
+    @Test
+    public void multipartInAMessageWithTheBoundaryOfTheEnclosingMultipartShouldNotCloseIt() throws Exception {
+        assertStableWithTwoParts("Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "--b\r\n"
+            + "Content-Type: message/rfc822\r\n\r\n"
+            + "Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "--b\r\n\r\n"
+            + "x\r\n"
+            + "--b--\r\n");
+    }
+
+    @Test
+    public void emptyNestedMultipartWithItsOwnBoundaryShouldKeepItsClosingDelimiter() throws Exception {
+        byte[] raw = ("Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "--b\r\n"
+            + "Content-Type: multipart/mixed; boundary=c\r\n\r\n"
+            + "--c--\r\n"
+            + "\r\n--b--\r\n").getBytes(StandardCharsets.US_ASCII);
+        Message message = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(raw));
+
+        assertThat(new String(DefaultMessageWriter.asBytes(message), StandardCharsets.US_ASCII)).contains("--c--");
+    }
 }
