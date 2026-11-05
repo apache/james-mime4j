@@ -105,7 +105,7 @@ public class BasicBodyFactory implements BodyFactory {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
         }
-        return new StringBody1(text, resolveCharset(mimeCharset));
+        return new StringBody1(text, CharsetUtil.forEncoding(resolveCharset(mimeCharset), text));
     }
 
     public TextBody textBody(final byte[] content, final Charset charset) {
@@ -126,11 +126,13 @@ public class BasicBodyFactory implements BodyFactory {
         if (text == null) {
             throw new IllegalArgumentException("Text may not be null");
         }
-        return new StringBody1(text, charset);
+        return new StringBody1(text, CharsetUtil.forEncoding(charset, text));
     }
 
     public TextBody textBody(final String text) {
-        return textBody(text, Charsets.DEFAULT_CHARSET);
+        // No charset chosen: the default one, or UTF-8 for a text it cannot encode
+        Charset charset = CharsetUtil.forEncoding(null, text);
+        return textBody(text, charset != null ? charset : Charsets.DEFAULT_CHARSET);
     }
 
     public BinaryBody binaryBody(final String content, final Charset charset) {
