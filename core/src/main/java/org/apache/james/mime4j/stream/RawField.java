@@ -22,6 +22,7 @@ package org.apache.james.mime4j.stream;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.CharsetUtil;
 import org.apache.james.mime4j.util.ContentUtil;
@@ -161,9 +162,34 @@ public final class RawField implements Field {
             if (len > off && (CharsetUtil.isWhitespace((char) (raw.byteAt(off) & 0xff)))) {
                 off++;
             }
-            return MimeUtil.unfold(ContentUtil.decode(raw, off, len - off, StandardCharsets.UTF_8));
+            return decodeUnfolded(raw, off, len);
         }
         return null;
+    }
+
+    /**
+     * Deletes CR and LF from the bytes before decoding, as RawFieldParser does: a line break inside
+     * a multi-byte sequence must not split it.
+     */
+    private static String decodeUnfolded(ByteSequence raw, int off, int len) {
+        ByteArrayBuffer unfolded = null;
+        for (int i = off; i < len; i++) {
+            byte b = raw.byteAt(i);
+            if (b == '\r' || b == '\n') {
+                if (unfolded == null) {
+                    unfolded = new ByteArrayBuffer(len - off);
+                    for (int j = off; j < i; j++) {
+                        unfolded.append(raw.byteAt(j));
+                    }
+                }
+            } else if (unfolded != null) {
+                unfolded.append(b);
+            }
+        }
+        if (unfolded == null) {
+            return ContentUtil.decode(raw, off, len - off, StandardCharsets.UTF_8);
+        }
+        return ContentUtil.decode(unfolded, 0, unfolded.length(), StandardCharsets.UTF_8);
     }
 
     public int getDelimiterIdx() {
