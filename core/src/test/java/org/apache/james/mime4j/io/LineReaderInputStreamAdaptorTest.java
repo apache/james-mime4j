@@ -24,6 +24,11 @@ import org.apache.james.mime4j.util.ContentUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 public class LineReaderInputStreamAdaptorTest {
 
     private static LineReaderInputStreamAdaptor create(final String s) {
@@ -182,4 +187,23 @@ public class LineReaderInputStreamAdaptorTest {
         instream2.close();
     }
 
+
+    @Test
+    public void skipShouldNotGoBeyondTheRequestedCountWhenReadsAreShort() throws Exception {
+        byte[] content = new byte[100];
+        for (int i = 0; i < content.length; i++) {
+            content[i] = (byte) i;
+        }
+        // Stands for the parser's buffer or MimeBoundaryInputStream: at most 7 bytes per read
+        InputStream shortReads = new FilterInputStream(new ByteArrayInputStream(content)) {
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                return super.read(b, off, Math.min(len, 7));
+            }
+        };
+        LineReaderInputStreamAdaptor stream = new LineReaderInputStreamAdaptor(shortReads);
+
+        Assert.assertEquals(10, stream.skip(10));
+        Assert.assertEquals(10, stream.read());
+    }
 }
