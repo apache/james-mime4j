@@ -216,29 +216,29 @@ public class CharsetUtil {
     }
 
     /**
-     * Returns the charset to encode a text with, so that the text is not silently altered.
-     * A charset chosen by the caller has to encode the whole text. Without a charset, the text
-     * stays in the default one (<code>null</code> is returned) or else takes UTF-8.
+     * Returns the charset to encode a text with and to label it with, so that the text is not
+     * silently altered. Text that the given charset cannot encode takes UTF-8: that charset may
+     * come from a received part, whose text can hold what decoding replaced with U+FFFD. Without
+     * a charset, the text stays in the default one (<code>null</code> is returned) or takes UTF-8.
      *
-     * @param charset the charset the caller chose, may be <code>null</code>.
+     * @param charset the charset wanted, may be <code>null</code>.
      * @param text the text to encode.
-     * @return the charset to use and to label the text with, <code>null</code> when the text fits
-     * the default charset and the caller chose none.
-     * @throws IllegalArgumentException if the charset cannot encode the text. A lone surrogate
-     * cannot be encoded by any charset.
+     * @return the charset to use, which callers have to label the text with: it may not be the
+     * given one. <code>null</code> when the text fits the default charset and none was given.
+     * @throws IllegalArgumentException if the text holds a lone surrogate, which no charset encodes.
      */
     public static Charset forEncoding(final Charset charset, final CharSequence text) {
         Charset cs = forEncoding(charset);
-        if (cs == null) {
-            if (Charsets.DEFAULT_CHARSET.newEncoder().canEncode(text)) {
-                return null;
-            }
-            cs = Charsets.UTF_8;
+        if (cs == null && Charsets.DEFAULT_CHARSET.newEncoder().canEncode(text)) {
+            return null;
         }
-        if (!cs.newEncoder().canEncode(text)) {
-            throw new IllegalArgumentException("Charset " + cs.name() + " cannot encode the text");
+        if (cs != null && cs.newEncoder().canEncode(text)) {
+            return cs;
         }
-        return cs;
+        if (!Charsets.UTF_8.newEncoder().canEncode(text)) {
+            throw new IllegalArgumentException("The text holds a lone surrogate: no charset can encode it");
+        }
+        return Charsets.UTF_8;
     }
 
 }

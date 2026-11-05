@@ -76,4 +76,17 @@ public class StorageBodyFactoryTest {
             .textBody("okay", "ISO-8859-1");
         Assert.assertEquals("ISO-8859-1", body.getMimeCharset());
     }
+
+    @Test
+    public void textThatItsCharsetCannotEncodeShouldTakeUtf8AndItsLabel() throws Exception {
+        TextBody body = new StorageBodyFactory(new MemoryStorageProvider(), DecodeMonitor.SILENT)
+            .textBody("caf\u00e9", "US-ASCII");
+
+        Assert.assertEquals("UTF-8", body.getMimeCharset());
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        body.writeTo(out);
+        Assert.assertEquals("caf\u00e9", new String(out.toByteArray(), StandardCharsets.UTF_8));
+        Assert.assertEquals("UTF-8", new StorageBodyFactory(new MemoryStorageProvider(), DecodeMonitor.SILENT)
+            .textBody("caf\u00e9").getMimeCharset());
+    }
 }
