@@ -295,17 +295,45 @@ public class MultipartBuilderTest {
     }
 
     @Test
-    public void textBodyInACharsetThatCannotEncodeItShouldBeRejected() throws Exception {
-        assertThatThrownBy(() -> Message.Builder.of().setBody("caf\u00e9", "plain", StandardCharsets.US_ASCII))
-            .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> BodyPartBuilder.create().setBody("caf\u00e9", "plain", StandardCharsets.US_ASCII))
-            .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> MultipartBuilder.create("mixed").addTextPart("\u20ac", StandardCharsets.ISO_8859_1))
-            .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> BasicBodyFactory.INSTANCE.textBody("caf\u00e9", StandardCharsets.US_ASCII))
-            .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> SingleBodyBuilder.create().setText("caf\u00e9").setCharset(StandardCharsets.US_ASCII).buildText())
-            .isInstanceOf(IllegalArgumentException.class);
+    public void textThatItsCharsetCannotEncodeShouldTakeUtf8AndItsLabel() throws Exception {
+        Message built = Message.Builder.of().setBody("caf\u00e9", "plain", StandardCharsets.US_ASCII).build();
+        assertThat(((ContentTypeField) built.getHeader().getField("Content-Type")).getCharset()).isEqualTo("UTF-8");
+        assertThat(readText(writeAndParse(built))).isEqualTo("caf\u00e9");
+
+        Message part = Message.Builder.of()
+            .setBody(MultipartBuilder.create("mixed").addTextPart("\u20ac", StandardCharsets.ISO_8859_1).build())
+            .build();
+        Entity parsedPart = ((Multipart) writeAndParse(part).getBody()).getBodyParts().get(0);
+        assertThat(((ContentTypeField) parsedPart.getHeader().getField("Content-Type")).getCharset()).isEqualTo("UTF-8");
+        assertThat(readText(parsedPart)).isEqualTo("\u20ac");
+
+        assertThat(BodyPartBuilder.create().setBody("caf\u00e9", "plain", StandardCharsets.US_ASCII)
+            .build().getCharset()).isEqualTo("UTF-8");
+        assertThat(BasicBodyFactory.INSTANCE.textBody("caf\u00e9", StandardCharsets.US_ASCII).getMimeCharset()).isEqualTo("UTF-8");
+        assertThat(BasicBodyFactory.INSTANCE.textBody("caf\u00e9", "US-ASCII").getMimeCharset()).isEqualTo("UTF-8");
+        assertThat(SingleBodyBuilder.create().setText("caf\u00e9").setCharset(StandardCharsets.US_ASCII)
+            .buildText().getMimeCharset()).isEqualTo("UTF-8");
+    }
+
+    @Test
+    public void textThatItsCharsetCanEncodeShouldKeepThatCharset() throws Exception {
+        assertThat(BasicBodyFactory.INSTANCE.textBody("caf\u00e9", StandardCharsets.ISO_8859_1).getMimeCharset()).isEqualTo("ISO-8859-1");
+        assertThat(BasicBodyFactory.INSTANCE.textBody("cafe", StandardCharsets.US_ASCII).getMimeCharset()).isEqualTo("US-ASCII");
+    }
+
+    @Test
+    public void textOfAReceivedPartShouldBeReusableWithTheCharsetOfThatPart() throws Exception {
+        byte[] raw = ("Content-Type: text/plain; charset=US-ASCII\r\n"
+            + "Content-Transfer-Encoding: 8bit\r\n\r\ncaf\u00e9").getBytes(StandardCharsets.ISO_8859_1);
+        Message message = new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(raw));
+        TextBody received = (TextBody) message.getBody();
+        String text = readText(message);
+
+        TextBody rebuilt = SingleBodyBuilder.create().setText(text).setCharset(received.getCharset()).buildText();
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        rebuilt.writeTo(out);
+        assertThat(new String(out.toByteArray(), rebuilt.getCharset())).isEqualTo(text);
     }
 
     @Test

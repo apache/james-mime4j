@@ -249,7 +249,7 @@ public class StorageBodyFactory implements BodyFactory {
         if (text == null)
             throw new IllegalArgumentException();
 
-        return new StringTextBody(text, Charsets.DEFAULT_CHARSET);
+        return new StringTextBody(text, CharsetUtil.forEncoding(Charsets.DEFAULT_CHARSET, text));
     }
 
     /**
@@ -275,7 +275,7 @@ public class StorageBodyFactory implements BodyFactory {
             throw new IllegalArgumentException();
 
         Charset charset = toJavaCharset(mimeCharset, true, monitor);
-        return new StringTextBody(text, charset);
+        return new StringTextBody(text, CharsetUtil.forEncoding(charset, text));
     }
 
     private static Charset toJavaCharset(
