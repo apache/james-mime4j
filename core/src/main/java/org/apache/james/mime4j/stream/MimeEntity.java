@@ -294,6 +294,10 @@ class MimeEntity implements EntityStateMachine {
                 field = parsedField != null ? parsedField : rawfield;
                 return true;
             } catch (MimeException e) {
+                if (stopped) {
+                    // Nothing, or only the line read ahead, is left to parse: the header ends here
+                    return false;
+                }
                 monitor(Event.INVALID_HEADER);
                 if (config.isMalformedHeaderStartsBody()) {
                     LineReaderInputStream instream = getDataStream();
