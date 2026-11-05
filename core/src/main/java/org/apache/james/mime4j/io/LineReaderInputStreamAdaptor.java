@@ -145,7 +145,7 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
         final byte[] buffer = new byte[bufferSize];
         long result = 0;
         while (count > 0) {
-            int res = read(buffer);
+            int res = read(buffer, 0, (int) Math.min(buffer.length, count));
             if (res == -1) {
                 break;
             }
