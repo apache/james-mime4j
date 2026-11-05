@@ -120,4 +120,14 @@ public class LenientContentTypeFieldTest {
         // other parameters keep the backslash before an ordinary character, as before
         Assert.assertEquals("a\\bc", lenient.getParameter("name"));
     }
+
+    @Test
+    public void quotedPairInCharsetShouldBeUnescapedLikeTheStrictParser() throws Exception {
+        String raw = "Content-Type: text/plain; charset=\"iso-8859\\-1\"";
+        ContentTypeField lenient = parse(raw);
+        ContentTypeField strict = (ContentTypeField) DefaultFieldParser.parse(raw);
+
+        Assert.assertEquals("iso-8859-1", strict.getCharset());
+        Assert.assertEquals("iso-8859-1", lenient.getCharset());
+    }
 }
