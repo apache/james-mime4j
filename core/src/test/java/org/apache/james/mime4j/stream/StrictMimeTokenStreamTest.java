@@ -188,4 +188,54 @@ public class StrictMimeTokenStreamTest {
         Assert.assertEquals(Arrays.asList(EntityState.T_BODY, EntityState.T_END_MESSAGE,
             EntityState.T_END_OF_STREAM), after);
     }
+
+    @Test
+    public void stopAtTheStartOfTheMessageShouldEndTheHeaderInStrictMode() throws Exception {
+        String msg = "Subject: a\r\nFrom: b@example.com\r\n\r\nbody\r\n";
+        MimeTokenStream stream = new MimeTokenStream(MimeConfig.custom().setStrictParsing(true).build());
+        stream.parse(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+        Assert.assertEquals(EntityState.T_START_MESSAGE, stream.getState());
+        stream.stop();
+
+        List<EntityState> after = new ArrayList<>();
+        EntityState state;
+        do {
+            state = stream.next();
+            after.add(state);
+        } while (state != EntityState.T_END_OF_STREAM);
+        Assert.assertEquals(Arrays.asList(EntityState.T_START_HEADER, EntityState.T_END_HEADER, EntityState.T_BODY,
+            EntityState.T_END_MESSAGE, EntityState.T_END_OF_STREAM), after);
+    }
+
+    @Test
+    public void stopAtTheStartOfABodyPartShouldNotFailInStrictMode() throws Exception {
+        String msg = "Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "--b\r\nSubject: part\r\n\r\none\r\n--b--\r\n";
+        MimeTokenStream stream = new MimeTokenStream(MimeConfig.custom().setStrictParsing(true).build());
+        stream.parse(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+        while (stream.next() != EntityState.T_START_BODYPART) {
+            // up to the part
+        }
+        stream.stop();
+
+        EntityState state;
+        do {
+            state = stream.next();
+        } while (state != EntityState.T_END_OF_STREAM);
+    }
+
+    @Test
+    public void stopOnAFieldFollowedByAMalformedLineShouldNotFailInStrictMode() throws Exception {
+        String msg = "Subject: a\r\nbadline\r\n\r\nbody\r\n";
+        MimeTokenStream stream = new MimeTokenStream(MimeConfig.custom().setStrictParsing(true).build());
+        stream.parse(new ByteArrayInputStream(msg.getBytes(StandardCharsets.US_ASCII)));
+        stream.next(); // T_START_HEADER
+        Assert.assertEquals(EntityState.T_FIELD, stream.next());
+        stream.stop();
+
+        EntityState state;
+        do {
+            state = stream.next();
+        } while (state != EntityState.T_END_OF_STREAM);
+    }
 }
