@@ -19,13 +19,19 @@
 
 package org.apache.james.mime4j.field;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.field.ContentDispositionField;
 import org.apache.james.mime4j.dom.field.ContentLanguageField;
 import org.apache.james.mime4j.dom.field.ContentLocationField;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.dom.field.MimeVersionField;
+import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.stream.RawFieldParser;
+import org.apache.james.mime4j.util.ByteArrayBuffer;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * A CR or LF that is not part of a fold is deleted by MimeUtil#unfold, which the strict parsers
@@ -88,5 +94,27 @@ public class BareLineBreakStrictLenientTest {
         ContentDispositionField lenient = (ContentDispositionField) LenientFieldParser.parse(raw);
         Assert.assertEquals(raw, strict.getDispositionType(), lenient.getDispositionType());
         Assert.assertEquals(raw, strict.getParameter(parameter), lenient.getParameter(parameter));
+    }
+
+    @Test
+    public void bareCarriageReturnInsideAUtf8SequenceShouldBeReadTheSameWayByBothParsers() throws Exception {
+        assertFilename("caf\u00e9.txt", "Content-Disposition: a; filename=\"caf\u00c3\r\u00a9.txt\"");
+        assertFilename("caf\u00e9.txt", "Content-Disposition: a; filename=caf\u00c3\r\u00a9.txt");
+    }
+
+    @Test
+    public void bareLineFeedInsideAUtf8SequenceShouldBeReadTheSameWayByBothParsers() throws Exception {
+        assertFilename("caf\u00e9.txt", "Content-Disposition: a; filename=\"caf\u00c3\n\u00a9.txt\"");
+    }
+
+    private static void assertFilename(String expected, String latin1) throws Exception {
+        RawField field = RawFieldParser.DEFAULT.parseField(
+            new ByteArrayBuffer(latin1.getBytes(StandardCharsets.ISO_8859_1), true));
+
+        ContentDispositionField strict = (ContentDispositionField) DefaultFieldParser.getParser().parse(field, DecodeMonitor.SILENT);
+        ContentDispositionField lenient = (ContentDispositionField) LenientFieldParser.getParser().parse(field, DecodeMonitor.SILENT);
+
+        Assert.assertEquals(expected, lenient.getFilename());
+        Assert.assertEquals(expected, strict.getFilename());
     }
 }
