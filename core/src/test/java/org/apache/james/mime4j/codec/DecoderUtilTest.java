@@ -209,4 +209,29 @@ public class DecoderUtilTest {
         Assert.assertEquals("ab =?x?q?c =?y",
             DecoderUtil.decodeEncodedWords("=?utf-8?q?a?= =?utf-8?q?b?= =?x?q?c =?y", DecodeMonitor.SILENT));
     }
+
+    @Test
+    public void decodeEncodedWordsWithFallbackShouldBehaveLikeSilentMonitorOnUndecodableWords() {
+        Charset fallback = Charset.forName("ISO-8859-1");
+        String[] inputs = {
+            "=?UTF-8?B?QQ?=",
+            "=?ISO-8859-1?R?abc?=",
+            "=?ISO-8859-1?Q?=ZZ?=",
+            "=?ISO-8859-1?B?@@@@?=",
+            "test =?ISO-8859-1?R?abc?="
+        };
+        for (String input : inputs) {
+            Assert.assertEquals(input,
+                DecoderUtil.decodeEncodedWords(input, DecodeMonitor.SILENT, fallback),
+                DecoderUtil.decodeEncodedWords(input, fallback));
+        }
+    }
+
+    @Test
+    public void decodeEncodedWordsShouldTreatNullMonitorAsSilent() {
+        String input = "=?FOO-BAR?Q?abc?=";
+        Assert.assertEquals(
+            DecoderUtil.decodeEncodedWords(input, DecodeMonitor.SILENT, null),
+            DecoderUtil.decodeEncodedWords(input, (DecodeMonitor) null, null));
+    }
 }

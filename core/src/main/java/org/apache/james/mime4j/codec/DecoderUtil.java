@@ -215,6 +215,9 @@ public class DecoderUtil {
     public static String decodeEncodedWords(String body, DecodeMonitor monitor, Charset fallback,
             Map<Charset, Charset> charsetOverrides)
             throws IllegalArgumentException {
+        if (monitor == null) {
+            monitor = DecodeMonitor.SILENT;
+        }
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         StringBuilder sb = new StringBuilder();
