@@ -248,14 +248,21 @@ public class BasicBodyFactory implements BodyFactory {
 
     static class StringBody3 extends TextBody {
 
-        private final ByteArrayOutputStreamRecycler.Wrapper content;
+        // null once disposed: the buffer may then be recycled for another body
+        private ByteArrayOutputStreamRecycler.Wrapper content;
         private final Charset charset;
-        private boolean disposed;
 
         StringBody3(final ByteArrayOutputStreamRecycler.Wrapper content, final Charset charset) {
             super();
             this.content = content;
             this.charset = charset;
+        }
+
+        private ByteArrayOutputStreamRecycler.Wrapper content() {
+            if (content == null) {
+                throw new IllegalStateException("body has been disposed");
+            }
+            return content;
         }
 
         @Override
@@ -270,35 +277,36 @@ public class BasicBodyFactory implements BodyFactory {
 
         @Override
         public Reader getReader() throws IOException {
-            return new InputStreamReader(this.content.getValue().toInputStream(), this.charset);
+            return new InputStreamReader(content().getValue().toInputStream(), this.charset);
         }
 
         @Override
         public InputStream getInputStream() throws IOException {
-            return this.content.getValue().toInputStream();
+            return content().getValue().toInputStream();
         }
 
         @Override
         public long size() {
-            return content.getValue().size();
+            return content().getValue().size();
         }
 
         @Override
         public void writeTo(OutputStream out) throws IOException {
-            content.getValue().writeTo(out);
+            content().getValue().writeTo(out);
         }
 
         @Override
         public void dispose() {
-            if (!disposed) {
-                disposed = true;
-                this.content.release();
+            if (content != null) {
+                ByteArrayOutputStreamRecycler.Wrapper released = content;
+                content = null;
+                released.release();
             }
         }
 
         @Override
         public SingleBody copy() {
-            return new StringBody3(this.content.retain(), this.charset);
+            return new StringBody3(content().retain(), this.charset);
         }
 
     }
@@ -340,40 +348,48 @@ public class BasicBodyFactory implements BodyFactory {
 
     static class BinaryBody3 extends BinaryBody {
 
-        private final ByteArrayOutputStreamRecycler.Wrapper content;
-        private boolean disposed;
+        // null once disposed: the buffer may then be recycled for another body
+        private ByteArrayOutputStreamRecycler.Wrapper content;
 
         BinaryBody3(ByteArrayOutputStreamRecycler.Wrapper content) {
             super();
             this.content = content;
         }
 
+        private ByteArrayOutputStreamRecycler.Wrapper content() {
+            if (content == null) {
+                throw new IllegalStateException("body has been disposed");
+            }
+            return content;
+        }
+
         @Override
         public InputStream getInputStream() throws IOException {
-            return content.getValue().toInputStream();
+            return content().getValue().toInputStream();
         }
 
         @Override
         public void writeTo(OutputStream out) throws IOException {
-            content.getValue().writeTo(out);
+            content().getValue().writeTo(out);
         }
 
         @Override
         public long size() {
-            return content.getValue().size();
+            return content().getValue().size();
         }
 
         @Override
         public void dispose() {
-            if (!disposed) {
-                disposed = true;
-                content.release();
+            if (content != null) {
+                ByteArrayOutputStreamRecycler.Wrapper released = content;
+                content = null;
+                released.release();
             }
         }
 
         @Override
         public SingleBody copy() {
-            return new BinaryBody3(content.retain());
+            return new BinaryBody3(content().retain());
         }
 
     }

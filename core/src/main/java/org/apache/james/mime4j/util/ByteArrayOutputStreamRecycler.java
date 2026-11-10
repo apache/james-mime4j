@@ -46,19 +46,46 @@ public class ByteArrayOutputStreamRecycler {
         /**
          * Registers an additional owner of the underlying buffer, which then needs one more
          * {@link #release()} before being recycled.
+         *
+         * @throws IllegalStateException if the buffer has already been released: it may already
+         *   be in use by another owner
          */
         public Wrapper retain() {
-            REFERENCES.incrementAndGet(this);
-            return this;
-        }
-
-        public void release() {
-            if (REFERENCES.decrementAndGet(this) == 0) {
-                recycler.release(value);
+            for (;;) {
+                int current = references;
+                if (current <= 0) {
+                    throw new IllegalStateException("buffer has been released");
+                }
+                if (REFERENCES.compareAndSet(this, current, current + 1)) {
+                    return this;
+                }
             }
         }
 
+        public void release() {
+            for (;;) {
+                int current = references;
+                if (current <= 0) {
+                    // Already recycled: recycling it twice would hand it to two later owners
+                    return;
+                }
+                if (REFERENCES.compareAndSet(this, current, current - 1)) {
+                    if (current == 1) {
+                        recycler.release(value);
+                    }
+                    return;
+                }
+            }
+        }
+
+        /**
+         * @throws IllegalStateException if the buffer has been released: it may then hold the
+         *   content of another owner
+         */
         public UnsynchronizedByteArrayOutputStream getValue() {
+            if (references <= 0) {
+                throw new IllegalStateException("buffer has been released");
+            }
             return value;
         }
     }

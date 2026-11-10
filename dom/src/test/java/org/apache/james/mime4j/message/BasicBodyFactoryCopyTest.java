@@ -21,10 +21,12 @@ package org.apache.james.mime4j.message;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
 import org.apache.james.mime4j.dom.Message;
 import org.apache.james.mime4j.dom.SingleBody;
+import org.apache.james.mime4j.dom.TextBody;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -86,5 +88,71 @@ public class BasicBodyFactoryCopyTest {
 
         Assert.assertEquals("first\r\n", body(first));
         Assert.assertEquals("second\r\n", body(second));
+    }
+
+    private interface BodyAccess {
+        void run(SingleBody body) throws Exception;
+    }
+
+    private static void assertDisposed(SingleBody body, BodyAccess access) throws Exception {
+        try {
+            access.run(body);
+            Assert.fail("Expected IllegalStateException");
+        } catch (IllegalStateException expected) {
+            // the body no longer reaches its recycled buffer
+        }
+    }
+
+    private static void assertDisposedBodyDoesNotServeTheNextMessage(String contentType) throws Exception {
+        Message original = parse("Content-Type: " + contentType + "\r\n\r\nhello\r\n");
+        SingleBody body = (SingleBody) original.getBody();
+        original.dispose();
+        Message other = parse("Content-Type: " + contentType + "\r\n\r\nsomeone else's mail\r\n");
+
+        assertDisposed(body, b -> b.getInputStream());
+        assertDisposed(body, b -> b.writeTo(new ByteArrayOutputStream()));
+        assertDisposed(body, b -> b.size());
+        assertDisposed(body, b -> b.copy());
+        if (body instanceof TextBody) {
+            assertDisposed(body, b -> ((TextBody) b).getReader());
+        }
+        Assert.assertEquals("someone else's mail\r\n", body(other));
+    }
+
+    @Test
+    public void aDisposedTextBodyShouldNotServeTheNextMessage() throws Exception {
+        assertDisposedBodyDoesNotServeTheNextMessage("text/plain");
+    }
+
+    @Test
+    public void aDisposedBinaryBodyShouldNotServeTheNextMessage() throws Exception {
+        assertDisposedBodyDoesNotServeTheNextMessage("application/octet-stream");
+    }
+
+    @Test
+    public void copyAfterDisposeShouldNotShareTheNextMessageBuffer() throws Exception {
+        Message original = parse("Content-Type: text/plain\r\n\r\nhello\r\n");
+        SingleBody body = (SingleBody) original.getBody();
+        original.dispose();
+
+        assertDisposed(body, b -> b.copy());
+        Message other = parse("Content-Type: text/plain\r\n\r\nsomeone else's mail\r\n");
+        Assert.assertEquals("someone else's mail\r\n", body(other));
+    }
+
+    @Test
+    public void aStreamOpenedBeforeDisposeShouldKeepItsContent() throws Exception {
+        Message original = parse("Content-Type: text/plain\r\n\r\nhello\r\n");
+        InputStream in = ((SingleBody) original.getBody()).getInputStream();
+        original.dispose();
+        parse("Content-Type: text/plain\r\n\r\nsomeone else's mail\r\n");
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buf = new byte[64];
+        int n;
+        while ((n = in.read(buf)) != -1) {
+            out.write(buf, 0, n);
+        }
+        Assert.assertEquals("hello\r\n", out.toString("US-ASCII"));
     }
 }
