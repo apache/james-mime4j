@@ -71,6 +71,8 @@ public class EncoderUtil {
 
     /** Characters that end or restructure an address in a header: never written raw in a domain */
     private static final String DOMAIN_STRUCTURE_CHARS = ",;:<>()\"@\\";
+    // Inside a domain literal: ":" (IPv6 literals) and "(" ")" are read back as dtext
+    private static final String DOMAIN_LITERAL_STRUCTURE_CHARS = ",;<>\"@";
 
     private static BitSet initChars(String specials) {
         BitSet bs = new BitSet(128);
@@ -164,8 +166,9 @@ public class EncoderUtil {
 
     /**
      * Encodes the domain of an address specification as described in RFC 5322 section 3.4.1. A
-     * dot-atom (non ASCII characters allowed, as in internationalized domains) or a domain literal
-     * is returned unchanged. From any other domain, such as the ones a lenient parser reads from
+     * dot-atom (non ASCII characters allowed, as in internationalized domains) is returned
+     * unchanged. From a domain literal, the dtext characters a lenient reader takes for the end
+     * of the address (",", ";", "&lt;", "&gt;", "\"", "@") are dropped. From any other domain, such as the ones a lenient parser reads from
      * malformed addresses, the characters that would change the structure of the header (e.g. a
      * "," adding recipients) are dropped.
      *
@@ -177,8 +180,11 @@ public class EncoderUtil {
         // domain = dot-atom / domain-literal
         // domain-literal = [CFWS] "[" *([FWS] dtext) [FWS] "]" [CFWS]
         // dtext = %d33-90 / %d94-126
-        if (isDotAtomText(domain, true) || isDomainLiteral(domain)) {
+        if (isDotAtomText(domain, true)) {
             return domain;
+        }
+        if (isDomainLiteral(domain)) {
+            return removeChars(domain, DOMAIN_LITERAL_STRUCTURE_CHARS);
         }
         StringBuilder sb = new StringBuilder(domain.length());
         for (int idx = 0; idx < domain.length(); idx++) {
@@ -188,6 +194,22 @@ public class EncoderUtil {
             }
         }
         return sb.toString();
+    }
+
+    private static String removeChars(String str, String chars) {
+        StringBuilder sb = null;
+        for (int idx = 0; idx < str.length(); idx++) {
+            char ch = str.charAt(idx);
+            if (chars.indexOf(ch) != -1) {
+                if (sb == null) {
+                    sb = new StringBuilder(str.length());
+                    sb.append(str, 0, idx);
+                }
+            } else if (sb != null) {
+                sb.append(ch);
+            }
+        }
+        return sb == null ? str : sb.toString();
     }
 
     private static boolean isDomainLiteral(String str) {

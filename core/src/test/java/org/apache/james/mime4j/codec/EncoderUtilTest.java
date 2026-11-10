@@ -366,6 +366,14 @@ public class EncoderUtilTest {
     }
 
     @Test
+    public void domainLiteralsShouldLoseTheCharactersThatEndAnAddress() {
+        Assert.assertEquals("[]", EncoderUtil.encodeAddressDomain("[,]"));
+        Assert.assertEquals("[xy]", EncoderUtil.encodeAddressDomain("[x,y]"));
+        Assert.assertEquals("[]", EncoderUtil.encodeAddressDomain("[;<>\"@]"));
+        Assert.assertEquals("[IPv6:2001:db8::1]", EncoderUtil.encodeAddressDomain("[IPv6:2001:db8::1]"));
+    }
+
+    @Test
     public void harmlessMalformedDomainsShouldBeKept() {
         Assert.assertEquals("[", EncoderUtil.encodeAddressDomain("["));
         Assert.assertEquals("example.com.", EncoderUtil.encodeAddressDomain("example.com."));

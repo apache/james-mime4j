@@ -666,4 +666,23 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals(2, list.size());
         Assert.assertEquals("[1.2.3.4]", ((Mailbox) list.get(1)).getDomain());
     }
+
+    @Test
+    public void domainLiteralHoldingACommaIsOneRecipient() {
+        String[][] mailboxes = {{"a", "[x,y]"}, {"", "[,]"}, {"a", "[;]"}, {"a", "[<b@c>]"}};
+        for (String[] m : mailboxes) {
+            String header = AddressFormatter.DEFAULT.encode(new Mailbox(m[0], m[1]));
+            AddressList read = LenientAddressParser.DEFAULT.parseAddressList(header);
+            Assert.assertEquals(header, 1, read.flatten().size());
+        }
+    }
+
+    @Test
+    public void domainLiteralHoldingASemicolonKeepsTheGroupWhole() {
+        Group group = new Group("team", new Mailbox("a", "[;]"), new Mailbox("b", "c"));
+        String header = AddressFormatter.DEFAULT.encode(group);
+        AddressList read = LenientAddressParser.DEFAULT.parseAddressList(header);
+        Assert.assertEquals(header, 1, read.size());
+        Assert.assertEquals(header, 2, read.flatten().size());
+    }
 }
