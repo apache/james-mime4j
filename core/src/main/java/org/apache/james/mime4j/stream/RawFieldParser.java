@@ -311,6 +311,11 @@ public class RawFieldParser {
         for (int i = indexFrom; i < indexTo; i++, pos++) {
             current = (char) (buf.byteAt(i) & 0xff);
             if (escaped) {
+                if (isLineBreak(current)) {
+                    // Deleted, as by MimeUtil#unfold (a fold or a bare CR / LF): the quoted pair
+                    // applies to the character after it, as in copyQuotedContent
+                    continue;
+                }
                 escaped = false;
             } else {
                 if (current == '\\') {

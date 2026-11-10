@@ -117,4 +117,21 @@ public class BareLineBreakStrictLenientTest {
         Assert.assertEquals(expected, lenient.getFilename());
         Assert.assertEquals(expected, strict.getFilename());
     }
+
+    @Test
+    public void bareCarriageReturnAfterABackslashInACommentShouldBeReadTheSameWayByBothParsers() throws Exception {
+        for (String lineBreak : new String[] {"\r", "\n", "\r\n"}) {
+            String header = "Content-Disposition: attachment (\\" + lineBreak + "(x); filename=a.exe";
+            ContentDispositionField strict = (ContentDispositionField) DefaultFieldParser.parse(header);
+            ContentDispositionField lenient = (ContentDispositionField) LenientFieldParser.parse(header);
+
+            Assert.assertEquals("a.exe", strict.getFilename());
+            Assert.assertEquals(strict.getFilename(), lenient.getFilename());
+
+            String language = "Content-Language: (\\" + lineBreak + "(x) en";
+            Assert.assertEquals(
+                    ((ContentLanguageField) DefaultFieldParser.parse(language)).getLanguages(),
+                    ((ContentLanguageField) LenientFieldParser.parse(language)).getLanguages());
+        }
+    }
 }
