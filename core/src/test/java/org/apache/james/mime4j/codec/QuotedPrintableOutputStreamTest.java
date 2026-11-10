@@ -112,4 +112,40 @@ public class QuotedPrintableOutputStreamTest {
             return null;
         }
     }
+
+    @Test
+    public void encodeShouldNeverStartALineWithADash() throws Exception {
+        String a75 = new String(new char[75]).replace('\0', 'a');
+        String[] inputs = {"--b\r\n" + a75 + "--b", "x\r\n--b\r\n-", a75 + "a-b", "-"};
+        for (boolean binary : new boolean[] {false, true}) {
+            for (String input : inputs) {
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
+                QuotedPrintableOutputStream qp = new QuotedPrintableOutputStream(out, binary);
+                qp.write(input.getBytes("US-ASCII"));
+                qp.close();
+                String encoded = out.toString("US-ASCII");
+                for (String line : encoded.split("\r\n")) {
+                    Assert.assertFalse(encoded, line.startsWith("-"));
+                    Assert.assertTrue(encoded, line.length() <= 76);
+                }
+                ByteArrayOutputStream decoded = new ByteArrayOutputStream();
+                QuotedPrintableInputStream in = new QuotedPrintableInputStream(
+                        new java.io.ByteArrayInputStream(out.toByteArray()));
+                int b;
+                while ((b = in.read()) != -1) {
+                    decoded.write(b);
+                }
+                Assert.assertEquals(input, decoded.toString("US-ASCII"));
+            }
+        }
+    }
+
+    @Test
+    public void encodeShouldKeepADashInsideALine() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        QuotedPrintableOutputStream qp = new QuotedPrintableOutputStream(out, false);
+        qp.write("a--b\r\n-x".getBytes("US-ASCII"));
+        qp.close();
+        Assert.assertEquals("a--b\r\n=2Dx", out.toString("US-ASCII"));
+    }
 }
