@@ -177,4 +177,22 @@ public class RawFieldTest {
         assertThatCode(() -> new RawField("X-Custom_1.2!#$%&'*+/=?^`{|}~", "value")).doesNotThrowAnyException();
         assertThatCode(() -> new RawField(" Subject ", "value")).doesNotThrowAnyException();
     }
+
+    @Test
+    public void getBodyShouldSkipTheWhitespaceOfAFoldRightAfterTheColon() throws Exception {
+        RawField field = RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject:\r\n abc"));
+        Assert.assertEquals("abc", field.getBody());
+
+        field = RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject:\n\tabc"));
+        Assert.assertEquals("abc", field.getBody());
+    }
+
+    @Test
+    public void getBodyShouldKeepTheWhitespaceAfterTheOneThatSeparatesTheName() throws Exception {
+        RawField field = RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject:\r\n  abc"));
+        Assert.assertEquals(" abc", field.getBody());
+
+        field = RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Subject:  abc"));
+        Assert.assertEquals(" abc", field.getBody());
+    }
 }
