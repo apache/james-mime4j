@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
  * A resizable byte array.
  */
 public final class RecycledByteArrayBuffer implements ByteSequence {
+    private static final byte[] EMPTY = new byte[0];
     private final BufferRecycler bufferRecycler;
     private byte[] buffer;
     private int len;
@@ -60,6 +61,13 @@ public final class RecycledByteArrayBuffer implements ByteSequence {
     }
 
     private void expand(int newlen) {
+        if (released) {
+            // Still used after release (e.g. a field read after stop()): plain arrays from now on
+            byte newbuffer[] = new byte[Math.max(this.buffer.length << 1, newlen)];
+            System.arraycopy(this.buffer, 0, newbuffer, 0, this.len);
+            this.buffer = newbuffer;
+            return;
+        }
         byte newbuffer[] = bufferRecycler.allocByteBuffer(0, Math.max(this.buffer.length << 1, newlen));
         System.arraycopy(this.buffer, 0, newbuffer, 0, this.len);
         bufferRecycler.releaseByteBuffer(0, buffer);
@@ -187,6 +195,9 @@ public final class RecycledByteArrayBuffer implements ByteSequence {
         if (!released) {
             released = true;
             bufferRecycler.releaseByteBuffer(0, buffer);
+            // The array may now be handed to another user: never read nor write it again
+            this.buffer = EMPTY;
+            this.len = 0;
         }
     }
 

@@ -46,6 +46,8 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         return br;
     }
 
+    private static final byte[] EMPTY_BYTES = new byte[0];
+
     private boolean truncated;
     private boolean released;
 
@@ -145,6 +147,13 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         BufferRecycler bufferRecycler = getBufferRecycler();
         bufferRecycler.releaseByteBuffer(0, buffer);
         bufferRecycler.releaseIntBuffer(shiftTable);
+        // The arrays may now be handed to another stream: never read nor write them again
+        this.buffer = EMPTY_BYTES;
+        this.shiftTable = new int[256];
+        this.cachedShiftPattern = null;
+        this.bufpos = 0;
+        this.buflen = 0;
+        this.truncated = true;
     }
 
     protected boolean readAllowed() {
