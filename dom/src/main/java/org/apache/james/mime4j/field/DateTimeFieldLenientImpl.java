@@ -41,6 +41,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.FieldParser;
@@ -84,7 +86,10 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             .appendLiteral(' ')
             .appendOffsetId()
         .optionalEnd()
-        // RFC 5322 4.3: obs-zone has no leading FWS of its own ("09:55:06EDT")
+        // RFC 5322 4.3: obs-zone has no leading FWS of its own ("09:55:06EDT").
+        // Parsed strictly: a lenient text field falls back to a number, which would read an
+        // offset rejected above ("+9900") as a number of seconds
+        .parseStrict()
         .optionalStart()
             .optionalStart()
                 .appendLiteral(' ')
@@ -97,6 +102,7 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             .optionalEnd()
             .appendText(OFFSET_SECONDS, obsoleteDaylightZones())
         .optionalEnd()
+        .parseLenient()
         .toFormatter()
         .withZone(ZoneId.of("GMT"))
         .withResolverStyle(ResolverStyle.LENIENT)
@@ -188,7 +194,7 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
         try {
             // RFC 5322 FWS: any run of white space reads as one space
-            String normalized = normalizeShortYear(collapseWhiteSpace(text));
+            String normalized = signUnsignedOffset(normalizeShortYear(collapseWhiteSpace(text)));
             ParsePosition position = new ParsePosition(0);
             Instant instant = Instant.from(RFC_5322.parse(normalized, position));
             if (zoneLeftUnread(normalized, position.getIndex())) {
@@ -358,6 +364,20 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
         char c = text.charAt(p);
         return c == '+' || c == '-' || (c >= '0' && c <= '9');
+    }
+
+    /**
+     * An offset without its sign right after the time ("22:23:35.882 0000", MIME4J-219) reads as
+     * a positive one: the obs-zone sections do not read digits.
+     */
+    private static final Pattern UNSIGNED_OFFSET = Pattern.compile("(\\d:\\d+(?:\\.\\d+)?) (\\d{4})(?=$|[ (])");
+
+    private static String signUnsignedOffset(final String text) {
+        Matcher matcher = UNSIGNED_OFFSET.matcher(text);
+        if (!matcher.find()) {
+            return text;
+        }
+        return text.substring(0, matcher.start(2)) + '+' + text.substring(matcher.start(2));
     }
 
     private static String collapseWhiteSpace(final String text) {

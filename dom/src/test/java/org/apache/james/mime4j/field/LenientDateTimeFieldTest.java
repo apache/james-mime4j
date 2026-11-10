@@ -168,4 +168,22 @@ public class LenientDateTimeFieldTest {
         Assert.assertEquals(Instant.parse("1997-11-21T15:55:06Z"),
             parse("Date: Fri, 21 Nov 1997 09:55:06 -0600 (CST)").getDate().toInstant());
     }
+
+    @Test
+    public void outOfRangeNumericOffsetShouldNotBeReadAsSeconds() throws Exception {
+        Date date = parse("Date: 21 Nov 1997 09:55:06 +9900").getDate();
+        // 9900 seconds = +02:45
+        Assert.assertNotEquals(Instant.parse("1997-11-21T07:10:06Z"), date == null ? null : date.toInstant());
+        Assert.assertNull(date);
+        Assert.assertNull(parse("Date: 1 Jan 2020 25:61:61 +9999").getDate());
+        Assert.assertNull(parse("Date: 32 Jan 0 00:54 +6357").getDate());
+    }
+
+    @Test
+    public void obsoleteZonesShouldStillBeHonoured() throws Exception {
+        Assert.assertEquals(Instant.parse("1997-11-21T16:55:06Z"),
+            parse("Date: 21 Nov 1997 09:55:06 PDT").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T14:55:06Z"),
+            parse("Date: 21 Nov 1997 09:55:06 est").getDate().toInstant());
+    }
 }
