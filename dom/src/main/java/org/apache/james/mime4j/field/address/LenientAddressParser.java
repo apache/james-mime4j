@@ -249,6 +249,15 @@ public class LenientAddressParser implements AddressParser {
      * Like {@link RawFieldParser#parseValue}, but the unquoted whitespace around dots is not part
      * of the local part (RFC 5322 obs-local-part: <code>john . doe</code> is <code>john.doe</code>).
      */
+    private static boolean holdsQuote(final ByteSequence buf, final int from, final int to) {
+        for (int i = from; i < to; i++) {
+            if (buf.byteAt(i) == '\"') {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private String parseLocalPart(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
         StringBuilder dst = new StringBuilder();
         boolean whitespace = false;
@@ -266,7 +275,8 @@ public class LenientAddressParser implements AddressParser {
                     dst.append(' ');
                 }
                 if (current == '\"') {
-                    this.parser.copyQuotedContent(buf, cursor, dst);
+                    // RFC 2047 section 5: no encoded word in an addr-spec
+                    this.parser.copyQuotedContent(buf, cursor, dst, false);
                 } else {
                     this.parser.copyUnquotedContent(buf, cursor, delimiters, dst);
                 }
@@ -310,8 +320,10 @@ public class LenientAddressParser implements AddressParser {
             return parseMailboxAddress(openingText, buf, cursor);
         } else if (current == AT) {
             // localPart @ domain form
-            // Without joined whitespace, parsing it as a local part gives the same text
-            String localPart = openingText.indexOf(' ') < 0
+            // Without joined whitespace nor quoted string, parsing it as a local part gives the
+            // same text; a quoted string must be read again, as the opening text decodes one
+            // that looks like an encoded word, which RFC 2047 section 5 forbids in an addr-spec
+            String localPart = openingText.indexOf(' ') < 0 && !holdsQuote(buf, start, pos)
                 ? openingText
                 : parseLocalPart(buf, new ParserCursor(start, pos), null);
             cursor.updatePos(pos + 1);
@@ -389,8 +401,10 @@ public class LenientAddressParser implements AddressParser {
             return parseMailboxAddress(openingText, buf, cursor);
         } else if (current == AT) {
             // localPart @ domain form
-            // Without joined whitespace, parsing it as a local part gives the same text
-            String localPart = openingText.indexOf(' ') < 0
+            // Without joined whitespace nor quoted string, parsing it as a local part gives the
+            // same text; a quoted string must be read again, as the opening text decodes one
+            // that looks like an encoded word, which RFC 2047 section 5 forbids in an addr-spec
+            String localPart = openingText.indexOf(' ') < 0 && !holdsQuote(buf, start, pos)
                 ? openingText
                 : parseLocalPart(buf, new ParserCursor(start, pos), null);
             cursor.updatePos(pos + 1);
