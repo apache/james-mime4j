@@ -263,15 +263,35 @@ public class EncoderUtil {
      *            parameter name.
      * @param value
      *            parameter value.
+     * <p>The readers of these fields decode the RFC 2047 encoded words of a parameter value, as
+     * many mailers write <code>filename="=?utf-8?B?...?="</code>, so a value holding a literal
+     * <code>=?</code> cannot be written as a plain quoted string. It is written as an RFC 2231
+     * extended parameter (<code>name*=utf-8''%3D%3F...</code>) when the parser of the field
+     * decodes them, and otherwise, when the value starts with <code>=?</code> (the only case the
+     * lenient readers decode), as an encoded word of the whole value.</p>
+     *
+     * @param name
+     *            parameter name.
+     * @param value
+     *            parameter value.
      * @param rfc2231Sections
-     *            whether a parameter too long for one line may be split into
-     *            RFC 2231 sections.
+     *            whether the parser of the field decodes RFC 2231 parameters, so that a
+     *            parameter too long for one line may be split into RFC 2231 sections.
      * @return encoded result.
      * @throws IllegalArgumentException if the name is invalid, or if the
      *             parameter is too long for one line and cannot be split.
      */
     public static String encodeHeaderParameter(String name, String value, boolean rfc2231Sections) {
         String parameter = encodeHeaderParameter(name, value);
+        if (name.indexOf('*') < 0 && value.contains("=?")) {
+            String lowerName = name.toLowerCase(Locale.US);
+            if (rfc2231Sections) {
+                return encodeExtended(lowerName, value);
+            } else if (value.startsWith("=?")) {
+                parameter = lowerName + "=\"" + ENC_WORD_PREFIX + "utf-8?B?"
+                        + encodeB(value.getBytes(Charsets.UTF_8)) + ENC_WORD_SUFFIX + "\"";
+            }
+        }
         if (fitsOnFoldedLines(parameter)) {
             return parameter;
         }
@@ -343,6 +363,16 @@ public class EncoderUtil {
         }
         appendEncodedSection(sb, name, section, current);
         return sb.toString();
+    }
+
+    // RFC 2231 section 4: name*=utf-8''%XX..., in sections when too long for one
+    private static String encodeExtended(String name, String value) {
+        String sections = encodeEncodedSections(name, value);
+        String single = name + "*0*=";
+        if (sections.indexOf(';') < 0 && sections.startsWith(single)) {
+            return name + "*=" + sections.substring(single.length());
+        }
+        return sections;
     }
 
     private static void appendEncodedSection(StringBuilder sb, String name, int section, CharSequence value) {
