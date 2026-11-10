@@ -137,4 +137,35 @@ public class LenientDateTimeFieldTest {
         Assert.assertEquals(Instant.parse("2899-10-04T10:00:00Z"), parse("Date: 4 Oct 999 10:00:00 +0000").getDate().toInstant());
         Assert.assertEquals(Instant.parse("2001-10-04T10:00:00Z"), parse("Date: 4 Oct 2001 10:00:00 +0000").getDate().toInstant());
     }
+
+    @Test
+    public void zoneAfterFoldingWhiteSpaceShouldBeHonoured() throws Exception {
+        Assert.assertEquals(Instant.parse("1997-11-21T15:55:06Z"),
+            parse("Date: Fri, 21 Nov 1997 09:55:06  -0600").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T14:55:06Z"),
+            parse("Date: Fri, 21 Nov 1997 09:55:06  EST").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("1997-11-21T15:55:06Z"),
+            parse("Date: Fri, 21 Nov 1997 09:55:06\t-0600").getDate().toInstant());
+    }
+
+    @Test
+    public void obsoleteZoneWithoutSpaceShouldBeHonoured() throws Exception {
+        // RFC 5322 4.3: obs-zone has no leading FWS, obs-second is [CFWS] 2DIGIT [CFWS]
+        Assert.assertEquals(Instant.parse("1997-11-21T13:55:06Z"),
+            parse("Date: Fri, 21 Nov 1997 09:55:06EDT").getDate().toInstant());
+        Assert.assertEquals(Instant.parse("2000-10-04T05:02:00Z"),
+            parse("Date: 4 Oct 0 1:2EDT").getDate().toInstant());
+    }
+
+    @Test
+    public void partlyReadOffsetShouldNotGiveADate() throws Exception {
+        Assert.assertNull(parse("Date: 32 Feb 3416118 48:84:32 +1178").getDate());
+        Assert.assertNull(parse("Date: 21 Nov 1997 09:55:06 +11789").getDate());
+    }
+
+    @Test
+    public void trailingTextAfterTheZoneShouldStillBeTolerated() throws Exception {
+        Assert.assertEquals(Instant.parse("1997-11-21T15:55:06Z"),
+            parse("Date: Fri, 21 Nov 1997 09:55:06 -0600 (CST)").getDate().toInstant());
+    }
 }
