@@ -486,10 +486,29 @@ public class RawFieldParser {
         copyQuotedContent(buf, cursor, dst, false, false);
     }
 
+    /**
+     * Transfers content enclosed with quote marks into the destination buffer, decoding the
+     * RFC 2047 encoded words it starts with only when asked to. RFC 2047 section 5 forbids encoded
+     * words in an addr-spec and in a quoted-string: an address local part must not be decoded.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     * @param dst destination buffer
+     * @param decodeEncodedWords whether a content starting with <code>=?</code> is decoded
+     */
+    public void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
+            final StringBuilder dst, final boolean decodeEncodedWords) {
+        copyQuotedContent(buf, cursor, dst, !decodeEncodedWords, false);
+    }
+
     private static boolean isLineBreak(final char c) {
         return c == '\r' || c == '\n';
     }
 
+    /**
+     * @param boundary when set, the content is never decoded as encoded words (a boundary, an
+     *   address local part)
+     */
     private void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst, final boolean boundary, final boolean unescape) {
         if (cursor.atEnd()) {

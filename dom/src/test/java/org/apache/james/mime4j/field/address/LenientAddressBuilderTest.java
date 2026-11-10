@@ -685,4 +685,33 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals(header, 1, read.size());
         Assert.assertEquals(header, 2, read.flatten().size());
     }
+
+    @Test
+    public void quotedLocalPartLookingLikeAnEncodedWordIsNotDecoded() {
+        AddressList list = LenientAddressParser.DEFAULT.parseAddressList("\"=?utf-8?q?x?=\"@example.com");
+        Mailbox mailbox = (Mailbox) list.get(0);
+        Assert.assertEquals("=?utf-8?q?x?=", mailbox.getLocalPart());
+
+        mailbox = (Mailbox) LenientAddressParser.DEFAULT.parseAddressList("A <\"=?utf-8?q?x?=\"@example.com>").get(0);
+        Assert.assertEquals("=?utf-8?q?x?=", mailbox.getLocalPart());
+
+        mailbox = LenientAddressParser.DEFAULT.parseMailbox("\"=?utf-8?q?x?=\"@example.com");
+        Assert.assertEquals("=?utf-8?q?x?=", mailbox.getLocalPart());
+    }
+
+    @Test
+    public void builtLocalPartLookingLikeAnEncodedWordRoundTrips() {
+        String[] localParts = {"=?utf-8?q?x?=", "=?utf-8?q?x?=\"\"", "=?utf-8?q?x?= y"};
+        for (String localPart : localParts) {
+            Mailbox written = new Mailbox(localPart, "example.com");
+            AddressList read = LenientAddressParser.DEFAULT.parseAddressList(AddressFormatter.DEFAULT.encode(written));
+            Assert.assertEquals(localPart, ((Mailbox) read.get(0)).getLocalPart());
+        }
+    }
+
+    @Test
+    public void encodedWordsInADisplayNameAreStillDecoded() {
+        Mailbox mailbox = (Mailbox) LenientAddressParser.DEFAULT.parseAddressList("\"=?utf-8?q?J=C3=A9r=C3=B4me?=\" <a@example.com>").get(0);
+        Assert.assertEquals("J\u00e9r\u00f4me", mailbox.getName());
+    }
 }
