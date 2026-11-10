@@ -461,4 +461,19 @@ public class DefaultMessageWriterTest {
         assertOnePartKept("x\r\n--b=\r\n inline\r\nContent-Type: text/html\r\n\r\ny",
             "x\r\n--b inline\r\nContent-Type: text/html\r\n\r\ny");
     }
+
+    @Test
+    public void aOneWordSubjectShouldBeReadBackUnchanged() throws Exception {
+        for (int length = 60; length <= 80; length++) {
+            String subject = new String(new char[length]).replace('\0', 'a');
+            Message message = Message.Builder.of()
+                .setSubject(subject)
+                .setBody("x", StandardCharsets.UTF_8)
+                .build();
+
+            Message read = reparse(DefaultMessageWriter.asBytes(message));
+
+            assertThat(read.getSubject()).isEqualTo(subject);
+        }
+    }
 }

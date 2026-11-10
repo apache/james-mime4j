@@ -159,6 +159,11 @@ public final class RawField implements Field {
         if (raw != null) {
             int len = raw.length();
             int off = delimiterIdx + 1;
+            // A fold right after the colon ("Subject:" CRLF SP "word") separates the name from
+            // the body as a single whitespace does: its line break is deleted by unfolding anyway
+            while (len > off && (raw.byteAt(off) == '\r' || raw.byteAt(off) == '\n')) {
+                off++;
+            }
             if (len > off && (CharsetUtil.isWhitespace((char) (raw.byteAt(off) & 0xff)))) {
                 off++;
             }
