@@ -424,4 +424,41 @@ public class DefaultMessageWriterTest {
 
         assertThat(new String(DefaultMessageWriter.asBytes(message), StandardCharsets.US_ASCII)).contains("--c--");
     }
+
+    private static Message reparse(byte[] bytes) throws Exception {
+        return new DefaultMessageBuilder().parseMessage(new ByteArrayInputStream(bytes));
+    }
+
+    private static void assertOnePartKept(String qpBody, String decoded) throws Exception {
+        byte[] input = ("Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "--b\r\nContent-Transfer-Encoding: quoted-printable\r\n\r\n"
+            + qpBody + "\r\n--b--\r\n").getBytes(StandardCharsets.US_ASCII);
+        Message m1 = reparse(input);
+        Message m2 = reparse(DefaultMessageWriter.asBytes(m1));
+
+        Multipart multipart = (Multipart) m2.getBody();
+        assertThat(multipart.getBodyParts()).hasSize(1);
+        SingleBody body = (SingleBody) multipart.getBodyParts().get(0).getBody();
+        assertThat(new String(ContentUtil.buffer(body.getInputStream()), StandardCharsets.US_ASCII))
+            .isEqualTo(decoded);
+    }
+
+    @Test
+    public void writeMessageShouldNotLetAQuotedPrintableSoftBreakStartALineWithTheDelimiter() throws Exception {
+        String a75 = new String(new char[75]).replace('\0', 'a');
+        String text = a75 + "--b\r\nContent-Type: text/html\r\n\r\ny";
+        assertOnePartKept(text, text);
+    }
+
+    @Test
+    public void writeMessageShouldNotWriteADecodedDelimiterLineOfAQuotedPrintableBody() throws Exception {
+        assertOnePartKept("x\r\n=2D-b\r\nContent-Type: text/html\r\n\r\ny",
+            "x\r\n--b\r\nContent-Type: text/html\r\n\r\ny");
+    }
+
+    @Test
+    public void writeMessageShouldNotWriteADelimiterJoinedByASoftBreak() throws Exception {
+        assertOnePartKept("x\r\n--b=\r\n inline\r\nContent-Type: text/html\r\n\r\ny",
+            "x\r\n--b inline\r\nContent-Type: text/html\r\n\r\ny");
+    }
 }

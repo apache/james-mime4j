@@ -30,6 +30,10 @@ import java.io.OutputStream;
  * by default because this is a workaround for some "filter"/"antivirus"
  * "old mua" having issues with dots at the beginning or the end of a
  * qp encode line (maybe a bad dot-destuffing algo).
+ *
+ * A dash "-" that would start an output line is encoded too, so that the
+ * encoded data never holds a multipart delimiter, whatever the boundary
+ * (RFC 2046 section 5.1.1).
  */
 public class QuotedPrintableOutputStream extends FilterOutputStream {
 
@@ -39,6 +43,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
     private static final byte SP = 0x20;
     private static final byte EQ = 0x3D;
     private static final byte DOT = 0x2E;
+    private static final byte DASH = 0x2D;
     private static final byte CR = 0x0D;
     private static final byte LF = 0x0A;
     private static final byte QUOTED_PRINTABLE_LAST_PLAIN = 0x7E;
@@ -55,6 +60,8 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
     private boolean pendingCR;
     private int nextSoftBreak;
     private int outputIndex;
+    // nothing written yet on the current output line
+    private boolean lineStart = true;
 
     private boolean closed = false;
 
@@ -168,10 +175,21 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
     }
 
     private void plain(byte next) throws IOException {
+        // A line starting with "--" may be read as a multipart delimiter (RFC 2046 5.1.1): a dash
+        // never starts an output line, whether the line follows a line break or a soft break
+        if (next == DASH && lineStart) {
+            escape(next);
+            return;
+        }
         if (--nextSoftBreak <= 1) {
             softBreak();
+            if (next == DASH) {
+                escape(next);
+                return;
+            }
         }
         write(next);
+        lineStart = false;
     }
 
     private void escape(byte next) throws IOException {
@@ -186,6 +204,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
         write(HEX_DIGITS[nextUnsigned >> 4]);
         --nextSoftBreak;
         write(HEX_DIGITS[nextUnsigned % 0x10]);
+        lineStart = false;
     }
 
     private void write(byte next) throws IOException {
@@ -204,6 +223,7 @@ public class QuotedPrintableOutputStream extends FilterOutputStream {
         write(CR);
         write(LF);
         nextSoftBreak = QUOTED_PRINTABLE_MAX_LINE_LENGTH;
+        lineStart = true;
     }
 
     void flushOutput() throws IOException {
