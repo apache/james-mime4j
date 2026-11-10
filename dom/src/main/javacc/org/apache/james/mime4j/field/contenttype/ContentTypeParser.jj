@@ -160,7 +160,7 @@ TOKEN_MGR_DECLS :
 	// This is because the outermost level must be treated
 	// specially anyway, because the outermost ")" has a
 	// different token type than inner ")" instances.
-	static int commentNest;
+	int commentNest;
 }
 
 MORE :
