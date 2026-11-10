@@ -203,6 +203,12 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
     @Override
     public int readLine(final ByteArrayBuffer dst)
             throws MaxLineLimitException, IOException {
+        return readLine(dst, -1);
+    }
+
+    @Override
+    public int readLine(final ByteArrayBuffer dst, int maxLen)
+            throws MaxLineLimitException, IOException {
         if (dst == null) {
             throw new IllegalArgumentException("Buffer may not be null");
         }
@@ -233,6 +239,9 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
             }
             if (exceedsMaxLineLen(dst, this.maxLineLen)) {
                 throw new MaxLineLimitException("Maximum line length limit (" + this.maxLineLen +") exceeded");
+            }
+            if (!found && maxLen > 0 && dst.length() > maxLen) {
+                break;
             }
         }
         if (total == 0 && bytesRead == -1) {

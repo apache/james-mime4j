@@ -192,6 +192,11 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
 
     @Override
     public int readLine(final ByteArrayBuffer dst) throws IOException {
+        return readLine(dst, -1);
+    }
+
+    @Override
+    public int readLine(final ByteArrayBuffer dst, int maxLen) throws IOException {
         if (dst == null) {
             throw new IllegalArgumentException("Destination buffer may not be null");
         }
@@ -223,6 +228,9 @@ public class MimeBoundaryInputStream extends LineReaderInputStream {
                 dst.append(this.buffer.buf(), this.buffer.pos(), chunk);
                 this.buffer.skip(chunk);
                 total += chunk;
+            }
+            if (!found && maxLen > 0 && dst.length() > maxLen) {
+                break;
             }
         }
         if (total == 0 && bytesRead == -1) {

@@ -35,6 +35,7 @@ import org.apache.james.mime4j.io.LineNumberSource;
 import org.apache.james.mime4j.io.LineReaderInputStream;
 import org.apache.james.mime4j.io.LineReaderInputStreamAdaptor;
 import org.apache.james.mime4j.io.MaxContentLengthLimitException;
+import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.io.MaxHeaderLimitException;
 import org.apache.james.mime4j.io.MaxLineLimitException;
 import org.apache.james.mime4j.io.MimeBoundaryInputStream;
@@ -233,6 +234,10 @@ class MimeEntity implements EntityStateMachine {
         if (endOfHeader)
             throw new IllegalStateException();
         LineReaderInputStream instream = getDataStream();
+        // A line of more than maxHeaderLen bytes cannot belong to an accepted field: stop
+        // buffering it there, even when the line length is not bounded (MimeConfig.PERMISSIVE)
+        int maxHeaderLen = config.getMaxHeaderLen();
+        int lineBound = maxHeaderLen > 0 && maxHeaderLen < Integer.MAX_VALUE ? maxHeaderLen + 1 : -1;
         try {
             for (;;) {
                 // If there's still data stuck in the line buffer
@@ -242,7 +247,12 @@ class MimeEntity implements EntityStateMachine {
                     fieldBuilder.append(linebuf);
                 }
                 linebuf.clear();
-                if (instream.readLine(linebuf) == -1) {
+                int read = instream.readLine(linebuf, lineBound);
+                if (LineReaderInputStream.isCutShort(linebuf, lineBound)) {
+                    linebuf.clear();
+                    throw new MaxHeaderLengthLimitException("Maximum header length limit (" + maxHeaderLen + ") exceeded");
+                }
+                if (read == -1) {
                     if (!stopped) {
                         // A header cut short by stop() is not a malformed message
                         monitor(Event.HEADERS_PREMATURE_END);
