@@ -27,10 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.io.FileUtils;
 
@@ -50,6 +49,23 @@ import org.apache.commons.io.FileUtils;
 public class TempFileStorageProvider extends AbstractStorageProvider {
 
     private static final String DEFAULT_PREFIX = "m4j";
+
+    /**
+     * Bound on the files whose deletion failed and is retried by later deletions; the files
+     * beyond it are only deleted at shutdown.
+     */
+    static final int MAX_PENDING_DELETIONS = 1024;
+
+    /**
+     * The temporary files created and not deleted yet. Unlike {@link File#deleteOnExit()}, whose
+     * registrations stay in memory until the JVM stops, a file leaves this set once deleted.
+     */
+    private static final Set<File> LIVE_FILES = ConcurrentHashMap.newKeySet();
+
+    /** The files whose deletion failed, retried by later deletions. */
+    private static final Set<File> PENDING_DELETIONS = ConcurrentHashMap.newKeySet();
+
+    private static final AtomicBoolean SHUTDOWN_HOOK_REGISTERED = new AtomicBoolean();
 
     private final String prefix;
     private final String suffix;
@@ -115,9 +131,54 @@ public class TempFileStorageProvider extends AbstractStorageProvider {
         } else {
             file = Files.createTempFile(directory.toPath(), prefix, suffix).toFile();
         }
-        file.deleteOnExit();
+        register(file);
 
         return new TempFileStorageOutputStream(file);
+    }
+
+    private static void register(File file) {
+        if (SHUTDOWN_HOOK_REGISTERED.compareAndSet(false, true)) {
+            try {
+                Runtime.getRuntime().addShutdownHook(
+                        new Thread(TempFileStorageProvider::deleteLiveFiles, "mime4j-temp-file-cleanup"));
+            } catch (IllegalStateException | SecurityException e) {
+                // shutting down, or not allowed: the files are only deleted by their storage
+            }
+        }
+        LIVE_FILES.add(file);
+    }
+
+    private static void deleteLiveFiles() {
+        for (File file : LIVE_FILES) {
+            tryDelete(file);
+        }
+    }
+
+    /**
+     * Deletes the given file.
+     *
+     * @return whether the file no longer exists
+     */
+    private static boolean tryDelete(File file) {
+        if (file.delete() || !file.exists()) {
+            LIVE_FILES.remove(file);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Number of temporary files created and not deleted yet. Package private, for tests.
+     */
+    static int liveFileCount() {
+        return LIVE_FILES.size();
+    }
+
+    /**
+     * Whether the given temporary file is still registered for deletion. Package private, for tests.
+     */
+    static boolean isRegistered(File file) {
+        return LIVE_FILES.contains(file);
     }
 
     private static final class TempFileStorageOutputStream extends
@@ -151,9 +212,7 @@ public class TempFileStorageProvider extends AbstractStorageProvider {
 
     private static final class TempFileStorage implements Storage {
 
-        private File file;
-
-        private static final Set<File> filesToDelete = new HashSet<File>();
+        private volatile File file;
 
         public TempFileStorage(File file) {
             this.file = file;
@@ -162,34 +221,33 @@ public class TempFileStorageProvider extends AbstractStorageProvider {
         public void delete() {
             // deleting a file might not immediately succeed if there are still
             // streams left open (especially under Windows). so we keep track of
-            // the files that have to be deleted and try to delete all these
-            // files each time this method gets invoked.
+            // the files that could not be deleted (up to a bound) and try to
+            // delete them again each time this method gets invoked; whatever
+            // is left is deleted at shutdown.
+            File toDelete;
+            synchronized (this) {
+                toDelete = file;
+                file = null;
+            }
+            if (toDelete != null && !tryDelete(toDelete)
+                    && PENDING_DELETIONS.size() < MAX_PENDING_DELETIONS) {
+                PENDING_DELETIONS.add(toDelete);
+            }
 
-            // a better but more complicated solution would be to start a
-            // separate thread that tries to delete the files periodically.
-
-            synchronized (filesToDelete) {
-                if (file != null) {
-                    filesToDelete.add(file);
-                    file = null;
-                }
-
-                for (Iterator<File> iterator = filesToDelete.iterator(); iterator
-                        .hasNext();) {
-                    try {
-                        FileUtils.forceDelete(iterator.next());
-                        iterator.remove();
-                    } catch (IOException e) {
-                    }
+            for (File pending : PENDING_DELETIONS) {
+                // whoever removes it from the set retries it
+                if (pending != toDelete && PENDING_DELETIONS.remove(pending) && !tryDelete(pending)) {
+                    PENDING_DELETIONS.add(pending);
                 }
             }
         }
 
         public InputStream getInputStream() throws IOException {
-            if (file == null)
+            File current = file;
+            if (current == null)
                 throw new IllegalStateException("storage has been deleted");
 
-            return new BufferedInputStream(new FileInputStream(file));
+            return new BufferedInputStream(new FileInputStream(current));
         }
 
     }
