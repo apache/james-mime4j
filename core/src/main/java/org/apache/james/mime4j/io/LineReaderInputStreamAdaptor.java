@@ -81,18 +81,24 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
     @Override
     public int readLine(final ByteArrayBuffer dst)
             throws MaxLineLimitException, IOException {
+        return readLine(dst, -1);
+    }
+
+    @Override
+    public int readLine(final ByteArrayBuffer dst, int maxLen)
+            throws MaxLineLimitException, IOException {
         int i;
         if (this.bis != null) {
-             i = this.bis.readLine(dst);
+             i = this.bis.readLine(dst, maxLen);
         } else {
-             i = doReadLine(dst);
+             i = doReadLine(dst, maxLen);
         }
         this.eof = i == -1;
         this.used = true;
         return i;
     }
 
-    private int doReadLine(final ByteArrayBuffer dst)
+    private int doReadLine(final ByteArrayBuffer dst, int maxLen)
             throws MaxLineLimitException, IOException {
         int total = 0;
         int ch;
@@ -103,6 +109,9 @@ public class LineReaderInputStreamAdaptor extends LineReaderInputStream {
                 throw new MaxLineLimitException("Maximum line length limit ( "+ this.maxLineLen +") exceeded");
             }
             if (ch == '\n') {
+                break;
+            }
+            if (maxLen > 0 && dst.length() > maxLen) {
                 break;
             }
         }

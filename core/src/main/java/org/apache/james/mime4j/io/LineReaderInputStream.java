@@ -50,6 +50,37 @@ public abstract class LineReaderInputStream extends FilterInputStream {
             throws MaxLineLimitException, IOException;
 
     /**
+     * Reads one line of text into the given {@link ByteArrayBuffer}, but stops once
+     * <code>dst</code> holds more than <code>maxLen</code> bytes and no line feed: the rest of
+     * the line is then left unread, so that a caller with its own bound does not buffer a line
+     * it is bound to reject, whatever the line length limit of this stream.
+     *
+     * <p>The default implementation ignores <code>maxLen</code>.</p>
+     *
+     * @param dst Destination
+     * @param maxLen bound on the bytes held by <code>dst</code> before the line is cut short,
+     *   a non positive value disables it
+     * @return number of bytes copied or <code>-1</code> if the end of
+     * the stream has been reached.
+     *
+     * @throws MaxLineLimitException if the line exceeds a limit on
+     *   the line length imposed by a subclass.
+     * @throws IOException in case of an I/O error.
+     */
+    public int readLine(final ByteArrayBuffer dst, int maxLen)
+            throws MaxLineLimitException, IOException {
+        return readLine(dst);
+    }
+
+    /**
+     * Whether a line read with {@link #readLine(ByteArrayBuffer, int)} was cut short by its bound.
+     */
+    public static boolean isCutShort(ByteArrayBuffer dst, int maxLen) {
+        int len = dst.length();
+        return maxLen > 0 && len > maxLen && dst.byteAt(len - 1) != '\n';
+    }
+
+    /**
      * Tries to unread the last read line.
      *
      * Implementation may refuse to unread a new buffer until the previous

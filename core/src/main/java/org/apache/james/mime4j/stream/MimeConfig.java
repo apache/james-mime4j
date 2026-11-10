@@ -37,6 +37,12 @@ public final class MimeConfig {
      *     <li>{@code james.mime4j.permissive.max.line.length} (default -1, unbounded)</li>
      * </ul>
      * A non positive value disables the corresponding check.
+     *
+     * <p>Body lines are not bounded by default, but header lines always are: a header line is
+     * not buffered beyond the header length limit, so a header made of one huge line fails with a
+     * {@link org.apache.james.mime4j.io.MaxHeaderLengthLimitException} once that limit is reached.
+     * The memory used for the headers of a message is thus bounded when that limit is set; the
+     * memory used for a body depends on the {@code BodyFactory}.</p>
      */
     public static final MimeConfig PERMISSIVE = MimeConfig.custom()
         .setMaxContentLen(Long.getLong("james.mime4j.permissive.max.content.length", 100 * 1024 * 1024))
