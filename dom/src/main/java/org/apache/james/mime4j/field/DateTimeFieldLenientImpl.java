@@ -84,12 +84,17 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             .appendLiteral(' ')
             .appendOffsetId()
         .optionalEnd()
+        // RFC 5322 4.3: obs-zone has no leading FWS of its own ("09:55:06EDT")
         .optionalStart()
-            .appendLiteral(' ')
+            .optionalStart()
+                .appendLiteral(' ')
+            .optionalEnd()
             .appendText(OFFSET_SECONDS, obsoleteZones())
         .optionalEnd()
         .optionalStart()
-            .appendLiteral(' ')
+            .optionalStart()
+                .appendLiteral(' ')
+            .optionalEnd()
             .appendText(OFFSET_SECONDS, obsoleteDaylightZones())
         .optionalEnd()
         .toFormatter()
@@ -182,7 +187,15 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             return null;
         }
         try {
-            return Date.from(Instant.from(RFC_5322.parse(normalizeShortYear(text), new ParsePosition(0))));
+            // RFC 5322 FWS: any run of white space reads as one space
+            String normalized = normalizeShortYear(collapseWhiteSpace(text));
+            ParsePosition position = new ParsePosition(0);
+            Instant instant = Instant.from(RFC_5322.parse(normalized, position));
+            if (zoneLeftUnread(normalized, position.getIndex())) {
+                // Reading it as GMT, or with the part of the offset read, would shift the date
+                return null;
+            }
+            return Date.from(instant);
         } catch (Exception e) {
             // Ignore: invalid date
             return null;
@@ -329,6 +342,44 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
         char c = s.charAt(pos);
         return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    /**
+     * Text left after the parse is tolerated (a comment, an unknown zone name), except a numeric
+     * zone that was not read at all or only in part (<code>+11</code> of <code>+1178</code>).
+     */
+    private static boolean zoneLeftUnread(final String text, final int end) {
+        int p = end;
+        if (p < text.length() && text.charAt(p) == ' ') {
+            p++;
+        }
+        if (p >= text.length()) {
+            return false;
+        }
+        char c = text.charAt(p);
+        return c == '+' || c == '-' || (c >= '0' && c <= '9');
+    }
+
+    private static String collapseWhiteSpace(final String text) {
+        StringBuilder sb = null;
+        boolean previousSpace = false;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            boolean space = c == ' ' || c == '\t' || c == '\r' || c == '\n';
+            if (space && (previousSpace || c != ' ')) {
+                if (sb == null) {
+                    sb = new StringBuilder(text.length());
+                    sb.append(text, 0, i);
+                }
+                if (!previousSpace) {
+                    sb.append(' ');
+                }
+            } else if (sb != null) {
+                sb.append(c);
+            }
+            previousSpace = space;
+        }
+        return sb == null ? text : sb.toString();
     }
 
     /**
