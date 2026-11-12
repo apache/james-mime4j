@@ -149,7 +149,8 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         bufferRecycler.releaseIntBuffer(shiftTable);
         // The arrays may now be handed to another stream: never read nor write them again
         this.buffer = EMPTY_BYTES;
-        this.shiftTable = new int[256];
+        // No new table: a released stream searches nothing (see indexOf)
+        this.shiftTable = null;
         this.cachedShiftPattern = null;
         this.bufpos = 0;
         this.buflen = 0;
@@ -275,7 +276,8 @@ public class BufferedLineReaderInputStream extends LineReaderInputStream {
         if (off < this.bufpos || len < 0 || off + len > this.buflen) {
             throw new IndexOutOfBoundsException("looking for "+off+"("+len+")"+" in "+bufpos+"/"+buflen);
         }
-        if (len < pattern.length) {
+        if (len < pattern.length || released) {
+            // Released: the shift table went back to the recycler, and the buffer is empty
             return -1;
         }
 
