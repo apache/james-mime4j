@@ -198,4 +198,17 @@ public class BufferedLineReaderInputStreamTest {
             }
         }
     }
+
+    @Test
+    public void aReleasedStreamShouldReadAndFindNothing() throws Exception {
+        BufferedLineReaderInputStream in = new BufferedLineReaderInputStream(
+                new java.io.ByteArrayInputStream(ContentUtil.toAsciiByteArray("abc\r\n--b\r\n")), 4096);
+        Assert.assertTrue(in.fillBuffer() > 0);
+        in.release();
+
+        Assert.assertEquals(-1, in.indexOf(new byte[0], 0, 0));
+        Assert.assertEquals(-1, in.indexOf(ContentUtil.toAsciiByteArray("--b"), 0, 0));
+        Assert.assertEquals(-1, in.read());
+        Assert.assertEquals(-1, in.readLine(new ByteArrayBuffer(16)));
+    }
 }
