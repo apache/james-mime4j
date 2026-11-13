@@ -738,4 +738,34 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals("[x]]", ((Mailbox) parser.parseAddressList("a@[x\\\r\n]]").get(0)).getDomain());
         Assert.assertEquals("b@c", ((Mailbox) list.get(1)).getAddress());
     }
+
+    @Test
+    public void quotedDomainlessLocalPartLookingLikeAnEncodedWordIsNotDecoded() {
+        Mailbox read = (Mailbox) parser.parseAddressList("\"a =?utf-8?q?x?=\"").get(0);
+        Assert.assertEquals("a =?utf-8?q?x?=", read.getLocalPart());
+        Assert.assertNull(read.getDomain());
+
+        Mailbox first = (Mailbox) parser.parseAddressList("a =?utf-8?q?x?=@").get(0);
+        Mailbox again = (Mailbox) parser.parseAddressList(AddressFormatter.DEFAULT.encode(first)).get(0);
+        Assert.assertEquals(first.getLocalPart(), again.getLocalPart());
+
+        Assert.assertEquals("=?utf-8?q?x?=", parser.parseMailbox("\"=?utf-8?q?x?=\"").getLocalPart());
+        AddressList mailboxes = parser.parseAddressList("\"=?utf-8?q?x?=nnn\", b@c");
+        Assert.assertEquals(2, mailboxes.size());
+        Assert.assertEquals("=?utf-8?q?x?=nnn", ((Mailbox) mailboxes.get(0)).getLocalPart());
+        Group group = (Group) parser.parseAddressList("g: \"=?utf-8?q?x?=]\";").get(0);
+        Assert.assertEquals("=?utf-8?q?x?=]", group.getMailboxes().get(0).getLocalPart());
+    }
+
+    @Test
+    public void quotedDomainlessLocalPartDecodingToNothingKeepsTheMailbox() {
+        AddressList list = parser.parseAddressList("\"=?x???=\", a@b");
+        Assert.assertEquals(2, list.size());
+        Assert.assertEquals("=?x???=", ((Mailbox) list.get(0)).getLocalPart());
+    }
+
+    @Test
+    public void bareDomainlessEncodedLocalPartIsStillDecoded() {
+        Assert.assertEquals("a x", ((Mailbox) parser.parseAddressList("a =?utf-8?q?x?=").get(0)).getLocalPart());
+    }
 }

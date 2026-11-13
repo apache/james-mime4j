@@ -322,6 +322,21 @@ public class LenientAddressParser implements AddressParser {
         }
     }
 
+    /**
+     * A mailbox without domain, read from <code>buf</code> between <code>from</code> and
+     * <code>to</code>, of which <code>openingText</code> is the value. As in the local@domain form, a
+     * text holding a quoted string is read again as a local part: RFC 2047 section 5 forbids encoded
+     * words in a quoted string, and the opening text decodes one that starts with "=?". Bare text
+     * keeps its encoded words decoded (MIME4J-253).
+     */
+    private Mailbox createMailbox(final String openingText, final ByteSequence buf, final int from, final int to) {
+        if (!holdsQuote(buf, from, to)) {
+            return createMailbox(openingText);
+        }
+        String localPart = parseLocalPart(buf, new ParserCursor(from, to), null);
+        return localPart.length() > 0 ? new Mailbox(null, null, localPart, null) : null;
+    }
+
     public Mailbox parseMailbox(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
         return parseMailbox(buf, cursor, delimiters, union(MAILBOX_STOP, delimiters));
@@ -332,7 +347,7 @@ public class LenientAddressParser implements AddressParser {
         int start = cursor.getPos();
         String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
-            return createMailbox(openingText);
+            return createMailbox(openingText, buf, start, cursor.getPos());
         }
         int pos = cursor.getPos();
         char current = (char) (buf.byteAt(pos) & 0xff);
@@ -351,7 +366,7 @@ public class LenientAddressParser implements AddressParser {
             String domain = parseDomain(buf, cursor, delimiters);
             return new Mailbox(null, null, localPart, domain);
         } else {
-            return createMailbox(openingText);
+            return createMailbox(openingText, buf, start, cursor.getPos());
         }
     }
 
@@ -413,7 +428,7 @@ public class LenientAddressParser implements AddressParser {
         int start = cursor.getPos();
         String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
-            return createMailbox(openingText);
+            return createMailbox(openingText, buf, start, cursor.getPos());
         }
         int pos = cursor.getPos();
         char current = (char) (buf.byteAt(pos) & 0xff);
@@ -444,7 +459,7 @@ public class LenientAddressParser implements AddressParser {
             }
             return new Group(decodeGroupName(openingText), mboxes);
         } else {
-            return createMailbox(openingText);
+            return createMailbox(openingText, buf, start, cursor.getPos());
         }
     }
 
