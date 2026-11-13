@@ -194,7 +194,7 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
         try {
             // RFC 5322 FWS: any run of white space reads as one space
-            String normalized = signUnsignedOffset(normalizeShortYear(collapseWhiteSpace(text)));
+            String normalized = signUnsignedOffset(normalizeShortYear(removeCfwsAroundTimeColons(collapseWhiteSpace(text))));
             ParsePosition position = new ParsePosition(0);
             Instant instant = Instant.from(RFC_5322.parse(normalized, position));
             if (zoneLeftUnread(normalized, position.getIndex())) {
@@ -352,9 +352,14 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
 
     /**
      * Text left after the parse is tolerated (a comment, an unknown zone name), except a numeric
-     * zone that was not read at all or only in part (<code>+11</code> of <code>+1178</code>).
+     * zone that was not read at all or only in part (<code>+11</code> of <code>+1178</code>), and
+     * seconds or milliseconds that were not read (<code>:61</code> of <code>09:55:61</code>): the
+     * zone after them would be left unread too.
      */
     private static boolean zoneLeftUnread(final String text, final int end) {
+        if (end < text.length() && (text.charAt(end) == ':' || text.charAt(end) == '.')) {
+            return true;
+        }
         int p = end;
         if (p < text.length() && text.charAt(p) == ' ') {
             p++;
@@ -364,6 +369,21 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
         char c = text.charAt(p);
         return c == '+' || c == '-' || (c >= '0' && c <= '9');
+    }
+
+    /**
+     * RFC 5322 obs-hour, obs-minute and obs-second allow CFWS around the colons of the time
+     * (<code>09:55: 06</code>, <code>09:55:(c)06</code>), as the strict parser reads them. Applied
+     * to a text whose white space is collapsed. Nested comments are not removed: the value is then
+     * not read, see {@link #zoneLeftUnread}.
+     */
+    private static final Pattern CFWS_AROUND_TIME_COLON = Pattern.compile("(\\d)(?: |\\([^()]*\\))*:(?: |\\([^()]*\\))*(?=\\d)");
+
+    private static String removeCfwsAroundTimeColons(final String text) {
+        if (text.indexOf('(') < 0 && text.indexOf(": ") < 0 && text.indexOf(" :") < 0) {
+            return text;
+        }
+        return CFWS_AROUND_TIME_COLON.matcher(text).replaceAll("$1:");
     }
 
     /**
