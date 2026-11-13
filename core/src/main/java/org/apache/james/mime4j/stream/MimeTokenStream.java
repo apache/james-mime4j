@@ -136,7 +136,7 @@ public class MimeTokenStream {
         super();
         this.config = config != null ? config : MimeConfig.DEFAULT;
         this.fieldBuilder = fieldBuilder != null ? fieldBuilder :
-            new DefaultFieldBuilder(this.config.getMaxHeaderLen());
+            new DefaultFieldBuilder(MimeEntity.fieldLengthLimit(this.config));
         this.monitor = monitor != null ? monitor :
             (this.config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT);
         this.bodyDescBuilder = bodyDescBuilder != null ? bodyDescBuilder :

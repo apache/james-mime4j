@@ -20,6 +20,7 @@ package org.apache.james.mime4j.utils.search;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.io.MaxHeaderLengthLimitException;
 import org.apache.james.mime4j.stream.EntityState;
 import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.MimeTokenStream;
@@ -147,7 +148,12 @@ public class MessageMatcher {
 
     private boolean matchBufferInMailBeingMimeAware(final InputStream input, final List<NeedleMatcher> matchers) throws IOException, MimeException {
         try {
-            MimeConfig config = MimeConfig.custom().setMaxLineLen(-1).setMaxHeaderLen(-1).build();
+            // Body lines are not bounded, but header fields are, as by MimeConfig.PERMISSIVE: the
+            // message is untrusted, and a field over the limit ends the search
+            MimeConfig config = MimeConfig.custom()
+                .setMaxLineLen(-1)
+                .setMaxHeaderLen(MimeConfig.PERMISSIVE.getMaxHeaderLen())
+                .build();
 
             MimeTokenStream parser = new MimeTokenStream(config);
             parser.parse(input);
@@ -188,6 +194,8 @@ public class MessageMatcher {
         } catch (UnsupportedCharsetException e) {
             handle(e);
         } catch (IllegalStateException e) {
+            handle(e);
+        } catch (MaxHeaderLengthLimitException e) {
             handle(e);
         }
         return false;

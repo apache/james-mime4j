@@ -131,7 +131,7 @@ class MimeEntity implements EntityStateMachine {
         this(lineSource, instream, config,
                 EntityState.T_START_MESSAGE, EntityState.T_END_MESSAGE,
                 config.isStrictParsing() ? DecodeMonitor.STRICT : DecodeMonitor.SILENT,
-                new DefaultFieldBuilder(config.getMaxHeaderLen()),
+                new DefaultFieldBuilder(fieldLengthLimit(config)),
                 bodyDescBuilder);
     }
 
@@ -231,6 +231,23 @@ class MimeEntity implements EntityStateMachine {
     }
 
     /**
+     * The length over which a header field cannot be accepted: maxHeaderLen, or when it is turned
+     * off, maxTotalHeaderLen, which a single field cannot exceed either. Without it, turning off
+     * maxHeaderLen (as MessageMatcher did) let one field be buffered whole, several times over,
+     * before the message wide limit rejected it.
+     *
+     * @return the limit, or -1 when there is none.
+     */
+    static int fieldLengthLimit(final MimeConfig config) {
+        int maxHeaderLen = config.getMaxHeaderLen();
+        if (maxHeaderLen > 0) {
+            return maxHeaderLen;
+        }
+        long maxTotalHeaderLen = config.getMaxTotalHeaderLen();
+        return maxTotalHeaderLen > 0 ? (int) Math.min(maxTotalHeaderLen, Integer.MAX_VALUE) : -1;
+    }
+
+    /**
      * The length of a header line as {@link DefaultFieldBuilder#append} counts it: a CRLF line end
      * counts as one byte.
      */
@@ -248,7 +265,7 @@ class MimeEntity implements EntityStateMachine {
         LineReaderInputStream instream = getDataStream();
         // A line of more than maxHeaderLen bytes cannot belong to an accepted field: stop
         // buffering it there, even when the line length is not bounded (MimeConfig.PERMISSIVE)
-        int maxHeaderLen = config.getMaxHeaderLen();
+        int maxHeaderLen = fieldLengthLimit(config);
         int lineBound = maxHeaderLen > 0 && maxHeaderLen < Integer.MAX_VALUE ? maxHeaderLen + 1 : -1;
         try {
             for (;;) {
@@ -265,7 +282,9 @@ class MimeEntity implements EntityStateMachine {
                 // field before it is never emitted, whatever the read sizes
                 if (lineBound > 0 && measuredLength(linebuf) > maxHeaderLen) {
                     linebuf.clear();
-                    throw new MaxHeaderLengthLimitException("Maximum header length limit (" + maxHeaderLen + ") exceeded");
+                    throw new MaxHeaderLengthLimitException(config.getMaxHeaderLen() > 0
+                        ? "Maximum header length limit (" + maxHeaderLen + ") exceeded"
+                        : "Maximum total header length limit (" + maxHeaderLen + ") exceeded");
                 }
                 if (read == -1) {
                     if (!stopped) {

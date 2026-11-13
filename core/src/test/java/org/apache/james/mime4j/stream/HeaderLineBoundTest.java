@@ -166,4 +166,59 @@ public class HeaderLineBoundTest {
         }
         Assert.assertEquals(1024 * 1024, body.served);
     }
+
+    /** Serves the same folded line, "\r\n " and 98 bytes of 'a', <code>count</code> times. */
+    private static class FoldedLines extends InputStream {
+        private static final byte[] LINE = ("\r\n " + new String(new char[98]).replace('\0', 'a'))
+            .getBytes(StandardCharsets.US_ASCII);
+        private final long size;
+        private long served;
+
+        FoldedLines(long count) {
+            this.size = count * LINE.length;
+        }
+
+        @Override
+        public int read() {
+            return served < size ? LINE[(int) (served++ % LINE.length)] : -1;
+        }
+    }
+
+    private static final MimeConfig NO_FIELD_LIMIT = MimeConfig.custom()
+        .setMaxLineLen(-1)
+        .setMaxHeaderLen(-1)
+        .build(); // maxTotalHeaderLen 1 MB
+
+    @Test
+    public void withoutFieldLimitAHugeHeaderLineShouldStopAtTheTotalHeaderLimit() throws Exception {
+        LongLine line = new LongLine(TEN_MB);
+        try {
+            parseAll(NO_FIELD_LIMIT, new SequenceInputStream(ascii("X-A: "), line));
+            Assert.fail("Expected MaxHeaderLengthLimitException");
+        } catch (MaxHeaderLengthLimitException expected) {
+            long maxTotalHeaderLen = NO_FIELD_LIMIT.getMaxTotalHeaderLen();
+            Assert.assertTrue("read " + line.served + " bytes of the line", line.served < maxTotalHeaderLen + 64 * 1024);
+        }
+    }
+
+    @Test
+    public void withoutFieldLimitAHugeFoldedFieldShouldStopAtTheTotalHeaderLimit() throws Exception {
+        FoldedLines lines = new FoldedLines(TEN_MB / 100);
+        try {
+            parseAll(NO_FIELD_LIMIT, new SequenceInputStream(ascii("X-A: b"), lines));
+            Assert.fail("Expected MaxHeaderLengthLimitException");
+        } catch (MaxHeaderLengthLimitException expected) {
+            long maxTotalHeaderLen = NO_FIELD_LIMIT.getMaxTotalHeaderLen();
+            Assert.assertTrue("read " + lines.served + " bytes", lines.served < maxTotalHeaderLen + 64 * 1024);
+        }
+    }
+
+    @Test
+    public void withoutFieldLimitAFieldUnderTheTotalHeaderLimitIsAccepted() throws Exception {
+        StringBuilder sb = new StringBuilder("X-A: ");
+        for (int i = 0; i < 512 * 1024; i++) {
+            sb.append('a');
+        }
+        parseAll(NO_FIELD_LIMIT, ascii(sb.append("\r\n\r\nbody").toString()));
+    }
 }

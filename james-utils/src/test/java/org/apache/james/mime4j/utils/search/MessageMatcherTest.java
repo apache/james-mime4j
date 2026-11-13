@@ -233,4 +233,39 @@ public class MessageMatcherTest {
         return ClassLoader.getSystemClassLoader().getResourceAsStream(resourceName);
     }
 
+
+    private static InputStream messageWithAHugeHeaderField(String header, String body) {
+        StringBuilder sb = new StringBuilder("Subject: test\r\nX-A: ");
+        for (int i = 0; i < 2 * 1024 * 1024; i++) {
+            sb.append('a');
+        }
+        sb.append("\r\n").append(header).append("\r\n").append(body);
+        return new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.US_ASCII));
+    }
+
+    @Test(timeout = 10000)
+    public void hugeHeaderFieldShouldEndTheSearchWithoutAMatch() throws Exception {
+        MessageMatcher messageMatcher = MessageMatcher.builder()
+            .searchContents(Lists.<CharSequence>newArrayList("needle"))
+            .caseInsensitive(true)
+            .includeHeaders(true)
+            .build();
+        assertThat(messageMatcher.messageMatches(messageWithAHugeHeaderField("X-B: needle", "needle"))).isFalse();
+    }
+
+    @Test
+    public void headerFieldUnderThePermissiveLimitShouldStillBeSearched() throws Exception {
+        StringBuilder sb = new StringBuilder("Subject: test\r\nX-A: ");
+        for (int i = 0; i < 60 * 1024; i++) {
+            sb.append('a');
+        }
+        sb.append(" needle\r\n\r\nbody");
+        MessageMatcher messageMatcher = MessageMatcher.builder()
+            .searchContents(Lists.<CharSequence>newArrayList("needle"))
+            .caseInsensitive(true)
+            .includeHeaders(true)
+            .build();
+        assertThat(messageMatcher.messageMatches(
+            new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.US_ASCII)))).isTrue();
+    }
 }
