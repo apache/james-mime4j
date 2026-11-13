@@ -101,4 +101,15 @@ public class ContentLocationFieldTest extends TestCase {
             assertEquals(value, lenient.getLocation(), strict.getLocation());
         }
     }
+
+    public void testFormFeedAndVerticalTabAreKeptLikeTheLenientParser() throws Exception {
+        String[] values = {"a/\fb", "a/\u000Bb", "a /\f b"};
+        for (String value : values) {
+            ContentLocationField strict = parse("Content-Location: " + value);
+            ContentLocationField lenient = LenientContentLocationFieldTest.parse("Content-Location: " + value);
+            assertNull(strict.getParseException());
+            assertEquals(value, lenient.getLocation(), strict.getLocation());
+        }
+        assertEquals("a/\fb", parse("Content-Location: a/\fb").getLocation());
+    }
 }
