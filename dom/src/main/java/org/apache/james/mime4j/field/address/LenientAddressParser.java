@@ -113,8 +113,11 @@ public class LenientAddressParser implements AddressParser {
 
     /**
      * Copies a domain literal up to its closing bracket: '(' and ')' are dtext there, not a comment
-     * (RFC 5322 section 3.4.1). Returns -1 once copied. When no ']' comes before a delimiter, copies
-     * nothing and returns the index where the search stopped: the delimiter, or the upper bound.
+     * (RFC 5322 section 3.4.1). A quoted pair (obs-dtext, section 4.4) is the escaped character alone,
+     * as for the strict parser: its backslash is dropped, and an escaped ']' does not close the
+     * literal. A line break after a backslash is unfolded, the quoted pair applying to the character
+     * after it. Returns -1 once copied. When no ']' comes before a delimiter, copies nothing and
+     * returns the index where the search stopped: the delimiter, or the upper bound.
      */
     private int copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
                                       final StringBuilder dst) {
@@ -122,11 +125,20 @@ public class LenientAddressParser implements AddressParser {
         int to = cursor.getUpperBound();
         for (int i = from + 1; i < to; i++) {
             char current = (char) (buf.byteAt(i) & 0xff);
+            if (current == '\\') {
+                i = skipLineBreaks(buf, i + 1, to);
+                continue;
+            }
             if (current == ']') {
                 ByteArrayBuffer literal = new ByteArrayBuffer(i + 1 - from);
                 for (int j = from; j <= i; j++) {
                     byte b = buf.byteAt(j);
-                    if (b != '\r' && b != '\n') {
+                    if (b == '\\') {
+                        j = skipLineBreaks(buf, j + 1, i);
+                        if (j < i) {
+                            literal.append(buf.byteAt(j));
+                        }
+                    } else if (b != '\r' && b != '\n') {
                         literal.append(b);
                     }
                 }
@@ -140,6 +152,15 @@ public class LenientAddressParser implements AddressParser {
             }
         }
         return to;
+    }
+
+    /** Returns the index of the first byte from <code>from</code> that is not CR or LF, at most <code>to</code>. */
+    private static int skipLineBreaks(final ByteSequence buf, final int from, final int to) {
+        int i = from;
+        while (i < to && (buf.byteAt(i) == '\r' || buf.byteAt(i) == '\n')) {
+            i++;
+        }
+        return i;
     }
 
     DomainList parseRoute(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
