@@ -33,7 +33,7 @@ import org.apache.james.mime4j.stream.Field;
  * Represents a <code>Content-Location</code> field.
  */
 public class ContentLocationFieldImpl extends AbstractField implements ContentLocationField {
-    private static final Pattern PATTERN = Pattern.compile("\\s");
+    private static final Pattern PATTERN = Pattern.compile("[ \\t\\r\\n]");
 
     private boolean parsed = false;
     private String location;

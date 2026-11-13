@@ -55,6 +55,8 @@ public class QuotedPrintableInputStream extends InputStream {
 
     private final InputStream in;
     private final RecycledByteArrayBuffer decodedBuf;
+    // next byte of decodedBuf to serve: draining from the front does not shift the buffer
+    private int decodedPos = 0;
     private final RecycledByteArrayBuffer blanks;
 
     private final byte[] encoded;
@@ -158,6 +160,7 @@ public class QuotedPrintableInputStream extends InputStream {
             index += chunk;
             int remaining = blanks.length() - chunk;
             if (remaining > 0) {
+                compactDecoded();
                 decodedBuf.append(blanks.buffer(), chunk, remaining);
             }
             blanks.clear();
@@ -171,10 +174,22 @@ public class QuotedPrintableInputStream extends InputStream {
             if (index < to) {
                 buffer[index++] = (byte) b;
             } else {
+                compactDecoded();
                 decodedBuf.append(b);
             }
         }
         return index;
+    }
+
+    /**
+     * Drops the bytes of decodedBuf already served. decodedBuf is only appended to once the
+     * caller's buffer is full, after read0 drained it, so this moves nothing in practice.
+     */
+    private void compactDecoded() {
+        if (decodedPos > 0) {
+            decodedBuf.remove(0, decodedPos);
+            decodedPos = 0;
+        }
     }
 
     private int read0(final byte[] buffer, final int off, final int len) throws IOException {
@@ -183,11 +198,18 @@ public class QuotedPrintableInputStream extends InputStream {
         int index = off;
 
         // check if a previous invocation left decoded content
-        if (decodedBuf.length() > 0) {
-            int chunk = Math.min(decodedBuf.length(), to - index);
-            System.arraycopy(decodedBuf.buffer(), 0, buffer, index, chunk);
-            decodedBuf.remove(0, chunk);
+        // Served from decodedPos: removing the served bytes from the front on every read moved
+        // what is left each time, quadratic in a long run of blanks
+        int available = decodedBuf.length() - decodedPos;
+        if (available > 0) {
+            int chunk = Math.min(available, to - index);
+            System.arraycopy(decodedBuf.buffer(), decodedPos, buffer, index, chunk);
+            decodedPos += chunk;
             index += chunk;
+            if (decodedPos == decodedBuf.length()) {
+                decodedBuf.clear();
+                decodedPos = 0;
+            }
         }
 
         while (index < to) {

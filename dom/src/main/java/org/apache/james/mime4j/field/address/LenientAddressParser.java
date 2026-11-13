@@ -113,8 +113,11 @@ public class LenientAddressParser implements AddressParser {
 
     /**
      * Copies a domain literal up to its closing bracket: '(' and ')' are dtext there, not a comment
-     * (RFC 5322 section 3.4.1). Returns -1 once copied. When no ']' comes before a delimiter, copies
-     * nothing and returns the index where the search stopped: the delimiter, or the upper bound.
+     * (RFC 5322 section 3.4.1). A quoted pair (obs-dtext, section 4.4) is the escaped character alone,
+     * as for the strict parser: its backslash is dropped, and an escaped ']' does not close the
+     * literal. A line break after a backslash is unfolded, the quoted pair applying to the character
+     * after it. Returns -1 once copied. When no ']' comes before a delimiter, copies nothing and
+     * returns the index where the search stopped: the delimiter, or the upper bound.
      */
     private int copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
                                       final StringBuilder dst) {
@@ -122,11 +125,20 @@ public class LenientAddressParser implements AddressParser {
         int to = cursor.getUpperBound();
         for (int i = from + 1; i < to; i++) {
             char current = (char) (buf.byteAt(i) & 0xff);
+            if (current == '\\') {
+                i = skipLineBreaks(buf, i + 1, to);
+                continue;
+            }
             if (current == ']') {
                 ByteArrayBuffer literal = new ByteArrayBuffer(i + 1 - from);
                 for (int j = from; j <= i; j++) {
                     byte b = buf.byteAt(j);
-                    if (b != '\r' && b != '\n') {
+                    if (b == '\\') {
+                        j = skipLineBreaks(buf, j + 1, i);
+                        if (j < i) {
+                            literal.append(buf.byteAt(j));
+                        }
+                    } else if (b != '\r' && b != '\n') {
                         literal.append(b);
                     }
                 }
@@ -140,6 +152,15 @@ public class LenientAddressParser implements AddressParser {
             }
         }
         return to;
+    }
+
+    /** Returns the index of the first byte from <code>from</code> that is not CR or LF, at most <code>to</code>. */
+    private static int skipLineBreaks(final ByteSequence buf, final int from, final int to) {
+        int i = from;
+        while (i < to && (buf.byteAt(i) == '\r' || buf.byteAt(i) == '\n')) {
+            i++;
+        }
+        return i;
     }
 
     DomainList parseRoute(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
@@ -301,6 +322,21 @@ public class LenientAddressParser implements AddressParser {
         }
     }
 
+    /**
+     * A mailbox without domain, read from <code>buf</code> between <code>from</code> and
+     * <code>to</code>, of which <code>openingText</code> is the value. As in the local@domain form, a
+     * text holding a quoted string is read again as a local part: RFC 2047 section 5 forbids encoded
+     * words in a quoted string, and the opening text decodes one that starts with "=?". Bare text
+     * keeps its encoded words decoded (MIME4J-253).
+     */
+    private Mailbox createMailbox(final String openingText, final ByteSequence buf, final int from, final int to) {
+        if (!holdsQuote(buf, from, to)) {
+            return createMailbox(openingText);
+        }
+        String localPart = parseLocalPart(buf, new ParserCursor(from, to), null);
+        return localPart.length() > 0 ? new Mailbox(null, null, localPart, null) : null;
+    }
+
     public Mailbox parseMailbox(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
         return parseMailbox(buf, cursor, delimiters, union(MAILBOX_STOP, delimiters));
@@ -311,7 +347,7 @@ public class LenientAddressParser implements AddressParser {
         int start = cursor.getPos();
         String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
-            return createMailbox(openingText);
+            return createMailbox(openingText, buf, start, cursor.getPos());
         }
         int pos = cursor.getPos();
         char current = (char) (buf.byteAt(pos) & 0xff);
@@ -330,7 +366,7 @@ public class LenientAddressParser implements AddressParser {
             String domain = parseDomain(buf, cursor, delimiters);
             return new Mailbox(null, null, localPart, domain);
         } else {
-            return createMailbox(openingText);
+            return createMailbox(openingText, buf, start, cursor.getPos());
         }
     }
 
@@ -392,7 +428,7 @@ public class LenientAddressParser implements AddressParser {
         int start = cursor.getPos();
         String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
-            return createMailbox(openingText);
+            return createMailbox(openingText, buf, start, cursor.getPos());
         }
         int pos = cursor.getPos();
         char current = (char) (buf.byteAt(pos) & 0xff);
@@ -423,7 +459,7 @@ public class LenientAddressParser implements AddressParser {
             }
             return new Group(decodeGroupName(openingText), mboxes);
         } else {
-            return createMailbox(openingText);
+            return createMailbox(openingText, buf, start, cursor.getPos());
         }
     }
 

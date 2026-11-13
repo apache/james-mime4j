@@ -186,4 +186,34 @@ public class LenientDateTimeFieldTest {
         Assert.assertEquals(Instant.parse("1997-11-21T14:55:06Z"),
             parse("Date: 21 Nov 1997 09:55:06 est").getDate().toInstant());
     }
+
+    @Test
+    public void secondsAfterFoldingWhiteSpaceAreRead() throws Exception {
+        // same as the strict DateTimeFieldImpl: 1997-11-21T15:55:06Z
+        Assert.assertEquals(880127706000L, parse("Date: Fri, 21 Nov 1997 09:55: 06 -0600").getDate().getTime());
+        Assert.assertEquals(880127706000L, parse("Date: Fri, 21 Nov 1997 09 : 55 :\t06 -0600").getDate().getTime());
+    }
+
+    @Test
+    public void secondsAfterCommentAreRead() throws Exception {
+        Assert.assertEquals(880127706000L, parse("Date: Fri, 21 Nov 1997 09:55:(x)06 -0600").getDate().getTime());
+        Assert.assertEquals(880127706000L, parse("Date: Fri, 21 Nov 1997 09:55: () (y) 06 -0600").getDate().getTime());
+    }
+
+    @Test
+    public void secondsAfterCfwsAgreeWithTheStrictParser() throws Exception {
+        String[] values = {"Fri, 21 Nov 1997 09:55: 06 -0600", "Fri, 21 Nov 1997 09:55:(x)06 -0600",
+            "1 Jan 2020 23:01:\t()\t()59 +0000", "Fri, 21 Nov 1997 09 :55:06 +0100"};
+        for (String value : values) {
+            Date strict = DateTimeFieldImpl.PARSER.parse(
+                RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Date: " + value)), null).getDate();
+            Assert.assertEquals(value, strict, parse("Date: " + value).getDate());
+        }
+    }
+
+    @Test
+    public void unreadSecondsGiveNoDate() throws Exception {
+        // a nested comment is not removed: rather no date than one without its seconds and zone
+        Assert.assertNull(parse("Date: Fri, 21 Nov 1997 09:55:((x))06 -0600").getDate());
+    }
 }

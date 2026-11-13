@@ -19,6 +19,7 @@
 
 package org.apache.james.mime4j.field.address;
 
+import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.dom.address.Address;
 import org.apache.james.mime4j.dom.address.AddressList;
 import org.apache.james.mime4j.dom.address.DomainList;
@@ -713,5 +714,58 @@ public class LenientAddressBuilderTest {
     public void encodedWordsInADisplayNameAreStillDecoded() {
         Mailbox mailbox = (Mailbox) LenientAddressParser.DEFAULT.parseAddressList("\"=?utf-8?q?J=C3=A9r=C3=B4me?=\" <a@example.com>").get(0);
         Assert.assertEquals("J\u00e9r\u00f4me", mailbox.getName());
+    }
+
+    @Test
+    public void quotedPairInADomainLiteralIsUnescapedLikeTheStrictParser() throws Exception {
+        String[] texts = {"a@[1.2.3\\.4]", "a@[x\\]y]", "a@[#\\\\]", "a@[x\\(y]"};
+        for (String text : texts) {
+            Mailbox strict = (Mailbox) DefaultAddressParser.DEFAULT.parseAddressList(text, DecodeMonitor.SILENT).get(0);
+            Mailbox lenient = (Mailbox) parser.parseAddressList(text).get(0);
+            Assert.assertEquals(text, strict.getDomain(), lenient.getDomain());
+            Assert.assertEquals(text, "a", lenient.getLocalPart());
+        }
+        Assert.assertEquals("[1.2.3.4]", ((Mailbox) parser.parseAddressList("a@[1.2.3\\.4]").get(0)).getDomain());
+        Assert.assertEquals("[x]y]", ((Mailbox) parser.parseAddressList("a@[x\\]y]").get(0)).getDomain());
+    }
+
+    @Test
+    public void escapedClosingBracketDoesNotEndTheDomainLiteral() {
+        AddressList list = parser.parseAddressList("a@[x\\] y], b@c");
+        Assert.assertEquals(2, list.size());
+        Assert.assertEquals("[x] y]", ((Mailbox) list.get(0)).getDomain());
+        // a line break after the backslash is unfolded, the quoted pair escapes what follows it
+        Assert.assertEquals("[x]]", ((Mailbox) parser.parseAddressList("a@[x\\\r\n]]").get(0)).getDomain());
+        Assert.assertEquals("b@c", ((Mailbox) list.get(1)).getAddress());
+    }
+
+    @Test
+    public void quotedDomainlessLocalPartLookingLikeAnEncodedWordIsNotDecoded() {
+        Mailbox read = (Mailbox) parser.parseAddressList("\"a =?utf-8?q?x?=\"").get(0);
+        Assert.assertEquals("a =?utf-8?q?x?=", read.getLocalPart());
+        Assert.assertNull(read.getDomain());
+
+        Mailbox first = (Mailbox) parser.parseAddressList("a =?utf-8?q?x?=@").get(0);
+        Mailbox again = (Mailbox) parser.parseAddressList(AddressFormatter.DEFAULT.encode(first)).get(0);
+        Assert.assertEquals(first.getLocalPart(), again.getLocalPart());
+
+        Assert.assertEquals("=?utf-8?q?x?=", parser.parseMailbox("\"=?utf-8?q?x?=\"").getLocalPart());
+        AddressList mailboxes = parser.parseAddressList("\"=?utf-8?q?x?=nnn\", b@c");
+        Assert.assertEquals(2, mailboxes.size());
+        Assert.assertEquals("=?utf-8?q?x?=nnn", ((Mailbox) mailboxes.get(0)).getLocalPart());
+        Group group = (Group) parser.parseAddressList("g: \"=?utf-8?q?x?=]\";").get(0);
+        Assert.assertEquals("=?utf-8?q?x?=]", group.getMailboxes().get(0).getLocalPart());
+    }
+
+    @Test
+    public void quotedDomainlessLocalPartDecodingToNothingKeepsTheMailbox() {
+        AddressList list = parser.parseAddressList("\"=?x???=\", a@b");
+        Assert.assertEquals(2, list.size());
+        Assert.assertEquals("=?x???=", ((Mailbox) list.get(0)).getLocalPart());
+    }
+
+    @Test
+    public void bareDomainlessEncodedLocalPartIsStillDecoded() {
+        Assert.assertEquals("a x", ((Mailbox) parser.parseAddressList("a =?utf-8?q?x?=").get(0)).getLocalPart());
     }
 }
