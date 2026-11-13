@@ -40,6 +40,8 @@ import org.apache.james.mime4j.dom.field.MailboxListField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.address.DefaultAddressParser;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.NameValuePair;
+import org.apache.james.mime4j.stream.RawFieldParser;
 import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.ContentUtil;
 import org.apache.james.mime4j.util.MimeUtil;
@@ -507,5 +509,32 @@ public class FieldsTest {
         } catch (IllegalArgumentException e) {
             // expected
         }
+    }
+
+    @Test
+    public void contentTypeParameterStartingWithAnEncodedWordLookalikeShouldReadBackUnchangedWithBothParsers() throws Exception {
+        String[] values = {"=?utf-8?q?x?=", "=?utf-8?q?x?=\"", "=?x???="};
+        for (String value : values) {
+            ContentTypeField field = Fields.contentType("text/plain",
+                    Collections.singletonList(new NameValuePair("name", value)));
+
+            Assert.assertEquals(value, field.getParameter("name"));
+            Assert.assertEquals(value, ((ContentTypeField) LenientFieldParser.getParser()
+                    .parse(RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Content-Type: " + field.getBody())), DecodeMonitor.SILENT)).getParameter("name"));
+            Assert.assertEquals(value, ((ContentTypeField) DefaultFieldParser.getParser()
+                    .parse(RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Content-Type: " + field.getBody())), DecodeMonitor.SILENT)).getParameter("name"));
+        }
+    }
+
+    @Test
+    public void strictContentTypeShouldDecodeAQuotedEncodedWordLikeTheLenientParser() throws Exception {
+        Field raw = DefaultFieldParser.parse("Content-Type: text/plain; name=\"=?utf-8?q?caf=C3=A9.txt?=\"; "
+            + "boundary=\"=?utf-8?q?b?=\"", DecodeMonitor.SILENT);
+        ContentTypeField strict = (ContentTypeField) DefaultFieldParser.getParser().parse(raw, DecodeMonitor.SILENT);
+        ContentTypeField lenient = (ContentTypeField) LenientFieldParser.getParser().parse(raw, DecodeMonitor.SILENT);
+        Assert.assertEquals("caf\u00e9.txt", strict.getParameter("name"));
+        Assert.assertEquals(lenient.getParameter("name"), strict.getParameter("name"));
+        Assert.assertEquals("=?utf-8?q?b?=", strict.getBoundary());
+        Assert.assertEquals(lenient.getBoundary(), strict.getBoundary());
     }
 }

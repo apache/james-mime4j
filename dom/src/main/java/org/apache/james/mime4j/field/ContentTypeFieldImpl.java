@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
+import org.apache.james.mime4j.codec.DecoderUtil;
 import org.apache.james.mime4j.dom.FieldParser;
 import org.apache.james.mime4j.dom.field.ContentTypeField;
 import org.apache.james.mime4j.field.contenttype.parser.ContentTypeParser;
@@ -214,13 +215,27 @@ public class ContentTypeFieldImpl extends AbstractField implements ContentTypeFi
                 final int len = Math.min(paramNames.size(), paramValues.size());
                 for (int i = 0; i < len; i++) {
                     String paramName = paramNames.get(i).toLowerCase(Locale.US);
-                    String paramValue = paramValues.get(i);
+                    String paramValue = decodeEncodedWordValue(paramName, paramValues.get(i));
                     parameters.put(paramName, paramValue);
                 }
             }
         }
 
         parsed = true;
+    }
+
+    /**
+     * A value starting with "=?" is a quoted string, as '=' and '?' are not token characters. As
+     * the lenient reader (RawFieldParser) and many mailers do (name="=?utf-8?B?...?="), and as
+     * EncoderUtil#encodeHeaderParameter writes such a value for Content-Type, it is decoded as
+     * encoded words, though RFC 2047 section 5 does not allow them there. Never a boundary, which
+     * is a byte exact delimiter.
+     */
+    private static String decodeEncodedWordValue(final String name, final String value) {
+        if (value == null || !value.startsWith("=?") || PARAM_BOUNDARY.equals(name)) {
+            return value;
+        }
+        return DecoderUtil.decodeEncodedWords(value, DecodeMonitor.SILENT);
     }
 
     public static final FieldParser<ContentTypeField> PARSER = new FieldParser<ContentTypeField>() {
