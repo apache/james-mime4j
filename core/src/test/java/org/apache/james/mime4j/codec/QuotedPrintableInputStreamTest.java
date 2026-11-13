@@ -19,12 +19,16 @@
 
 package org.apache.james.mime4j.codec;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+
+import java.util.Arrays;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.Charsets;
@@ -283,5 +287,58 @@ public class QuotedPrintableInputStreamTest {
         InputStream in = new QuotedPrintableInputStream(InputStreams.createAscii("a=2\r\nb\r\n"), DecodeMonitor.SILENT);
         // "=2" is left as is (MIME4J-160), the CRLF stays one line break
         Assert.assertEquals("a=2\r\nb\r\n", readText(in));
+    }
+
+    private static byte[] blanksThenX(int blanks) {
+        byte[] encoded = new byte[blanks + 1];
+        Arrays.fill(encoded, 0, blanks, (byte) ' ');
+        encoded[blanks] = 'x';
+        return encoded;
+    }
+
+    private static byte[] decodeReadingBy(byte[] encoded, int readSize) throws IOException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream(encoded.length);
+        try (QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(new ByteArrayInputStream(encoded), false)) {
+            byte[] buffer = new byte[readSize];
+            for (int n = decoder.read(buffer); n != -1; n = decoder.read(buffer)) {
+                out.write(buffer, 0, n);
+            }
+        }
+        return out.toByteArray();
+    }
+
+    @Test(timeout = 5000)
+    public void longRunOfBlanksShouldDecodeInLinearTime() throws Exception {
+        // Draining the blanks by removing the served bytes from the front of the buffer moved
+        // about N^2 / 2L bytes: some 2 TB here, about a minute
+        byte[] encoded = blanksThenX(16 * 1024 * 1024);
+        Assert.assertArrayEquals(encoded, decodeReadingBy(encoded, 64));
+    }
+
+    @Test
+    public void longRunOfBlanksShouldDecodeUnchangedWhateverTheReadSize() throws Exception {
+        byte[] encoded = blanksThenX(100000);
+        Assert.assertArrayEquals(encoded, decodeReadingBy(encoded, 4096));
+        Assert.assertArrayEquals(encoded, decodeReadingBy(encoded, 1));
+        try (QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(new ByteArrayInputStream(encoded), false)) {
+            Assert.assertArrayEquals(encoded, IOUtils.toByteArray(decoder));
+        }
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        try (QuotedPrintableInputStream decoder = new QuotedPrintableInputStream(new ByteArrayInputStream(encoded), false)) {
+            for (int b = decoder.read(); b != -1; b = decoder.read()) {
+                bytes.write(b);
+            }
+        }
+        Assert.assertArrayEquals(encoded, bytes.toByteArray());
+    }
+
+    @Test
+    public void blanksSpillingOverSeveralReadsShouldKeepTheTextAfterThem() throws Exception {
+        String encoded = "a" + new String(blanksThenX(10000), "US-ASCII") + "=3D \r\n" + "  b  \r\nc";
+        String expected = "a" + new String(blanksThenX(10000), "US-ASCII") + "=\r\n  b\r\nc";
+        for (int readSize : new int[] {1, 3, 100, 4096, 20000}) {
+            Assert.assertEquals("read by " + readSize, expected,
+                new String(decodeReadingBy(encoded.getBytes("US-ASCII"), readSize), "US-ASCII"));
+        }
     }
 }
