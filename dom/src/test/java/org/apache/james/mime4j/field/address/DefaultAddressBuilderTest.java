@@ -359,4 +359,13 @@ public class DefaultAddressBuilderTest {
             // expected
         }
     }
+
+    @Test
+    public void singleNonAsciiCharacterAtomsShouldBeAccepted() throws ParseException {
+        Assert.assertEquals("\u00e9@example.com", parser.parseMailbox("\u00e9@example.com").getAddress());
+        Assert.assertEquals("a@\u00e9", parser.parseMailbox("a@\u00e9").getAddress());
+        Mailbox named = parser.parseMailbox("Jean \u00e9 <jean@example.com>");
+        Assert.assertEquals("Jean \u00e9", named.getName());
+        Assert.assertEquals(2, parser.parseAddressList("sender@example.com, \ufffd@x.tld").size());
+    }
 }
