@@ -216,4 +216,36 @@ public class LenientDateTimeFieldTest {
         // a nested comment is not removed: rather no date than one without its seconds and zone
         Assert.assertNull(parse("Date: Fri, 21 Nov 1997 09:55:((x))06 -0600").getDate());
     }
+    static Date dateOf(final String body) {
+        return DateTimeFieldLenientImpl.PARSER.parse(new RawField("Date", body), null).getDate();
+    }
+
+    @Test(timeout = 10000)
+    public void manyEmptyCommentsBeforeATimeColonGiveNoDate() {
+        // a regex loop recursed once per comment: StackOverflowError
+        StringBuilder value = new StringBuilder("1");
+        for (int i = 0; i < 32_000; i++) {
+            value.append("()");
+        }
+        Assert.assertNull(dateOf(value.append(":1").toString()));
+    }
+
+    @Test(timeout = 10000)
+    public void manyAlternatingBlanksAndCommentsBeforeATimeColonGiveNoDate() {
+        StringBuilder value = new StringBuilder("1");
+        for (int i = 0; i < 16_000; i++) {
+            value.append(" ( )");
+        }
+        Assert.assertNull(dateOf(value.append(":1").toString()));
+    }
+
+    @Test(timeout = 10000)
+    public void manyCommentsAroundATimeColonAreRemoved() {
+        StringBuilder comments = new StringBuilder();
+        for (int i = 0; i < 16_000; i++) {
+            comments.append("() ");
+        }
+        Assert.assertEquals(880127706000L,
+            dateOf("Fri, 21 Nov 1997 09:55" + comments + ":" + comments + "06 -0600").getTime());
+    }
 }

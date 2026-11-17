@@ -375,15 +375,54 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
      * RFC 5322 obs-hour, obs-minute and obs-second allow CFWS around the colons of the time
      * (<code>09:55: 06</code>, <code>09:55:(c)06</code>), as the strict parser reads them. Applied
      * to a text whose white space is collapsed. Nested comments are not removed: the value is then
-     * not read, see {@link #zoneLeftUnread}.
+     * not read, see {@link #zoneLeftUnread}. A linear scan: a regex loop over the comments
+     * recursed once per comment, and a run of them overflowed the stack.
      */
-    private static final Pattern CFWS_AROUND_TIME_COLON = Pattern.compile("(\\d)(?: |\\([^()]*\\))*:(?: |\\([^()]*\\))*(?=\\d)");
-
     private static String removeCfwsAroundTimeColons(final String text) {
         if (text.indexOf('(') < 0 && text.indexOf(": ") < 0 && text.indexOf(" :") < 0) {
             return text;
         }
-        return CFWS_AROUND_TIME_COLON.matcher(text).replaceAll("$1:");
+        StringBuilder sb = new StringBuilder(text.length());
+        int i = 0;
+        while (i < text.length()) {
+            char c = text.charAt(i++);
+            sb.append(c);
+            if (c >= '0' && c <= '9') {
+                int colon = skipCfws(text, i);
+                if (colon < text.length() && text.charAt(colon) == ':') {
+                    int next = skipCfws(text, colon + 1);
+                    if (next < text.length() && text.charAt(next) >= '0' && text.charAt(next) <= '9') {
+                        sb.append(':');
+                        i = next;
+                    }
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /** Skips blanks and comments without nesting; returns the first position after them. */
+    private static int skipCfws(final String text, final int from) {
+        int p = from;
+        while (p < text.length()) {
+            char c = text.charAt(p);
+            if (c == ' ') {
+                p++;
+            } else if (c == '(') {
+                int close = p + 1;
+                while (close < text.length() && text.charAt(close) != '(' && text.charAt(close) != ')') {
+                    close++;
+                }
+                if (close >= text.length() || text.charAt(close) != ')') {
+                    // nested or unclosed comment: not removed
+                    return p;
+                }
+                p = close + 1;
+            } else {
+                return p;
+            }
+        }
+        return p;
     }
 
     /**
