@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Rule;
@@ -111,5 +112,31 @@ public class MboxIteratorEdgeCasesTest {
         } catch (IllegalArgumentException e) {
             // "does not contain From_ lines": acceptable
         }
+    }
+
+    @Test(timeout = 10000)
+    public void longLineStartingWithFromShouldBeRejectedInLinearTime() throws IOException {
+        String line = "From " + repeat('a', 500_000) + "\n";
+        Assert.assertEquals(Arrays.asList("a\n" + line, "b\n"),
+            messages("From a@b 2011\na\n" + line + "From c@d 2012\nb\n", 2 * 1024 * 1024));
+    }
+
+    @Test(timeout = 10000)
+    public void longLineOfAtSignsStartingWithFromShouldBeRejectedInLinearTime() throws IOException {
+        StringBuilder line = new StringBuilder("From ");
+        for (int i = 0; i < 250_000; i++) {
+            line.append("a@");
+        }
+        line.append('\n');
+        Assert.assertEquals(Arrays.asList("a\n" + line, "b\n"),
+            messages("From a@b 2011\na\n" + line + "From c@d 2012\nb\n", 2 * 1024 * 1024));
+    }
+
+    @Test
+    public void defaultPatternsShouldNotLetTheYearOverlapTheFirstCharacter() {
+        Assert.assertFalse(Pattern.compile(FromLinePatterns.DEFAULT, Pattern.MULTILINE).matcher("From a@1234").find());
+        Assert.assertTrue(Pattern.compile(FromLinePatterns.DEFAULT, Pattern.MULTILINE).matcher("From a@b1234").find());
+        Assert.assertFalse(Pattern.compile(FromLinePatterns.DEFAULT2, Pattern.MULTILINE).matcher("From 1234").find());
+        Assert.assertTrue(Pattern.compile(FromLinePatterns.DEFAULT2, Pattern.MULTILINE).matcher("From 12345").find());
     }
 }
