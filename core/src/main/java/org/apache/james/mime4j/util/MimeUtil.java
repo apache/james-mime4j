@@ -29,6 +29,7 @@ import static java.time.temporal.ChronoField.OFFSET_SECONDS;
 import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 import static java.time.temporal.ChronoField.YEAR;
 
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.text.FieldPosition;
 import java.text.SimpleDateFormat;
@@ -45,7 +46,6 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 import java.util.TimeZone;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
@@ -82,7 +82,7 @@ public final class MimeUtil {
     public static final int DEFAULT_MAX_CHARACTERS = 76;
 
     // used to create unique ids
-    private static final Random random = new Random();
+    private static final SecureRandom random = new SecureRandom();
 
     // used to create unique ids
     private static int counter = 0;
