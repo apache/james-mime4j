@@ -259,6 +259,9 @@ public final class MimeUtil {
         int wspIdx = indexOfWsp(s, 0);
         // The used characters (usually the field name and its colon) are text of the first line
         boolean lineHasText = wspIdx > 0 || usedCharacters > 0;
+        // end of the whitespace run holding wspIdx, computed once per run
+        int runEnd = -1;
+        boolean runEndsWithFold = false;
         while (true) {
             if (wspIdx == length) {
                 sb.append(s.substring(Math.max(0, lastLineBreak)));
@@ -266,6 +269,10 @@ public final class MimeUtil {
             }
 
             int nextWspIdx = indexOfWsp(s, wspIdx + 1);
+            if (wspIdx >= runEnd) {
+                runEnd = endOfWspRun(s, wspIdx);
+                runEndsWithFold = runEnd < length && s.charAt(runEnd) == '\r';
+            }
 
             if (wspIdx > 0 && s.charAt(wspIdx - 1) == '\n') {
                 // the value is already folded here: a new line starts with this whitespace,
@@ -273,7 +280,7 @@ public final class MimeUtil {
                 lineStart = wspIdx;
                 lineHasText = false;
             } else if (nextWspIdx - lineStart > maxCharacters && lineHasText && wspIdx < lastNonWspIdx
-                    && !endsWithFold(s, wspIdx)) {
+                    && !runEndsWithFold) {
                 sb.append(s, Math.max(0, lastLineBreak), wspIdx);
                 sb.append("\r\n");
                 lastLineBreak = wspIdx;
@@ -289,15 +296,15 @@ public final class MimeUtil {
     }
 
     /**
-     * Whether the whitespace run starting at <code>index</code> is followed by a fold already in the value:
-     * breaking there would write a whitespace only line.
+     * Index of the first character after the whitespace run starting at <code>index</code>.
+     * When it is a fold already in the value, breaking in the run would write a whitespace only line.
      */
-    private static boolean endsWithFold(String s, int index) {
+    private static int endOfWspRun(String s, int index) {
         int i = index;
         while (i < s.length() && isWsp(s.charAt(i))) {
             i++;
         }
-        return i < s.length() && s.charAt(i) == '\r';
+        return i;
     }
 
     private static boolean holdsText(String s, int from, int to) {
