@@ -24,17 +24,18 @@ package org.apache.james.mime4j.mboxiterator;
  * It's possible that more mailer agents wrote in the same file using different From_ lines.
  */
 public interface FromLinePatterns {
+    // Quantifiers are possessive and the year is checked by a look-behind: a long line costs linear time.
 
     /**
      * Match a line like: From ieugen@apache.org Fri Sep 09 14:04:52 2011
      */
-    String DEFAULT = "^From \\S+@\\S.*\\d{4}$";
+    String DEFAULT = "^From \\S[^\\s@]*+@\\S(?=.{4}).*+(?<=\\d{4})$";
     /**
      * Matches other type of From_ line (without @):
      * From MAILER-DAEMON Wed Oct 05 21:54:09 2011
      * Thunderbird mbox content: From - Wed Apr 02 06:51:08 2014
      */
-    String DEFAULT2 = "^From \\S+.*\\d{4}$";
+    String DEFAULT2 = "^From \\S(?=.{4}).*+(?<=\\d{4})$";
 
 
 }
