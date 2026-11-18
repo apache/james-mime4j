@@ -206,4 +206,11 @@ public class MimeUtilTest {
         }
         Assert.assertEquals(value, MimeUtil.unfold(folded));
     }
+
+    @Test(timeout = 10000)
+    public void foldShouldBeLinearInALongWhitespaceRunEndingAtAFold() {
+        String value = "x" + repeat(" ", 1_000_000) + "\r\n y";
+        String folded = MimeUtil.fold(value, 0);
+        Assert.assertEquals(value, folded);
+    }
 }
