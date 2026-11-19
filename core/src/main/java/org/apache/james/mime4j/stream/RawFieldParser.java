@@ -230,7 +230,7 @@ public class RawFieldParser {
 
     private String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
             final boolean boundary, final boolean unescape) {
-        StringBuilder dst = new StringBuilder();
+        StringBuilder dst = new StringBuilder(initialCapacity(cursor));
         boolean whitespace = false;
         while (!cursor.atEnd()) {
             char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
@@ -367,54 +367,7 @@ public class RawFieldParser {
      */
     public void copyContent(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
             final StringBuilder dst) {
-        int pos = cursor.getPos();
-        int indexFrom = pos;
-        int indexTo = cursor.getUpperBound();
-        int dstStart = dst.length();
-        for (int i = indexFrom; i < indexTo; i++) {
-            byte bVal = buf.byteAt(i);
-            char current = (char) (bVal & 0xff);
-            if (isLineBreak(current)) {
-                // deleted, as by MimeUtil#unfold: the word goes on
-                pos++;
-                continue;
-            }
-            if ((delimiters != null && delimiters.get(current))
-                    || CharsetUtil.isWhitespace(current) || current == '(') {
-                break;
-            }
-            pos++;
-            if (bVal < 0) {
-                // Non-ASCII byte: undo the ASCII chars written so far, redo via UTF-8 decode
-                dst.setLength(dstStart);
-                ByteArrayBuffer dstRaw = DECODE_BUFFER.get();
-                dstRaw.clear();
-                for (int j = indexFrom; j <= i; j++) {
-                    if (!isLineBreak((char) (buf.byteAt(j) & 0xff))) {
-                        dstRaw.append(buf.byteAt(j));
-                    }
-                }
-                for (int k = i + 1; k < indexTo; k++) {
-                    byte bk = buf.byteAt(k);
-                    char ck = (char) (bk & 0xff);
-                    if (isLineBreak(ck)) {
-                        pos++;
-                        continue;
-                    }
-                    if ((delimiters != null && delimiters.get(ck))
-                            || CharsetUtil.isWhitespace(ck) || ck == '(') {
-                        break;
-                    }
-                    pos++;
-                    dstRaw.append(bk);
-                }
-                cursor.updatePos(pos);
-                dst.append(ContentUtil.decode(StandardCharsets.UTF_8, dstRaw));
-                return;
-            }
-            dst.append(current);
-        }
-        cursor.updatePos(pos);
+        copyRun(buf, cursor, delimiters, dst, false);
     }
 
     /**
@@ -429,54 +382,90 @@ public class RawFieldParser {
      */
     public void copyUnquotedContent(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
                             final StringBuilder dst) {
-        int pos = cursor.getPos();
-        int indexFrom = pos;
-        int indexTo = cursor.getUpperBound();
-        int dstStart = dst.length();
-        for (int i = indexFrom; i < indexTo; i++) {
-            byte bVal = buf.byteAt(i);
-            char current = (char) (bVal & 0xff);
-            if (isLineBreak(current)) {
-                // deleted, as by MimeUtil#unfold: the word goes on
-                pos++;
+        copyRun(buf, cursor, delimiters, dst, true);
+    }
+
+    // Bits of the stop chars below 64 that are not delimiters: whitespace (CR and LF are deleted
+    // before this test) and '('
+    private static final long WSP_OR_COMMENT = 1L << ' ' | 1L << '\t' | 1L << '(';
+    private static final long QUOTE = 1L << '\"';
+
+    /**
+     * Copies the run of bytes from the cursor to the first whitespace, '(', '"' when
+     * <code>stopAtQuote</code>, or delimiter. CR and LF are deleted, as by MimeUtil#unfold: the
+     * word goes on. A run holding a non-ASCII byte is decoded as UTF-8.
+     * <p>
+     * The run is found first, then appended at once: the stop test is two bit masks for ASCII.
+     */
+    private void copyRun(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+            final StringBuilder dst, final boolean stopAtQuote) {
+        long stopLow = WSP_OR_COMMENT | (stopAtQuote ? QUOTE : 0L);
+        long stopHigh = 0L;
+        boolean nonAsciiDelimiters = false;
+        if (delimiters != null) {
+            for (int d = delimiters.nextSetBit(0); d >= 0; d = delimiters.nextSetBit(d + 1)) {
+                if (d < 64) {
+                    stopLow |= 1L << d;
+                } else if (d < 128) {
+                    stopHigh |= 1L << (d - 64);
+                } else {
+                    nonAsciiDelimiters = true;
+                    break;
+                }
+            }
+        }
+        final int indexFrom = cursor.getPos();
+        final int indexTo = cursor.getUpperBound();
+        boolean nonAscii = false;
+        boolean lineBreak = false;
+        int end = indexFrom;
+        for (; end < indexTo; end++) {
+            int current = buf.byteAt(end) & 0xff;
+            if (current == '\r' || current == '\n') {
+                lineBreak = true;
                 continue;
             }
-            if ((delimiters != null && delimiters.get(current))
-                    || CharsetUtil.isWhitespace(current) || current == '(' || current == '\"') {
-                break;
-            }
-            pos++;
-            if (bVal < 0) {
-                // Non-ASCII byte: undo the ASCII chars written so far, redo via UTF-8 decode
-                dst.setLength(dstStart);
-                ByteArrayBuffer dstRaw = DECODE_BUFFER.get();
-                dstRaw.clear();
-                for (int j = indexFrom; j <= i; j++) {
-                    if (!isLineBreak((char) (buf.byteAt(j) & 0xff))) {
-                        dstRaw.append(buf.byteAt(j));
-                    }
+            if (current < 64) {
+                if ((stopLow >>> current & 1L) != 0) {
+                    break;
                 }
-                for (int k = i + 1; k < indexTo; k++) {
-                    byte bk = buf.byteAt(k);
-                    char ck = (char) (bk & 0xff);
-                    if (isLineBreak(ck)) {
-                        pos++;
-                        continue;
-                    }
-                    if ((delimiters != null && delimiters.get(ck))
-                            || CharsetUtil.isWhitespace(ck) || ck == '(' || ck == '\"') {
-                        break;
-                    }
-                    pos++;
-                    dstRaw.append(bk);
+            } else if (current < 128) {
+                if ((stopHigh >>> (current - 64) & 1L) != 0) {
+                    break;
                 }
-                cursor.updatePos(pos);
-                dst.append(ContentUtil.decode(StandardCharsets.UTF_8, dstRaw));
-                return;
+            } else {
+                if (nonAsciiDelimiters && delimiters.get(current)) {
+                    break;
+                }
+                nonAscii = true;
             }
-            dst.append(current);
         }
-        cursor.updatePos(pos);
+        cursor.updatePos(end);
+        if (nonAscii) {
+            ByteArrayBuffer dstRaw = DECODE_BUFFER.get();
+            dstRaw.clear();
+            for (int j = indexFrom; j < end; j++) {
+                byte bj = buf.byteAt(j);
+                if (bj != '\r' && bj != '\n') {
+                    dstRaw.append(bj);
+                }
+            }
+            dst.append(ContentUtil.decode(StandardCharsets.UTF_8, dstRaw));
+            return;
+        }
+        dst.ensureCapacity(dst.length() + (end - indexFrom));
+        if (!lineBreak) {
+            for (int j = indexFrom; j < end; j++) {
+                dst.append((char) (buf.byteAt(j) & 0xff));
+            }
+            return;
+        }
+        for (int j = indexFrom; j < end; j++) {
+            char c = (char) (buf.byteAt(j) & 0xff);
+            if (!isLineBreak(c)) {
+                dst.append(c);
+            }
+        }
     }
 
     /**
@@ -504,6 +493,13 @@ public class RawFieldParser {
     public void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst, final boolean decodeEncodedWords) {
         copyQuotedContent(buf, cursor, dst, !decodeEncodedWords, false);
+    }
+
+    /**
+     * The capacity of a builder for what is left under the cursor, capped: most values are short.
+     */
+    private static int initialCapacity(final ParserCursor cursor) {
+        return Math.max(16, Math.min(64, cursor.getUpperBound() - cursor.getPos()));
     }
 
     private static boolean isLineBreak(final char c) {
