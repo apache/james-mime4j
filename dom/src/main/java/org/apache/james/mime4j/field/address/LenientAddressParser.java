@@ -89,7 +89,7 @@ public class LenientAddressParser implements AddressParser {
     }
 
     String parseDomain(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        StringBuilder dst = new StringBuilder();
+        StringBuilder dst = new StringBuilder(initialCapacity(cursor));
         // Every '[' before this index has no ']' before the next delimiter: a failed scan for
         // the closing bracket is not repeated for each of them, which would be quadratic.
         int unclosedUntil = -1;
@@ -280,7 +280,7 @@ public class LenientAddressParser implements AddressParser {
     }
 
     private String parseLocalPart(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        StringBuilder dst = new StringBuilder();
+        StringBuilder dst = new StringBuilder(initialCapacity(cursor));
         boolean whitespace = false;
         while (!cursor.atEnd()) {
             char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
@@ -490,6 +490,13 @@ public class LenientAddressParser implements AddressParser {
         ByteSequence raw = ContentUtil.encode(text);
         ParserCursor cursor = new ParserCursor(0, raw.length());
         return parseAddressList(raw, cursor);
+    }
+
+    /**
+     * The capacity of a builder for what is left under the cursor, capped: a domain or a local part is short.
+     */
+    private static int initialCapacity(final ParserCursor cursor) {
+        return Math.max(16, Math.min(64, cursor.getUpperBound() - cursor.getPos()));
     }
 
 }
