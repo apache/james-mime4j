@@ -102,6 +102,8 @@ public class MessageMatcher {
         return new MessageMatcherBuilder();
     }
 
+    private static final int CHUNK_SIZE = 4096;
+
     private final Logger logger;
     private final List<CharSequence> searchContents;
     private final List<String> contentTypes;
@@ -248,18 +250,24 @@ public class MessageMatcher {
         for (NeedleMatcher matcher : matchers) {
             matcher.reset();
         }
+        // Read in blocks: Reader#read() decodes one char per call. The matcher state carries across blocks.
+        final char[] chunk = new char[CHUNK_SIZE];
+        final int matcherCount = matchers.size();
         int read;
-        while ((read = reader.read()) != -1) {
-            final char next = computeNextChar(isCaseInsensitive, (char) read);
-            boolean allFound = true;
-            for (NeedleMatcher matcher : matchers) {
-                if (!matcher.found) {
-                    matcher.accept(next);
-                    allFound &= matcher.found;
+        while ((read = reader.read(chunk, 0, chunk.length)) != -1) {
+            for (int i = 0; i < read; i++) {
+                final char next = computeNextChar(isCaseInsensitive, chunk[i]);
+                boolean allFound = true;
+                for (int m = 0; m < matcherCount; m++) {
+                    final NeedleMatcher matcher = matchers.get(m);
+                    if (!matcher.found) {
+                        matcher.accept(next);
+                        allFound &= matcher.found;
+                    }
                 }
-            }
-            if (allFound) {
-                return true;
+                if (allFound) {
+                    return true;
+                }
             }
         }
         return false;
@@ -287,15 +295,18 @@ public class MessageMatcher {
      * ending the input.
      */
     private static final class NeedleMatcher {
-        private final CharBuffer needle;
+        private final char[] needle;
         private final int length;
         private final int[] fallback;
         private int matched;
         private boolean found;
 
-        NeedleMatcher(final CharBuffer needle) {
-            this.needle = needle;
-            this.length = needle.limit();
+        NeedleMatcher(final CharBuffer buffer) {
+            this.length = buffer.limit();
+            this.needle = new char[length];
+            for (int i = 0; i < length; i++) {
+                needle[i] = buffer.get(i);
+            }
             this.fallback = fallbackTable(needle, length);
             this.found = length == 0;
         }
@@ -305,10 +316,10 @@ public class MessageMatcher {
         }
 
         void accept(final char next) {
-            while (matched > 0 && needle.get(matched) != next) {
+            while (matched > 0 && needle[matched] != next) {
                 matched = fallback[matched - 1];
             }
-            if (needle.get(matched) == next) {
+            if (needle[matched] == next) {
                 matched++;
                 if (matched == length) {
                     found = true;
@@ -319,14 +330,14 @@ public class MessageMatcher {
         /**
          * For each prefix of the searched text, the length of its longest proper prefix that is also a suffix.
          */
-        private static int[] fallbackTable(final CharBuffer buffer, final int length) {
+        private static int[] fallbackTable(final char[] buffer, final int length) {
             final int[] fallback = new int[length];
             int k = 0;
             for (int i = 1; i < length; i++) {
-                while (k > 0 && buffer.get(i) != buffer.get(k)) {
+                while (k > 0 && buffer[i] != buffer[k]) {
                     k = fallback[k - 1];
                 }
-                if (buffer.get(i) == buffer.get(k)) {
+                if (buffer[i] == buffer[k]) {
                     k++;
                 }
                 fallback[i] = k;
