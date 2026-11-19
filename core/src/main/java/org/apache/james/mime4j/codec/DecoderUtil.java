@@ -19,18 +19,20 @@
 
 package org.apache.james.mime4j.codec;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.SoftReference;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import org.apache.james.mime4j.io.InputStreams;
 import org.apache.james.mime4j.util.BufferRecycler;
 import org.apache.james.mime4j.util.CharsetUtil;
-import org.apache.james.mime4j.util.RecycledByteArrayBuffer;
 
 /**
  * Static methods for decoding strings, byte arrays and encoded words.
@@ -51,26 +53,14 @@ public class DecoderUtil {
     }
 
     /**
-     * Decodes a string containing quoted-printable encoded data.
+     * Decodes quoted-printable encoded data.
      *
-     * @param s the string to decode.
+     * @param ascii the encoded data.
      * @return the decoded bytes.
      */
-    private static byte[] decodeQuotedPrintable(String s, DecodeMonitor monitor) {
-        try {
-            QuotedPrintableInputStream is = new QuotedPrintableInputStream(
-                    InputStreams.createAscii(s), monitor);
-            RecycledByteArrayBuffer buf = new RecycledByteArrayBuffer(getBufferRecycler(), s.length());
-            try {
-                int b;
-                while ((b = is.read()) != -1) {
-                    buf.append(b);
-                }
-                return buf.toByteArray();
-            } finally {
-                is.close();
-                buf.release();
-            }
+    private static byte[] decodeQuotedPrintable(byte[] ascii, DecodeMonitor monitor) {
+        try (InputStream is = new QuotedPrintableInputStream(new ByteArrayInputStream(ascii), monitor)) {
+            return drain(is, ascii.length);
         } catch (IOException ex) {
             // Reading from memory: only the strict DecodeMonitor makes the decoder fail
             throw new IllegalArgumentException(ex.getMessage(), ex);
@@ -85,24 +75,42 @@ public class DecoderUtil {
      * @return the decoded bytes.
      */
     private static byte[] decodeBase64(String s, DecodeMonitor monitor) {
-        try {
-            Base64InputStream is = new Base64InputStream(
-                    InputStreams.createAscii(s), monitor);
-            RecycledByteArrayBuffer buf = new RecycledByteArrayBuffer(getBufferRecycler(), s.length());
-            try {
-                int b;
-                while ((b = is.read()) != -1) {
-                    buf.append(b);
-                }
-                return buf.toByteArray();
-            } finally {
-                is.close();
-                buf.release();
-            }
+        byte[] ascii = toAscii(s);
+        try (InputStream is = new Base64InputStream(new ByteArrayInputStream(ascii), monitor)) {
+            return drain(is, ascii.length);
         } catch (IOException ex) {
             // Reading from memory: only the strict DecodeMonitor makes the decoder fail
             throw new IllegalArgumentException(ex.getMessage(), ex);
         }
+    }
+
+    /**
+     * The encoded text as bytes. A char out of US-ASCII becomes '?', as the replacing encoder of
+     * {@link org.apache.james.mime4j.io.InputStreams#createAscii(CharSequence)} did.
+     */
+    private static byte[] toAscii(String s) {
+        return s.getBytes(StandardCharsets.US_ASCII);
+    }
+
+    /**
+     * Reads the decoder in bulk. Q and B never decode to more bytes than they read, so one byte
+     * more than <code>expectedMax</code> (the encoded length) lets the end of stream be read
+     * without growing; the buffer still grows if needed.
+     */
+    private static byte[] drain(InputStream is, int expectedMax) throws IOException {
+        byte[] out = new byte[expectedMax + 1];
+        int len = 0;
+        while (true) {
+            if (len == out.length) {
+                out = Arrays.copyOf(out, out.length * 2);
+            }
+            int n = is.read(out, len, out.length - len);
+            if (n == -1) {
+                break;
+            }
+            len += n;
+        }
+        return len == out.length ? out : Arrays.copyOf(out, len);
     }
 
     /**
@@ -138,9 +146,7 @@ public class DecoderUtil {
      */
     static String decodeQ(String encodedText, String charset, DecodeMonitor monitor)
             throws UnsupportedEncodingException {
-        encodedText = replaceUnderscores(encodedText);
-
-        byte[] decodedBytes = decodeQuotedPrintable(encodedText, monitor);
+        byte[] decodedBytes = decodeQuotedPrintable(replaceUnderscores(encodedText), monitor);
         return new String(decodedBytes, charset);
     }
 
@@ -384,21 +390,29 @@ public class DecoderUtil {
         return "=?" + mimeCharset + "?" + encoding + "?" + encodedText + "?=";
     }
 
-    // Replace _ with =20
-    private static String replaceUnderscores(String str) {
-        // probably faster than String#replace(CharSequence, CharSequence)
-
-        StringBuilder sb = new StringBuilder(128);
-
-        for (int i = 0; i < str.length(); i++) {
-            char c = str.charAt(i);
-            if (c == '_') {
-                sb.append("=20");
-            } else {
-                sb.append(c);
+    // The encoded text as US-ASCII bytes, with _ replaced by =20
+    private static byte[] replaceUnderscores(String str) {
+        final byte[] ascii = toAscii(str);
+        int underscores = 0;
+        for (byte b : ascii) {
+            if (b == '_') {
+                underscores++;
             }
         }
-
-        return sb.toString();
+        if (underscores == 0) {
+            return ascii;
+        }
+        final byte[] replaced = new byte[ascii.length + 2 * underscores];
+        int j = 0;
+        for (byte b : ascii) {
+            if (b == '_') {
+                replaced[j++] = '=';
+                replaced[j++] = '2';
+                replaced[j++] = '0';
+            } else {
+                replaced[j++] = b;
+            }
+        }
+        return replaced;
     }
 }
