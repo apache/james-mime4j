@@ -27,6 +27,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Base64;
+import java.util.Random;
 
 public class Base64OutputStreamTest {
 
@@ -222,5 +224,88 @@ public class Base64OutputStreamTest {
             fail(e.getMessage());
             return null;
         }
+    }
+    @Test
+    public void encodingInChunksShouldWriteWhatTheJdkStreamEncoderWrites() throws IOException {
+        Random random = new Random(42);
+        int[] lineLengths = {76, 0, -1, 3, 4, 5, 64, 77, 1000, 5000};
+        byte[][] separators = {{'\r', '\n'}, {'\n'}, {}, {'\r', '\n', ' ', '\t'}};
+        int[] sizes = {0, 1, 2, 3, 56, 57, 58, 3647, 3648, 3649, 3072, 4000, 10000, 70001};
+        for (int lineLength : lineLengths) {
+            for (byte[] separator : separators) {
+                for (int size : sizes) {
+                    byte[] content = new byte[size];
+                    random.nextBytes(content);
+                    for (int attempt = 0; attempt < 4; attempt++) {
+                        assertSameAsReference(content, lineLength, separator, random, attempt);
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    public void aStreamWritingIntoAnotherOnTheSameThreadShouldEncodeBothTimes() throws IOException {
+        byte[] content = new byte[100000];
+        new Random(43).nextBytes(content);
+
+        ByteArrayOutputStream once = new ByteArrayOutputStream();
+        try (Base64OutputStream encoder = new Base64OutputStream(once)) {
+            encoder.write(content);
+        }
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        try (Base64OutputStream encoder = new Base64OutputStream(expected)) {
+            encoder.write(once.toByteArray());
+        }
+
+        ByteArrayOutputStream actual = new ByteArrayOutputStream();
+        try (Base64OutputStream outer = new Base64OutputStream(actual);
+             Base64OutputStream inner = new Base64OutputStream(outer)) {
+            for (int pos = 0; pos < content.length; pos += 5000) {
+                inner.write(content, pos, Math.min(5000, content.length - pos));
+            }
+        }
+
+        Assert.assertArrayEquals(expected.toByteArray(), actual.toByteArray());
+    }
+
+    private void assertSameAsReference(byte[] content, int lineLength, byte[] separator, Random random, int attempt) throws IOException {
+        ByteArrayOutputStream expected = new ByteArrayOutputStream();
+        // The previous implementation: the JDK stream encoder, and a trailing separator if anything was written
+        ByteArrayOutputStream encoded = new ByteArrayOutputStream();
+        OutputStream reference = Base64.getMimeEncoder(lineLength, separator).wrap(encoded);
+        reference.write(content);
+        reference.close();
+        expected.write(encoded.toByteArray());
+        if (encoded.size() > 0) {
+            expected.write(separator);
+        }
+
+        ByteArrayOutputStream actual = new ByteArrayOutputStream();
+        Base64OutputStream encoder = new Base64OutputStream(actual, lineLength, separator);
+        int pos = 0;
+        while (pos < content.length) {
+            int split;
+            if (attempt == 0) {
+                split = content.length - pos;
+            } else if (attempt == 1) {
+                split = 1 + random.nextInt(Math.min(10, content.length - pos));
+            } else {
+                split = 1 + random.nextInt(content.length - pos);
+            }
+            if (split == 1 && random.nextBoolean()) {
+                encoder.write(content[pos]);
+            } else {
+                encoder.write(content, pos, split);
+            }
+            if (random.nextInt(8) == 0) {
+                encoder.flush();
+            }
+            pos += split;
+        }
+        encoder.close();
+
+        Assert.assertArrayEquals("lineLength " + lineLength + " separator " + separator.length + " size " + content.length + " attempt " + attempt,
+            expected.toByteArray(), actual.toByteArray());
     }
 }
