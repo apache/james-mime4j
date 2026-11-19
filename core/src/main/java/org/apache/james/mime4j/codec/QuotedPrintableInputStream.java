@@ -50,6 +50,16 @@ public class QuotedPrintableInputStream extends InputStream {
     private static final byte EQ = 0x3D;
     private static final byte CR = 0x0D;
     private static final byte LF = 0x0A;
+    private static final byte SP = 0x20;
+
+    // Character.isWhitespace for each byte value, without the Unicode lookup
+    private static final boolean[] WHITESPACE = new boolean[256];
+
+    static {
+        for (int i = 0; i < WHITESPACE.length; i++) {
+            WHITESPACE[i] = Character.isWhitespace(i);
+        }
+    }
 
     private final byte[] singleByte = new byte[1];
 
@@ -228,6 +238,41 @@ public class QuotedPrintableInputStream extends InputStream {
             while (pos < limit && index < to) {
                 int b = encoded[pos++] & 0xFF;
 
+                if (!lastWasCR) {
+                    if (b > SP) {
+                        // The common case: a plain byte (neither blank, control nor '=') with no blank
+                        // held back. transfer would write it as is.
+                        if (b != EQ && blanks.length() == 0) {
+                            buffer[index++] = (byte) b;
+                            continue;
+                        }
+                    } else if (b != CR && b != LF && WHITESPACE[b]) {
+                        // A single space between two plain bytes is not trailing: written along with
+                        // the next byte instead of being held back in blanks
+                        if (b == SP && pos < limit && to - index >= 2 && blanks.length() == 0) {
+                            int next = encoded[pos] & 0xFF;
+                            if (next > SP && next != EQ) {
+                                buffer[index++] = SP;
+                                buffer[index++] = (byte) next;
+                                pos++;
+                                continue;
+                            }
+                        }
+                        // a blank, as below: held back as a possible trailing blank, along with the
+                        // blanks that follow it in the buffer (no CR nor LF among them)
+                        int start = pos - 1;
+                        while (pos < limit) {
+                            int c = encoded[pos] & 0xFF;
+                            if (c == CR || c == LF || !WHITESPACE[c]) {
+                                break;
+                            }
+                            pos++;
+                        }
+                        blanks.append(encoded, start, pos - start);
+                        continue;
+                    }
+                }
+
                 if (lastWasCR && b != LF) {
                     if (monitor.warn("Found CR without LF", "Leaving it as is")) {
                         throw new IOException("Found CR without LF");
@@ -279,7 +324,7 @@ public class QuotedPrintableInputStream extends InputStream {
                         } else {
                             monitor.warn("Unexpected == encountered", "==");
                         }
-                    } else if (Character.isWhitespace((char) b2)) {
+                    } else if (b2 != -1 && WHITESPACE[b2]) {
                         // soft line break
                         int b3 = peek(0);
                         if (!(b2 == CR && b3 == LF)) {
@@ -312,7 +357,7 @@ public class QuotedPrintableInputStream extends InputStream {
                             index = transfer((upper << 4) | lower, buffer, index, to, true);
                         }
                     }
-                } else if (Character.isWhitespace(b)) {
+                } else if (WHITESPACE[b]) {
                     blanks.append(b);
                 } else {
                     index = transfer(b & 0xFF, buffer, index, to, true);
