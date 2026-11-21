@@ -45,8 +45,10 @@ import org.apache.james.mime4j.dom.field.ParsedField;
 import org.apache.james.mime4j.dom.field.UnstructuredField;
 import org.apache.james.mime4j.field.address.AddressFormatter;
 import org.apache.james.mime4j.stream.Field;
+import org.apache.james.mime4j.stream.MimeConfig;
 import org.apache.james.mime4j.stream.NameValuePair;
 import org.apache.james.mime4j.stream.RawField;
+import org.apache.james.mime4j.util.ByteSequence;
 import org.apache.james.mime4j.util.MimeUtil;
 
 /**
@@ -90,6 +92,8 @@ public class Fields {
      *            map containing content-type parameters such as
      *            <code>&quot;boundary&quot;</code>.
      * @return the newly created <i>Content-Type</i> field.
+     * @throws IllegalArgumentException if the field would be longer than the
+     *             default maximum header length of the readers ({@link MimeConfig#DEFAULT}).
      */
     public static ContentTypeField contentType(String mimeType,
             Map<String, String> parameters) {
@@ -107,7 +111,7 @@ public class Fields {
                 sb.append(EncoderUtil.encodeHeaderParameter(entry.getKey(),
                         entry.getValue(), false));
             }
-            String contentType = sb.toString();
+            String contentType = checkDefaultMaxHeaderLen(FieldName.CONTENT_TYPE, sb.toString());
             return contentType(contentType);
         }
     }
@@ -122,6 +126,8 @@ public class Fields {
      * @param parameters
      *            list of content-type parameter name/value pairs.
      * @return the newly created <i>Content-Type</i> field.
+     * @throws IllegalArgumentException if the field would be longer than the
+     *             default maximum header length of the readers ({@link MimeConfig#DEFAULT}).
      */
     public static ContentTypeField contentType(String mimeType,
                                                Iterable<NameValuePair> parameters) {
@@ -140,7 +146,7 @@ public class Fields {
                 // no Content-Type parser decodes RFC 2231 sections: a value too long for a line is rejected
                 sb.append(EncoderUtil.encodeHeaderParameter(name, value != null ? value : "", false));
             }
-            String contentType = sb.toString();
+            String contentType = checkDefaultMaxHeaderLen(FieldName.CONTENT_TYPE, sb.toString());
             return contentType(contentType);
         }
     }
@@ -202,6 +208,8 @@ public class Fields {
      *            map containing disposition parameters such as
      *            <code>&quot;filename&quot;</code>.
      * @return the newly created <i>Content-Disposition</i> field.
+     * @throws IllegalArgumentException if the field would be longer than the
+     *             default maximum header length of the readers ({@link MimeConfig#DEFAULT}).
      */
     public static ContentDispositionField contentDisposition(
             String dispositionType, Map<String, String> parameters) {
@@ -218,7 +226,7 @@ public class Fields {
                 sb.append(EncoderUtil.encodeHeaderParameter(entry.getKey(),
                         entry.getValue(), true));
             }
-            String contentDisposition = sb.toString();
+            String contentDisposition = checkDefaultMaxHeaderLen(FieldName.CONTENT_DISPOSITION, sb.toString());
             return contentDisposition(contentDisposition);
         }
     }
@@ -233,6 +241,8 @@ public class Fields {
      * @param parameters
      *            list of disposition parameter name/value pairs.
      * @return the newly created <i>Content-Disposition</i> field.
+     * @throws IllegalArgumentException if the field would be longer than the
+     *             default maximum header length of the readers ({@link MimeConfig#DEFAULT}).
      */
     public static ContentDispositionField contentDisposition(
             String dispositionType, Iterable<NameValuePair> parameters) {
@@ -250,7 +260,7 @@ public class Fields {
                 String value = param.getValue();
                 sb.append(EncoderUtil.encodeHeaderParameter(name, value != null ? value : "", true));
             }
-            String contentDisposition = sb.toString();
+            String contentDisposition = checkDefaultMaxHeaderLen(FieldName.CONTENT_DISPOSITION, sb.toString());
             return contentDisposition(contentDisposition);
         }
     }
@@ -707,6 +717,32 @@ public class Fields {
     private static boolean isValidDispositionType(String dispositionType) {
         return dispositionType != null && EncoderUtil.isToken(dispositionType);
 
+    }
+
+    /**
+     * The parameters of a field are encoded so that each line fits (RFC 2231 sections for a long
+     * value), but nothing bounds their sum: a field longer than {@link MimeConfig#getMaxHeaderLen()}
+     * of {@link MimeConfig#DEFAULT} is rejected by the readers with the default configuration, which
+     * then lose the rest of the message. It is measured once folded as written, each line end
+     * counted as one byte, as by the readers.
+     *
+     * @throws IllegalArgumentException if the written field would be longer
+     */
+    private static String checkDefaultMaxHeaderLen(String fieldName, String body) {
+        ByteSequence raw = new RawField(fieldName, body).getSafeRaw();
+        // the line end after the last line
+        int measured = raw.length() + 1;
+        for (int i = 0; i + 1 < raw.length(); i++) {
+            if (raw.byteAt(i) == '\r' && raw.byteAt(i + 1) == '\n') {
+                measured--;
+            }
+        }
+        int max = MimeConfig.DEFAULT.getMaxHeaderLen();
+        if (max > 0 && measured > max) {
+            throw new IllegalArgumentException(fieldName + " field too long (" + measured
+                    + " bytes) to be read back with the default maximum header length (" + max + ")");
+        }
+        return body;
     }
 
     private static <F extends ParsedField> F parse(FieldParser<F> parser,
