@@ -345,6 +345,13 @@ public class EncoderUtilTest {
     }
 
     @Test
+    public void localPartHoldingAnEncodedWordLookalikeShouldBeQuoted() {
+        Assert.assertEquals("\"=?utf-8?q?x?=\"", EncoderUtil.encodeAddressLocalPart("=?utf-8?q?x?="));
+        Assert.assertEquals("\"a.=?b\"", EncoderUtil.encodeAddressLocalPart("a.=?b"));
+        Assert.assertEquals("a?=b", EncoderUtil.encodeAddressLocalPart("a?=b"));
+    }
+
+    @Test
     public void localPartShouldNotHoldRawLineBreaks() {
         Assert.assertEquals("\"\\\\\"", EncoderUtil.encodeAddressLocalPart("\\\r"));
         Assert.assertEquals("\"a b\"", EncoderUtil.encodeAddressLocalPart("a\r\n b"));

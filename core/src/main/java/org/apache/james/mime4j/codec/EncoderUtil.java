@@ -145,7 +145,8 @@ public class EncoderUtil {
      * Encodes the local part of an address specification as described in RFC
      * 5322 section 3.4.1. Leading and trailing CFWS should have been removed
      * before calling this method. The specified string should not contain any
-     * illegal (control or non-ASCII) characters.
+     * illegal (control or non-ASCII) characters. A local part holding
+     * <code>=?</code> is quoted, so that it is not read back as an encoded word.
      *
      * @param localPart
      *            the local part to encode
@@ -156,7 +157,9 @@ public class EncoderUtil {
         // dot-atom = [CFWS] dot-atom-text [CFWS]
         // CFWS = comment or folding white space
 
-        if (isDotAtomText(localPart)) {
+        // A dot-atom holding "=?" is quoted too: RFC 2047 section 5 forbids encoded words in a
+        // quoted string, while a lenient reader decodes the bare text of a mailbox without domain
+        if (isDotAtomText(localPart) && !localPart.contains("=?")) {
             return localPart;
         } else {
             // CR and LF can be neither qtext nor quoted-pair (RFC 5322 section 3.2.4): readers drop them
