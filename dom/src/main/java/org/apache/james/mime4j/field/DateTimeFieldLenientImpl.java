@@ -37,6 +37,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.time.format.SignStyle;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
@@ -197,7 +198,7 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
         try {
             // RFC 5322 FWS: any run of white space reads as one space
-            String normalized = signUnsignedOffset(normalizeShortYear(removeCfwsAroundTimeColons(collapseWhiteSpace(text))));
+            String normalized = signUnsignedOffset(normalizeShortYear(removeCommentsBetweenTokens(removeCfwsAroundTimeColons(collapseWhiteSpace(text)))));
             ParsePosition position = new ParsePosition(0);
             Instant instant = Instant.from(RFC_5322.parse(normalized, position));
             if (zoneLeftUnread(normalized, position.getIndex())) {
@@ -324,8 +325,9 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         }
         p += 5;
 
-        // Then the end of the value, or a comment " (UTC)" that RFC_5322 does not read either
-        return p == s.length() || (isChar(s, p, ' ') && isChar(s, p + 1, '('));
+        // Then the end of the value, or a comment " (UTC)" that RFC_5322 does not read either: a
+        // text after it ("(c)0", "(a) -0600 (b)") is left to RFC_5322
+        return p == s.length() || (isChar(s, p, ' ') && isChar(s, p + 1, '(') && commentEnd(s, p + 1) == s.length());
     }
 
     private static boolean isChar(final String s, final int pos, final char c) {
@@ -387,23 +389,24 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
     /**
      * RFC 5322 obs-hour, obs-minute and obs-second allow CFWS around the colons of the time
      * (<code>09:55: 06</code>, <code>09:55:(c)06</code>), as the strict parser reads them. Applied
-     * to a text whose white space is collapsed. Nested comments are not removed: the value is then
-     * not read, see {@link #zoneLeftUnread}. A linear scan: a regex loop over the comments
-     * recursed once per comment, and a run of them overflowed the stack.
+     * to a text whose white space is collapsed. Nested comments and quoted pairs included, as by
+     * {@link #commentEnds}; an unclosed comment is not removed. A linear scan: a regex loop over
+     * the comments recursed once per comment, and a run of them overflowed the stack.
      */
     private static String removeCfwsAroundTimeColons(final String text) {
         if (text.indexOf('(') < 0 && text.indexOf(": ") < 0 && text.indexOf(" :") < 0) {
             return text;
         }
+        int[] ends = text.indexOf('(') < 0 ? null : commentEnds(text);
         StringBuilder sb = new StringBuilder(text.length());
         int i = 0;
         while (i < text.length()) {
             char c = text.charAt(i++);
             sb.append(c);
             if (c >= '0' && c <= '9') {
-                int colon = skipCfws(text, i);
+                int colon = skipCfws(text, i, ends);
                 if (colon < text.length() && text.charAt(colon) == ':') {
-                    int next = skipCfws(text, colon + 1);
+                    int next = skipCfws(text, colon + 1, ends);
                     if (next < text.length() && text.charAt(next) >= '0' && text.charAt(next) <= '9') {
                         sb.append(':');
                         i = next;
@@ -414,28 +417,107 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
         return sb.toString();
     }
 
-    /** Skips blanks and comments without nesting; returns the first position after them. */
-    private static int skipCfws(final String text, final int from) {
+    /**
+     * RFC 5322 allows CFWS between the tokens of a date, as the strict parser reads them: a run of
+     * blanks and comments between two tokens (<code>09:55:06 (c) -0600</code>, <code>2:5()EST</code>,
+     * <code>21(c)Nov</code>, <code>06 ((c)) -0600</code>) reads as one space. Applied after
+     * {@link #removeCfwsAroundTimeColons}. An unclosed comment is not removed. Linear: the end of
+     * each comment is found once, by {@link #commentEnds}.
+     */
+    private static String removeCommentsBetweenTokens(final String text) {
+        if (text.indexOf('(') < 0) {
+            return text;
+        }
+        int[] ends = commentEnds(text);
+        StringBuilder sb = new StringBuilder(text.length());
+        int i = 0;
+        while (i < text.length()) {
+            char c = text.charAt(i++);
+            sb.append(c);
+            if (isAsciiLetterOrDigit(c) && i < text.length() && (text.charAt(i) == '(' || text.charAt(i) == ' ')) {
+                int next = skipCfws(text, i, ends);
+                if (next < text.length() && holdsComment(text, i, next) && isTokenStart(text.charAt(next))) {
+                    sb.append(' ');
+                    i = next;
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /** The position after the comment, nested or not, that opens at <code>from</code>; -1 if unclosed. */
+    private static int commentEnd(final String text, final int from) {
+        int depth = 0;
+        for (int p = from; p < text.length(); p++) {
+            char c = text.charAt(p);
+            if (c == '\\') {
+                p++;
+            } else if (c == '(') {
+                depth++;
+            } else if (c == ')' && --depth == 0) {
+                return p + 1;
+            }
+        }
+        return -1;
+    }
+
+    /**
+     * For each "(" opening a comment, nested or not, the position after its ")"; -1 for an unclosed
+     * one, or a "(" that is not a comment opening (escaped). A quoted pair escapes the character
+     * after it in a comment.
+     */
+    private static int[] commentEnds(final String text) {
+        int[] ends = new int[text.length()];
+        Arrays.fill(ends, -1);
+        int[] opens = new int[text.length()];
+        int depth = 0;
+        for (int p = 0; p < text.length(); p++) {
+            char c = text.charAt(p);
+            if (depth > 0 && c == '\\') {
+                p++;
+            } else if (c == '(') {
+                opens[depth++] = p;
+            } else if (c == ')' && depth > 0) {
+                ends[opens[--depth]] = p + 1;
+            }
+        }
+        return ends;
+    }
+
+    /**
+     * Skips blanks and comments, nested ones included; returns the first position after them.
+     * <code>ends</code> is null for a text without comment.
+     */
+    private static int skipCfws(final String text, final int from, final int[] ends) {
         int p = from;
         while (p < text.length()) {
             char c = text.charAt(p);
             if (c == ' ') {
                 p++;
-            } else if (c == '(') {
-                int close = p + 1;
-                while (close < text.length() && text.charAt(close) != '(' && text.charAt(close) != ')') {
-                    close++;
-                }
-                if (close >= text.length() || text.charAt(close) != ')') {
-                    // nested or unclosed comment: not removed
-                    return p;
-                }
-                p = close + 1;
+            } else if (c == '(' && ends != null && ends[p] > 0) {
+                p = ends[p];
             } else {
                 return p;
             }
         }
         return p;
+    }
+
+    private static boolean holdsComment(final String text, final int from, final int to) {
+        for (int p = from; p < to; p++) {
+            if (text.charAt(p) == '(') {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isAsciiLetterOrDigit(final char c) {
+        return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
+    }
+
+    private static boolean isTokenStart(final char c) {
+        return c == '+' || c == '-' || isAsciiLetterOrDigit(c);
     }
 
     /**

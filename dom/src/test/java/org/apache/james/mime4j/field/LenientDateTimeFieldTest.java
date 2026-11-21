@@ -213,8 +213,13 @@ public class LenientDateTimeFieldTest {
 
     @Test
     public void unreadSecondsGiveNoDate() throws Exception {
-        // a nested comment is not removed: rather no date than one without its seconds and zone
-        Assert.assertNull(parse("Date: Fri, 21 Nov 1997 09:55:((x))06 -0600").getDate());
+        // a nested comment is read as the strict parser does
+        Date strict = DateTimeFieldImpl.PARSER.parse(
+            RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Date: Fri, 21 Nov 1997 09:55:((x))06 -0600")), null).getDate();
+        Assert.assertEquals(Date.from(Instant.parse("1997-11-21T15:55:06Z")), strict);
+        Assert.assertEquals(strict, parse("Date: Fri, 21 Nov 1997 09:55:((x))06 -0600").getDate());
+        // an unclosed one is not removed: rather no date than one without its seconds and zone
+        Assert.assertNull(parse("Date: Fri, 21 Nov 1997 09:55:((x)06 -0600").getDate());
     }
     @Test
     public void numericZoneOfOtherThanFourDigitsShouldBeRejected() throws Exception {
@@ -229,6 +234,39 @@ public class LenientDateTimeFieldTest {
         }
         Assert.assertEquals(1577874203000L, parse("Date: 1 Jan 2020 21:23:23 +1100").getDate().getTime());
         Assert.assertEquals(1577913803000L, parse("Date: 1 Jan 2020 21:23:23 Z").getDate().getTime());
+    }
+
+    @Test
+    public void zoneAfterACommentShouldBeReadLikeTheStrictParser() throws Exception {
+        String[] values = {"Fri, 21 Nov 1997 09:55:06 (c) -0600", "Fri, 21 Nov 1997 09:55:06(c)-0600",
+            "Fri, 21 Nov 1997 09:55:06 ((c)) -0600", "Fri, 21 Nov 1997 09:55:06 (a\\)b) -0600",
+            "Fri, 21 Nov 1997 09:55:06 (a) (b) -0600", "21(c)Nov 1997 09:55:06 -0600", "21 Nov 1997 09:55:06()CST",
+            "Fri, 21 Nov 1997 09:55((c)):06 -0600", "Fri, 21 Nov 1997 09:55(a\\)b):06 -0600", "Fri, 21 Nov 1997 09:55(\\():06 -0600"};
+        for (String value : values) {
+            Date strict = DateTimeFieldImpl.PARSER.parse(
+                RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Date: " + value)), null).getDate();
+            Assert.assertEquals(value, Date.from(Instant.parse("1997-11-21T15:55:06Z")), strict);
+            Assert.assertEquals(value, strict, parse("Date: " + value).getDate());
+        }
+        Assert.assertEquals(Date.from(Instant.parse("2020-01-01T07:05:00Z")), parse("Date: 1 Jan 20 2:5()EST").getDate());
+        // a trailing comment, or a military zone after a comment, is still read as before
+        Assert.assertEquals(Date.from(Instant.parse("1997-11-21T15:55:06Z")), parse("Date: Fri, 21 Nov 1997 09:55:06 -0600 (CST)").getDate());
+        Assert.assertEquals(Date.from(Instant.parse("1997-11-21T09:55:06Z")), parse("Date: Fri, 21 Nov 1997 09:55:06 (c) Z").getDate());
+        // after a trailing comment, a text is read: the fast path leaves it to the formatter
+        for (String value : new String[] {"Tue, 26 Apr 2022 02:27:54 +0000 (a) -0600 (b)", "Tue, 26 Apr 2022 02:27:54 +0000 (a)0(b)"}) {
+            Assert.assertNull(value, DateTimeFieldLenientImpl.parseCommonForm(value));
+            Assert.assertNull(value, DateTimeFieldLenientImpl.parseWithFormatter(value));
+        }
+    }
+
+    @Test(timeout = 10000)
+    public void manyUnclosedCommentsAfterTokensAreLinear() {
+        StringBuilder value = new StringBuilder("1 Jan 2020 10:00:00 ");
+        for (int i = 0; i < 100_000; i++) {
+            value.append("1(");
+        }
+        // the digit left after the time is a zone not read: no date
+        Assert.assertNull(dateOf(value.toString()));
     }
 
     static Date dateOf(final String body) {
