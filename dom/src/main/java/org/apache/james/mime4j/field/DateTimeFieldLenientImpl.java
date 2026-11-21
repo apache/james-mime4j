@@ -78,18 +78,21 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
             .appendLiteral('.')
             .appendValue(MILLI_OF_SECOND, 3)
         .optionalEnd()
+        // The zone is parsed strictly. RFC 5322 3.3: a numeric zone is a sign and 4 digits, while
+        // a lenient offset reads "+11" as +11:00 and "+111900" as +11:19:00, and an offset id
+        // "+11:00"; left unread, they are rejected by zoneLeftUnread
+        .parseStrict()
         .optionalStart()
             .appendLiteral(' ')
             .appendOffset("+HHMM", "GMT")
         .optionalEnd()
         .optionalStart()
             .appendLiteral(' ')
-            .appendOffsetId()
+            .appendOffset("+HHMM", "Z")
         .optionalEnd()
         // RFC 5322 4.3: obs-zone has no leading FWS of its own ("09:55:06EDT").
-        // Parsed strictly: a lenient text field falls back to a number, which would read an
-        // offset rejected above ("+9900") as a number of seconds
-        .parseStrict()
+        // A lenient text field falls back to a number, which would read an offset rejected
+        // above ("+9900") as a number of seconds
         .optionalStart()
             .optionalStart()
                 .appendLiteral(' ')
@@ -352,12 +355,22 @@ public class DateTimeFieldLenientImpl extends AbstractField implements DateTimeF
 
     /**
      * Text left after the parse is tolerated (a comment, an unknown zone name), except a numeric
-     * zone that was not read at all or only in part (<code>+11</code> of <code>+1178</code>), and
+     * zone that was not read at all or only in part (<code>+11</code> of <code>+1178</code>) or not
+     * as 4 digits, and
      * seconds or milliseconds that were not read (<code>:61</code> of <code>09:55:61</code>): the
      * zone after them would be left unread too.
      */
     private static boolean zoneLeftUnread(final String text, final int end) {
         if (end < text.length() && (text.charAt(end) == ':' || text.charAt(end) == '.')) {
+            return true;
+        }
+        // A numeric zone read with other than 4 digits: the offset parser of some JDKs reads
+        // optional seconds even in strict mode ("+111900")
+        int digits = end;
+        while (digits > 0 && Character.isDigit(text.charAt(digits - 1))) {
+            digits--;
+        }
+        if (digits > 0 && (text.charAt(digits - 1) == '+' || text.charAt(digits - 1) == '-') && end - digits != 4) {
             return true;
         }
         int p = end;

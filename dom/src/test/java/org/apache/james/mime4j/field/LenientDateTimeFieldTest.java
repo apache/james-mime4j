@@ -216,6 +216,21 @@ public class LenientDateTimeFieldTest {
         // a nested comment is not removed: rather no date than one without its seconds and zone
         Assert.assertNull(parse("Date: Fri, 21 Nov 1997 09:55:((x))06 -0600").getDate());
     }
+    @Test
+    public void numericZoneOfOtherThanFourDigitsShouldBeRejected() throws Exception {
+        String[] values = {"1 Jan 2002 02:03 +11", "1 JAn\t2 2:3 +11", "1 Jan 2020 21:23:23 +111900",
+            "1 Jan 2020 21:23:23 -011", "1 Jan 2020 21:23:23 +11:00", "1 Jan 2020 21:23:23 +11:00:30", "1 Jan 2020 21:23:23 +01:00 (x)",
+            "1 Jan 2020 21:23:23 +1178"};
+        for (String value : values) {
+            Assert.assertNull(value, parse("Date: " + value).getDate());
+            Date strict = DateTimeFieldImpl.PARSER.parse(
+                RawFieldParser.DEFAULT.parseField(ContentUtil.encode("Date: " + value)), null).getDate();
+            Assert.assertNull(value, strict);
+        }
+        Assert.assertEquals(1577874203000L, parse("Date: 1 Jan 2020 21:23:23 +1100").getDate().getTime());
+        Assert.assertEquals(1577913803000L, parse("Date: 1 Jan 2020 21:23:23 Z").getDate().getTime());
+    }
+
     static Date dateOf(final String body) {
         return DateTimeFieldLenientImpl.PARSER.parse(new RawField("Date", body), null).getDate();
     }
