@@ -277,6 +277,8 @@ public abstract class AbstractEntityBuilder {
      * @param mimeType MIME type of this message
      *            the MIME type to use.
      * @param parameters content type parameters to use.
+     * @throws IllegalArgumentException if the field would be longer than the default maximum
+     *             header length of the readers, see {@link Fields}.
      */
     public AbstractEntityBuilder setContentType(String mimeType, NameValuePair... parameters) {
         if (mimeType == null) {
@@ -352,6 +354,8 @@ public abstract class AbstractEntityBuilder {
      * @param filename
      *            filename parameter value or <code>null</code> if the
      *            parameter should not be included.
+     * @throws IllegalArgumentException if the field would be longer than the default maximum
+     *             header length of the readers, see {@link Fields}.
      */
     public AbstractEntityBuilder setContentDisposition(String dispositionType, String filename) {
         if (dispositionType == null) {
@@ -376,6 +380,8 @@ public abstract class AbstractEntityBuilder {
      * @param size
      *            size parameter value or <code>-1</code> if the parameter
      *            should not be included.
+     * @throws IllegalArgumentException if the field would be longer than the default maximum
+     *             header length of the readers, see {@link Fields}.
      */
     public AbstractEntityBuilder setContentDisposition(String dispositionType, String filename,
                                       long size) {
@@ -409,6 +415,8 @@ public abstract class AbstractEntityBuilder {
      * @param readDate
      *            read-date parameter value or <code>null</code> if the
      *            parameter should not be included.
+     * @throws IllegalArgumentException if the field would be longer than the default maximum
+     *             header length of the readers, see {@link Fields}.
      */
     public AbstractEntityBuilder setContentDisposition(String dispositionType, String filename,
                                       long size, Date creationDate, Date modificationDate, Date readDate) {
