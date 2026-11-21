@@ -22,8 +22,10 @@ package org.apache.james.mime4j.io;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.SecureRandom;
 
 import org.apache.james.mime4j.Charsets;
@@ -152,6 +154,44 @@ public class TextInputStreamTest {
         r.reset();
         r.reset();
         r.close();
+    }
+
+    @Test
+    public void testStatefulCharsetEndsInInitialState() throws Exception {
+        Charset iso2022jp = Charset.forName("ISO-2022-JP");
+        String text = "\u3053\u3093";
+        byte[] expected = text.getBytes(iso2022jp); // ESC $ B $3$s ESC ( B
+
+        InputStream in = new TextInputStream(text, iso2022jp, 1024);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        byte[] buf = new byte[16];
+        int n;
+        while ((n = in.read(buf)) != -1) {
+            out.write(buf, 0, n);
+        }
+        Assert.assertArrayEquals(expected, out.toByteArray());
+
+        // byte by byte, with a buffer too small for the final escape sequence
+        in = new TextInputStream(text, iso2022jp, 4);
+        out.reset();
+        int b;
+        while ((b = in.read()) != -1) {
+            out.write(b);
+        }
+        Assert.assertArrayEquals(expected, out.toByteArray());
+
+        // re-read after a reset
+        in = new TextInputStream(text, iso2022jp, 1024);
+        in.mark(0);
+        while (in.read() != -1) {
+            // drain
+        }
+        in.reset();
+        out.reset();
+        while ((n = in.read(buf)) != -1) {
+            out.write(buf, 0, n);
+        }
+        Assert.assertArrayEquals(expected, out.toByteArray());
     }
 
 }

@@ -145,7 +145,8 @@ public class EncoderUtil {
      * Encodes the local part of an address specification as described in RFC
      * 5322 section 3.4.1. Leading and trailing CFWS should have been removed
      * before calling this method. The specified string should not contain any
-     * illegal (control or non-ASCII) characters.
+     * illegal (control or non-ASCII) characters. A local part holding
+     * <code>=?</code> is quoted, so that it is not read back as an encoded word.
      *
      * @param localPart
      *            the local part to encode
@@ -156,7 +157,9 @@ public class EncoderUtil {
         // dot-atom = [CFWS] dot-atom-text [CFWS]
         // CFWS = comment or folding white space
 
-        if (isDotAtomText(localPart)) {
+        // A dot-atom holding "=?" is quoted too: RFC 2047 section 5 forbids encoded words in a
+        // quoted string, while a lenient reader decodes the bare text of a mailbox without domain
+        if (isDotAtomText(localPart) && !localPart.contains("=?")) {
             return localPart;
         } else {
             // CR and LF can be neither qtext nor quoted-pair (RFC 5322 section 3.2.4): readers drop them
@@ -268,7 +271,9 @@ public class EncoderUtil {
      * <code>=?</code> cannot be written as a plain quoted string. It is written as an RFC 2231
      * extended parameter (<code>name*=utf-8''%3D%3F...</code>) when the parser of the field
      * decodes them, and otherwise, when the value starts with <code>=?</code> (the only case the
-     * lenient readers decode), as an encoded word of the whole value.</p>
+     * lenient readers decode), as an encoded word of the whole value. Without RFC 2231
+     * parameters, a boundary, which the Content-Type readers never decode, is written as a
+     * plain value.</p>
      *
      * @param name
      *            parameter name.
@@ -283,7 +288,10 @@ public class EncoderUtil {
      */
     public static String encodeHeaderParameter(String name, String value, boolean rfc2231Sections) {
         String parameter = encodeHeaderParameter(name, value);
-        if (name.indexOf('*') < 0 && value.contains("=?")) {
+        // The Content-Type readers never decode a boundary (the fix of #29): it is written as a
+        // plain value. The readers of RFC 2231 parameters decode it as any other parameter
+        boolean plainBoundary = !rfc2231Sections && "boundary".equalsIgnoreCase(name);
+        if (name.indexOf('*') < 0 && value.contains("=?") && !plainBoundary) {
             String lowerName = name.toLowerCase(Locale.US);
             if (rfc2231Sections) {
                 return encodeExtended(lowerName, value);

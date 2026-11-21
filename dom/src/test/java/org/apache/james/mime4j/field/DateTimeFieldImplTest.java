@@ -83,6 +83,17 @@ public class DateTimeFieldImplTest {
     }
 
     @Test
+    public void strictParserShouldRejectNumericZoneOfOtherThanFourDigits() throws Exception {
+        for (String value : new String[] {"1 Jan 2020 21:23:23 +111900", "1 Jan 2002 02:03 +11", "1 Jan 2002 02:03 +1160"}) {
+            DateTimeField field = parse("Date: " + value);
+            assertNull(value, field.getDate());
+            assertNotNull(value, field.getParseException());
+        }
+        assertEquals(1577874203000L, parse("Date: 1 Jan 2020 21:23:23 +1100").getDate().getTime());
+        assertEquals(1577874203000L - 59 * 60000L, parse("Date: 1 Jan 2020 21:23:23 +1159").getDate().getTime());
+    }
+
+    @Test
     public void parseShouldFailWhenYearIsTooLong() throws Exception {
         DateTimeField field = parse("Date: 1 Jan 99999999999 00:00 +0000");
         assertNull(field.getDate());

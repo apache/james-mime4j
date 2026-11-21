@@ -39,6 +39,10 @@ class TextInputStream extends InputStream {
     private final ByteBuffer bbuf;
 
     private int mark = -1;
+    // encode(..., true) consumed all the input
+    private boolean encoded;
+    // flush wrote the final bytes of a stateful encoding, such as the ESC ( B of ISO-2022-JP
+    private boolean flushed;
 
     TextInputStream(final CharSequence s, final Charset charset, int bufferSize) {
         super();
@@ -52,11 +56,25 @@ class TextInputStream extends InputStream {
 
     private void fillBuffer() throws CharacterCodingException {
         this.bbuf.compact();
-        CoderResult result = this.encoder.encode(this.cbuf, this.bbuf, true);
-        if (result.isError()) {
-            result.throwException();
+        if (!this.encoded) {
+            CoderResult result = this.encoder.encode(this.cbuf, this.bbuf, true);
+            if (result.isError()) {
+                result.throwException();
+            }
+            this.encoded = result.isUnderflow();
+        }
+        if (this.encoded && !this.flushed) {
+            CoderResult result = this.encoder.flush(this.bbuf);
+            if (result.isError()) {
+                result.throwException();
+            }
+            this.flushed = result.isUnderflow();
         }
         this.bbuf.flip();
+    }
+
+    private boolean atEnd() {
+        return !this.bbuf.hasRemaining() && this.flushed;
     }
 
     @Override
@@ -67,7 +85,7 @@ class TextInputStream extends InputStream {
         if (off < 0 || len < 0 || off + len > b.length) {
             throw new IndexOutOfBoundsException();
         }
-        if (!this.bbuf.hasRemaining() && !this.cbuf.hasRemaining()) {
+        if (atEnd()) {
             return -1;
         }
         int bytesRead = 0;
@@ -80,7 +98,7 @@ class TextInputStream extends InputStream {
                 bytesRead += chunk;
             } else {
                 fillBuffer();
-                if (!this.bbuf.hasRemaining() && !this.cbuf.hasRemaining()) {
+                if (atEnd()) {
                     break;
                 }
             }
@@ -88,7 +106,7 @@ class TextInputStream extends InputStream {
         if (bytesRead > 0) {
             return bytesRead;
         } else {
-            if (!this.bbuf.hasRemaining() && !this.cbuf.hasRemaining()) {
+            if (atEnd()) {
                 return -1;
             } else {
                 return bytesRead;
@@ -103,7 +121,7 @@ class TextInputStream extends InputStream {
                 return this.bbuf.get() & 0xFF;
             } else {
                 fillBuffer();
-                if (!this.bbuf.hasRemaining() && !this.cbuf.hasRemaining()) {
+                if (atEnd()) {
                     return -1;
                 }
             }
@@ -141,6 +159,9 @@ class TextInputStream extends InputStream {
         if (this.mark != -1) {
             this.cbuf.position(this.mark);
             this.mark = -1;
+            this.encoder.reset();
+            this.encoded = false;
+            this.flushed = false;
         }
     }
 
