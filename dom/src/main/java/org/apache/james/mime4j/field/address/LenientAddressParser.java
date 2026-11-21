@@ -377,7 +377,7 @@ public class LenientAddressParser implements AddressParser {
     private Mailbox parseMailbox(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
             final BitSet stopSet, final UnclosedLiterals unclosed) {
         int start = cursor.getPos();
-        String openingText = this.parser.parseValue(buf, cursor, stopSet);
+        String openingText = this.parser.parseAddressValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
             return createMailbox(openingText, buf, start, cursor.getPos());
         }
@@ -436,7 +436,7 @@ public class LenientAddressParser implements AddressParser {
     }
 
     public Group parseGroup(final ByteSequence buf, final ParserCursor cursor) {
-        String name = this.parser.parseToken(buf, cursor, COLON_ONLY);
+        String name = this.parser.parseAddressValue(buf, cursor, COLON_ONLY);
         if (cursor.atEnd()) {
             return new Group(decodeGroupName(name), Collections.<Mailbox>emptyList());
         }
@@ -463,7 +463,7 @@ public class LenientAddressParser implements AddressParser {
     private Address parseAddress(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
             final BitSet stopSet, final UnclosedLiterals unclosed) {
         int start = cursor.getPos();
-        String openingText = this.parser.parseValue(buf, cursor, stopSet);
+        String openingText = this.parser.parseAddressValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
             return createMailbox(openingText, buf, start, cursor.getPos());
         }

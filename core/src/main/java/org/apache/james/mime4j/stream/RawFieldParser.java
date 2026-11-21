@@ -228,6 +228,20 @@ public class RawFieldParser {
         return parseValue(buf, cursor, delimiters, false, false);
     }
 
+    /**
+     * Like {@link #parseValue(ByteSequence, ParserCursor, BitSet)}, for a value of an address (a display
+     * name, a group name, a local part): as in RFC 5322 section 3.2.4, a quoted pair in a quoted string
+     * stands for the escaped character, no backslash is kept.
+     *
+     * @param buf buffer with the sequence of bytes to be parsed
+     * @param cursor defines the bounds and current position of the buffer
+     * @param delimiters set of delimiting characters. Can be <code>null</code> if the value
+     *  is not delimited by any character.
+     */
+    public String parseAddressValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
+        return parseValue(buf, cursor, delimiters, false, true);
+    }
+
     private String parseValue(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
             final boolean boundary, final boolean unescape) {
         StringBuilder dst = new StringBuilder(initialCapacity(cursor));
@@ -481,9 +495,11 @@ public class RawFieldParser {
     }
 
     /**
-     * Transfers content enclosed with quote marks into the destination buffer, decoding the
+     * Transfers the quoted string of an address into the destination buffer, decoding the
      * RFC 2047 encoded words it starts with only when asked to. RFC 2047 section 5 forbids encoded
      * words in an addr-spec and in a quoted-string: an address local part must not be decoded.
+     * As in RFC 5322 section 3.2.4, a quoted pair stands for the escaped character: unlike
+     * {@link #copyQuotedContent(ByteSequence, ParserCursor, StringBuilder)}, no backslash is kept.
      *
      * @param buf buffer with the sequence of bytes to be parsed
      * @param cursor defines the bounds and current position of the buffer
@@ -492,7 +508,7 @@ public class RawFieldParser {
      */
     public void copyQuotedContent(final ByteSequence buf, final ParserCursor cursor,
             final StringBuilder dst, final boolean decodeEncodedWords) {
-        copyQuotedContent(buf, cursor, dst, !decodeEncodedWords, false);
+        copyQuotedContent(buf, cursor, dst, !decodeEncodedWords, true);
     }
 
     /**
@@ -538,7 +554,8 @@ public class RawFieldParser {
                     // applies to the character after it
                     continue;
                 }
-                // A boundary or a charset cannot hold a backslash: the quoted pair is unescaped
+                // A boundary, a charset, an address: the quoted pair is unescaped. Elsewhere, a
+                // quoted pair other than \" and \\ keeps its backslash
                 if (!unescape && current != '\"' && current != '\\') {
                     dstRaw.append('\\');
                 }
