@@ -786,6 +786,35 @@ public class LenientAddressBuilderTest {
     }
 
     @Test
+    public void quotedPairInAQuotedLocalPartIsUnescapedLikeTheStrictParser() throws Exception {
+        String[] texts = {"\"\\a\"@d", "\"a\\\"b\\\\c\"@d", "\"x\\ y\"@d", "J <\"\\a\"@d>"};
+        for (String text : texts) {
+            Mailbox strict = (Mailbox) DefaultAddressParser.DEFAULT.parseAddressList(text, DecodeMonitor.SILENT).get(0);
+            Mailbox lenient = (Mailbox) parser.parseAddressList(text).get(0);
+            Assert.assertEquals(text, strict.getLocalPart(), lenient.getLocalPart());
+        }
+        Assert.assertEquals("a", parser.parseMailbox("\"\\a\"@d").getLocalPart());
+        Assert.assertEquals("a", ((Mailbox) parser.parseAddressList("\"\\a\"").get(0)).getLocalPart());
+        Assert.assertEquals("a\"b\\c", parser.parseMailbox("\"a\\\"b\\\\c\"@d").getLocalPart());
+    }
+
+    @Test
+    public void quotedPairInADisplayNameOrGroupNameIsUnescapedLikeTheStrictParser() throws Exception {
+        String[] names = {"\"J\\ohn\" <a@d>", "\"J\\\"o\" <a@d>", "\"J\\\\o\" <a@d>", "\"\\=?utf-8?q?x?=\" <a@d>"};
+        for (String text : names) {
+            Mailbox strict = (Mailbox) DefaultAddressParser.DEFAULT.parseAddressList(text, DecodeMonitor.SILENT).get(0);
+            Mailbox lenient = (Mailbox) parser.parseAddressList(text).get(0);
+            Assert.assertEquals(text, strict.getName(), lenient.getName());
+        }
+        Assert.assertEquals("John", ((Mailbox) parser.parseAddressList("\"J\\ohn\" <a@d>").get(0)).getName());
+        String group = "\"G\\x\": a@d;";
+        Group strict = (Group) DefaultAddressParser.DEFAULT.parseAddressList(group, DecodeMonitor.SILENT).get(0);
+        Assert.assertEquals("Gx", strict.getName());
+        Assert.assertEquals("Gx", ((Group) parser.parseAddressList(group).get(0)).getName());
+        Assert.assertEquals("Gx", parser.parseGroup(group).getName());
+    }
+
+    @Test
     public void escapedClosingBracketDoesNotEndTheDomainLiteral() {
         AddressList list = parser.parseAddressList("a@[x\\] y], b@c");
         Assert.assertEquals(2, list.size());
