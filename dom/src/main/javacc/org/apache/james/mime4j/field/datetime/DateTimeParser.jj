@@ -298,7 +298,15 @@ int second() :
 int zone() :
 { Token t, u; int z; }
 {
-(    t=< OFFSETDIR: ["+", "-"] > u=<DIGITS> { z=parseDigits(u)*(t.image.equals("-") ? -1 : 1); }
+(    t=< OFFSETDIR: ["+", "-"] > u=<DIGITS>
+    {
+      // RFC 5322 3.3: 4 digits, HHMM. "+11" is not 11 minutes, nor "+111900" 1119 hours
+      if (u.image.length() != 4 || parseDigits(u) % 100 > 59)
+      {
+        throw new ParseException("Invalid zone: " + t.image + u.image);
+      }
+      z=parseDigits(u)*(t.image.equals("-") ? -1 : 1);
+    }
 |   z=obs_zone()
 )
     { return z; }
