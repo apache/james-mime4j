@@ -90,4 +90,24 @@ public class FieldsLiteralEncodedWordParameterTest {
         ContentDispositionField field = Fields.contentDisposition("attachment", "a b.txt", -1, null, null, null);
         assertEquals("Content-Disposition: attachment; filename=\"a b.txt\"", raw(field));
     }
+
+    @Test
+    public void boundaryThatStartsLikeAnEncodedWordShouldBeReadBackUnchanged() throws Exception {
+        for (String name : new String[] {"boundary", "Boundary"}) {
+            for (String boundary : new String[] {"=?x", "=?utf-8?q?x?=", "=?\"\""}) {
+                ContentTypeField field = Fields.contentType("multipart/mixed",
+                        Collections.singletonMap(name, boundary));
+                assertEquals(boundary, field.getBoundary());
+                String raw = raw(field);
+                assertEquals(raw, boundary, ((ContentTypeField) DefaultFieldParser.parse(raw)).getBoundary());
+                assertEquals(raw, boundary, ((ContentTypeField) LenientFieldParser.parse(raw)).getBoundary());
+            }
+        }
+        // Content-Disposition decodes every parameter: there, it is still written as RFC 2231
+        ContentDispositionField disposition = Fields.contentDisposition("attachment",
+                Collections.singletonMap("boundary", "=?utf-8?q?x?="));
+        String raw = raw(disposition);
+        assertEquals(raw, "=?utf-8?q?x?=", ((ContentDispositionField) DefaultFieldParser.parse(raw)).getParameter("boundary"));
+        assertEquals(raw, "=?utf-8?q?x?=", ((ContentDispositionField) LenientFieldParser.parse(raw)).getParameter("boundary"));
+    }
 }
