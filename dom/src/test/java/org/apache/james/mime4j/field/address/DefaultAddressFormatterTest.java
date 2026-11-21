@@ -88,4 +88,24 @@ public class DefaultAddressFormatterTest {
         Assert.assertEquals("Undisclosed recipients:;", formatter.encode(g));
     }
 
+    @Test
+    public void domainlessLocalPartLookingLikeAnEncodedWordRoundTrips() {
+        String[] localParts = {"=?utf-8?q?x?=", "{L{{OOO2.O.O.=?utf-8?q?x?={{{.{{", "=?=???=?"};
+        for (String localPart : localParts) {
+            Mailbox parsed = new Mailbox(null, null, localPart, null);
+            String written = formatter.encode(parsed);
+            Mailbox again = LenientAddressParser.DEFAULT.parseAddressList(written).flatten().get(0);
+            Assert.assertEquals(written, localPart, again.getLocalPart());
+            Assert.assertNull(written, again.getDomain());
+
+            Group group = new Group("", new MailboxList(Arrays.asList(parsed), true));
+            written = formatter.encode(group);
+            again = LenientAddressParser.DEFAULT.parseAddressList(written).flatten().get(0);
+            Assert.assertEquals(written, localPart, again.getLocalPart());
+        }
+        Mailbox parsed = LenientAddressParser.DEFAULT.parseAddressList("\"=?utf-8?q?x?=\"").flatten().get(0);
+        Assert.assertEquals("\"=?utf-8?q?x?=\"", formatter.encode(parsed));
+        Assert.assertEquals("\"=?utf-8?q?x?=\"@example.com", formatter.encode(new Mailbox("=?utf-8?q?x?=", "example.com")));
+    }
+
 }
