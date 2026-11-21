@@ -81,7 +81,7 @@ public class DateTimeFieldLenientFastPathTest {
         Random random = new Random(42);
         String alphabet = "0123456789 :+-,()JanFebMarAprDecMonTueGMTUTESTPDTZ.\t";
         String[] seeds = {"Tue, 26 Apr 2022 02:27:54 +0000", "4 Oct 2001 20:12 -0700", "29 Feb 2024 23:59:59",
-            "Sun, 31 Dec 9999 23:59:59 -1759 (comment)"};
+            "Sun, 31 Dec 9999 23:59:59 -1759 (comment)", "Tue, 26 Apr 2022 02:27:54 +0000 (a) (b)"};
         List<String> fastPathTaken = new ArrayList<>();
         for (int i = 0; i < 500_000; i++) {
             StringBuilder s = new StringBuilder(seeds[random.nextInt(seeds.length)]);
