@@ -108,4 +108,33 @@ public class DefaultAddressFormatterTest {
         Assert.assertEquals("\"=?utf-8?q?x?=\"@example.com", formatter.encode(new Mailbox("=?utf-8?q?x?=", "example.com")));
     }
 
+    @Test
+    public void unclosedDomainLiteralDoesNotSwallowTheNextMailbox() {
+        MailboxList mailboxes = LenientAddressParser.DEFAULT.parseAddressList("a@[x,b\\]@d").flatten();
+        Assert.assertEquals(2, mailboxes.size());
+        StringBuilder sb = new StringBuilder();
+        for (Mailbox mailbox : mailboxes) {
+            if (sb.length() > 0) {
+                sb.append(", ");
+            }
+            formatter.encode(sb, mailbox);
+        }
+        MailboxList again = LenientAddressParser.DEFAULT.parseAddressList(sb.toString()).flatten();
+        Assert.assertEquals(sb.toString(), 2, again.size());
+        Assert.assertEquals(sb.toString(), "d", again.get(1).getDomain());
+    }
+
+    @Test
+    public void bareBracketDomainDoesNotAddARecipient() {
+        StringBuilder sb = new StringBuilder();
+        formatter.encode(sb, new Mailbox("a", "["));
+        sb.append(", ");
+        formatter.encode(sb, new Mailbox("],<evil@example.org>\"", null));
+        MailboxList again = LenientAddressParser.DEFAULT.parseAddressList(sb.toString()).flatten();
+        Assert.assertEquals(sb.toString(), 2, again.size());
+        Assert.assertEquals(sb.toString(), "a", again.get(0).getLocalPart());
+        Assert.assertNull(sb.toString(), again.get(0).getDomain());
+        Assert.assertEquals(sb.toString(), "],<evil@example.org>\"", again.get(1).getLocalPart());
+    }
+
 }

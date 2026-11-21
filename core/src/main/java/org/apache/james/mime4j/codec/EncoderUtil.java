@@ -69,8 +69,9 @@ public class EncoderUtil {
 
     private static final Pattern QUOTE = Pattern.compile("[\\\\\"]");
 
-    /** Characters that end or restructure an address in a header: never written raw in a domain */
-    private static final String DOMAIN_STRUCTURE_CHARS = ",;:<>()\"@\\";
+    /** Characters that end or restructure an address in a header: never written raw in a domain. An unclosed "[" would be
+     * read on to the "]" of a later address, so outside a complete literal the brackets go too */
+    private static final String DOMAIN_STRUCTURE_CHARS = ",;:<>()\"@\\[]";
     // Inside a domain literal: ":" (IPv6 literals) and "(" ")" are read back as dtext
     private static final String DOMAIN_LITERAL_STRUCTURE_CHARS = ",;<>\"@";
 
