@@ -271,7 +271,9 @@ public class EncoderUtil {
      * <code>=?</code> cannot be written as a plain quoted string. It is written as an RFC 2231
      * extended parameter (<code>name*=utf-8''%3D%3F...</code>) when the parser of the field
      * decodes them, and otherwise, when the value starts with <code>=?</code> (the only case the
-     * lenient readers decode), as an encoded word of the whole value.</p>
+     * lenient readers decode), as an encoded word of the whole value. Without RFC 2231
+     * parameters, a boundary, which the Content-Type readers never decode, is written as a
+     * plain value.</p>
      *
      * @param name
      *            parameter name.
@@ -286,7 +288,10 @@ public class EncoderUtil {
      */
     public static String encodeHeaderParameter(String name, String value, boolean rfc2231Sections) {
         String parameter = encodeHeaderParameter(name, value);
-        if (name.indexOf('*') < 0 && value.contains("=?")) {
+        // The Content-Type readers never decode a boundary (the fix of #29): it is written as a
+        // plain value. The readers of RFC 2231 parameters decode it as any other parameter
+        boolean plainBoundary = !rfc2231Sections && "boundary".equalsIgnoreCase(name);
+        if (name.indexOf('*') < 0 && value.contains("=?") && !plainBoundary) {
             String lowerName = name.toLowerCase(Locale.US);
             if (rfc2231Sections) {
                 return encodeExtended(lowerName, value);
