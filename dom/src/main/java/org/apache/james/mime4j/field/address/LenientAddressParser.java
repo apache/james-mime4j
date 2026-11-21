@@ -23,7 +23,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.codec.DecoderUtil;
@@ -88,11 +90,33 @@ public class LenientAddressParser implements AddressParser {
         this.parser = new RawFieldParser();
     }
 
+    /**
+     * The searches for the ']' of a domain literal that failed in one parse, by delimiter set: every
+     * '[' before the index where such a search stopped has no ']' before that index either. A
+     * search from a later '[' starts unescaped, as the earlier search went on after it, so it
+     * stops at the same index: it is not repeated for each domain, which would be quadratic. The
+     * domain itself, copied by copyContent, can end before that index, at an escaped delimiter.
+     */
+    private static final class UnclosedLiterals {
+        private final Map<BitSet, Integer> until = new HashMap<BitSet, Integer>(4);
+
+        boolean isUnclosed(final BitSet delimiters, final int pos) {
+            Integer end = until.get(delimiters);
+            return end != null && pos < end;
+        }
+
+        void unclosedUntil(final BitSet delimiters, final int end) {
+            until.put(delimiters, end);
+        }
+    }
+
     String parseDomain(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
+        return parseDomain(buf, cursor, delimiters, new UnclosedLiterals());
+    }
+
+    private String parseDomain(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+            final UnclosedLiterals unclosed) {
         StringBuilder dst = new StringBuilder(initialCapacity(cursor));
-        // Every '[' before this index has no ']' before the next delimiter: a failed scan for
-        // the closing bracket is not repeated for each of them, which would be quadratic.
-        int unclosedUntil = -1;
         while (!cursor.atEnd()) {
             char current = (char) (buf.byteAt(cursor.getPos()) & 0xff);
             if (delimiters != null && delimiters.get(current)) {
@@ -101,8 +125,8 @@ public class LenientAddressParser implements AddressParser {
                 this.parser.skipWhiteSpace(buf, cursor);
             } else if (current == '(') {
                 this.parser.skipComment(buf, cursor);
-            } else if (current == '[' && cursor.getPos() >= unclosedUntil
-                    && (unclosedUntil = copyDomainLiteral(buf, cursor, delimiters, dst)) < 0) {
+            } else if (current == '[' && !unclosed.isUnclosed(delimiters, cursor.getPos())
+                    && copyDomainLiteral(buf, cursor, delimiters, dst, unclosed)) {
                 continue;
             } else {
                 this.parser.copyContent(buf, cursor, delimiters, dst);
@@ -116,11 +140,12 @@ public class LenientAddressParser implements AddressParser {
      * (RFC 5322 section 3.4.1). A quoted pair (obs-dtext, section 4.4) is the escaped character alone,
      * as for the strict parser: its backslash is dropped, and an escaped ']' does not close the
      * literal. A line break after a backslash is unfolded, the quoted pair applying to the character
-     * after it. Returns -1 once copied. When no ']' comes before a delimiter, copies nothing and
-     * returns the index where the search stopped: the delimiter, or the upper bound.
+     * after it. Returns true once copied. When no ']' comes before a delimiter, copies nothing,
+     * records in <code>unclosed</code> the index where the search stopped (the delimiter, or the
+     * upper bound) and returns false.
      */
-    private int copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
-                                      final StringBuilder dst) {
+    private boolean copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+                                      final StringBuilder dst, final UnclosedLiterals unclosed) {
         int from = cursor.getPos();
         int to = cursor.getUpperBound();
         for (int i = from + 1; i < to; i++) {
@@ -145,13 +170,15 @@ public class LenientAddressParser implements AddressParser {
                 // UTF-8, as the other parts of the header
                 dst.append(ContentUtil.decode(StandardCharsets.UTF_8, literal));
                 cursor.updatePos(i + 1);
-                return -1;
+                return true;
             }
             if (delimiters != null && delimiters.get(current)) {
-                return i;
+                unclosed.unclosedUntil(delimiters, i);
+                return false;
             }
         }
-        return to;
+        unclosed.unclosedUntil(delimiters, to);
+        return false;
     }
 
     /** Returns the index of the first byte from <code>from</code> that is not CR or LF, at most <code>to</code>. */
@@ -164,10 +191,11 @@ public class LenientAddressParser implements AddressParser {
     }
 
     DomainList parseRoute(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        return parseRouteUntil(buf, cursor, union(ROUTE_STOP, delimiters));
+        return parseRouteUntil(buf, cursor, union(ROUTE_STOP, delimiters), new UnclosedLiterals());
     }
 
-    private DomainList parseRouteUntil(final ByteSequence buf, final ParserCursor cursor, final BitSet stopSet) {
+    private DomainList parseRouteUntil(final ByteSequence buf, final ParserCursor cursor, final BitSet stopSet,
+            final UnclosedLiterals unclosed) {
         List<String> domains = null;
         for (;;) {
             this.parser.skipAllWhiteSpace(buf, cursor);
@@ -181,7 +209,7 @@ public class LenientAddressParser implements AddressParser {
             } else {
                 break;
             }
-            String s = parseDomain(buf, cursor, stopSet);
+            String s = parseDomain(buf, cursor, stopSet, unclosed);
             if (s != null && s.length() > 0) {
                 if (domains == null) {
                     domains = new ArrayList<String>();
@@ -214,6 +242,11 @@ public class LenientAddressParser implements AddressParser {
     
     Mailbox parseMailboxAddress(
             final String openingText, final ByteSequence buf, final ParserCursor cursor) {
+        return parseMailboxAddress(openingText, buf, cursor, new UnclosedLiterals());
+    }
+
+    private Mailbox parseMailboxAddress(final String openingText, final ByteSequence buf, final ParserCursor cursor,
+            final UnclosedLiterals unclosed) {
         if (cursor.atEnd()) {
             return createMailbox(null, null, openingText, null);
         }
@@ -224,7 +257,7 @@ public class LenientAddressParser implements AddressParser {
         } else {
             return createMailbox(null, null, openingText, null);
         }
-        DomainList domainList = parseRouteUntil(buf, cursor, BRACKETED_ROUTE_STOP);
+        DomainList domainList = parseRouteUntil(buf, cursor, BRACKETED_ROUTE_STOP, unclosed);
         String localPart = parseLocalPart(buf, cursor, AT_AND_CLOSING_BRACKET);
         if (cursor.atEnd()) {
             return createMailbox(openingText, domainList, localPart, null);
@@ -234,7 +267,7 @@ public class LenientAddressParser implements AddressParser {
         String domain;
         if (current == AT) {
             cursor.updatePos(pos + 1);
-            domain = parseDomain(buf, cursor, CLOSING_BRACKET_ONLY);
+            domain = parseDomain(buf, cursor, CLOSING_BRACKET_ONLY, unclosed);
             if (cursor.atEnd()) {
                 return createMailbox(openingText, domainList, localPart, domain);
             }
@@ -339,11 +372,11 @@ public class LenientAddressParser implements AddressParser {
 
     public Mailbox parseMailbox(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        return parseMailbox(buf, cursor, delimiters, union(MAILBOX_STOP, delimiters));
+        return parseMailbox(buf, cursor, delimiters, union(MAILBOX_STOP, delimiters), new UnclosedLiterals());
     }
 
-    private Mailbox parseMailbox(
-            final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters, final BitSet stopSet) {
+    private Mailbox parseMailbox(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+            final BitSet stopSet, final UnclosedLiterals unclosed) {
         int start = cursor.getPos();
         String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
@@ -353,7 +386,7 @@ public class LenientAddressParser implements AddressParser {
         char current = (char) (buf.byteAt(pos) & 0xff);
         if (current == OPENING_BRACKET) {
             // name <localPart @ domain> form
-            return parseMailboxAddress(openingText, buf, cursor);
+            return parseMailboxAddress(openingText, buf, cursor, unclosed);
         } else if (current == AT) {
             // localPart @ domain form
             // Without joined whitespace nor quoted string, parsing it as a local part gives the
@@ -363,7 +396,7 @@ public class LenientAddressParser implements AddressParser {
                 ? openingText
                 : parseLocalPart(buf, new ParserCursor(start, pos), null);
             cursor.updatePos(pos + 1);
-            String domain = parseDomain(buf, cursor, delimiters);
+            String domain = parseDomain(buf, cursor, delimiters, unclosed);
             return new Mailbox(null, null, localPart, domain);
         } else {
             return createMailbox(openingText, buf, start, cursor.getPos());
@@ -378,6 +411,11 @@ public class LenientAddressParser implements AddressParser {
 
     List<Mailbox> parseMailboxes(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
+        return parseMailboxes(buf, cursor, delimiters, new UnclosedLiterals());
+    }
+
+    private List<Mailbox> parseMailboxes(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+            final UnclosedLiterals unclosed) {
         BitSet bitset = union(COMMA_ONLY, delimiters);
         BitSet mailboxStop = union(MAILBOX_STOP, bitset);
         List<Mailbox> mboxes = new ArrayList<Mailbox>();
@@ -389,7 +427,7 @@ public class LenientAddressParser implements AddressParser {
             } else if (current == COMMA) {
                 cursor.updatePos(pos + 1);
             } else {
-                Mailbox mbox = parseMailbox(buf, cursor, bitset, mailboxStop);
+                Mailbox mbox = parseMailbox(buf, cursor, bitset, mailboxStop, unclosed);
                 if (mbox != null) {
                     mboxes.add(mbox);
                 }
@@ -420,11 +458,11 @@ public class LenientAddressParser implements AddressParser {
 
     public Address parseAddress(
             final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters) {
-        return parseAddress(buf, cursor, delimiters, union(ADDRESS_STOP, delimiters));
+        return parseAddress(buf, cursor, delimiters, union(ADDRESS_STOP, delimiters), new UnclosedLiterals());
     }
 
-    private Address parseAddress(
-            final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters, final BitSet stopSet) {
+    private Address parseAddress(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
+            final BitSet stopSet, final UnclosedLiterals unclosed) {
         int start = cursor.getPos();
         String openingText = this.parser.parseValue(buf, cursor, stopSet);
         if (cursor.atEnd()) {
@@ -434,7 +472,7 @@ public class LenientAddressParser implements AddressParser {
         char current = (char) (buf.byteAt(pos) & 0xff);
         if (current == OPENING_BRACKET) {
             // name <localPart @ domain> form
-            return parseMailboxAddress(openingText, buf, cursor);
+            return parseMailboxAddress(openingText, buf, cursor, unclosed);
         } else if (current == AT) {
             // localPart @ domain form
             // Without joined whitespace nor quoted string, parsing it as a local part gives the
@@ -444,12 +482,12 @@ public class LenientAddressParser implements AddressParser {
                 ? openingText
                 : parseLocalPart(buf, new ParserCursor(start, pos), null);
             cursor.updatePos(pos + 1);
-            String domain = parseDomain(buf, cursor, delimiters);
+            String domain = parseDomain(buf, cursor, delimiters, unclosed);
             return new Mailbox(null, null, localPart, domain);
         } else if (current == COLON) {
             // group-name: localPart @ domain, name <localPart @ domain>; form
             cursor.updatePos(pos + 1);
-            List<Mailbox> mboxes = parseMailboxes(buf, cursor, SEMICOLON_ONLY);
+            List<Mailbox> mboxes = parseMailboxes(buf, cursor, SEMICOLON_ONLY, unclosed);
             if (!cursor.atEnd()) {
                 pos = cursor.getPos();
                 current = (char) (buf.byteAt(pos) & 0xff);
@@ -471,13 +509,14 @@ public class LenientAddressParser implements AddressParser {
 
     public AddressList parseAddressList(final ByteSequence buf, final ParserCursor cursor) {
         List<Address> addresses = new ArrayList<Address>();
+        UnclosedLiterals unclosed = new UnclosedLiterals();
         while (!cursor.atEnd()) {
             int pos = cursor.getPos();
             int current = (char) (buf.byteAt(pos) & 0xff);
             if (current == COMMA) {
                 cursor.updatePos(pos + 1);
             } else {
-                Address address = parseAddress(buf, cursor, COMMA_ONLY, ADDRESS_IN_LIST_STOP);
+                Address address = parseAddress(buf, cursor, COMMA_ONLY, ADDRESS_IN_LIST_STOP, unclosed);
                 if (address != null) {
                     addresses.add(address);
                 }

@@ -661,6 +661,36 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals("b[x[x[x", ((Mailbox) list.get(0)).getDomain().substring(0, 7));
     }
 
+    @Test(timeout = 5000)
+    public void parseAddressListShouldBeLinearOnEscapedCommasAfterUnclosedDomainLiterals() {
+        // each unit alone, and alternated with domains of another delimiter set
+        String[] units = {"a@[\\,", "g:a@[\\;", "a@[ \\,", "a@[\\\r\n,", "<a@[\\>", "a@[\\,<b@[x>"};
+        for (String unit : units) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 20000; i++) {
+                sb.append(unit);
+            }
+            AddressList list = parser.parseAddressList(sb);
+            if (unit.equals("a@[\\,")) {
+                Assert.assertEquals(20000, list.size());
+                Assert.assertEquals("[\\", ((Mailbox) list.get(0)).getDomain());
+            }
+        }
+    }
+
+    @Test
+    public void escapedDelimiterInAClosedDomainLiteralIsKept() throws Exception {
+        String[] texts = {"a@[x\\,y]", "b <a@[x\\>y]>", "g: a@[x\\;y];", "<@[x\\,y]:a@b>"};
+        for (String text : texts) {
+            MailboxList strict = DefaultAddressParser.DEFAULT.parseAddressList(text, DecodeMonitor.SILENT).flatten();
+            MailboxList lenient = parser.parseAddressList(text).flatten();
+            Assert.assertEquals(text, 1, lenient.size());
+            Assert.assertEquals(text, strict.get(0).getDomain(), lenient.get(0).getDomain());
+            Assert.assertEquals(text, strict.get(0).getLocalPart(), lenient.get(0).getLocalPart());
+        }
+        Assert.assertEquals("[x,y]", ((Mailbox) parser.parseAddressList("a@[x\\,y], b@c").get(0)).getDomain());
+    }
+
     @Test
     public void anUnclosedBracketShouldNotHideALaterDomainLiteral() {
         AddressList list = parser.parseAddressList("a@b[x [y, c@[1.2.3.4]");
