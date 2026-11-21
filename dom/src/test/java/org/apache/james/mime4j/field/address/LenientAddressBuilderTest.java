@@ -709,6 +709,32 @@ public class LenientAddressBuilderTest {
     }
 
     @Test
+    public void domainLiteralHoldingADelimiterIsOneMailboxLikeTheStrictParser() throws Exception {
+        String[] texts = {"a@[x,victim@example.com,]", "h@[,]", "g: a@[;];", "b <a@[x>y]>", "<@[x,y]:a@b>", "a@[x,y], b@c"};
+        for (String text : texts) {
+            MailboxList strict = DefaultAddressParser.DEFAULT.parseAddressList(text, DecodeMonitor.SILENT).flatten();
+            MailboxList lenient = parser.parseAddressList(text).flatten();
+            Assert.assertEquals(text, strict.size(), lenient.size());
+            Assert.assertEquals(text, strict.get(0).getDomain(), lenient.get(0).getDomain());
+            Assert.assertEquals(text, strict.get(0).getLocalPart(), lenient.get(0).getLocalPart());
+        }
+        Assert.assertEquals("[x,victim@example.com,]", parser.parseMailbox("a@[x,victim@example.com,]").getDomain());
+        // without a ']', the domain still ends at the comma
+        Assert.assertEquals(2, parser.parseAddressList("a@[x, b@c").size());
+    }
+
+    @Test(timeout = 5000)
+    public void parseAddressListShouldBeLinearOnUnclosedDomainLiteralsBetweenCommas() {
+        for (String unit : new String[] {"a@[x,", "a@[ \\\r\n[,", "g:a@[x;", "<a@[x>"}) {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 20000; i++) {
+                sb.append(unit);
+            }
+            parser.parseAddressList(sb);
+        }
+    }
+
+    @Test
     public void domainLiteralHoldingASemicolonKeepsTheGroupWhole() {
         Group group = new Group("team", new Mailbox("a", "[;]"), new Mailbox("b", "c"));
         String header = AddressFormatter.DEFAULT.encode(group);

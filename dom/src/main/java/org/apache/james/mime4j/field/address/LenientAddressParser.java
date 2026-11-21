@@ -23,9 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.james.mime4j.codec.DecodeMonitor;
 import org.apache.james.mime4j.codec.DecoderUtil;
@@ -91,22 +89,21 @@ public class LenientAddressParser implements AddressParser {
     }
 
     /**
-     * The searches for the ']' of a domain literal that failed in one parse, by delimiter set: every
-     * '[' before the index where such a search stopped has no ']' before that index either. A
-     * search from a later '[' starts unescaped, as the earlier search went on after it, so it
-     * stops at the same index: it is not repeated for each domain, which would be quadratic. The
-     * domain itself, copied by copyContent, can end before that index, at an escaped delimiter.
+     * The searches for the ']' of a domain literal that failed in one parse: every '[' before the
+     * index where such a search stopped has no ']' before that index either. A search from a later
+     * '[' starts unescaped, as the earlier search went on after it, so it stops at the same index:
+     * it is not repeated for each domain, which would be quadratic. Public entry points start a new
+     * memo: parse a whole list with {@link #parseAddressList}.
      */
     private static final class UnclosedLiterals {
-        private final Map<BitSet, Integer> until = new HashMap<BitSet, Integer>(4);
+        private int until = -1;
 
-        boolean isUnclosed(final BitSet delimiters, final int pos) {
-            Integer end = until.get(delimiters);
-            return end != null && pos < end;
+        boolean isUnclosed(final int pos) {
+            return pos < until;
         }
 
-        void unclosedUntil(final BitSet delimiters, final int end) {
-            until.put(delimiters, end);
+        void unclosedUntil(final int end) {
+            until = end;
         }
     }
 
@@ -125,8 +122,8 @@ public class LenientAddressParser implements AddressParser {
                 this.parser.skipWhiteSpace(buf, cursor);
             } else if (current == '(') {
                 this.parser.skipComment(buf, cursor);
-            } else if (current == '[' && !unclosed.isUnclosed(delimiters, cursor.getPos())
-                    && copyDomainLiteral(buf, cursor, delimiters, dst, unclosed)) {
+            } else if (current == '[' && !unclosed.isUnclosed(cursor.getPos())
+                    && copyDomainLiteral(buf, cursor, dst, unclosed)) {
                 continue;
             } else {
                 this.parser.copyContent(buf, cursor, delimiters, dst);
@@ -140,12 +137,14 @@ public class LenientAddressParser implements AddressParser {
      * (RFC 5322 section 3.4.1). A quoted pair (obs-dtext, section 4.4) is the escaped character alone,
      * as for the strict parser: its backslash is dropped, and an escaped ']' does not close the
      * literal. A line break after a backslash is unfolded, the quoted pair applying to the character
-     * after it. Returns true once copied. When no ']' comes before a delimiter, copies nothing,
-     * records in <code>unclosed</code> the index where the search stopped (the delimiter, or the
-     * upper bound) and returns false.
+     * after it. The delimiters of the caller (",", ";", "&gt;") are dtext too: a literal
+     * "[x,y]" is one domain, as for the strict parser. Returns true once copied. When no ']' comes
+     * before another unescaped '[', which cannot be in a literal, copies nothing, records in
+     * <code>unclosed</code> the index where the search stopped (that '[', or the upper bound) and
+     * returns false: the domain is then copied up to the next delimiter.
      */
-    private boolean copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final BitSet delimiters,
-                                      final StringBuilder dst, final UnclosedLiterals unclosed) {
+    private boolean copyDomainLiteral(final ByteSequence buf, final ParserCursor cursor, final StringBuilder dst,
+                                      final UnclosedLiterals unclosed) {
         int from = cursor.getPos();
         int to = cursor.getUpperBound();
         for (int i = from + 1; i < to; i++) {
@@ -172,12 +171,12 @@ public class LenientAddressParser implements AddressParser {
                 cursor.updatePos(i + 1);
                 return true;
             }
-            if (delimiters != null && delimiters.get(current)) {
-                unclosed.unclosedUntil(delimiters, i);
+            if (current == '[') {
+                unclosed.unclosedUntil(i);
                 return false;
             }
         }
-        unclosed.unclosedUntil(delimiters, to);
+        unclosed.unclosedUntil(to);
         return false;
     }
 
