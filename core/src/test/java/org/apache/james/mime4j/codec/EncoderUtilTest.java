@@ -382,9 +382,17 @@ public class EncoderUtilTest {
 
     @Test
     public void harmlessMalformedDomainsShouldBeKept() {
-        Assert.assertEquals("[", EncoderUtil.encodeAddressDomain("["));
         Assert.assertEquals("example.com.", EncoderUtil.encodeAddressDomain("example.com."));
         Assert.assertEquals("a..b", EncoderUtil.encodeAddressDomain("a..b"));
+    }
+
+    @Test
+    public void bracketsOutsideACompleteDomainLiteralShouldBeDropped() {
+        Assert.assertEquals("", EncoderUtil.encodeAddressDomain("["));
+        Assert.assertEquals("x", EncoderUtil.encodeAddressDomain("[x"));
+        Assert.assertEquals("x", EncoderUtil.encodeAddressDomain("x]"));
+        Assert.assertEquals("xy", EncoderUtil.encodeAddressDomain("[x]y"));
+        Assert.assertEquals("[x]", EncoderUtil.encodeAddressDomain("[x]"));
     }
 
     @Test

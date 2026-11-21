@@ -208,13 +208,18 @@ public class DefaultMessageWriterTest {
 
     @Test
     public void mailboxesParsedFromMalformedAddressesShouldBeWrittenBack() {
-        for (String address : new String[] {"a@[", "a@example.com.", "a@example..com"}) {
+        for (String address : new String[] {"a@example.com.", "a@example..com"}) {
             Mailbox parsed = LenientAddressParser.DEFAULT.parseMailbox(address);
 
             AddressListField field = Fields.to(parsed);
 
             assertThat(LenientAddressParser.DEFAULT.parseMailbox(field.getBody()).getDomain()).isEqualTo(parsed.getDomain());
         }
+        // An unclosed "[" would be read on to the "]" of a later address: it is dropped, the local part is kept
+        Mailbox parsed = LenientAddressParser.DEFAULT.parseMailbox("a@[");
+        Mailbox again = LenientAddressParser.DEFAULT.parseMailbox(Fields.to(parsed).getBody());
+        assertThat(again.getLocalPart()).isEqualTo("a");
+        assertThat(again.getDomain()).isNull();
     }
 
     @Test
