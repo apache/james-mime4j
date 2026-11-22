@@ -57,7 +57,8 @@ public class LenientAddressParser implements AddressParser {
     private static final BitSet COMMA_ONLY             = RawFieldParser.INIT_BITSET(COMMA);
     private static final BitSet COLON_ONLY             = RawFieldParser.INIT_BITSET(COLON);
     private static final BitSet SEMICOLON_ONLY         = RawFieldParser.INIT_BITSET(SEMICOLON);
-    private static final BitSet ROUTE_STOP             = RawFieldParser.INIT_BITSET(COMMA, COLON);
+    // "@" too: route domains may follow each other with no comma ("@a@b:"), as for the strict parser
+    private static final BitSet ROUTE_STOP             = RawFieldParser.INIT_BITSET(COMMA, COLON, AT);
     private static final BitSet MAILBOX_STOP           = RawFieldParser.INIT_BITSET(AT, OPENING_BRACKET);
     private static final BitSet ADDRESS_STOP           = RawFieldParser.INIT_BITSET(COLON, AT, OPENING_BRACKET);
     private static final BitSet BRACKETED_ROUTE_STOP   = union(ROUTE_STOP, CLOSING_BRACKET_ONLY);
@@ -220,7 +221,10 @@ public class LenientAddressParser implements AddressParser {
             }
             pos = cursor.getPos();
             current = (char) (buf.byteAt(pos) & 0xff);
-            if (current == COMMA) {
+            if (current == AT) {
+                // the next route domain, consumed at the top of the loop
+                continue;
+            } else if (current == COMMA) {
                 cursor.updatePos(pos + 1);
                 // obs-domain-list: a comma may be followed by empty elements ("@a,,@b:"),
                 // or end the list ("@a,:"). Anything else is left for the caller.
