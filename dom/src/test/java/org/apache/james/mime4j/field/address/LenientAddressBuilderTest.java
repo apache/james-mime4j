@@ -253,8 +253,29 @@ public class LenientAddressBuilderTest {
         Assert.assertEquals(null, mailbox.getDomain());
         DomainList route = mailbox.getRoute();
         Assert.assertNotNull(route);
-        Assert.assertEquals(1, route.size());
-        Assert.assertEquals("somehost.com@somehost.com", route.get(0));
+        Assert.assertEquals(2, route.size());
+        Assert.assertEquals("somehost.com", route.get(0));
+        Assert.assertEquals("somehost.com", route.get(1));
+    }
+
+    @Test
+    public void testParseRouteDomainsSeparatedByAtMatchStrictParser() throws Exception {
+        String[] inputs = {"<@a@[x,y]:b@c>", "<@a@[x:y]:b@c>", "x <@a@b@[x,y]:b@c>", "<@a @b:b@c>",
+            "<@a(x)@b,,@d:b@c>"};
+        for (String input : inputs) {
+            Mailbox strict = DefaultAddressParser.DEFAULT.parseMailbox(input);
+            Mailbox lenient = parser.parseMailbox(input);
+            Assert.assertEquals(input, "b@c", strict.getAddress());
+            Assert.assertEquals(input, strict.getAddress(), lenient.getAddress());
+            Assert.assertEquals(input, strict.getRoute().toRouteString(), lenient.getRoute().toRouteString());
+        }
+    }
+
+    @Test
+    public void testParseRouteEmptyDomainsBetweenAtsAreDropped() throws Exception {
+        Mailbox mailbox = parser.parseMailbox("<@@a@@b:b@c>");
+        Assert.assertEquals("b@c", mailbox.getAddress());
+        Assert.assertEquals("@a,@b", mailbox.getRoute().toRouteString());
     }
 
     @Test
