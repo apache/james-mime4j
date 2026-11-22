@@ -184,6 +184,65 @@ public class LenientAddressBuilderTest {
     }
 
     @Test
+    public void testParseRouteWithEmptyElement() throws Exception {
+        Mailbox mailbox = parser.parseMailbox("<@a,,@b:c@d>");
+        Assert.assertEquals("c", mailbox.getLocalPart());
+        Assert.assertEquals("d", mailbox.getDomain());
+        DomainList route = mailbox.getRoute();
+        Assert.assertNotNull(route);
+        Assert.assertEquals(2, route.size());
+        Assert.assertEquals("a", route.get(0));
+        Assert.assertEquals("b", route.get(1));
+
+        AddressList list = parser.parseAddressList("x <@a, ,@b:c@d>, e@f");
+        Assert.assertEquals(2, list.size());
+        Assert.assertEquals("c@d", ((Mailbox) list.get(0)).getAddress());
+        Assert.assertEquals("e@f", ((Mailbox) list.get(1)).getAddress());
+    }
+
+    @Test
+    public void testParseRouteEndingWithComma() throws Exception {
+        Mailbox mailbox = parser.parseMailbox("<@a, (x) ,:c@d>");
+        Assert.assertEquals("c@d", mailbox.getAddress());
+        Assert.assertEquals(1, mailbox.getRoute().size());
+        Assert.assertEquals("a", mailbox.getRoute().get(0));
+    }
+
+    @Test
+    public void testParseRouteEmptyElementsMatchStrictParser() throws Exception {
+        String[] inputs = {"<@a,,@b:c@d>", "<@a, ,@b:c@d>", "<@a,(x),@b:c@d>", "<@a,,,@b,,@e:c@d>",
+            "x <@a,,@b:c@d>"};
+        for (String input : inputs) {
+            Mailbox strict = DefaultAddressParser.DEFAULT.parseMailbox(input);
+            Mailbox lenient = parser.parseMailbox(input);
+            Assert.assertEquals(input, strict.getAddress(), lenient.getAddress());
+            Assert.assertEquals(input, strict.getRoute().toRouteString(), lenient.getRoute().toRouteString());
+        }
+    }
+
+    @Test
+    public void testParseRouteCommaNotFollowedByDomainKeepsCursor() throws Exception {
+        String s = "@a,,b";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        DomainList route = parser.parseRoute(raw, cursor, null);
+        Assert.assertEquals(1, route.size());
+        Assert.assertEquals(3, cursor.getPos());
+    }
+
+    @Test
+    public void testParseRouteEmptyElementsBeforeColonConsumeTheColon() throws Exception {
+        String s = "@a,,:x";
+        ByteSequence raw = ContentUtil.encode(s);
+        ParserCursor cursor = new ParserCursor(0, s.length());
+
+        DomainList route = parser.parseRoute(raw, cursor, null);
+        Assert.assertEquals(1, route.size());
+        Assert.assertEquals(5, cursor.getPos());
+    }
+
+    @Test
     public void testParseAddressStartingWithAt() throws Exception {
         String s = "<@somehost.com@somehost.com>";
         ByteSequence raw = ContentUtil.encode(s);

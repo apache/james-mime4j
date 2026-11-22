@@ -222,6 +222,16 @@ public class LenientAddressParser implements AddressParser {
             current = (char) (buf.byteAt(pos) & 0xff);
             if (current == COMMA) {
                 cursor.updatePos(pos + 1);
+                // obs-domain-list: a comma may be followed by empty elements ("@a,,@b:"),
+                // or end the list ("@a,:"). Anything else is left for the caller.
+                int afterComma = cursor.getPos();
+                current = skipEmptyRouteElements(buf, cursor);
+                if (current == COLON) {
+                    cursor.updatePos(cursor.getPos() + 1);
+                    break;
+                } else if (current != AT) {
+                    cursor.updatePos(afterComma);
+                }
             } else if (current == COLON) {
                 cursor.updatePos(pos + 1);
                 break;
@@ -230,6 +240,24 @@ public class LenientAddressParser implements AddressParser {
             }
         }
         return domains != null ? new DomainList(domains) : null;
+    }
+
+    /**
+     * Skips CFWS and commas. Returns the character the cursor then stands on, or -1 at the end.
+     */
+    private int skipEmptyRouteElements(final ByteSequence buf, final ParserCursor cursor) {
+        for (;;) {
+            this.parser.skipAllWhiteSpace(buf, cursor);
+            if (cursor.atEnd()) {
+                return -1;
+            }
+            int pos = cursor.getPos();
+            int current = (char) (buf.byteAt(pos) & 0xff);
+            if (current != COMMA) {
+                return current;
+            }
+            cursor.updatePos(pos + 1);
+        }
     }
 
     private Mailbox createMailbox(
