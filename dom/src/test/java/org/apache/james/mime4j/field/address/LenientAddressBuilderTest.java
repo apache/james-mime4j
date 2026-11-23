@@ -933,4 +933,24 @@ public class LenientAddressBuilderTest {
     public void bareDomainlessEncodedLocalPartIsStillDecoded() {
         Assert.assertEquals("a x", ((Mailbox) parser.parseAddressList("a =?utf-8?q?x?=").get(0)).getLocalPart());
     }
+
+    @Test
+    public void bareDomainlessEncodedLocalPartDecodingToALineBreakIsNotDecoded() {
+        // "x\r\nBcc: a@b" in base64
+        String encoded = "=?UTF-8?B?eA0KQmNjOiBhQGI=?=";
+
+        Mailbox fromAddressList = (Mailbox) parser.parseAddressList(encoded).get(0);
+        Mailbox fromAddress = (Mailbox) parser.parseAddress(encoded);
+        Mailbox fromMailbox = parser.parseMailbox(encoded);
+
+        Assert.assertEquals(encoded, fromAddressList.getAddress());
+        Assert.assertEquals(encoded, fromAddress.getAddress());
+        Assert.assertEquals(encoded, fromMailbox.getAddress());
+    }
+
+    @Test
+    public void bareDomainlessEncodedLocalPartDecodingToANulIsNotDecoded() {
+        String encoded = "=?UTF-8?Q?a=00b?=";
+        Assert.assertEquals(encoded, parser.parseMailbox(encoded).getLocalPart());
+    }
 }
