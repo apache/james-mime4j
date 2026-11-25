@@ -368,4 +368,19 @@ public class DefaultAddressBuilderTest {
         Assert.assertEquals("Jean \u00e9", named.getName());
         Assert.assertEquals(2, parser.parseAddressList("sender@example.com, \ufffd@x.tld").size());
     }
+
+    @Test
+    public void manyCommentsBetweenPhraseWordsShouldNotOverflowTheStack() throws ParseException {
+        StringBuilder sb = new StringBuilder("a");
+        StringBuilder expectedName = new StringBuilder("a");
+        for (int i = 0; i < 100000; i++) {
+            sb.append(" ()");
+            expectedName.append(' ');
+        }
+        sb.append(" b <x@y>");
+        expectedName.append(" b");
+        Mailbox mailbox = parser.parseMailbox(sb);
+        Assert.assertEquals("x@y", mailbox.getAddress());
+        Assert.assertEquals(expectedName.toString(), mailbox.getName());
+    }
 }
