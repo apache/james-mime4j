@@ -19,7 +19,9 @@
 
 package org.apache.james.mime4j.field.address;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 
@@ -196,9 +198,12 @@ class Builder {
     }
 
     private void addSpecials(StringBuilder out, Token specialToken) {
-        if (specialToken != null) {
-            addSpecials(out, specialToken.specialToken);
-            out.append(specialToken.image);
+        Deque<String> images = new ArrayDeque<>();
+        for (Token t = specialToken; t != null; t = t.specialToken) {
+            images.push(t.image);
+        }
+        while (!images.isEmpty()) {
+            out.append(images.pop());
         }
     }
 
