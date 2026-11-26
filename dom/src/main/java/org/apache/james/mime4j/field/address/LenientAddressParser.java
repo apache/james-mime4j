@@ -64,6 +64,9 @@ public class LenientAddressParser implements AddressParser {
     private static final BitSet BRACKETED_ROUTE_STOP   = union(ROUTE_STOP, CLOSING_BRACKET_ONLY);
     private static final BitSet ADDRESS_IN_LIST_STOP   = union(ADDRESS_STOP, COMMA_ONLY);
 
+    /** The RFC 5322 specials but ".", which a plain (dot-atom) local part does not hold. */
+    private static final String ADDRESS_SPECIALS       = "()<>[]:;@\\,\"";
+
     /**
      * Returns the union of a stop set with optional extra delimiters, sharing the
      * base set when there is nothing to add. Callers must not mutate the result.
@@ -380,26 +383,27 @@ public class LenientAddressParser implements AddressParser {
 
     /**
      * A mailbox without domain whose bare local part keeps its encoded words decoded (MIME4J-253).
-     * A decoded text holding a control character, such as CR or LF, is not a local part: the encoded
-     * form is kept, so that the address cannot carry a line break into a header it is written to.
+     * A decoded text holding a control character, such as CR or LF, or an RFC 5322 special, such as
+     * "@", is not a plain local part: the encoded form is kept, so that the address cannot carry a
+     * line break into a header it is written to, nor read as an address the header does not hold.
      */
     private Mailbox createMailbox(final String localPart) {
         if (localPart != null && localPart.length() > 0) {
             String decoded = DecoderUtil.decodeEncodedWords(localPart, this.monitor);
-            return new Mailbox(null, null, holdsControlChar(decoded) ? localPart : decoded, null);
+            return new Mailbox(null, null, isPlainLocalPart(decoded) ? decoded : localPart, null);
         } else {
             return null;
         }
     }
 
-    private static boolean holdsControlChar(final String text) {
+    private static boolean isPlainLocalPart(final String text) {
         for (int i = 0; i < text.length(); i++) {
             char c = text.charAt(i);
-            if (c < 0x20 || c == 0x7f) {
-                return true;
+            if (c < 0x20 || c == 0x7f || ADDRESS_SPECIALS.indexOf(c) >= 0) {
+                return false;
             }
         }
-        return false;
+        return true;
     }
 
     /**
