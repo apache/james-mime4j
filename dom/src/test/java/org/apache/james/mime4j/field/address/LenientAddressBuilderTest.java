@@ -330,8 +330,17 @@ public class LenientAddressBuilderTest {
 
     @Test
     public void testParseMailboxEncodedLocalPart() throws ParseException {
-        Mailbox mailbox1 = parser.parseMailbox("=?utf-8?B?IkvDpXJlIFPDpnRyZSIgPGtzQGRvbWFpbi5jb20+?=");
-        Assert.assertEquals("\"Kåre Sætre\" <ks@domain.com>", mailbox1.getLocalPart());
+        Mailbox mailbox1 = parser.parseMailbox("=?utf-8?B?S8OlcmUuU8OmdHJl?=");
+        Assert.assertEquals("Kåre.Sætre", mailbox1.getLocalPart());
+    }
+
+    @Test
+    public void testParseMailboxEncodedLocalPartDecodingToAMailboxIsNotDecoded() throws ParseException {
+        // "\"Kåre Sætre\" <ks@domain.com>" in base64
+        String encoded = "=?utf-8?B?IkvDpXJlIFPDpnRyZSIgPGtzQGRvbWFpbi5jb20+?=";
+        Mailbox mailbox1 = parser.parseMailbox(encoded);
+        Assert.assertEquals(encoded, mailbox1.getLocalPart());
+        Assert.assertNull(mailbox1.getDomain());
     }
 
     @Test
@@ -952,5 +961,37 @@ public class LenientAddressBuilderTest {
     public void bareDomainlessEncodedLocalPartDecodingToANulIsNotDecoded() {
         String encoded = "=?UTF-8?Q?a=00b?=";
         Assert.assertEquals(encoded, parser.parseMailbox(encoded).getLocalPart());
+    }
+
+    @Test
+    public void bareDomainlessEncodedLocalPartDecodingToAnAddressIsNotDecoded() {
+        // "ceo@corp.com" in Q and B encodings
+        for (String encoded : new String[] {"=?UTF-8?Q?ceo=40corp.com?=", "=?UTF-8?B?Y2VvQGNvcnAuY29t?="}) {
+            Mailbox fromAddressList = (Mailbox) parser.parseAddressList(encoded).get(0);
+            Mailbox secondInList = (Mailbox) parser.parseAddressList("alice@example.org, " + encoded).get(1);
+            Mailbox fromAddress = (Mailbox) parser.parseAddress(encoded);
+            Mailbox fromMailbox = parser.parseMailbox(encoded);
+
+            for (Mailbox mailbox : new Mailbox[] {fromAddressList, secondInList, fromAddress, fromMailbox}) {
+                Assert.assertEquals(encoded, mailbox.getAddress());
+                Assert.assertNull(mailbox.getDomain());
+            }
+        }
+    }
+
+    @Test
+    public void bareDomainlessEncodedLocalPartDecodingToASpecialIsNotDecoded() {
+        // "<", ">", ",", ";", ":", "\"", "(", ")", "[", "]" and "\\" Q-encoded
+        for (String special : new String[] {"=3C", "=3E", "=2C", "=3B", "=3A", "=22", "=28", "=29", "=5B", "=5D", "=5C"}) {
+            String encoded = "=?UTF-8?Q?a" + special + "b?=";
+            Assert.assertEquals(encoded, parser.parseMailbox(encoded).getLocalPart());
+        }
+    }
+
+    @Test
+    public void bareDomainlessEncodedLocalPartDecodingToAPlainLocalPartIsDecoded() {
+        Assert.assertEquals("j\u00f6rg.m\u00fcller", parser.parseMailbox("=?UTF-8?Q?j=C3=B6rg.m=C3=BCller?=").getAddress());
+        Assert.assertEquals("j\u00f6rg.m\u00fcller",
+            ((Mailbox) parser.parseAddressList("alice@example.org, =?UTF-8?B?asO2cmcubcO8bGxlcg==?=").get(1)).getAddress());
     }
 }
