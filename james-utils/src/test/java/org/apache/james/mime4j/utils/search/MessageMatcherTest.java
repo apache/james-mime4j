@@ -225,6 +225,25 @@ public class MessageMatcherTest {
         assertThat(messageMatcher.messageMatches(stream("the first and the second"))).isFalse();
     }
 
+    @Test
+    public void bodyWithAnUnknownCharsetShouldStillBeSearched() throws Exception {
+        MessageMatcher messageMatcher = MessageMatcher.builder()
+            .searchContents(Lists.<CharSequence>newArrayList("aB"))
+            .build();
+        assertThat(messageMatcher.messageMatches(stream("Content-Type: text/plain; charset=x-unknown\r\n\r\naB"))).isTrue();
+    }
+
+    @Test
+    public void bodyWithAnUnknownCharsetShouldNotStopTheSearchOfTheOtherParts() throws Exception {
+        MessageMatcher messageMatcher = MessageMatcher.builder()
+            .searchContents(Lists.<CharSequence>newArrayList("needle"))
+            .build();
+        assertThat(messageMatcher.messageMatches(stream("Content-Type: multipart/mixed; boundary=b\r\n\r\n"
+            + "--b\r\nContent-Type: text/plain; charset=\"UC\"64\r\n\r\nother\r\n"
+            + "--b\r\nContent-Type: text/plain\r\n\r\nneedle\r\n"
+            + "--b--\r\n"))).isTrue();
+    }
+
     private InputStream stream(String content) {
         return new ByteArrayInputStream(content.getBytes(StandardCharsets.US_ASCII));
     }
