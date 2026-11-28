@@ -32,8 +32,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.nio.CharBuffer;
 import java.nio.charset.IllegalCharsetNameException;
+import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -210,8 +212,21 @@ public class MessageMatcher {
     }
 
     private boolean checkBody(final List<NeedleMatcher> matchers, MimeTokenStream parser) throws IOException {
-        try (Reader reader = parser.getReader()) {
+        try (Reader reader = bodyReader(parser)) {
             return searchIn(reader, matchers);
+        }
+    }
+
+    /**
+     * A body whose charset is unknown is read as US-ASCII, as a body without charset: it is
+     * still searched, and the search goes on with the other parts.
+     */
+    private Reader bodyReader(MimeTokenStream parser) {
+        try {
+            return parser.getReader();
+        } catch (UnsupportedEncodingException e) {
+            logger.debug("Unknown body charset, read as US-ASCII.", e);
+            return new InputStreamReader(parser.getDecodedInputStream(), StandardCharsets.US_ASCII);
         }
     }
 
